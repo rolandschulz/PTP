@@ -16,6 +16,7 @@
           <anchor id="ptpRun"/>
           <!-- FIXME make order consistent with toc.xml -->
           <topic label="Running Open MPI Jobs" href="html/rms/openMPI.html"/>
+          <topic label="Running SLURM Jobs" href="html/rms/slurm.html"/>
           <topic label="Running SLURM ALPS Jobs" href="html/rms/slurmalps.html"/>
           <topic label="Running Grid Engine Jobs" href="html/rms/gridengine.html"/>
           <topic label="Running IBM PE Jobs" href="html/rms/ibm-pe.html"/>

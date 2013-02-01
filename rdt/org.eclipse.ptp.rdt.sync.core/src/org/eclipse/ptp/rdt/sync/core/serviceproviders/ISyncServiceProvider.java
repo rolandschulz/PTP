@@ -36,13 +36,6 @@ public interface ISyncServiceProvider extends IRemoteExecutionServiceProvider {
 	 * @return location
 	 */
 	public String getLocation();
-	
-	/**
-	 * Get the location of the tool (binary) for executing this sync service provider.
-	 * 
-	 * @return location
-	 */
-	public String getToolLocation();
 
 	/**
 	 * Get the remote connection used by this sync service provider.

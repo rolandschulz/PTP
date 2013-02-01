@@ -94,8 +94,8 @@ public class NewRemoteSyncProjectWizardOperation {
 		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();	
 		// Create build scenario based on initial remote location information
 		ISyncServiceProvider provider = participant.getProvider(project);
-		BuildScenario remoteBuildScenario = new BuildScenario(provider.getName(), provider.getToolLocation(),
-				provider.getRemoteConnection(), provider.getLocation());
+		BuildScenario remoteBuildScenario = new BuildScenario(provider.getName(), provider.getRemoteConnection(),
+				provider.getLocation());
 		
 		// Initialize project with this build scenario, which will be applied to all current configurations.
 		// Note then that we initially assume all configs are remote.

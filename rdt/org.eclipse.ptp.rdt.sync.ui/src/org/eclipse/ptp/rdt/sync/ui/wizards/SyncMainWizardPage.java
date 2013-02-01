@@ -421,16 +421,8 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	}
 
 	protected boolean validateRemoteLocation() {
-		String participantErrorMessage = fSelectedParticipant.getErrorMessage();
-		if (participantErrorMessage != null) {
-			errorMessage = participantErrorMessage;
-		}
-		String participantMessage = fSelectedParticipant.getMessage();
-		if (participantMessage != null) {
-			message = participantMessage;
-			messageType = fSelectedParticipant.getMessageType();
-		}
-		return participantErrorMessage == null && fSelectedParticipant.isConfigComplete();
+		errorMessage = fSelectedParticipant.getErrorMessage();
+		return fSelectedParticipant.getErrorMessage() == null && fSelectedParticipant.isConfigComplete();
 	}
 
 	/*

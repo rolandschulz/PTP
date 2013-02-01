@@ -50,12 +50,10 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	public static final String ID = "org.eclipse.ptp.rdt.sync.git.core.GitServiceProvider"; //$NON-NLS-1$
 
 	private static final String GIT_LOCATION = "location"; //$NON-NLS-1$
-	private static final String GIT_TOOL_LOCATION = "tool-location"; //$NON-NLS-1$
 
 	private static final String GIT_CONNECTION_NAME = "connectionName"; //$NON-NLS-1$
 	private static final String GIT_SERVICES_ID = "servicesId"; //$NON-NLS-1$
 	private String fLocation = null;
-	private String fToolLocation = null;
 	private IRemoteConnection fConnection = null;
 	private boolean hasBeenSynced = false;
 
@@ -135,17 +133,6 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		}
 		return fLocation;
 	}
-	
-	/**
-	 * Get the tool (binary) 
-	 * Get the location of the tool (binary) used for synchronization.
-	 */
-	public String getToolLocation() {
-		if (fToolLocation == null) {
-			fToolLocation = getString(GIT_TOOL_LOCATION, null);
-		}
-		return fToolLocation;
-	}
 
 	/**
 	 * Get the remote connection used for synchronization
@@ -201,22 +188,6 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		}
 		fLocation = location;
 		putString(GIT_LOCATION, location);
-	}
-	
-	/**
-	 * Set the tool (binary) location that will be used for synchronization
-	 * 
-	 * @param location
-	 *            tool path
-	 * @throws RuntimeException
-	 *             if already set. Changing these local parameters is not currently supported but should be possible.
-	 */
-	public void setToolLocation(String location) {
-		if (fToolLocation != null) {
-			throw new RuntimeException(Messages.GitServiceProvider_6);
-		}
-		fToolLocation = location;
-		putString(GIT_TOOL_LOCATION, location);
 	}
 
 	/**
@@ -445,8 +416,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	}
 	
 	// Return appropriate sync connection or null for scenarios with no sync provider or if the connection is missing.
-	// Creates a new sync connection if necessary. This function must properly maintain the map of connections and also remember to set
-	// the file filter (always, not just for new connections).
+	// Creates a new sync connection if necessary. This function must properly maintain the map of connections and also remember
+	// to set the file filter (always, not just for new connections).
 	// TODO: Create progress monitor if passed monitor is null.
 	private synchronized GitRemoteSyncConnection getSyncConnection(IProject project, BuildScenario buildScenario,
 			SyncFileFilter fileFilter, IProgressMonitor monitor) throws RemoteSyncException {
@@ -457,8 +428,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			ProjectAndScenario pas = new ProjectAndScenario(project, buildScenario);
 			if (!syncConnectionMap.containsKey(pas)) {
 				try {
-					GitRemoteSyncConnection grsc = new GitRemoteSyncConnection(project, project.getLocation().toString(), buildScenario,
-							fileFilter, monitor);
+					GitRemoteSyncConnection grsc = new GitRemoteSyncConnection(project, project.getLocation().toString(),
+							buildScenario, fileFilter, monitor);
 					syncConnectionMap.put(pas, grsc);
 				} catch (MissingConnectionException e) {
 					return null;
