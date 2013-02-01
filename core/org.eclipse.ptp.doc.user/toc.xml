@@ -7,15 +7,20 @@
       <topic label="Prerequisites" href="html/00prereqs.html"/>
       <topic label="New and Noteworthy"  href="html/00newNoteworthy.html"/> 
       <topic label="Introduction to PTP Project Types"  href="html/localVsRemote.html"/>
+
       <topic label="Introduction to Creating MPI Projects" href="html/01buildMPIprog.html"/> 
       <topic label="Synchronized Projects" href="html/sync.html"/>
       <topic label="Configuring Environment Modules" href="html/modules.html"/>
       <topic label="Recognizing Compiler Errors: Cray, PGI, and Open64" href="html/errorParsers.html"/>
       <topic label="Running Parallel Programs"  href="html/03pRunConfig.html"> 
           <anchor id="ptpRun"/>
+          <!-- FIXME make order consistent with toc.xml -->
           <topic label="Running Open MPI Jobs" href="html/rms/openMPI.html"/>
           <topic label="Running SLURM ALPS Jobs" href="html/rms/slurmalps.html"/>
           <topic label="Running Grid Engine Jobs" href="html/rms/gridengine.html"/>
+          <topic label="Running IBM PE Jobs" href="html/rms/ibm-pe.html"/>
+          <topic label="Running PBS Jobs" href="html/rms/pbs.html"/>
+          <topic label="Running IBM LoadLeveler Jobs" href="html/rms/ibm-ll.html"/>
           <topic label="Running Jobs on JSC JUDGE" href="html/rms/de.fz-juelich.judge.html"/>
           <topic label="Running Jobs on JSC JUROPA" href="html/rms/de.fz-juelich.juropa.html"/>
           <topic label="Running Jobs on JSC JUQUEEN" href="html/rms/de.fz-juelich.juqueen.html"/>
@@ -23,6 +28,7 @@
       <topic label="Monitoring Jobs and Systems" href="html/05monitoring.html"/>
       <topic label="Parallel Debugging"  href="html/06parDebugging.html"/>
       <topic label="Preferences" href="html/07ptpPrefs.html"/>
+      <topic label="Managing Remote Connections with Remote Tools" href="html/remoteTools.html"/>
       <topic label="Parallel Language Development Tools (PLDT)">
       	<anchor id="ptpPLDT"/>
       </topic>

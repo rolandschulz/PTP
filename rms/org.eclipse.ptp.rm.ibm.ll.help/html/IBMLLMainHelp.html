@@ -22,14 +22,17 @@ allows you to run a parallel or serial application (job) using the Tivoli
 Workload Scheduler LoadLeveler from within the PTP framework. In addition to running parallel 
 and serial jobs, you can monitor their status and control their execution from within PTP.</p>
 
-<!-- NEEDS UPDATING FOR PTP 6.0 -->
+<!----------- caveat for PTP 6.0 ------------>
 <p><b>Note:</b> PTP 6.0 does not require the creation of separate <i>Resource Managers</i>
 and instead, the target configuration is specified on the Run Configuration dialog.
-This document has not yet been updated for PTP 6.0, but the Resources tab on the
-new Run Configuration menu should have approximately the same information as 
-the Resource manager setup dialog described here, but this can vary depending on the 
-target configuration / resource manager.
-<!--  -------------------------- -->
+
+This document describes the legacy (proxy-based) Resource Managers supported in versions of PTP
+prior to PTP 6.0.  Target System Configurations replace Resource Managers in PTP 6.0 and beyond.
+<ul>
+<li>For more up-to-date information on launching IBM LoadLeveler jobs with PE, see
+      <a href="PLUGINS_ROOT/org.eclipse.ptp.doc.user/html/rms/ibm-ll.html">Launching jobs with IBM LoadLeveler</a>
+</ul>
+<!--  ------------------------------------- -->
 
 <h2><A name=requirements></A>Requirements</h2>
 <p>In addition to having Eclipse and PTP installed, you need to have the following software packages installed.</p>

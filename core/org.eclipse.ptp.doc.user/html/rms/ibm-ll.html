@@ -1,0 +1,57 @@
+<html>
+<head>
+<title>IBM LoadLeveler</title>
+<link rel="stylesheet" type="text/css" href="../help.css">
+<script type="text/javascript" src="thumb.js"> </script>
+</head>
+<body>
+
+<h1 id="top">IBM LoadLeveler</h1>
+<p>This section describes how to set up a run configuration using IBM LoadLeveler as a PTP target system configuration
+<ul>
+<li>For related information see the <a href="ibm-pe.html">IBM PE</a> target system configuration.
+<li>For information about the legacy (proxy-based) resource manager for IBM LoadLeveler from prior PTP releases,
+see
+  <a href="PLUGINS_ROOT/org.eclipse.ptp.rm.ibm.ll.help/html/IBMLLMainHelp.html">IBM LoadLeveler proxy-based resource manager.</a>
+</ul>
+<p>As described in <a href="../03pRunConfig.html">Running Parallel Programs</a>, next create a run configuration
+via Run > Run Configurations ... and create a new <b>Parallel Application</b>.
+
+<p>The specifics for running an IBM LoadLeveler parallel application with PTP are specified on
+the <b>Resources</b> tab of the run configuration.
+For <b>Target System Configuration</b>, select <b>IBM LoadLeveler</b>
+<p><img src="../images/rms-ibmll1.png">
+<p id=connection>Then specify a connection.  If you have already specified a connection, e.g.
+for a <a href="../sync.html">Synchronized Project</a> or a remote project,
+it will be selected already.
+If you are launching a local application (on the same machine where Eclipse is running), 
+you must specify a connection back to the local machine.
+
+<p id=pe>After selecting IBM LoadLeveler, the Resources tab will be filled with information specific to this
+target configuration.  
+This area usually (depending on the target system configuration) includes further tabs to
+segment the other information you can provide.
+Fill in the IBM LoadLeveler options you need. 
+
+<p>To see the information that will be passed, via environment variables etc., to the target system, click on the
+<b>View Configuration</b> button at the bottom of the Resources tab area.
+
+<p id=environmentVars>For Environment variables that don't have a corresponding text field or other way to enter the information
+in the UI, you can use the <b>Environment</b> tab.  For example, to fill in a LoadLeveler reservation id,
+create a new environment variable by clicking on the <b>New</b> button.  Enter the name and value for the variable
+and click the <b>OK</b> button. The environment variable will be submitted with the job.
+<p><img src="../images/rms-ibmpe5-env.png">
+
+<p>Now continue with the 
+<a href="../03pRunConfig.html#application">run configuration setup for running your parallel application</a> by specifying the Application program
+on the <b>Application</b> tab, and any other information required.
+
+
+<p>&nbsp
+<p><a href="#top">Back to Top</a> | <a href="../toc.html">Back to Table of Contents</a>
+</body>
+</html>
+
+
+
+
