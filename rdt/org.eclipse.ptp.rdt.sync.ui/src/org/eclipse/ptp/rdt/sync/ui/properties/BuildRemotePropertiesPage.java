@@ -212,7 +212,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 
 		// browse button
 		fBrowseButton = new Button(composite, SWT.PUSH);
-		fBrowseButton.setText(Messages.BRPPage_BrowseButton);
+		fBrowseButton.setText(Messages.BuildRemotePropertiesPage_5);
 		fBrowseButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {

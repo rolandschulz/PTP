@@ -33,14 +33,14 @@ public interface ISyncServiceProvider extends IRemoteExecutionServiceProvider {
 	/**
 	 * Get the build location specified by this sync service provider.
 	 * 
-	 * @return
+	 * @return location
 	 */
 	public String getLocation();
 
 	/**
 	 * Get the remote connection used by this sync service provider.
 	 * 
-	 * @return
+	 * @return connection
 	 */
 	public IRemoteConnection getRemoteConnection();
 

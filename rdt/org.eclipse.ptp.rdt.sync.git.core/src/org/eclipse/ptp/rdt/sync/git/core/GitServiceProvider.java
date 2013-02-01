@@ -31,9 +31,9 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.MissingConnectionException;
+import org.eclipse.ptp.rdt.sync.core.RecursiveSubMonitor;
 import org.eclipse.ptp.rdt.sync.core.RemoteSyncException;
 import org.eclipse.ptp.rdt.sync.core.RemoteSyncMergeConflictException;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
@@ -224,7 +224,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 */
 	public void synchronize(final IProject project, BuildScenario buildScenario, IResourceDelta delta, SyncFileFilter fileFilter,
 			IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException {
-		SubMonitor progress = SubMonitor.convert(monitor, Messages.GSP_SyncTaskName, 130);
+		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 1000);
 		
 		// On first sync, place .gitignore in directories. This is useful for folders that are already present and thus are never
 		// captured by a resource add or change event. (This can happen for projects converted to sync projects.)
@@ -335,7 +335,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			// lock syncLock. interruptible by progress monitor
 			try {
 				while (!syncLock.tryLock(50, TimeUnit.MILLISECONDS)) {
-					if (progress.isCanceled()) {
+					if (subMon.isCanceled()) {
 						throw new CoreException(new Status(IStatus.CANCEL, Activator.PLUGIN_ID, Messages.GitServiceProvider_1));
 					}
 				}
@@ -363,7 +363,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 					throw new RuntimeException(Messages.GitServiceProvider_3 + project.getName());
 				}
 
-				GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, buildScenario, fileFilter, progress);
+				subMon.subTask(Messages.GitServiceProvider_7);
+				GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, buildScenario, fileFilter, subMon.newChild(98));
 				if (fSyncConnection == null) {
 					// Should never happen
 					if (buildScenario.getSyncProvider() == null) {
@@ -385,11 +386,13 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				}
 				
 				try {
-					fSyncConnection.sync(progress.newChild(40), true);
+					subMon.subTask(Messages.GitServiceProvider_8);
+					fSyncConnection.sync(subMon.newChild(900), true);
 				// Unlike other exceptions, we need to do some post-sync activities after a merge exception.
 				// TODO: Refactor code to get rid of duplication of post-sync activities.
 				} catch (RemoteSyncMergeConflictException e) {
-					project.refreshLocal(IResource.DEPTH_INFINITE, progress.newChild(20));
+					subMon.subTask(Messages.GitServiceProvider_9);
+					project.refreshLocal(IResource.DEPTH_INFINITE, subMon.newChild(1));
 					throw e;
 				}
 				finishedSyncTaskId = willFinishTaskId;
@@ -403,7 +406,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			SyncManager.setShowErrors(project, true);
 			
 			// Refresh after sync to display changes
-			project.refreshLocal(IResource.DEPTH_INFINITE, progress.newChild(20));
+			subMon.subTask(Messages.GitServiceProvider_10);
+			project.refreshLocal(IResource.DEPTH_INFINITE, subMon.newChild(1));
 		} finally {
 			if (monitor != null) {
 				monitor.done();
@@ -412,27 +416,33 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	}
 	
 	// Return appropriate sync connection or null for scenarios with no sync provider or if the connection is missing.
-	// Creates a new sync connection if necessary. This function must properly maintain the map of connections and also remember to set
-	// the file filter (always, not just for new connections).
+	// Creates a new sync connection if necessary. This function must properly maintain the map of connections and also remember
+	// to set the file filter (always, not just for new connections).
 	// TODO: Create progress monitor if passed monitor is null.
 	private synchronized GitRemoteSyncConnection getSyncConnection(IProject project, BuildScenario buildScenario,
-			SyncFileFilter fileFilter, SubMonitor progress) throws RemoteSyncException {
-		if (buildScenario.getSyncProvider() == null) {
-			return null;
-		}
-		ProjectAndScenario pas = new ProjectAndScenario(project, buildScenario);
-		if (!syncConnectionMap.containsKey(pas)) {
-			try {
-				GitRemoteSyncConnection grsc = new GitRemoteSyncConnection(project, project.getLocation().toString(), buildScenario,
-						fileFilter, progress);
-				syncConnectionMap.put(pas, grsc);
-			} catch (MissingConnectionException e) {
+			SyncFileFilter fileFilter, IProgressMonitor monitor) throws RemoteSyncException {
+		try {
+			if (buildScenario.getSyncProvider() == null) {
 				return null;
 			}
+			ProjectAndScenario pas = new ProjectAndScenario(project, buildScenario);
+			if (!syncConnectionMap.containsKey(pas)) {
+				try {
+					GitRemoteSyncConnection grsc = new GitRemoteSyncConnection(project, project.getLocation().toString(),
+							buildScenario, fileFilter, monitor);
+					syncConnectionMap.put(pas, grsc);
+				} catch (MissingConnectionException e) {
+					return null;
+				}
+			}
+			GitRemoteSyncConnection fSyncConnection = syncConnectionMap.get(pas);
+			fSyncConnection.setFileFilter(fileFilter);
+			return fSyncConnection;
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
 		}
-		GitRemoteSyncConnection fSyncConnection = syncConnectionMap.get(pas);
-		fSyncConnection.setFileFilter(fileFilter);
-		return fSyncConnection;
 	}
 
 	/*

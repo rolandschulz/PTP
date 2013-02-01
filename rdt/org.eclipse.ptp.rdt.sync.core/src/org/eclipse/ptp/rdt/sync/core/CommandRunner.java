@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Oak Ridge National Laboratory and others.
+ * Copyright (c) 2012 Oak Ridge National Laboratory and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -175,6 +175,9 @@ public class CommandRunner {
 	 * 
 	 * @param conn
 	 * @param command
+	 * @param remoteDirectory
+	 * 					Working directory for command
+	 * @param monitor
 	 * @return CommandResults (contains stdout, stderr, and exit code)
 	 * @throws IOException
 	 *             in several cases if there is a problem communicating with the remote host.
@@ -200,7 +203,10 @@ public class CommandRunner {
 	 * Execute command on a remote host and wait for the command to complete.
 	 * 
 	 * @param conn
-	 * @param command
+	 * @param commandList
+	 * @param remoteDirectory
+	 * 					Working directory for command
+	 * @param monitor
 	 * @return CommandResults (contains stdout, stderr, and exit code)
 	 * @throws IOException
 	 *             in several cases if there is a problem communicating with the remote host.
@@ -214,42 +220,48 @@ public class CommandRunner {
 	public static CommandResults executeRemoteCommand(IRemoteConnection conn, List<String> commandList, String remoteDirectory,
 															IProgressMonitor monitor) throws 
 																	IOException, InterruptedException, RemoteConnectionException, RemoteSyncException {
-	
-		
-		if (!conn.isOpen()) {
-			conn.open(monitor);
-		}
-		final IRemoteProcessBuilder rpb = conn.getRemoteServices().getProcessBuilder(conn, commandList);
-		final IRemoteFileManager rfm = conn.getRemoteServices().getFileManager(conn);
-		rpb.directory(rfm.getResource(remoteDirectory));
+		RecursiveSubMonitor progress = RecursiveSubMonitor.convert(monitor, 100);
+		try {
+			progress.subTask(Messages.CommandRunner_4);
+			conn.open(progress.newChild(50));
+			final IRemoteProcessBuilder rpb = conn.getRemoteServices().getProcessBuilder(conn, commandList);
+			final IRemoteFileManager rfm = conn.getRemoteServices().getFileManager(conn);
+			if (remoteDirectory != null && remoteDirectory.length() > 0) {
+				rpb.directory(rfm.getResource(remoteDirectory));
+			}
 
-		// Run process and stream readers
-		OutputStream output = new ByteArrayOutputStream();
-		OutputStream error = new ByteArrayOutputStream();
-	
+			// Run process and stream readers
+			OutputStream output = new ByteArrayOutputStream();
+			OutputStream error = new ByteArrayOutputStream();
 
-		IRemoteProcess rp = rpb.start();
-		StreamCopyThread getOutput = new StreamCopyThread(rp.getInputStream(), output);
-		StreamCopyThread getError = new StreamCopyThread(rp.getErrorStream(), error);
-		getOutput.start();
-		getError.start();
-		//wait for EOF with the change for the ProcessMonitor to cancel
-		for (;;) {
-			getOutput.join(250);
-			if (!getOutput.isAlive()) break;
-			if (monitor!=null && monitor.isCanceled()) {
-				throw new RemoteSyncException(new Status(IStatus.CANCEL, RDTSyncCorePlugin.PLUGIN_ID, Messages.CommandRunner_0));
+			progress.subTask(Messages.CommandRunner_3);
+			IRemoteProcess rp = rpb.start();
+			StreamCopyThread getOutput = new StreamCopyThread(rp.getInputStream(), output);
+			StreamCopyThread getError = new StreamCopyThread(rp.getErrorStream(), error);
+			getOutput.start();
+			getError.start();
+			//wait for EOF with the change for the ProcessMonitor to cancel
+			for (;;) {
+				getOutput.join(250);
+				if (!getOutput.isAlive()) break;
+				if (progress.isCanceled()) {
+					throw new RemoteSyncException(new Status(IStatus.CANCEL, RDTSyncCorePlugin.PLUGIN_ID, Messages.CommandRunner_0));
+				}
+			}
+			//rp and getError should be finished as soon as getOutput is finished
+			int exitCode = rp.waitFor();
+			getError.halt();
+
+			final CommandResults commandResults = new CommandResults();
+			commandResults.setExitCode(exitCode);
+			commandResults.setStdout(output.toString());
+			commandResults.setStderr(error.toString());
+			return commandResults;
+		} finally {
+			if (monitor != null) {
+				monitor.done();
 			}
 		}
-		//rp and getError should be finished as soon as getOutput is finished
-		int exitCode = rp.waitFor();
-		getError.halt();
-		
-		final CommandResults commandResults = new CommandResults();
-		commandResults.setExitCode(exitCode);
-		commandResults.setStdout(output.toString());
-		commandResults.setStderr(error.toString());
-		return commandResults;
 	}
 
 	// Enforce as static
