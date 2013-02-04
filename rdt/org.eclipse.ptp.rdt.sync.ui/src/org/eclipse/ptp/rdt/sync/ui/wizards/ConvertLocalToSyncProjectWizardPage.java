@@ -37,7 +37,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
@@ -324,8 +323,8 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 
 			// Create a remote build scenario
 			ISyncServiceProvider provider = participant.getProvider(project);
-			BuildScenario remoteBuildScenario = new BuildScenario(provider.getName(), provider.getToolLocation(),
-					provider.getRemoteConnection(), provider.getLocation());
+			BuildScenario remoteBuildScenario = new BuildScenario(provider.getName(), provider.getRemoteConnection(),
+					provider.getLocation());
 
 			Object[] selectedConfigs = fConfigTable.getCheckedElements();
 			Set<Object> selectedConfigsSet = new HashSet<Object>(Arrays.asList(selectedConfigs));
@@ -478,32 +477,6 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 		}
 		setPageComplete(super.validatePage() && errMsg == null);
 		return errMsg;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.dialogs.DialogPage#getMessage()
-	 */
-	@Override
-	public String getMessage() {
-		if (fSelectedProvider != null) {
-			return fSelectedProvider.getParticipant().getMessage();
-		}
-
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.dialogs.DialogPage#getMessageType()
-	 */
-	@Override
-	public int getMessageType() {
-		if (fSelectedProvider != null) {
-			return fSelectedProvider.getParticipant().getMessageType();
-		}
-
-		return IMessageProvider.NONE;
 	}
 
 	/**

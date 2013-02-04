@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?NLS TYPE="org.eclipse.help.toc"?>
-
+<!-- ** UNUSED *** superceded by more recent info in org.eclipse.ptp.doc.user, this info is no longer
+   put in toc - extension point removed from plugin.xml    -->
 <toc label="Running SLURM Jobs" link_to="../org.eclipse.ptp.doc.user/toc.xml#ptpRun">
 <topic label="Running SLURM Jobs">
    <topic href="html/toc.html" label="Contents"></topic>

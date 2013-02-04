@@ -13,7 +13,7 @@ It will cover the following topics:</p>
 <li><a href="#perspective">System Monitoring perspective</a></li>
 <li><a href="#monitors">Monitors view</a></li>
 <li><a href="#system">System view</a></li>
-<li><a href="#jobs">Active/Inactive Jobs viewa</a></li>
+<li><a href="#jobs">Active/Inactive Jobs view</a></li>
 <li><a href="#messages">Messages view</a></li>
 <li><a href="#console">Console view</a></li>
 </ul>
@@ -42,20 +42,32 @@ to connect to the remote system, and a System Type column that shows the type of
 <p>Using the toolbar buttons on this view, it is possible to start and stop monitoring a system, request a manual refresh, and add and remove monitors respectively.
 It is only possible to have one monitor for each combination of connection name and system type.</p>
 
-<h3 id="system">System View</h3>
+<h2 id="system">System View</h2>
 
-The System view provides an overall view of the activity on the target remote system. The view tab will contain the name of the remote system
+The System view provides an overall view of the activity on the target remote system. 
+This view is typically on the right side of the perspective and takes up the major part of the window.
+The view tab will contain the name of the remote system
 (as provided by the target system configuration). The layout of this view will depend on the configuration of
 the target system, but will generally consist of a number of boxes that represent aggregations of computing resources (such as racks). These boxes may in turn 
 contain other elements that represent the computing resources (such as nodes). The color of the boxes is used to indicate which jobs are running on the nodes.
 <p>
 The view currently supports two mouse actions. Hovering over an element in the view will display a tooltip box with information about that element, including
-which jobs are associated with the element. Clicking on an element will highlight all associated elements (those with the same color) in the display. This
+which jobs are associated with the element. Clicking on an element will highlight all associated elements (which will also be the same color) in the display. This
 shows the user where a particular job is running on the system.
 
 <p><img src="images/05sysMonView1.png"></p>
 
-<h3 id="jobs">Active/Inactive Jobs Views</h3>
+<p>The System View supports zooming from the arrow buttons in the upper right area of the view.
+Zooming out successively will show, depending on the machine being monitored, successively higher levels of aggregation,
+from the individual cores out to the entire system.  Some of these views will show a bar-graph like area for each
+component, with the colored areas showing a percentage of the component that the job is taking up.
+<p><img src="images/05sysMonView2_zoom1.png"></p>
+<p>The same system zoomed out once:
+<p><img src="images/05sysMonView2_zoom2.png"></p>
+<p>The same system zoomed out twice (fully) is shown below. The bars show the percentage of the machine that the jobs take up.
+The black bar at the end (presumably) aggregates all the shows too small to be represented.
+<p><img src="images/05sysMonView2_zoom3.png"></p>
+<h2 id="jobs">Active/Inactive Jobs Views</h2>
 
 The Active Jobs view shows a list of all the jobs that are running on the system. The exact columns displayed in the view will depend on the capabilities of
 the remote system. Each job in the table is assigned a color in the first column. This color corresponds to the colors displayed in the System Monitor view.
@@ -83,12 +95,15 @@ selecting the appropriate action. Completed jobs will remain in the view between
 losing information about the jobs. If you wish to remove the job from the view (permanently), use the <b>Remove Job Entry</b> action.
 <p><img src="images/05inactiveJobs2.png"></p>
 
+<h2 id="messages">Messages View</h2>
+<p>The Messages view shows information from the target system. A context menu on the view allows the message
+of the day to be shown in this view.
+<p><img src="images/05sysMonView3_messages.png"></p>
 
-<h2 id="output">Console View</h2>
-Depending on the functionality of the target system configuration, PTP can also display standard output and standard error from the parallel program in the
+<h2 id="console">Console View</h2>
+<p>Depending on the functionality of the target system configuration, PTP can also display standard output and standard error from the parallel program in the
 Console view. As mentioned above, output from batch jobs is only available once the job is completed. However, output from interactive jobs
 is generally displayed immediately in the console view (depending on settings in the launch configuration).</p>
-
 
 <p><img src="images/05ptpRuntimeConsoleView.png"></p>
 

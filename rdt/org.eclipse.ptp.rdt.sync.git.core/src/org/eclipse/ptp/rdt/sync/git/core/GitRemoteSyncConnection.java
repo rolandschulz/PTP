@@ -1234,11 +1234,6 @@ public class GitRemoteSyncConnection {
 	
 	// Get the base git command for this system, includes the git binary plus sync-specific arguments.
 	private String gitCommand() {
-		String gitPath = buildScenario.getSyncProviderPath();
-		if (gitPath == null) {
-			return "git " + gitArgs; //$NON-NLS-1$
-		} else {
-			return gitPath + " " + gitArgs;  //$NON-NLS-1$
-		}
+		return "git " + gitArgs; //$NON-NLS-1$
 	}
 }
