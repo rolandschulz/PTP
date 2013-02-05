@@ -81,18 +81,22 @@ public interface ILaunchController extends IJobControl {
 	public boolean isInitialized();
 
 	/**
-	 * Runs an action command.
+	 * Runs a command. The command will be executed on the target system specified in the launch
+	 * controller.
 	 * 
-	 * @param action
-	 *            name of action or command
+	 * @param name
+	 *            Name of the command to execute. The name should refer to a command or action specified in the target
+	 *            configuration. Only commands defined using the <code>start-up</code>, <code>shut-down</code>, or
+	 *            <code>button-action</code> elements can be run.
 	 * @param resetValue
-	 *            name of property or attribute
+	 *            Name of an attribute to cleared prior to command execution
 	 * @param configuration
-	 *            current values
-	 * @return result of the action on resetValue, if any
-	 * 
+	 *            Launch configuration from which to initialize attributes. The configuration can be null, in which case the current
+	 *            attributes will be used.
+	 * @throws CoreException
+	 *             This exception is thrown if the command fails to execute.
 	 */
-	public Object runActionCommand(String action, String resetValue, ILaunchConfiguration configuration) throws CoreException;
+	public void runCommand(String command, String resetValue, ILaunchConfiguration configuration) throws CoreException;
 
 	/**
 	 * Set the connection name for this control

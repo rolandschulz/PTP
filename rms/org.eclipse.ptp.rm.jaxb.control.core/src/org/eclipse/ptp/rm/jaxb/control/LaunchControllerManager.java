@@ -53,7 +53,7 @@ public class LaunchControllerManager {
 
 	/**
 	 * Look up a controller using the remote services ID, the connection name, and the configuration name. Creates a new controller
-	 * if one doesn't already exist.
+	 * if one doesn't already exist. The controller is initialized before being returned.
 	 * 
 	 * @param remoteServicesId
 	 *            remote services Id

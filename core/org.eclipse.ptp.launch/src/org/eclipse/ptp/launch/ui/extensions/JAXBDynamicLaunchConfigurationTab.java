@@ -352,7 +352,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 * 
 	 */
 	public void run(ButtonActionType action) throws CoreException {
-		getJobControl().runActionCommand(action.getAction(), action.getClearValue(), listenerConfiguration);
+		getJobControl().runCommand(action.getAction(), action.getClearValue(), listenerConfiguration);
 		if (action.isRefresh()) {
 			try {
 				fDynamicTab.initializeFrom(null);

@@ -116,15 +116,10 @@ public class ManagedFilesTest extends TestCase implements ILaunchController {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#runActionCommand (java.lang.String, java.lang.String,
-	 * org.eclipse.debug.core.ILaunchConfiguration)
-	 */
 	@Override
-	public Object runActionCommand(String action, String resetValue, ILaunchConfiguration configuration) throws CoreException {
-		return null;
+	public void runCommand(String command, String resetValue, ILaunchConfiguration configuration) throws CoreException {
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override

@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.debug.core.ILaunchMode;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.jobs.JobManager;
@@ -54,6 +55,7 @@ import org.eclipse.ptp.rm.jaxb.control.internal.runnable.JobStatusMap;
 import org.eclipse.ptp.rm.jaxb.control.internal.runnable.ManagedFilesJob;
 import org.eclipse.ptp.rm.jaxb.control.internal.runnable.ManagedFilesJob.Operation;
 import org.eclipse.ptp.rm.jaxb.control.internal.runnable.command.CommandJob;
+import org.eclipse.ptp.rm.jaxb.control.internal.runnable.command.CommandJob.JobMode;
 import org.eclipse.ptp.rm.jaxb.control.internal.runnable.command.CommandJobStatus;
 import org.eclipse.ptp.rm.jaxb.control.internal.utils.JobIdPinTable;
 import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
@@ -62,7 +64,6 @@ import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBInitializationUtils;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.CommandType;
-import org.eclipse.ptp.rm.jaxb.core.data.ControlType;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFileType;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFilesType;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
@@ -144,7 +145,6 @@ public class LaunchController implements ILaunchController {
 	private ICommandJob interactiveJob;
 	private ICommandJobStatusMap jobStatusMap;
 	private RMVariableMap rmVarMap;
-	private ControlType controlData;
 	private String servicesId;
 	private String connectionName;
 	private boolean appendLaunchEnv;
@@ -177,26 +177,6 @@ public class LaunchController implements ILaunchController {
 	}
 
 	/**
-	 * Add connection properties to the attribute map.
-	 * 
-	 * @param conn
-	 */
-	private void addConnectionPropertyAttributes(IRemoteConnection conn) {
-		String property = conn.getProperty(IRemoteConnection.OS_ARCH_PROPERTY);
-		if (property != null) {
-			addAttribute(IRemoteConnection.OS_ARCH_PROPERTY, property);
-		}
-		property = conn.getProperty(IRemoteConnection.OS_NAME_PROPERTY);
-		if (property != null) {
-			addAttribute(IRemoteConnection.OS_NAME_PROPERTY, property);
-		}
-		property = conn.getProperty(IRemoteConnection.OS_VERSION_PROPERTY);
-		if (property != null) {
-			addAttribute(IRemoteConnection.OS_VERSION_PROPERTY, property);
-		}
-	}
-
-	/**
 	 * Checks to see if there was an exception thrown by the run method.
 	 * 
 	 * @param job
@@ -222,8 +202,8 @@ public class LaunchController implements ILaunchController {
 	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public void control(String jobId, String operation, IProgressMonitor monitor) throws CoreException {
-		if (!resourceManagerIsActive()) {
-			throw CoreExceptionUtils.newException(Messages.LaunchController_resourceManagerNotStarted, null);
+		if (!isActive()) {
+			throw CoreExceptionUtils.newException(Messages.LaunchController_notStarted, null);
 		}
 
 		if (jobId == null) {
@@ -286,27 +266,27 @@ public class LaunchController implements ILaunchController {
 		CommandType job = null;
 		if (TERMINATE_OPERATION.equals(operation)) {
 			maybeKillInteractive(jobId);
-			job = controlData.getTerminateJob();
+			job = getConfiguration().getControlData().getTerminateJob();
 			if (job == null) { // there may not be an external cancel
 				return;
 			}
 		} else if (SUSPEND_OPERATION.equals(operation)) {
-			job = controlData.getSuspendJob();
+			job = getConfiguration().getControlData().getSuspendJob();
 			if (job == null) {
 				throw ce;
 			}
 		} else if (RESUME_OPERATION.equals(operation)) {
-			job = controlData.getResumeJob();
+			job = getConfiguration().getControlData().getResumeJob();
 			if (job == null) {
 				throw ce;
 			}
 		} else if (RELEASE_OPERATION.equals(operation)) {
-			job = controlData.getReleaseJob();
+			job = getConfiguration().getControlData().getReleaseJob();
 			if (job == null) {
 				throw ce;
 			}
 		} else if (HOLD_OPERATION.equals(operation)) {
-			job = controlData.getHoldJob();
+			job = getConfiguration().getControlData().getHoldJob();
 			if (job == null) {
 				throw ce;
 			}
@@ -332,18 +312,18 @@ public class LaunchController implements ILaunchController {
 		CommandJob.JobMode jobMode = CommandJob.JobMode.INTERACTIVE;
 
 		if (ILaunchManager.RUN_MODE.equals(launchMode)) {
-			command = controlData.getSubmitBatch();
+			command = getConfiguration().getControlData().getSubmitBatch();
 			if (command != null) {
 				jobMode = CommandJob.JobMode.BATCH;
 			} else {
-				command = controlData.getSubmitInteractive();
+				command = getConfiguration().getControlData().getSubmitInteractive();
 			}
 		} else if (ILaunchManager.DEBUG_MODE.equals(launchMode)) {
-			command = controlData.getSubmitBatchDebug();
+			command = getConfiguration().getControlData().getSubmitBatchDebug();
 			if (command != null) {
 				jobMode = CommandJob.JobMode.BATCH;
 			} else {
-				command = controlData.getSubmitInteractiveDebug();
+				command = getConfiguration().getControlData().getSubmitInteractiveDebug();
 			}
 		}
 
@@ -454,8 +434,8 @@ public class LaunchController implements ILaunchController {
 	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public IJobStatus getJobStatus(String jobId, boolean force, IProgressMonitor monitor) throws CoreException {
-		if (!resourceManagerIsActive()) {
-			throw CoreExceptionUtils.newException(Messages.LaunchController_resourceManagerNotStarted, null);
+		if (!isActive()) {
+			throw CoreExceptionUtils.newException(Messages.LaunchController_notStarted, null);
 		}
 
 		SubMonitor progress = SubMonitor.convert(monitor, 100);
@@ -497,8 +477,8 @@ public class LaunchController implements ILaunchController {
 			try {
 				AttributeType a = getRMVariableMap().get(jobId);
 
-				CommandType job = controlData.getGetJobStatus();
-				if (job != null && resourceManagerIsActive() && !progress.isCanceled()) {
+				CommandType job = getConfiguration().getControlData().getGetJobStatus();
+				if (job != null && isActive() && !progress.isCanceled()) {
 					pinTable.pin(jobId);
 					AttributeType tmp = null;
 					if (a == null) {
@@ -613,7 +593,7 @@ public class LaunchController implements ILaunchController {
 			rmVarMap = new RMVariableMap();
 		}
 		if (!rmVarMap.isInitialized()) {
-			JAXBInitializationUtils.initializeMap(configData, rmVarMap);
+			JAXBInitializationUtils.initializeMap(getConfiguration(), rmVarMap);
 		}
 		return rmVarMap;
 	}
@@ -635,13 +615,12 @@ public class LaunchController implements ILaunchController {
 	public void initialize() throws CoreException {
 		try {
 			realizeRMDataFromXML();
-			controlData = configData.getControlData();
 			if (servicesId == null && connectionName == null) {
 				/*
 				 * Set connection information from the site configuration. This may get overidden by the launch configuration
 				 * later
 				 */
-				SiteType site = configData.getSiteData();
+				SiteType site = getConfiguration().getSiteData();
 				if (site != null) {
 					servicesId = site.getRemoteServices();
 					if (servicesId == null) {
@@ -653,12 +632,19 @@ public class LaunchController implements ILaunchController {
 			if (servicesId == null || connectionName == null) {
 				throw new Throwable(Messages.LaunchController_missingServicesOrConnectionName);
 			}
-			fControlId = LaunchControllerManager.generateControlId(servicesId, connectionName, configData.getName());
+			fControlId = LaunchControllerManager.generateControlId(servicesId, connectionName, getConfiguration().getName());
 		} catch (Throwable t) {
 			throw CoreExceptionUtils.newException(t.getMessage(), t);
 		}
 
 		isInitialized = true;
+	}
+
+	/**
+	 * @return whether the state of the resource manager is stopped or not.
+	 */
+	private boolean isActive() {
+		return isActive;
 	}
 
 	/*
@@ -888,77 +874,21 @@ public class LaunchController implements ILaunchController {
 	}
 
 	/**
-	 * @return whether the state of the resource manager is stopped or not.
-	 */
-	private boolean resourceManagerIsActive() {
-		return isActive;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.IJAXBLaunchControl#runActionCommand(java.lang.String, java.lang.String,
-	 * org.eclipse.debug.core.ILaunchConfiguration)
-	 */
-	public Object runActionCommand(String action, String resetValue, ILaunchConfiguration configuration) throws CoreException {
-		if (!resourceManagerIsActive()) {
-			throw CoreExceptionUtils.newException(Messages.LaunchController_resourceManagerNotStarted, null);
-		}
-
-		updateAttributeValues(configuration, ILaunchManager.RUN_MODE, null);
-
-		AttributeType changedValue = null;
-
-		if (resetValue != null) {
-			changedValue = getRMVariableMap().get(resetValue);
-			changedValue.setValue(null);
-		}
-
-		CommandType command = null;
-
-		for (CommandType cmd : controlData.getButtonAction()) {
-			if (cmd.getName().equals(action)) {
-				command = cmd;
-				break;
-			}
-		}
-
-		if (command == null) {
-			for (CommandType cmd : controlData.getStartUpCommand()) {
-				if (cmd.getName().equals(action)) {
-					command = cmd;
-					break;
-				}
-			}
-		}
-
-		if (command == null) {
-			for (CommandType cmd : controlData.getShutDownCommand()) {
-				if (cmd.getName().equals(action)) {
-					command = cmd;
-					break;
-				}
-			}
-		}
-
-		if (command != null) {
-			runCommand(null, command, CommandJob.JobMode.INTERACTIVE, configuration, ILaunchManager.RUN_MODE, true);
-		}
-
-		return changedValue;
-	}
-
-	/**
 	 * Create command job, and schedule. Used for job-specific commands directly.
 	 * 
 	 * @param uuid
-	 *            temporary internal id for as yet unsubmitted job
+	 *            Temporary internal id for as yet unsubmitted job. If null, the command will be assumed to be interactive.
 	 * @param command
-	 *            configuration object containing the command arguments and tokenizers
-	 * @param mode
-	 *            whether batch, interactive, or a status job
+	 *            Configuration object containing the command arguments and tokenizers.
+	 * @param jobMode
+	 *            Whether batch, interactive, or a status job.
+	 * @param launchConfig
+	 *            Launch configuration. This is only required if the launch environment needs to be passed to the remote command,
+	 *            otherwise null can be used.
+	 * @param launchMode
+	 *            Launch mode (see {@link ILaunchMode}). Will be returned in the job status {@link IJobStatus#getLaunchMode()}.
 	 * @param join
-	 *            whether to launch serially or not
+	 *            Whether to launch serially or not.
 	 * @return the runnable job object
 	 * @throws CoreException
 	 */
@@ -983,10 +913,64 @@ public class LaunchController implements ILaunchController {
 		return job;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.control.ILaunchController#runCommand(java.lang.String, java.lang.String,
+	 * org.eclipse.debug.core.ILaunchConfiguration)
+	 */
+	public void runCommand(String name, String resetValue, ILaunchConfiguration configuration) throws CoreException {
+		if (!isActive()) {
+			throw CoreExceptionUtils.newException(Messages.LaunchController_notStarted, null);
+		}
+
+		if (configuration != null) {
+			updateAttributeValues(configuration, ILaunchManager.RUN_MODE, null);
+		}
+
+		AttributeType changedValue = null;
+
+		if (resetValue != null) {
+			changedValue = getRMVariableMap().get(resetValue);
+			changedValue.setValue(null);
+		}
+
+		CommandType command = null;
+
+		for (CommandType cmd : getConfiguration().getControlData().getButtonAction()) {
+			if (cmd.getName().equals(name)) {
+				command = cmd;
+				break;
+			}
+		}
+
+		if (command == null) {
+			for (CommandType cmd : getConfiguration().getControlData().getStartUpCommand()) {
+				if (cmd.getName().equals(name)) {
+					command = cmd;
+					break;
+				}
+			}
+		}
+
+		if (command == null) {
+			for (CommandType cmd : getConfiguration().getControlData().getShutDownCommand()) {
+				if (cmd.getName().equals(name)) {
+					command = cmd;
+					break;
+				}
+			}
+		}
+
+		if (command != null) {
+			runCommand(null, command, CommandJob.JobMode.INTERACTIVE, configuration, ILaunchManager.RUN_MODE, true);
+		}
+	}
+
 	/**
 	 * Run command sequence. Invoked by startup or shutdown commands. Delegates to
-	 * {@link #runCommand(String, CommandType, boolean, boolean)}. If a job in the sequence fails, the subsequent commands will not
-	 * run.
+	 * {@link #runCommand(String, CommandType, JobMode, ILaunchConfiguration, String, boolean)}. If a job in the sequence fails, the
+	 * subsequent commands will not run.
 	 * 
 	 * @param cmds
 	 *            configuration objects containing the command arguments and tokenizers
@@ -1005,6 +989,26 @@ public class LaunchController implements ILaunchController {
 	 */
 	public void setConnectionName(String connName) {
 		connectionName = connName;
+	}
+
+	/**
+	 * Add connection properties to the attribute map.
+	 * 
+	 * @param conn
+	 */
+	private void setConnectionPropertyAttributes(IRemoteConnection conn) {
+		String property = conn.getProperty(IRemoteConnection.OS_ARCH_PROPERTY);
+		if (property != null) {
+			addAttribute(IRemoteConnection.OS_ARCH_PROPERTY, property);
+		}
+		property = conn.getProperty(IRemoteConnection.OS_NAME_PROPERTY);
+		if (property != null) {
+			addAttribute(IRemoteConnection.OS_NAME_PROPERTY, property);
+		}
+		property = conn.getProperty(IRemoteConnection.OS_VERSION_PROPERTY);
+		if (property != null) {
+			addAttribute(IRemoteConnection.OS_VERSION_PROPERTY, property);
+		}
 	}
 
 	/**
@@ -1076,7 +1080,7 @@ public class LaunchController implements ILaunchController {
 				}
 
 				setFixedConfigurationProperties(conn);
-				addConnectionPropertyAttributes(conn);
+				setConnectionPropertyAttributes(conn);
 
 				appendLaunchEnv = true;
 
@@ -1089,7 +1093,7 @@ public class LaunchController implements ILaunchController {
 				/*
 				 * Run the start up commands, if any
 				 */
-				List<CommandType> onStartUp = controlData.getStartUpCommand();
+				List<CommandType> onStartUp = getConfiguration().getControlData().getStartUpCommand();
 				runCommands(onStartUp);
 
 				isActive = true;
@@ -1123,7 +1127,7 @@ public class LaunchController implements ILaunchController {
 			}
 			control(iJobId, TERMINATE_OPERATION, null);
 
-			List<CommandType> onShutDown = controlData.getShutDownCommand();
+			List<CommandType> onShutDown = getConfiguration().getControlData().getShutDownCommand();
 			runCommands(onShutDown);
 
 			if (rmVarMap != null) {
@@ -1152,8 +1156,8 @@ public class LaunchController implements ILaunchController {
 		 */
 		String uuid = UUID.randomUUID().toString();
 
-		if (!resourceManagerIsActive()) {
-			throw CoreExceptionUtils.newException(Messages.LaunchController_resourceManagerNotStarted, null);
+		if (!isActive()) {
+			throw CoreExceptionUtils.newException(Messages.LaunchController_notStarted, null);
 		}
 
 		SubMonitor progress = SubMonitor.convert(monitor, 100);
@@ -1170,11 +1174,11 @@ public class LaunchController implements ILaunchController {
 			/*
 			 * process script
 			 */
-			ScriptType script = controlData.getScript();
+			ScriptType script = getConfiguration().getControlData().getScript();
 			boolean delScript = maybeHandleScript(uuid, script, progress.newChild(5));
 			worked(progress, 20);
 
-			List<ManagedFilesType> files = controlData.getManagedFiles();
+			List<ManagedFilesType> files = getConfiguration().getControlData().getManagedFiles();
 
 			/*
 			 * if the script is to be staged, a managed file pointing to either its content (${ptp_rm:script#value}), or to its path
@@ -1243,7 +1247,8 @@ public class LaunchController implements ILaunchController {
 	}
 
 	/**
-	 * Transfers the values from the configuration to the live map.
+	 * Transfers the values from the configuration to the attribute map. This needs to be called whenever a new launch configuration
+	 * is being used in order to switch the attributes to use the new values.
 	 * 
 	 * @param configuration
 	 *            passed in from Launch Tab when the "run" command is chosen.
@@ -1251,8 +1256,6 @@ public class LaunchController implements ILaunchController {
 	 */
 	private void updateAttributeValues(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor)
 			throws CoreException {
-		SubMonitor progress = SubMonitor.convert(monitor, 40);
-
 		/*
 		 * Add launch mode attribute
 		 */
@@ -1267,8 +1270,6 @@ public class LaunchController implements ILaunchController {
 			}
 		}
 
-		progress.worked(10);
-
 		/*
 		 * The non-selected variables have been excluded from the valid attributes of the configuration; but we need to null out the
 		 * superset values here that are undefined.
@@ -1281,8 +1282,6 @@ public class LaunchController implements ILaunchController {
 				}
 			}
 		}
-
-		progress.worked(10);
 
 		/*
 		 * make sure these fixed properties are included
@@ -1326,8 +1325,7 @@ public class LaunchController implements ILaunchController {
 
 		IEnvManagerConfig envMgrConfig = getEnvManagerConfig(configuration);
 		if (envMgrConfig != null) {
-			IEnvManager envManager = EnvManagerRegistry.getEnvManager(progress.newChild(1),
-					fRemoteServicesDelegate.getRemoteConnection());
+			IEnvManager envManager = EnvManagerRegistry.getEnvManager(monitor, fRemoteServicesDelegate.getRemoteConnection());
 			if (envManager != null) {
 				String emsStr = envManager.getBashConcatenation("\n", false, envMgrConfig, null);
 				AttributeType a = getEnvironment().get(JAXBControlConstants.EMS_ATTR);

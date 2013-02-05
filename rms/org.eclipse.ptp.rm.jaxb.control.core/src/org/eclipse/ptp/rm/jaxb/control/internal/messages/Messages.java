@@ -71,7 +71,7 @@ public class Messages extends NLS {
 
 	public static String LaunchController_missingServicesOrConnectionName;
 	public static String LaunchController_missingURL;
-	public static String LaunchController_resourceManagerNotStarted;
+	public static String LaunchController_notStarted;
 	public static String LaunchController_unableToLoad;
 	public static String LaunchController_usingCachedDefinition;
 
