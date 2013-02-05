@@ -34,6 +34,7 @@ import org.eclipse.ptp.rm.jaxb.control.JAXBUtils;
 import org.eclipse.ptp.rm.jaxb.control.LaunchController;
 import org.eclipse.ptp.rm.jaxb.control.internal.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.control.internal.utils.DebuggingLogger;
+import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.SimpleCommandType;
 import org.eclipse.ptp.utils.core.ArgumentParser;
 
@@ -48,6 +49,7 @@ public class SimpleCommandJob extends Job {
 
 	private final SimpleCommandType fCommand;
 	private final ILaunchController fControl;
+	private final IVariableMap fVarMap;
 	private final CommandJob fCommandJob;
 	private final String fUuid;
 	private final String fDirectory;
@@ -66,13 +68,14 @@ public class SimpleCommandJob extends Job {
 	 * @param rm
 	 *            the calling resource manager
 	 */
-	public SimpleCommandJob(String uuid, SimpleCommandType command, String directory, ILaunchController control,
+	public SimpleCommandJob(String uuid, SimpleCommandType command, String directory, ILaunchController control, IVariableMap map,
 			CommandJob commandJob) {
 		super(command.getName() != null ? command.getName() : "Simple Command"); //$NON-NLS-1$
 		fUuid = uuid;
 		fCommand = command;
 		fDirectory = command.getDirectory() != null ? command.getDirectory() : directory;
 		fControl = control;
+		fVarMap = map;
 		fCommandJob = commandJob;
 	}
 
@@ -247,7 +250,7 @@ public class SimpleCommandJob extends Job {
 	 */
 	private IRemoteProcessBuilder prepareCommand(IProgressMonitor monitor) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 10);
-		ArgumentParser args = new ArgumentParser(fControl.getEnvironment().getString(fUuid, fCommand.getExec()));
+		ArgumentParser args = new ArgumentParser(fVarMap.getString(fUuid, fCommand.getExec()));
 		RemoteServicesDelegate delegate = JAXBUtils.getRemoteServicesDelegate(fControl.getRemoteServicesId(),
 				fControl.getConnectionName(), progress.newChild(5));
 		if (delegate.getRemoteConnection() == null) {
@@ -271,7 +274,7 @@ public class SimpleCommandJob extends Job {
 		}
 		IRemoteProcessBuilder builder = delegate.getRemoteServices().getProcessBuilder(conn, args.getTokenList());
 		if (fDirectory != null && !JAXBControlConstants.ZEROSTR.equals(fDirectory)) {
-			String directory = fControl.getEnvironment().getString(fUuid, fDirectory);
+			String directory = fVarMap.getString(fUuid, fDirectory);
 			IFileStore dir = delegate.getRemoteFileManager().getResource(directory);
 			builder.directory(dir);
 		}

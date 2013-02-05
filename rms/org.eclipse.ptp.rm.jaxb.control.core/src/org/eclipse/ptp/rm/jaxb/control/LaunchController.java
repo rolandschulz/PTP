@@ -292,7 +292,7 @@ public class LaunchController implements ILaunchController {
 			}
 		}
 
-		runCommand(jobId, job, CommandJob.JobMode.INTERACTIVE, null, ILaunchManager.RUN_MODE, true);
+		runCommand(jobId, job, CommandJob.JobMode.INTERACTIVE, getEnvironment(), null, ILaunchManager.RUN_MODE, true);
 	}
 
 	/**
@@ -335,7 +335,7 @@ public class LaunchController implements ILaunchController {
 		/*
 		 * NOTE: changed this to join, because the waitForId is now part of the run() method of the command itself (05.01.2011)
 		 */
-		return runCommand(uuid, command, jobMode, launchConfig, launchMode, true);
+		return runCommand(uuid, command, jobMode, getEnvironment(), launchConfig, launchMode, true);
 	}
 
 	/*
@@ -487,7 +487,7 @@ public class LaunchController implements ILaunchController {
 						tmp.setName(jobId);
 						getRMVariableMap().put(jobId, tmp);
 					}
-					runCommand(jobId, job, CommandJob.JobMode.STATUS, null, ILaunchManager.RUN_MODE, true);
+					runCommand(jobId, job, CommandJob.JobMode.STATUS, getEnvironment(), null, ILaunchManager.RUN_MODE, true);
 					if (tmp != null) {
 						a = getRMVariableMap().remove(jobId);
 					}
@@ -501,7 +501,7 @@ public class LaunchController implements ILaunchController {
 			}
 
 			if (status == null) {
-				status = new CommandJobStatus(jobId, state, null, this, ILaunchManager.RUN_MODE);
+				status = new CommandJobStatus(jobId, state, null, this, getEnvironment(), ILaunchManager.RUN_MODE);
 				status.setOwner(getRMVariableMap().getString(JAXBControlConstants.CONTROL_USER_NAME));
 				jobStatusMap.addJobStatus(jobId, status);
 			} else {
@@ -873,6 +873,16 @@ public class LaunchController implements ILaunchController {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.control.ILaunchController#runCommand(org.eclipse.ptp.rm.jaxb.core.data.CommandType,
+	 * org.eclipse.ptp.rm.jaxb.core.IVariableMap)
+	 */
+	public void runCommand(CommandType command, IVariableMap attributes) throws CoreException {
+		runCommand(null, command, CommandJob.JobMode.INTERACTIVE, attributes, null, ILaunchManager.RUN_MODE, true);
+	}
+
 	/**
 	 * Create command job, and schedule. Used for job-specific commands directly.
 	 * 
@@ -882,6 +892,8 @@ public class LaunchController implements ILaunchController {
 	 *            Configuration object containing the command arguments and tokenizers.
 	 * @param jobMode
 	 *            Whether batch, interactive, or a status job.
+	 * @param map
+	 *            Attribute map to use when running the command. Allows an alternate map to be used if required.
 	 * @param launchConfig
 	 *            Launch configuration. This is only required if the launch environment needs to be passed to the remote command,
 	 *            otherwise null can be used.
@@ -892,13 +904,13 @@ public class LaunchController implements ILaunchController {
 	 * @return the runnable job object
 	 * @throws CoreException
 	 */
-	private ICommandJob runCommand(String uuid, CommandType command, CommandJob.JobMode jobMode, ILaunchConfiguration launchConfig,
-			String launchMode, boolean join) throws CoreException {
+	private ICommandJob runCommand(String uuid, CommandType command, CommandJob.JobMode jobMode, IVariableMap map,
+			ILaunchConfiguration launchConfig, String launchMode, boolean join) throws CoreException {
 		if (command == null) {
 			throw CoreExceptionUtils.newException(Messages.RMNoSuchCommandError, null);
 		}
 
-		ICommandJob job = new CommandJob(uuid, command, jobMode, this, launchConfig, launchMode);
+		ICommandJob job = new CommandJob(uuid, command, jobMode, this, map, launchConfig, launchMode);
 		((Job) job).setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY, Boolean.TRUE);
 		job.schedule();
 		if (join) {
@@ -963,7 +975,8 @@ public class LaunchController implements ILaunchController {
 		}
 
 		if (command != null) {
-			runCommand(null, command, CommandJob.JobMode.INTERACTIVE, configuration, ILaunchManager.RUN_MODE, true);
+			runCommand(null, command, CommandJob.JobMode.INTERACTIVE, getEnvironment(), configuration, ILaunchManager.RUN_MODE,
+					true);
 		}
 	}
 
@@ -978,7 +991,7 @@ public class LaunchController implements ILaunchController {
 	 */
 	private void runCommands(List<CommandType> cmds) throws CoreException {
 		for (CommandType cmd : cmds) {
-			runCommand(null, cmd, CommandJob.JobMode.INTERACTIVE, null, ILaunchManager.RUN_MODE, true);
+			runCommand(null, cmd, CommandJob.JobMode.INTERACTIVE, getEnvironment(), null, ILaunchManager.RUN_MODE, true);
 		}
 	}
 

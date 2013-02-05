@@ -30,6 +30,7 @@ import org.eclipse.ptp.rm.jaxb.control.runnable.ScriptHandler;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBInitializationUtils;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
+import org.eclipse.ptp.rm.jaxb.core.data.CommandType;
 import org.eclipse.ptp.rm.jaxb.core.data.ControlType;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFileType;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFilesType;
@@ -39,11 +40,27 @@ import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
 public class ManagedFilesTest extends TestCase implements ILaunchController {
 
 	private static final String xml = JAXBControlConstants.DATA + "pbs-test-local.xml"; //$NON-NLS-1$
+
 	private static ControlType controlData;
 	private static Map<String, AttributeType> env;
 	private static Map<String, String> live;
 	private static boolean verbose = false;
 	private RMVariableMap rmVarMap;
+
+	private void composeScript() {
+		ScriptType script = controlData.getScript();
+		assertNotNull(script);
+		ScriptHandler job = new ScriptHandler(null, script, rmVarMap, live, false);
+		job.schedule();
+		try {
+			job.join();
+		} catch (InterruptedException t) {
+			t.printStackTrace();
+		}
+
+		AttributeType contents = env.get(JAXBControlConstants.SCRIPT);
+		assertNotNull(contents);
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -55,8 +72,20 @@ public class ManagedFilesTest extends TestCase implements ILaunchController {
 	public void control(String jobId, String operation, IProgressMonitor monitor) throws CoreException {
 	}
 
+	@Override
+	public void dispose() {
+		// TODO Auto-generated method stub
+
+	}
+
 	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ResourceManagerData getConfiguration() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -69,6 +98,11 @@ public class ManagedFilesTest extends TestCase implements ILaunchController {
 	@Override
 	public String getConnectionName() {
 		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getControlId() {
 		return null;
 	}
 
@@ -117,7 +151,75 @@ public class ManagedFilesTest extends TestCase implements ILaunchController {
 	}
 
 	@Override
+	public void initialize() throws CoreException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public boolean isInitialized() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	private ManagedFilesType maybeAddManagedFileForScript(ManagedFilesType files) {
+		AttributeType scriptVar = rmVarMap.get(JAXBControlConstants.SCRIPT);
+		AttributeType scriptPathVar = rmVarMap.get(JAXBControlConstants.SCRIPT_PATH);
+		if (scriptVar != null || scriptPathVar != null) {
+			if (files == null) {
+				files = new ManagedFilesType();
+				files.setFileStagingLocation(JAXBControlConstants.ECLIPSESETTINGS);
+			}
+			List<ManagedFileType> fileList = files.getFile();
+			ManagedFileType scriptFile = null;
+			if (!fileList.isEmpty()) {
+				for (ManagedFileType f : fileList) {
+					if (f.getName().equals(JAXBControlConstants.SCRIPT_FILE)) {
+						scriptFile = f;
+						break;
+					}
+				}
+			}
+			if (scriptFile == null) {
+				scriptFile = new ManagedFileType();
+				scriptFile.setName(JAXBControlConstants.SCRIPT_FILE);
+				fileList.add(scriptFile);
+			}
+			scriptFile.setResolveContents(false);
+			scriptFile.setUniqueIdPrefix(true);
+			if (scriptPathVar != null) {
+				scriptFile.setPath(String.valueOf(scriptPathVar.getValue()));
+				scriptFile.setDeleteSourceAfterUse(false);
+			} else {
+				scriptFile.setContents(JAXBControlConstants.OPENVRM + JAXBControlConstants.SCRIPT + JAXBControlConstants.PD
+						+ JAXBControlConstants.VALUE + JAXBControlConstants.CLOSV);
+				scriptFile.setDeleteSourceAfterUse(true);
+			}
+		}
+		return files;
+	}
+
+	private void putValue(String name, String value) {
+		AttributeType p = new AttributeType();
+		p.setName(name);
+		p.setValue(value);
+		env.put(name, p);
+	}
+
+	@Override
+	public void runCommand(CommandType command, IVariableMap attributes) throws CoreException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
 	public void runCommand(String command, String resetValue, ILaunchConfiguration configuration) throws CoreException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void setConnectionName(String connName) {
 		// TODO Auto-generated method stub
 
 	}
@@ -126,6 +228,35 @@ public class ManagedFilesTest extends TestCase implements ILaunchController {
 	public void setInteractiveJob(ICommandJob interactiveJob) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public void setRemoteServicesId(String id) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void setRMConfigurationURL(URL url) {
+		// TODO Auto-generated method stub
+
+	}
+
+	private void setTestValues() {
+		for (String key : env.keySet()) {
+			AttributeType target = env.get(key);
+			String value = key + "_TEST_VALUE"; //$NON-NLS-1$
+			target.setValue(value);
+		}
+		putValue(JAXBControlConstants.CONTROL_USER_VAR, "fooUser"); //$NON-NLS-1$
+		putValue(JAXBControlConstants.CONTROL_ADDRESS_VAR, "abe.ncsa.uiuc.edu"); //$NON-NLS-1$
+		putValue(JAXBControlConstants.DIRECTORY, "/u/ncsa/arossi/test"); //$NON-NLS-1$ 
+		putValue(JAXBControlConstants.MPI_CMD, "mpiexec"); //$NON-NLS-1$ 
+		putValue(JAXBControlConstants.MPI_ARGS, "-np 8"); //$NON-NLS-1$ 
+		putValue(JAXBControlConstants.EXEC_PATH, "/u/ncsa/arossi/test/foo"); //$NON-NLS-1$ 
+		if (verbose) {
+			RMDataTest.print(rmVarMap);
+		}
 	}
 
 	@Override
@@ -147,6 +278,18 @@ public class ManagedFilesTest extends TestCase implements ILaunchController {
 			fail(t.getMessage());
 		}
 		setTestValues();
+	}
+
+	@Override
+	public void start(IProgressMonitor monitor) throws CoreException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void stop() throws CoreException {
+		// TODO Auto-generated method stub
+
 	}
 
 	/*
@@ -205,140 +348,5 @@ public class ManagedFilesTest extends TestCase implements ILaunchController {
 			t.printStackTrace();
 			fail(t.getMessage());
 		}
-	}
-
-	private void composeScript() {
-		ScriptType script = controlData.getScript();
-		assertNotNull(script);
-		ScriptHandler job = new ScriptHandler(null, script, rmVarMap, live, false);
-		job.schedule();
-		try {
-			job.join();
-		} catch (InterruptedException t) {
-			t.printStackTrace();
-		}
-
-		AttributeType contents = env.get(JAXBControlConstants.SCRIPT);
-		assertNotNull(contents);
-	}
-
-	private ManagedFilesType maybeAddManagedFileForScript(ManagedFilesType files) {
-		AttributeType scriptVar = rmVarMap.get(JAXBControlConstants.SCRIPT);
-		AttributeType scriptPathVar = rmVarMap.get(JAXBControlConstants.SCRIPT_PATH);
-		if (scriptVar != null || scriptPathVar != null) {
-			if (files == null) {
-				files = new ManagedFilesType();
-				files.setFileStagingLocation(JAXBControlConstants.ECLIPSESETTINGS);
-			}
-			List<ManagedFileType> fileList = files.getFile();
-			ManagedFileType scriptFile = null;
-			if (!fileList.isEmpty()) {
-				for (ManagedFileType f : fileList) {
-					if (f.getName().equals(JAXBControlConstants.SCRIPT_FILE)) {
-						scriptFile = f;
-						break;
-					}
-				}
-			}
-			if (scriptFile == null) {
-				scriptFile = new ManagedFileType();
-				scriptFile.setName(JAXBControlConstants.SCRIPT_FILE);
-				fileList.add(scriptFile);
-			}
-			scriptFile.setResolveContents(false);
-			scriptFile.setUniqueIdPrefix(true);
-			if (scriptPathVar != null) {
-				scriptFile.setPath(String.valueOf(scriptPathVar.getValue()));
-				scriptFile.setDeleteSourceAfterUse(false);
-			} else {
-				scriptFile.setContents(JAXBControlConstants.OPENVRM + JAXBControlConstants.SCRIPT + JAXBControlConstants.PD
-						+ JAXBControlConstants.VALUE + JAXBControlConstants.CLOSV);
-				scriptFile.setDeleteSourceAfterUse(true);
-			}
-		}
-		return files;
-	}
-
-	private void putValue(String name, String value) {
-		AttributeType p = new AttributeType();
-		p.setName(name);
-		p.setValue(value);
-		env.put(name, p);
-	}
-
-	private void setTestValues() {
-		for (String key : env.keySet()) {
-			AttributeType target = env.get(key);
-			String value = key + "_TEST_VALUE"; //$NON-NLS-1$
-			target.setValue(value);
-		}
-		putValue(JAXBControlConstants.CONTROL_USER_VAR, "fooUser"); //$NON-NLS-1$
-		putValue(JAXBControlConstants.CONTROL_ADDRESS_VAR, "abe.ncsa.uiuc.edu"); //$NON-NLS-1$
-		putValue(JAXBControlConstants.DIRECTORY, "/u/ncsa/arossi/test"); //$NON-NLS-1$ 
-		putValue(JAXBControlConstants.MPI_CMD, "mpiexec"); //$NON-NLS-1$ 
-		putValue(JAXBControlConstants.MPI_ARGS, "-np 8"); //$NON-NLS-1$ 
-		putValue(JAXBControlConstants.EXEC_PATH, "/u/ncsa/arossi/test/foo"); //$NON-NLS-1$ 
-		if (verbose) {
-			RMDataTest.print(rmVarMap);
-		}
-	}
-
-	@Override
-	public String getControlId() {
-		return null;
-	}
-
-	@Override
-	public ResourceManagerData getConfiguration() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void dispose() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void initialize() throws CoreException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public boolean isInitialized() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void setConnectionName(String connName) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void setRemoteServicesId(String id) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void setRMConfigurationURL(URL url) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void start(IProgressMonitor monitor) throws CoreException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void stop() throws CoreException {
-		// TODO Auto-generated method stub
-
 	}
 }

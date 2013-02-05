@@ -226,7 +226,7 @@ public class CommandJob extends Job implements ICommandJob {
 	 * @param rm
 	 *            the calling resource manager
 	 */
-	public CommandJob(String jobUUID, CommandType command, JobMode jobMode, ILaunchController control,
+	public CommandJob(String jobUUID, CommandType command, JobMode jobMode, ILaunchController control, IVariableMap map,
 			ILaunchConfiguration launchConfig, String launchMode) {
 		super(command.getName() + JAXBControlConstants.CO + JAXBControlConstants.SP
 				+ (jobUUID == null ? control.getConnectionName() : jobUUID));
@@ -235,7 +235,7 @@ public class CommandJob extends Job implements ICommandJob {
 		this.launchConfig = launchConfig;
 		this.launchMode = launchMode;
 		this.control = control;
-		this.rmVarMap = control.getEnvironment();
+		this.rmVarMap = map;
 		this.uuid = jobUUID;
 		this.proxy = new CommandJobStreamsProxy();
 		this.waitForId = command.isWaitForId();
@@ -667,7 +667,7 @@ public class CommandJob extends Job implements ICommandJob {
 	 */
 	private String prepareInput() throws CoreException {
 		List<ArgType> args = command.getInput();
-		return ArgImpl.toString(uuid, args, control.getEnvironment());
+		return ArgImpl.toString(uuid, args, rmVarMap);
 	}
 
 	/**
@@ -724,7 +724,7 @@ public class CommandJob extends Job implements ICommandJob {
 			progress.worked(25);
 
 			for (SimpleCommandType cmd : command.getPreLaunchCmd()) {
-				Job job = new SimpleCommandJob(uuid, cmd, command.getDirectory(), control, this);
+				Job job = new SimpleCommandJob(uuid, cmd, command.getDirectory(), control, rmVarMap, this);
 				job.setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY, Boolean.TRUE);
 				job.schedule();
 				if (cmd.isWait()) {
@@ -766,7 +766,7 @@ public class CommandJob extends Job implements ICommandJob {
 			ICommandJob parent = keepOpen ? this : null;
 
 			if (waitForId) {
-				jobStatus = new CommandJobStatus(parent, control, launchMode);
+				jobStatus = new CommandJobStatus(parent, control, rmVarMap, launchMode);
 				jobStatus.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
 				jobStatus.setQueueName(rmVarMap.getString(JAXBControlConstants.CONTROL_QUEUE_NAME));
 				if (!isBatch()) {
@@ -798,7 +798,7 @@ public class CommandJob extends Job implements ICommandJob {
 					a.setValue(state);
 				}
 				a.setName(uuid);
-				jobStatus = new CommandJobStatus(uuid, state, parent, control, launchMode);
+				jobStatus = new CommandJobStatus(uuid, state, parent, control, rmVarMap, launchMode);
 				jobStatus.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
 				jobStatus.setQueueName(rmVarMap.getString(JAXBControlConstants.CONTROL_QUEUE_NAME));
 				if (!isBatch()) {
@@ -823,7 +823,7 @@ public class CommandJob extends Job implements ICommandJob {
 					 * Once job has started running, execute any post launch commands
 					 */
 					for (SimpleCommandType cmd : command.getPostLaunchCmd()) {
-						Job job = new SimpleCommandJob(uuid, cmd, command.getDirectory(), control, this);
+						Job job = new SimpleCommandJob(uuid, cmd, command.getDirectory(), control, rmVarMap, this);
 						job.setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY, Boolean.TRUE);
 						job.schedule();
 						if (cmd.isWait()) {

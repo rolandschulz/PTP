@@ -18,6 +18,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.jobs.IJobControl;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJob;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
+import org.eclipse.ptp.rm.jaxb.core.data.CommandType;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 
 /**
@@ -81,7 +82,21 @@ public interface ILaunchController extends IJobControl {
 	public boolean isInitialized();
 
 	/**
-	 * Runs a command. The command will be executed on the target system specified in the launch
+	 * Run a command. The command will be executed on the target system specified in the launch
+	 * controller. The any side effects of the command will be applied to the supplied attribute map rather than the launch
+	 * controller attribute map.
+	 * 
+	 * @param command
+	 *            Command to execute. Only interactive commands are supported.
+	 * @param attributes
+	 *            Attribute map containing attributes that will be side effected by the command
+	 * @throws CoreException
+	 *             This exception is thrown if the command fails to execute.
+	 */
+	public void runCommand(CommandType command, IVariableMap attributes) throws CoreException;
+
+	/**
+	 * Run a command. The command will be executed on the target system specified in the launch
 	 * controller.
 	 * 
 	 * @param name
@@ -96,7 +111,7 @@ public interface ILaunchController extends IJobControl {
 	 * @throws CoreException
 	 *             This exception is thrown if the command fails to execute.
 	 */
-	public void runCommand(String command, String resetValue, ILaunchConfiguration configuration) throws CoreException;
+	public void runCommand(String name, String resetValue, ILaunchConfiguration configuration) throws CoreException;
 
 	/**
 	 * Set the connection name for this control

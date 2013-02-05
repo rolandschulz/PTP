@@ -175,11 +175,12 @@ public class CommandJobStatus implements ICommandJobStatus {
 
 	private final ILaunchController control;
 	private final ICommandJob open;
+	private final String launchMode;
+	private final IVariableMap fVarMap;
 
 	private String jobId;
 	private String owner;
 	private String queue;
-	private final String launchMode;
 	private String state;
 	private String stateDetail;
 	private String remoteOutputPath;
@@ -199,8 +200,8 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * @param control
 	 *            resource manager control
 	 */
-	public CommandJobStatus(ICommandJob open, ILaunchController control, String mode) {
-		this(null, UNDETERMINED, open, control, mode);
+	public CommandJobStatus(ICommandJob open, ILaunchController control, IVariableMap map, String mode) {
+		this(null, UNDETERMINED, open, control, map, mode);
 	}
 
 	/**
@@ -211,11 +212,12 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * @param control
 	 *            resource manager control
 	 */
-	public CommandJobStatus(String jobId, String state, ICommandJob open, ILaunchController control, String mode) {
+	public CommandJobStatus(String jobId, String state, ICommandJob open, ILaunchController control, IVariableMap map, String mode) {
 		this.jobId = jobId;
 		setState(state);
 		this.open = open;
 		this.control = control;
+		this.fVarMap = map;
 		this.launchMode = mode;
 		waitEnabled = true;
 		lastRequestedUpdate = 0;
@@ -335,7 +337,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 				return this;
 			}
 			if (jobId != null && control != null) {
-				AttributeType nProcsAttr = control.getEnvironment().get(JAXBControlConstants.MPI_PROCESSES);
+				AttributeType nProcsAttr = fVarMap.get(JAXBControlConstants.MPI_PROCESSES);
 				if (nProcsAttr != null) {
 					int nProcs = 0;
 					try {
@@ -527,18 +529,18 @@ public class CommandJobStatus implements ICommandJobStatus {
 		String path = null;
 		remoteOutputPath = null;
 		remoteErrorPath = null;
-		AttributeType a = control.getEnvironment().get(JAXBControlConstants.STDOUT_REMOTE_FILE);
+		AttributeType a = fVarMap.get(JAXBControlConstants.STDOUT_REMOTE_FILE);
 		if (a != null) {
 			path = (String) a.getValue();
 			if (path != null && !JAXBControlConstants.ZEROSTR.equals(path)) {
-				remoteOutputPath = control.getEnvironment().getString(jobId, path);
+				remoteOutputPath = fVarMap.getString(jobId, path);
 			}
 		}
-		a = control.getEnvironment().get(JAXBControlConstants.STDERR_REMOTE_FILE);
+		a = fVarMap.get(JAXBControlConstants.STDERR_REMOTE_FILE);
 		if (a != null) {
 			path = (String) a.getValue();
 			if (path != null && !JAXBControlConstants.ZEROSTR.equals(path)) {
-				remoteErrorPath = control.getEnvironment().getString(jobId, path);
+				remoteErrorPath = fVarMap.getString(jobId, path);
 			}
 		}
 		initialized = true;
@@ -792,11 +794,6 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public void waitForJobId(String uuid, String waitUntil, IProgressMonitor monitor) throws CoreException {
-		IVariableMap env = control.getEnvironment();
-		if (env == null) {
-			return;
-		}
-
 		while (!monitor.isCanceled() && isWaitEnabled() && (jobId == null || !isReached(state, waitUntil))) {
 			synchronized (this) {
 				try {
@@ -816,7 +813,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 				}
 			}
 
-			AttributeType a = env.get(uuid);
+			AttributeType a = fVarMap.get(uuid);
 			if (a == null) {
 				continue;
 			}
@@ -842,7 +839,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 			/*
 			 * guarantee the presence of intermediate state in the environment
 			 */
-			env.put(jobId, a);
+			fVarMap.put(jobId, a);
 
 			/*
 			 * Update status
