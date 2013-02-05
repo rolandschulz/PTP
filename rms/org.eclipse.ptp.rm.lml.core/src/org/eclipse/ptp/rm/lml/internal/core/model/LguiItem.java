@@ -698,7 +698,19 @@ public class LguiItem implements ILguiItem {
 			} else if (column.getName().equals(JOB_OWNER)) {
 				addCellToRow(row, column, status.getOwner());
 			} else if (column.getName().equals(JOB_QUEUE_NAME)) {
-				addCellToRow(row, column, status.getQueueName());
+				// Get the queue information from monitoring results instead of from the
+				// user input, if possible
+				String queue = status.getQueueName();
+				if (queue.equals("") && status.getInfo(JOB_QUEUE_NAME) != null) { //$NON-NLS-1$
+					queue = status.getInfo(JOB_QUEUE_NAME);
+				}
+				addCellToRow(row, column, queue);
+			}
+			else { // Check if other information is also stored in the jobdata instance
+				final String value = status.getInfo(column.getName());
+				if (value != null) {
+					addCellToRow(row, column, value);
+				}
 			}
 		}
 
@@ -839,6 +851,11 @@ public class LguiItem implements ILguiItem {
 				}
 			}
 		}
+
+		/*
+		 * Also store additional information from into the jobstatusdata
+		 */
+		getTableHandler().forwardRowToJobData();
 
 		/*
 		 * Remove any rows for removed jobs

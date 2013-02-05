@@ -402,7 +402,7 @@ public class TableView extends ViewPart {
 							fLguiItem.getTableHandler().getSortProperties(gid);
 							fLguiItem.getTableHandler().sort(gid, SWT.UP, getSortIndex(), tree.getSortDirection());
 						}
-						setViewerInput();
+						updateViewerInput();
 						updateAfterLastFilter = true;
 						if (fLguiItem != null && fLguiItem.getTableHandler() != null) {
 							fLguiItem.getObjectStatus().addComponent(eventForwarder);
@@ -608,11 +608,7 @@ public class TableView extends ViewPart {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				if (viewer != null) {
-					if (fLguiItem.getTableHandler().getPattern(gid).size() > 0) {
-						setViewerInput(fLguiItem.getTableHandler().getPattern(gid));
-					} else {
-						setViewerInput();
-					}
+					updateViewerInput();
 					viewer.refresh();
 				}
 				return Status.OK_STATUS;
@@ -1135,6 +1131,20 @@ public class TableView extends ViewPart {
 				viewer.setChildCount(input, input.length);
 				fixRowHeight();
 			}
+		}
+	}
+
+	/**
+	 * If filtering operations are active, use these operations
+	 * to call setViewerInput with parameters. If there are no filters
+	 * active, just call the default setViewerInput function.
+	 * 
+	 */
+	private void updateViewerInput() {
+		if (fLguiItem.getTableHandler().getPattern(gid).size() > 0) {
+			setViewerInput(fLguiItem.getTableHandler().getPattern(gid));
+		} else {
+			setViewerInput();
 		}
 	}
 }

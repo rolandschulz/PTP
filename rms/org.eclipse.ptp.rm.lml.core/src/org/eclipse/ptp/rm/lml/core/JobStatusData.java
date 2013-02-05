@@ -11,6 +11,7 @@ package org.eclipse.ptp.rm.lml.core;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Wrapper for job status which extracts the persistent properties and saves them or reloads them from a memento.
@@ -52,16 +53,42 @@ public class JobStatusData {
 
 	private final Map<String, String> fAttrs = new HashMap<String, String>();
 
+	/**
+	 * Store key value pairs for this job
+	 */
+	private final Map<String, String> jobData = new HashMap<String, String>();
+
 	public JobStatusData(String[][] attrs) {
 		setState(SUBMITTED);
 		setStateDetail(SUBMITTED);
 
-		for (String[] attr : attrs) {
+		for (final String[] attr : attrs) {
 			fAttrs.put(attr[0], attr[1]);
 		}
 
 		fOutReady = getOutputPath() != null && JOB_OUTERR_READY.equals(getStateDetail());
 		fErrReady = getErrorPath() != null && JOB_OUTERR_READY.equals(getStateDetail());
+	}
+
+	/**
+	 * Store a key value pair in the jobData map.
+	 * Store any data for this job, which can be serialized and returned to
+	 * the user within the job tables of lml.ui.
+	 * 
+	 * @param key
+	 *            the key of the stored data, e.g. dispatchdate
+	 * @param value
+	 *            the value of the data, e.g. 21.03.2012
+	 */
+	public void addInfo(String key, String value) {
+		jobData.put(key, value);
+	}
+
+	/**
+	 * @return list of keys given by the jobData hashmap
+	 */
+	public Set<String> getAdditionalKeys() {
+		return jobData.keySet();
 	}
 
 	/**
@@ -90,6 +117,17 @@ public class JobStatusData {
 	 */
 	public boolean getErrReady() {
 		return fErrReady;
+	}
+
+	/**
+	 * Get the value stored for a given key.
+	 * 
+	 * @param key
+	 *            the key, e.g. dispatchdate
+	 * @return the stored value or null, if there is no value stored
+	 */
+	public String getInfo(String key) {
+		return jobData.get(key);
 	}
 
 	/**
@@ -170,11 +208,11 @@ public class JobStatusData {
 	 * @return job was submitted interactively
 	 */
 	public boolean isInteractive() {
-		String interactive = fAttrs.get(INTERACTIVE_ATTR);
+		final String interactive = fAttrs.get(INTERACTIVE_ATTR);
 		if (interactive != null) {
 			try {
 				return Boolean.parseBoolean(interactive);
-			} catch (Exception e) {
+			} catch (final Exception e) {
 			}
 		}
 		return false;
