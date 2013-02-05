@@ -18,7 +18,7 @@
 		<tycho-version>0.15.0</tycho-version>
 		<platform-version>4.2</platform-version>
 		<platform-site>http://download.eclipse.org/eclipse/updates/${platform-version}</platform-site>
-		<tm-version>3.4</tm-version>
+		<tm-version>3.5milestones</tm-version>
 		<tm-site>http://download.eclipse.org/tm/updates/${tm-version}</tm-site>
 		<cdt-version>kepler</cdt-version>
 		<cdt-site>http://download.eclipse.org/tools/cdt/builds/${cdt-version}/nightly</cdt-site>	
