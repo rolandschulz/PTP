@@ -12,7 +12,7 @@ package org.eclipse.ptp.core.jobs;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.debug.core.ILaunch;
+import org.eclipse.debug.core.ILaunchConfiguration;
 
 /**
  * @since 6.0
@@ -96,13 +96,15 @@ public interface IJobControl {
 	/**
 	 * Submit a job for execution
 	 * 
-	 * @param launch
-	 *            job launch
+	 * @param launchConfig
+	 *            job launch configuration
+	 * @param mode
+	 *            job launch mode
 	 * @param monitor
 	 *            progress monitor
 	 * @return job ID that can be used to identify the job
 	 * @throws CoreException
 	 * @since 7.0
 	 */
-	public String submitJob(ILaunch launch, IProgressMonitor monitor) throws CoreException;
+	public String submitJob(ILaunchConfiguration launchConfig, String launchMode, IProgressMonitor monitor) throws CoreException;
 }

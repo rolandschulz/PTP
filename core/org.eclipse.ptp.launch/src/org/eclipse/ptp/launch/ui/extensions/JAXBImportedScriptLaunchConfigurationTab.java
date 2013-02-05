@@ -22,7 +22,7 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.launch.internal.messages.Messages;
-import org.eclipse.ptp.rm.jaxb.control.IJobController;
+import org.eclipse.ptp.rm.jaxb.control.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIConstants;
 import org.eclipse.ptp.rm.jaxb.control.ui.utils.LaunchTabBuilder;
 import org.eclipse.ptp.rm.jaxb.control.ui.utils.WidgetActionUtils;
@@ -78,7 +78,7 @@ public class JAXBImportedScriptLaunchConfigurationTab extends JAXBDynamicLaunchC
 	 * @param parentTab
 	 *            the parent controller tab
 	 */
-	public JAXBImportedScriptLaunchConfigurationTab(IJobController control, LaunchTabType.Import importTab,
+	public JAXBImportedScriptLaunchConfigurationTab(ILaunchController control, LaunchTabType.Import importTab,
 			JAXBControllerLaunchConfigurationTab parentTab, IProgressMonitor monitor) {
 		super(control, parentTab);
 		setProgressMonitor(monitor);

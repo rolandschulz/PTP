@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.internal.runnable;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,13 +31,24 @@ import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatusMap;
  */
 public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 
-	private final IJobControl control;
-	private final Map<String, ICommandJobStatus> map;
+	private final IJobControl fControl;
+	private final Map<String, ICommandJobStatus> fJobStatusMap = new HashMap<String, ICommandJobStatus>();
 	private boolean running = false;
 
-	public JobStatusMap(IJobControl control) {
-		this.control = control;
-		map = new HashMap<String, ICommandJobStatus>();
+	private static final Map<IJobControl, ICommandJobStatusMap> fMaps = Collections
+			.synchronizedMap(new HashMap<IJobControl, ICommandJobStatusMap>());
+
+	public static ICommandJobStatusMap getInstance(IJobControl control) {
+		ICommandJobStatusMap map = fMaps.get(control);
+		if (map == null) {
+			map = new JobStatusMap(control);
+			fMaps.put(control, map);
+		}
+		return map;
+	}
+
+	private JobStatusMap(IJobControl control) {
+		fControl = control;
 	}
 
 	/*
@@ -46,10 +58,10 @@ public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 	public boolean addJobStatus(String jobId, ICommandJobStatus status) {
 		boolean notifyAdd = false;
 		boolean exists = false;
-		synchronized (map) {
-			exists = map.containsKey(jobId);
+		synchronized (fJobStatusMap) {
+			exists = fJobStatusMap.containsKey(jobId);
 			notifyAdd = !exists && !IJobStatus.UNDETERMINED.equals(status.getState());
-			map.put(jobId, status);
+			fJobStatusMap.put(jobId, status);
 		}
 		if (notifyAdd) {
 			try {
@@ -69,8 +81,8 @@ public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 	 */
 	public ICommandJobStatus cancel(String jobId) {
 		ICommandJobStatus status = null;
-		synchronized (map) {
-			status = map.get(jobId);
+		synchronized (fJobStatusMap) {
+			status = fJobStatusMap.get(jobId);
 			if (status != null) {
 				status.cancel();
 				status.setState(IJobStatus.CANCELED);
@@ -82,84 +94,14 @@ public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJobStatusMap#getStatus(java.lang .String)
+	 * @see org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatusMap#dispose()
 	 */
-	public ICommandJobStatus getStatus(String jobId) {
-		ICommandJobStatus status = null;
-		synchronized (map) {
-			status = map.get(jobId);
-		}
-		return status;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJobStatusMap#halt()
-	 */
-	public void halt() {
-		synchronized (map) {
+	public void dispose() {
+		synchronized (fJobStatusMap) {
 			running = false;
-			map.notifyAll();
+			fJobStatusMap.notifyAll();
 		}
-	}
-
-	/**
-	 * Thread daemon for cleanup on the map. Eliminates stray completed state information, and also starts the stream proxies on
-	 * jobs which have been submitted to a scheduler and have become active.
-	 */
-	@Override
-	public void run() {
-		Map<String, String> toPrune = new HashMap<String, String>();
-
-		synchronized (map) {
-			running = true;
-		}
-
-		while (isRunning()) {
-			synchronized (map) {
-				try {
-					map.wait(2 * JAXBControlConstants.MINUTE_IN_MS);
-				} catch (InterruptedException ignored) {
-				}
-
-				for (String jobId : map.keySet()) {
-					IJobStatus status = null;
-					try {
-						status = control.getJobStatus(jobId, true, null);
-					} catch (CoreException e) {
-					}
-					if (status == null || IJobStatus.COMPLETED.equals(status.getState())) {
-						toPrune.put(jobId, jobId);
-					}
-				}
-
-				for (String jobId : toPrune.keySet()) {
-					remove(jobId, true, null);
-				}
-				toPrune.clear();
-			}
-		}
-
-		synchronized (map) {
-			for (String jobId : map.keySet()) {
-				doTerminated(jobId, false, null);
-			}
-			map.clear();
-		}
-	}
-
-	/*
-	 * Synchronized terminate. (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJobStatusMap#terminated(java.lang .String)
-	 */
-	public ICommandJobStatus terminated(String jobId, IProgressMonitor monitor) {
-		ICommandJobStatus status = null;
-		synchronized (map) {
-			status = doTerminated(jobId, true, monitor);
-		}
-		return status;
+		fMaps.remove(fControl);
 	}
 
 	/**
@@ -174,7 +116,7 @@ public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 	 * @return job status
 	 */
 	private ICommandJobStatus doTerminated(String jobId, boolean block, IProgressMonitor monitor) {
-		ICommandJobStatus status = map.get(jobId);
+		ICommandJobStatus status = fJobStatusMap.get(jobId);
 		if (status != null) {
 			String d = status.getStateDetail();
 			if (!IJobStatus.JOB_OUTERR_READY.equals(d)) {
@@ -192,6 +134,30 @@ public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 		return status;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJobStatusMap#getStatus(java.lang .String)
+	 */
+	public ICommandJobStatus getStatus(String jobId) {
+		ICommandJobStatus status = null;
+		synchronized (fJobStatusMap) {
+			status = fJobStatusMap.get(jobId);
+		}
+		return status;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatusMap#initialize()
+	 */
+	public void initialize() {
+		if (!isRunning()) {
+			start();
+		}
+	}
+
 	/**
 	 * FIXME Why not just return running?
 	 * 
@@ -199,7 +165,7 @@ public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 	 */
 	private boolean isRunning() {
 		boolean b = false;
-		synchronized (map) {
+		synchronized (fJobStatusMap) {
 			b = running;
 		}
 		return b;
@@ -218,7 +184,65 @@ public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 	 */
 	private ICommandJobStatus remove(String jobId, boolean block, IProgressMonitor monitor) {
 		ICommandJobStatus status = doTerminated(jobId, block, monitor);
-		map.remove(jobId);
+		fJobStatusMap.remove(jobId);
+		return status;
+	}
+
+	/**
+	 * Thread daemon for cleanup on the map. Eliminates stray completed state information, and also starts the stream proxies on
+	 * jobs which have been submitted to a scheduler and have become active.
+	 */
+	@Override
+	public void run() {
+		Map<String, String> toPrune = new HashMap<String, String>();
+
+		synchronized (fJobStatusMap) {
+			running = true;
+		}
+
+		while (isRunning()) {
+			synchronized (fJobStatusMap) {
+				try {
+					fJobStatusMap.wait(2 * JAXBControlConstants.MINUTE_IN_MS);
+				} catch (InterruptedException ignored) {
+				}
+
+				for (String jobId : fJobStatusMap.keySet()) {
+					IJobStatus status = null;
+					try {
+						status = fControl.getJobStatus(jobId, true, null);
+					} catch (CoreException e) {
+					}
+					if (status == null || IJobStatus.COMPLETED.equals(status.getState())) {
+						toPrune.put(jobId, jobId);
+					}
+				}
+
+				for (String jobId : toPrune.keySet()) {
+					remove(jobId, true, null);
+				}
+				toPrune.clear();
+			}
+		}
+
+		synchronized (fJobStatusMap) {
+			for (String jobId : fJobStatusMap.keySet()) {
+				doTerminated(jobId, false, null);
+			}
+			fJobStatusMap.clear();
+		}
+	}
+
+	/*
+	 * Synchronized terminate. (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJobStatusMap#terminated(java.lang .String)
+	 */
+	public ICommandJobStatus terminated(String jobId, IProgressMonitor monitor) {
+		ICommandJobStatus status = null;
+		synchronized (fJobStatusMap) {
+			status = doTerminated(jobId, true, monitor);
+		}
 		return status;
 	}
 }

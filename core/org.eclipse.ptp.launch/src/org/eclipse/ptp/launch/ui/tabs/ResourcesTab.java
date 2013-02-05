@@ -35,7 +35,6 @@ import org.eclipse.ptp.launch.ui.extensions.JAXBControllerLaunchConfigurationTab
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.ui.widgets.RemoteConnectionWidget;
-import org.eclipse.ptp.rm.jaxb.control.IJobController;
 import org.eclipse.ptp.rm.jaxb.control.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.LaunchControllerManager;
 import org.eclipse.ptp.rm.jaxb.core.JAXBExtensionUtils;
@@ -378,7 +377,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 *            launch controller
 	 * @return
 	 */
-	private IRMLaunchConfigurationDynamicTab getLaunchConfigurationDynamicTab(final IJobController controller) {
+	private IRMLaunchConfigurationDynamicTab getLaunchConfigurationDynamicTab(final ILaunchController controller) {
 		if (!fDynamicTabs.containsKey(controller)) {
 			final IRMLaunchConfigurationDynamicTab[] dynamicTab = new IRMLaunchConfigurationDynamicTab[1];
 			try {
@@ -407,7 +406,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 *            progress monitor
 	 * @return
 	 */
-	private IRMLaunchConfigurationDynamicTab getLaunchConfigurationDynamicTab(final IJobController controller,
+	private IRMLaunchConfigurationDynamicTab getLaunchConfigurationDynamicTab(final ILaunchController controller,
 			IProgressMonitor monitor) {
 		if (!fDynamicTabs.containsKey(controller)) {
 			try {

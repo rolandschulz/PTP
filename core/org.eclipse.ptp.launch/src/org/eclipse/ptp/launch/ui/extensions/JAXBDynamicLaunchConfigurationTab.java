@@ -34,7 +34,7 @@ import org.eclipse.ptp.launch.internal.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
-import org.eclipse.ptp.rm.jaxb.control.IJobController;
+import org.eclipse.ptp.rm.jaxb.control.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.control.runnable.ScriptHandler;
@@ -88,7 +88,7 @@ import org.eclipse.swt.widgets.Shell;
 public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigurationTab implements IJAXBLaunchConfigurationTab,
 		SelectionListener {
 
-	protected final IJobController fControl;
+	protected final ILaunchController fControl;
 	protected final ValueUpdateHandler updateHandler;
 	protected final List<Viewer> viewers;
 	protected final Map<Object, IUpdateModel> localWidgets;
@@ -110,7 +110,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 * @param parentTab
 	 *            the parent controller tab
 	 */
-	public JAXBDynamicLaunchConfigurationTab(IJobController control, TabControllerType controller,
+	public JAXBDynamicLaunchConfigurationTab(ILaunchController control, TabControllerType controller,
 			JAXBControllerLaunchConfigurationTab parentTab, IProgressMonitor monitor) {
 		this(control, parentTab);
 		setProgressMonitor(monitor);
@@ -136,7 +136,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 * @param parentTab
 	 *            the parent controller tab
 	 */
-	protected JAXBDynamicLaunchConfigurationTab(IJobController control, JAXBControllerLaunchConfigurationTab parentTab) {
+	protected JAXBDynamicLaunchConfigurationTab(ILaunchController control, JAXBControllerLaunchConfigurationTab parentTab) {
 		super(parentTab);
 		fControl = control;
 		fDynamicTab = parentTab;
@@ -199,7 +199,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	/**
 	 * @return the remote connection
 	 */
-	public IJobController getJobControl() {
+	public ILaunchController getJobControl() {
 		return fControl;
 	}
 
@@ -228,7 +228,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 */
 	// Based on org.eclipse.ptp.rm.launch.RMLaunchUtils#getRemoteConnection(ILaunchConfiguration, IProgressMonitor)
 	public IRemoteConnection getRemoteConnection() {
-		final IJobController jobControl = getParent().getJobControl();
+		final ILaunchController jobControl = getParent().getJobControl();
 		final String remoteServicesID = jobControl.getRemoteServicesId();
 		final String connectionName = jobControl.getConnectionName();
 

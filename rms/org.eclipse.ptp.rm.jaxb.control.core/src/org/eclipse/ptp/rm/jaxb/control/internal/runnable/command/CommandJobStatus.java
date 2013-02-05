@@ -21,14 +21,14 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IStreamsProxy;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.jobs.IPJobStatus;
+import org.eclipse.ptp.core.jobs.JobManager;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
-import org.eclipse.ptp.rm.jaxb.control.IJobController;
+import org.eclipse.ptp.rm.jaxb.control.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlCorePlugin;
 import org.eclipse.ptp.rm.jaxb.control.JAXBUtils;
@@ -37,6 +37,7 @@ import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatus;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatusMap;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStreamMonitor;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStreamsProxy;
+import org.eclipse.ptp.rm.jaxb.control.internal.runnable.JobStatusMap;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.JAXBCoreConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
@@ -172,14 +173,13 @@ public class CommandJobStatus implements ICommandJobStatus {
 		}
 	}
 
-	private final IJobController control;
-	private final IVariableMap varMap;
+	private final ILaunchController control;
 	private final ICommandJob open;
 
 	private String jobId;
 	private String owner;
 	private String queue;
-	private ILaunch launch;
+	private final String launchMode;
 	private String state;
 	private String stateDetail;
 	private String remoteOutputPath;
@@ -199,8 +199,8 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * @param control
 	 *            resource manager control
 	 */
-	public CommandJobStatus(ICommandJob open, IJobController control) {
-		this(null, UNDETERMINED, open, control);
+	public CommandJobStatus(ICommandJob open, ILaunchController control, String mode) {
+		this(null, UNDETERMINED, open, control, mode);
 	}
 
 	/**
@@ -211,12 +211,12 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * @param control
 	 *            resource manager control
 	 */
-	public CommandJobStatus(String jobId, String state, ICommandJob open, IJobController control) {
+	public CommandJobStatus(String jobId, String state, ICommandJob open, ILaunchController control, String mode) {
 		this.jobId = jobId;
 		setState(state);
 		this.open = open;
 		this.control = control;
-		this.varMap = control.getEnvironment();
+		this.launchMode = mode;
 		waitEnabled = true;
 		lastRequestedUpdate = 0;
 		initialized = false;
@@ -224,10 +224,10 @@ public class CommandJobStatus implements ICommandJobStatus {
 		fFilesChecked = false;
 	}
 
-	/**
-	 * Closes the proxy and calls destroy on the process. Used for interactive job cancellation.
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @return true if canceled during this call.
+	 * @see org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatus#cancel()
 	 */
 	public boolean cancel() {
 		synchronized (this) {
@@ -260,8 +260,10 @@ public class CommandJobStatus implements ICommandJobStatus {
 		}
 	}
 
-	/**
-	 * Notifies all callers of <code>waitForId</code> to exit wait.
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatus#cancelWait()
 	 */
 	public void cancelWait() {
 		synchronized (this) {
@@ -368,25 +370,31 @@ public class CommandJobStatus implements ICommandJobStatus {
 		return remoteErrorPath;
 	}
 
-	/**
-	 * @return jobId either internal UUID or resource-specific id
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.core.jobs.IJobStatus#getJobId()
 	 */
 	public synchronized String getJobId() {
 		return jobId;
 	}
 
-	/**
-	 * for throttling requests.
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatus#getLastUpdateRequest()
 	 */
 	public synchronized long getLastUpdateRequest() {
 		return lastRequestedUpdate;
 	}
 
-	/**
-	 * @return launch used for this submission.
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.core.jobs.IJobStatus#getLaunchMode()
 	 */
-	public ILaunch getLaunch() {
-		return launch;
+	public String getLaunchMode() {
+		return launchMode;
 	}
 
 	/*
@@ -434,8 +442,10 @@ public class CommandJobStatus implements ICommandJobStatus {
 		return queue;
 	}
 
-	/**
-	 * @return state of the job (not of the submission process).
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.core.jobs.IJobStatus#getState()
 	 */
 	public synchronized String getState() {
 		if (stateDetail != IJobStatus.CANCELED) {
@@ -444,8 +454,10 @@ public class CommandJobStatus implements ICommandJobStatus {
 		return state;
 	}
 
-	/**
-	 * @return more specific state identifier.
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.core.jobs.IJobStatus#getStateDetail()
 	 */
 	public synchronized String getStateDetail() {
 		if (stateDetail != IJobStatus.CANCELED) {
@@ -493,20 +505,19 @@ public class CommandJobStatus implements ICommandJobStatus {
 		return 0;
 	}
 
-	/**
-	 * Wrapper containing monitoring functionality for the associated output and error streams.
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.core.jobs.IJobStatus#getStreamsProxy()
 	 */
 	public IStreamsProxy getStreamsProxy() {
 		return proxy;
 	}
 
 	/*
-	 * NOTE: Initialize must be called immediately after the return of the submit.run() method while the property for the jobId is
-	 * pinned and in the environment. Note also that batch variable replacement will not work, as that would not be interpretable
-	 * for the RM. One actually needs to configure two separate strings in this case, giving one to the script and one to the
-	 * resource manager.
+	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus#initialize(java.lang.String )
+	 * @see org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatus#initialize(java.lang.String)
 	 */
 	public void initialize(String jobId) {
 		if (initialized) {
@@ -516,26 +527,27 @@ public class CommandJobStatus implements ICommandJobStatus {
 		String path = null;
 		remoteOutputPath = null;
 		remoteErrorPath = null;
-		AttributeType a = varMap.get(JAXBControlConstants.STDOUT_REMOTE_FILE);
+		AttributeType a = control.getEnvironment().get(JAXBControlConstants.STDOUT_REMOTE_FILE);
 		if (a != null) {
 			path = (String) a.getValue();
 			if (path != null && !JAXBControlConstants.ZEROSTR.equals(path)) {
-				remoteOutputPath = varMap.getString(jobId, path);
+				remoteOutputPath = control.getEnvironment().getString(jobId, path);
 			}
 		}
-		a = varMap.get(JAXBControlConstants.STDERR_REMOTE_FILE);
+		a = control.getEnvironment().get(JAXBControlConstants.STDERR_REMOTE_FILE);
 		if (a != null) {
 			path = (String) a.getValue();
 			if (path != null && !JAXBControlConstants.ZEROSTR.equals(path)) {
-				remoteErrorPath = varMap.getString(jobId, path);
+				remoteErrorPath = control.getEnvironment().getString(jobId, path);
 			}
 		}
 		initialized = true;
 	}
 
-	/**
-	 * @return whether a process object has been attached to this status object (in which case the submission is not through an
-	 *         asynchronous job scheduler).
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.core.jobs.IJobStatus#isInteractive()
 	 */
 	public boolean isInteractive() {
 		return process != null;
@@ -614,14 +626,6 @@ public class CommandJobStatus implements ICommandJobStatus {
 		fFilesChecked = true;
 	}
 
-	/**
-	 * @param launch
-	 *            launch used for this submission.
-	 */
-	public void setLaunch(ILaunch launch) {
-		this.launch = launch;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -631,9 +635,10 @@ public class CommandJobStatus implements ICommandJobStatus {
 		this.owner = owner;
 	}
 
-	/**
-	 * @param process
-	 *            object (used for interactive cancellation)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatus#setProcess(org.eclipse.ptp.remote.core.IRemoteProcess)
 	 */
 	public void setProcess(IRemoteProcess process) {
 		this.process = process;
@@ -661,9 +666,11 @@ public class CommandJobStatus implements ICommandJobStatus {
 		}
 	}
 
-	/**
-	 * @param proxy
-	 *            Wrapper containing monitoring functionality for the associated output and error streams.
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatus#setProxy(org.eclipse.ptp.rm.jaxb.control.internal.
+	 * ICommandJobStreamsProxy)
 	 */
 	public void setProxy(ICommandJobStreamsProxy proxy) {
 		this.proxy = proxy;
@@ -678,9 +685,10 @@ public class CommandJobStatus implements ICommandJobStatus {
 		this.queue = name;
 	}
 
-	/**
-	 * @param state
-	 *            of the job (not of the submission process).
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatus#setState(java.lang.String)
 	 */
 	public synchronized void setState(String state) {
 		if (!canUpdateState(state)) {
@@ -741,9 +749,10 @@ public class CommandJobStatus implements ICommandJobStatus {
 		}
 	}
 
-	/**
-	 * @param time
-	 *            in milliseconds of last update request issued to remote resource
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatus#setUpdateRequestTime(long)
 	 */
 	public synchronized void setUpdateRequestTime(long update) {
 		lastRequestedUpdate = update;
@@ -777,19 +786,12 @@ public class CommandJobStatus implements ICommandJobStatus {
 	}
 
 	/*
-	 * Wait until the jobId has been set on the job id property in the environment.
-	 * 
-	 * The uuid key for the property containing as its name the resource-specific jobId and as its value the state.
-	 * 
-	 * The waitUntil state will usually be either SUBMITTED or RUNNING (for interactive)
-	 * 
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus#waitForJobId(java.lang .String, java.lang.String,
-	 * org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl)
+	 * @see org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatus#waitForJobId(java.lang.String, java.lang.String,
+	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public void waitForJobId(String uuid, String waitUntil, ICommandJobStatusMap map, IProgressMonitor monitor)
-			throws CoreException {
+	public void waitForJobId(String uuid, String waitUntil, IProgressMonitor monitor) throws CoreException {
 		IVariableMap env = control.getEnvironment();
 		if (env == null) {
 			return;
@@ -841,8 +843,13 @@ public class CommandJobStatus implements ICommandJobStatus {
 			 * guarantee the presence of intermediate state in the environment
 			 */
 			env.put(jobId, a);
-			if (!map.addJobStatus(jobId, this)) {
-				control.jobStateChanged(jobId, this);
+
+			/*
+			 * Update status
+			 */
+			ICommandJobStatusMap map = JobStatusMap.getInstance(control);
+			if (map != null && !map.addJobStatus(jobId, this)) {
+				JobManager.getInstance().fireJobChanged(this);
 			}
 		}
 	}

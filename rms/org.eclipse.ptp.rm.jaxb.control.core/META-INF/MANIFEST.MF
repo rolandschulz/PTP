@@ -19,13 +19,12 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: org.eclipse.ptp.rm.jaxb.control;
-  x-friends:="org.eclipse.ptp.rm.jaxb.control.ui,
+  x-friends:="org.eclipse.ptp.etfw.parallel,
+   org.eclipse.ptp.launch,
+   org.eclipse.ptp.rm.jaxb.control.ui,
    org.eclipse.ptp.rm.jaxb.tests,
    org.eclipse.ptp.rm.lml.monitor.core,
-   org.eclipse.ptp.rm.lml_jaxb,
-   org.eclipse.ptp.launch,
-   org.eclipse.ptp.rm.lml.monitor.ui,
-   org.eclipse.ptp.etfw.parallel",
+   org.eclipse.ptp.rm.lml.monitor.ui",
  org.eclipse.ptp.rm.jaxb.control.data;x-friends:="org.eclipse.ptp.rm.jaxb.control.ui,org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.launch",
  org.eclipse.ptp.rm.jaxb.control.exceptions;x-friends:="org.eclipse.ptp.rm.jaxb.control.ui,org.eclipse.ptp.rm.jaxb.tests",
  org.eclipse.ptp.rm.jaxb.control.internal;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.control.ui",
@@ -35,10 +34,6 @@ Export-Package: org.eclipse.ptp.rm.jaxb.control;
  org.eclipse.ptp.rm.jaxb.control.internal.runnable.command;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.control.ui,org.eclipse.ptp.launch",
  org.eclipse.ptp.rm.jaxb.control.internal.utils;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.control.ui",
  org.eclipse.ptp.rm.jaxb.control.internal.variables;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.control.ui,org.eclipse.ptp.launch",
- org.eclipse.ptp.rm.jaxb.control.runnable;
-  x-friends:="org.eclipse.ptp.rm.jaxb.control.ui,
-   org.eclipse.ptp.rm.lml_jaxb,
-   org.eclipse.ptp.rm.jaxb.tests,
-   org.eclipse.ptp.rm.launch"
+ org.eclipse.ptp.rm.jaxb.control.runnable;x-friends:="org.eclipse.ptp.rm.jaxb.control.ui,org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.launch"
 Bundle-Vendor: %pluginProvider
 Bundle-Localization: plugin

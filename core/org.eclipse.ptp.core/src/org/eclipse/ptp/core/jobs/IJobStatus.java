@@ -11,7 +11,6 @@
 package org.eclipse.ptp.core.jobs;
 
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IStreamsProxy;
 
 /**
@@ -111,12 +110,9 @@ public interface IJobStatus extends IAdaptable {
 	public String getJobId();
 
 	/**
-	 * Get the launch used for this job
-	 * 
-	 * @return launch
 	 * @since 7.0
 	 */
-	public ILaunch getLaunch();
+	public String getLaunchMode();
 
 	/**
 	 * @return path to remote file

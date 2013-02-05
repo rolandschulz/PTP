@@ -25,13 +25,11 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.jobs.IJobListener;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.jobs.JobManager;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
-import org.eclipse.ptp.core.util.LaunchUtils;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
@@ -155,19 +153,21 @@ public class MonitorControl implements IMonitorControl {
 	}
 
 	private void addJob(IJobStatus status) {
-		ILaunchConfiguration configuration = status.getLaunch().getLaunchConfiguration();
-		String configName = LaunchUtils.getTemplateName(configuration);
-		String[][] attrs = { { JobStatusData.JOB_ID_ATTR, status.getJobId() },
-				{ JobStatusData.REMOTE_SERVICES_ID_ATTR, getRemoteServicesId() },
-				{ JobStatusData.CONNECTION_NAME_ATTR, getConnectionName() }, { JobStatusData.CONFIGURATION_NAME_ATTR, configName },
-				{ JobStatusData.QUEUE_NAME_ATTR, status.getQueueName() }, { JobStatusData.OWNER_ATTR, status.getOwner() },
-				{ JobStatusData.STDOUT_REMOTE_FILE_ATTR, status.getOutputPath() },
-				{ JobStatusData.STDERR_REMOTE_FILE_ATTR, status.getErrorPath() },
-				{ JobStatusData.INTERACTIVE_ATTR, Boolean.toString(status.isInteractive()) } };
-		final JobStatusData data = new JobStatusData(attrs);
-		data.setState(status.getState());
-		data.setStateDetail(status.getStateDetail());
-		fLMLManager.addUserJob(getControlId(), status.getJobId(), data);
+		ILaunchController controller = LaunchControllerManager.getInstance().getLaunchController(status.getControlId());
+		if (controller != null) {
+			String[][] attrs = { { JobStatusData.JOB_ID_ATTR, status.getJobId() },
+					{ JobStatusData.REMOTE_SERVICES_ID_ATTR, getRemoteServicesId() },
+					{ JobStatusData.CONNECTION_NAME_ATTR, getConnectionName() },
+					{ JobStatusData.CONFIGURATION_NAME_ATTR, controller.getConfiguration().getName() },
+					{ JobStatusData.QUEUE_NAME_ATTR, status.getQueueName() }, { JobStatusData.OWNER_ATTR, status.getOwner() },
+					{ JobStatusData.STDOUT_REMOTE_FILE_ATTR, status.getOutputPath() },
+					{ JobStatusData.STDERR_REMOTE_FILE_ATTR, status.getErrorPath() },
+					{ JobStatusData.INTERACTIVE_ATTR, Boolean.toString(status.isInteractive()) } };
+			final JobStatusData data = new JobStatusData(attrs);
+			data.setState(status.getState());
+			data.setStateDetail(status.getStateDetail());
+			fLMLManager.addUserJob(getControlId(), status.getJobId(), data);
+		}
 	}
 
 	/*
@@ -203,19 +203,6 @@ public class MonitorControl implements IMonitorControl {
 	@Override
 	public String getControlId() {
 		return fControlId;
-	}
-
-	private String getControlId(IJobStatus status) {
-		ILaunchConfiguration configuration = status.getLaunch().getLaunchConfiguration();
-		if (configuration != null) {
-			String connectionName = LaunchUtils.getConnectionName(configuration);
-			String remoteServicesId = LaunchUtils.getRemoteServicesId(configuration);
-			String conifigurationName = LaunchUtils.getTemplateName(configuration);
-			if (connectionName != null && remoteServicesId != null && conifigurationName != null) {
-				return MonitorControlManager.generateMonitorId(remoteServicesId, connectionName, conifigurationName);
-			}
-		}
-		return null;
 	}
 
 	private RequestType getMonitorConfigurationRequestType(ILaunchController controller) {
@@ -573,8 +560,7 @@ public class MonitorControl implements IMonitorControl {
 	}
 
 	private void updateJob(IJobStatus status) {
-		String monitorId = getControlId(status);
-		if (monitorId != null && monitorId.equals(getControlId())) {
+		if (status.getControlId().equals(getControlId())) {
 			fLMLManager.updateUserJob(getControlId(), status.getJobId(), status.getState(), status.getStateDetail());
 		}
 	}

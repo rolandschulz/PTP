@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 The Regents of the University of California. 
+Copyright (c) 2007 The Regents of the University of California. 
  * This material was produced under U.S. Government contract W-7405-ENG-36 
  * for Los Alamos National Laboratory, which is operated by the University 
  * of California for the U.S. Department of Energy. The U.S. Government has 
@@ -44,8 +44,8 @@ public class PJobWorkbenchAdapter extends WorkbenchAdapter {
 		} else if (job.getState() == IJobStatus.COMPLETED) {
 			state = 3;
 		}
-		return new ImageImageDescriptor(ParallelImages.jobImages[state][job.getLaunch().getLaunchMode()
-				.equals(ILaunchManager.DEBUG_MODE) ? 1 : 0]);
+		return new ImageImageDescriptor(ParallelImages.jobImages[state][job.getLaunchMode().equals(ILaunchManager.DEBUG_MODE) ? 1
+				: 0]);
 	}
 
 	/*

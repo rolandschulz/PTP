@@ -14,17 +14,56 @@ import java.net.URL;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.ptp.core.jobs.IJobControl;
+import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJob;
+import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
+import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 
 /**
  * Launch Control interface.
  * 
  */
-public interface ILaunchController extends IJobController {
-
+public interface ILaunchController extends IJobControl {
 	/**
 	 * Safely dispose of this controller.
 	 */
 	public void dispose();
+
+	/**
+	 * Get the control configuration
+	 * 
+	 * @return configuration
+	 */
+	public ResourceManagerData getConfiguration();
+
+	/**
+	 * Get the connection used to control the job
+	 * 
+	 * @return remote connection name
+	 * @since 6.0
+	 */
+	public String getConnectionName();
+
+	/**
+	 * @return variable resolver environment
+	 */
+	public IVariableMap getEnvironment();
+
+	/**
+	 * Get the current interactive job.
+	 * 
+	 * @return current interactive job
+	 */
+	public ICommandJob getInteractiveJob();
+
+	/**
+	 * Get the remote services provider used to control the job
+	 * 
+	 * @return remote services provider
+	 * @since 6.0
+	 */
+	public String getRemoteServicesId();
 
 	/**
 	 * Initialize the controller. The controller is ready to be used after initialization, however it must be started before any
@@ -42,11 +81,34 @@ public interface ILaunchController extends IJobController {
 	public boolean isInitialized();
 
 	/**
+	 * Runs an action command.
+	 * 
+	 * @param action
+	 *            name of action or command
+	 * @param resetValue
+	 *            name of property or attribute
+	 * @param configuration
+	 *            current values
+	 * @return result of the action on resetValue, if any
+	 * 
+	 */
+	public Object runActionCommand(String action, String resetValue, ILaunchConfiguration configuration) throws CoreException;
+
+	/**
 	 * Set the connection name for this control
 	 * 
 	 * @param connName
 	 */
 	public void setConnectionName(String connName);
+
+	/**
+	 * Set the current interactive job.
+	 * 
+	 * TODO: The current implementation allows only one interactive job per launch controller.
+	 * 
+	 * @param interactiveJob
+	 */
+	public void setInteractiveJob(ICommandJob interactiveJob);
 
 	/**
 	 * Set the remote services ID for this control

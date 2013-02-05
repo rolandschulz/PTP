@@ -15,39 +15,13 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
-import org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
-import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJob;
 import org.eclipse.ptp.rm.jaxb.control.internal.messages.Messages;
 
 public final class JAXBUtils {
-
-	/*
-	 * copied from AbstractToolRuntimeSystem; the RM should shut down when the remote connection is closed
-	 */
-	private class ConnectionChangeListener implements IRemoteConnectionChangeListener {
-		public ConnectionChangeListener() {
-			// Nothing
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener# connectionChanged
-		 * (org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent)
-		 */
-		public void connectionChanged(IRemoteConnectionChangeEvent event) {
-			if (event.getType() == IRemoteConnectionChangeEvent.CONNECTION_ABORTED
-					|| event.getType() == IRemoteConnectionChangeEvent.CONNECTION_CLOSED) {
-			}
-		}
-	}
 
 	/**
 	 * tries to open connection if closed
@@ -69,26 +43,6 @@ public final class JAXBUtils {
 		}
 	}
 
-	/**
-	 * Checks to see if there was an exception thrown by the run method.
-	 * 
-	 * @param job
-	 * @throws CoreException
-	 *             if the job execution raised and exception
-	 */
-	private static void checkJobForError(ICommandJob job) throws CoreException {
-		IStatus status = job.getRunStatus();
-		if (status != null && status.getSeverity() == IStatus.ERROR) {
-			Throwable t = status.getException();
-			if (t instanceof CoreException) {
-				throw (CoreException) t;
-			} else {
-				throw CoreExceptionUtils.newException(status.getMessage(), t);
-			}
-		}
-	}
-
-	private ConnectionChangeListener connectionListener;
 	private static final Map<String, RemoteServicesDelegate> fDelegates = new HashMap<String, RemoteServicesDelegate>();
 
 	/**

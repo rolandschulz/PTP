@@ -11,7 +11,6 @@ package org.eclipse.ptp.rm.jaxb.control.internal;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.debug.core.ILaunch;
 import org.eclipse.ptp.core.jobs.IPJobStatus;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 
@@ -48,7 +47,12 @@ public interface ICommandJobStatus extends IPJobStatus {
 	public long getLastUpdateRequest();
 
 	/**
-	 * Initialize remote file paths from current env.
+	 * Initialize remote file paths from current environment.
+	 * 
+	 * Initialize must be called immediately after the return of the submit.run() method while the property for the jobId is
+	 * pinned and in the environment. Note also that batch variable replacement will not work, as that would not be interpretable
+	 * for the RM. One actually needs to configure two separate strings in this case, giving one to the script and one to the
+	 * resource manager.
 	 * 
 	 * @param jobId
 	 *            for the associated job
@@ -64,11 +68,6 @@ public interface ICommandJobStatus extends IPJobStatus {
 	 *            progress monitor for potential cancellation
 	 */
 	public void maybeWaitForHandlerFiles(int blockForSecs, IProgressMonitor monitor);
-
-	/**
-	 * @param launch
-	 */
-	public void setLaunch(ILaunch launch);
 
 	/**
 	 * @param owner
@@ -112,17 +111,18 @@ public interface ICommandJobStatus extends IPJobStatus {
 	public boolean stateChanged();
 
 	/**
-	 * Do a monitor wait until the job id arrives.
+	 * Wait until the jobId has been set on the job id property in the environment.
+	 * 
+	 * The uuid key for the property containing as its name the resource-specific jobId and as its value the state.
+	 * 
+	 * The waitUntil state will usually be either SUBMITTED or RUNNING (for interactive)
 	 * 
 	 * @param uuid
 	 *            internal id which the job id will be mapped to.
 	 * @param waitUntil
 	 *            wait until this state is reached.
-	 * @param map
-	 *            callback to map for waits with intermediate states
 	 * @oaram monitor
 	 * @throws CoreException
 	 */
-	public void waitForJobId(String uuid, String waitUntil, ICommandJobStatusMap map, IProgressMonitor monitor)
-			throws CoreException;
+	public void waitForJobId(String uuid, String waitUntil, IProgressMonitor monitor) throws CoreException;
 }

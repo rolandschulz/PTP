@@ -26,7 +26,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
-import org.eclipse.ptp.rm.jaxb.control.IJobController;
+import org.eclipse.ptp.rm.jaxb.control.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlCorePlugin;
 import org.eclipse.ptp.rm.jaxb.control.JAXBUtils;
@@ -52,12 +52,11 @@ import org.eclipse.ptp.rm.jaxb.core.data.ManagedFilesType;
 public class ManagedFilesJob extends Job {
 
 	public enum Operation {
-		COPY,
-		DELETE
+		COPY, DELETE
 	};
 
 	private final String uuid;
-	private final IJobController control;
+	private final ILaunchController control;
 	private final List<ManagedFileType> files;
 
 	private RemoteServicesDelegate delegate;
@@ -76,7 +75,7 @@ public class ManagedFilesJob extends Job {
 	 *            callback to resource manager control
 	 * @throws CoreException
 	 */
-	public ManagedFilesJob(String uuid, ManagedFilesType files, IJobController control) throws CoreException {
+	public ManagedFilesJob(String uuid, ManagedFilesType files, ILaunchController control) throws CoreException {
 		super(Messages.ManagedFilesJob);
 		this.uuid = uuid;
 		this.control = control;

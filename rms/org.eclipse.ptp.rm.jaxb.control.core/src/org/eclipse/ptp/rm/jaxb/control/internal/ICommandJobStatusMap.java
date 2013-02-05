@@ -42,7 +42,7 @@ public interface ICommandJobStatusMap extends Runnable {
 	/**
 	 * shuts down the map's internal thread
 	 */
-	public void halt();
+	public void dispose();
 
 	/**
 	 * @param jobId
@@ -52,4 +52,6 @@ public interface ICommandJobStatusMap extends Runnable {
 	 * @return object containing status info and stream proxy
 	 */
 	public ICommandJobStatus terminated(String jobId, IProgressMonitor monitor);
+
+	public void initialize();
 }

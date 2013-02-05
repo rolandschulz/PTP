@@ -14,7 +14,6 @@ package org.eclipse.ptp.rm.jaxb.control.internal.runnable.command;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Map;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
@@ -29,13 +28,12 @@ import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
-import org.eclipse.ptp.rm.jaxb.control.IJobController;
+import org.eclipse.ptp.rm.jaxb.control.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.JAXBUtils;
 import org.eclipse.ptp.rm.jaxb.control.LaunchController;
 import org.eclipse.ptp.rm.jaxb.control.internal.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.control.internal.utils.DebuggingLogger;
-import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.SimpleCommandType;
 import org.eclipse.ptp.utils.core.ArgumentParser;
 
@@ -49,9 +47,8 @@ import org.eclipse.ptp.utils.core.ArgumentParser;
 public class SimpleCommandJob extends Job {
 
 	private final SimpleCommandType fCommand;
-	private final IJobController fControl;
-	private final IVariableMap fRmVarMap;
-	private final int fFlags;
+	private final ILaunchController fControl;
+	private final CommandJob fCommandJob;
 	private final String fUuid;
 	private final String fDirectory;
 
@@ -69,14 +66,14 @@ public class SimpleCommandJob extends Job {
 	 * @param rm
 	 *            the calling resource manager
 	 */
-	public SimpleCommandJob(String uuid, SimpleCommandType command, String directory, IJobController control) {
+	public SimpleCommandJob(String uuid, SimpleCommandType command, String directory, ILaunchController control,
+			CommandJob commandJob) {
 		super(command.getName() != null ? command.getName() : "Simple Command"); //$NON-NLS-1$
 		fUuid = uuid;
 		fCommand = command;
 		fDirectory = command.getDirectory() != null ? command.getDirectory() : directory;
 		fControl = control;
-		fRmVarMap = fControl.getEnvironment();
-		fFlags = getFlags(command.getFlags());
+		fCommandJob = commandJob;
 	}
 
 	/**
@@ -155,12 +152,12 @@ public class SimpleCommandJob extends Job {
 			if (progress.isCanceled()) {
 				return Status.CANCEL_STATUS;
 			}
-			prepareEnv(builder);
+			fCommandJob.prepareEnv(builder);
 			progress.worked(10);
 
 			fProcess = null;
 			try {
-				fProcess = builder.start(fFlags);
+				fProcess = builder.start(fCommandJob.getFlags(fCommand.getFlags()));
 			} catch (IOException t) {
 				throw CoreExceptionUtils.newException(Messages.CouldNotLaunch + builder.command(), t);
 			}
@@ -241,30 +238,6 @@ public class SimpleCommandJob extends Job {
 	}
 
 	/**
-	 * Converts or'd string into bit-wise or of available flags for remote process builder.
-	 * 
-	 * @param flags
-	 * @return bit-wise or
-	 */
-	private int getFlags(String flags) {
-		if (flags == null) {
-			return IRemoteProcessBuilder.NONE;
-		}
-
-		String[] split = flags.split(JAXBControlConstants.REGPIP);
-		int f = IRemoteProcessBuilder.NONE;
-		for (String s : split) {
-			s = s.trim();
-			if (JAXBControlConstants.TAG_ALLOCATE_PTY.equals(s)) {
-				f |= IRemoteProcessBuilder.ALLOCATE_PTY;
-			} else if (JAXBControlConstants.TAG_FORWARD_X11.equals(s)) {
-				f |= IRemoteProcessBuilder.FORWARD_X11;
-			}
-		}
-		return f;
-	}
-
-	/**
 	 * Resolves the command arguments against the current environment, then gets the process builder from the remote connection.
 	 * Also sets the directory if it is defined (otherwise it defaults to the connection dir).
 	 * 
@@ -274,7 +247,7 @@ public class SimpleCommandJob extends Job {
 	 */
 	private IRemoteProcessBuilder prepareCommand(IProgressMonitor monitor) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 10);
-		ArgumentParser args = new ArgumentParser(fRmVarMap.getString(fUuid, fCommand.getExec()));
+		ArgumentParser args = new ArgumentParser(fControl.getEnvironment().getString(fUuid, fCommand.getExec()));
 		RemoteServicesDelegate delegate = JAXBUtils.getRemoteServicesDelegate(fControl.getRemoteServicesId(),
 				fControl.getConnectionName(), progress.newChild(5));
 		if (delegate.getRemoteConnection() == null) {
@@ -298,29 +271,10 @@ public class SimpleCommandJob extends Job {
 		}
 		IRemoteProcessBuilder builder = delegate.getRemoteServices().getProcessBuilder(conn, args.getTokenList());
 		if (fDirectory != null && !JAXBControlConstants.ZEROSTR.equals(fDirectory)) {
-			String directory = fRmVarMap.getString(fUuid, fDirectory);
+			String directory = fControl.getEnvironment().getString(fUuid, fDirectory);
 			IFileStore dir = delegate.getRemoteFileManager().getResource(directory);
 			builder.directory(dir);
 		}
 		return builder;
-	}
-
-	/**
-	 * Either appends to or replaces the process builder's environment with the Launch Configuration environment variables.
-	 * 
-	 * @param builder
-	 * @throws CoreException
-	 */
-	private void prepareEnv(IRemoteProcessBuilder builder) throws CoreException {
-		if (!fControl.getAppendEnv()) {
-			builder.environment().clear();
-		}
-
-		Map<String, String> live = fControl.getLaunchEnv();
-		for (String var : live.keySet()) {
-			builder.environment().put(var, live.get(var));
-		}
-
-		builder.redirectErrorStream(fCommand.isRedirectStderr());
 	}
 }

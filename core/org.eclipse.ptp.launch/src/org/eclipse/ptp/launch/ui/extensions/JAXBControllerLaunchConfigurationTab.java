@@ -24,7 +24,7 @@ import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
-import org.eclipse.ptp.rm.jaxb.control.IJobController;
+import org.eclipse.ptp.rm.jaxb.control.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModelEnabled;
 import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler;
 import org.eclipse.ptp.rm.jaxb.control.ui.launch.IJAXBParentLaunchConfigurationTab;
@@ -53,7 +53,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 		IUpdateModelEnabled, SelectionListener {
 
 	private RemoteServicesDelegate delegate;
-	private final IJobController fControl;
+	private final ILaunchController fControl;
 	private final LaunchTabType launchTabData;
 	private final ValueUpdateHandler updateHandler;
 	private final LCVariableMap lcMap;
@@ -67,7 +67,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	 *            the launch dialog parent
 	 * @throws Throwable
 	 */
-	public JAXBControllerLaunchConfigurationTab(IJobController control, IProgressMonitor monitor) throws Throwable {
+	public JAXBControllerLaunchConfigurationTab(ILaunchController control, IProgressMonitor monitor) throws Throwable {
 		setProgressMonitor(monitor);
 		fControl = control;
 		LCVariableMap varMap = null;
@@ -115,14 +115,14 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 		lcMap = varMap;
 	}
 
-	private IEnvManager getEnvManager(IJobController control, IProgressMonitor monitor) {
+	private IEnvManager getEnvManager(ILaunchController control, IProgressMonitor monitor) {
 		SubMonitor progress = SubMonitor.convert(monitor, 10);
 		LazyEnvManagerDetector envMgr = new LazyEnvManagerDetector(getConnection(control));
 		envMgr.setProgressMonitor(progress.newChild(10));
 		return envMgr;
 	}
 
-	private IRemoteConnection getConnection(final IJobController control) {
+	private IRemoteConnection getConnection(final ILaunchController control) {
 		final IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(control.getRemoteServicesId(),
 				getProgressMonitor());
 
@@ -190,7 +190,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	 * 
 	 * @return the ResourceManager (base) configuration
 	 */
-	public IJobController getJobControl() {
+	public ILaunchController getJobControl() {
 		return fControl;
 	}
 

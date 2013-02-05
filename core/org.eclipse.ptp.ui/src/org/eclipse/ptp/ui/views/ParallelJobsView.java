@@ -487,8 +487,8 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 				terminateAllAction.setEnabled(false);
 			} else {
 				IJobStatus job = (IJobStatus) ((IStructuredSelection) selection).getFirstElement();
-				terminateAllAction.setEnabled(!(job.getLaunch().getLaunchMode().equals(ILaunchManager.DEBUG_MODE) || job.getState()
-						.equals(IJobStatus.COMPLETED)));
+				terminateAllAction.setEnabled(!(job.getLaunchMode().equals(ILaunchManager.DEBUG_MODE) || job.getState().equals(
+						IJobStatus.COMPLETED)));
 			}
 		}
 	}

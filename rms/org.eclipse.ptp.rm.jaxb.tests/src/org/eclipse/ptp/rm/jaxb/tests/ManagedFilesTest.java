@@ -10,6 +10,7 @@
 
 package org.eclipse.ptp.rm.jaxb.tests;
 
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,13 +19,11 @@ import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.jobs.IJobStatus;
-import org.eclipse.ptp.rm.jaxb.control.IJobController;
+import org.eclipse.ptp.rm.jaxb.control.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
 import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJob;
-import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJobStatusMap;
 import org.eclipse.ptp.rm.jaxb.control.internal.runnable.ManagedFilesJob;
 import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
 import org.eclipse.ptp.rm.jaxb.control.runnable.ScriptHandler;
@@ -37,7 +36,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.ManagedFilesType;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
 
-public class ManagedFilesTest extends TestCase implements IJobController {
+public class ManagedFilesTest extends TestCase implements ILaunchController {
 
 	private static final String xml = JAXBControlConstants.DATA + "pbs-test-local.xml"; //$NON-NLS-1$
 	private static ControlType controlData;
@@ -60,16 +59,6 @@ public class ManagedFilesTest extends TestCase implements IJobController {
 	public Object getAdapter(Class adapter) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getAppendEnv()
-	 */
-	@Override
-	public boolean getAppendEnv() {
-		return false;
 	}
 
 	public ResourceManagerData getConfigurationData() {
@@ -121,36 +110,10 @@ public class ManagedFilesTest extends TestCase implements IJobController {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#getLaunchEnv()
-	 */
-	@Override
-	public Map<String, String> getLaunchEnv() {
-		return null;
-	}
-
 	@Override
 	public String getRemoteServicesId() {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	@Override
-	public ICommandJobStatusMap getStatusMap() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.IJAXBResourceManagerControl#jobStateChanged (java.lang.String,
-	 * org.eclipse.ptp.rmsystem.IJobStatus)
-	 */
-	@Override
-	public void jobStateChanged(String jobId, IJobStatus status) {
 	}
 
 	/*
@@ -194,11 +157,11 @@ public class ManagedFilesTest extends TestCase implements IJobController {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.core.jobs.IJobControl#submitJob(org.eclipse.debug.core.ILaunch,
+	 * @see org.eclipse.ptp.core.jobs.IJobControl#submitJob(org.eclipse.debug.core.ILaunchConfiguration, java.lang.String,
 	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	public String submitJob(ILaunch launch, IProgressMonitor monitor) throws CoreException {
+	public String submitJob(ILaunchConfiguration launchConfig, String mode, IProgressMonitor monitor) throws CoreException {
 		return null;
 	}
 
@@ -334,5 +297,53 @@ public class ManagedFilesTest extends TestCase implements IJobController {
 	public ResourceManagerData getConfiguration() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void dispose() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void initialize() throws CoreException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public boolean isInitialized() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void setConnectionName(String connName) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void setRemoteServicesId(String id) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void setRMConfigurationURL(URL url) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void start(IProgressMonitor monitor) throws CoreException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void stop() throws CoreException {
+		// TODO Auto-generated method stub
+
 	}
 }

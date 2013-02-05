@@ -11,6 +11,7 @@
 package org.eclipse.ptp.rm.jaxb.control;
 
 import java.net.URL;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -24,7 +25,8 @@ import org.eclipse.ptp.rm.jaxb.core.JAXBRMPreferenceConstants;
 public class LaunchControllerManager {
 
 	private static final LaunchControllerManager fInstance = new LaunchControllerManager();
-	private static final Map<String, ILaunchController> fControllers = new HashMap<String, ILaunchController>();
+	private static final Map<String, ILaunchController> fControllers = Collections
+			.synchronizedMap(new HashMap<String, ILaunchController>());
 
 	public static String generateControlId(String remoteServicesId, String connectionName, String configName) {
 		String controlBytes = remoteServicesId + "/" + connectionName + "/" + configName; //$NON-NLS-1$ //$NON-NLS-2$
@@ -39,12 +41,26 @@ public class LaunchControllerManager {
 	}
 
 	/**
-	 * @param name
-	 *            configuration name
+	 * Look up a controller using the control ID
+	 * 
+	 * @param controlId
+	 *            control ID of controller
+	 * @return controller or null if no controller found
+	 */
+	public ILaunchController getLaunchController(String controlId) {
+		return fControllers.get(controlId);
+	}
+
+	/**
+	 * Look up a controller using the remote services ID, the connection name, and the configuration name. Creates a new controller
+	 * if one doesn't already exist.
+	 * 
 	 * @param remoteServicesId
 	 *            remote services Id
 	 * @param connectionName
 	 *            connection name
+	 * @param configName
+	 *            configuration name
 	 * @return launch controller or null if the launch controller can't be created or initialized
 	 * @throws CoreException
 	 */

@@ -26,7 +26,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
@@ -328,18 +327,18 @@ public class LaunchController implements ILaunchController {
 	 * @return job wrapper object
 	 * @throws CoreException
 	 */
-	private ICommandJob doJobSubmitCommand(String uuid, ILaunch launch) throws CoreException {
+	private ICommandJob doJobSubmitCommand(String uuid, ILaunchConfiguration launchConfig, String launchMode) throws CoreException {
 		CommandType command = null;
 		CommandJob.JobMode jobMode = CommandJob.JobMode.INTERACTIVE;
 
-		if (ILaunchManager.RUN_MODE.equals(launch.getLaunchMode())) {
+		if (ILaunchManager.RUN_MODE.equals(launchMode)) {
 			command = controlData.getSubmitBatch();
 			if (command != null) {
 				jobMode = CommandJob.JobMode.BATCH;
 			} else {
 				command = controlData.getSubmitInteractive();
 			}
-		} else if (ILaunchManager.DEBUG_MODE.equals(launch.getLaunchMode())) {
+		} else if (ILaunchManager.DEBUG_MODE.equals(launchMode)) {
 			command = controlData.getSubmitBatchDebug();
 			if (command != null) {
 				jobMode = CommandJob.JobMode.BATCH;
@@ -350,13 +349,13 @@ public class LaunchController implements ILaunchController {
 
 		if (command == null) {
 			throw CoreExceptionUtils.newException(Messages.MissingRunCommandsError + JAXBControlConstants.SP + uuid
-					+ JAXBControlConstants.SP + launch.getLaunchMode(), null);
+					+ JAXBControlConstants.SP + launchMode, null);
 		}
 
 		/*
 		 * NOTE: changed this to join, because the waitForId is now part of the run() method of the command itself (05.01.2011)
 		 */
-		return runCommand(uuid, command, jobMode, launch, launch.getLaunchMode(), true);
+		return runCommand(uuid, command, jobMode, launchConfig, launchMode, true);
 	}
 
 	/*
@@ -369,8 +368,10 @@ public class LaunchController implements ILaunchController {
 		return null;
 	}
 
-	/**
-	 * @return whether to append (true) the env passed in through the LaunchConfiguration, or replace the current env with it.
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.control.ILaunchController#getAppendEnv()
 	 */
 	public boolean getAppendEnv() {
 		return appendLaunchEnv;
@@ -476,7 +477,7 @@ public class LaunchController implements ILaunchController {
 					 */
 					status = jobStatusMap.terminated(jobId, progress.newChild(50));
 					if (status != null && status.stateChanged()) {
-						jobStateChanged(jobId, status);
+						JobManager.getInstance().fireJobChanged(status);
 					}
 					return status;
 				}
@@ -520,7 +521,7 @@ public class LaunchController implements ILaunchController {
 			}
 
 			if (status == null) {
-				status = new CommandJobStatus(jobId, state, null, this);
+				status = new CommandJobStatus(jobId, state, null, this, ILaunchManager.RUN_MODE);
 				status.setOwner(getRMVariableMap().getString(JAXBControlConstants.CONTROL_USER_NAME));
 				jobStatusMap.addJobStatus(jobId, status);
 			} else {
@@ -532,7 +533,7 @@ public class LaunchController implements ILaunchController {
 			 */
 			if (progress.isCanceled()) {
 				status.setState(IJobStatus.UNDETERMINED);
-				jobStateChanged(jobId, status);
+				JobManager.getInstance().fireJobChanged(status);
 				return status;
 			}
 
@@ -545,7 +546,7 @@ public class LaunchController implements ILaunchController {
 			}
 
 			if (status.stateChanged()) {
-				jobStateChanged(jobId, status);
+				JobManager.getInstance().fireJobChanged(status);
 			}
 
 			return status;
@@ -660,18 +661,13 @@ public class LaunchController implements ILaunchController {
 		isInitialized = true;
 	}
 
-	public boolean isInitialized() {
-		return isInitialized;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.IJAXBLaunchControl#jobStateChanged(java.lang.String,
-	 * org.eclipse.ptp.rmsystem.IJobStatus)
+	 * @see org.eclipse.ptp.rm.jaxb.control.ILaunchController#isInitialized()
 	 */
-	public void jobStateChanged(String jobId, IJobStatus status) {
-		JobManager.getInstance().fireJobChanged(status);
+	public boolean isInitialized() {
+		return isInitialized;
 	}
 
 	/**
@@ -946,7 +942,7 @@ public class LaunchController implements ILaunchController {
 		}
 
 		if (command != null) {
-			runCommand(null, command, CommandJob.JobMode.INTERACTIVE, null, ILaunchManager.RUN_MODE, true);
+			runCommand(null, command, CommandJob.JobMode.INTERACTIVE, configuration, ILaunchManager.RUN_MODE, true);
 		}
 
 		return changedValue;
@@ -966,13 +962,13 @@ public class LaunchController implements ILaunchController {
 	 * @return the runnable job object
 	 * @throws CoreException
 	 */
-	private ICommandJob runCommand(String uuid, CommandType command, CommandJob.JobMode jobMode, ILaunch launch, String launchMode,
-			boolean join) throws CoreException {
+	private ICommandJob runCommand(String uuid, CommandType command, CommandJob.JobMode jobMode, ILaunchConfiguration launchConfig,
+			String launchMode, boolean join) throws CoreException {
 		if (command == null) {
 			throw CoreExceptionUtils.newException(Messages.RMNoSuchCommandError, null);
 		}
 
-		ICommandJob job = new CommandJob(uuid, command, jobMode, this, launch, launchMode);
+		ICommandJob job = new CommandJob(uuid, command, jobMode, this, launchConfig, launchMode);
 		((Job) job).setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY, Boolean.TRUE);
 		job.schedule();
 		if (join) {
@@ -1087,8 +1083,8 @@ public class LaunchController implements ILaunchController {
 				/*
 				 * start daemon
 				 */
-				jobStatusMap = new JobStatusMap(this);
-				((Thread) jobStatusMap).start();
+				jobStatusMap = JobStatusMap.getInstance(this);
+				jobStatusMap.initialize();
 
 				/*
 				 * Run the start up commands, if any
@@ -1133,7 +1129,7 @@ public class LaunchController implements ILaunchController {
 			if (rmVarMap != null) {
 				rmVarMap.clear();
 			}
-			jobStatusMap.halt();
+			jobStatusMap.dispose();
 
 			IRemoteConnection conn = fRemoteServicesDelegate.getRemoteConnection();
 			if (conn != null) {
@@ -1144,7 +1140,13 @@ public class LaunchController implements ILaunchController {
 		}
 	}
 
-	public String submitJob(ILaunch launch, IProgressMonitor monitor) throws CoreException {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.core.jobs.IJobControl#submitJob(org.eclipse.debug.core.ILaunchConfiguration, java.lang.String,
+	 * org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	public String submitJob(ILaunchConfiguration launchConfig, String launchMode, IProgressMonitor monitor) throws CoreException {
 		/*
 		 * give submission a unique id which will in most cases be replaced by the resource-generated id for the job/process
 		 */
@@ -1156,8 +1158,6 @@ public class LaunchController implements ILaunchController {
 
 		SubMonitor progress = SubMonitor.convert(monitor, 100);
 		try {
-			String jobId = null;
-
 			AttributeType a = new AttributeType();
 			a.setVisible(false);
 			getRMVariableMap().put(uuid, a);
@@ -1165,7 +1165,7 @@ public class LaunchController implements ILaunchController {
 			/*
 			 * Overwrite attribute values based on user choices. Note that the launch can also modify attributes.
 			 */
-			updateAttributeValues(launch.getLaunchConfiguration(), launch.getLaunchMode(), progress.newChild(5));
+			updateAttributeValues(launchConfig, launchMode, progress.newChild(5));
 
 			/*
 			 * process script
@@ -1195,7 +1195,7 @@ public class LaunchController implements ILaunchController {
 			ICommandJob job = null;
 
 			try {
-				job = doJobSubmitCommand(uuid, launch);
+				job = doJobSubmitCommand(uuid, launchConfig, launchMode);
 
 				IStatus status = job.getRunStatus();
 				if (status != null && status.getSeverity() == IStatus.CANCEL) {
@@ -1222,22 +1222,11 @@ public class LaunchController implements ILaunchController {
 			 * resolve proxy-specific info
 			 */
 			getRMVariableMap().remove(uuid);
-			jobId = a.getName();
-
-			/*
-			 * job was cancelled during waitForId
-			 */
-			if (jobId == null) {
-				status = new CommandJobStatus(uuid, IJobStatus.CANCELED, null, this);
-				status.setOwner(getRMVariableMap().getString(JAXBControlConstants.CONTROL_USER_NAME));
-				return status.getJobId();
-			}
 
 			/*
 			 * initialize the job status while the id property is live
 			 */
 			jobStatusMap.addJobStatus(status.getJobId(), status);
-			status.setLaunch(launch);
 			worked(progress, 5);
 
 			/*
@@ -1260,7 +1249,6 @@ public class LaunchController implements ILaunchController {
 	 *            passed in from Launch Tab when the "run" command is chosen.
 	 * @throws CoreException
 	 */
-	@SuppressWarnings({ "unchecked" })
 	private void updateAttributeValues(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor)
 			throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 40);
@@ -1350,10 +1338,6 @@ public class LaunchController implements ILaunchController {
 				a.setValue(emsStr);
 			}
 		}
-
-		launchEnv.clear();
-		launchEnv.putAll(configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, launchEnv));
-		appendLaunchEnv = configuration.getAttribute(ILaunchManager.ATTR_APPEND_ENVIRONMENT_VARIABLES, appendLaunchEnv);
 	}
 
 	/**

@@ -386,7 +386,7 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 		if (job == null) {
 			return false;
 		}
-		return job.getLaunch().getLaunchMode().equals(ILaunchManager.DEBUG_MODE);
+		return job.getLaunchMode().equals(ILaunchManager.DEBUG_MODE);
 	}
 
 	/**

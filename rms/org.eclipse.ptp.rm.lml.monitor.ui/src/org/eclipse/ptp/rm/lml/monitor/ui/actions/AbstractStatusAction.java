@@ -17,7 +17,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.core.jobs.IJobControl;
-import org.eclipse.ptp.rm.jaxb.control.IJobController;
+import org.eclipse.ptp.rm.jaxb.control.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.LaunchControllerManager;
 import org.eclipse.ptp.rm.jaxb.core.data.ControlType;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
@@ -86,7 +86,7 @@ public abstract class AbstractStatusAction implements IObjectActionDelegate {
 	 */
 	protected static boolean operationSupported(JobStatusData status, String operation, IViewPart targetPart) {
 		try {
-			IJobController jobController = LaunchControllerManager.getInstance().getLaunchController(status.getRemoteId(),
+			ILaunchController jobController = LaunchControllerManager.getInstance().getLaunchController(status.getRemoteId(),
 					status.getConnectionName(), status.getConfigurationName());
 			if (jobController != null) {
 				ResourceManagerData data = jobController.getConfiguration();

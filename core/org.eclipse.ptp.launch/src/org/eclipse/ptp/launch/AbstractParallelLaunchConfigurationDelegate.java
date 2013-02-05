@@ -589,7 +589,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			}
 
 			JobManager.getInstance().addListener(control.getControlId(), fJobListener);
-			String jobId = control.submitJob(launch, subMon.newChild(10));
+			String jobId = control.submitJob(launch.getLaunchConfiguration(), mode, subMon.newChild(10));
 			if (subMon.isCanceled()) {
 				control.stop();
 				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(), "Launch was cancelled"));
