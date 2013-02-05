@@ -450,6 +450,9 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						<set field="name">
 							<entry valueGroup="0"/>
 						</set>
+						<append field="name" separator=".">
+							<entry value="jj28b01"/>
+						</append>
 						<set field="default">
 							<entry valueGroup="1"/>
 						</set>
