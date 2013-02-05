@@ -12,9 +12,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tm.internal.terminal.provisional.api.ISettingsPage;
+import org.eclipse.tm.internal.terminal.provisional.api.AbstractSettingsPage;
 
-public class RemoteToolsSettingsPage implements ISettingsPage {
+public class RemoteToolsSettingsPage extends AbstractSettingsPage {
 	private final RemoteToolsSettings fTerminalSettings;
 	private RemoteConnectionWidget fRemoteConnectionWidget;
 
