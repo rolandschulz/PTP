@@ -15,9 +15,11 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.ptp.rm.lml.core.ILMLCoreConstants;
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
@@ -49,7 +51,6 @@ public class TableHandler extends LguiHandler {
 		public void handleEvent(ILguiUpdatedEvent e) {
 			update(e.getLgui());
 		}
-
 	}
 
 	private final TableListener tableListener = new TableListener();
@@ -122,6 +123,45 @@ public class TableHandler extends LguiHandler {
 				for (final String columnTitle : columnsTitle) {
 					if (column.getName().equals(columnTitle)) {
 						column.setPattern(null);
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Forwards new information for the jobs to the jobstatus instances,
+	 * which are afterwards saved via Memento within the monitor.core
+	 * plug-in. This function stores all additional information provided by
+	 * lml_da in each jobStatusData instance.
+	 */
+	public void forwardRowToJobData() {
+		final JobStatusData[] userJobs = lguiItem.getUserJobs();
+		final Set<String> userNames = new HashSet<String>();
+		for (final JobStatusData jobStatus : userJobs) {
+			userNames.add(jobStatus.getOwner());
+		}
+
+		// Traverse all tables
+		for (final TableType table : getTables()) {
+			// Get extended rows with attached jobStatusData
+			final Row[] rows = getTableDataWithColor(table.getId(), false);// Contains extended rows with additional data
+			for (int i = 0; i < rows.length; i++) {
+				if (rows[i].status == null) {// If there is no jobstatusdata, do not add additional data
+					continue;
+				}
+				if (!userNames.contains(rows[i].status.getOwner())) {
+					continue;
+				}
+
+				final RowType rawRow = table.getRow().get(i);// The actual row from LML data
+				// Iterate over all columns and save their key value pairs
+				// into the jobstatus instances
+				for (final ColumnType column : table.getColumn()) {
+					final String columnName = column.getName();
+					final String value = getCellValue(table, rawRow, columnName);
+					if (value != null) {
+						rows[i].status.addInfo(columnName, value);
 					}
 				}
 			}
@@ -209,7 +249,7 @@ public class TableHandler extends LguiHandler {
 		final BigInteger index = getColumnIndex(table, colName);
 		if (index != null) {
 			for (final CellType cell : row.getCell()) {
-				if (cell.getCid().equals(index)) {
+				if (cell.getCid() != null && cell.getCid().equals(index)) {
 					return cell.getValue();
 				}
 			}

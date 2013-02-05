@@ -24,12 +24,12 @@
 		<!-- Needed by RM internals for fetch; name is fixed by convention -->
 		<attribute name="stdout_remote_path" visible="false">
 			<default>${ptp_rm:directory#value}/${ptp_rm:Job_Name#value}.o${ptp_rm:@jobId#default}</default>
-			<link-value-to>Output_Path</link-value-to>
+			<link-value-to>LL_STDOUT</link-value-to>
 		</attribute>
 		<!-- Needed by RM internals for fetch; name is fixed by convention -->
 		<attribute name="stderr_remote_path" visible="false">
 			<default>${ptp_rm:directory#value}/${ptp_rm:Job_Name#value}.e${ptp_rm:@jobId#default}</default>
-			<link-value-to>Error_Path</link-value-to>
+			<link-value-to>LL_STDERR</link-value-to>
 		</attribute>
 		<attribute name="mpiCommand" type="choice">
 			<description>Optional MPI command to run job.</description>
@@ -354,6 +354,13 @@
 							<entry valueGroup="1"/>
 						</set>
 					</match>
+					<match>
+						<!-- Match completed case -->
+						<expression>llq: There is currently no job status to report\.</expression>
+						<set field="value">
+							<entry value="COMPLETED"/>
+						</set>
+					</match>
 					<test op="EQ">
 						<value>#value</value>
 						<value>R</value>
@@ -366,6 +373,13 @@
 						<value>H</value>
 						<set field="value">
 							<entry value="HELD"/>
+						</set>
+					</test>
+					<test op="EQ">
+						<value>#value</value>
+						<value>I</value>
+						<set field="value">
+							<entry value="SUBMITTED"/>
 						</set>
 					</test>
 				</target>
@@ -1275,8 +1289,8 @@
 					<items>
 						<include>destination</include>
 						<include>Job_Name</include>
-						<include>Output_Path</include>
-						<include>Error_Path</include>
+						<include>LL_STDOUT</include>
+						<include>LL_STDERR</include>
 					</items>
 				</export-for-override>
 			</import>

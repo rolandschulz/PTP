@@ -333,7 +333,13 @@ public class MonitorControl implements IMonitorControl {
 						{ JobStatusData.QUEUE_NAME_ATTR, child.getString(JobStatusData.QUEUE_NAME_ATTR) },
 						{ JobStatusData.OWNER_ATTR, child.getString(JobStatusData.OWNER_ATTR) },
 						{ JobStatusData.OID_ATTR, child.getString(JobStatusData.OID_ATTR) } };
-				jobs.add(new JobStatusData(attrs));
+				final JobStatusData jobData = new JobStatusData(attrs);
+
+				for (final String attKey : child.getAttributeKeys()) {
+					jobData.addInfo(attKey, child.getString(attKey));
+				}
+
+				jobs.add(jobData);
 			}
 		}
 	}
@@ -403,6 +409,13 @@ public class MonitorControl implements IMonitorControl {
 		jobMemento.putString(JobStatusData.QUEUE_NAME_ATTR, job.getQueueName());
 		jobMemento.putString(JobStatusData.OWNER_ATTR, job.getOwner());
 		jobMemento.putString(JobStatusData.OID_ATTR, job.getOid());
+		
+		for (final String key : job.getAdditionalKeys()) {
+			// Save only the data, which was not saved by the above statements
+			if (jobMemento.getString(key) == null) {
+				jobMemento.putString(key, job.getInfo(key));
+			}
+		}
 	}
 
 	private void saveState(IMemento memento) {
