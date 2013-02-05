@@ -29,16 +29,9 @@
          id="org.eclipse.ptp.remotetools"
          version="0.0.0"/>
 
-   <includes
-         id="org.eclipse.tm.terminal"
-         version="0.0.0"/>
-
-   <includes
-         id="org.eclipse.tm.terminal.view"
-         version="0.0.0"/>
-
    <requires>
-      <import plugin="org.eclipse.jgit" version="1.0.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.tm.terminal" version="3.2.2" match="greaterOrEqual"/>
+      <import feature="org.eclipse.tm.terminal.view" version="2.4.1" match="greaterOrEqual"/>
    </requires>
 
    <plugin
