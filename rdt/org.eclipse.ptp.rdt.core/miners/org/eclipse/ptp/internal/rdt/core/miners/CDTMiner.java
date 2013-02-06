@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2012 IBM Corporation and others.
+ * Copyright (c) 2008, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -206,6 +206,8 @@ public class CDTMiner extends Miner {
 		}
 		catch(RuntimeException e) {
 			UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+			getDataStore().refresh(theCommand);
+			getDataStore().disconnectObject(theCommand);
 			throw e;
 		}
 	}
@@ -269,9 +271,13 @@ public class CDTMiner extends Miner {
 				provider = (IRemoteIndexerInfoProvider) Serializer.deserialize(getString(theCommand, 6));
 			} catch (IOException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				status.getDataStore().refresh(status);
+				status.getDataStore().disconnectObject(status.getParent());
 				return status;
 			} catch (ClassNotFoundException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				status.getDataStore().refresh(status);
+				status.getDataStore().disconnectObject(status.getParent());
 				return status;
 			}
 			
@@ -794,6 +800,8 @@ public class CDTMiner extends Miner {
 			}
 		}
 		
+		status.getDataStore().refresh(status);
+		status.getDataStore().disconnectObject(status.getParent());
 		return status;
 	}
 	
@@ -2306,6 +2314,7 @@ public class CDTMiner extends Miner {
 	public static DataElement statusDone(DataElement status) {
 		status.setAttribute(DE.A_NAME, DataStoreResources.model_done);
 		status.getDataStore().refresh(status);
+		status.getDataStore().disconnectObject(status.getParent());
 		return status;
 	}
 
@@ -2315,6 +2324,7 @@ public class CDTMiner extends Miner {
 	public static DataElement statusCancelled(DataElement status) {
 		status.setAttribute(DE.A_NAME, CANCELLED);
 		status.getDataStore().refresh(status);
+		status.getDataStore().disconnectObject(status.getParent());
 		return status;
 	}
 
