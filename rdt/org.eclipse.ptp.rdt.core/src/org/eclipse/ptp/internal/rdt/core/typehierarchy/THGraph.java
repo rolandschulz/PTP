@@ -314,26 +314,22 @@ public class THGraph implements Serializable {
 	private void addMembers(IIndex index, THGraphNode graphNode, IBinding binding, ICProjectFactory projectFactory) throws CoreException {
 		if (graphNode.getMembers(false) == null) {
 			ArrayList<ICElement> memberList= new ArrayList<ICElement>();
-			try {
-				if (binding instanceof ICPPClassType) {
-					ICPPClassType ct= (ICPPClassType) binding;
-					IBinding[] members= ct.getDeclaredFields();
-					addMemberElements(index, members, memberList, projectFactory);
-					members= ct.getDeclaredMethods();
-					addMemberElements(index, members, memberList, projectFactory);
-				}
-				else if (binding instanceof ICompositeType) {
-					ICompositeType ct= (ICompositeType) binding;
-					IBinding[] members= ct.getFields();
-					addMemberElements(index, members, memberList, projectFactory);
-				}
-				else if (binding instanceof IEnumeration) {
-					IEnumeration ct= (IEnumeration) binding;
-					IBinding[] members= ct.getEnumerators();
-					addMemberElements(index, members, memberList, projectFactory);
-				}
-			} catch (DOMException e) {
-				// problem bindings should not be reported to the log.
+			if (binding instanceof ICPPClassType) {
+				ICPPClassType ct= (ICPPClassType) binding;
+				IBinding[] members= ct.getDeclaredFields();
+				addMemberElements(index, members, memberList, projectFactory);
+				members= ct.getDeclaredMethods();
+				addMemberElements(index, members, memberList, projectFactory);
+			}
+			else if (binding instanceof ICompositeType) {
+				ICompositeType ct= (ICompositeType) binding;
+				IBinding[] members= ct.getFields();
+				addMemberElements(index, members, memberList, projectFactory);
+			}
+			else if (binding instanceof IEnumeration) {
+				IEnumeration ct= (IEnumeration) binding;
+				IBinding[] members= ct.getEnumerators();
+				addMemberElements(index, members, memberList, projectFactory);
 			}
 			if (memberList.isEmpty()) {
 				graphNode.setMembers(NO_MEMBERS);

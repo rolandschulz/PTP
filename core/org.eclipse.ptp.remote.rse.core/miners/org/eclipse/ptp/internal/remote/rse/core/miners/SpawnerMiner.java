@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2011 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -128,6 +128,8 @@ public class SpawnerMiner extends Miner {
 		}
 		catch(RuntimeException e) {
 			UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+			_dataStore.refresh(theCommand);
+			_dataStore.disconnectObject(theCommand);
 			throw e;
 		}
 	}
@@ -154,6 +156,8 @@ public class SpawnerMiner extends Miner {
 			
 			
 			handleSpawnRedirected(subject, cmd, dir, envp, status);
+			status.getDataStore().refresh(status);
+			status.getDataStore().disconnectObject(status.getParent());
 			return status;
 		}
 		
@@ -175,6 +179,9 @@ public class SpawnerMiner extends Miner {
 			fSupportsCharConversion = true;
 
 		}
+		
+		status.getDataStore().refresh(status);
+		status.getDataStore().disconnectObject(status.getParent());
 		return null;
 	}
 
@@ -230,6 +237,7 @@ public class SpawnerMiner extends Miner {
 	public static DataElement statusDone(DataElement status) {
 		status.setAttribute(DE.A_NAME, DataStoreResources.model_done);
 		status.getDataStore().refresh(status);
+		status.getDataStore().disconnectObject(status.getParent());
 		return status;
 	}
 
