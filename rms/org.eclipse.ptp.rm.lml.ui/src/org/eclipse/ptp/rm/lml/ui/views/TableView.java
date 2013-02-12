@@ -1141,7 +1141,7 @@ public class TableView extends ViewPart {
 	 * 
 	 */
 	private void updateViewerInput() {
-		if (fLguiItem.getTableHandler().getPattern(gid).size() > 0) {
+		if (fLguiItem != null && fLguiItem.getTableHandler() != null && fLguiItem.getTableHandler().getPattern(gid).size() > 0) {
 			setViewerInput(fLguiItem.getTableHandler().getPattern(gid));
 		} else {
 			setViewerInput();
