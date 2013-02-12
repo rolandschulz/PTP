@@ -119,5 +119,12 @@
 	<extension point="org.eclipse.core.runtime.preferences">
 		<initializer class="org.eclipse.ptp.internal.rdt.editor.preferences.PreferenceInitializer"/>
 	</extension>
-     
+    <extension
+       point="org.eclipse.ui.contexts">
+	    <context
+	          id="org.eclipse.ptp.rdt.editor.RemoteCEditorScope"
+	          name="%remoteEditor.name"
+	          parentId="org.eclipse.cdt.ui.cEditorScope">
+	    </context>
+	</extension>
 </plugin>
