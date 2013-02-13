@@ -30,7 +30,7 @@ import org.osgi.framework.BundleContext;
 public class JAXBControlCorePlugin extends Plugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "org.eclipse.ptp.rm.jaxb.control.core.core"; //$NON-NLS-1$
+	public static final String PLUGIN_ID = "org.eclipse.ptp.rm.jaxb.control.core"; //$NON-NLS-1$
 
 	// The shared instance
 	private static JAXBControlCorePlugin fPlugin;

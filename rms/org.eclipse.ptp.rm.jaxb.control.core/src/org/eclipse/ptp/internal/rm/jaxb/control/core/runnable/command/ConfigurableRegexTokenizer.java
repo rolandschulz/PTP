@@ -50,19 +50,18 @@ import org.eclipse.ptp.rm.jaxb.core.data.TokenizerType;
  * to configure the tokenizer are provided in
  * org.eclipse.ptp.rm.jaxb.tests/data/tokenizer-examples.xml.<br>
  * <br>
- * For the two ways to segment the stream, see
- * {@link #findNextSegment(BufferedReader)}. For the two modes of reading, see
+ * For the two ways to segment the stream, see {@link #findNextSegment(BufferedReader)}. For the two modes of reading, see
  * {@link #read(BufferedReader)}.
  * 
- * @see org.eclipse.ptp.internal.rm.jaxb.control.core.core.data.TargetImpl
- * @see org.eclipse.ptp.internal.rm.jaxb.control.core.core.data.MatchImpl
- * @see org.eclipse.ptp.internal.rm.jaxb.control.core.core.data.RegexImpl
- * @see org.eclipse.ptp.internal.rm.jaxb.control.core.core.data.AddImpl
- * @see org.eclipse.ptp.internal.rm.jaxb.control.core.core.data.AppendImpl
- * @see org.eclipse.ptp.internal.rm.jaxb.control.core.core.data.PutImpl
- * @see org.eclipse.ptp.internal.rm.jaxb.control.core.core.data.SetImpl
- * @see org.eclipse.ptp.internal.rm.jaxb.control.core.core.data.TestImpl
- * @see org.eclipse.ptp.internal.rm.jaxb.control.core.core.data.ThrowImpl
+ * @see org.eclipse.ptp.internal.rm.jaxb.control.core.data.TargetImpl
+ * @see org.eclipse.ptp.internal.rm.jaxb.control.core.data.MatchImpl
+ * @see org.eclipse.ptp.internal.rm.jaxb.control.core.data.RegexImpl
+ * @see org.eclipse.ptp.internal.rm.jaxb.control.core.data.AddImpl
+ * @see org.eclipse.ptp.internal.rm.jaxb.control.core.data.AppendImpl
+ * @see org.eclipse.ptp.internal.rm.jaxb.control.core.data.PutImpl
+ * @see org.eclipse.ptp.internal.rm.jaxb.control.core.data.SetImpl
+ * @see org.eclipse.ptp.internal.rm.jaxb.control.core.data.TestImpl
+ * @see org.eclipse.ptp.internal.rm.jaxb.control.core.data.ThrowImpl
  * 
  * @author arossi
  * 
@@ -397,8 +396,7 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, Runna
 	/**
 	 * Adjusts the buffer. If the read is delimited, the buffer is cleared. Else
 	 * the end of the buffer (with capacity 2X the maximum length indicated by
-	 * the configuration) is shifted forward so that then next
-	 * <code>maxLen</code> characters can be read.
+	 * the configuration) is shifted forward so that then next <code>maxLen</code> characters can be read.
 	 */
 	private void reset() {
 		if (chars.length == 1) {

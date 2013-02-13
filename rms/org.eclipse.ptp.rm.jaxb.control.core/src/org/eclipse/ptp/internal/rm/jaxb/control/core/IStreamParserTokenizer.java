@@ -22,7 +22,7 @@ import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
  * Extension point: org.eclipse.ptp.rm.jaxb.core.streamParserTokenizer<br>
  * <br>
  * 
- * @see org.eclipse.ptp.internal.rm.jaxb.control.core.core.runnable.command.ConfigurableRegexTokenizer
+ * @see org.eclipse.ptp.internal.rm.jaxb.control.core.runnable.command.ConfigurableRegexTokenizer
  * 
  * @author arossi
  * 
@@ -36,8 +36,7 @@ public interface IStreamParserTokenizer extends Runnable {
 
 	/**
 	 * @param uuid
-	 *            id associated with this resource manager operation (can be
-	 *            <code>null</code>).
+	 *            id associated with this resource manager operation (can be <code>null</code>).
 	 * @param rmVarMap
 	 *            resource manager environment
 	 * @param commandMonitor
