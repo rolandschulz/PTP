@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?NLS TYPE="org.eclipse.help.toc"?>
 
-<toc label="Parallel Tools Platform (PTP) User Guide">
+<toc label="Parallel Development User Guide">
       <topic label="Contents" href="html/toc.html"/>
       <topic label="Overview"  href="html/00overview.html"/> 
       <topic label="Prerequisites" href="html/00prereqs.html"/>
