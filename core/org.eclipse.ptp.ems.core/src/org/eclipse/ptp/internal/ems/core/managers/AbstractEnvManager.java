@@ -8,7 +8,7 @@
  * Contributors:
  *    Jeff Overbey (Illinois) - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.ems.internal.core.managers;
+package org.eclipse.ptp.internal.ems.core.managers;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -30,7 +30,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.ems.core.IEnvManagerConfig;
-import org.eclipse.ptp.ems.internal.core.EMSCorePlugin;
+import org.eclipse.ptp.internal.ems.core.EMSCorePlugin;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcess;

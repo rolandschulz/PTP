@@ -8,7 +8,7 @@
  * Contributors:
  *    Jeff Overbey (Illinois) - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.ems.internal.core.managers;
+package org.eclipse.ptp.internal.ems.core.managers;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.ems.core.IEnvManager;
-import org.eclipse.ptp.ems.internal.core.Messages;
+import org.eclipse.ptp.internal.ems.core.messages.Messages;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
 /**

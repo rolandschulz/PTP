@@ -8,7 +8,7 @@
  * Contributors:
  *    Jeff Overbey (Illinois) - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.ems.internal.core.managers;
+package org.eclipse.ptp.internal.ems.core.managers;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -21,24 +21,24 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.ems.core.IEnvManager;
-import org.eclipse.ptp.ems.internal.core.Messages;
+import org.eclipse.ptp.internal.ems.core.messages.Messages;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
 /**
- * An {@link IEnvManager} for <a href="http://modules.sf.net">Modules</a>.
+ * An {@link IEnvManager} for <a href="http://lmod.sourceforge.net">Lmod</a> (Modules based on Lua).
  * 
  * @author Jeff Overbey
  */
-public final class ModulesEnvManager extends AbstractEnvManager {
+public final class LmodEnvManager extends AbstractEnvManager {
 
 	/** Command used by {@link #getDescription(IProgressMonitor)}.  Output must match {@value #MODULES_SIGNATURE}. */
 	private static final String CMD_MODULE_HELP = "module help"; //$NON-NLS-1$
 
 	/** Command used by {@link #determineDefaultElements(IProgressMonitor)} */
-	private static final String CMD_MODULE_LIST = "module list -t"; //$NON-NLS-1$
+	private static final String CMD_MODULE_LIST = "module list"; //$NON-NLS-1$
 
 	/** Command used by {@link #determineAvailableElements(IProgressMonitor)} */
-	private static final String CMD_MODULE_AVAIL = "module avail -t"; //$NON-NLS-1$
+	private static final String CMD_MODULE_AVAIL = "module avail"; //$NON-NLS-1$
 
 	/** Command used to unload all loaded modules. */
 	private static final String CMD_MODULE_PURGE = "module purge >/dev/null 2>&1"; //$NON-NLS-1$
@@ -57,10 +57,10 @@ public final class ModulesEnvManager extends AbstractEnvManager {
 	 * management system to be detected.  The version number will be extracted from capture group
 	 * {@value #MODULES_SIGNATURE_VERSION_CAPTURE_GROUP}.
 	 */
-	private static final Pattern MODULES_SIGNATURE = Pattern.compile("^(  Modules Release|Modules Release) ((Tcl )?[^ \t\r\n]+).*"); //$NON-NLS-1$
+	private static final Pattern MODULES_SIGNATURE = Pattern.compile("^Modules based on Lua: Version ([^ \t\r\n]+).*"); //$NON-NLS-1$
 
 	/** Capture group for the version number in {@link #MODULES_SIGNATURE}. */
-	private static final int MODULES_SIGNATURE_VERSION_CAPTURE_GROUP = 2;
+	private static final int MODULES_SIGNATURE_VERSION_CAPTURE_GROUP = 1;
 
 	/**
 	 * Pattern that all module names must match.
@@ -72,9 +72,22 @@ public final class ModulesEnvManager extends AbstractEnvManager {
 	 */
 	private static final Pattern MODULE_NAME_PATTERN = Pattern.compile("[A-Za-z0-9-_/.]+"); //$NON-NLS-1$
 
+	/**
+	 * Pattern to match numeric prefixes in module output.
+	 * <p>
+	 * This is used to match "1)", "2)", etc. when the following output lines are split on a " +" regex.
+	 * <pre>
+	 * Currently Loaded Modules:
+	 *   1) TACC-paths     4) intel/11.1    7) tar/1.22
+	 *   2) Linux          5) mvapich2/1.6  8) cluster
+	 *   3) cluster-paths  6) gzip/1.3.12   9) TACC
+	 * </pre>
+	 */
+	private static final Pattern NUMERIC_PREFIX = Pattern.compile("[0-9]+[)]"); //$NON-NLS-1$
+
 	@Override
 	public String getName() {
-		return "Modules"; //$NON-NLS-1$
+		return "Lmod"; //$NON-NLS-1$
 	}
 
 	@Override
@@ -91,7 +104,7 @@ public final class ModulesEnvManager extends AbstractEnvManager {
 			for (final String line : output) {
 				final Matcher matcher = MODULES_SIGNATURE.matcher(line);
 				if (matcher.find()) {
-					return "Modules " + matcher.group(MODULES_SIGNATURE_VERSION_CAPTURE_GROUP); //$NON-NLS-1$
+					return "Lmod " + matcher.group(MODULES_SIGNATURE_VERSION_CAPTURE_GROUP); //$NON-NLS-1$
 				}
 			}
 			return null;
@@ -139,32 +152,32 @@ public final class ModulesEnvManager extends AbstractEnvManager {
 		/*
 		 * Output should resemble the following:
 		 * 
-		 * /usr/local/modules.forge/modulefiles:
-		 * dot
-		 * module-cvs
-		 * module-info
-		 * modules
-		 * null
-		 * use.own
-		 * /usr/local/modules.forge/cue:
-		 * /usr/local/modules.forge/apps:
-		 * R/2.13.2(default)
-		 * chemistry/Amber-11.1.5
+		 * ---------------------- /share1/apps/teragrid/modulefiles -----------------------
+		 *   CTSSV4                        globus/5.0.4 (default)  
+		 *   GLOBUS-4.0                    gsissh/4.1  
+		 *   GLOBUS-5.0                    gsissh/4.3 (default)  
+		 *   TERAGRID-BASIC                gx-map/0.5.3.3 (default)
+		 * 
+		 * or the following:
+		 * 
+		 * Currently Loaded Modules:
+		 *   1) TACC-paths     4) intel/11.1    7) tar/1.22
+		 *   2) Linux          5) mvapich2/1.6  8) cluster
+		 *   3) cluster-paths  6) gzip/1.3.12   9) TACC
 		 */
 		final Set<String> result = new TreeSet<String>(MODULE_NAME_COMPARATOR);
 		for (final String line : output) {
 			if (!shouldIgnore(line)) {
-				String moduleName = line;
-				if (moduleName.endsWith("(default)")) { //$NON-NLS-1$
-					moduleName = removeSuffix(moduleName, "(default)"); //$NON-NLS-1$
-				}
-				moduleName = moduleName.trim();
+				for (String moduleName : line.trim().split(" +")) { //$NON-NLS-1$
+					if (moduleName.equals("") || moduleName.equals("(default)") || NUMERIC_PREFIX.matcher(moduleName).matches()) //$NON-NLS-1$ //$NON-NLS-2$
+						continue;
 
-				if (MODULE_NAME_PATTERN.matcher(moduleName).matches()) {
-					result.add(moduleName);
-				} else {
-					// Ignore spurious output (e.g., errors reported when /etc/profile executes)
-					System.err.printf("Output from module command includes \"%s\", which is not a valid module name\n", moduleName); //$NON-NLS-1$
+					if (MODULE_NAME_PATTERN.matcher(moduleName).matches()) {
+						result.add(moduleName);
+					} else {
+						// Ignore spurious output (e.g., errors reported when /etc/profile executes)
+						System.err.printf("Output from module command includes \"%s\", which is not a valid module name\n", moduleName); //$NON-NLS-1$
+					}
 				}
 			}
 		}
@@ -172,15 +185,8 @@ public final class ModulesEnvManager extends AbstractEnvManager {
 	}
 
 	private boolean shouldIgnore(final String line) {
-		return line.equals("")          // Ignore blank lines //$NON-NLS-1$
-			|| line.endsWith(":")       // Ignore lines describing module locations //$NON-NLS-1$
-			|| line.startsWith("-----") // Ignore lines describing module locations (Tcl) //$NON-NLS-1$
-			|| line.equals("No Modulefiles Currently Loaded."); //$NON-NLS-1$
-	}
-
-	private String removeSuffix(String string, String suffix) {
-		assert string != null && suffix != null && string.endsWith(suffix);
-		return string.substring(0, string.length() - suffix.length());
+		// All informational lines start in column 1, while lines listing modules begin with two spaces
+		return !line.startsWith(" "); //$NON-NLS-1$
 	}
 
 	@Override

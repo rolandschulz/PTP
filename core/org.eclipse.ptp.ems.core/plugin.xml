@@ -9,9 +9,9 @@
 
    <!-- Environment manager contributions for Modules and SoftEnv -->
    <extension point="org.eclipse.ptp.ems.core.envmanager">
-      <envManager class="org.eclipse.ptp.ems.internal.core.managers.ModulesEnvManager" />
-      <envManager class="org.eclipse.ptp.ems.internal.core.managers.LmodEnvManager" />
-      <envManager class="org.eclipse.ptp.ems.internal.core.managers.SoftEnvManager" />
+      <envManager class="org.eclipse.ptp.internal.ems.core.managers.ModulesEnvManager" />
+      <envManager class="org.eclipse.ptp.internal.ems.core.managers.LmodEnvManager" />
+      <envManager class="org.eclipse.ptp.internal.ems.core.managers.SoftEnvManager" />
    </extension>
 
 </plugin>

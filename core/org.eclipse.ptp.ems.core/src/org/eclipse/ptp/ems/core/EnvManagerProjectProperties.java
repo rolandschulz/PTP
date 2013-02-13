@@ -18,7 +18,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.ems.internal.core.EMSCorePlugin;
+import org.eclipse.ptp.internal.ems.core.EMSCorePlugin;
 
 /**
  * Provides access to environment management project properties for a synchronized remote project.

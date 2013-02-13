@@ -8,7 +8,7 @@
  * Contributors:
  *    Jeff Overbey (Illinois) - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.ems.internal.core.managers;
+package org.eclipse.ptp.internal.ems.core.managers;
 
 import java.util.Collections;
 import java.util.List;
@@ -17,7 +17,7 @@ import java.util.Set;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.ems.core.IEnvManagerConfig;
-import org.eclipse.ptp.ems.internal.core.Messages;
+import org.eclipse.ptp.internal.ems.core.messages.Messages;
 
 /**
  * An {@link IEnvManager} which represents the absence of a supported environment management system (a Null Object).

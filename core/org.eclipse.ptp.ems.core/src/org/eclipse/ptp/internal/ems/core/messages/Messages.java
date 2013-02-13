@@ -7,13 +7,13 @@
  * Contributors: 
  *     Jeff Overbey (Illinois/NCSA) - Design and implementation
  ******************************************************************************/
-package org.eclipse.ptp.ems.internal.core;
+package org.eclipse.ptp.internal.ems.core.messages;
 
 import org.eclipse.osgi.util.NLS;
 
 @SuppressWarnings("javadoc")
 public class Messages extends NLS {
-	private static final String BUNDLE_NAME = "org.eclipse.ptp.ems.internal.core.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.internal.ems.core.messages.messages"; //$NON-NLS-1$
 
 	public static String ModulesEnvManager_SelectModulesToBeLoaded;
 	public static String NullEnvManager_NoSupportedEMSFound;

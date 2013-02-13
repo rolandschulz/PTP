@@ -14,8 +14,8 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.ptp.ems.internal.core.EMSCorePlugin;
-import org.eclipse.ptp.ems.internal.core.managers.NullEnvManager;
+import org.eclipse.ptp.internal.ems.core.EMSCorePlugin;
+import org.eclipse.ptp.internal.ems.core.managers.NullEnvManager;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 
 /**
