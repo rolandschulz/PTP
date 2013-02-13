@@ -1,4 +1,4 @@
-<?xml version="1.1" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!-- ******************************************************************************* -->
 <!-- * Copyright (c) 2011 University of Illinois All rights reserved. This program -->
 <!-- * and the accompanying materials are made available under the terms of the -->
@@ -406,11 +406,10 @@
 					<xs:enumeration value="radiobutton"/>
 					<xs:enumeration value="spinner"/>
 					<xs:enumeration value="combo"/>
-					<xs:enumeration value="custom"/>
+					<xs:enumeration value="envconfig"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
-		<xs:attribute name="typeId" type="xs:string"/>
 		<xs:attribute name="buttonId" type="xs:string"/>
 		<xs:attribute name="title" type="xs:string"/>
 		<xs:attribute name="style" type="xs:string"/>
