@@ -1,13 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="widget" name="Widget and its Update Model" schema="schema/widget.exsd"/>
    <extension
          point="org.eclipse.core.variables.dynamicVariables">
       <variable
             description="Dynamic variable backed by LaunchConfiguration"
             name="ptp_lc"
-            resolver="org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableResolver">
+            resolver="org.eclipse.ptp.internal.rm.jaxb.control.ui.variables.LCVariableResolver">
       </variable>
    </extension>
-
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.eclipse.ptp.internal.rm.jaxb.control.ui.preferences.JAXBRMPreferenceManager">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage"
+            class="org.eclipse.ptp.internal.rm.jaxb.control.ui.preferences.JAXBRMPreferencesPage"
+            id="org.eclipse.ptp.internal.rm.jaxb.control.ui.preferences.JAXBRMPreferencesPage"
+            name="%PreferencePage.name">
+      </page>
+   </extension>
 </plugin>

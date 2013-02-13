@@ -3,10 +3,4 @@
 <plugin>
    <extension-point id="streamParserTokenizer" name="StreamParserTokenizer" schema="schema/streamParserTokenizer.exsd"/>
    <extension-point id="JAXBResourceManagerConfigurations" name="JAXBResourceManagerConfigurations" schema="schema/JAXBResourceManagerConfigurations.exsd"/>
-   <extension
-         point="org.eclipse.core.runtime.preferences">
-      <initializer
-            class="org.eclipse.ptp.rm.jaxb.core.JAXBRMPreferenceManager">
-      </initializer>
-   </extension>
 </plugin>

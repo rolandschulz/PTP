@@ -20,13 +20,13 @@ import java.util.UUID;
 import junit.framework.TestCase;
 
 import org.eclipse.ptp.core.Preferences;
-import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
-import org.eclipse.ptp.rm.jaxb.control.internal.IStreamParserTokenizer;
-import org.eclipse.ptp.rm.jaxb.control.internal.runnable.command.ConfigurableRegexTokenizer;
-import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
-import org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin;
-import org.eclipse.ptp.rm.jaxb.core.JAXBInitializationUtils;
-import org.eclipse.ptp.rm.jaxb.core.JAXBRMPreferenceConstants;
+import org.eclipse.ptp.internal.rm.jaxb.control.core.IStreamParserTokenizer;
+import org.eclipse.ptp.internal.rm.jaxb.control.core.JAXBControlConstants;
+import org.eclipse.ptp.internal.rm.jaxb.control.core.JAXBRMPreferenceConstants;
+import org.eclipse.ptp.internal.rm.jaxb.control.core.runnable.command.ConfigurableRegexTokenizer;
+import org.eclipse.ptp.internal.rm.jaxb.control.core.variables.RMVariableMap;
+import org.eclipse.ptp.internal.rm.jaxb.core.JAXBCorePlugin;
+import org.eclipse.ptp.internal.rm.jaxb.core.JAXBInitializationUtils;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.CommandType;
 import org.eclipse.ptp.rm.jaxb.core.data.ControlType;
@@ -94,8 +94,8 @@ public class StreamParserTest extends TestCase {
 			List<String> from = new ArrayList<String>();
 			List<String> to = new ArrayList<String>();
 			String[] commas = expression.split(JAXBControlConstants.CM);
-			for (int i = 0; i < commas.length; i++) {
-				String[] colon = commas[i].split(JAXBControlConstants.CO);
+			for (String comma : commas) {
+				String[] colon = comma.split(JAXBControlConstants.CO);
 				if (colon.length == 2) {
 					from.add(colon[0]);
 					to.add(colon[1]);

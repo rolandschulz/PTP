@@ -26,6 +26,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.jobs.IJobControl;
 import org.eclipse.ptp.core.util.LaunchUtils;
+import org.eclipse.ptp.internal.rm.jaxb.core.JAXBExtensionUtils;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.internal.messages.Messages;
 import org.eclipse.ptp.launch.ui.LaunchImages;
@@ -35,9 +36,8 @@ import org.eclipse.ptp.launch.ui.extensions.JAXBControllerLaunchConfigurationTab
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.ui.widgets.RemoteConnectionWidget;
-import org.eclipse.ptp.rm.jaxb.control.ILaunchController;
-import org.eclipse.ptp.rm.jaxb.control.LaunchControllerManager;
-import org.eclipse.ptp.rm.jaxb.core.JAXBExtensionUtils;
+import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
+import org.eclipse.ptp.rm.jaxb.control.core.LaunchControllerManager;
 import org.eclipse.ptp.rm.jaxb.core.data.MonitorType;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -499,7 +499,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	}
 
 	private void stopController(ILaunchController controller) {
-		if (controller != null) {
+		if (controller != null && !controller.hasRunningJobs()) {
 			try {
 				controller.stop();
 			} catch (CoreException e) {
@@ -518,12 +518,17 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	}
 
 	/**
-	 * This routine is called when the configuration has been changed via the combo boxes. It's job is to regenerate the dynamic ui
-	 * components, dependent on the configuration choice.
+	 * This routine is called when the configuration has been changed via the combo boxes. It's job is to regenerate the dynamic UI
+	 * components, dependent on the configuration choice. The controller will be started if startController is true. This is only
+	 * required if the connection information has been specified, in which case we want to run the start up commands
+	 * so that the UI elements will be loaded correctly.
 	 * 
-	 * @param rm
-	 * @param queue
+	 * @param controller
+	 *            current controller
 	 * @param launchConfiguration
+	 *            current launch configuration
+	 * @param startController
+	 *            if true, start the controller
 	 */
 	private void updateLaunchAttributeControls(final ILaunchController controller, ILaunchConfiguration launchConfiguration,
 			final boolean startController) {
@@ -534,12 +539,12 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		}
 		if (controller != null) {
 			final IRMLaunchConfigurationDynamicTab[] dynamicTab = new IRMLaunchConfigurationDynamicTab[1];
-			try {
-				getLaunchConfigurationDialog().run(false, true, new IRunnableWithProgress() {
+			if (startController) {
+				try {
+					getLaunchConfigurationDialog().run(false, true, new IRunnableWithProgress() {
 
-					public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-						SubMonitor progress = SubMonitor.convert(monitor, 20);
-						if (startController) {
+						public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+							SubMonitor progress = SubMonitor.convert(monitor, 20);
 							try {
 								controller.start(progress.newChild(10));
 								dynamicTab[0] = getLaunchConfigurationDynamicTab(controller, progress.newChild(10));
@@ -547,10 +552,10 @@ public class ResourcesTab extends LaunchConfigurationTab {
 								PTPLaunchPlugin.errorDialog(e.getMessage(), e);
 							}
 						}
-					}
-				});
-			} catch (InvocationTargetException e) {
-			} catch (InterruptedException e) {
+					});
+				} catch (InvocationTargetException e) {
+				} catch (InterruptedException e) {
+				}
 			}
 			if (dynamicTab[0] != null) {
 				try {

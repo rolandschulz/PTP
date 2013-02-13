@@ -18,18 +18,19 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.ems.ui.LazyEnvManagerDetector;
+import org.eclipse.ptp.internal.rm.jaxb.control.ui.handlers.ValueUpdateHandler;
+import org.eclipse.ptp.internal.rm.jaxb.control.ui.launch.IJAXBParentLaunchConfigurationTab;
+import org.eclipse.ptp.internal.rm.jaxb.control.ui.utils.WidgetActionUtils;
+import org.eclipse.ptp.internal.rm.jaxb.control.ui.variables.LCVariableMap;
 import org.eclipse.ptp.launch.internal.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
-import org.eclipse.ptp.rm.jaxb.control.ILaunchController;
+import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
+import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateHandler;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModelEnabled;
-import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler;
-import org.eclipse.ptp.rm.jaxb.control.ui.launch.IJAXBParentLaunchConfigurationTab;
-import org.eclipse.ptp.rm.jaxb.control.ui.utils.WidgetActionUtils;
-import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.LaunchTabType;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
@@ -55,7 +56,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	private RemoteServicesDelegate delegate;
 	private final ILaunchController fControl;
 	private final LaunchTabType launchTabData;
-	private final ValueUpdateHandler updateHandler;
+	private final IUpdateHandler updateHandler;
 	private final LCVariableMap lcMap;
 
 	private ScriptType script;
@@ -138,7 +139,8 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.ui.launch.ExtensibleJAXBControllerTab#createControl(org.eclipse.swt.widgets.Composite,
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.control.core.ui.launch.ExtensibleJAXBControllerTab#createControl(org.eclipse.swt.widgets.Composite,
 	 * java.lang.String)
 	 */
 	@Override
@@ -204,7 +206,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	/**
 	 * @return handler responsible for notifying all widgets to refresh their values from the launch tab environment map
 	 */
-	public ValueUpdateHandler getUpdateHandler() {
+	public IUpdateHandler getUpdateHandler() {
 		return updateHandler;
 	}
 
@@ -219,7 +221,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	 * Rebuilds the launch tab environment map, and clears the controls registered with the update handler. This is necessary
 	 * because on calls to this method subsequent to the first, the widgets it contained will have been disposed. (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.ui.launch.ExtensibleJAXBControllerTab#initializeFrom
+	 * @see org.eclipse.ptp.internal.rm.jaxb.ui.launch.ExtensibleJAXBControllerTab#initializeFrom
 	 * (org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	@Override
@@ -251,7 +253,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	/**
 	 * Calls relink on the LCVariableMap for current controller.
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModelEnabled#relink()
+	 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.IUpdateModelEnabled#relink()
 	 */
 	public void relink() {
 		AbstractJAXBLaunchConfigurationTab t = getControllers().get(tabFolder.getSelectionIndex());

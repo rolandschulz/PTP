@@ -2,8 +2,8 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.rm.jaxb.core;singleton:=true
-Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: org.eclipse.ptp.rm.jaxb.core.JAXBCorePlugin
+Bundle-Version: 1.1.0.qualifier
+Bundle-Activator: org.eclipse.ptp.internal.rm.jaxb.core.JAXBCorePlugin
 Bundle-Vendor: %pluginProvider
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.debug.core,
@@ -16,25 +16,11 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
-Export-Package: org.eclipse.ptp.rm.jaxb.core;
+Export-Package: org.eclipse.ptp.internal.rm.jaxb.core;
   x-friends:="org.eclipse.ptp.rm.jaxb.control.core,
-   org.eclipse.ptp.rm.jaxb.control.ui,
-   org.eclipse.ptp.rm.jaxb.core,
-   org.eclipse.ptp.rm.jaxb.tests,
    org.eclipse.ptp.rm.jaxb.ui,
-   org.eclipse.ptp.rm.lml.core,
-   org.eclipse.ptp.rm.lml.monitor.core,
-   org.eclipse.ptp.rm.lml.monitor.ui,
-   org.eclipse.ptp.rm.lml.ui,
+   org.eclipse.ptp.rm.jaxb.control.ui,
+   org.eclipse.ptp.rm.jaxb.tests,
    org.eclipse.ptp.launch",
- org.eclipse.ptp.rm.jaxb.core.data;
-  x-friends:="org.eclipse.ptp.rm.jaxb.control.core,
-   org.eclipse.ptp.rm.jaxb.control.ui,
-   org.eclipse.ptp.rm.jaxb.core,
-   org.eclipse.ptp.rm.jaxb.tests,
-   org.eclipse.ptp.rm.jaxb.ui,
-   org.eclipse.ptp.rm.lml.core,
-   org.eclipse.ptp.rm.lml.monitor.core,
-   org.eclipse.ptp.rm.lml.monitor.ui,
-   org.eclipse.ptp.rm.lml.ui,
-   org.eclipse.ptp.launch"
+ org.eclipse.ptp.rm.jaxb.core,
+ org.eclipse.ptp.rm.jaxb.core.data

@@ -2,8 +2,8 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.rm.jaxb.control.core;singleton:=true
-Bundle-Version: 2.0.0.qualifier
-Bundle-Activator: org.eclipse.ptp.rm.jaxb.control.JAXBControlCorePlugin
+Bundle-Version: 2.1.0.qualifier
+Bundle-Activator: org.eclipse.ptp.internal.rm.jaxb.control.core.JAXBControlCorePlugin
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ptp.rm.jaxb.core,
  org.eclipse.debug.core,
@@ -18,22 +18,19 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ptp.rm.lml.da.server
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Export-Package: org.eclipse.ptp.rm.jaxb.control;
-  x-friends:="org.eclipse.ptp.etfw.parallel,
-   org.eclipse.ptp.launch,
+Export-Package: org.eclipse.ptp.internal.rm.jaxb.control.core;
+  x-friends:="org.eclipse.ptp.rm.jaxb.tests,
    org.eclipse.ptp.rm.jaxb.control.ui,
-   org.eclipse.ptp.rm.jaxb.tests,
-   org.eclipse.ptp.rm.lml.monitor.core,
-   org.eclipse.ptp.rm.lml.monitor.ui",
- org.eclipse.ptp.rm.jaxb.control.data;x-friends:="org.eclipse.ptp.rm.jaxb.control.ui,org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.launch",
- org.eclipse.ptp.rm.jaxb.control.exceptions;x-friends:="org.eclipse.ptp.rm.jaxb.control.ui,org.eclipse.ptp.rm.jaxb.tests",
- org.eclipse.ptp.rm.jaxb.control.internal;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.control.ui",
- org.eclipse.ptp.rm.jaxb.control.internal.data;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.control.ui",
- org.eclipse.ptp.rm.jaxb.control.internal.messages;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.control.ui",
- org.eclipse.ptp.rm.jaxb.control.internal.runnable;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.control.ui,org.eclipse.ptp.launch",
- org.eclipse.ptp.rm.jaxb.control.internal.runnable.command;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.control.ui,org.eclipse.ptp.launch",
- org.eclipse.ptp.rm.jaxb.control.internal.utils;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.control.ui",
- org.eclipse.ptp.rm.jaxb.control.internal.variables;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.control.ui,org.eclipse.ptp.launch",
- org.eclipse.ptp.rm.jaxb.control.runnable;x-friends:="org.eclipse.ptp.rm.jaxb.control.ui,org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.launch"
+   org.eclipse.ptp.launch,
+   org.eclipse.ptp.etfw.parallel",
+ org.eclipse.ptp.internal.rm.jaxb.control.core.data;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.control.ui",
+ org.eclipse.ptp.internal.rm.jaxb.control.core.messages;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.control.ui",
+ org.eclipse.ptp.internal.rm.jaxb.control.core.runnable;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.control.ui,org.eclipse.ptp.launch",
+ org.eclipse.ptp.internal.rm.jaxb.control.core.runnable.command;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.control.ui,org.eclipse.ptp.launch",
+ org.eclipse.ptp.internal.rm.jaxb.control.core.utils;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.control.ui",
+ org.eclipse.ptp.internal.rm.jaxb.control.core.variables;x-friends:="org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.rm.jaxb.control.ui,org.eclipse.ptp.launch",
+ org.eclipse.ptp.rm.jaxb.control.core,
+ org.eclipse.ptp.rm.jaxb.control.core.exceptions;x-friends:="org.eclipse.ptp.rm.jaxb.control.ui,org.eclipse.ptp.rm.jaxb.tests",
+ org.eclipse.ptp.rm.jaxb.control.core.runnable;x-friends:="org.eclipse.ptp.rm.jaxb.control.ui,org.eclipse.ptp.rm.jaxb.tests,org.eclipse.ptp.launch"
 Bundle-Vendor: %pluginProvider
 Bundle-Localization: plugin

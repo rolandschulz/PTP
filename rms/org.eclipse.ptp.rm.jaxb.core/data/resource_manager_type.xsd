@@ -407,9 +407,11 @@
 					<xs:enumeration value="spinner"/>
 					<xs:enumeration value="combo"/>
 					<xs:enumeration value="envconfig"/>
+					<xs:enumeration value="custom"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
+		<xs:attribute name="typeId" type="xs:string"/>
 		<xs:attribute name="buttonId" type="xs:string"/>
 		<xs:attribute name="title" type="xs:string"/>
 		<xs:attribute name="style" type="xs:string"/>

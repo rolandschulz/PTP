@@ -11,17 +11,17 @@ package org.eclipse.ptp.rm.jaxb.control.ui;
 
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.ptp.rm.jaxb.control.ui.model.ViewerUpdateModel;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 
 /**
  * API for update models connected to viewer cell editors.
  * 
- * @see org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel
- * @see org.eclipse.ptp.rm.jaxb.control.ui.IColumnViewerLabelSupport
+ * @see org.eclipse.ptp.rm.jaxb.control.core.ui.IUpdateModel
+ * @see org.eclipse.ptp.rm.jaxb.control.core.ui.IColumnViewerLabelSupport
  * 
  * @author arossi
+ * @since 1.1
  * 
  */
 public interface ICellEditorUpdateModel extends IUpdateModel, IColumnViewerLabelSupport {
@@ -103,5 +103,5 @@ public interface ICellEditorUpdateModel extends IUpdateModel, IColumnViewerLabel
 	 * @param viewerModel
 	 *            the model of the viewer to which this cell model belongs
 	 */
-	public void setViewer(ViewerUpdateModel viewerModel);
+	public void setViewer(IUpdateModel viewerModel);
 }

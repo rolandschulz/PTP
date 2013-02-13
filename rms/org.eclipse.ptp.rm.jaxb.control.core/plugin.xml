@@ -6,13 +6,13 @@
       <variable
             description="Dynamic resource manager configuration variable"
             name="ptp_rm"
-            resolver="org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableResolver">
+            resolver="org.eclipse.ptp.internal.rm.jaxb.control.core.variables.RMVariableResolver">
       </variable>
    </extension>
    <extension
          point="org.eclipse.ptp.rm.jaxb.core.streamParserTokenizer">
       <streamParserTokenizer
-            class="org.eclipse.ptp.rm.jaxb.control.internal.runnable.command.ConfigurableRegexTokenizer"
+            class="org.eclipse.ptp.internal.rm.jaxb.control.core.runnable.command.ConfigurableRegexTokenizer"
             id="org.eclipse.ptp.rm.jaxb.configurableRegexTokenizer"
             name="Configurable Regex Tokenizer">
       </streamParserTokenizer>

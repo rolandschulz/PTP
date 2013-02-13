@@ -5,7 +5,7 @@ Bundle-SymbolicName: org.eclipse.ptp.rm.jaxb.ui;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-Vendor: %pluginProvider
-Bundle-Activator: org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin
+Bundle-Activator: org.eclipse.ptp.internal.rm.jaxb.ui.JAXBUIPlugin
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui;bundle-version="3.7.0",
  org.eclipse.ptp.rm.jaxb.core;bundle-version="1.0.0",
@@ -17,8 +17,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ptp.ems.ui,
  org.eclipse.ptp.remote.core
 Bundle-ActivationPolicy: lazy
-Export-Package: org.eclipse.ptp.rm.jaxb.ui;x-friends:="org.eclipse.ptp.rm.jaxb.control.ui,org.eclipse.ptp.launch",
- org.eclipse.ptp.rm.jaxb.ui.messages;x-internal:=true,
- org.eclipse.ptp.rm.jaxb.ui.util;x-friends:="org.eclipse.ptp.rm.jaxb.control.ui,org.eclipse.ptp.launch",
- org.eclipse.ptp.rm.jaxb.ui.wizards;x-friends:="org.eclipse.ptp.rm.jaxb.control.ui"
+Export-Package: org.eclipse.ptp.internal.rm.jaxb.ui;x-friends:="org.eclipse.ptp.rm.jaxb.control.ui,org.eclipse.ptp.launch",
+ org.eclipse.ptp.internal.rm.jaxb.ui.messages;x-internal:=true,
+ org.eclipse.ptp.internal.rm.jaxb.ui.util;x-friends:="org.eclipse.ptp.rm.jaxb.control.ui,org.eclipse.ptp.launch",
+ org.eclipse.ptp.internal.rm.jaxb.ui.wizards;x-friends:="org.eclipse.ptp.rm.jaxb.control.ui"
 Bundle-Localization: plugin

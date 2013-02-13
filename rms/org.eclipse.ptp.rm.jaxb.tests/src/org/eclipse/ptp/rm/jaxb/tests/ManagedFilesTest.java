@@ -21,14 +21,13 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.jobs.IJobStatus;
-import org.eclipse.ptp.rm.jaxb.control.ILaunchController;
-import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
-import org.eclipse.ptp.rm.jaxb.control.internal.ICommandJob;
-import org.eclipse.ptp.rm.jaxb.control.internal.runnable.ManagedFilesJob;
-import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
-import org.eclipse.ptp.rm.jaxb.control.runnable.ScriptHandler;
+import org.eclipse.ptp.internal.rm.jaxb.control.core.JAXBControlConstants;
+import org.eclipse.ptp.internal.rm.jaxb.control.core.runnable.ManagedFilesJob;
+import org.eclipse.ptp.internal.rm.jaxb.control.core.variables.RMVariableMap;
+import org.eclipse.ptp.internal.rm.jaxb.core.JAXBInitializationUtils;
+import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
+import org.eclipse.ptp.rm.jaxb.control.core.runnable.ScriptHandler;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
-import org.eclipse.ptp.rm.jaxb.core.JAXBInitializationUtils;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.CommandType;
 import org.eclipse.ptp.rm.jaxb.core.data.ControlType;
@@ -114,12 +113,6 @@ public class ManagedFilesTest extends TestCase implements ILaunchController {
 	@Override
 	public IVariableMap getEnvironment() {
 		return rmVarMap;
-	}
-
-	@Override
-	public ICommandJob getInteractiveJob() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	/*
@@ -220,12 +213,6 @@ public class ManagedFilesTest extends TestCase implements ILaunchController {
 
 	@Override
 	public void setConnectionName(String connName) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void setInteractiveJob(ICommandJob interactiveJob) {
 		// TODO Auto-generated method stub
 
 	}
@@ -348,5 +335,11 @@ public class ManagedFilesTest extends TestCase implements ILaunchController {
 			t.printStackTrace();
 			fail(t.getMessage());
 		}
+	}
+
+	@Override
+	public boolean hasRunningJobs() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

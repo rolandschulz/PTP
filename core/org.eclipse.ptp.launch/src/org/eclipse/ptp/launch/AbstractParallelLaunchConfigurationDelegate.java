@@ -64,7 +64,7 @@ import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
-import org.eclipse.ptp.rm.jaxb.control.ILaunchController;
+import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl;
 import org.eclipse.ptp.rm.lml.monitor.core.MonitorControlManager;
 import org.eclipse.ptp.rm.lml.ui.ILMLUIConstants;
@@ -196,12 +196,6 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 						 * Clean up any launch activities.
 						 */
 						doCleanupLaunch(fLaunch);
-
-						try {
-							fLaunchControl.stop();
-						} catch (CoreException e) {
-							// Nothing we can do now
-						}
 
 						/*
 						 * Remove job submission
@@ -560,6 +554,9 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
 						Messages.AbstractParallelLaunchConfigurationDelegate_Specified_resource_manager_not_found));
 			}
+			/*
+			 * Make sure controller is started before we submit the job
+			 */
 			control.start(subMon.newChild(10));
 
 			if (!mode.equals(ILaunchManager.DEBUG_MODE)) {
@@ -591,11 +588,9 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			JobManager.getInstance().addListener(control.getControlId(), fJobListener);
 			String jobId = control.submitJob(launch.getLaunchConfiguration(), mode, subMon.newChild(10));
 			if (subMon.isCanceled()) {
-				control.stop();
 				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(), "Launch was cancelled"));
 			}
 			if (control.getJobStatus(jobId, subMon.newChild(10)).equals(IJobStatus.UNDETERMINED)) {
-				control.stop();
 				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
 						Messages.AbstractParallelLaunchConfigurationDelegate_UnableToDetermineJobStatus));
 			}

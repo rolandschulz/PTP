@@ -25,6 +25,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
  * 
  * @author arossi
  * @author Jeff Overbey - Environment Manager support
+ * @since 1.1
  */
 public interface IVariableMap {
 
@@ -41,6 +42,13 @@ public interface IVariableMap {
 	 * @return the found attribute
 	 */
 	public AttributeType get(String name);
+
+	/**
+	 * Get the map containing the variables.
+	 * 
+	 * @return map containing the variables
+	 */
+	public Map<String, AttributeType> getAttributes();
 
 	/**
 	 * Get the default value of the attribute
@@ -86,11 +94,13 @@ public interface IVariableMap {
 	public String getString(String uuid, String value);
 
 	/**
-	 * Get the map containing the variables.
+	 * Gets an attribute value directly from the map or returns null if no attribute of this name exists
 	 * 
-	 * @return map containing the variables
+	 * @param name
+	 *            name of attribute
+	 * @return value of attribute
 	 */
-	public Map<String, AttributeType> getAttributes();
+	public Object getValue(String name);
 
 	/**
 	 * Places a attribute directly in the environment.
@@ -101,6 +111,16 @@ public interface IVariableMap {
 	 *            of variable
 	 */
 	public void put(String name, AttributeType value);
+
+	/**
+	 * Puts an attribute value directly into the map. Creates a new attribute if necessary.
+	 * 
+	 * @param name
+	 *            attribute name
+	 * @param value
+	 *            value to assign to the attribute
+	 */
+	public void putValue(String name, Object value);
 
 	/**
 	 * Removes an attribute. Checks first in the predefined values map, and if it does not exist there, removes from the runtime

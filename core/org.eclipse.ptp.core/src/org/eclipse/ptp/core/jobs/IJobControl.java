@@ -38,6 +38,12 @@ public interface IJobControl {
 	 * Control operation to terminate a job
 	 */
 	public static final String TERMINATE_OPERATION = "TERMINATE"; //$NON-NLS-1$
+	/**
+	 * Rerun the job. Note that this is currently only used to resend input to a job that is already in running state.
+	 * 
+	 * @since 7.0
+	 */
+	public static final String RERUN_OPERATION = "RERUN"; //$NON-NLS-1$
 
 	/**
 	 * Perform control operation on job.

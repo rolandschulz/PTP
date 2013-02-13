@@ -9,68 +9,79 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.ui;
 
-import org.eclipse.ptp.rm.jaxb.control.ui.launch.IJAXBParentLaunchConfigurationTab;
-import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
-import org.eclipse.ptp.rm.jaxb.core.data.ValidatorType;
 
 /**
  * Basic API for model objects associated with SWT controls.
  * 
  * @author arossi
+ * @since 1.1
  * 
  */
 public interface IUpdateModel {
 
 	/**
-	 * @return the control to which this model is bound
+	 * Get the control to which this model is bound
+	 * 
+	 * @return control to which this model is bound
 	 */
 	public Object getControl();
 
 	/**
+	 * Get the identifier for the value of the model
+	 * 
 	 * @return identifier for the value of the model
 	 */
 	public String getName();
 
 	/**
+	 * Get the value from the associated control
+	 * 
 	 * @return the value retrieved from the associated control/widget
 	 */
 	public Object getValueFromControl();
 
 	/**
-	 * Load values and settings from Launch Tab environment.
+	 * Load values and settings from one attribute map to another.
 	 * 
-	 * @param rmMap
-	 *            ResourceManager environment
-	 * @param lcMap
-	 *            Launch Tab environment
+	 * @param toMap
+	 *            destination attribute map
+	 * @param fromMap
+	 *            source attribute map
 	 */
-	public void initialize(IVariableMap rmMap, LCVariableMap lcMap);
+	public void initialize(IVariableMap toMap, IVariableMap fromMap);
 
 	/**
-	 * Whether the value of the associated control can be written to the environment.
+	 * Tests if the value of the associated control can be written to the map.
 	 * 
-	 * @return true is the value can be written
+	 * @return true if the value can be written
 	 */
 	public boolean isWritable();
 
 	/**
 	 * Update call triggered by the handler.
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler
+	 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.IUpdateHandler
 	 */
 	public void refreshValueFromMap();
 
 	/**
-	 * Called by the Launch Tab.
+	 * Restore the value of the control to its default value
 	 */
 	public void restoreDefault();
 
 	/**
+	 * Set the validator for this attribute's value
+	 * 
 	 * @param validator
-	 *            used to validate the value entered by the user
-	 * @param tab
-	 *            parent tab (from which to get the remote services delegate)
+	 *            validator for this attribute's value
 	 */
-	public void setValidator(ValidatorType validator, IJAXBParentLaunchConfigurationTab tab);
+	public void setValidator(IValidator validator);
+
+	/**
+	 * Retrieves the value from the control and stores it to the current attribute map. Calls the update handler if necessary.
+	 * 
+	 * @return value from the control
+	 */
+	public Object storeValue() throws Exception;
 }

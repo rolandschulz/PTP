@@ -15,11 +15,11 @@ import java.util.TreeSet;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.ptp.internal.rm.jaxb.control.ui.launch.IJAXBParentLaunchConfigurationTab;
+import org.eclipse.ptp.internal.rm.jaxb.control.ui.variables.LCVariableMap;
+import org.eclipse.ptp.internal.rm.jaxb.ui.JAXBUIConstants;
+import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.internal.messages.Messages;
-import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIPlugin;
-import org.eclipse.ptp.rm.jaxb.control.ui.launch.IJAXBParentLaunchConfigurationTab;
-import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
-import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 
@@ -28,8 +28,8 @@ import org.eclipse.swt.widgets.Composite;
  * as children of the controller tab.<br>
  * <br>
  * 
- * @see org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBDynamicLaunchConfigurationTab
- * @see org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBImportedScriptLaunchConfigurationTab
+ * @see org.eclipse.ptp.rm.jaxb.control.core.ui.launch.JAXBDynamicLaunchConfigurationTab
+ * @see org.eclipse.ptp.rm.jaxb.control.core.ui.launch.JAXBImportedScriptLaunchConfigurationTab
  * 
  * @author arossi
  * @since 7.0
@@ -86,7 +86,7 @@ public abstract class AbstractJAXBLaunchConfigurationTab extends AbstractRMLaunc
 			try {
 				refreshLocal(configuration);
 			} catch (CoreException t) {
-				JAXBControlUIPlugin.log(t);
+				PTPLaunchPlugin.log(t);
 				return new RMLaunchValidation(false, t.getMessage());
 			}
 		}

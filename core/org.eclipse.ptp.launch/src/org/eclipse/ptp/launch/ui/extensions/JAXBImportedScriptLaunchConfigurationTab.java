@@ -21,16 +21,15 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
+import org.eclipse.ptp.internal.rm.jaxb.control.ui.JAXBControlUIConstants;
+import org.eclipse.ptp.internal.rm.jaxb.control.ui.utils.LaunchTabBuilder;
+import org.eclipse.ptp.internal.rm.jaxb.control.ui.utils.WidgetActionUtils;
+import org.eclipse.ptp.internal.rm.jaxb.ui.JAXBUIConstants;
+import org.eclipse.ptp.internal.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.ptp.launch.internal.messages.Messages;
-import org.eclipse.ptp.rm.jaxb.control.ILaunchController;
-import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIConstants;
-import org.eclipse.ptp.rm.jaxb.control.ui.utils.LaunchTabBuilder;
-import org.eclipse.ptp.rm.jaxb.control.ui.utils.WidgetActionUtils;
-import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
+import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeViewerType;
 import org.eclipse.ptp.rm.jaxb.core.data.LaunchTabType;
-import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
-import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
@@ -103,7 +102,8 @@ public class JAXBImportedScriptLaunchConfigurationTab extends JAXBDynamicLaunchC
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBDynamicLaunchConfigurationTab#createControl(org.eclipse.swt.widgets.Composite,
+	 * org.eclipse.ptp.rm.jaxb.control.core.ui.launch.JAXBDynamicLaunchConfigurationTab#createControl(org.eclipse.swt.widgets.Composite
+	 * ,
 	 * java.lang.String)
 	 */
 	@Override
@@ -263,19 +263,18 @@ public class JAXBImportedScriptLaunchConfigurationTab extends JAXBDynamicLaunchC
 	/*
 	 * Store SCRIPT_PATH. (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.ui.launch.AbstractJAXBLaunchConfigurationTab# doRefreshLocal()
+	 * @see org.eclipse.ptp.internal.rm.jaxb.ui.launch.AbstractJAXBLaunchConfigurationTab# doRefreshLocal()
 	 */
 	@Override
 	protected void doRefreshLocal() {
 		super.doRefreshLocal();
-		LCVariableMap lcMap = parentTab.getVariableMap();
-		lcMap.putValue(JAXBControlUIConstants.SCRIPT_PATH, selected);
+		parentTab.getVariableMap().putValue(JAXBControlUIConstants.SCRIPT_PATH, selected);
 	}
 
 	/*
 	 * Let the writeLocalProperties determine validity of script, excluded by all other controllers. (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBDynamicLaunchConfigurationTab #getLocalInvalid()
+	 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.launch.JAXBDynamicLaunchConfigurationTab #getLocalInvalid()
 	 */
 	@Override
 	protected Set<String> getLocalInvalid() {
@@ -287,7 +286,7 @@ public class JAXBImportedScriptLaunchConfigurationTab extends JAXBDynamicLaunchC
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.ui.launch.AbstractJAXBLaunchConfigurationTab #writeLocalProperties()
+	 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.launch.AbstractJAXBLaunchConfigurationTab #writeLocalProperties()
 	 */
 	@Override
 	protected void writeLocalProperties() {

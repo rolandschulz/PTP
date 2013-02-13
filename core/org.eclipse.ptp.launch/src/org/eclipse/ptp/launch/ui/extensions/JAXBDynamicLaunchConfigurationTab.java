@@ -30,33 +30,33 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
+import org.eclipse.ptp.internal.rm.jaxb.control.core.JAXBControlConstants;
+import org.eclipse.ptp.internal.rm.jaxb.control.core.variables.RMVariableMap;
+import org.eclipse.ptp.internal.rm.jaxb.control.ui.JAXBControlUIConstants;
+import org.eclipse.ptp.internal.rm.jaxb.control.ui.dialogs.ScrollingEditableMessageDialog;
+import org.eclipse.ptp.internal.rm.jaxb.control.ui.handlers.ControlStateListener;
+import org.eclipse.ptp.internal.rm.jaxb.control.ui.launch.IJAXBLaunchConfigurationTab;
+import org.eclipse.ptp.internal.rm.jaxb.control.ui.launch.IJAXBParentLaunchConfigurationTab;
+import org.eclipse.ptp.internal.rm.jaxb.control.ui.model.ViewerUpdateModel;
+import org.eclipse.ptp.internal.rm.jaxb.control.ui.utils.LaunchTabBuilder;
+import org.eclipse.ptp.internal.rm.jaxb.control.ui.utils.WidgetActionUtils;
+import org.eclipse.ptp.internal.rm.jaxb.control.ui.variables.LCVariableMap;
+import org.eclipse.ptp.internal.rm.jaxb.ui.JAXBUIConstants;
+import org.eclipse.ptp.internal.rm.jaxb.ui.JAXBUIPlugin;
+import org.eclipse.ptp.internal.rm.jaxb.ui.util.WidgetBuilderUtils;
+import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.internal.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
-import org.eclipse.ptp.rm.jaxb.control.ILaunchController;
-import org.eclipse.ptp.rm.jaxb.control.JAXBControlConstants;
-import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
-import org.eclipse.ptp.rm.jaxb.control.runnable.ScriptHandler;
+import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
+import org.eclipse.ptp.rm.jaxb.control.core.runnable.ScriptHandler;
 import org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel;
+import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateHandler;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel;
-import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIConstants;
-import org.eclipse.ptp.rm.jaxb.control.ui.JAXBControlUIPlugin;
-import org.eclipse.ptp.rm.jaxb.control.ui.dialogs.ScrollingEditableMessageDialog;
-import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ControlStateListener;
-import org.eclipse.ptp.rm.jaxb.control.ui.handlers.ValueUpdateHandler;
-import org.eclipse.ptp.rm.jaxb.control.ui.launch.IJAXBLaunchConfigurationTab;
-import org.eclipse.ptp.rm.jaxb.control.ui.launch.IJAXBParentLaunchConfigurationTab;
-import org.eclipse.ptp.rm.jaxb.control.ui.model.ViewerUpdateModel;
-import org.eclipse.ptp.rm.jaxb.control.ui.utils.LaunchTabBuilder;
-import org.eclipse.ptp.rm.jaxb.control.ui.utils.WidgetActionUtils;
-import org.eclipse.ptp.rm.jaxb.control.ui.variables.LCVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.ButtonActionType;
 import org.eclipse.ptp.rm.jaxb.core.data.TabControllerType;
-import org.eclipse.ptp.rm.jaxb.ui.JAXBUIConstants;
-import org.eclipse.ptp.rm.jaxb.ui.JAXBUIPlugin;
-import org.eclipse.ptp.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -78,7 +78,7 @@ import org.eclipse.swt.widgets.Shell;
  * Aside from being registered with the update handler, the widgets specific to this tab are also maintained in a local map so that
  * their values (and only theirs) will appear in the environment when performApply() is called. <br>
  * <br>
- * If different widgets on different tabs reference the same Property or Attribute, its value will change everywhere. However, if
+ * If different widgets on different tabs reference the same Attribute, its value will change everywhere. However, if
  * the <code>shared</code> property is given a list of other controllers, their values are included in the local environment.
  * 
  * @author arossi
@@ -89,7 +89,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		SelectionListener {
 
 	protected final ILaunchController fControl;
-	protected final ValueUpdateHandler updateHandler;
+	protected final IUpdateHandler updateHandler;
 	protected final List<Viewer> viewers;
 	protected final Map<Object, IUpdateModel> localWidgets;
 	protected final IRMLaunchConfigurationDynamicTab fDynamicTab;
@@ -224,7 +224,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.ui.launch.IJAXBLaunchConfigurationTab#getRemoteConnection()
+	 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.launch.IJAXBLaunchConfigurationTab#getRemoteConnection()
 	 */
 	// Based on org.eclipse.ptp.rm.launch.RMLaunchUtils#getRemoteConnection(ILaunchConfiguration, IProgressMonitor)
 	public IRemoteConnection getRemoteConnection() {
@@ -265,7 +265,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	public RMLaunchValidation initializeFrom(ILaunchConfiguration configuration) {
 		listenerConfiguration = configuration;
 		try {
-			ValueUpdateHandler handler = getParent().getUpdateHandler();
+			IUpdateHandler handler = getParent().getUpdateHandler();
 
 			viewers.clear();
 			for (Map.Entry<Object, IUpdateModel> e : localWidgets.entrySet()) {
@@ -308,7 +308,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 				v.refresh();
 			}
 		} catch (Throwable t) {
-			JAXBControlUIPlugin.log(t);
+			PTPLaunchPlugin.log(t);
 			return new RMLaunchValidation(false, t.getMessage());
 		}
 		return new RMLaunchValidation(true, null);
@@ -327,7 +327,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.ui.launch.AbstractJAXBLaunchConfigurationTab
+	 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.launch.AbstractJAXBLaunchConfigurationTab
 	 * #performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
 	 */
 	@Override
@@ -383,7 +383,8 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	/*
 	 * Pull out the local maps from each and set them into the shared array. (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.ui.launch.AbstractJAXBLaunchConfigurationTab #setUpSharedEnvironment(java.util.List)
+	 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.launch.AbstractJAXBLaunchConfigurationTab
+	 * #setUpSharedEnvironment(java.util.List)
 	 */
 	@Override
 	public void setUpSharedEnvironment(Map<String, AbstractJAXBLaunchConfigurationTab> controllers) throws CoreException {
@@ -399,7 +400,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	/*
 	 * Reactivates the tab; if this was not the last tab, the Apply button should become active.
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.ui.launch.AbstractJAXBLaunchConfigurationTab #setVisible()
+	 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.launch.AbstractJAXBLaunchConfigurationTab #setVisible()
 	 */
 	@Override
 	public void setVisible() {
@@ -675,7 +676,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 * Calls {@link ControlStateListener#setState()} on all control state listeners to update any widget state that is based on an
 	 * attribute value rather than a button ID.
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.ui.launch.AbstractJAXBLaunchConfigurationTab# doRefreshLocal()
+	 * @see org.eclipse.ptp.internal.rm.jaxb.ui.launch.AbstractJAXBLaunchConfigurationTab# doRefreshLocal()
 	 */
 	@Override
 	protected void doRefreshLocal() {
@@ -734,7 +735,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	/**
 	 * VISIBLE, ENABLED, (LOCALLY) INVALID and VALID.
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.ui.launch.AbstractJAXBLaunchConfigurationTab #writeLocalProperties()
+	 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.launch.AbstractJAXBLaunchConfigurationTab #writeLocalProperties()
 	 */
 	@Override
 	protected void writeLocalProperties() {

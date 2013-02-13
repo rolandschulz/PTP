@@ -16,9 +16,9 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.eclipse.ptp.rm.jaxb.control.internal.variables.RMVariableMap;
-import org.eclipse.ptp.rm.jaxb.core.JAXBCoreConstants;
-import org.eclipse.ptp.rm.jaxb.core.JAXBInitializationUtils;
+import org.eclipse.ptp.internal.rm.jaxb.control.core.variables.RMVariableMap;
+import org.eclipse.ptp.internal.rm.jaxb.core.JAXBCoreConstants;
+import org.eclipse.ptp.internal.rm.jaxb.core.JAXBInitializationUtils;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.CommandType;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
