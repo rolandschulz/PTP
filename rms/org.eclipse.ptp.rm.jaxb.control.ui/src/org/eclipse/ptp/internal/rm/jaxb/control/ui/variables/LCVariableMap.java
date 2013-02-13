@@ -234,19 +234,10 @@ public class LCVariableMap implements IVariableMap {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Get the environment manager for this map
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getEnvironmentManager()
-	 */
-	public IEnvManager getEnvironmentManager() {
-		return envManager;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getEnvManager()
+	 * @return environment manager
 	 */
 	public IEnvManager getEnvManager() {
 		return envManager;

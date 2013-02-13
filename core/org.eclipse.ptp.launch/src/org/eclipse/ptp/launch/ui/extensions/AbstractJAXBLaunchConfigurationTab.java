@@ -28,8 +28,8 @@ import org.eclipse.swt.widgets.Composite;
  * as children of the controller tab.<br>
  * <br>
  * 
- * @see org.eclipse.ptp.rm.jaxb.control.core.ui.launch.JAXBDynamicLaunchConfigurationTab
- * @see org.eclipse.ptp.rm.jaxb.control.core.ui.launch.JAXBImportedScriptLaunchConfigurationTab
+ * @see org.eclipse.ptp.rm.jaxb.ui.launch.JAXBDynamicLaunchConfigurationTab
+ * @see org.eclipse.ptp.rm.jaxb.ui.launch.JAXBImportedScriptLaunchConfigurationTab
  * 
  * @author arossi
  * @since 7.0

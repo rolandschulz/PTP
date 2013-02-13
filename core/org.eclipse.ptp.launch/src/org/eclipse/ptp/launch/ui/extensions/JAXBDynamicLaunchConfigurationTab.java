@@ -224,7 +224,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.launch.IJAXBLaunchConfigurationTab#getRemoteConnection()
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.launch.IJAXBLaunchConfigurationTab#getRemoteConnection()
 	 */
 	// Based on org.eclipse.ptp.rm.launch.RMLaunchUtils#getRemoteConnection(ILaunchConfiguration, IProgressMonitor)
 	public IRemoteConnection getRemoteConnection() {
@@ -327,7 +327,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.launch.AbstractJAXBLaunchConfigurationTab
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.launch.AbstractJAXBLaunchConfigurationTab
 	 * #performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
 	 */
 	@Override
@@ -383,7 +383,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	/*
 	 * Pull out the local maps from each and set them into the shared array. (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.launch.AbstractJAXBLaunchConfigurationTab
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.launch.AbstractJAXBLaunchConfigurationTab
 	 * #setUpSharedEnvironment(java.util.List)
 	 */
 	@Override
@@ -400,7 +400,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	/*
 	 * Reactivates the tab; if this was not the last tab, the Apply button should become active.
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.launch.AbstractJAXBLaunchConfigurationTab #setVisible()
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.launch.AbstractJAXBLaunchConfigurationTab #setVisible()
 	 */
 	@Override
 	public void setVisible() {
@@ -735,7 +735,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	/**
 	 * VISIBLE, ENABLED, (LOCALLY) INVALID and VALID.
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.launch.AbstractJAXBLaunchConfigurationTab #writeLocalProperties()
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.launch.AbstractJAXBLaunchConfigurationTab #writeLocalProperties()
 	 */
 	@Override
 	protected void writeLocalProperties() {

@@ -8,7 +8,7 @@
  * Contributors:
  *    Jeff Overbey (Illinois) - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.ems.internal.ui;
+package org.eclipse.ptp.internal.ems.ui;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.ptp.internal.ems.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;

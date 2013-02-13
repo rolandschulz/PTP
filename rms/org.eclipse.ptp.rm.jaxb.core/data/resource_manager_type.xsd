@@ -406,7 +406,6 @@
 					<xs:enumeration value="radiobutton"/>
 					<xs:enumeration value="spinner"/>
 					<xs:enumeration value="combo"/>
-					<xs:enumeration value="envconfig"/>
 					<xs:enumeration value="custom"/>
 				</xs:restriction>
 			</xs:simpleType>

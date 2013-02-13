@@ -17,9 +17,7 @@ import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.resource.FontRegistry;
-import org.eclipse.ptp.ems.ui.EnvManagerConfigButton;
 import org.eclipse.ptp.internal.rm.jaxb.ui.JAXBUIConstants;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.rm.jaxb.core.data.FontType;
 import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
@@ -166,25 +164,6 @@ public class WidgetBuilderUtils {
 			}
 		}
 		return combo;
-	}
-
-	public static EnvManagerConfigButton createEnvConfig(Composite parent, Integer style, Object layoutData, String initialValue,
-			String label, String tooltip, Object listener, IRemoteConnection conn) {
-		if (label != null) {
-			Label buttonLabel = createLabel(parent, label, SWT.RIGHT, 1);
-			if (tooltip != null) {
-				buttonLabel.setToolTipText(tooltip);
-			}
-		}
-		final EnvManagerConfigButton button = new EnvManagerConfigButton(parent, conn);
-		if (label != null) {
-			button.setText(label);
-		}
-		button.setLayoutData(layoutData);
-		if (initialValue != null) {
-			button.setConfiguration(initialValue);
-		}
-		return button;
 	}
 
 	/**

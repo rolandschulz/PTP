@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ptp.rm.jaxb.control.ui.widget">
+      <widget
+            id="envconfig"
+            updateModelClass="org.eclipse.ptp.internal.ems.ui.EnvConfigButtonUpdateModel"
+            widgetClass="org.eclipse.ptp.internal.ems.ui.EnvManagerConfigButton">
+      </widget>
+   </extension>
+
+
+</plugin>

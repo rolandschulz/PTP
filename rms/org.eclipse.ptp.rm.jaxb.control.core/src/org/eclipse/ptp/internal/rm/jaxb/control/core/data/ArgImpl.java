@@ -13,8 +13,6 @@ package org.eclipse.ptp.internal.rm.jaxb.control.core.data;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.ptp.ems.core.EnvManagerConfigString;
-import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.internal.rm.jaxb.core.JAXBCoreConstants;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
@@ -100,15 +98,18 @@ public class ArgImpl {
 			return arg.getContent();
 		}
 		String dereferenced = map.getString(uuid, arg.getContent());
-		if (dereferenced != null && !dereferenced.equals("") && EnvManagerConfigString.isEnvMgmtConfigString(dereferenced)) {
-			IEnvManager mgr = map.getEnvManager();
-			if (mgr != null) {
-				dereferenced = mgr.getBashConcatenation("\n", false, new EnvManagerConfigString(dereferenced), //$NON-NLS-1$
-						null);
-			} else {
-				dereferenced = ""; //$NON-NLS-1$
-			}
-		}
+		// This should already be handled by the variable resolver
+		// XXX: Need to check!
+		//
+		// if (dereferenced != null && !dereferenced.equals("") && EnvManagerConfigString.isEnvMgmtConfigString(dereferenced)) {
+		// IEnvManager mgr = map.getEnvManager();
+		// if (mgr != null) {
+		//				dereferenced = mgr.getBashConcatenation("\n", false, new EnvManagerConfigString(dereferenced), //$NON-NLS-1$
+		// null);
+		// } else {
+		//				dereferenced = ""; //$NON-NLS-1$
+		// }
+		// }
 		String undefined = arg.getIsUndefinedIfMatches();
 		String attribute = arg.getAttribute();
 		if (attribute != null && undefined != null) {

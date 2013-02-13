@@ -7,7 +7,7 @@
  * Contributors: 
  *     Jeff Overbey (Illinois/NCSA) - Design and implementation
  ******************************************************************************/
-package org.eclipse.ptp.ems.internal.ui;
+package org.eclipse.ptp.internal.ems.ui;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;

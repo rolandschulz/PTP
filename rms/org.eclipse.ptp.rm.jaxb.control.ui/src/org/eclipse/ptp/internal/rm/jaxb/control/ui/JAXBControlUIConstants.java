@@ -43,7 +43,6 @@ public class JAXBControlUIConstants extends JAXBUIConstants {
 	public static final String CHECKBOX = "checkbox";//$NON-NLS-1$
 	public static final String SPINNER = "spinner";//$NON-NLS-1$
 	public static final String COMBO = "combo";//$NON-NLS-1$
-	public static final String ENVCONFIG = "envconfig";//$NON-NLS-1$
 	public static final String RADIOBUTTON = "radiobutton";//$NON-NLS-1$
 	public static final String BROWSE = "browse";//$NON-NLS-1$
 	public static final String ACTION = "action";//$NON-NLS-1$

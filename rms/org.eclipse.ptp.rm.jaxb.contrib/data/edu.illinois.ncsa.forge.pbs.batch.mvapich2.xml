@@ -767,7 +767,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						<tooltip>${ptp_rm:modules#tooltip}</tooltip>
 						<fixed-text>Modules to Load: </fixed-text>
 					</widget>
-					<widget type="envconfig" style="SWT.BORDER" attribute="modules">
+					<widget type="custom" typeId="envconfig" style="SWT.BORDER" attribute="modules">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false"/>
 						</layout-data>

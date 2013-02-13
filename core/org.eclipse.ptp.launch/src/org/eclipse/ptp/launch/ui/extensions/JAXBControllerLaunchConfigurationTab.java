@@ -140,7 +140,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.rm.jaxb.control.core.ui.launch.ExtensibleJAXBControllerTab#createControl(org.eclipse.swt.widgets.Composite,
+	 * org.eclipse.ptp.rm.jaxb.control.ui.launch.ExtensibleJAXBControllerTab#createControl(org.eclipse.swt.widgets.Composite,
 	 * java.lang.String)
 	 */
 	@Override
@@ -253,7 +253,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	/**
 	 * Calls relink on the LCVariableMap for current controller.
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.IUpdateModelEnabled#relink()
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModelEnabled#relink()
 	 */
 	public void relink() {
 		AbstractJAXBLaunchConfigurationTab t = getControllers().get(tabFolder.getSelectionIndex());

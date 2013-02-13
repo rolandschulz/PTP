@@ -17,8 +17,8 @@ import org.eclipse.swt.graphics.Font;
 /**
  * API for update models connected to viewer cell editors.
  * 
- * @see org.eclipse.ptp.rm.jaxb.control.core.ui.IUpdateModel
- * @see org.eclipse.ptp.rm.jaxb.control.core.ui.IColumnViewerLabelSupport
+ * @see org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel
+ * @see org.eclipse.ptp.rm.jaxb.control.ui.IColumnViewerLabelSupport
  * 
  * @author arossi
  * @since 1.1

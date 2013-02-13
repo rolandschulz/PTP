@@ -70,7 +70,7 @@ import org.eclipse.swt.widgets.Tree;
  * Object responsible for constructing the configurable JAXB Launch Configuration Tab, as well as building and registering the
  * related model objects and listeners.
  * 
- * @see org.eclipse.ptp.rm.jaxb.control.core.ui.launch.JAXBDynamicLaunchConfigurationTab
+ * @see org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBDynamicLaunchConfigurationTab
  * 
  * @author arossi
  * 
@@ -164,7 +164,7 @@ public class LaunchTabBuilder {
 	 * Constructs the viewer, its row items and their update models, and adds it to the tree.
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.data.AttributeViewer
-	 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.ICellEditorUpdateModel
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel
 	 * @see org.eclipse.ptp.internal.rm.jaxb.control.ui.model.ViewerUpdateModel
 	 * @see org.eclipse.ptp.internal.rm.jaxb.control.ui.utils.UpdateModelFactory#createModel(ColumnViewer, AttributeViewer,
 	 *      JAXBDynamicLaunchConfigurationTab)
@@ -535,8 +535,8 @@ public class LaunchTabBuilder {
 	 * data model for the viewer provider. Adds the cell editor-to-model mappings to the local widget map of the LaunchTab being
 	 * built.
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.IUpdateModel
-	 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.ICellEditorUpdateModel
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel
 	 * @see org.eclipse.ptp.internal.rm.jaxb.control.ui.model.CellEditorUpdateModel
 	 * @see org.eclipse.ptp.internal.rm.jaxb.control.ui.model.TableRowUpdateModel
 	 * @see org.eclipse.ptp.internal.rm.jaxb.control.ui.model.ValueTreeNodeUpdateModel

@@ -188,7 +188,7 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.ICellEditorUpdateModel#getParent()
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel#getParent()
 	 */
 	public Viewer getParent() {
 		return (Viewer) viewer.getControl();
@@ -263,7 +263,8 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.internal.rm.jaxb.control.ui.model.AbstractUpdateModel#initialize(org.eclipse.ptp.rm.jaxb.core.IVariableMap,
+	 * @see
+	 * org.eclipse.ptp.internal.rm.jaxb.control.ui.model.AbstractUpdateModel#initialize(org.eclipse.ptp.rm.jaxb.core.IVariableMap,
 	 * org.eclipse.ptp.rm.jaxb.core.IVariableMap)
 	 */
 	@Override
@@ -442,7 +443,8 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.internal.rm.jaxb.ui.ICellEditorUpdateModel#setViewer(org.eclipse .ptp.rm.jaxb.ui.model.ViewerUpdateModel)
+	 * @see org.eclipse.ptp.internal.rm.jaxb.ui.ICellEditorUpdateModel#setViewer(org.eclipse
+	 * .ptp.rm.jaxb.ui.model.ViewerUpdateModel)
 	 */
 	public void setViewer(IUpdateModel viewer) {
 		this.viewer = viewer;

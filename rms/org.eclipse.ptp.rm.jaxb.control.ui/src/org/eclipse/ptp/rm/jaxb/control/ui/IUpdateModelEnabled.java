@@ -12,7 +12,7 @@ package org.eclipse.ptp.rm.jaxb.control.ui;
 /**
  * Exports tab update call.
  * 
- * @see org.eclipse.ptp.rm.jaxb.control.core.ui.IUpdateHandler
+ * @see org.eclipse.ptp.rm.jaxb.control.ui.IUpdateHandler
  * @see org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab#fireContentsChanged()
  * @author arossi
  * @since 1.1

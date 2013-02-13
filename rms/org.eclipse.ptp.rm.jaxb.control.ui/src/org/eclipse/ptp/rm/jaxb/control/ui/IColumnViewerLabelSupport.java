@@ -17,7 +17,7 @@ import org.eclipse.swt.graphics.Image;
  * Interface implemented by cell editor update models to support cell label
  * providers.
  * 
- * @see org.eclipse.ptp.rm.jaxb.control.core.ui.ICellEditorUpdateModel
+ * @see org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel
  * 
  * @author arossi
  * @since 1.1

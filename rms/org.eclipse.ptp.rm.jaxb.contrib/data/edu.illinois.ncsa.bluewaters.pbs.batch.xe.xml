@@ -771,7 +771,7 @@ Only one job is eligible at a time.</fixed-text>
 						<tooltip>${ptp_rm:modules#tooltip}</tooltip>
 						<fixed-text>Modules to Load: </fixed-text>
 					</widget>
-					<widget type="envconfig" style="SWT.NONE" attribute="modules">
+					<widget type="custom" typeId="envconfig" style="SWT.NONE" attribute="modules">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.TOP"
 								horizontalSpan="2" grabExcessHorizontal="false" />

@@ -104,7 +104,7 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 	/**
 	 * Delegates to the handler update method.
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.IUpdateHandler#handleUpdate(Object, Object)
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.IUpdateHandler#handleUpdate(Object, Object)
 	 * 
 	 * @param value
 	 *            updated value (currently unused)
@@ -133,7 +133,7 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.IUpdateModel#isWritable()
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel#isWritable()
 	 */
 	public boolean isWritable() {
 		return canSave;

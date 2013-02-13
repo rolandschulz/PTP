@@ -14,7 +14,6 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.debug.ui;bundle-version="3.7.0",
  org.eclipse.ptp.rm.core;bundle-version="3.0.0",
  org.eclipse.ptp.utils.ui;bundle-version="2.0.0",
- org.eclipse.ptp.ems.ui,
  org.eclipse.ptp.remote.core
 Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.ptp.internal.rm.jaxb.ui;x-friends:="org.eclipse.ptp.rm.jaxb.control.ui,org.eclipse.ptp.launch",

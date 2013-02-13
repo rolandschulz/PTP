@@ -61,7 +61,7 @@ public interface IUpdateModel {
 	/**
 	 * Update call triggered by the handler.
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.IUpdateHandler
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.IUpdateHandler
 	 */
 	public void refreshValueFromMap();
 

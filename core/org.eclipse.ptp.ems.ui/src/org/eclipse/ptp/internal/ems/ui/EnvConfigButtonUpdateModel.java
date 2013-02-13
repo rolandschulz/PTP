@@ -6,17 +6,15 @@
  * 	
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
- * 	Jeff Overbey - modified for {@link EnvManagerConfigButton} from {@link TextUpdateModel}
+ * 	Jeff Overbey - modified for {@link EnvManagerConfigButton} 
  ******************************************************************************/
-package org.eclipse.ptp.internal.rm.jaxb.control.ui.model;
+package org.eclipse.ptp.internal.ems.ui;
 
-import org.eclipse.ptp.ems.ui.EnvManagerConfigButton;
-import org.eclipse.ptp.internal.rm.jaxb.control.ui.JAXBControlUIConstants;
-import org.eclipse.ptp.internal.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ptp.rm.jaxb.control.ui.AbstractUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateHandler;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.widgets.Control;
 
 /**
  * Update Model for {@link EnvManagerConfigButton} widgets.
@@ -35,12 +33,12 @@ public class EnvConfigButtonUpdateModel extends AbstractUpdateModel implements M
 	 *            name of the model, which will correspond to the name of an attribute if the widget value is to be saved.
 	 * @param handler
 	 *            the handler for notifying other widgets to refresh their values
-	 * @param button
+	 * @param control
 	 *            the widget to which this model corresponds
 	 */
-	public EnvConfigButtonUpdateModel(String name, IUpdateHandler handler, EnvManagerConfigButton button) {
+	public EnvConfigButtonUpdateModel(String name, IUpdateHandler handler, Control control) {
 		super(name, handler);
-		this.button = button;
+		this.button = (EnvManagerConfigButton) control;
 		button.addModifyListener(this);
 	}
 
@@ -52,8 +50,9 @@ public class EnvConfigButtonUpdateModel extends AbstractUpdateModel implements M
 	/*
 	 * @return String value of the selection (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.internal.rm.jaxb.ui.IUpdateModel#getValueFromControl()
+	 * @see org.eclipse.ptp.rm.jaxb.ui.IUpdateModel#getValueFromControl()
 	 */
+	@Override
 	public Object getValueFromControl() {
 		return button.getConfiguration();
 	}
@@ -63,6 +62,7 @@ public class EnvConfigButtonUpdateModel extends AbstractUpdateModel implements M
 	 * 
 	 * @see org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.swt.events .ModifyEvent)
 	 */
+	@Override
 	public void modifyText(ModifyEvent e) {
 		if (refreshing) {
 			return;
@@ -78,15 +78,16 @@ public class EnvConfigButtonUpdateModel extends AbstractUpdateModel implements M
 	 * Sets the value on the text, either by resolving the arguments for read-only, or by retrieving the value. Turns on the
 	 * refreshing flag so as not to trigger further updates from the listener. (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.internal.rm.jaxb.ui.IUpdateModel#refreshValueFromMap()
+	 * @see org.eclipse.ptp.rm.jaxb.ui.IUpdateModel#refreshValueFromMap()
 	 */
+	@Override
 	public void refreshValueFromMap() {
 		refreshing = true;
 		mapValue = lcMap.getValue(name);
-		if (JAXBUIConstants.ZEROSTR.equals(mapValue)) {
+		if ("".equals(mapValue)) { //$NON-NLS-1$
 			mapValue = null;
 		}
-		String s = JAXBControlUIConstants.ZEROSTR;
+		String s = ""; //$NON-NLS-1$
 		if (mapValue != null) {
 			s = (String) mapValue;
 		}

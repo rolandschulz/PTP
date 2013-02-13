@@ -560,7 +560,7 @@ public class UpdateModelFactory {
 	 * Constructs button group update model.
 	 * 
 	 * @see org.eclipse.ptp.internal.rm.jaxb.control.ui.model.ButtonGroupUpdateModel
-	 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.IUpdateHandler
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.IUpdateHandler
 	 * 
 	 * @param bGroupDescriptor
 	 *            JAXB data element describing the button group.
@@ -599,7 +599,7 @@ public class UpdateModelFactory {
 	 * Constructs the viewer update model.
 	 * 
 	 * @see org.eclipse.ptp.internal.rm.jaxb.control.ui.model.ViewerUpdateModel
-	 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.IUpdateHandler
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.IUpdateHandler
 	 * 
 	 * @param viewer
 	 *            SWT object to which this model is bound
@@ -1120,7 +1120,7 @@ public class UpdateModelFactory {
 				/*
 				 * (non-Javadoc)
 				 * 
-				 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.IValidator#validate(java.lang.Object)
+				 * @see org.eclipse.ptp.rm.jaxb.control.ui.IValidator#validate(java.lang.Object)
 				 */
 				public Object validate(Object value) throws Exception {
 					WidgetActionUtils.validate(String.valueOf(value), attr.getValidator(), tab.getRemoteServicesDelegate()
@@ -1131,7 +1131,7 @@ public class UpdateModelFactory {
 				/*
 				 * (non-Javadoc)
 				 * 
-				 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.IValidator#getErrorMessage()
+				 * @see org.eclipse.ptp.rm.jaxb.control.ui.IValidator#getErrorMessage()
 				 */
 				public String getErrorMessage() {
 					return attr.getValidator().getErrorMessage();

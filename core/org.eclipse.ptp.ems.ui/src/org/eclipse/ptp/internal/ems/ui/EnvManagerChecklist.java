@@ -8,7 +8,7 @@
  * Contributors:
  *    Jeff Overbey (Illinois) - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.ems.internal.ui;
+package org.eclipse.ptp.internal.ems.ui;
 
 import java.net.URI;
 import java.util.Collections;
@@ -25,6 +25,7 @@ import org.eclipse.ptp.ems.core.EnvManagerRegistry;
 import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.ems.ui.EnvManagerConfigWidget;
 import org.eclipse.ptp.ems.ui.IErrorListener;
+import org.eclipse.ptp.internal.ems.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;

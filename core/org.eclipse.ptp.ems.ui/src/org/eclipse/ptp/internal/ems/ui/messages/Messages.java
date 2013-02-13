@@ -7,13 +7,13 @@
  * Contributors: 
  *     Jeff Overbey (Illinois/NCSA) - Design and implementation
  ******************************************************************************/
-package org.eclipse.ptp.ems.internal.ui;
+package org.eclipse.ptp.internal.ems.ui.messages;
 
 import org.eclipse.osgi.util.NLS;
 
 @SuppressWarnings("javadoc")
 public class Messages extends NLS {
-	private static final String BUNDLE_NAME = "org.eclipse.ptp.ems.internal.ui.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.internal.ems.ui.messages.messages"; //$NON-NLS-1$
 
 	public static String EnvConfigurationControl_ManualOverride;
 	public static String EnvConfigurationControl_UseEMS;

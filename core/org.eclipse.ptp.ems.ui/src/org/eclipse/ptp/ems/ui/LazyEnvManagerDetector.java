@@ -21,7 +21,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ptp.ems.core.EnvManagerRegistry;
 import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.ems.core.IEnvManagerConfig;
-import org.eclipse.ptp.ems.internal.ui.EMSUIPlugin;
+import org.eclipse.ptp.internal.ems.ui.EMSUIPlugin;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ui.PlatformUI;

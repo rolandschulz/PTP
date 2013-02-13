@@ -40,7 +40,7 @@ public class ValueUpdateHandler implements IUpdateHandler {
 	/**
 	 * @param tab
 	 *            the parent controller tab
-	 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.launch.JAXBControllerLaunchConfigurationTab
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBControllerLaunchConfigurationTab
 	 */
 	public ValueUpdateHandler(IUpdateModelEnabled tab) {
 		controlToModelMap = new HashMap<Object, IUpdateModel>();
@@ -53,7 +53,7 @@ public class ValueUpdateHandler implements IUpdateHandler {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.IUpdateHandler#addError(java.lang.String, java.lang.String)
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.IUpdateHandler#addError(java.lang.String, java.lang.String)
 	 */
 	public void addError(String source, String error) {
 		errors.put(source, error);
@@ -63,8 +63,8 @@ public class ValueUpdateHandler implements IUpdateHandler {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.IUpdateHandler#addUpdateModelEntry(java.lang.Object,
-	 * org.eclipse.ptp.rm.jaxb.control.core.ui.IUpdateModel)
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.IUpdateHandler#addUpdateModelEntry(java.lang.Object,
+	 * org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel)
 	 */
 	public void addUpdateModelEntry(Object control, IUpdateModel model) {
 		if (model instanceof ViewerUpdateModel) {
@@ -79,7 +79,7 @@ public class ValueUpdateHandler implements IUpdateHandler {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.IUpdateHandler#clear()
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.IUpdateHandler#clear()
 	 */
 	public void clear() {
 		cellEditorToModelMap.clear();
@@ -90,7 +90,7 @@ public class ValueUpdateHandler implements IUpdateHandler {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.IUpdateHandler#getFirstError()
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.IUpdateHandler#getFirstError()
 	 */
 	public String getFirstError() {
 		if (!errors.isEmpty()) {
@@ -105,7 +105,7 @@ public class ValueUpdateHandler implements IUpdateHandler {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.IUpdateHandler#handleUpdate(java.lang.Object, java.lang.Object)
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.IUpdateHandler#handleUpdate(java.lang.Object, java.lang.Object)
 	 */
 	public void handleUpdate(Object source, Object value) {
 		if (!errors.isEmpty()) {
@@ -150,7 +150,7 @@ public class ValueUpdateHandler implements IUpdateHandler {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.IUpdateHandler#removeError(java.lang.String)
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.IUpdateHandler#removeError(java.lang.String)
 	 */
 	public void removeError(String source) {
 		errors.remove(source);

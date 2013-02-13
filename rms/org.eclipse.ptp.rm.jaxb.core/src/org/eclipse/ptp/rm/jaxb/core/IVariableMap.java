@@ -12,7 +12,6 @@ package org.eclipse.ptp.rm.jaxb.core;
 
 import java.util.Map;
 
-import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 
 /**
@@ -64,13 +63,6 @@ public interface IVariableMap {
 	 * @return the map containing any variables added through discovery processes, or <code>null</code> if unsupported
 	 */
 	public Map<String, AttributeType> getDiscovered();
-
-	/**
-	 * Get the environment manager associated with this map.
-	 * 
-	 * @return environment manager
-	 */
-	public IEnvManager getEnvManager();
 
 	/**
 	 * Get the string representation of an expression.

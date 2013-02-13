@@ -102,7 +102,7 @@ public class JAXBImportedScriptLaunchConfigurationTab extends JAXBDynamicLaunchC
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.rm.jaxb.control.core.ui.launch.JAXBDynamicLaunchConfigurationTab#createControl(org.eclipse.swt.widgets.Composite
+	 * org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBDynamicLaunchConfigurationTab#createControl(org.eclipse.swt.widgets.Composite
 	 * ,
 	 * java.lang.String)
 	 */
@@ -274,7 +274,7 @@ public class JAXBImportedScriptLaunchConfigurationTab extends JAXBDynamicLaunchC
 	/*
 	 * Let the writeLocalProperties determine validity of script, excluded by all other controllers. (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.launch.JAXBDynamicLaunchConfigurationTab #getLocalInvalid()
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.launch.JAXBDynamicLaunchConfigurationTab #getLocalInvalid()
 	 */
 	@Override
 	protected Set<String> getLocalInvalid() {
@@ -286,7 +286,7 @@ public class JAXBImportedScriptLaunchConfigurationTab extends JAXBDynamicLaunchC
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.launch.AbstractJAXBLaunchConfigurationTab #writeLocalProperties()
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.launch.AbstractJAXBLaunchConfigurationTab #writeLocalProperties()
 	 */
 	@Override
 	protected void writeLocalProperties() {

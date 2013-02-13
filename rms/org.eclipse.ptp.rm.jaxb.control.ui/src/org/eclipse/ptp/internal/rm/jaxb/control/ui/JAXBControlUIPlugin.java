@@ -24,7 +24,7 @@ import org.osgi.framework.BundleContext;
 public class JAXBControlUIPlugin extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "org.eclipse.ptp.rm.jaxb.control.core.ui"; //$NON-NLS-1$
+	public static final String PLUGIN_ID = "org.eclipse.ptp.rm.jaxb.control.ui"; //$NON-NLS-1$
 
 	// The shared instance
 	private static JAXBControlUIPlugin plugin;

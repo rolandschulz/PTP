@@ -5,21 +5,20 @@ Bundle-SymbolicName: org.eclipse.ptp.rm.jaxb.control.ui;singleton:=true
 Bundle-Version: 1.1.0.qualifier
 Bundle-Activator: org.eclipse.ptp.internal.rm.jaxb.control.ui.JAXBControlUIPlugin
 Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.ui;bundle-version="3.7.0",
- org.eclipse.ptp.rm.jaxb.control.core;bundle-version="1.0.0",
- org.eclipse.ptp.rm.jaxb.core;bundle-version="1.0.0",
- org.eclipse.core.filesystem;bundle-version="1.3.100",
- org.eclipse.ptp.remote.core;bundle-version="5.0.0",
- org.eclipse.core.variables;bundle-version="3.2.500",
- org.eclipse.ptp.core;bundle-version="5.0.0",
- org.eclipse.ptp.rm.core;bundle-version="3.0.0",
- org.eclipse.ptp.remote.ui;bundle-version="5.0.0",
- org.eclipse.ptp.utils.ui;bundle-version="3.0.0",
- org.eclipse.ptp.ems.core,
- org.eclipse.ptp.ems.ui,
+ org.eclipse.ui,
+ org.eclipse.ptp.rm.jaxb.control.core,
+ org.eclipse.ptp.rm.jaxb.core,
+ org.eclipse.core.filesystem,
+ org.eclipse.ptp.remote.core,
+ org.eclipse.core.variables,
+ org.eclipse.ptp.core,
+ org.eclipse.ptp.rm.core,
+ org.eclipse.ptp.remote.ui,
+ org.eclipse.ptp.utils.ui,
  org.eclipse.ptp.remote.core,
  org.eclipse.debug.core,
- org.eclipse.ptp.rm.jaxb.ui;bundle-version="1.0.0"
+ org.eclipse.ptp.rm.jaxb.ui,
+ org.eclipse.ptp.ems.core
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: org.eclipse.ptp.internal.rm.jaxb.control.ui;x-friends:="org.eclipse.ptp.launch",

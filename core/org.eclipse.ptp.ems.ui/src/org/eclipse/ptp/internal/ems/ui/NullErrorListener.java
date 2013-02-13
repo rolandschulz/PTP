@@ -8,7 +8,7 @@
  * Contributors:
  *    Jeff Overbey (Illinois) - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.ems.internal.ui;
+package org.eclipse.ptp.internal.ems.ui;
 
 import org.eclipse.ptp.ems.ui.IErrorListener;
 

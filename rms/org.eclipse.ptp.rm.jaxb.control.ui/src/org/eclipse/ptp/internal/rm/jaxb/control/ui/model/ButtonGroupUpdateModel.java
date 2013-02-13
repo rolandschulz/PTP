@@ -63,7 +63,7 @@ public class ButtonGroupUpdateModel extends AbstractUpdateModel implements Selec
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.IUpdateModel#getValueFromControl()
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel#getValueFromControl()
 	 */
 	public Object getValueFromControl() {
 		return selectedLabel;
@@ -73,7 +73,7 @@ public class ButtonGroupUpdateModel extends AbstractUpdateModel implements Selec
 	 * Sets the selection on the button corresponding to the selected label, after translating the value from the current
 	 * environment. Turns on the refreshing flag so as not to trigger further updates from the listener. (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.core.ui.IUpdateModel#refreshValueFromMap()
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel#refreshValueFromMap()
 	 */
 	public void refreshValueFromMap() {
 		refreshing = true;

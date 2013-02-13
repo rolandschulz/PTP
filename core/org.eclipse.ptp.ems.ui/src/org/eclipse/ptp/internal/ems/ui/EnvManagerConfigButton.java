@@ -8,7 +8,7 @@
  * Contributors:
  *    Jeff Overbey (Illinois) - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.ems.ui;
+package org.eclipse.ptp.internal.ems.ui;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -19,8 +19,11 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.JFaceColors;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.ems.core.EnvManagerConfigString;
-import org.eclipse.ptp.ems.internal.ui.Messages;
+import org.eclipse.ptp.ems.ui.EnvManagerConfigWidget;
+import org.eclipse.ptp.ems.ui.IErrorListener;
+import org.eclipse.ptp.internal.ems.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.rm.jaxb.control.ui.IWidgetDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.events.ModifyListener;
@@ -68,19 +71,37 @@ public final class EnvManagerConfigButton extends Composite {
 	/**
 	 * Constructor.
 	 * 
-	 * @param parent parent {@link Composite} (non-<code>null</code>)
-	 * @param remoteConnection {@link IRemoteConnection} used to access files and execute shell commands on the remote machine (non-<code>null</code>)
+	 * @param parent
+	 *            parent {@link Composite} (non-<code>null</code>)
+	 * @param wd
+	 *            widget descriptor
+	 * @since 2.0
 	 */
-	public EnvManagerConfigButton(Composite parent, IRemoteConnection remoteConnection) {
+	public EnvManagerConfigButton(Composite parent, IWidgetDescriptor wd) {
+
 		super(parent, SWT.NONE);
 
-		this.remoteConnection = remoteConnection;
+		String label = wd.getTitle();
 
-		this.configString = new EnvManagerConfigString();
+		String tooltip = wd.getToolTipText();
+
+		if (label != null) {
+			Label buttonLabel = new Label(parent, SWT.RIGHT);
+			buttonLabel.setText(label);
+			GridData data = new GridData(SWT.DEFAULT, SWT.DEFAULT, false, false, 1, 1);
+			buttonLabel.setLayoutData(data);
+			if (tooltip != null) {
+				buttonLabel.setToolTipText(tooltip);
+			}
+		}
+
+		remoteConnection = wd.getRemoteConnection();
+
+		configString = new EnvManagerConfigString();
 
 		setLayout(new FillLayout());
 
-		this.button = new Button(this, SWT.PUSH);
+		button = new Button(this, SWT.PUSH);
 		button.setText(Messages.EnvManagerConfigButton_ConfigureButtonText);
 		button.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -91,6 +112,12 @@ public final class EnvManagerConfigButton extends Composite {
 				}
 			}
 		});
+
+		if (label != null) {
+			setText(label);
+		}
+		setConfiguration(""); //$NON-NLS-1$
+
 	}
 
 	private class EnvConfigurationDialog extends Dialog {
@@ -270,4 +297,12 @@ public final class EnvManagerConfigButton extends Composite {
 	public String getConfiguration() {
 		return configString.toString();
 	}
+
+	@Override
+	public void setToolTipText(String string) {
+		if (button != null) {
+			button.setToolTipText(string);
+		}
+	}
+
 }
