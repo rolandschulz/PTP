@@ -4,9 +4,9 @@
 	terms of the Eclipse Public License v1.0s which accompanies this distribution, 
 	and is available at http://www.eclipse.org/legal/epl-v10.html -->
 <resource-manager-builder 
-	xmlns="org.eclipse.ptp" 
+	xmlns="http://eclipse.org/ptp/schemas" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="org.eclipse.ptp http://eclipse.org/ptp/schemas/rm.xsd" 
+	xsi:schemaLocation="http://eclipse.org/ptp/schemas http://eclipse.org/ptp/schemas/rm.xsd" 
 	name="IBM Parallel Environment">
 	<!-- Make sure XML editor line length is set long enough (160) to avoid wrapping text so messages don't get wrapped when reformatting -->
 	<control-data>

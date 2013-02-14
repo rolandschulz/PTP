@@ -8,9 +8,9 @@
 <!-- * Carsten Karbach - additional parameters for JUQUEEN job submission -->
 <!-- ****************************************************************************** -->
 <resource-manager-builder 
-	xmlns="org.eclipse.ptp" 
+	xmlns="http://eclipse.org/ptp/schemas" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="org.eclipse.ptp http://eclipse.org/ptp/schemas/rm.xsd" 
+	xsi:schemaLocation="http://eclipse.org/ptp/schemas http://eclipse.org/ptp/schemas/rm.xsd" 
 	name="de.fz-juelich.juqueen.ll_bg">
 	<control-data>
 		<!-- Set the default value of this attribute if LL is installed in a non-standard location -->

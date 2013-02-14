@@ -8,9 +8,9 @@
 <!-- * Greg Watson - adapt to keeneland -->
 <!-- ****************************************************************************** -->
 <resource-manager-builder 
-	xmlns="org.eclipse.ptp" 
+	xmlns="http://eclipse.org/ptp/schemas" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="org.eclipse.ptp http://eclipse.org/ptp/schemas/rm.xsd" 
+	xsi:schemaLocation="http://eclipse.org/ptp/schemas http://eclipse.org/ptp/schemas/rm.xsd" 
 	name="edu.utk.nics.keeneland.pbs.batch">
 	<control-data>
 		<!-- this is a necessary attribute for the functioning of LML; link it to the batch-specific variable name -->
