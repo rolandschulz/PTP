@@ -407,7 +407,7 @@ public class TableView extends ViewPart {
 							fLguiItem.getObjectStatus().addComponent(eventForwarder);
 							componentAdded = true;
 						}
-
+						viewer.refresh();
 					}
 				}
 			});
@@ -507,8 +507,9 @@ public class TableView extends ViewPart {
 		// Part for the controlling Monitor - context menu
 		final MenuManager contextMenu = new MenuManager();
 		contextMenu.setRemoveAllWhenShown(true);
-		final Menu menu = contextMenu.createContextMenu(composite);
+		final Menu menu = contextMenu.createContextMenu(tree);
 		getSite().registerContextMenu(contextMenu, viewer);
+		getSite().setSelectionProvider(viewer);
 
 		tree.setLinesVisible(true);
 		tree.setHeaderVisible(true);
