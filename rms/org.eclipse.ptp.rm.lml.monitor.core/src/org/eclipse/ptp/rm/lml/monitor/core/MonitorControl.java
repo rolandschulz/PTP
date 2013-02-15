@@ -147,6 +147,9 @@ public class MonitorControl implements IMonitorControl {
 	private static final String LAYOUT_STRING_ATTR = "layoutString";//$NON-NLS-1$
 	private static final String MONITOR_STATE = "monitorState";//$NON-NLS-1$;
 	private static final String MONITOR_ATTR = "monitor";//$NON-NLS-1$
+	private static final String REMOTE_SERVICES_ID_ATTR = "remoteServicesId";//$NON-NLS-1$;
+	private static final String CONNECTION_NAME_ATTR = "connectionName";//$NON-NLS-1$;
+	private static final String CONFIGURATION_NAME_ATTR = "configurationName";//$NON-NLS-1$
 
 	public MonitorControl(String controlId) {
 		fControlId = controlId;
@@ -155,15 +158,12 @@ public class MonitorControl implements IMonitorControl {
 	private void addJob(IJobStatus status) {
 		ILaunchController controller = LaunchControllerManager.getInstance().getLaunchController(status.getControlId());
 		if (controller != null) {
-			String[][] attrs = { { JobStatusData.JOB_ID_ATTR, status.getJobId() },
-					{ JobStatusData.REMOTE_SERVICES_ID_ATTR, getRemoteServicesId() },
-					{ JobStatusData.CONNECTION_NAME_ATTR, getConnectionName() },
-					{ JobStatusData.CONFIGURATION_NAME_ATTR, controller.getConfiguration().getName() },
+			String[][] attrs = { { JobStatusData.CONTROL_ID_ATTR, status.getControlId() },
 					{ JobStatusData.QUEUE_NAME_ATTR, status.getQueueName() }, { JobStatusData.OWNER_ATTR, status.getOwner() },
 					{ JobStatusData.STDOUT_REMOTE_FILE_ATTR, status.getOutputPath() },
 					{ JobStatusData.STDERR_REMOTE_FILE_ATTR, status.getErrorPath() },
 					{ JobStatusData.INTERACTIVE_ATTR, Boolean.toString(status.isInteractive()) } };
-			final JobStatusData data = new JobStatusData(attrs);
+			final JobStatusData data = new JobStatusData(status.getJobId(), attrs);
 			data.setState(status.getState());
 			data.setStateDetail(status.getStateDetail());
 			fLMLManager.addUserJob(getControlId(), status.getJobId(), data);
@@ -321,33 +321,23 @@ public class MonitorControl implements IMonitorControl {
 		if (memento != null) {
 			final IMemento[] children = memento.getChildren(JOB_ATTR);
 			for (final IMemento child : children) {
-				String[][] attrs = { { JobStatusData.JOB_ID_ATTR, child.getID() },
-						{ JobStatusData.REMOTE_SERVICES_ID_ATTR, getRemoteServicesId() },
-						{ JobStatusData.CONNECTION_NAME_ATTR, getConnectionName() },
-						{ JobStatusData.CONFIGURATION_NAME_ATTR, child.getString(JobStatusData.CONFIGURATION_NAME_ATTR) },
-						{ JobStatusData.STATE_ATTR, child.getString(JobStatusData.STATE_ATTR) },
-						{ JobStatusData.STATE_DETAIL_ATTR, child.getString(JobStatusData.STATE_DETAIL_ATTR) },
-						{ JobStatusData.STDOUT_REMOTE_FILE_ATTR, child.getString(JobStatusData.STDOUT_REMOTE_FILE_ATTR) },
-						{ JobStatusData.STDERR_REMOTE_FILE_ATTR, child.getString(JobStatusData.STDERR_REMOTE_FILE_ATTR) },
-						{ JobStatusData.INTERACTIVE_ATTR, Boolean.toString(child.getBoolean(JobStatusData.INTERACTIVE_ATTR)) },
-						{ JobStatusData.QUEUE_NAME_ATTR, child.getString(JobStatusData.QUEUE_NAME_ATTR) },
-						{ JobStatusData.OWNER_ATTR, child.getString(JobStatusData.OWNER_ATTR) },
-						{ JobStatusData.OID_ATTR, child.getString(JobStatusData.OID_ATTR) } };
-				final JobStatusData jobData = new JobStatusData(attrs);
-
-				for (final String attKey : child.getAttributeKeys()) {
-					jobData.addInfo(attKey, child.getString(attKey));
+				String[] keys = child.getAttributeKeys();
+				String[][] attrs = new String[2][keys.length];
+				for (int i = 0; i < keys.length; i++) {
+					attrs[0][i] = keys[i];
+					attrs[1][i] = child.getString(keys[i]);
 				}
 
+				final JobStatusData jobData = new JobStatusData(child.getID(), attrs);
 				jobs.add(jobData);
 			}
 		}
 	}
 
 	private boolean loadState(IMemento memento) {
-		setRemoteServicesId(memento.getString(JobStatusData.REMOTE_SERVICES_ID_ATTR));
-		setConnectionName(memento.getString(JobStatusData.CONNECTION_NAME_ATTR));
-		setConfigurationName(memento.getString(JobStatusData.CONFIGURATION_NAME_ATTR));
+		setRemoteServicesId(memento.getString(REMOTE_SERVICES_ID_ATTR));
+		setConnectionName(memento.getString(CONNECTION_NAME_ATTR));
+		setConfigurationName(memento.getString(CONFIGURATION_NAME_ATTR));
 		return memento.getBoolean(MONITOR_STATE);
 	}
 
@@ -400,28 +390,16 @@ public class MonitorControl implements IMonitorControl {
 
 	private void saveJob(JobStatusData job, IMemento memento) {
 		final IMemento jobMemento = memento.createChild(JOB_ATTR, job.getJobId());
-		jobMemento.putString(JobStatusData.CONFIGURATION_NAME_ATTR, job.getConfigurationName());
-		jobMemento.putString(JobStatusData.STATE_ATTR, job.getState());
-		jobMemento.putString(JobStatusData.STATE_DETAIL_ATTR, job.getStateDetail());
-		jobMemento.putString(JobStatusData.STDOUT_REMOTE_FILE_ATTR, job.getOutputPath());
-		jobMemento.putString(JobStatusData.STDERR_REMOTE_FILE_ATTR, job.getErrorPath());
-		jobMemento.putBoolean(JobStatusData.INTERACTIVE_ATTR, job.isInteractive());
-		jobMemento.putString(JobStatusData.QUEUE_NAME_ATTR, job.getQueueName());
-		jobMemento.putString(JobStatusData.OWNER_ATTR, job.getOwner());
-		jobMemento.putString(JobStatusData.OID_ATTR, job.getOid());
-		
-		for (final String key : job.getAdditionalKeys()) {
-			// Save only the data, which was not saved by the above statements
-			if (jobMemento.getString(key) == null) {
-				jobMemento.putString(key, job.getInfo(key));
-			}
+
+		for (final String key : job.getKeys()) {
+			jobMemento.putString(key, job.getString(key));
 		}
 	}
 
 	private void saveState(IMemento memento) {
-		memento.putString(JobStatusData.REMOTE_SERVICES_ID_ATTR, getRemoteServicesId());
-		memento.putString(JobStatusData.CONNECTION_NAME_ATTR, getConnectionName());
-		memento.putString(JobStatusData.CONFIGURATION_NAME_ATTR, getConfigurationName());
+		memento.putString(REMOTE_SERVICES_ID_ATTR, getRemoteServicesId());
+		memento.putString(CONNECTION_NAME_ATTR, getConnectionName());
+		memento.putString(CONFIGURATION_NAME_ATTR, getConfigurationName());
 		memento.putBoolean(MONITOR_STATE, isActive());
 	}
 
@@ -476,7 +454,7 @@ public class MonitorControl implements IMonitorControl {
 
 				if (controller == null) {
 					throw new CoreException(new Status(IStatus.ERROR, LMLMonitorCorePlugin.getUniqueIdentifier(),
-							"Unable to locate launch controller"));
+							Messages.MonitorControl_UnableToLocateLaunchController));
 				}
 
 				try {

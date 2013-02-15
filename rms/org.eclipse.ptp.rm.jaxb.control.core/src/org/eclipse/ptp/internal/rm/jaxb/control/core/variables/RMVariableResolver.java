@@ -57,7 +57,8 @@ public class RMVariableResolver implements IDynamicVariableResolver {
 						throw CoreExceptionUtils.newException(Messages.RMVariableResolver_derefError, t);
 					}
 				} else {
-					if (value instanceof String && !((String)value).equals("") && EnvManagerConfigString.isEnvMgmtConfigString((String) value)) {
+					if (value instanceof String
+							&& !((String) value).equals("") && EnvManagerConfigString.isEnvMgmtConfigString((String) value)) { //$NON-NLS-1$
 						if (fActive.getEnvManager() != null) {
 							return fActive.getEnvManager().getBashConcatenation(
 									"\n", false, new EnvManagerConfigString((String) value), //$NON-NLS-1$

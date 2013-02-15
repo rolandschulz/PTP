@@ -210,6 +210,7 @@ public class SimpleCommandJob extends Job {
 					try {
 						wait(500);
 					} catch (InterruptedException e) {
+						// Ignore
 					}
 				}
 			}

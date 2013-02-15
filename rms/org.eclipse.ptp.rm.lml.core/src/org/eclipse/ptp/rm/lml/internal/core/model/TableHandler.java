@@ -139,7 +139,7 @@ public class TableHandler extends LguiHandler {
 		final JobStatusData[] userJobs = lguiItem.getUserJobs();
 		final Set<String> userNames = new HashSet<String>();
 		for (final JobStatusData jobStatus : userJobs) {
-			userNames.add(jobStatus.getOwner());
+			userNames.add(jobStatus.getString(JobStatusData.OWNER_ATTR));
 		}
 
 		// Traverse all tables
@@ -150,7 +150,7 @@ public class TableHandler extends LguiHandler {
 				if (rows[i].status == null) {// If there is no jobstatusdata, do not add additional data
 					continue;
 				}
-				if (!userNames.contains(rows[i].status.getOwner())) {
+				if (!userNames.contains(rows[i].status.getString(JobStatusData.OWNER_ATTR))) {
 					continue;
 				}
 
@@ -161,7 +161,7 @@ public class TableHandler extends LguiHandler {
 					final String columnName = column.getName();
 					final String value = getCellValue(table, rawRow, columnName);
 					if (value != null) {
-						rows[i].status.addInfo(columnName, value);
+						rows[i].status.putString(columnName, value);
 					}
 				}
 			}
@@ -497,13 +497,13 @@ public class TableHandler extends LguiHandler {
 				}
 			}
 			if (jobId != null) {
-				JobStatusData status = LMLManager.getInstance().getUserJob(lguiItem.toString(), jobId);
+				JobStatusData status = LMLManager.getInstance().getUserJob(lguiItem.getName(), jobId);
 				if (status == null) {
 					final String queueName = getCellValue(table, row, ILguiItem.JOB_QUEUE_NAME);
 					final String owner = getCellValue(table, row, ILguiItem.JOB_OWNER);
-					final String[][] attrs = { { JobStatusData.JOB_ID_ATTR, jobId }, { JobStatusData.QUEUE_NAME_ATTR, queueName },
-							{ JobStatusData.OWNER_ATTR, owner } };
-					status = new JobStatusData(attrs);
+					final String[][] attrs = { { JobStatusData.CONTROL_ID_ATTR, lguiItem.getName() },
+							{ JobStatusData.QUEUE_NAME_ATTR, queueName }, { JobStatusData.OWNER_ATTR, owner } };
+					status = new JobStatusData(jobId, attrs);
 				}
 				tableData[i].setJobStatusData(status);
 			}

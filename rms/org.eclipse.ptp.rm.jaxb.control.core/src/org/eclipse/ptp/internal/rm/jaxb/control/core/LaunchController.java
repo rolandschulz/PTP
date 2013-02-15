@@ -42,8 +42,8 @@ import org.eclipse.ptp.internal.rm.jaxb.control.core.runnable.JobStatusMap;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.runnable.ManagedFilesJob;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.runnable.ManagedFilesJob.Operation;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.runnable.command.CommandJob;
-import org.eclipse.ptp.internal.rm.jaxb.control.core.runnable.command.CommandJobStatus;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.runnable.command.CommandJob.JobMode;
+import org.eclipse.ptp.internal.rm.jaxb.control.core.runnable.command.CommandJobStatus;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.utils.JobIdPinTable;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.variables.RMVariableMap;
 import org.eclipse.ptp.internal.rm.jaxb.core.JAXBInitializationUtils;
@@ -725,6 +725,7 @@ public class LaunchController implements ILaunchController {
 			try {
 				job.join();
 			} catch (InterruptedException ignored) {
+				// Ignore
 			}
 		}
 	}
@@ -756,6 +757,7 @@ public class LaunchController implements ILaunchController {
 				try {
 					job.join();
 				} catch (InterruptedException ignored) {
+					// Ignore
 				}
 				return script.isDeleteAfterSubmit();
 			}
@@ -810,6 +812,7 @@ public class LaunchController implements ILaunchController {
 			try {
 				job.join();
 			} catch (InterruptedException ignored) {
+				// Ignore
 			}
 			if (!job.getSuccess()) {
 				return false;
@@ -905,6 +908,7 @@ public class LaunchController implements ILaunchController {
 			try {
 				job.join();
 			} catch (InterruptedException ignored) {
+				// Ignore
 			}
 		}
 		if (!command.isIgnoreExitStatus()) {
@@ -1304,7 +1308,7 @@ public class LaunchController implements ILaunchController {
 		if (envMgrConfig != null) {
 			IEnvManager envManager = EnvManagerRegistry.getEnvManager(monitor, fRemoteServicesDelegate.getRemoteConnection());
 			if (envManager != null) {
-				String emsStr = envManager.getBashConcatenation("\n", false, envMgrConfig, null);
+				String emsStr = envManager.getBashConcatenation("\n", false, envMgrConfig, null); //$NON-NLS-1$
 				AttributeType a = getEnvironment().get(JAXBControlConstants.EMS_ATTR);
 				if (a == null) {
 					a = new AttributeType();

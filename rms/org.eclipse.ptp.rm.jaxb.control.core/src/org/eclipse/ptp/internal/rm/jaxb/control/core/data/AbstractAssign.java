@@ -217,6 +217,7 @@ public abstract class AbstractAssign implements IAssign {
 			try {
 				return new Integer(string);
 			} catch (NumberFormatException nfe) {
+				// Ignore
 			}
 		}
 		return value;

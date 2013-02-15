@@ -20,6 +20,7 @@ Export-Package: org.eclipse.ptp.internal.rm.jaxb.core;
    org.eclipse.ptp.rm.jaxb.ui,
    org.eclipse.ptp.rm.jaxb.control.ui,
    org.eclipse.ptp.rm.jaxb.tests,
-   org.eclipse.ptp.launch",
+   org.eclipse.ptp.launch,
+   org.eclipse.ptp.rm.lml.monitor.core",
  org.eclipse.ptp.rm.jaxb.core,
  org.eclipse.ptp.rm.jaxb.core.data

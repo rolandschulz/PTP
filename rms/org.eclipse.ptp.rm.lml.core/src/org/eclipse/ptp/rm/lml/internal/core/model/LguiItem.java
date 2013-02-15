@@ -556,16 +556,6 @@ public class LguiItem implements ILguiItem {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.lml.core.elements.ILguiItem#toString
-	 */
-	@Override
-	public String toString() {
-		return name;
-	}
-
 	@Override
 	public void unlockPattern() {
 		lockPattern = false;
@@ -696,18 +686,17 @@ public class LguiItem implements ILguiItem {
 			} else if (column.getName().equals(JOB_STATUS)) {
 				addCellToRow(row, column, status.getState());
 			} else if (column.getName().equals(JOB_OWNER)) {
-				addCellToRow(row, column, status.getOwner());
+				addCellToRow(row, column, status.getString(JobStatusData.OWNER_ATTR));
 			} else if (column.getName().equals(JOB_QUEUE_NAME)) {
 				// Get the queue information from monitoring results instead of from the
 				// user input, if possible
-				String queue = status.getQueueName();
-				if (queue.equals("") && status.getInfo(JOB_QUEUE_NAME) != null) { //$NON-NLS-1$
-					queue = status.getInfo(JOB_QUEUE_NAME);
+				String queue = status.getString(JobStatusData.QUEUE_NAME_ATTR);
+				if (queue.equals("") && status.getString(JOB_QUEUE_NAME) != null) { //$NON-NLS-1$
+					queue = status.getString(JOB_QUEUE_NAME);
 				}
 				addCellToRow(row, column, queue);
-			}
-			else { // Check if other information is also stored in the jobdata instance
-				final String value = status.getInfo(column.getName());
+			} else { // Check if other information is also stored in the jobdata instance
+				final String value = status.getString(column.getName());
 				if (value != null) {
 					addCellToRow(row, column, value);
 				}
@@ -885,9 +874,9 @@ public class LguiItem implements ILguiItem {
 					if (!status.isRemoved() && !jobsInTable.contains(status.getJobId())) {
 						if (!status.isCompleted()) {
 							status.setState(JobStatusData.COMPLETED);
-							status.setOid(generateOid());
+							status.putString(JobStatusData.OID_ATTR, generateOid());
 						}
-						addJobToTable(table, status.getOid(), status);
+						addJobToTable(table, status.getString(JobStatusData.OID_ATTR), status);
 					}
 				}
 			}

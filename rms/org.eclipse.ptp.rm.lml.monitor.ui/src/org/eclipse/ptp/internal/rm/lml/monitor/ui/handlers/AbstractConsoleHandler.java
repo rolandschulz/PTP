@@ -14,6 +14,8 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
+import org.eclipse.ptp.rm.jaxb.control.core.LaunchControllerManager;
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
 import org.eclipse.ptp.rm.lml.internal.core.model.Row;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -32,9 +34,12 @@ public abstract class AbstractConsoleHandler extends AbstractHandler {
 		if (selection != null && !selection.isEmpty()) {
 			Row row = (Row) selection.getFirstElement();
 			status = row.status;
-			if (status.getRemoteId() != null && status.getConnectionName() != null) {
-				String path = isError() ? status.getErrorPath() : status.getOutputPath();
-				ActionUtils.readRemoteFile(status.getRemoteId(), status.getConnectionName(), path);
+			String controlId = status.getString(JobStatusData.CONTROL_ID_ATTR);
+			if (controlId != null) {
+				ILaunchController control = LaunchControllerManager.getInstance().getLaunchController(controlId);
+				if (control != null) {
+					ActionUtils.readRemoteFile(control.getRemoteServicesId(), control.getConnectionName(), getPath());
+				}
 			}
 		}
 		return null;
@@ -44,10 +49,8 @@ public abstract class AbstractConsoleHandler extends AbstractHandler {
 	 * @return correct file path
 	 */
 	protected String getPath() {
-		if (isError()) {
-			return status.getErrorPath();
-		}
-		return status.getOutputPath();
+		String attr = isError() ? JobStatusData.STDERR_REMOTE_FILE_ATTR : JobStatusData.STDOUT_REMOTE_FILE_ATTR;
+		return status.getString(attr);
 	}
 
 	/**

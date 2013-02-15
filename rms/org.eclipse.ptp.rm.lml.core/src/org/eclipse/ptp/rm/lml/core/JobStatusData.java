@@ -29,8 +29,6 @@ public class JobStatusData {
 	public static final String FAILED = "FAILED";//$NON-NLS-1$
 	public static final String CANCELED = "CANCELED";//$NON-NLS-1$
 
-	public static final String JOB_ID_ATTR = "jobId";//$NON-NLS-1$
-	public static final String CONFIGURATION_NAME_ATTR = "configurationName";//$NON-NLS-1$
 	public static final String SYSTEM_TYPE_ATTR = "systemType";//$NON-NLS-1$
 	public static final String STDOUT_REMOTE_FILE_ATTR = "stdoutRemotePath";//$NON-NLS-1$
 	public static final String STDERR_REMOTE_FILE_ATTR = "stderrRemotePath";//$NON-NLS-1$
@@ -40,8 +38,7 @@ public class JobStatusData {
 	public static final String OID_ATTR = "oid";//$NON-NLS-1$;
 	public static final String QUEUE_NAME_ATTR = "queueName";//$NON-NLS-1$;
 	public static final String OWNER_ATTR = "owner";//$NON-NLS-1$;
-	public static final String REMOTE_SERVICES_ID_ATTR = "remoteServicesId";//$NON-NLS-1$;
-	public static final String CONNECTION_NAME_ATTR = "connectionName";//$NON-NLS-1$;
+	public static final String CONTROL_ID_ATTR = "controlId";//$NON-NLS-1$
 
 	private static boolean detailIsFinal(String detail) {
 		return CANCELED.equals(detail) || FAILED.equals(detail) || JOB_OUTERR_READY.equals(detail);
@@ -53,12 +50,11 @@ public class JobStatusData {
 
 	private final Map<String, String> fAttrs = new HashMap<String, String>();
 
-	/**
-	 * Store key value pairs for this job
-	 */
-	private final Map<String, String> jobData = new HashMap<String, String>();
+	private final String fJobId;
 
-	public JobStatusData(String[][] attrs) {
+	public JobStatusData(String jobId, String[][] attrs) {
+		fJobId = jobId;
+
 		setState(SUBMITTED);
 		setStateDetail(SUBMITTED);
 
@@ -66,50 +62,8 @@ public class JobStatusData {
 			fAttrs.put(attr[0], attr[1]);
 		}
 
-		fOutReady = getOutputPath() != null && JOB_OUTERR_READY.equals(getStateDetail());
-		fErrReady = getErrorPath() != null && JOB_OUTERR_READY.equals(getStateDetail());
-	}
-
-	/**
-	 * Store a key value pair in the jobData map.
-	 * Store any data for this job, which can be serialized and returned to
-	 * the user within the job tables of lml.ui.
-	 * 
-	 * @param key
-	 *            the key of the stored data, e.g. dispatchdate
-	 * @param value
-	 *            the value of the data, e.g. 21.03.2012
-	 */
-	public void addInfo(String key, String value) {
-		jobData.put(key, value);
-	}
-
-	/**
-	 * @return list of keys given by the jobData hashmap
-	 */
-	public Set<String> getAdditionalKeys() {
-		return jobData.keySet();
-	}
-
-	/**
-	 * @return connection name
-	 */
-	public String getConnectionName() {
-		return fAttrs.get(CONNECTION_NAME_ATTR);
-	}
-
-	/**
-	 * @return configuration name
-	 */
-	public String getConfigurationName() {
-		return fAttrs.get(CONFIGURATION_NAME_ATTR);
-	}
-
-	/**
-	 * @return path to remote error file
-	 */
-	public String getErrorPath() {
-		return fAttrs.get(STDERR_REMOTE_FILE_ATTR);
+		fOutReady = getString(JobStatusData.STDOUT_REMOTE_FILE_ATTR) != null && JOB_OUTERR_READY.equals(getStateDetail());
+		fErrReady = getString(JobStatusData.STDERR_REMOTE_FILE_ATTR) != null && JOB_OUTERR_READY.equals(getStateDetail());
 	}
 
 	/**
@@ -120,39 +74,14 @@ public class JobStatusData {
 	}
 
 	/**
-	 * Get the value stored for a given key.
-	 * 
-	 * @param key
-	 *            the key, e.g. dispatchdate
-	 * @return the stored value or null, if there is no value stored
-	 */
-	public String getInfo(String key) {
-		return jobData.get(key);
-	}
-
-	/**
 	 * @return job id
 	 */
 	public String getJobId() {
-		return fAttrs.get(JOB_ID_ATTR);
+		return fJobId;
 	}
 
-	/**
-	 * @return system type
-	 */
-	public String getSystemType() {
-		return fAttrs.get(SYSTEM_TYPE_ATTR);
-	}
-
-	public String getOid() {
-		return fAttrs.get(OID_ATTR);
-	}
-
-	/**
-	 * @return path to remote output file
-	 */
-	public String getOutputPath() {
-		return fAttrs.get(STDOUT_REMOTE_FILE_ATTR);
+	public Set<String> getKeys() {
+		return fAttrs.keySet();
 	}
 
 	/**
@@ -163,27 +92,6 @@ public class JobStatusData {
 	}
 
 	/**
-	 * @return job id
-	 */
-	public String getOwner() {
-		return fAttrs.get(OWNER_ATTR);
-	}
-
-	/**
-	 * @return queue name
-	 */
-	public String getQueueName() {
-		return fAttrs.get(QUEUE_NAME_ATTR);
-	}
-
-	/**
-	 * @return remote services ID
-	 */
-	public String getRemoteId() {
-		return fAttrs.get(REMOTE_SERVICES_ID_ATTR);
-	}
-
-	/**
 	 * @return fState, or empty string if none.
 	 */
 	public String getState() {
@@ -191,10 +99,18 @@ public class JobStatusData {
 	}
 
 	/**
-	 * @return fState detail, or empty string if none.
+	 * @return fState, or empty string if none.
 	 */
 	public String getStateDetail() {
 		return fAttrs.get(STATE_DETAIL_ATTR);
+	}
+
+	/**
+	 * @param key
+	 * @return
+	 */
+	public String getString(String key) {
+		return fAttrs.get(key);
 	}
 
 	/**
@@ -213,6 +129,7 @@ public class JobStatusData {
 			try {
 				return Boolean.parseBoolean(interactive);
 			} catch (final Exception e) {
+				// Default to false
 			}
 		}
 		return false;
@@ -223,6 +140,14 @@ public class JobStatusData {
 	 */
 	public boolean isRemoved() {
 		return fRemoved;
+	}
+
+	/**
+	 * @param key
+	 * @param value
+	 */
+	public void putString(String key, String value) {
+		fAttrs.put(key, value);
 	}
 
 	/**
@@ -250,8 +175,7 @@ public class JobStatusData {
 	}
 
 	/**
-	 * @param outReady
-	 *            output file is ready
+	 * Set job as removed
 	 */
 	public void setRemoved() {
 		fRemoved = true;
@@ -271,8 +195,8 @@ public class JobStatusData {
 	 */
 	public void setStateDetail(String stateDetail) {
 		fAttrs.put(STATE_DETAIL_ATTR, stateDetail);
-		fOutReady = getOutputPath() != null && JOB_OUTERR_READY.equals(stateDetail);
-		fErrReady = getErrorPath() != null && JOB_OUTERR_READY.equals(stateDetail);
+		fOutReady = getString(JobStatusData.STDOUT_REMOTE_FILE_ATTR) != null && JOB_OUTERR_READY.equals(stateDetail);
+		fErrReady = getString(JobStatusData.STDERR_REMOTE_FILE_ATTR) != null && JOB_OUTERR_READY.equals(stateDetail);
 	}
 
 	/**

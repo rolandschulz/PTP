@@ -11,12 +11,8 @@
 package org.eclipse.ptp.internal.rm.lml.monitor.ui.propertyTesters;
 
 import org.eclipse.core.expressions.PropertyTester;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.core.jobs.IJobControl;
-import org.eclipse.ptp.internal.rm.lml.monitor.ui.LMLMonitorUIPlugin;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.internal.rm.lml.monitor.ui.handlers.ActionUtils;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.core.LaunchControllerManager;
 import org.eclipse.ptp.rm.jaxb.core.data.ControlType;
@@ -34,29 +30,10 @@ public class JobPropertyTester extends PropertyTester {
 
 	private static final String JOB_STATUS_CMD = "GET_JOB_STATUS";//$NON-NLS-1$
 
-	/**
-	 * @param status
-	 * @return
-	 */
-	protected boolean isAuthorised(JobStatusData status) {
-		if (status.getRemoteId() == null || status.getConnectionName() == null) {
-			return false;
-		}
-		IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(status.getRemoteId());
-		if (!services.isInitialized()) {
-			return false;
-		}
-		IRemoteConnection connection = services.getConnectionManager().getConnection(status.getConnectionName());
-		if (connection == null || !connection.getUsername().equals(status.getOwner())) {
-			return false;
-		}
-		return true;
-	}
-
 	protected boolean operationSupported(JobStatusData status, String operation) {
-		try {
-			ILaunchController jobController = LaunchControllerManager.getInstance().getLaunchController(status.getRemoteId(),
-					status.getConnectionName(), status.getConfigurationName());
+		String controlId = status.getString(JobStatusData.CONTROL_ID_ATTR);
+		if (controlId != null) {
+			ILaunchController jobController = LaunchControllerManager.getInstance().getLaunchController(controlId);
 			if (jobController != null) {
 				ResourceManagerData data = jobController.getConfiguration();
 				if (data != null) {
@@ -81,8 +58,6 @@ public class JobPropertyTester extends PropertyTester {
 					}
 				}
 			}
-		} catch (CoreException e) {
-			LMLMonitorUIPlugin.log(e.getStatus());
 		}
 		return false;
 	}
@@ -109,7 +84,7 @@ public class JobPropertyTester extends PropertyTester {
 			} else if (JOB_STATE_DETAIL.equals(property)) {
 				return status.getStateDetail().equals(toString(expectedValue));
 			} else if (AUTHORIZED.equals(property)) {
-				return isAuthorised(status) == toBoolean(expectedValue);
+				return ActionUtils.isAuthorised(status) == toBoolean(expectedValue);
 			}
 		}
 		return false;

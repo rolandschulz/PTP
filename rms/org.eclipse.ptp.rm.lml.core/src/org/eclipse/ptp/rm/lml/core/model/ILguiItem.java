@@ -190,14 +190,6 @@ public interface ILguiItem {
 
 	public void setRequest(RequestType request);
 
-	/**
-	 * Getting a string representing the ILguiItem.
-	 * 
-	 * @return string
-	 */
-	@Override
-	public String toString();
-
 	public void unlockPattern();
 
 	/**

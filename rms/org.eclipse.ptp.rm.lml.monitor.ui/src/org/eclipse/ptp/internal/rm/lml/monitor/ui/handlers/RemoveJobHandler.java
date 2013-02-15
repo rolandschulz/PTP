@@ -23,7 +23,6 @@ import org.eclipse.ptp.internal.rm.lml.monitor.ui.messages.Messages;
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
 import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.internal.core.model.Row;
-import org.eclipse.ptp.rm.lml.monitor.core.MonitorControlManager;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 public class RemoveJobHandler extends AbstractHandler {
@@ -39,17 +38,24 @@ public class RemoveJobHandler extends AbstractHandler {
 			if (MessageDialog.openQuestion(HandlerUtil.getActiveShell(event), Messages.RemoveJob_Cannot_undo,
 					Messages.RemoveJob_Permanently_remove_job_entry)) {
 				List<JobStatusData> data = new ArrayList<JobStatusData>();
+				String controlId = null;
 				for (Object selected : selection.toArray()) {
 					if (selected instanceof Row) {
 						Row row = (Row) selected;
 						JobStatusData status = row.status;
+						if (controlId == null) {
+							controlId = status.getString(JobStatusData.CONTROL_ID_ATTR);
+							if (controlId == null) {
+								break;
+							}
+						}
 						data.add(status);
-						String monitorId = MonitorControlManager.generateMonitorId(status.getRemoteId(),
-								status.getConnectionName(), status.getConfigurationName());
-						LMLManager.getInstance().removeUserJob(monitorId, status.getJobId());
+						LMLManager.getInstance().removeUserJob(controlId, status.getJobId());
 					}
 				}
-				ActionUtils.removeFiles(data);
+				if (controlId != null) {
+					ActionUtils.removeFiles(controlId, data);
+				}
 				return Status.OK_STATUS;
 			}
 		}

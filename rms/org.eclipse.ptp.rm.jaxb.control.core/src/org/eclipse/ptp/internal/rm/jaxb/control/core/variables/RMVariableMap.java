@@ -392,6 +392,7 @@ public class RMVariableMap implements IVariableMap {
 	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#setDefault(java.lang.String, java.lang.String)
 	 */
 	public void setDefault(String name, String defaultValue) {
+		// This map does not support default values
 	}
 
 	public void setEnvManagerFromConnection(IRemoteConnection connection) {

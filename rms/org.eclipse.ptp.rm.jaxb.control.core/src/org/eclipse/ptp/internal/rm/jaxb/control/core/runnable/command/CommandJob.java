@@ -137,6 +137,7 @@ public class CommandJob extends Job implements ICommandJob {
 								try {
 									stream.close();
 								} catch (IOException t) {
+									// Ignore
 								}
 							} else {
 								throw dead;
@@ -288,6 +289,7 @@ public class CommandJob extends Job implements ICommandJob {
 					try {
 						exit = process.exitValue();
 					} catch (Throwable t) {
+						// Ignore
 					}
 					if ((exit != 0 || error.length() > 0)) {
 						processError(builder.command().get(0), exit, null);
@@ -303,6 +305,7 @@ public class CommandJob extends Job implements ICommandJob {
 			try {
 				exit = process.waitFor();
 			} catch (InterruptedException ignored) {
+				// Ignore
 			}
 
 			CoreException e = joinConsumers();
@@ -448,6 +451,7 @@ public class CommandJob extends Job implements ICommandJob {
 			try {
 				outSplitter.join();
 			} catch (InterruptedException ignored) {
+				// Ignore
 			}
 		}
 
@@ -455,6 +459,7 @@ public class CommandJob extends Job implements ICommandJob {
 			try {
 				errSplitter.join();
 			} catch (InterruptedException ignored) {
+				// Ignore
 			}
 		}
 
@@ -462,6 +467,7 @@ public class CommandJob extends Job implements ICommandJob {
 			try {
 				stdoutT.join();
 			} catch (InterruptedException ignored) {
+				// Ignore
 			}
 			t = stdoutTokenizer.getInternalError();
 		}
@@ -470,6 +476,7 @@ public class CommandJob extends Job implements ICommandJob {
 			try {
 				stderrT.join();
 			} catch (InterruptedException ignored) {
+				// Ignore
 			}
 			if (t == null) {
 				t = stderrTokenizer.getInternalError();
@@ -741,6 +748,7 @@ public class CommandJob extends Job implements ICommandJob {
 							}
 						}
 					} catch (InterruptedException ignored) {
+						// Ignore
 					}
 				} else {
 					cmdJobs.add(job);
@@ -841,6 +849,7 @@ public class CommandJob extends Job implements ICommandJob {
 									}
 								}
 							} catch (InterruptedException ignored) {
+								// Ignore
 							}
 						} else {
 							cmdJobs.add(job);

@@ -214,6 +214,7 @@ public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 				try {
 					fJobStatusMap.wait(2 * JAXBControlConstants.MINUTE_IN_MS);
 				} catch (InterruptedException ignored) {
+					// Ignore
 				}
 
 				for (String jobId : fJobStatusMap.keySet()) {
@@ -221,6 +222,7 @@ public class JobStatusMap extends Thread implements ICommandJobStatusMap {
 					try {
 						status = fControl.getJobStatus(jobId, true, null);
 					} catch (CoreException e) {
+						// Ignore
 					}
 					if (status == null || IJobStatus.COMPLETED.equals(status.getState())) {
 						toPrune.put(jobId, jobId);

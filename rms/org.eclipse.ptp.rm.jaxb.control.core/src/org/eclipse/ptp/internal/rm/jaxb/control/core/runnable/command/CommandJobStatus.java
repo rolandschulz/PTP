@@ -343,6 +343,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 					try {
 						nProcs = Integer.parseInt(nProcsAttr.getValue().toString());
 					} catch (Exception e) {
+						// Ignore
 					}
 					if (nProcs > 0) {
 						fProcesses = new PProcesses(nProcs);
@@ -617,6 +618,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 			try {
 				tout.join();
 			} catch (InterruptedException ignored) {
+				// Ignore
 			}
 		}
 
@@ -624,6 +626,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 			try {
 				terr.join();
 			} catch (InterruptedException ignored) {
+				// Ignore
 			}
 		}
 
@@ -805,6 +808,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 				try {
 					wait(1000);
 				} catch (InterruptedException ignored) {
+					// Ignore
 				}
 			}
 
@@ -813,6 +817,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 				try {
 					exit = process.exitValue();
 				} catch (Throwable t) {
+					// Ignore
 				}
 				if (exit != 0 && !monitor.isCanceled() && isWaitEnabled()) {
 					throw CoreExceptionUtils.newException(uuid + JAXBCoreConstants.CO + JAXBCoreConstants.SP + FAILED, null);

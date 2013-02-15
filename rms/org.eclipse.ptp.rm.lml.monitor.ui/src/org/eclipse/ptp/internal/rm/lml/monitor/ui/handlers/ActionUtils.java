@@ -35,7 +35,6 @@ import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.core.LaunchControllerManager;
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
 import org.eclipse.ptp.rm.lml.core.LMLManager;
-import org.eclipse.ptp.rm.lml.monitor.core.MonitorControlManager;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IOConsole;
@@ -145,12 +144,14 @@ public class ActionUtils {
 	public static void callDoControl(JobStatusData status, String operation, IProgressMonitor monitor) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 20);
 		try {
-			ILaunchController controller = LaunchControllerManager.getInstance().getLaunchController(status.getRemoteId(),
-					status.getConnectionName(), status.getConfigurationName());
-			if (controller != null) {
-				controller.start(progress.newChild(10));
-				controller.control(status.getJobId(), operation, progress.newChild(10));
-				maybeUpdateJobState(controller, status, progress.newChild(10));
+			String controlId = status.getString(JobStatusData.CONTROL_ID_ATTR);
+			if (controlId != null) {
+				ILaunchController controller = LaunchControllerManager.getInstance().getLaunchController(controlId);
+				if (controller != null) {
+					controller.start(progress.newChild(10));
+					controller.control(status.getJobId(), operation, progress.newChild(10));
+					maybeUpdateJobState(controller, status, progress.newChild(10));
+				}
 			}
 		} finally {
 			if (monitor != null) {
@@ -164,18 +165,18 @@ public class ActionUtils {
 	 * @return
 	 */
 	public static boolean isAuthorised(JobStatusData status) {
-		if (status.getRemoteId() == null || status.getConnectionName() == null) {
-			return false;
+		String controlId = status.getString(JobStatusData.CONTROL_ID_ATTR);
+		if (controlId != null) {
+			ILaunchController control = LaunchControllerManager.getInstance().getLaunchController(controlId);
+			IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(control.getRemoteServicesId());
+			if (services.isInitialized()) {
+				IRemoteConnection connection = services.getConnectionManager().getConnection(control.getConnectionName());
+				if (connection != null && connection.getUsername().equals(status.getString(JobStatusData.OWNER_ATTR))) {
+					return true;
+				}
+			}
 		}
-		IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(status.getRemoteId());
-		if (!services.isInitialized()) {
-			return false;
-		}
-		IRemoteConnection connection = services.getConnectionManager().getConnection(status.getConnectionName());
-		if (connection == null || !connection.getUsername().equals(status.getOwner())) {
-			return false;
-		}
-		return true;
+		return false;
 	}
 
 	/**
@@ -188,11 +189,13 @@ public class ActionUtils {
 	public static void maybeUpdateJobState(JobStatusData status, IProgressMonitor monitor) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 20);
 		try {
-			ILaunchController controller = LaunchControllerManager.getInstance().getLaunchController(status.getRemoteId(),
-					status.getConnectionName(), status.getConfigurationName());
-			if (controller != null) {
-				controller.start(progress.newChild(10));
-				maybeUpdateJobState(controller, status, progress.newChild(10));
+			String controlId = status.getString(JobStatusData.CONTROL_ID_ATTR);
+			if (controlId != null) {
+				ILaunchController controller = LaunchControllerManager.getInstance().getLaunchController(controlId);
+				if (controller != null) {
+					controller.start(progress.newChild(10));
+					maybeUpdateJobState(controller, status, progress.newChild(10));
+				}
 			}
 		} finally {
 			if (monitor != null) {
@@ -208,9 +211,8 @@ public class ActionUtils {
 			IJobStatus refreshed = controller.getJobStatus(status.getJobId(), true, progress.newChild(10));
 			status.updateState(refreshed.getState(), refreshed.getStateDetail());
 			maybeCheckFiles(status);
-			String monitorId = MonitorControlManager.generateMonitorId(status.getRemoteId(), status.getConnectionName(),
-					status.getConfigurationName());
-			LMLManager.getInstance().updateUserJob(monitorId, status.getJobId(), status.getState(), status.getStateDetail());
+			String controlId = status.getString(JobStatusData.CONTROL_ID_ATTR);
+			LMLManager.getInstance().updateUserJob(controlId, status.getJobId(), status.getState(), status.getStateDetail());
 		} finally {
 			if (monitor != null) {
 				monitor.done();
@@ -237,18 +239,19 @@ public class ActionUtils {
 	 * @param selected
 	 *            list of job data objects
 	 */
-	public static void removeFiles(final List<JobStatusData> selected) {
+	public static void removeFiles(final String controlId, final List<JobStatusData> selected) {
 		Job j = new Job(Messages.ActionUtils_Remove_Files) {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				SubMonitor progress = SubMonitor.convert(monitor, 50 * selected.size());
 				for (JobStatusData status : selected) {
-					if (status.getRemoteId() != null && status.getConnectionName() != null) {
-						String remotePath = status.getOutputPath();
+					ILaunchController control = LaunchControllerManager.getInstance().getLaunchController(controlId);
+					if (control != null) {
+						String remotePath = status.getString(JobStatusData.STDOUT_REMOTE_FILE_ATTR);
 						if (remotePath != null) {
 							try {
-								IFileStore lres = getRemoteFile(status.getRemoteId(), status.getConnectionName(), remotePath,
-										progress);
+								IFileStore lres = getRemoteFile(control.getRemoteServicesId(), control.getConnectionName(),
+										remotePath, progress);
 								if (lres != null) {
 									if (lres.fetchInfo(EFS.NONE, progress.newChild(25)).exists()) {
 										lres.delete(EFS.NONE, progress.newChild(25));
@@ -258,11 +261,11 @@ public class ActionUtils {
 								// continue to remove if possible
 							}
 						}
-						remotePath = status.getErrorPath();
+						remotePath = status.getString(JobStatusData.STDERR_REMOTE_FILE_ATTR);
 						if (remotePath != null) {
 							try {
-								IFileStore lres = getRemoteFile(status.getRemoteId(), status.getConnectionName(), remotePath,
-										progress);
+								IFileStore lres = getRemoteFile(control.getRemoteServicesId(), control.getConnectionName(),
+										remotePath, progress);
 								if (lres != null) {
 									if (lres.fetchInfo(EFS.NONE, progress.newChild(25)).exists()) {
 										lres.delete(EFS.NONE, progress.newChild(25));
@@ -317,10 +320,10 @@ public class ActionUtils {
 	 */
 	private static void maybeCheckFiles(JobStatusData job) {
 		if (IJobStatus.JOB_OUTERR_READY.equals(job.getStateDetail())) {
-			if (job.getOutputPath() != null) {
+			if (job.getString(JobStatusData.STDOUT_REMOTE_FILE_ATTR) != null) {
 				job.setOutReady(true);
 			}
-			if (job.getErrorPath() != null) {
+			if (job.getString(JobStatusData.STDERR_REMOTE_FILE_ATTR) != null) {
 				job.setErrReady(true);
 			}
 		}

@@ -204,7 +204,7 @@ public class LMLManager {
 	}
 
 	public void selectLgui(String name) {
-		if (name != null && fLguiItem != null && fLguiItem.toString().equals(name)) {
+		if (name != null && fLguiItem != null && fLguiItem.getName().equals(name)) {
 			return;
 		}
 		if (fLguiItem != null) {

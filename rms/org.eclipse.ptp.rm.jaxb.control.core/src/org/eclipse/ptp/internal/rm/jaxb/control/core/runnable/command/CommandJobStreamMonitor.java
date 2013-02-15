@@ -56,8 +56,8 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor {
 			}
 			fText = text;
 			Object[] copiedListeners = fListeners.getListeners();
-			for (int i = 0; i < copiedListeners.length; i++) {
-				fListener = (IStreamListener) copiedListeners[i];
+			for (Object copiedListener : copiedListeners) {
+				fListener = (IStreamListener) copiedListener;
 				SafeRunner.run(this);
 			}
 			fListener = null;
@@ -133,6 +133,7 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor {
 				thread.interrupt();
 				thread.join();
 			} catch (InterruptedException ie) {
+				// Ignore
 			}
 			fContents.setLength(0);
 			fListeners = new ListenerList();
@@ -262,6 +263,7 @@ public class CommandJobStreamMonitor implements ICommandJobStreamMonitor {
 					Thread.sleep(1); // just give up CPU to maintain UI
 										// responsiveness.
 				} catch (InterruptedException e) {
+					// Ignore
 				}
 			}
 		}
