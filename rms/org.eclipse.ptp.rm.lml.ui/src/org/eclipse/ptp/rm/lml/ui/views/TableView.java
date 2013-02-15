@@ -884,7 +884,7 @@ public class TableView extends ViewPart {
 			}
 
 			// Insert the input
-			setViewerInput();
+			updateViewerInput();
 			viewChanged = true;
 		}
 		composite.layout();
