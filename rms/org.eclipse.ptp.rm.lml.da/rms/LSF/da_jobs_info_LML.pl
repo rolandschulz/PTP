@@ -25,6 +25,7 @@ my $patint="([\\+\\-\\d]+)";   # Pattern for Integer number
 my $patfp ="([\\+\\-\\d.E]+)"; # Pattern for Floating Point number
 my $patwrd="([\^\\s]+)";       # Pattern for Work (all noblank characters)
 my $patbl ="\\s+";             # Pattern for blank space (variable length)
+my $patdate = "^(.*):";		   # Pattern for date format, allow any date format here
 
 #LML definitions
 my $schemaURL = "http://www.llview.de";
@@ -67,7 +68,7 @@ my %mapping = (
     "RequestedResources"                     => "",
     "Job Group"                              => "group",
     "JobGroup"                               => "group",
-    "Project"							     => "project",
+    "Project"							     => "",
     "Totalcores"							 => "totalcores",
     "Totaltasks"							 => "totaltasks",
     "detailedstatus"						 => "detailedstatus",
@@ -147,14 +148,17 @@ while($line=<IN>) {
     #                t>=2000&&mempercore<=4000] rusage[memavail=2000,slotsavail
     #                =1] span[hosts=1] order[-memavail_perslot:-slotsavail:-mem
     #                 percore]>;
-    if($line =~ /^(\S+.*\d{2}:\d{2}:\d{2}):\s*Submitted/ ){
+    if($line =~ /$patdate\s*Submitted/ ){
     	my $submitdate = $1;
-    	$submitdate.=" ".getCurrentYear();#Attach the current year to this date -> LML_da lib/LML_da_date_manip.pm expects date format e.g. Wed Nov 21 14:10:08 2012
+    	my $year = getCurrentYear();
+    	if(index($submitdate, $year) == -1 ){
+    		$submitdate.=" ".getCurrentYear();#Attach the current year to this date -> LML_da lib/LML_da_date_manip.pm expects date format e.g. Wed Nov 21 14:10:08 2012
+    	}
     	#Store submit time
     	$jobs{$jobid}{SUBMIT_TIME} = $submitdate;
     	
     	#Remove date string from key-value string
-    	$line =~ s/^(\S+.*\d{2}:\d{2}:\d{2})://;
+    	$line =~ s/$patdate//;
     	
     	#Collect all lines, which contain simple key value job data
     	$data = concatLines(*IN, $line);
@@ -186,9 +190,12 @@ while($line=<IN>) {
     #                 ecution CWD </fastfs/sureinh/BatchJobs>;
     #Parse special lines for recently dispatched jobs, which can look like this:
     #Wed Nov 21 15:04:07: Dispatched to <n061>;
-    if($line =~ /^(\S+.*\d{2}:\d{2}:\d{2}):\s*(\[.+\])?\s*(((S|s)tarted)|((D|d)ispatched))/ ){
+    if($line =~ /$patdate\s*(\[.+\])?\s*(((S|s)tarted)|((D|d)ispatched))/ ){
     	my $dispatchdate = $1;
-    	$dispatchdate.=" ".getCurrentYear();
+    	my $year = getCurrentYear();
+    	if(index($dispatchdate, $year) == -1 ){
+    		$dispatchdate.=" ".getCurrentYear();#Attach the current year to this date -> LML_da lib/LML_da_date_manip.pm expects date format e.g. Wed Nov 21 14:10:08 2012
+    	}
     	#Store dispatch time
     	$jobs{$jobid}{START_TIME} = $dispatchdate;
 
@@ -201,7 +208,7 @@ while($line=<IN>) {
     	if($data =~ /(D|d)ispatched to (\d+) Hosts/ ){
     		$totalcores = $2;
     	}
-    	#Note: $totalcores can also be set by the previous if statement: if($line =~ /^(\S+.*\d{2}:\d{2}:\d{2}):\s*Submitted/ )
+    	#Note: $totalcores can also be set by the previous if statement
     	$jobs{$jobid}{Totalcores} = $totalcores;
     	
     	#Parse node list
@@ -209,7 +216,7 @@ while($line=<IN>) {
     	if($data =~ /((<[^<>]+>\s*)+)/ ){
     		my $nodes = removeWhiteSpaces($1);
     		
-    		my @nodeentries = split(/\s+/, $nodes);
+    		my @nodeentries = split(/>\s*</, $nodes);
     		foreach my $node (@nodeentries){
     			$node = removeWhiteSpaces($node);
     			$node =~ s/^<//;
