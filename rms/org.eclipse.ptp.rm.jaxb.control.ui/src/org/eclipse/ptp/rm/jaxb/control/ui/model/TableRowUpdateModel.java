@@ -26,15 +26,18 @@ public class TableRowUpdateModel extends CellEditorUpdateModel {
 	 * Cell editor model for Table row with underlying attribute data.
 	 * 
 	 * @param name
-	 *            of the model, which will correspond to the name of an attribute the value is to be saved to
+	 *            of the model, which will correspond to the name of an
+	 *            attribute the value is to be saved to
 	 * @param handler
-	 *            the handler for notifying other widgets to refresh their values
+	 *            the handler for notifying other widgets to refresh their
+	 *            values
 	 * @param editor
 	 *            the cell editor for the value cell
 	 * @param items
 	 *            if this is a combo editor, the preset selection items
 	 * @param itemsFrom
-	 *            if this is a combo editor, the property or attribute value to get the items from
+	 *            if this is a combo editor, the property or attribute value to
+	 *            get the items from
 	 * @param translateBooleanAs
 	 *            if this is a checkbox, use these string values for T/F
 	 * @param readOnly
@@ -50,15 +53,18 @@ public class TableRowUpdateModel extends CellEditorUpdateModel {
 	 * * Cell editor model for Table row with underlying Attribute data.
 	 * 
 	 * @param name
-	 *            of the model, which will correspond to the name of an attribute the value is to be saved to
+	 *            of the model, which will correspond to the name of an
+	 *            attribute the value is to be saved to
 	 * @param handler
-	 *            the handler for notifying other widgets to refresh their values
+	 *            the handler for notifying other widgets to refresh their
+	 *            values
 	 * @param editor
 	 *            the cell editor for the value cell
 	 * @param items
 	 *            if this is a combo editor, the selection items
 	 * @param itemsFrom
-	 *            if this is a combo editor, the property or attribute value to get the items from
+	 *            if this is a combo editor, the property or attribute value to
+	 *            get the items from
 	 * @param translateBooleanAs
 	 *            if this is a checkbox, use these string values for T/F
 	 * @param readOnly
@@ -73,27 +79,27 @@ public class TableRowUpdateModel extends CellEditorUpdateModel {
 	}
 
 	/*
-	 * For a table row, the field to access on the model corresponds to the column name. If the item is not checked, an empty string
-	 * is returned.(non-Javadoc)
+	 * For a table row, the field to access on the model corresponds to the
+	 * column name.
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.ui.IColumnViewerLabelSupport#getDisplayValue( java.lang.String)
+	 * @see
+	 * org.eclipse.ptp.rm.jaxb.ui.IColumnViewerLabelSupport#getDisplayValue(
+	 * java.lang.String)
 	 */
 	public String getDisplayValue(String columnName) {
 		String displayValue = null;
 		if (JAXBControlUIConstants.COLUMN_NAME.equals(columnName)) {
 			displayValue = name;
-		} else if (isChecked()) {
-			if (JAXBControlUIConstants.COLUMN_DESC.equals(columnName)) {
-				displayValue = description;
-			} else if (JAXBControlUIConstants.COLUMN_DEFAULT.equals(columnName)) {
-				displayValue = defaultValue;
-			} else if (JAXBControlUIConstants.COLUMN_TYPE.equals(columnName)) {
-				displayValue = getType();
-			} else if (JAXBControlUIConstants.COLUMN_VALUE.equals(columnName)) {
-				displayValue = getValueAsString();
-			} else if (JAXBControlUIConstants.COLUMN_STATUS.equals(columnName)) {
-				displayValue = status;
-			}
+		} else if (JAXBControlUIConstants.COLUMN_DESC.equals(columnName)) {
+			displayValue = description;
+		} else if (JAXBControlUIConstants.COLUMN_DEFAULT.equals(columnName)) {
+			displayValue = defaultValue;
+		} else if (JAXBControlUIConstants.COLUMN_TYPE.equals(columnName)) {
+			displayValue = getType();
+		} else if (JAXBControlUIConstants.COLUMN_VALUE.equals(columnName)) {
+			displayValue = getValueAsString();
+		} else if (JAXBControlUIConstants.COLUMN_STATUS.equals(columnName)) {
+			displayValue = status;
 		}
 		if (displayValue == null) {
 			return JAXBControlUIConstants.ZEROSTR;
