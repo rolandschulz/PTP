@@ -69,9 +69,6 @@
 		<perspectiveExtension
 			targetID="org.eclipse.ptp.debug.ui.PTPDebugPerspective">
 			<perspectiveShortcut
-				id="org.eclipse.ptp.ui.PTPRunPerspective">
-			</perspectiveShortcut>
-			<perspectiveShortcut
 				id="org.eclipse.debug.ui.DebugPerspective">
 			</perspectiveShortcut>
 			<view
@@ -85,9 +82,6 @@
 			</viewShortcut>
 			<actionSet
 				id="org.eclipse.debug.ui.launchActionSet">
-			</actionSet>
-			<actionSet
-				id="org.eclipse.ptp.ui.actionSets">
 			</actionSet>
 			<actionSet
 				id="org.eclipse.cdt.debug.ui.debugActionSet">
