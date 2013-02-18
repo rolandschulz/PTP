@@ -127,8 +127,7 @@ while($line=<IN>) {
 
     if($line=~/^\s*Machine\s*[=]\s*$patwrd/) {
 		$nodeid=$1;
-# LL seems to use full domain name for job id, don't remove
-#		$nodeid=~s/\..*$//gs;  # remove domain
+# node name is allowed to be both full qualified or unqualified
 		$nodes{$nodeid}{id}=$nodeid;
 #	print "line $line\n";
     } elsif($line=~/^\s*([^\=\s]+(\s*[^\=\s]+)*)\s*\=\s+(.*)$/) {

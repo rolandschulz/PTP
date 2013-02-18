@@ -360,11 +360,8 @@ sub _remap_nodes {
 	    print "ERROR: _remap_nodes: unknown node in spec '$spec', skipping\n";
 	}
 	
-	if(exists($self->{NODEMAPPING}->{$node})) {
-	    $newnode=$self->{NODEMAPPING}->{$node}; 
-	} else {
-	    $newnode=$node;
-	}
+	$newnode = $self->_realnodename_to_virtualname($node);
+	
 	$newnodelist.="," if($newnodelist);
 	$newnodelist.=sprintf("%s-c%02d",$newnode,$num);
     }
@@ -388,11 +385,7 @@ sub _remap_nodes_vnode {
 	    print "ERROR: _remap_nodes: unknown node in spec '$spec', skipping\n";
 	}
 	
-	if(exists($self->{NODEMAPPING}->{$node})) {
-	    $newnode=$self->{NODEMAPPING}->{$node}; 
-	} else {
-	    $newnode=$node;
-	}
+	$newnode = $self->_realnodename_to_virtualname($node);
 	
 	if(!exists($self->{NODELASTTASKNUMBER}->{$node})) {
 	    $self->{NODELASTTASKNUMBER}->{$node}=-1;
@@ -417,6 +410,52 @@ sub _remap_nodes_vnode {
 	}
     }
     return($newnodelist);
+}
+
+#*******************************************************************
+# Looks up the NODEMAPPING hash for mapping real node names to virtual
+# node names used by the automatically generated nodedisplay scheme.
+# Also converts the passed nodename into an unqualified name without
+# its domain and searches for a corresponding mapping. 
+#
+# @param[0] the real node name, qualified or unqualified
+# 
+# @return mapping for the passed real node name
+#
+#*******************************************************************
+sub _realnodename_to_virtualname{
+	my($self) = shift;
+	my $nodename = shift;
+	
+	my $newnodename = $nodename;#Return the original name, if no mapping is found
+	
+	if(exists($self->{NODEMAPPING}->{$nodename})) {#Covers the cases, where $nodename and the node names are both equally full qualified or unqualified
+	    $newnodename=$self->{NODEMAPPING}->{$nodename}; 
+	}
+	else{
+		#Try to find mapping for unqualified $nodename, this covers the case of $nodename is full qualified and the node names are not qualified
+		$nodename =~ s/\.[^\-]*//;#Remove domain, but do not remove possible -c00 attachments for core selection
+		if(exists($self->{NODEMAPPING}->{$nodename})) {
+		    $newnodename=$self->{NODEMAPPING}->{$nodename}; 
+		}
+		else{
+			#Assume the passed $nodename is not qualified, but all the node names are full qualified
+			
+			#Find the domain of the node names
+			my @nodenames = keys(%{$self->{NODEMAPPING}});
+			if( scalar(@nodenames) >= 1){				
+				my $domain = $nodenames[0];
+				$domain =~ s/[^\.]*//;#Remove the first part of the node name => domain = .cluster.com
+				#Make nodename full qualified
+				$nodename = $nodename.$domain;
+				if(exists($self->{NODEMAPPING}->{$nodename})) {
+				    $newnodename=$self->{NODEMAPPING}->{$nodename}; 
+				}
+			}
+		}
+	}
+	
+	return $newnodename;	
 }
 
 

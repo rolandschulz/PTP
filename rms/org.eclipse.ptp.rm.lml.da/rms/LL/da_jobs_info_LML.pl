@@ -199,13 +199,24 @@ open(IN,"$cmd -l |");
 my $jobid="-";
 my $lastkey="-";
 my (%nodelastcorenumber);
+my $domain="";
 while($line=<IN>) {
     chomp($line);
     next if ($line=~/^\-+$/);
     last if($line=~/There is currently no job step to report/);
+    
+    #Parse domain from allocated hosts line: Allocated Hosts : f14c07p06.cluster.com::
+    if($line =~ /Allocated Hosts\s*[:]\s*([^:]+)[:]/){
+    	$domain = $1;
+    	$domain =~ s/[^\.]*//;#Remove the first part of the above name => domain = .cluster.com
+    }
 
     if($line=~/^\s*Task Instance[:]\s*$patwrd[:]$patint/) {
 		my($host,$num)=($1,$2);
+		#Make sure host is full-qualified
+		if( $domain ne "" && index($host, $domain) == -1){
+			$host = $host.$domain;
+		}
 		$nodelastcorenumber{$host}=0 if(!exists($nodelastcorenumber{$host}));
 		if($num>=0) {
 		    $jobs{$jobid}{TaskInstances}.="($host,".$nodelastcorenumber{$host}.")";
