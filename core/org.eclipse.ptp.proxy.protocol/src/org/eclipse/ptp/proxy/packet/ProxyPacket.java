@@ -440,10 +440,14 @@ public class ProxyPacket {
 	 *             if an I/O error occurs
 	 */
 	private int fullRead(ReadableByteChannel channel, ByteBuffer buf) throws IOException {
-		int n = 0;
+		int n;
+		int len = buf.remaining();
 		buf.clear();
-		while (buf.hasRemaining()) {
-			n += channel.read(buf);
+		while ((n = channel.read(buf)) < len) {
+			if (n <= 0) {
+				break;
+			}
+			len -= n;
 		}
 		buf.flip();
 		return n;
