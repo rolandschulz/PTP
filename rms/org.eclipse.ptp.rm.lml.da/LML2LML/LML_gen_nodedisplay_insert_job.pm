@@ -46,8 +46,17 @@ sub insert_job_into_nodedisplay  {
     foreach $node (sort(split(/\s*,\s*/,$nodelist))) {
 	$listref=$self->get_numbers_from_name($node,$schemeref);
 	if(!defined($listref)) {
-	    print STDERR "insert_job_into_nodedisplay: Error: could not map node $node\n";
-	    return(0)
+		#Check if node name is full qualified. Try to map not qualified node name
+		my $pointPos = index($node, '.');
+		if($pointPos != -1 ){
+			$node =~ s/\.[^\-]*//;#Remove domain, but do not remove possible -c00 attachments for core selection
+			#Try to map the node again
+			$listref=$self->get_numbers_from_name($node,$schemeref);
+			if(!defined($listref)) {
+				print STDERR "insert_job_into_nodedisplay: Error: could not map node $node\n";
+	    		return(0);
+			}
+		}
 	}
 	push(@nodelistrefs,$listref);
     }
