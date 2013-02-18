@@ -112,7 +112,7 @@ public class ValueTreeNodeUpdateModel extends CellEditorUpdateModel {
 		String displayValue = null;
 		if (JAXBControlUIConstants.COLUMN_NAME.equals(columnName)) {
 			displayValue = name;
-		} else if (isChecked() && JAXBControlUIConstants.COLUMN_VALUE.equals(columnName)) {
+		} else if (JAXBControlUIConstants.COLUMN_VALUE.equals(columnName)) {
 			displayValue = getValueAsString();
 		}
 		if (displayValue == null) {

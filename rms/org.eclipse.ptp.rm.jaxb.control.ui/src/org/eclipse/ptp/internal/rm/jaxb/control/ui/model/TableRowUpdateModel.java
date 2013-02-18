@@ -82,18 +82,16 @@ public class TableRowUpdateModel extends CellEditorUpdateModel {
 		String displayValue = null;
 		if (JAXBControlUIConstants.COLUMN_NAME.equals(columnName)) {
 			displayValue = name;
-		} else if (isChecked()) {
-			if (JAXBControlUIConstants.COLUMN_DESC.equals(columnName)) {
-				displayValue = description;
-			} else if (JAXBControlUIConstants.COLUMN_DEFAULT.equals(columnName)) {
-				displayValue = defaultValue;
-			} else if (JAXBControlUIConstants.COLUMN_TYPE.equals(columnName)) {
-				displayValue = getType();
-			} else if (JAXBControlUIConstants.COLUMN_VALUE.equals(columnName)) {
-				displayValue = getValueAsString();
-			} else if (JAXBControlUIConstants.COLUMN_STATUS.equals(columnName)) {
-				displayValue = status;
-			}
+		} else if (JAXBControlUIConstants.COLUMN_DESC.equals(columnName)) {
+			displayValue = description;
+		} else if (JAXBControlUIConstants.COLUMN_DEFAULT.equals(columnName)) {
+			displayValue = defaultValue;
+		} else if (JAXBControlUIConstants.COLUMN_TYPE.equals(columnName)) {
+			displayValue = getType();
+		} else if (JAXBControlUIConstants.COLUMN_VALUE.equals(columnName)) {
+			displayValue = getValueAsString();
+		} else if (JAXBControlUIConstants.COLUMN_STATUS.equals(columnName)) {
+			displayValue = status;
 		}
 		if (displayValue == null) {
 			return JAXBControlUIConstants.ZEROSTR;

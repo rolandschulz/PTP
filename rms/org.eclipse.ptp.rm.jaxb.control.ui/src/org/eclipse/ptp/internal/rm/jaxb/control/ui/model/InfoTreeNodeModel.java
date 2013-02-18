@@ -83,18 +83,16 @@ public class InfoTreeNodeModel implements IColumnViewerLabelSupport {
 		if (JAXBControlUIConstants.COLUMN_NAME.equals(columnName)) {
 			displayValue = id;
 		} else if (displayCol.equals(columnName)) {
-			if (parent.isChecked()) {
-				if (JAXBControlUIConstants.COLUMN_DESC.equals(id)) {
-					displayValue = parent.getDescription();
-				} else if (JAXBControlUIConstants.COLUMN_DEFAULT.equals(id)) {
-					displayValue = parent.getDefault();
-				} else if (JAXBControlUIConstants.COLUMN_TYPE.equals(id)) {
-					displayValue = parent.getType();
-				} else if (JAXBControlUIConstants.COLUMN_VALUE.equals(id)) {
-					displayValue = parent.getValueAsString();
-				} else if (JAXBControlUIConstants.COLUMN_STATUS.equals(id)) {
-					displayValue = parent.getStatus();
-				}
+			if (JAXBControlUIConstants.COLUMN_DESC.equals(id)) {
+				displayValue = parent.getDescription();
+			} else if (JAXBControlUIConstants.COLUMN_DEFAULT.equals(id)) {
+				displayValue = parent.getDefault();
+			} else if (JAXBControlUIConstants.COLUMN_TYPE.equals(id)) {
+				displayValue = parent.getType();
+			} else if (JAXBControlUIConstants.COLUMN_VALUE.equals(id)) {
+				displayValue = parent.getValueAsString();
+			} else if (JAXBControlUIConstants.COLUMN_STATUS.equals(id)) {
+				displayValue = parent.getStatus();
 			}
 		}
 		if (displayValue == null) {
