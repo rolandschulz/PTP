@@ -1114,7 +1114,7 @@ public class UpdateModelFactory {
 	 *            launch tab being built
 	 */
 	private static void maybeAddValidator(IUpdateModel model, final AttributeType attr, final IJAXBParentLaunchConfigurationTab tab) {
-		if (attr.getValidator() != null) {
+		if (attr != null && attr.getValidator() != null) {
 			IValidator validator = new IValidator() {
 
 				/*
