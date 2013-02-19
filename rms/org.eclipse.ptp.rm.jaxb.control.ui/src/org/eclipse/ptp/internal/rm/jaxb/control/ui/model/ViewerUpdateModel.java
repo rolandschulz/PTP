@@ -107,7 +107,8 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 
 	/*
 	 * Model serves as CheckStateListener for the viewer. Multiple rows can be selected, in which case they will all receive the
-	 * value of the clicked row. (non-Javadoc)
+	 * value of the clicked row, provided the clicked row is one of the selected row. Otherwise only the clicked row is changed.
+	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.jface.viewers.ICheckStateListener#checkStateChanged(org.eclipse .jface.viewers.CheckStateChangedEvent)
 	 */
@@ -122,8 +123,11 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 			boolean checked = viewer.getChecked(element);
 			IStructuredSelection selection = (IStructuredSelection) ((ColumnViewer) viewer).getSelection();
 			List<Object> selected = new ArrayList<Object>();
-			selected.add(element);
-			selected.addAll(selection.toList());
+			if (selection.toList().contains(element)) {
+				selected.addAll(selection.toList());
+			} else {
+				selected.add(element);
+			}
 			if (!selected.isEmpty()) {
 				for (Object o : selected) {
 					if (o instanceof ICellEditorUpdateModel) {
