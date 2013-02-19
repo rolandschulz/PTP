@@ -40,7 +40,8 @@ import org.eclipse.swt.widgets.Control;
 /**
  * Update model for the entire viewer (CheckboxTable or CheckboxTree). <br>
  * <br>
- * The viewer needs to be acted on as a whole on updates when check state changes, and it needs to be refreshed after updates.
+ * The viewer needs to be acted on as a whole on updates when check state
+ * changes, and it needs to be refreshed after updates.
  * 
  * @author arossi
  * 
@@ -73,17 +74,21 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 
 	/**
 	 * @param name
-	 *            An arbitrary name given to the viewer; the viewer string output (produced from the pattern template) will be
-	 *            stored in the environment as the value of this name, and thus can be referenced by other widget models.
+	 *            An arbitrary name given to the viewer; the viewer string
+	 *            output (produced from the pattern template) will be stored in
+	 *            the environment as the value of this name, and thus can be
+	 *            referenced by other widget models.
 	 * @param initialAllChecked
 	 *            default setting for all is checked; else all unchecked
 	 * @param handler
-	 *            the handler for notifying other widgets to refresh their values
+	 *            the handler for notifying other widgets to refresh their
+	 *            values
 	 * @param viewer
 	 *            the checkable viewer the object models
 	 * @param template
-	 *            JAXB data element defining a pattern by which to process the name-value pairs associated with the items of the
-	 *            viewer into a single output string
+	 *            JAXB data element defining a pattern by which to process the
+	 *            name-value pairs associated with the items of the viewer into
+	 *            a single output string
 	 */
 	public ViewerUpdateModel(String name, boolean initialAllChecked, ValueUpdateHandler handler, ICheckable viewer,
 			TemplateType template) {
@@ -105,10 +110,13 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 	}
 
 	/*
-	 * Model serves as CheckStateListener for the viewer. Multiple rows can be selected, in which case they will all receive the
-	 * value of the clicked row. (non-Javadoc)
+	 * Model serves as CheckStateListener for the viewer. Multiple rows can be
+	 * selected, in which case they will all receive the value of the clicked
+	 * row. (non-Javadoc)
 	 * 
-	 * @see org.eclipse.jface.viewers.ICheckStateListener#checkStateChanged(org.eclipse .jface.viewers.CheckStateChangedEvent)
+	 * @see
+	 * org.eclipse.jface.viewers.ICheckStateListener#checkStateChanged(org.eclipse
+	 * .jface.viewers.CheckStateChangedEvent)
 	 */
 	@SuppressWarnings("unchecked")
 	public void checkStateChanged(CheckStateChangedEvent event) {
@@ -121,8 +129,11 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 			boolean checked = viewer.getChecked(element);
 			IStructuredSelection selection = (IStructuredSelection) ((ColumnViewer) viewer).getSelection();
 			List<Object> selected = new ArrayList<Object>();
-			selected.add(element);
-			selected.addAll(selection.toList());
+			if (selection.toList().contains(element)) {
+				selected.addAll(selection.toList());
+			} else {
+				selected.add(element);
+			}
 			if (!selected.isEmpty()) {
 				for (Object o : selected) {
 					if (o instanceof ICellEditorUpdateModel) {
@@ -164,7 +175,8 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 	}
 
 	/*
-	 * Returns the mapValue in this case, since there is not actually a single value associated with the viewer. (non-Javadoc)
+	 * Returns the mapValue in this case, since there is not actually a single
+	 * value associated with the viewer. (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.ui.IUpdateModel#getValueFromControl()
 	 */
@@ -173,8 +185,9 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 	}
 
 	/**
-	 * Set up the initial state of the viewer from the initial state of the items; set the button state controlling the filter from
-	 * the initial map value.
+	 * Set up the initial state of the viewer from the initial state of the
+	 * items; set the button state controlling the filter from the initial map
+	 * value.
 	 * 
 	 * @throws CoreException
 	 */
@@ -246,7 +259,8 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 	}
 
 	/*
-	 * NOP for this type; easier to keep in sync at the storeValue call.(non-Javadoc)
+	 * NOP for this type; easier to keep in sync at the storeValue
+	 * call.(non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.ui.IUpdateModel#refreshValueFromMap()
 	 */
@@ -297,18 +311,24 @@ public class ViewerUpdateModel extends AbstractUpdateModel implements ICheckStat
 	}
 
 	/*
-	 * Model serves as widget selected listener for the filter button. (non-Javadoc)
+	 * Model serves as widget selected listener for the filter button.
+	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse .swt.events.SelectionEvent)
+	 * @see
+	 * org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse
+	 * .swt.events.SelectionEvent)
 	 */
 	public void widgetDefaultSelected(SelectionEvent e) {
 		widgetSelected(e);
 	}
 
 	/*
-	 * Model serves as widget selected listener for the filter button. (non-Javadoc)
+	 * Model serves as widget selected listener for the filter button.
+	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt .events.SelectionEvent)
+	 * @see
+	 * org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt
+	 * .events.SelectionEvent)
 	 */
 	public void widgetSelected(SelectionEvent e) {
 		if (showOnlySelected.getSelection()) {
