@@ -48,4 +48,13 @@ public class CoreExceptionUtils {
 	public static CoreException newException(String message, Throwable t) {
 		return new CoreException(getErrorStatus(message, t));
 	}
+
+	/**
+	 * @param message
+	 * @return exception
+	 * @since 7.0
+	 */
+	public static CoreException newException(String message) {
+		return new CoreException(getErrorStatus(message, null));
+	}
 }

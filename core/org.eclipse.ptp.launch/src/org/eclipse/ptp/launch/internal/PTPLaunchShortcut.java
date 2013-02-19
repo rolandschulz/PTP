@@ -91,9 +91,9 @@ public class PTPLaunchShortcut implements ILaunchShortcut {
 		ILaunchConfigurationType configType = lm.getLaunchConfigurationType(IPTPLaunchConfigurationConstants.LAUNCH_APP_TYPE_ID);
 		try {
 			ILaunchConfiguration[] configs = lm.getLaunchConfigurations(configType);
-			for (int i = 0; i < configs.length; i++) {
-				if (configs[i].getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, "").equals(projectName)) {
-					return configs[i];
+			for (ILaunchConfiguration config : configs) {
+				if (config.getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, "").equals(projectName)) { //$NON-NLS-1$
+					return config;
 				}
 			}
 			ILaunchConfigurationWorkingCopy wc = configType.newInstance(file.getProject(), projectName);
@@ -103,6 +103,7 @@ public class PTPLaunchShortcut implements ILaunchShortcut {
 
 			return wc.doSave();
 		} catch (CoreException e) {
+			// Ignore
 		}
 		return null;
 	}

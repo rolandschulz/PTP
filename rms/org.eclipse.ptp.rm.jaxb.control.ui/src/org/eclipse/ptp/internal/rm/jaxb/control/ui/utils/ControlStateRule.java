@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.internal.rm.jaxb.control.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
@@ -48,7 +51,7 @@ public class ControlStateRule {
 	 *            set of Buttons which are the sources in this rule
 	 */
 	public ControlStateRule(ControlStateRuleType rule, Map<String, Button> map, Set<Button> sources, IVariableMap varMap)
-			throws Throwable {
+			throws CoreException {
 		this.varMap = varMap;
 		ControlStateRuleType.Not not = rule.getNot();
 		if (not != null) {
@@ -77,18 +80,18 @@ public class ControlStateRule {
 					if (rule.getButton() != null) {
 						button = map.get(rule.getButton());
 						if (button == null) {
-							throw new Throwable(Messages.ControlStateRule_0 + rule.getButton());
+							throw CoreExceptionUtils.newException(NLS.bind(Messages.ControlStateRule_0, rule.getButton()));
 						}
 						selected = rule.isSelected();
 						sources.add(button);
 					} else if (rule.getAttribute() != null) {
 						attribute = rule.getAttribute();
 						if (attribute == null) {
-							throw new Throwable(Messages.ControlStateRule_1 + rule.getAttribute());
+							throw CoreExceptionUtils.newException(NLS.bind(Messages.ControlStateRule_1, rule.getAttribute()));
 						}
 						value = rule.getValue();
 						if (value == null) {
-							throw new Throwable(Messages.ControlStateRule_2 + rule.getAttribute());
+							throw CoreExceptionUtils.newException(NLS.bind(Messages.ControlStateRule_2, rule.getAttribute()));
 						}
 					}
 				}

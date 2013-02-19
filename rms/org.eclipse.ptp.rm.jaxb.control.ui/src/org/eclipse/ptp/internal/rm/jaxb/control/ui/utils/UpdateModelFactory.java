@@ -28,6 +28,7 @@ import org.eclipse.jface.viewers.ICheckable;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.JAXBControlConstants;
 import org.eclipse.ptp.internal.rm.jaxb.control.ui.JAXBControlUIConstants;
@@ -44,7 +45,6 @@ import org.eclipse.ptp.internal.rm.jaxb.control.ui.model.TableRowUpdateModel;
 import org.eclipse.ptp.internal.rm.jaxb.control.ui.model.TextUpdateModel;
 import org.eclipse.ptp.internal.rm.jaxb.control.ui.model.ValueTreeNodeUpdateModel;
 import org.eclipse.ptp.internal.rm.jaxb.control.ui.model.ViewerUpdateModel;
-import org.eclipse.ptp.internal.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ptp.internal.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.ui.RemoteUIServicesUtils;
@@ -632,7 +632,7 @@ public class UpdateModelFactory {
 	 * 
 	 */
 	public static IUpdateModel createModel(Composite parent, BrowseType browse, IJAXBLaunchConfigurationTab tab,
-			IVariableMap rmVarMap, Map<ControlStateType, Control> targets) {
+			IVariableMap rmVarMap, Map<ControlStateType, Control> targets) throws CoreException {
 		ControlDescriptor cd = new ControlDescriptor(browse, rmVarMap, tab);
 
 		Control control = createBrowse(parent, browse, cd, tab, targets);
@@ -640,14 +640,14 @@ public class UpdateModelFactory {
 		String attr = browse.getAttribute();
 		IUpdateHandler handler = tab.getParent().getUpdateHandler();
 		IUpdateModel model = null;
-		if (control instanceof Text) {
-			if (attr != null && !JAXBControlUIConstants.ZEROSTR.equals(attr)) {
-				model = new TextUpdateModel(attr, handler, (Text) control);
-			}
-		}
 
-		if (attr != null && !JAXBUIConstants.ZEROSTR.equals(attr)) {
-			maybeAddValidator(model, rmVarMap.get(attr), tab.getParent());
+		if (attr != null) {
+			AttributeType a = rmVarMap.get(attr);
+			if (a == null) {
+				throw CoreExceptionUtils.newException(NLS.bind(Messages.UpdateModelFactory_Undefined_attribute_in_BrowseType, attr), null);
+			}
+			model = new TextUpdateModel(attr, handler, (Text) control);
+			maybeAddValidator(model, a, tab.getParent());
 		}
 		return model;
 	}
@@ -671,7 +671,7 @@ public class UpdateModelFactory {
 	 * @return update model if not a label
 	 */
 	public static IUpdateModel createModel(Composite parent, WidgetType widget, IJAXBLaunchConfigurationTab tab,
-			IVariableMap rmVarMap, Map<String, Button> sources, Map<ControlStateType, Control> targets) {
+			IVariableMap rmVarMap, Map<String, Button> sources, Map<ControlStateType, Control> targets) throws CoreException {
 		ControlDescriptor cd = new ControlDescriptor(widget, rmVarMap, tab);
 		Control control = createControl(parent, cd);
 
@@ -690,6 +690,14 @@ public class UpdateModelFactory {
 		}
 
 		String attr = widget.getAttribute();
+		AttributeType attrType = null;
+		if (attr != null) {
+			attrType = rmVarMap.get(attr);
+			if (attrType == null) {
+				throw CoreExceptionUtils.newException(NLS.bind(Messages.UpdateModelFactory_Undefined_attribute_in_WidgetType, attr), null);
+			}
+		}
+
 		List<ArgType> dynamic = null;
 
 		WidgetType.DynamicText dt = widget.getDynamicText();
@@ -700,7 +708,7 @@ public class UpdateModelFactory {
 		IUpdateHandler handler = tab.getParent().getUpdateHandler();
 		IUpdateModel model = null;
 		if (JAXBControlUIConstants.TEXT.equals(cd.getType())) {
-			if (attr != null && !JAXBControlUIConstants.ZEROSTR.equals(attr)) {
+			if (attr != null) {
 				model = new TextUpdateModel(attr, handler, (Text) control);
 			}
 			if (dynamic != null) {
@@ -720,8 +728,8 @@ public class UpdateModelFactory {
 			}
 		}
 
-		if (attr != null && !JAXBUIConstants.ZEROSTR.equals(attr)) {
-			maybeAddValidator(model, rmVarMap.get(attr), tab.getParent());
+		if (attr != null) {
+			maybeAddValidator(model, attrType, tab.getParent());
 		}
 		return model;
 	}
@@ -1109,12 +1117,12 @@ public class UpdateModelFactory {
 	 * @param model
 	 *            update model object to associate validator with
 	 * @param attr
-	 *            JAXB attribute descriptor
+	 *            JAXB attribute descriptor, which must reference a valid attribut
 	 * @param tab
 	 *            launch tab being built
 	 */
 	private static void maybeAddValidator(IUpdateModel model, final AttributeType attr, final IJAXBParentLaunchConfigurationTab tab) {
-		if (attr != null && attr.getValidator() != null) {
+		if (attr.getValidator() != null) {
 			IValidator validator = new IValidator() {
 
 				/*

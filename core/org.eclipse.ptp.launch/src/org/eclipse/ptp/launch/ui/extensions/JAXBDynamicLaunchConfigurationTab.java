@@ -29,6 +29,7 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.JAXBControlConstants;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.variables.RMVariableMap;
@@ -168,9 +169,8 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 				listeners.clear();
 			}
 			control = builder.build(parent);
-		} catch (Throwable t) {
-			t.printStackTrace();
-			throw CoreExceptionUtils.newException(Messages.CreateControlConfigurableError + JAXBUIConstants.SP + title, t);
+		} catch (CoreException e) {
+			throw CoreExceptionUtils.newException(NLS.bind(Messages.CreateControlConfigurableError, title), e);
 		}
 		createViewScriptGroup(control);
 	}
@@ -533,6 +533,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		try {
 			job.join();
 		} catch (InterruptedException ignored) {
+			// Ignore
 		}
 		return buffer.toString();
 	}
@@ -560,6 +561,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		try {
 			job.join();
 		} catch (InterruptedException ignored) {
+			// Ignore
 		}
 		return buffer.toString();
 	}
@@ -614,6 +616,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		try {
 			job.join();
 		} catch (InterruptedException ignored) {
+			// Ignore
 		}
 		value = job.getScriptValue();
 		lcMap.restoreGlobal();

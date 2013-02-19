@@ -437,6 +437,7 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 			viewer.storeValue();
 			handleUpdate(v);
 		} catch (Exception ignored) {
+			// Ignore
 		}
 	}
 

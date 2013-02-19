@@ -67,7 +67,8 @@ public class ComboUpdateModel extends AbstractUpdateModel implements ModifyListe
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.internal.rm.jaxb.control.ui.model.AbstractUpdateModel#initialize(org.eclipse.ptp.rm.jaxb.core.IVariableMap,
+	 * @see
+	 * org.eclipse.ptp.internal.rm.jaxb.control.ui.model.AbstractUpdateModel#initialize(org.eclipse.ptp.rm.jaxb.core.IVariableMap,
 	 * org.eclipse.ptp.rm.jaxb.core.IVariableMap)
 	 */
 	@Override
@@ -138,6 +139,7 @@ public class ComboUpdateModel extends AbstractUpdateModel implements ModifyListe
 			Object value = storeValue();
 			handleUpdate(value);
 		} catch (Exception ignored) {
+			// Ignore
 		}
 	}
 }

@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ColumnViewer;
@@ -155,7 +156,7 @@ public class LaunchTabBuilder {
 	 * @param tab
 	 *            whose control is configurable from the JAXB data tree
 	 */
-	public LaunchTabBuilder(IJAXBLaunchConfigurationTab tab) throws Throwable {
+	public LaunchTabBuilder(IJAXBLaunchConfigurationTab tab) {
 		this.tab = tab;
 		this.rmVarMap = tab.getParent().getJobControl().getEnvironment();
 	}
@@ -176,7 +177,7 @@ public class LaunchTabBuilder {
 	 *            control to which to add the viewer
 	 * @return the control
 	 */
-	public ColumnViewer addAttributeViewer(AttributeViewerType descriptor, Composite parent) {
+	public ColumnViewer addAttributeViewer(AttributeViewerType descriptor, Composite parent) throws CoreException {
 		Layout layout = createLayout(descriptor.getLayout());
 		Object data = createLayoutData(descriptor.getLayoutData());
 		int style = WidgetBuilderUtils.getStyle(descriptor.getStyle());
@@ -221,7 +222,7 @@ public class LaunchTabBuilder {
 	 * @return top-level composite control
 	 * @throws Throwable
 	 */
-	public Composite build(Composite parent) throws Throwable {
+	public Composite build(Composite parent) throws CoreException {
 		tab.getLocalWidgets().clear();
 		TabControllerType top = tab.getController();
 		Layout layout = createLayout(top.getLayout());
@@ -254,7 +255,7 @@ public class LaunchTabBuilder {
 	 * @param control
 	 *            to which to add the widget
 	 */
-	private void addBrowse(BrowseType browse, Composite control) {
+	private void addBrowse(BrowseType browse, Composite control) throws CoreException {
 		IUpdateModel model = UpdateModelFactory.createModel(control, browse, tab, rmVarMap, targets);
 		if (model != null) {
 			tab.getLocalWidgets().put(model.getControl(), model);
@@ -357,7 +358,7 @@ public class LaunchTabBuilder {
 	 * @param children
 	 *            list of types
 	 */
-	private void addChildren(List<Object> children, Composite control) {
+	private void addChildren(List<Object> children, Composite control) throws CoreException {
 		for (Object o : children) {
 			if (o instanceof TabFolderType) {
 				addFolder((TabFolderType) o, control);
@@ -393,7 +394,7 @@ public class LaunchTabBuilder {
 	 *            control to which to add the composite
 	 * @return the SWT Composite
 	 */
-	private Composite addComposite(CompositeType descriptor, Composite parent) {
+	private Composite addComposite(CompositeType descriptor, Composite parent) throws CoreException {
 		Layout layout = createLayout(descriptor.getLayout());
 		Object data = createLayoutData(descriptor.getLayoutData());
 		int style = WidgetBuilderUtils.getStyle(descriptor.getStyle());
@@ -438,7 +439,7 @@ public class LaunchTabBuilder {
 	 *            control to which to add the folder
 	 * @return the SWT TabFolder
 	 */
-	private CTabFolder addFolder(TabFolderType descriptor, Composite parent) {
+	private CTabFolder addFolder(TabFolderType descriptor, Composite parent) throws CoreException {
 		CTabFolder folder = new CTabFolder(parent, WidgetBuilderUtils.getStyle(descriptor.getStyle()));
 		Layout layout = createLayout(descriptor.getLayout());
 		if (layout != null) {
@@ -486,7 +487,7 @@ public class LaunchTabBuilder {
 	 * @param index
 	 *            of the tab in the folder
 	 */
-	private void addItem(CTabFolder folder, TabItemType descriptor, int index) {
+	private void addItem(CTabFolder folder, TabItemType descriptor, int index) throws CoreException {
 		int style = WidgetBuilderUtils.getStyle(descriptor.getStyle());
 		Layout layout = createLayout(descriptor.getLayout());
 		if (layout != null) {
@@ -606,7 +607,7 @@ public class LaunchTabBuilder {
 	 * @param control
 	 *            to which to add the widget
 	 */
-	private void addWidget(WidgetType widget, Composite control) {
+	private void addWidget(WidgetType widget, Composite control) throws CoreException {
 		IUpdateModel model = UpdateModelFactory.createModel(control, widget, tab, rmVarMap, sources, targets);
 		/*
 		 * Label models are not returned, since they cannot be updated
@@ -661,7 +662,7 @@ public class LaunchTabBuilder {
 	/**
 	 * Constructs a listener for each defined category of action on the target and adds it to the sources referenced in the rule.
 	 */
-	private void maybeWireWidgets() throws Throwable {
+	private void maybeWireWidgets() throws CoreException {
 		Collection<ControlStateListener> listeners = new HashSet<ControlStateListener>();
 		for (ControlStateType cst : targets.keySet()) {
 			Control target = targets.get(cst);

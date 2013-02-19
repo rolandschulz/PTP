@@ -43,9 +43,10 @@ public class ApplicationDebuggerTab extends DebuggerTab {
 		try {
 			// Reset sourcePathComputer in case it was modified by another tab. See bug 397019.
 			ILaunchConfigurationWorkingCopy wc = config.getWorkingCopy();
-			wc.setAttribute(ISourcePathComputer.ATTR_SOURCE_PATH_COMPUTER_ID, "org.eclipse.ptp.debug.core.sourcePathComputer");
+			wc.setAttribute(ISourcePathComputer.ATTR_SOURCE_PATH_COMPUTER_ID, "org.eclipse.ptp.debug.core.sourcePathComputer"); //$NON-NLS-1$
 			wc.doSave();
 		} catch (CoreException e) {
+			// Ignore
 		}
 		super.initializeFrom(config);
 	}

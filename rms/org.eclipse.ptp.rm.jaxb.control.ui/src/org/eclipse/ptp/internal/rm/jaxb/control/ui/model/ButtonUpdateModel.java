@@ -98,6 +98,7 @@ public class ButtonUpdateModel extends AbstractUpdateModel implements SelectionL
 			Object value = storeValue();
 			handleUpdate(value);
 		} catch (Exception ignored) {
+			// Ignore
 		}
 	}
 

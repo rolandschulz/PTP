@@ -511,7 +511,9 @@ public class ApplicationTab extends LaunchConfigurationTab {
 				}
 			});
 		} catch (InvocationTargetException e) {
+			// Ignore
 		} catch (InterruptedException e) {
+			// Ignore
 		}
 		if (conn[0] != null) {
 			IRemoteUIServices remoteUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(conn[0].getRemoteServices());

@@ -269,6 +269,7 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 							try {
 								page.showView(viewID, null, IWorkbenchPage.VIEW_CREATE);
 							} catch (PartInitException e) {
+								// Ignore
 							}
 						}
 					}

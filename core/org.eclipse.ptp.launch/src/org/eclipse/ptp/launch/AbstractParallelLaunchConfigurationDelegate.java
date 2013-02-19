@@ -157,6 +157,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 						}
 					}
 				} catch (CoreException e) {
+					// Ignore
 				} finally {
 					fSubLock.unlock();
 				}
@@ -176,6 +177,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 							}
 						}
 					} catch (CoreException e) {
+						// Ignore
 					} finally {
 						fSubLock.unlock();
 					}
@@ -588,7 +590,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			JobManager.getInstance().addListener(control.getControlId(), fJobListener);
 			String jobId = control.submitJob(launch.getLaunchConfiguration(), mode, subMon.newChild(10));
 			if (subMon.isCanceled()) {
-				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(), "Launch was cancelled"));
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(), Messages.AbstractParallelLaunchConfigurationDelegate_Launch_was_cancelled));
 			}
 			if (control.getJobStatus(jobId, subMon.newChild(10)).equals(IJobStatus.UNDETERMINED)) {
 				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
@@ -648,6 +650,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 									try {
 										PlatformUI.getWorkbench().showPerspective(perspectiveId, window);
 									} catch (WorkbenchException e) {
+										// Ignore
 									}
 								}
 							}

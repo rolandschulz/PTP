@@ -41,8 +41,8 @@ import org.eclipse.ptp.rm.jaxb.control.core.LaunchControllerManager;
 import org.eclipse.ptp.rm.jaxb.core.data.MonitorType;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
@@ -158,11 +158,8 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			fSystemTypeCombo.add(name);
 			fProviders.add(name);
 		}
-		fSystemTypeCombo.addSelectionListener(new SelectionListener() {
-
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-
+		fSystemTypeCombo.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				rmTypeSelectionChanged();
 				updateEnablement();
@@ -173,11 +170,8 @@ public class ResourcesTab extends LaunchConfigurationTab {
 
 		fRemoteConnectionWidget = new RemoteConnectionWidget(comp, SWT.NONE, null, getLaunchConfigurationDialog());
 		fRemoteConnectionWidget.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
-		fRemoteConnectionWidget.addSelectionListener(new SelectionListener() {
-
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-
+		fRemoteConnectionWidget.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				handleConnectionChanged();
 			}
@@ -345,6 +339,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 */
 
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
+		// Do nothing
 	}
 
 	/**
@@ -389,7 +384,9 @@ public class ResourcesTab extends LaunchConfigurationTab {
 					}
 				});
 			} catch (InvocationTargetException e) {
+				// Ignore
 			} catch (InterruptedException e) {
+				// Ignore
 			}
 			return dynamicTab[0];
 		}
@@ -503,6 +500,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			try {
 				controller.stop();
 			} catch (CoreException e) {
+				// Ignore
 			}
 		}
 
@@ -554,7 +552,9 @@ public class ResourcesTab extends LaunchConfigurationTab {
 						}
 					});
 				} catch (InvocationTargetException e) {
+					// Ignore
 				} catch (InterruptedException e) {
+					// Ignore
 				}
 			}
 			if (dynamicTab[0] != null) {

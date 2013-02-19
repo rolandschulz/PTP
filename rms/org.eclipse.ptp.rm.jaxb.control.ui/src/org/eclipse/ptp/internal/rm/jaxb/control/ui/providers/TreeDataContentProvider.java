@@ -23,6 +23,7 @@ import org.eclipse.ptp.internal.rm.jaxb.control.ui.model.ValueTreeNodeUpdateMode
  */
 public class TreeDataContentProvider implements ITreeContentProvider {
 	public void dispose() {
+		// Nothing required
 	}
 
 	/*
@@ -72,5 +73,6 @@ public class TreeDataContentProvider implements ITreeContentProvider {
 	}
 
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+		// Do nothing
 	}
 }

@@ -35,8 +35,8 @@ import org.eclipse.ptp.utils.ui.swt.FrameMold;
 import org.eclipse.ptp.utils.ui.swt.TextGroup;
 import org.eclipse.ptp.utils.ui.swt.TextMold;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -182,13 +182,11 @@ public class UploadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 				| GridData.GRAB_VERTICAL);
 		gridData.heightHint = 200;
 		fileList.setLayoutData(gridData);
-		fileList.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-
+		fileList.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				if (listenersEnabled < 0)
+				if (listenersEnabled < 0) {
 					return;
+				}
 				removeFilesButton.setEnabled(fileList.getSelectionCount() != 0);
 			}
 		});
@@ -201,39 +199,33 @@ public class UploadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 		addFilesFromFilesystemButton = new Button(buttonFrame, SWT.PUSH);
 		addFilesFromFilesystemButton.setText(Messages.UploadRuleDialog_FileButtonsFrame_AddFilesButton);
 		addFilesFromFilesystemButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
-		addFilesFromFilesystemButton.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-
+		addFilesFromFilesystemButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				if (listenersEnabled < 0)
+				if (listenersEnabled < 0) {
 					return;
+				}
 				handleFilesFromFilesystemButtonEvent();
 			}
 		});
 		addDirectoriesFromFilesystemButton = new Button(buttonFrame, SWT.PUSH);
 		addDirectoriesFromFilesystemButton.setText(Messages.UploadRuleDialog_FileButtonsFrame_AddDirectoryButton);
 		addDirectoriesFromFilesystemButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
-		addDirectoriesFromFilesystemButton.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-
+		addDirectoriesFromFilesystemButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				if (listenersEnabled < 0)
+				if (listenersEnabled < 0) {
 					return;
+				}
 				handleDirectoryFromFilesystemButtonEvent();
 			}
 		});
 		addFilesFromWorkspaceButton = new Button(buttonFrame, SWT.PUSH);
 		addFilesFromWorkspaceButton.setText(Messages.UploadRuleDialog_FileButtonsFrame_AddWorkspaceButton);
 		addFilesFromWorkspaceButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
-		addFilesFromWorkspaceButton.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-
+		addFilesFromWorkspaceButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				if (listenersEnabled < 0)
+				if (listenersEnabled < 0) {
 					return;
+				}
 				handleFilesFromWorkspaceButtonEvent();
 			}
 		});
@@ -244,13 +236,11 @@ public class UploadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 		removeFilesButton.setText(Messages.UploadRuleDialog_FileButtonsFrame_RemoveButton);
 		removeFilesButton.setEnabled(false);
 		removeFilesButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
-		removeFilesButton.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-
+		removeFilesButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				if (listenersEnabled < 0)
+				if (listenersEnabled < 0) {
 					return;
+				}
 				handleRemoveFilesButtonEvent();
 			}
 
@@ -290,13 +280,11 @@ public class UploadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 		mold.addItem(Integer.toString(OverwritePolicies.NEWER),
 				Messages.UploadRuleDialog_OptionsFrame_OverwriteCombo_OverwriteIfNewerOption);
 		overwritePolicyCombo = new ComboGroup(contents, mold);
-		overwritePolicyCombo.getCombo().addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-
+		overwritePolicyCombo.getCombo().addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				if (listenersEnabled < 0)
+				if (listenersEnabled < 0) {
 					return;
+				}
 				disableListeners();
 				if (overwritePolicyCombo.getSelectionId().equals(Integer.toString(OverwritePolicies.NEWER))) {
 					preserveTimeStampButton.setEnabled(false);
@@ -515,8 +503,8 @@ public class UploadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 			/*
 			 * Add items that a selected in the dialog but not in the file list.
 			 */
-			for (int i = 0; i < results.length; i++) {
-				IResource resource = (IResource) results[i];
+			for (Object result : results) {
+				IResource resource = (IResource) result;
 				String entry = resource.getFullPath().makeRelative().toOSString();
 				newFileList.add(entry);
 			}
@@ -535,8 +523,7 @@ public class UploadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 		}
 
 		HashSet<String> fileSet = new HashSet<String>(Arrays.asList(fileList.getItems()));
-		for (int i = 0; i < selection.length; i++) {
-			String string = selection[i];
+		for (String string : selection) {
 			fileSet.remove(string);
 		}
 

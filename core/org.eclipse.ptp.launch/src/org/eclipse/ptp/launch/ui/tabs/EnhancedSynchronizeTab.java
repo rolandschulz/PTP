@@ -43,6 +43,7 @@ import org.eclipse.ptp.utils.ui.swt.FrameMold;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
@@ -62,22 +63,25 @@ import org.eclipse.swt.widgets.List;
 public class EnhancedSynchronizeTab extends AbstractLaunchConfigurationTab {
 	protected class TabModifyListener implements ModifyListener, SelectionListener {
 		public void modifyText(ModifyEvent e) {
-			if (!isEventHandlerEnabled())
+			if (!isEventHandlerEnabled()) {
 				return;
+			}
 			dataChanged = true;
 			updateLaunchConfigurationDialog();
 		}
 
 		public void widgetDefaultSelected(SelectionEvent e) {
-			if (!isEventHandlerEnabled())
+			if (!isEventHandlerEnabled()) {
 				return;
+			}
 			dataChanged = true;
 			updateLaunchConfigurationDialog();
 		}
 
 		public void widgetSelected(SelectionEvent e) {
-			if (!isEventHandlerEnabled())
+			if (!isEventHandlerEnabled()) {
 				return;
+			}
 			dataChanged = true;
 			updateLaunchConfigurationDialog();
 		}
@@ -181,8 +185,9 @@ public class EnhancedSynchronizeTab extends AbstractLaunchConfigurationTab {
 	public void dispose() {
 		super.dispose();
 
-		if (tabImage != null)
+		if (tabImage != null) {
 			tabImage.dispose();
+		}
 		tabImage = null;
 	}
 
@@ -339,13 +344,12 @@ public class EnhancedSynchronizeTab extends AbstractLaunchConfigurationTab {
 		addUploadRuleButton = new Button(frameComposite, SWT.PUSH);
 		addUploadRuleButton.setText(Messages.EnhancedSynchronizeTab_RulesFrame_Actions_NewUploadRule);
 		addUploadRuleButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
-		addUploadRuleButton.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-
+		addUploadRuleButton.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (!isEventHandlerEnabled())
+				if (!isEventHandlerEnabled()) {
 					return;
+				}
 				handleAddUploadRuleButtonPressed();
 			}
 		});
@@ -353,13 +357,12 @@ public class EnhancedSynchronizeTab extends AbstractLaunchConfigurationTab {
 		addDownloadRuleButton = new Button(frameComposite, SWT.PUSH);
 		addDownloadRuleButton.setText(Messages.EnhancedSynchronizeTab_RulesFrame_Actions_DownloadRule);
 		addDownloadRuleButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
-		addDownloadRuleButton.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-
+		addDownloadRuleButton.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (!isEventHandlerEnabled())
+				if (!isEventHandlerEnabled()) {
 					return;
+				}
 				handleAddDownloadRuleButtonPressed();
 			}
 		});
@@ -367,13 +370,12 @@ public class EnhancedSynchronizeTab extends AbstractLaunchConfigurationTab {
 		editRuleButton = new Button(frameComposite, SWT.PUSH);
 		editRuleButton.setText(Messages.EnhancedSynchronizeTab_RulesFrame_Actions_EditSelectedRule);
 		editRuleButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
-		editRuleButton.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-
+		editRuleButton.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (!isEventHandlerEnabled())
+				if (!isEventHandlerEnabled()) {
 					return;
+				}
 				handleEditRuleButtonPressed();
 			}
 		});
@@ -382,13 +384,12 @@ public class EnhancedSynchronizeTab extends AbstractLaunchConfigurationTab {
 		removeRuleButton = new Button(frameComposite, SWT.PUSH);
 		removeRuleButton.setText(Messages.EnhancedSynchronizeTab_RulesFrame_Actions_RemoveSelectedRules);
 		removeRuleButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
-		removeRuleButton.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-
+		removeRuleButton.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (!isEventHandlerEnabled())
+				if (!isEventHandlerEnabled()) {
 					return;
+				}
 				handleRemoveRuleButtonPressed();
 			}
 		});
@@ -425,13 +426,12 @@ public class EnhancedSynchronizeTab extends AbstractLaunchConfigurationTab {
 				| GridData.GRAB_VERTICAL);
 		gridData.heightHint = 100;
 		ruleList.setLayoutData(gridData);
-		ruleList.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-
+		ruleList.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (!isEventHandlerEnabled())
+				if (!isEventHandlerEnabled()) {
 					return;
+				}
 				removeRuleButton.setEnabled(ruleList.getSelectionCount() != 0);
 				editRuleButton.setEnabled(ruleList.getSelectionCount() == 1);
 			}
@@ -440,6 +440,7 @@ public class EnhancedSynchronizeTab extends AbstractLaunchConfigurationTab {
 		ruleViewer = new ListViewer(ruleList);
 		ruleViewer.setContentProvider(new IStructuredContentProvider() {
 			public void dispose() {
+				// Do nothing
 			}
 
 			public Object[] getElements(Object inputElement) {
@@ -480,8 +481,9 @@ public class EnhancedSynchronizeTab extends AbstractLaunchConfigurationTab {
 	}
 
 	protected void handleEditRuleButtonPressed() {
-		if (ruleList.getSelectionCount() != 1)
+		if (ruleList.getSelectionCount() != 1) {
 			return;
+		}
 
 		int index = ruleList.getSelectionIndex();
 		ISynchronizationRule rule = rules.get(index);
@@ -502,13 +504,13 @@ public class EnhancedSynchronizeTab extends AbstractLaunchConfigurationTab {
 	}
 
 	protected void handleRemoveRuleButtonPressed() {
-		if (ruleList.getSelectionCount() == 0)
+		if (ruleList.getSelectionCount() == 0) {
 			return;
+		}
 
 		int indexes[] = ruleList.getSelectionIndices();
 		HashSet<ISynchronizationRule> set = new HashSet<ISynchronizationRule>();
-		for (int i = 0; i < indexes.length; i++) {
-			int index = indexes[i];
+		for (int index : indexes) {
 			set.add(rules.get(index));
 		}
 		rules.removeAll(set);

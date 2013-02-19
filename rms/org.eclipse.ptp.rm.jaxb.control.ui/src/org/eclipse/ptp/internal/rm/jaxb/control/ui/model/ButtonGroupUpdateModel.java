@@ -130,6 +130,7 @@ public class ButtonGroupUpdateModel extends AbstractUpdateModel implements Selec
 			Object value = storeValue();
 			handleUpdate(value);
 		} catch (Exception ignored) {
+			// Ignore
 		}
 	}
 }

@@ -168,9 +168,11 @@ public class JAXBImportedScriptLaunchConfigurationTab extends JAXBDynamicLaunchC
 		WidgetBuilderUtils.applyMonospace(editor);
 		editor.addMouseListener(new MouseListener() {
 			public void mouseDoubleClick(MouseEvent e) {
+				// Ignore
 			}
 
 			public void mouseDown(MouseEvent e) {
+				// Ignore
 			}
 
 			public void mouseUp(MouseEvent e) {

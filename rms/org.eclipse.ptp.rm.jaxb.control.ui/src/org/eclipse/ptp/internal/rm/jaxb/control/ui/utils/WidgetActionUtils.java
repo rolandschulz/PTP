@@ -405,6 +405,7 @@ public class WidgetActionUtils {
 		try {
 			j.join();
 		} catch (InterruptedException ignored) {
+			// Ignore
 		}
 
 		if (!info[0].exists()) {

@@ -35,7 +35,6 @@ public class Messages extends NLS {
 	public static String IllegalVariableValueType;
 	public static String TabInitialization;
 	public static String ControlStateListener_0;
-	public static String ControlStateListener_1;
 	public static String ControlStateRule_0;
 	public static String ControlStateRule_1;
 	public static String ControlStateRule_2;
@@ -45,6 +44,10 @@ public class Messages extends NLS {
 	public static String JAXBRMPreferencesPage_Preferences_options;
 	public static String JAXBRMPreferencesPage_ParserDebug_options;
 	public static String JAXBRMPreferencesPage_CommandDebug_options;
+
+	public static String UpdateModelFactory_Undefined_attribute_in_BrowseType;
+
+	public static String UpdateModelFactory_Undefined_attribute_in_WidgetType;
 
 	static {
 		// initialize resource bundle

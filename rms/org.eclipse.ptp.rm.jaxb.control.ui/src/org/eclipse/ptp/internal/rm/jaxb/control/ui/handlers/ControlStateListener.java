@@ -13,6 +13,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.internal.rm.jaxb.control.ui.messages.Messages;
 import org.eclipse.ptp.internal.rm.jaxb.control.ui.utils.ControlStateRule;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
@@ -35,11 +38,7 @@ import org.eclipse.swt.widgets.TypedListener;
 public class ControlStateListener implements SelectionListener {
 
 	public enum Action {
-		ENABLE,
-		DISABLE,
-		SHOW,
-		HIDE,
-		NONE;
+		ENABLE, DISABLE, SHOW, HIDE, NONE;
 	};
 
 	private final ControlStateRule rule;
@@ -57,7 +56,7 @@ public class ControlStateListener implements SelectionListener {
 	 *            control id to control
 	 */
 	public ControlStateListener(Control target, ControlStateRuleType rule, Action action, Map<String, Button> map,
-			IVariableMap varMap) throws Throwable {
+			IVariableMap varMap) throws CoreException {
 		this.target = target;
 		this.action = action;
 		Set<Button> sources = new HashSet<Button>();
@@ -71,10 +70,10 @@ public class ControlStateListener implements SelectionListener {
 	 * Checks for cyclical dependencies by looking at the targets getting their listeners. The check is only done for listeners
 	 * associated with buttons as targets.
 	 */
-	public void findCyclicalDependecies(Set<Button> buttons) throws Throwable {
+	public void findCyclicalDependecies(Set<Button> buttons) throws CoreException {
 		if (target instanceof Button) {
 			if (buttons.contains(target)) {
-				throw new Throwable(Messages.ControlStateListener_0 + target + Messages.ControlStateListener_1 + buttons);
+				throw CoreExceptionUtils.newException(NLS.bind(Messages.ControlStateListener_0, target) + buttons);
 			}
 			Button b = (Button) target;
 			buttons.add(b);

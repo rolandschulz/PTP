@@ -67,6 +67,7 @@ public class SpinnerUpdateModel extends AbstractUpdateModel implements ModifyLis
 			Object value = storeValue();
 			handleUpdate(value);
 		} catch (Exception ignored) {
+			// Ignore
 		}
 	}
 

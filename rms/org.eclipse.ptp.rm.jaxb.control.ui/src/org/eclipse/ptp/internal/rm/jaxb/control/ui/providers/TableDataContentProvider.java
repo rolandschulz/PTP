@@ -24,6 +24,7 @@ import org.eclipse.ptp.internal.rm.jaxb.control.ui.model.TableRowUpdateModel;
 public class TableDataContentProvider implements IStructuredContentProvider {
 
 	public void dispose() {
+		// Nothing required
 	}
 
 	/*
@@ -44,5 +45,6 @@ public class TableDataContentProvider implements IStructuredContentProvider {
 	}
 
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+		// Do nothing
 	}
 }

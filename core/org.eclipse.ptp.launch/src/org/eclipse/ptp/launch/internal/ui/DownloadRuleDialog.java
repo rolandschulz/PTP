@@ -35,8 +35,8 @@ import org.eclipse.ptp.utils.ui.swt.ComboMold;
 import org.eclipse.ptp.utils.ui.swt.Frame;
 import org.eclipse.ptp.utils.ui.swt.FrameMold;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -184,25 +184,21 @@ public class DownloadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 
 		localDirectoryButton = new Button(contents, SWT.PUSH);
 		localDirectoryButton.setText(Messages.DownloadRuleDialog_DestinationFrame_FileSystemButton);
-		localDirectoryButton.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-
+		localDirectoryButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				if (listenersEnabled < 0)
+				if (listenersEnabled < 0) {
 					return;
+				}
 				handleLocalDirectoryButtonEvent();
 			}
 		});
 		localWorkspaceButton = new Button(contents, SWT.PUSH);
 		localWorkspaceButton.setText(Messages.DownloadRuleDialog_DestinationFrame_WorkspaceButton);
-		localWorkspaceButton.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-
+		localWorkspaceButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				if (listenersEnabled < 0)
+				if (listenersEnabled < 0) {
 					return;
+				}
 				handleLocalWorkspaceButtonEvent();
 			}
 		});
@@ -235,13 +231,11 @@ public class DownloadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 		mold.addItem(Integer.toString(OverwritePolicies.NEWER),
 				Messages.DownloadRuleDialog_OptionsFrame_OverwriteCombo_OverwriteIfNewerOption);
 		overwritePolicyCombo = new ComboGroup(contents, mold);
-		overwritePolicyCombo.getCombo().addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-
+		overwritePolicyCombo.getCombo().addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				if (listenersEnabled < 0)
+				if (listenersEnabled < 0) {
 					return;
+				}
 				disableListeners();
 				if (overwritePolicyCombo.getSelectionId().equals(Integer.toString(OverwritePolicies.NEWER))) {
 					preserveTimeStampButton.setEnabled(false);
@@ -269,13 +263,11 @@ public class DownloadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 				| GridData.GRAB_VERTICAL);
 		gridData.heightHint = 200;
 		fileList.setLayoutData(gridData);
-		fileList.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-
+		fileList.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				if (listenersEnabled < 0)
+				if (listenersEnabled < 0) {
 					return;
+				}
 				removeFilesButton.setEnabled(fileList.getSelectionCount() != 0);
 				editFileButton.setEnabled(fileList.getSelectionCount() == 1);
 			}
@@ -286,26 +278,22 @@ public class DownloadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 		addFilesButton = new Button(buttonFrame, SWT.PUSH);
 		addFilesButton.setText(Messages.DownloadRuleDialog_FileListFrame_AddButton);
 		addFilesButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
-		addFilesButton.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-
+		addFilesButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				if (listenersEnabled < 0)
+				if (listenersEnabled < 0) {
 					return;
+				}
 				handleaddFilesButtonEvent();
 			}
 		});
 		editFileButton = new Button(buttonFrame, SWT.PUSH);
 		editFileButton.setText(Messages.DownloadRuleDialog_FileListFrame_EditButton);
 		editFileButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
-		editFileButton.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-
+		editFileButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				if (listenersEnabled < 0)
+				if (listenersEnabled < 0) {
 					return;
+				}
 				handleEditFileButtonEvent();
 			}
 		});
@@ -313,13 +301,11 @@ public class DownloadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 		removeFilesButton.setText(Messages.DownloadRuleDialog_FileListFrame_RemoveButton);
 		removeFilesButton.setEnabled(false);
 		removeFilesButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
-		removeFilesButton.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-
+		removeFilesButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				if (listenersEnabled < 0)
+				if (listenersEnabled < 0) {
 					return;
+				}
 				handleRemoveFilesButtonEvent();
 			}
 
@@ -333,8 +319,9 @@ public class DownloadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 	}
 
 	private void handleLocalDirectoryButtonEvent() {
-		if (listenersEnabled < 0)
+		if (listenersEnabled < 0) {
 			return;
+		}
 
 		IPath selectedPath = null;
 		/*
@@ -501,8 +488,7 @@ public class DownloadRuleDialog extends TitleAreaDialog implements IRuleDialog {
 		}
 
 		HashSet<String> fileSet = new HashSet<String>(Arrays.asList(fileList.getItems()));
-		for (int i = 0; i < selection.length; i++) {
-			String string = selection[i];
+		for (String string : selection) {
 			fileSet.remove(string);
 		}
 

@@ -188,6 +188,7 @@ public class SynchronizationRuleLabelProvider implements ILabelProvider {
 	}
 
 	public void addListener(ILabelProviderListener listener) {
+		// Do nothing
 	}
 
 	public void dispose() {
@@ -206,5 +207,6 @@ public class SynchronizationRuleLabelProvider implements ILabelProvider {
 	}
 
 	public void removeListener(ILabelProviderListener listener) {
+		// Do nothing
 	}
 }

@@ -95,6 +95,7 @@ public class DebuggerTab extends AbstractDebuggerTab {
 			loadDebuggerComboBox(config, id, LaunchUtils.getRemoteServicesId(config) == null);
 			initializeCommonControls(config);
 		} catch (CoreException e) {
+			// Ignore
 		}
 		setInitializing(false);
 	}
@@ -116,6 +117,7 @@ public class DebuggerTab extends AbstractDebuggerTab {
 			loadDebuggerComboBox(workingCopy, id, LaunchUtils.getRemoteServicesId(workingCopy) == null);
 			initializeCommonControls(workingCopy);
 		} catch (CoreException e) {
+			// Ignore
 		}
 		setInitializing(false);
 	}
@@ -225,6 +227,7 @@ public class DebuggerTab extends AbstractDebuggerTab {
 						IPTPLaunchConfigurationConstants.DEBUGGER_STOP_AT_MAIN_DEFAULT));
 			}
 		} catch (CoreException e) {
+			// Ignore
 		}
 	}
 
@@ -250,12 +253,12 @@ public class DebuggerTab extends AbstractDebuggerTab {
 			mode = IPTPLaunchConfigurationConstants.DEBUGGER_MODE_RUN;
 		}
 		String defaultSelection = selection;
-		for (int i = 0; i < debugConfigs.length; i++) {
-			if (debugConfigs[i].supportsMode(mode)) {
-				list.add(debugConfigs[i]);
+		for (IPDebugConfiguration debugConfig : debugConfigs) {
+			if (debugConfig.supportsMode(mode)) {
+				list.add(debugConfig);
 				// select first exact matching debugger for requested selection
 				if (!noDefault && defaultSelection.equals("")) { //$NON-NLS-1$
-					defaultSelection = debugConfigs[i].getID();
+					defaultSelection = debugConfig.getID();
 				}
 			}
 		}

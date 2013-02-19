@@ -44,6 +44,7 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 				Object value = storeValue();
 				handleUpdate(value);
 			} catch (Exception ignored) {
+				// Ignore
 			}
 			return Status.OK_STATUS;
 		}
