@@ -153,6 +153,8 @@ if ($launchMode eq 'debug') {
 
 $pid = fork();
 if ( $pid == 0 ) {
+	  # Unconditionally set MP_DEBUG_ATTACH to be sure attach.cfg file is created
+	$ENV{MP_DEBUG_ATTACH} = "yes";
 	printf( "::::PoePid=%d::::\n", $$ );
     if ($hpcrun eq 'yes') {
         exec('/opt/ibmhpc/ppedev.hpct/bin/hpcrun', '/usr/bin/poe', @ARGV);
