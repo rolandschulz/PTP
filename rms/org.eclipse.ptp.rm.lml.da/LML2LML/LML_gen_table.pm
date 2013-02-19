@@ -214,9 +214,11 @@ sub _select_objs {
 	    $specref = $LML_specs::LMLattributes->{$objtype_pattern}->{$skey};
 
 	    $sort="alpha"; # default
-	    $sort="alpha"   if ( ($specref->[0] eq "s") || ($specref->[0] eq "k") );
-	    $sort="numeric" if ( ($specref->[0] eq "d") || ($specref->[0] eq "f") );
-	    $sort="date"    if ( ($specref->[0] eq "D") );
+	    if(defined($specref->[0]) ){
+		    $sort="alpha"   if ( ($specref->[0] eq "s") || ($specref->[0] eq "k") );
+		    $sort="numeric" if ( ($specref->[0] eq "d") || ($specref->[0] eq "f") );
+		    $sort="date"    if ( ($specref->[0] eq "D") );
+		}
 	    
 
 	    if(exists($self->{LMLFH}->{DATA}->{INFODATA}->{$key}->{$skey})) {
