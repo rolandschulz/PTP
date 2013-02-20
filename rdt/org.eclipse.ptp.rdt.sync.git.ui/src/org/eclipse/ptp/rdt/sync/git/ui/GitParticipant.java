@@ -173,12 +173,15 @@ public class GitParticipant implements ISynchronizeParticipant {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				IRemoteUIConnectionManager connectionManager = getUIConnectionManager();
+				IRemoteConnection newConn = null;
 				if (connectionManager != null) {
-					connectionManager.newConnection(fNewConnectionButton.getShell());
+					newConn = connectionManager.newConnection(fNewConnectionButton.getShell());
 				}
 				// refresh list of connections
-				populateConnectionCombo(fConnectionCombo);
-				update();
+				if (newConn != null) {
+					populateConnectionCombo(fConnectionCombo, newConn.getName());
+					update();
+				}
 			}
 		});
 
@@ -341,17 +344,29 @@ public class GitParticipant implements ISynchronizeParticipant {
 	 * @param connectionCombo
 	 */
 	private void populateConnectionCombo(final Combo connectionCombo) {
+		this.populateConnectionCombo(connectionCombo, null);
+	}
+
+	/**
+	 * @param connectionCombo
+	 * @param initSelection
+	 */
+	private void populateConnectionCombo(final Combo connectionCombo, String initSelection) {
 		connectionCombo.removeAll();
 
+		int initIndex = 0;
 		IRemoteConnection[] connections = fSelectedProvider.getConnectionManager().getConnections();
 
 		for (int k = 0; k < connections.length; k++) {
 			connectionCombo.add(connections[k].getName(), k);
 			fComboIndexToRemoteConnectionMap.put(k, connections[k]);
+			if (connections[k].getName().equals(initSelection)) {
+				initIndex = k;
+			}
 		}
 
-		connectionCombo.select(0);
-		fSelectedConnection = fComboIndexToRemoteConnectionMap.get(0);
+		connectionCombo.select(initIndex);
+		fSelectedConnection = fComboIndexToRemoteConnectionMap.get(initIndex);
 	}
 
 	private void update() {

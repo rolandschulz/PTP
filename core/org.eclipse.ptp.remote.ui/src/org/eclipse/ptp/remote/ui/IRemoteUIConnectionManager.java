@@ -33,12 +33,12 @@ public interface IRemoteUIConnectionManager {
 	public static String LOGIN_USERNAME_HINT = "LOGIN_USERNAME_HINT"; //$NON-NLS-1$
 
 	/**
-	 * Create a new connection. The implementation can chose to do this in any
+	 * Create a new connection. The implementation can choose to do this in any
 	 * way, but typically will use a dialog or wizard.
 	 * 
 	 * @param shell
 	 *            shell used to display dialogs
-	 * @return newly created remote connection
+	 * @return newly created remote connection or null if none created
 	 */
 	public IRemoteConnection newConnection(Shell shell);
 
@@ -55,7 +55,7 @@ public interface IRemoteUIConnectionManager {
 	 * @param attrHintValues
 	 *            array containing default values for each attribute specified
 	 *            in attrHints
-	 * @return the newly created connection
+	 * @return the newly created connection or null if none created
 	 * @since 5.0
 	 */
 	public IRemoteConnection newConnection(Shell shell, String[] attrHints, String[] attrHintValues);
