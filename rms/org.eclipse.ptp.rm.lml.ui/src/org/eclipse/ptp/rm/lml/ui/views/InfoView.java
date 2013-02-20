@@ -27,7 +27,9 @@ import org.eclipse.ptp.rm.lml.core.events.IUnmarkObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.IUnselectedObjectEvent;
 import org.eclipse.ptp.rm.lml.core.events.IViewUpdateEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.ILMLListener;
+import org.eclipse.ptp.rm.lml.internal.core.elements.InfoType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.InfodataType;
+import org.eclipse.ptp.rm.lml.internal.core.model.OIDToInformation;
 import org.eclipse.ptp.rm.lml.ui.ILMLUIConstants;
 import org.eclipse.ptp.rm.lml.ui.UIUtils;
 import org.eclipse.ptp.rm.lml.ui.messages.Messages;
@@ -84,26 +86,32 @@ public class InfoView extends ViewPart {
 
 		@Override
 		public void handleEvent(final ISelectObjectEvent event) {
+			// Do nothing
 		}
 
 		@Override
 		public void handleEvent(ITableFilterEvent event) {
+			// Do nothing
 		}
 
 		@Override
 		public void handleEvent(ITableSortedEvent event) {
+			// Do nothing
 		}
 
 		@Override
 		public void handleEvent(IUnmarkObjectEvent event) {
+			// Do nothing
 		}
 
 		@Override
 		public void handleEvent(IUnselectedObjectEvent event) {
+			// Do nothing
 		}
 
 		@Override
 		public void handleEvent(IViewUpdateEvent event) {
+			// Do nothing
 		}
 
 	}
@@ -163,6 +171,7 @@ public class InfoView extends ViewPart {
 
 	@Override
 	public void setFocus() {
+		// Do nothing
 	}
 
 	public void setNewLabelText(String type, String oid) {
@@ -189,12 +198,15 @@ public class InfoView extends ViewPart {
 				column.setText(title);
 				column.setWidth(100);
 			}
-			if (lmlManager.getSelectedLguiItem().getOIDToInformation().getInfoByOid(oid) != null) {
-				for (final InfodataType infodata : lmlManager.getSelectedLguiItem().getOIDToInformation().getInfoByOid(oid)
-						.getData()) {
-					final TableItem item = new TableItem(((Table) content), SWT.NONE);
-					item.setText(0, infodata.getKey());
-					item.setText(1, infodata.getValue());
+			OIDToInformation info = lmlManager.getSelectedLguiItem().getOIDToInformation();
+			if (info != null) {
+				InfoType infoType = info.getInfoByOid(oid);
+				if (infoType != null) {
+					for (final InfodataType infodata : infoType.getData()) {
+						final TableItem item = new TableItem(((Table) content), SWT.NONE);
+						item.setText(0, infodata.getKey());
+						item.setText(1, infodata.getValue());
+					}
 				}
 			}
 
