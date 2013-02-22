@@ -21,6 +21,14 @@
             systemTypeIds="org.eclipse.rse.systemtype.unix;org.eclipse.rse.systemtype.windows;org.eclipse.rse.systemtype.linux"
             vendor="%configuration.vendor.0">
       </configuration>
+      <configuration
+            class="org.eclipse.ptp.internal.remote.rse.core.LocalSpawnerSubsystemConfiguration"
+            description="Spawns and manipulates local processes"
+            id="org.eclipse.ptp.remote.rse.core."
+            name="Local Process Spawner"
+            systemTypeIds="org.eclipse.rse.systemtype.local"
+            vendor="%configuration.vendor.0">
+      </configuration>
    </extension>
 
 </plugin>
