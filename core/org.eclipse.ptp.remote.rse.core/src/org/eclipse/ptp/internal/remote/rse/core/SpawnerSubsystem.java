@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2011 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.remote.rse.core;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -112,9 +113,38 @@ public class SpawnerSubsystem extends SubSystem {
 		}
 		return null;
 	}
+	
+	/**
+	 * 
+	 * Spawns an external local process and uses it to execute a command.  Does nothing if this subsystem is not associated
+	 * with a local connection.  Stderr will be redirected to stdout.
+	 * 
+	 * @param cmd
+	 * @param workingDirectory
+	 * @param encoding
+	 * @param envp
+	 * @param monitor
+	 * @return Process
+	 * @throws IOException
+	 */
+	public synchronized Process spawnLocalRedirected(String cmd, String workingDirectory, String encoding, String[] envp,
+			IProgressMonitor monitor) throws IOException {
+		return null;
+	}
 
+	/**
+	 * Spawns an external process on the associated connection.  Stderr will be redirected to stdout.
+	 * 
+	 * @param cmd
+	 * @param workingDirectory
+	 * @param encoding
+	 * @param envp
+	 * @param monitor
+	 * @return IHostShell
+	 * @throws IOException
+	 */
 	public synchronized IHostShell spawnRedirected(String cmd, String workingDirectory, String encoding, String[] envp,
-			IProgressMonitor monitor) {
+			IProgressMonitor monitor) throws IOException {
 		DataStore dataStore = getDataStore(monitor);
 
 		if (dataStore != null) {
