@@ -973,7 +973,7 @@ public class UpdateModelFactory {
 		} else if (JAXBControlUIConstants.CUSTOM.equals(cd.getType())) {
 			try {
 				c = createWidget(cd, parent);
-				c.setLayoutData(cd.layoutData);
+				if (c != null) c.setLayoutData(cd.layoutData);
 			} catch (CoreException e) {
 				// Widget will be missing from UI
 			}
@@ -1117,12 +1117,12 @@ public class UpdateModelFactory {
 	 * @param model
 	 *            update model object to associate validator with
 	 * @param attr
-	 *            JAXB attribute descriptor, which must reference a valid attribut
+	 *            JAXB attribute descriptor, which must reference a valid attribute
 	 * @param tab
 	 *            launch tab being built
 	 */
 	private static void maybeAddValidator(IUpdateModel model, final AttributeType attr, final IJAXBParentLaunchConfigurationTab tab) {
-		if (attr.getValidator() != null) {
+		if (attr != null && attr.getValidator() != null) {
 			IValidator validator = new IValidator() {
 
 				/*
