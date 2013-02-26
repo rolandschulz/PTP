@@ -100,7 +100,7 @@ public class ViewerDataCellLabelProvider extends CellLabelProvider {
 		}
 		color = getForeground(element, index);
 		if (color != null) {
-			cell.setBackground(color);
+			cell.setForeground(color);
 		}
 		Font font = getFont(element, index);
 		if (font != null) {
@@ -114,8 +114,7 @@ public class ViewerDataCellLabelProvider extends CellLabelProvider {
 	}
 
 	/**
-	 * Delegates to the
-	 * {@link IColumnViewerLabelSupport#getBackground(Object, int)} method.
+	 * Delegates to the {@link IColumnViewerLabelSupport#getBackground(Object, int)} method.
 	 * 
 	 * @param element
 	 *            model object
@@ -131,8 +130,7 @@ public class ViewerDataCellLabelProvider extends CellLabelProvider {
 	}
 
 	/**
-	 * Delegates to the {@link IColumnViewerLabelSupport#getColumnImage(String)}
-	 * method.
+	 * Delegates to the {@link IColumnViewerLabelSupport#getColumnImage(String)} method.
 	 * 
 	 * @param element
 	 *            model object
@@ -163,8 +161,7 @@ public class ViewerDataCellLabelProvider extends CellLabelProvider {
 	}
 
 	/**
-	 * Delegates to the
-	 * {@link IColumnViewerLabelSupport#getDisplayValue(String)} method.
+	 * Delegates to the {@link IColumnViewerLabelSupport#getDisplayValue(String)} method.
 	 * 
 	 * @param element
 	 *            model object
@@ -180,8 +177,7 @@ public class ViewerDataCellLabelProvider extends CellLabelProvider {
 	}
 
 	/**
-	 * Delegates to the {@link IColumnViewerLabelSupport#getFont(Object, int)}
-	 * method.
+	 * Delegates to the {@link IColumnViewerLabelSupport#getFont(Object, int)} method.
 	 * 
 	 * @param element
 	 *            model object
@@ -197,8 +193,7 @@ public class ViewerDataCellLabelProvider extends CellLabelProvider {
 	}
 
 	/**
-	 * Delegates to the
-	 * {@link IColumnViewerLabelSupport#getForeground(Object, int)} method.
+	 * Delegates to the {@link IColumnViewerLabelSupport#getForeground(Object, int)} method.
 	 * 
 	 * @param element
 	 *            model object
