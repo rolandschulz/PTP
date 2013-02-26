@@ -322,10 +322,10 @@ public class MonitorControl implements IMonitorControl {
 			final IMemento[] children = memento.getChildren(JOB_ATTR);
 			for (final IMemento child : children) {
 				String[] keys = child.getAttributeKeys();
-				String[][] attrs = new String[2][keys.length];
+				String[][] attrs = new String[keys.length][2];
 				for (int i = 0; i < keys.length; i++) {
-					attrs[0][i] = keys[i];
-					attrs[1][i] = child.getString(keys[i]);
+					attrs[i][0] = keys[i];
+					attrs[i][1] = child.getString(keys[i]);
 				}
 
 				final JobStatusData jobData = new JobStatusData(child.getID(), attrs);
