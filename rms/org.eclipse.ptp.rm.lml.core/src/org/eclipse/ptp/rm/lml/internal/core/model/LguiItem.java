@@ -672,6 +672,9 @@ public class LguiItem implements ILguiItem {
 	private void addCellToRow(RowType row, ColumnType column, String value) {
 		final CellType cell = new CellType();
 		cell.setCid(column.getId());
+		if (value == null) {
+			value = "?"; //$NON-NLS-1$
+		}
 		cell.setValue(value);
 		row.getCell().add(cell);
 	}
@@ -691,7 +694,7 @@ public class LguiItem implements ILguiItem {
 				// Get the queue information from monitoring results instead of from the
 				// user input, if possible
 				String queue = status.getString(JobStatusData.QUEUE_NAME_ATTR);
-				if (queue.equals("") && status.getString(JOB_QUEUE_NAME) != null) { //$NON-NLS-1$
+				if (queue == null || (queue.equals("") && status.getString(JOB_QUEUE_NAME) != null)) { //$NON-NLS-1$
 					queue = status.getString(JOB_QUEUE_NAME);
 				}
 				addCellToRow(row, column, queue);

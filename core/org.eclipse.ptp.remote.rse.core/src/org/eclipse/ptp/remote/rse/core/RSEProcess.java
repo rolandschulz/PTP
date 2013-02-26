@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2011 PalmSource, Inc. and others
+ * Copyright (c) 2006, 2013 PalmSource, Inc. and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,12 +32,14 @@ import org.eclipse.ptp.internal.remote.rse.core.miners.SpawnerMiner;
 import org.eclipse.ptp.remote.core.AbstractRemoteProcess;
 import org.eclipse.ptp.remote.core.NullInputStream;
 import org.eclipse.ptp.remote.rse.core.messages.Messages;
+import org.eclipse.rse.internal.services.local.shells.LocalHostShell;
 import org.eclipse.rse.services.shells.HostShellOutputStream;
 import org.eclipse.rse.services.shells.IHostOutput;
 import org.eclipse.rse.services.shells.IHostShell;
 import org.eclipse.rse.services.shells.IHostShellChangeEvent;
 import org.eclipse.rse.services.shells.IHostShellOutputListener;
 
+@SuppressWarnings("restriction")
 public class RSEProcess extends AbstractRemoteProcess implements IHostShellOutputListener {
 	private final boolean mergeOutput;
 	private final IHostShell hostShell;
@@ -76,7 +78,7 @@ public class RSEProcess extends AbstractRemoteProcess implements IHostShellOutpu
 			if (!fSpawnErrorFound) {
 
 				// troll through any new nested items, looking for launch errors
-				while (fIndex < fStatus.getNestedSize()) {
+				while (fStatus != null && fIndex < fStatus.getNestedSize()) {
 					DataElement element = fStatus.get(fIndex++);
 
 					String type = element.getType();
@@ -129,7 +131,13 @@ public class RSEProcess extends AbstractRemoteProcess implements IHostShellOutpu
 			fStatus = ((org.eclipse.rse.internal.services.dstore.shells.DStoreHostShell) hostShell).getStatus();
 		}
 		
-		fStatus.getDataStore().getDomainNotifier().addDomainListener(fDomainListener );
+		else if (hostShell instanceof LocalHostShell) {
+			fStatus = null;
+		}
+		
+		if(fStatus != null) {
+			fStatus.getDataStore().getDomainNotifier().addDomainListener(fDomainListener );
+		}
 	}
 
 	/*
@@ -237,12 +245,12 @@ public class RSEProcess extends AbstractRemoteProcess implements IHostShellOutpu
 
 	private void reportSpawnError() throws IOException {
 		// always look for errors that haven't been found yet, otherwise we might exit
-		// before they are found
+		// before they are found		
 		synchronized (fDomainListener) {
 			if (!fSpawnErrorFound) {
 
 				// troll through any new nested items, looking for spawn errors
-				while (fIndex < fStatus.getNestedSize()) {
+				while (fStatus != null && fIndex < fStatus.getNestedSize()) {
 					DataElement element = fStatus.get(fIndex++);
 
 					String type = element.getType();

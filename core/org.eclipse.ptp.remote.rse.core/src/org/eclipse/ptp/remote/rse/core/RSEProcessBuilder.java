@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2010 IBM Corporation and others.
+ * Copyright (c) 2007, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.ptp.internal.remote.rse.core.LocalSpawnerSubsystem;
 import org.eclipse.ptp.internal.remote.rse.core.SpawnerSubsystem;
 import org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -27,10 +28,12 @@ import org.eclipse.ptp.remote.rse.core.messages.Messages;
 import org.eclipse.rse.connectorservice.dstore.DStoreConnectorService;
 import org.eclipse.rse.core.subsystems.IConnectorService;
 import org.eclipse.rse.core.subsystems.ISubSystem;
+import org.eclipse.rse.internal.connectorservice.local.LocalConnectorService;
 import org.eclipse.rse.services.clientserver.messages.SystemMessageException;
 import org.eclipse.rse.services.shells.IHostShell;
 import org.eclipse.rse.services.shells.IShellService;
 
+@SuppressWarnings("restriction")
 public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 	private final static String EXIT_CMD = "exit"; //$NON-NLS-1$
 	private final static String CMD_DELIMITER = ";"; //$NON-NLS-1$
@@ -122,17 +125,25 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 			}
 
 			SpawnerSubsystem subsystem = getSpawnerSubsystem();
+			
+			if(subsystem instanceof LocalSpawnerSubsystem) {
+				Process process = subsystem.spawnLocalRedirected(remoteCmd, initialDir, null, getEnvironment(), new NullProgressMonitor());
+				return new LocalProcessWrapper(process);
+			}
+			
+			else {
+				if (subsystem != null) {
+					hostShell = subsystem.spawnRedirected(remoteCmd, initialDir, null, getEnvironment(),
+							new NullProgressMonitor());
 
-			if (subsystem != null) {
-				hostShell = subsystem.spawnRedirected(remoteCmd, initialDir, null, getEnvironment(), new NullProgressMonitor());
-
-				if (hostShell == null) {
+					if (hostShell == null) {
+						// fall back to old method of using RSE
+						hostShell = launchCommandWithRSE(remoteCmd, initialDir);
+					}
+				} else {
 					// fall back to old method of using RSE
 					hostShell = launchCommandWithRSE(remoteCmd, initialDir);
 				}
-			} else {
-				// fall back to old method of using RSE
-				hostShell = launchCommandWithRSE(remoteCmd, initialDir);
 			}
 		} catch (SystemMessageException e) {
 			// TODO Auto-generated catch block
@@ -161,13 +172,17 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 	}
 
 	private SpawnerSubsystem getSpawnerSubsystem() {
-		DStoreConnectorService dstoreConnectorService = getDStoreConnectorService();
+		IConnectorService connectorService = getDStoreConnectorService();
 
-		if (dstoreConnectorService == null) {
-			return null;
+		if (connectorService == null) {
+			// try getting the local connector service
+			connectorService = getLocalConnectorService();
+			if(connectorService == null) {
+				return null;
+			}
 		}
 
-		ISubSystem subsystems[] = dstoreConnectorService.getSubSystems();
+		ISubSystem subsystems[] = connectorService.getSubSystems();
 
 		for (ISubSystem subsystem : subsystems) {
 			if (subsystem instanceof SpawnerSubsystem) {
@@ -175,6 +190,16 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 			}
 		}
 
+		return null;
+	}
+
+	private LocalConnectorService getLocalConnectorService() {
+		for (IConnectorService service : fConnection.getHost().getConnectorServices()) {
+			if (service instanceof LocalConnectorService) {
+				return (LocalConnectorService) service;
+			}
+		}
+		
 		return null;
 	}
 

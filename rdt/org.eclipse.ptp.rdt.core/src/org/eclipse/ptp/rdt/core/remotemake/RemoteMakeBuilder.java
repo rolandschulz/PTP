@@ -409,21 +409,12 @@ public class RemoteMakeBuilder extends MakeBuilder {
 
 					if (p != null) {
 						
-						try {
-							// Close the input of the Process explicitly.
-							// We will never write to it.
-							p.getOutputStream().close();
-
-							// Hook up the process output to the console.
-							// In theory, stderr is combined so no need to read stderr... we should set it to null.
-							// HOWEVER:  the RSE provider doesn't merge the streams... so if we want the stderr output, then
-							// we have to (for now), supply both streams.  Not sure if this will cause stderr doubling on the Remote Tools provider.
-							RemoteProcessClosure remoteProcessClosure = new RemoteProcessClosure(p, consoleOut, consoleErr);
-							remoteProcessClosure.runNonBlocking();
-						
-						} catch (IOException e) {
-							// don't really care if this fails
-						}
+						// Hook up the process output to the console.
+						// In theory, stderr is combined so no need to read stderr... we should set it to null.
+						// HOWEVER:  the RSE provider doesn't merge the streams... so if we want the stderr output, then
+						// we have to (for now), supply both streams.  Not sure if this will cause stderr doubling on the Remote Tools provider.
+						RemoteProcessClosure remoteProcessClosure = new RemoteProcessClosure(p, consoleOut, consoleErr);
+						remoteProcessClosure.runNonBlocking();
 
 	
 						// wait for the process to finish

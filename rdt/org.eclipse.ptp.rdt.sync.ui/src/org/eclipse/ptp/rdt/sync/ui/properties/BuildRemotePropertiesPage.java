@@ -183,12 +183,15 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				IRemoteUIConnectionManager connectionManager = getUIConnectionManager();
+				IRemoteConnection newConn = null;
 				if (connectionManager != null) {
-					connectionManager.newConnection(fNewConnectionButton.getShell());
+					newConn = connectionManager.newConnection(fNewConnectionButton.getShell());
 				}
 				// refresh list of connections
-				populateConnectionCombo(fConnectionCombo);
-				update();
+				if (newConn != null) {
+					populateConnectionCombo(fConnectionCombo, newConn.getName());
+					update();
+				}
 			}
 		});
 
@@ -266,14 +269,30 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	 * @param connectionCombo
 	 */
 	private void populateConnectionCombo(final Combo connectionCombo) {
-		fSelectedConnection = null;
+		this.populateConnectionCombo(connectionCombo, null);
+	}
+
+	/**
+	 * @param connectionCombo
+	 * @param initSelection
+	 */
+	private void populateConnectionCombo(final Combo connectionCombo, String initSelection) {
 		connectionCombo.removeAll();
+
+		int initIndex = 0;
 		IRemoteConnection[] connections = fSelectedProvider.getConnectionManager().getConnections();
+
 		for (int k = 0; k < connections.length; k++) {
 			connectionCombo.add(connections[k].getName(), k);
 			fComboIndexToRemoteConnectionMap.put(k, connections[k]);
 			fComboRemoteConnectionToIndexMap.put(connections[k], k);
+			if (connections[k].getName().equals(initSelection)) {
+				initIndex = k;
+			}
 		}
+		
+		connectionCombo.select(initIndex);
+		fSelectedConnection = fComboIndexToRemoteConnectionMap.get(initIndex);
 	}
 	
 	private void populateRemoteProviderCombo(final Combo providerCombo) {
