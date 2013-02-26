@@ -1117,12 +1117,12 @@ public class UpdateModelFactory {
 	 * @param model
 	 *            update model object to associate validator with
 	 * @param attr
-	 *            JAXB attribute descriptor, which must reference a valid attribut
+	 *            JAXB attribute descriptor, which must reference a valid attribute
 	 * @param tab
 	 *            launch tab being built
 	 */
 	private static void maybeAddValidator(IUpdateModel model, final AttributeType attr, final IJAXBParentLaunchConfigurationTab tab) {
-		if (attr.getValidator() != null) {
+		if (attr != null && attr.getValidator() != null) {
 			IValidator validator = new IValidator() {
 
 				/*

@@ -2739,7 +2739,7 @@
 						<fixed-text>${ptp_rm:MP_CC_BUF_MEM_ATTR#description}
 						</fixed-text>
 					</widget>
-					<widget style="SWT.BORDER" attribute="MP_CC_BUF_ATTR"
+					<widget style="SWT.BORDER" attribute="MP_CC_BUF_MEM_ATTR"
 						type="text">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
