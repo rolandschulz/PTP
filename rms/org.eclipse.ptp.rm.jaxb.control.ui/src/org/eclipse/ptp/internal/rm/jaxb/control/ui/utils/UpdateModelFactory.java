@@ -973,7 +973,7 @@ public class UpdateModelFactory {
 		} else if (JAXBControlUIConstants.CUSTOM.equals(cd.getType())) {
 			try {
 				c = createWidget(cd, parent);
-				c.setLayoutData(cd.layoutData);
+				if (c != null) c.setLayoutData(cd.layoutData);
 			} catch (CoreException e) {
 				// Widget will be missing from UI
 			}
