@@ -13,7 +13,7 @@ package org.eclipse.ptp.ems.ui;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Comparator;
-import java.util.Set;
+import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
@@ -112,8 +112,11 @@ public class LazyEnvManagerDetector implements IEnvManager {
 	 * 
 	 * @see org.eclipse.ptp.ems.core.IEnvManager#determineAvailableElements(org.eclipse.core.runtime.IProgressMonitor)
 	 */
+	/**
+	 * @since 2.0
+	 */
 	@Override
-	public Set<String> determineAvailableElements(IProgressMonitor pm) throws RemoteConnectionException, IOException {
+	public List<String> determineAvailableElements(IProgressMonitor pm) throws RemoteConnectionException, IOException {
 		return ensureEnvManagerDetected().determineAvailableElements(pm);
 	}
 
@@ -122,8 +125,11 @@ public class LazyEnvManagerDetector implements IEnvManager {
 	 * 
 	 * @see org.eclipse.ptp.ems.core.IEnvManager#determineDefaultElements(org.eclipse.core.runtime.IProgressMonitor)
 	 */
+	/**
+	 * @since 2.0
+	 */
 	@Override
-	public Set<String> determineDefaultElements(IProgressMonitor pm) throws RemoteConnectionException, IOException {
+	public List<String> determineDefaultElements(IProgressMonitor pm) throws RemoteConnectionException, IOException {
 		return ensureEnvManagerDetected().determineDefaultElements(pm);
 	}
 

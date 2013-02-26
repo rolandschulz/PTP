@@ -17,28 +17,29 @@ public class Messages extends NLS {
 
 	public static String EnvConfigurationControl_ManualOverride;
 	public static String EnvConfigurationControl_UseEMS;
-
+	public static String EnvManagerChecklist_Available_Modules;
 	public static String EnvManagerChecklist_ConnectButtonLabel;
 	public static String EnvManagerChecklist_DetectingEMSPleaseWait;
 	public static String EnvManagerChecklist_DetectingRemoteEMS;
-	public static String EnvManagerChecklist_EnableColumnText;
 	public static String EnvManagerChecklist_EnvManagerInfo;
-	public static String EnvManagerChecklist_ModuleNameColumnText;
 	public static String EnvManagerChecklist_RemoteEnvironmentIsNotConnected;
 	public static String EnvManagerChecklist_NoSupportedEMSInstalled;
 	public static String EnvManagerChecklist_NotRemoteSync;
 	public static String EnvManagerChecklist_PleaseWaitRetrievingModuleList;
+	public static String EnvManagerChecklist_Selected_Modules;
 	public static String EnvManagerChecklist_SettingsOnEnvironmentsPageAreAppliedBeforehand;
 	public static String EnvManagerChecklist_UpdatingChecklist;
-
 	public static String EnvManagerConfigButton_ConfigureButtonText;
 	public static String EnvManagerConfigButton_EnvConfigurationDialogTitle;
-
 	public static String SearchableChecklist_ClearSelection;
-
 	public static String SearchableChecklist_ReloadList;
 	public static String SearchableChecklist_SearchBoxLabel;
 	public static String SearchableChecklist_SelectDefaults;
+	public static String SearchableSelectionList_Add;
+	public static String SearchableSelectionList_Down;
+	public static String SearchableSelectionList_Remove;
+	public static String SearchableSelectionList_Set_Default;
+	public static String SearchableSelectionList_Up;
 
 	static {
 		// initialize resource bundle

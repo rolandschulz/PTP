@@ -11,9 +11,9 @@
 package org.eclipse.ptp.internal.ems.ui;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -64,7 +64,7 @@ public final class EnvManagerChecklist extends Composite {
 	private IErrorListener errorListener;
 
 	private URI lastSyncURI;
-	private Set<String> lastSelectedItems;
+	private List<String> lastSelectedItems;
 
 	private Composite stack;
 	private StackLayout stackLayout;
@@ -73,7 +73,7 @@ public final class EnvManagerChecklist extends Composite {
 	private Label messageLabel;
 	private Button connectButton;
 
-	private SearchableChecklist checklist;
+	private SearchableSelectionList checklist;
 
 	/**
 	 * Constructor.
@@ -90,7 +90,7 @@ public final class EnvManagerChecklist extends Composite {
 		this.remoteConnection = remoteConnection;
 		this.envManager = EnvManagerRegistry.getNullEnvManager();
 		this.lastSyncURI = null;
-		this.lastSelectedItems = Collections.<String> emptySet();
+		this.lastSelectedItems = Collections.<String> emptyList();
 
 		this.errorListener = new NullErrorListener();
 
@@ -175,7 +175,7 @@ public final class EnvManagerChecklist extends Composite {
 	/**
 	 * @return the name of the remote environment (possibly <code>null</code>). The remote environment is determined by the
 	 *         {@link IRemoteConnection} provided to the constructor or
-	 *         {@link EnvManagerConfigWidget#configurationChanged(URI, IRemoteConnection, Set)},
+	 *         {@link EnvManagerConfigWidget#configurationChanged(URI, IRemoteConnection, List)},
 	 *         whichever was
 	 *         invoked most recently.
 	 * 
@@ -210,16 +210,15 @@ public final class EnvManagerChecklist extends Composite {
 	}
 
 	private void createChecklist() {
-		checklist = new SearchableChecklist(stack);
+		checklist = new SearchableSelectionList(stack);
 		checklist.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		checklist.setEnabledAndVisible(false);
-		checklist.setColumnHeaders(Messages.EnvManagerChecklist_EnableColumnText,
-				Messages.EnvManagerChecklist_ModuleNameColumnText);
+		checklist.setColumnHeaders(Messages.EnvManagerChecklist_Available_Modules, Messages.EnvManagerChecklist_Selected_Modules);
 		checklist.addDefaultButtonSelectonListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				// No need to recompute the list of available modules; store the existing list and use it
-				final Set<String> allModules = new HashSet<String>(checklist.getAllItems());
+				final List<String> allModules = new ArrayList<String>(checklist.getAllItems());
 				checklist.asyncRepopulate(new AsyncRepopulationStrategy() {
 					@Override
 					public String getMessage() {
@@ -227,14 +226,14 @@ public final class EnvManagerChecklist extends Composite {
 					}
 
 					@Override
-					public Set<String> computeItems() {
+					public List<String> computeItems(IProgressMonitor monitor) {
 						return allModules;
 					}
 
 					@Override
-					public Set<String> computeSelectedItems() throws Exception {
+					public List<String> computeSelectedItems(IProgressMonitor monitor) throws Exception {
 						// Recompute the list of modules loaded by default
-						return envManager.determineDefaultElements(new NullProgressMonitor());
+						return envManager.determineDefaultElements(monitor);
 					}
 
 					@Override
@@ -255,13 +254,16 @@ public final class EnvManagerChecklist extends Composite {
 	/**
 	 * Reconfigures this checklist, changing its sync URI, remote connection, and set of selected items.
 	 * 
-	 * @param newURI synchronization URI, or <code>null</code>
-	 * @param remoteConnection {@link IRemoteConnection}, or <code>null</code>
-	 * @param selectedItems items to check, or <code>null</code>
+	 * @param newURI
+	 *            synchronization URI, or <code>null</code>
+	 * @param remoteConnection
+	 *            {@link IRemoteConnection}, or <code>null</code>
+	 * @param selectedItems
+	 *            items to check, or <code>null</code>
 	 * 
-	 * @see EnvManagerConfigWidget#configurationChanged(URI, IRemoteConnection, Set)
+	 * @see EnvManagerConfigWidget#configurationChanged(URI, IRemoteConnection, List)
 	 */
-	public void reset(URI newURI, final IRemoteConnection remoteConnection, final Set<String> selectedItems) {
+	public void reset(URI newURI, final IRemoteConnection remoteConnection, final List<String> selectedItems) {
 		this.remoteConnection = remoteConnection;
 
 		final boolean syncURIHasChanged = newURI == null || !newURI.equals(lastSyncURI);
@@ -283,7 +285,7 @@ public final class EnvManagerChecklist extends Composite {
 		}
 	}
 
-	private void inBackgroundThreadDetectEnvManager(final IRemoteConnection remoteConnection, final Set<String> selectedItems) {
+	private void inBackgroundThreadDetectEnvManager(final IRemoteConnection remoteConnection, final List<String> selectedItems) {
 		setDetectingMessage();
 		final Job job = new Job(Messages.EnvManagerChecklist_DetectingRemoteEMS) {
 			@Override
@@ -313,7 +315,7 @@ public final class EnvManagerChecklist extends Composite {
 		stack.layout(true, true);
 	}
 
-	private void inUIThreadDisplayChecklist(final Set<String> selectedItems, final String description) {
+	private void inUIThreadDisplayChecklist(final List<String> selectedItems, final String description) {
 		final Job job = new Job(Messages.EnvManagerChecklist_UpdatingChecklist) {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
@@ -372,7 +374,7 @@ public final class EnvManagerChecklist extends Composite {
 		stack.layout(true, true);
 	}
 
-	private void populateModuleList(final Set<String> selectedItems) {
+	private void populateModuleList(final List<String> selectedItems) {
 		checklist.asyncRepopulate(new AsyncRepopulationStrategy() {
 			@Override
 			public String getMessage() {
@@ -380,12 +382,12 @@ public final class EnvManagerChecklist extends Composite {
 			}
 
 			@Override
-			public Set<String> computeItems() throws Exception {
-				return envManager.determineAvailableElements(new NullProgressMonitor());
+			public List<String> computeItems(IProgressMonitor monitor) throws Exception {
+				return envManager.determineAvailableElements(monitor);
 			}
 
 			@Override
-			public Set<String> computeSelectedItems() throws Exception {
+			public List<String> computeSelectedItems(IProgressMonitor monitor) throws Exception {
 				if (selectedItems != null) {
 					return selectedItems;
 				} else {
@@ -405,13 +407,13 @@ public final class EnvManagerChecklist extends Composite {
 	// }
 
 	/**
-	 * @return the text of the elements which are checked in the checklist. This set may be empty but is never <code>null</code>.
+	 * @return the text of the elements which are checked in the checklist. This list may be empty but is never <code>null</code>.
 	 *         It is, in theory, a subset of the strings returned by
 	 *         {@link IEnvManager#determineAvailableElements(IProgressMonitor)}.
 	 * 
 	 * @see EnvManagerConfigWidget#getSelectedElements()
 	 */
-	public Set<String> getSelectedElements() {
+	public List<String> getSelectedElements() {
 		return checklist.getSelectedItems();
 	}
 

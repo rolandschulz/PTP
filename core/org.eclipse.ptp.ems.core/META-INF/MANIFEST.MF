@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.ems.core;singleton:=true
 Bundle-Vendor: %providerName
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 2.0.0.qualifier
 Bundle-Localization: plugin
 Bundle-Activator: org.eclipse.ptp.internal.ems.core.EMSCorePlugin
 Require-Bundle: org.eclipse.core.runtime,

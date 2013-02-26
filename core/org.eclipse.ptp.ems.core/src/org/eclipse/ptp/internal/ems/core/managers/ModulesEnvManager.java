@@ -11,6 +11,7 @@
 package org.eclipse.ptp.internal.ems.core.managers;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -31,7 +32,7 @@ import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
  */
 public final class ModulesEnvManager extends AbstractEnvManager {
 
-	/** Command used by {@link #getDescription(IProgressMonitor)}.  Output must match {@value #MODULES_SIGNATURE}. */
+	/** Command used by {@link #getDescription(IProgressMonitor)}. Output must match {@value #MODULES_SIGNATURE}. */
 	private static final String CMD_MODULE_HELP = "module help"; //$NON-NLS-1$
 
 	/** Command used by {@link #determineDefaultElements(IProgressMonitor)} */
@@ -54,7 +55,7 @@ public final class ModulesEnvManager extends AbstractEnvManager {
 
 	/**
 	 * Pattern that must be matched by (at least) one line of the output of {@link #CMD_MODULE_HELP} in order for the environment
-	 * management system to be detected.  The version number will be extracted from capture group
+	 * management system to be detected. The version number will be extracted from capture group
 	 * {@value #MODULES_SIGNATURE_VERSION_CAPTURE_GROUP}.
 	 */
 	private static final Pattern MODULES_SIGNATURE = Pattern.compile("^(  Modules Release|Modules Release) ((Tcl )?[^ \t\r\n]+).*"); //$NON-NLS-1$
@@ -104,19 +105,20 @@ public final class ModulesEnvManager extends AbstractEnvManager {
 	}
 
 	@Override
-	public Set<String> determineAvailableElements(IProgressMonitor pm) throws RemoteConnectionException, IOException {
+	public List<String> determineAvailableElements(IProgressMonitor pm) throws RemoteConnectionException, IOException {
 		final List<String> output = runCommandInBashLoginShell(pm, CMD_MODULE_AVAIL);
 		if (output == null) {
-			return Collections.<String> emptySet();
+			return Collections.<String> emptyList();
 		} else {
-			final Set<String> listedModules = collectModuleNamesFrom(output);
-			final Set<String> unversionedModules = removeVersionNumbersFrom(listedModules);
-			return Collections.unmodifiableSet(union(listedModules, unversionedModules));
+			final List<String> collectedModules = collectModuleNamesFrom(output);
+			final Set<String> listedModules = new TreeSet<String>(collectedModules);
+			final Set<String> unversionedModules = new TreeSet<String>(removeVersionNumbersFrom(collectedModules));
+			return Collections.unmodifiableList(new ArrayList<String>(union(listedModules, unversionedModules)));
 		}
 	}
 
-	private Set<String> removeVersionNumbersFrom(Set<String> listedModules) {
-		final TreeSet<String> result = new TreeSet<String>();
+	private List<String> removeVersionNumbersFrom(List<String> listedModules) {
+		final List<String> result = new ArrayList<String>();
 		for (final String moduleName : listedModules) {
 			final int slashPosition = moduleName.indexOf('/');
 			if (slashPosition < 0) {
@@ -135,7 +137,7 @@ public final class ModulesEnvManager extends AbstractEnvManager {
 		return result;
 	}
 
-	private Set<String> collectModuleNamesFrom(List<String> output) {
+	private List<String> collectModuleNamesFrom(List<String> output) {
 		/*
 		 * Output should resemble the following:
 		 * 
@@ -151,7 +153,7 @@ public final class ModulesEnvManager extends AbstractEnvManager {
 		 * R/2.13.2(default)
 		 * chemistry/Amber-11.1.5
 		 */
-		final Set<String> result = new TreeSet<String>(MODULE_NAME_COMPARATOR);
+		final List<String> result = new ArrayList<String>();
 		for (final String line : output) {
 			if (!shouldIgnore(line)) {
 				String moduleName = line;
@@ -160,11 +162,9 @@ public final class ModulesEnvManager extends AbstractEnvManager {
 				}
 				moduleName = moduleName.trim();
 
-				if (MODULE_NAME_PATTERN.matcher(moduleName).matches()) {
+				// Ignore spurious output (e.g., errors reported when /etc/profile executes) and duplicates
+				if (MODULE_NAME_PATTERN.matcher(moduleName).matches() && !result.contains(moduleName)) {
 					result.add(moduleName);
-				} else {
-					// Ignore spurious output (e.g., errors reported when /etc/profile executes)
-					System.err.printf("Output from module command includes \"%s\", which is not a valid module name\n", moduleName); //$NON-NLS-1$
 				}
 			}
 		}
@@ -172,10 +172,10 @@ public final class ModulesEnvManager extends AbstractEnvManager {
 	}
 
 	private boolean shouldIgnore(final String line) {
-		return line.equals("")          // Ignore blank lines //$NON-NLS-1$
-			|| line.endsWith(":")       // Ignore lines describing module locations //$NON-NLS-1$
-			|| line.startsWith("-----") // Ignore lines describing module locations (Tcl) //$NON-NLS-1$
-			|| line.equals("No Modulefiles Currently Loaded."); //$NON-NLS-1$
+		return line.equals("") // Ignore blank lines //$NON-NLS-1$
+				|| line.endsWith(":") // Ignore lines describing module locations //$NON-NLS-1$
+				|| line.startsWith("-----") // Ignore lines describing module locations (Tcl) //$NON-NLS-1$
+				|| line.equals("No Modulefiles Currently Loaded."); //$NON-NLS-1$
 	}
 
 	private String removeSuffix(String string, String suffix) {
@@ -184,12 +184,12 @@ public final class ModulesEnvManager extends AbstractEnvManager {
 	}
 
 	@Override
-	public Set<String> determineDefaultElements(IProgressMonitor pm) throws RemoteConnectionException, IOException {
+	public List<String> determineDefaultElements(IProgressMonitor pm) throws RemoteConnectionException, IOException {
 		final List<String> output = runCommandInBashLoginShell(pm, CMD_MODULE_LIST);
 		if (output == null) {
-			return Collections.<String> emptySet();
+			return Collections.<String> emptyList();
 		} else {
-			return Collections.unmodifiableSet(collectModuleNamesFrom(output));
+			return Collections.unmodifiableList(collectModuleNamesFrom(output));
 		}
 	}
 

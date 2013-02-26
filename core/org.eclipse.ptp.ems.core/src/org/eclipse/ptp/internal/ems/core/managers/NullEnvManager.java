@@ -12,7 +12,6 @@ package org.eclipse.ptp.internal.ems.core.managers;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.ems.core.IEnvManager;
@@ -32,13 +31,13 @@ public final class NullEnvManager extends AbstractEnvManager {
 	}
 
 	@Override
-	public Set<String> determineAvailableElements(IProgressMonitor pm) {
-		return Collections.<String> emptySet();
+	public List<String> determineAvailableElements(IProgressMonitor pm) {
+		return Collections.<String> emptyList();
 	}
 
 	@Override
-	public Set<String> determineDefaultElements(IProgressMonitor pm) {
-		return Collections.<String> emptySet();
+	public List<String> determineDefaultElements(IProgressMonitor pm) {
+		return Collections.<String> emptyList();
 	}
 
 	@Override

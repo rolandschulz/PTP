@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.ems.core;
 
-import java.util.Set;
+import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -44,11 +44,11 @@ public final class EnvManagerProjectProperties implements IEnvManagerConfig {
 	 */
 	private static final QualifiedName[] PROPERTY_KEYS = new QualifiedName[]
 	{
-		new QualifiedName(EMSCorePlugin.PLUGIN_ID, ".envConfig"), //$NON-NLS-1$
-		new QualifiedName(EMSCorePlugin.PLUGIN_ID, ".envConfig2"), //$NON-NLS-1$
-		new QualifiedName(EMSCorePlugin.PLUGIN_ID, ".envConfig3"), //$NON-NLS-1$
-		new QualifiedName(EMSCorePlugin.PLUGIN_ID, ".envConfig4"), //$NON-NLS-1$
-		new QualifiedName(EMSCorePlugin.PLUGIN_ID, ".envConfig5"), //$NON-NLS-1$
+			new QualifiedName(EMSCorePlugin.PLUGIN_ID, ".envConfig"), //$NON-NLS-1$
+			new QualifiedName(EMSCorePlugin.PLUGIN_ID, ".envConfig2"), //$NON-NLS-1$
+			new QualifiedName(EMSCorePlugin.PLUGIN_ID, ".envConfig3"), //$NON-NLS-1$
+			new QualifiedName(EMSCorePlugin.PLUGIN_ID, ".envConfig4"), //$NON-NLS-1$
+			new QualifiedName(EMSCorePlugin.PLUGIN_ID, ".envConfig5"), //$NON-NLS-1$
 	};
 
 	/** The maximum length of a string storable by {@link IResource#setPersistentProperty(QualifiedName, String)} */
@@ -111,19 +111,20 @@ public final class EnvManagerProjectProperties implements IEnvManagerConfig {
 	/**
 	 * Splits a string into substrings of length <= {@value #MAX_PROJECT_PROPERTY_LENGTH}.
 	 * 
-	 * @throws CoreException if the number of substrings required is greater than {@link #PROPERTY_KEYS}.length
+	 * @throws CoreException
+	 *             if the number of substrings required is greater than {@link #PROPERTY_KEYS}.length
 	 */
 	private String[] splitString(String string) throws CoreException {
 		final String[] result = new String[PROPERTY_KEYS.length];
-		
+
 		final int maxLength = PROPERTY_KEYS.length * MAX_PROJECT_PROPERTY_LENGTH;
 		if (string.length() > maxLength) {
 			throw new CoreException(
-				new Status(IStatus.ERROR,
-					EMSCorePlugin.PLUGIN_ID,
-					"Environment configuration text cannot exceed " + maxLength + " characters")); //$NON-NLS-1$ //$NON-NLS-2$
+					new Status(IStatus.ERROR,
+							EMSCorePlugin.PLUGIN_ID,
+							"Environment configuration text cannot exceed " + maxLength + " characters")); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		
+
 		for (int i = 0; i < result.length; i++) {
 			final int startIndex = i * MAX_PROJECT_PROPERTY_LENGTH;
 			if (startIndex < string.length()) {
@@ -133,7 +134,7 @@ public final class EnvManagerProjectProperties implements IEnvManagerConfig {
 				result[i] = ""; //$NON-NLS-1$
 			}
 		}
-		
+
 		return result;
 	}
 
@@ -230,8 +231,11 @@ public final class EnvManagerProjectProperties implements IEnvManagerConfig {
 	 * 
 	 * @see org.eclipse.ptp.ems.core.IEnvManagerConfig#setConfigElements(java.util.Set)
 	 */
+	/**
+	 * @since 2.0
+	 */
 	@Override
-	public void setConfigElements(Set<String> selectedModules) {
+	public void setConfigElements(List<String> selectedModules) {
 		final EnvManagerConfigString properties = loadProperties();
 		properties.setConfigElements(selectedModules);
 		save(properties);
@@ -242,8 +246,11 @@ public final class EnvManagerProjectProperties implements IEnvManagerConfig {
 	 * 
 	 * @see org.eclipse.ptp.ems.core.IEnvManagerConfig#getConfigElements()
 	 */
+	/**
+	 * @since 2.0
+	 */
 	@Override
-	public Set<String> getConfigElements() {
+	public List<String> getConfigElements() {
 		return loadProperties().getConfigElements();
 	}
 }

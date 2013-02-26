@@ -423,8 +423,8 @@ public final class SearchableChecklist extends Composite {
 			final Set<String> modules;
 			final Set<String> modulesToSelect;
 			try {
-				modules = strategy.computeItems();
-				modulesToSelect = strategy.computeSelectedItems();
+				modules = new TreeSet<String>(strategy.computeItems(monitor));
+				modulesToSelect = new TreeSet<String>(strategy.computeSelectedItems(monitor));
 			} catch (final Exception e) {
 				if (!isDisposed()) {
 					getDisplay().syncExec(new Runnable() {

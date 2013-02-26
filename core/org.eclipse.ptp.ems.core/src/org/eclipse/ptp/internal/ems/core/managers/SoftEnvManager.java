@@ -11,11 +11,10 @@
 package org.eclipse.ptp.internal.ems.core.managers;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -74,28 +73,26 @@ public final class SoftEnvManager extends AbstractEnvManager {
 	}
 
 	@Override
-	public Set<String> determineAvailableElements(IProgressMonitor pm) throws RemoteConnectionException, IOException {
+	public List<String> determineAvailableElements(IProgressMonitor pm) throws RemoteConnectionException, IOException {
 		// NOTE: A clean exit is NOT required because -- for reasons I don't understand -- softenv -x may deliver
 		// complete output, but Remote Tools does not think it has terminated and will hang until timeout
 		final List<String> output = runCommand(pm, false, "bash", "--login", "-c", "softenv -x; exit"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		if (output == null) {
-			return Collections.<String> emptySet();
+			return Collections.<String> emptyList();
 		} else {
-			return Collections.unmodifiableSet(collectModuleNamesFrom(output));
+			return Collections.unmodifiableList(collectModuleNamesFrom(output));
 		}
 	}
 
-	private Set<String> collectModuleNamesFrom(List<String> output) {
-		final Set<String> result = new TreeSet<String>(MODULE_NAME_COMPARATOR);
+	private List<String> collectModuleNamesFrom(List<String> output) {
+		final List<String> result = new ArrayList<String>();
 		for (String line : output) {
 			line = line.trim();
 			if (line.startsWith("<key>") && line.endsWith("</key>")) { //$NON-NLS-1$ //$NON-NLS-2$
 				final String key = line.substring("<key>".length(), line.lastIndexOf("</key>")); //$NON-NLS-1$ //$NON-NLS-2$
-				if (SOFTENV_COMMAND_PATTERN.matcher(key).matches()) {
+				// Ignore spurious output (e.g., errors reported when /etc/profile executes) and duplicates
+				if (SOFTENV_COMMAND_PATTERN.matcher(key).matches() && !result.contains(key)) {
 					result.add(key);
-				} else {
-					// Ignore spurious output (e.g., errors reported when /etc/profile executes)
-					System.err.printf("Output from softenv command includes \"%s\", which is not a valid command\n", key); //$NON-NLS-1$
 				}
 			}
 		}
@@ -103,8 +100,8 @@ public final class SoftEnvManager extends AbstractEnvManager {
 	}
 
 	@Override
-	public Set<String> determineDefaultElements(IProgressMonitor pm) throws RemoteConnectionException, IOException {
-		return Collections.<String> emptySet();
+	public List<String> determineDefaultElements(IProgressMonitor pm) throws RemoteConnectionException, IOException {
+		return Collections.<String> emptyList();
 	}
 
 	@Override

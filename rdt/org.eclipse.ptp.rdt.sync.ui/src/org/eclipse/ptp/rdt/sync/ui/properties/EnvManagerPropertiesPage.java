@@ -11,7 +11,7 @@
 package org.eclipse.ptp.rdt.sync.ui.properties;
 
 import java.net.URI;
-import java.util.Set;
+import java.util.List;
 
 import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
 import org.eclipse.cdt.core.settings.model.ICResourceDescription;
@@ -48,9 +48,12 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 
 		this.ui = new EnvManagerConfigWidget(parent, remoteConnection);
 		this.ui.setErrorListener(new IErrorListener() {
+			@Override
 			public void errorRaised(String message) {
 				setErrorMessage(message);
 			}
+
+			@Override
 			public void errorCleared() {
 				setErrorMessage(null);
 			}
@@ -72,7 +75,7 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 		if (bs == null) {
 			return null;
 		}
-		
+
 		try {
 			return bs.getRemoteConnection();
 		} catch (MissingConnectionException e) {
@@ -125,7 +128,7 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 		}
 	}
 
-	private Set<String> computeSelectedItems() {
+	private List<String> computeSelectedItems() {
 		try {
 			final EnvManagerProjectProperties projectProperties = new EnvManagerProjectProperties(getProject());
 			if (projectProperties.getConnectionName().equals(ui.getConnectionName())) {

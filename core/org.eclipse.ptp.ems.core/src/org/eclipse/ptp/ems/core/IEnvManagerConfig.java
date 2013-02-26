@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.ems.core;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * A configuration of an environment management system.
@@ -81,27 +81,29 @@ public interface IEnvManagerConfig {
 	String getManualConfigText();
 
 	/**
-	 * Sets a configuration setting containing the set of selected environment configuration elements (environment modules/SoftEnv
+	 * Sets a configuration setting containing the list of selected environment configuration elements (environment modules/SoftEnv
 	 * macros/etc.).
 	 * <p>
 	 * Note that <code>null</code> is indistinguishable from the empty string: in both cases, {@link #getConfigElements()} will
-	 * return an empty set.
+	 * return an empty list.
 	 * 
 	 * @param selectedModules
 	 *            (may be <code>null</code>)
+	 * @since 2.0
 	 */
-	void setConfigElements(Set<String> selectedModules);
+	void setConfigElements(List<String> selectedModules);
 
 	/**
-	 * Returns the value of a configuration setting containing the set of selected environment configuration elements
+	 * Returns the value of a configuration setting containing the list of selected environment configuration elements
 	 * (modules/SoftEnv
 	 * macros/etc.).
 	 * <p>
 	 * This may return an empty set but will never return <code>null</code>.
 	 * 
 	 * @return non-<code>null</code>
+	 * @since 2.0
 	 */
-	Set<String> getConfigElements();
+	List<String> getConfigElements();
 
 	/**
 	 * Sets the connection name configuration setting.

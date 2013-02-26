@@ -11,7 +11,7 @@
 package org.eclipse.ptp.ems.ui;
 
 import java.net.URI;
-import java.util.Set;
+import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.resource.JFaceResources;
@@ -46,7 +46,7 @@ import org.eclipse.swt.widgets.Text;
  * <ol>
  * <li>Invoke the constructor, setting the {@link IRemoteConnection} that will provide access to the remote machine.
  * <li>Invoke {@link #setErrorListener(IErrorListener)} in order to display error messages to the user.
- * <li>As needed, invoke {@link #configurationChanged(URI, IRemoteConnection, Set)} or #setCheckbox(boolean)} to change the
+ * <li>As needed, invoke {@link #configurationChanged(URI, IRemoteConnection, List)} or #setCheckbox(boolean)} to change the
  * appearance of the control.
  * <li>Finally, invoke {@link #isUseEMSChecked()}, {@link #isManualConfigChecked()}, {@link #getSelectedElements()}, and
  * {@link #getConnectionName()} to retrieve the contents of the control, or use {@link #saveConfiguration(IEnvManagerConfig)} to
@@ -72,8 +72,11 @@ public final class EnvManagerConfigWidget extends Composite {
 	/**
 	 * Constructor.
 	 * 
-	 * @param parent parent {@link Composite} (non-<code>null</code>)
-	 * @param remoteConnection {@link IRemoteConnection} used to access files and execute shell commands on the remote machine (non-<code>null</code>)
+	 * @param parent
+	 *            parent {@link Composite} (non-<code>null</code>)
+	 * @param remoteConnection
+	 *            {@link IRemoteConnection} used to access files and execute shell commands on the remote machine (non-
+	 *            <code>null</code>)
 	 */
 	public EnvManagerConfigWidget(Composite parent, IRemoteConnection remoteConnection) {
 		super(parent, SWT.NONE);
@@ -225,17 +228,18 @@ public final class EnvManagerConfigWidget extends Composite {
 	/**
 	 * Sets the (unique) {@link IErrorListener} which will be used to display error messages to the user.
 	 * 
-	 * @param listener {@link IErrorListener} used to display error messages to the user, or <code>null</code>
+	 * @param listener
+	 *            {@link IErrorListener} used to display error messages to the user, or <code>null</code>
 	 */
 	public void setErrorListener(IErrorListener listener) {
 		envConfigChecklist.setErrorListener(listener);
 	}
 
 	/**
-	 * Re-populates this control to reflect a change in the project's remote location or a change in the set of selected items.
+	 * Re-populates this control to reflect a change in the project's remote location or a change in the selected items.
 	 * <p>
 	 * If the given URI is <code>null</code>, or if it differs from the URI supplied in the previous call to
-	 * {@link #configurationChanged(URI, IRemoteConnection, Set)}, then the elements in the checklist are re-loaded from the remote
+	 * {@link #configurationChanged(URI, IRemoteConnection, List)}, then the elements in the checklist are re-loaded from the remote
 	 * machine (using {@link IEnvManager#determineAvailableElements(IProgressMonitor)}). Otherwise, the items present in the
 	 * checklist remain the same, but the checked/unchecked state of the items may be changed.
 	 * 
@@ -245,9 +249,10 @@ public final class EnvManagerConfigWidget extends Composite {
 	 *            {@link IRemoteConnection} providing access to the remote machine (non-<code>null</code>)
 	 * @param selectedItems
 	 *            the items which should be selected in the checklist (non-<code>null</code>)
+	 * @since 2.0
 	 */
 	public void configurationChanged(URI uri, IRemoteConnection remoteConnection,
-			Set<String> selectedItems) {
+			List<String> selectedItems) {
 		envConfigChecklist.reset(uri, remoteConnection, selectedItems);
 		setTopControl();
 	}
@@ -288,11 +293,12 @@ public final class EnvManagerConfigWidget extends Composite {
 	}
 
 	/**
-	 * @return the text of the elements which are checked in the checklist. This set may be empty but is never <code>null</code>.
+	 * @return the text of the elements which are checked in the checklist. This list may be empty but is never <code>null</code>.
 	 *         It is, in theory, a subset of the strings returned by
 	 *         {@link IEnvManager#determineAvailableElements(org.eclipse.core.runtime.IProgressMonitor)}.
+	 * @since 2.0
 	 */
-	public Set<String> getSelectedElements() {
+	public List<String> getSelectedElements() {
 		return envConfigChecklist.getSelectedElements();
 	}
 
@@ -332,7 +338,7 @@ public final class EnvManagerConfigWidget extends Composite {
 
 	/**
 	 * @return the name of the remote environment (possibly <code>null</code>). The remote environment is determined by the
-	 *         {@link IRemoteConnection} provided to the constructor or {@link #configurationChanged(URI, IRemoteConnection, Set)},
+	 *         {@link IRemoteConnection} provided to the constructor or {@link #configurationChanged(URI, IRemoteConnection, List)},
 	 *         whichever was
 	 *         invoked most recently.
 	 */

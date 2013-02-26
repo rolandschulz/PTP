@@ -11,6 +11,7 @@
 package org.eclipse.ptp.internal.ems.core.managers;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -31,7 +32,7 @@ import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
  */
 public final class LmodEnvManager extends AbstractEnvManager {
 
-	/** Command used by {@link #getDescription(IProgressMonitor)}.  Output must match {@value #MODULES_SIGNATURE}. */
+	/** Command used by {@link #getDescription(IProgressMonitor)}. Output must match {@value #MODULES_SIGNATURE}. */
 	private static final String CMD_MODULE_HELP = "module help"; //$NON-NLS-1$
 
 	/** Command used by {@link #determineDefaultElements(IProgressMonitor)} */
@@ -54,7 +55,7 @@ public final class LmodEnvManager extends AbstractEnvManager {
 
 	/**
 	 * Pattern that must be matched by (at least) one line of the output of {@link #CMD_MODULE_HELP} in order for the environment
-	 * management system to be detected.  The version number will be extracted from capture group
+	 * management system to be detected. The version number will be extracted from capture group
 	 * {@value #MODULES_SIGNATURE_VERSION_CAPTURE_GROUP}.
 	 */
 	private static final Pattern MODULES_SIGNATURE = Pattern.compile("^Modules based on Lua: Version ([^ \t\r\n]+).*"); //$NON-NLS-1$
@@ -76,6 +77,7 @@ public final class LmodEnvManager extends AbstractEnvManager {
 	 * Pattern to match numeric prefixes in module output.
 	 * <p>
 	 * This is used to match "1)", "2)", etc. when the following output lines are split on a " +" regex.
+	 * 
 	 * <pre>
 	 * Currently Loaded Modules:
 	 *   1) TACC-paths     4) intel/11.1    7) tar/1.22
@@ -117,19 +119,20 @@ public final class LmodEnvManager extends AbstractEnvManager {
 	}
 
 	@Override
-	public Set<String> determineAvailableElements(IProgressMonitor pm) throws RemoteConnectionException, IOException {
+	public List<String> determineAvailableElements(IProgressMonitor pm) throws RemoteConnectionException, IOException {
 		final List<String> output = runCommandInBashLoginShell(pm, CMD_MODULE_AVAIL);
 		if (output == null) {
-			return Collections.<String> emptySet();
+			return Collections.<String> emptyList();
 		} else {
-			final Set<String> listedModules = collectModuleNamesFrom(output);
-			final Set<String> unversionedModules = removeVersionNumbersFrom(listedModules);
-			return Collections.unmodifiableSet(union(listedModules, unversionedModules));
+			final List<String> collectedModules = collectModuleNamesFrom(output);
+			final Set<String> listedModules = new TreeSet<String>(collectedModules);
+			final Set<String> unversionedModules = new TreeSet<String>(removeVersionNumbersFrom(collectedModules));
+			return Collections.unmodifiableList(new ArrayList<String>(union(listedModules, unversionedModules)));
 		}
 	}
 
-	private Set<String> removeVersionNumbersFrom(Set<String> listedModules) {
-		final TreeSet<String> result = new TreeSet<String>();
+	private List<String> removeVersionNumbersFrom(List<String> listedModules) {
+		final List<String> result = new ArrayList<String>();
 		for (final String moduleName : listedModules) {
 			final int slashPosition = moduleName.indexOf('/');
 			if (slashPosition < 0) {
@@ -148,35 +151,34 @@ public final class LmodEnvManager extends AbstractEnvManager {
 		return result;
 	}
 
-	private Set<String> collectModuleNamesFrom(List<String> output) {
+	private List<String> collectModuleNamesFrom(List<String> output) {
 		/*
 		 * Output should resemble the following:
 		 * 
 		 * ---------------------- /share1/apps/teragrid/modulefiles -----------------------
-		 *   CTSSV4                        globus/5.0.4 (default)  
-		 *   GLOBUS-4.0                    gsissh/4.1  
-		 *   GLOBUS-5.0                    gsissh/4.3 (default)  
-		 *   TERAGRID-BASIC                gx-map/0.5.3.3 (default)
+		 * CTSSV4 globus/5.0.4 (default)
+		 * GLOBUS-4.0 gsissh/4.1
+		 * GLOBUS-5.0 gsissh/4.3 (default)
+		 * TERAGRID-BASIC gx-map/0.5.3.3 (default)
 		 * 
 		 * or the following:
 		 * 
 		 * Currently Loaded Modules:
-		 *   1) TACC-paths     4) intel/11.1    7) tar/1.22
-		 *   2) Linux          5) mvapich2/1.6  8) cluster
-		 *   3) cluster-paths  6) gzip/1.3.12   9) TACC
+		 * 1) TACC-paths 4) intel/11.1 7) tar/1.22
+		 * 2) Linux 5) mvapich2/1.6 8) cluster
+		 * 3) cluster-paths 6) gzip/1.3.12 9) TACC
 		 */
-		final Set<String> result = new TreeSet<String>(MODULE_NAME_COMPARATOR);
+		final List<String> result = new ArrayList<String>();
 		for (final String line : output) {
 			if (!shouldIgnore(line)) {
 				for (String moduleName : line.trim().split(" +")) { //$NON-NLS-1$
-					if (moduleName.equals("") || moduleName.equals("(default)") || NUMERIC_PREFIX.matcher(moduleName).matches()) //$NON-NLS-1$ //$NON-NLS-2$
+					if (moduleName.equals("") || moduleName.equals("(default)") || NUMERIC_PREFIX.matcher(moduleName).matches()) { //$NON-NLS-1$//$NON-NLS-2$
 						continue;
+					}
 
-					if (MODULE_NAME_PATTERN.matcher(moduleName).matches()) {
+					// Ignore spurious output (e.g., errors reported when /etc/profile executes) and duplicates
+					if (MODULE_NAME_PATTERN.matcher(moduleName).matches() && !result.contains(moduleName)) {
 						result.add(moduleName);
-					} else {
-						// Ignore spurious output (e.g., errors reported when /etc/profile executes)
-						System.err.printf("Output from module command includes \"%s\", which is not a valid module name\n", moduleName); //$NON-NLS-1$
 					}
 				}
 			}
@@ -190,12 +192,12 @@ public final class LmodEnvManager extends AbstractEnvManager {
 	}
 
 	@Override
-	public Set<String> determineDefaultElements(IProgressMonitor pm) throws RemoteConnectionException, IOException {
+	public List<String> determineDefaultElements(IProgressMonitor pm) throws RemoteConnectionException, IOException {
 		final List<String> output = runCommandInBashLoginShell(pm, CMD_MODULE_LIST);
 		if (output == null) {
-			return Collections.<String> emptySet();
+			return Collections.<String> emptyList();
 		} else {
-			return Collections.unmodifiableSet(collectModuleNamesFrom(output));
+			return Collections.unmodifiableList(collectModuleNamesFrom(output));
 		}
 	}
 

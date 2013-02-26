@@ -10,7 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.ems.ui;
 
-import java.util.Set;
+import java.util.List;
+
+import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
  * Strategy object used for asynchronous population of a {@link SearchableChecklist}.
@@ -25,16 +27,23 @@ public interface AsyncRepopulationStrategy {
 	String getMessage();
 
 	/**
-	 * @return the items to be displayed in the checklist (non-<code>null</code>) 
-	 * @throws Exception if an error occurs
+	 * @param monitor
+	 *            progress monitor
+	 * @return the items to be displayed in the checklist (non-<code>null</code>)
+	 * @throws Exception
+	 *             if an error occurs
 	 */
-	Set<String> computeItems() throws Exception;
+	List<String> computeItems(IProgressMonitor monitor) throws Exception;
 
 	/**
-	 * @return the subset of items in the checklist which should be checked (non-<code>null</code>)
-	 * @throws Exception if an error occurs
+	 * @param monitor
+	 *            progress monitor
+	 * @return the list of items in the checklist which should be checked (non-<code>null</code>). Note that the ordering of items
+	 *         in the list is important.
+	 * @throws Exception
+	 *             if an error occurs
 	 */
-	Set<String> computeSelectedItems() throws Exception;
+	List<String> computeSelectedItems(IProgressMonitor monitor) throws Exception;
 
 	/** Code to be executed in the UI thread after the list is repopulated */
 	void afterRepopulation();

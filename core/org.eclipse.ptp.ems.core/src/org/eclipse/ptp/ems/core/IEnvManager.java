@@ -12,7 +12,7 @@ package org.eclipse.ptp.ems.core;
 
 import java.io.IOException;
 import java.util.Comparator;
-import java.util.Set;
+import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -123,18 +123,19 @@ public interface IEnvManager {
 	 *             if an remote connection error occurs
 	 * @throws IOException
 	 *             if an input/output error occurs
+	 * @since 2.0
 	 */
-	public Set<String> determineAvailableElements(IProgressMonitor pm) throws RemoteConnectionException, IOException;
+	public List<String> determineAvailableElements(IProgressMonitor pm) throws RemoteConnectionException, IOException;
 
 	/**
 	 * Returns the set of all environment configuration elements loaded by default upon login (e.g., the result of
-	 * <tt>module -t list</tt> in a login shell).
+	 * <tt>module -t list</tt> in a login shell). Note that the ordering of modules is important and must be retained.
 	 * 
 	 * @param pm
 	 *            progress monitor used to report the status of potentially long-running operations to the user (non-
 	 *            <code>null</code>)
 	 * 
-	 * @return unmodifiable Set (non-<code>null</code>)
+	 * @return unmodifiable List (non-<code>null</code>)
 	 * 
 	 * @throws NullPointerException
 	 *             if {@link #configure(IRemoteConnection)} has not been called
@@ -142,8 +143,9 @@ public interface IEnvManager {
 	 *             if an remote connection error occurs
 	 * @throws IOException
 	 *             if an input/output error occurs
+	 * @since 2.0
 	 */
-	public Set<String> determineDefaultElements(IProgressMonitor pm) throws RemoteConnectionException, IOException;
+	public List<String> determineDefaultElements(IProgressMonitor pm) throws RemoteConnectionException, IOException;
 
 	/**
 	 * Returns a single Bash shell command which will configure the remote environment with the given elements and then execute the

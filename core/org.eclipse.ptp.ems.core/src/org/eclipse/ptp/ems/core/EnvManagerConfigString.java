@@ -10,12 +10,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.ems.core;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 /**
  * Provides methods to persist an environment management configuration to a string.
@@ -66,7 +66,8 @@ public final class EnvManagerConfigString implements IEnvManagerConfig {
 	/**
 	 * Returns true iff <code>string</code> is a valid environment management configuration string
 	 * 
-	 * @param string string to test
+	 * @param string
+	 *            string to test
 	 * 
 	 * @return true iff <code>string</code> is a valid environment management configuration string
 	 */
@@ -84,13 +85,14 @@ public final class EnvManagerConfigString implements IEnvManagerConfig {
 		settings.put(ENABLE_MANUAL_CONFIG_PROPERTY_KEY, Boolean.FALSE.toString());
 		settings.put(ENVCONFIG_MANUAL_CONFIG_TEXT_PROPERTY_KEY, ""); //$NON-NLS-1$
 		settings.put(ENVCONFIG_CONNECTION_NAME_PROPERTY_KEY, null);
-		settings.put(ENVCONFIG_PROPERTY_KEY, toString(Collections.<String> emptySet()));
+		settings.put(ENVCONFIG_PROPERTY_KEY, toString(Collections.<String> emptyList()));
 	}
 
 	/**
 	 * Creates an {@link EnvManagerConfigString} from a given configuration string.
 	 * 
-	 * @param configuration an environment configuration string, as returned by {@link #toString()}
+	 * @param configuration
+	 *            an environment configuration string, as returned by {@link #toString()}
 	 */
 	public EnvManagerConfigString(String configuration) {
 		if (configuration != null) {
@@ -226,19 +228,22 @@ public final class EnvManagerConfigString implements IEnvManagerConfig {
 	 * 
 	 * @see org.eclipse.ptp.ems.core.IEnvManagerConfig#setConfigElements(java.util.Set)
 	 */
+	/**
+	 * @since 2.0
+	 */
 	@Override
-	public void setConfigElements(Set<String> selectedModules) {
+	public void setConfigElements(List<String> selectedModules) {
 		settings.put(ENVCONFIG_PROPERTY_KEY, toString(selectedModules));
 	}
 
-	private static String toString(final Set<String> set) {
-		if (set == null) {
+	private static String toString(final List<String> list) {
+		if (list == null) {
 			return ""; //$NON-NLS-1$
 		}
 
 		final StringBuilder sb = new StringBuilder();
 
-		final Iterator<String> it = set.iterator();
+		final Iterator<String> it = list.iterator();
 		if (it.hasNext()) {
 			sb.append(it.next());
 		}
@@ -255,29 +260,20 @@ public final class EnvManagerConfigString implements IEnvManagerConfig {
 	 * 
 	 * @see org.eclipse.ptp.ems.core.IEnvManagerConfig#getConfigElements()
 	 */
+	/**
+	 * @since 2.0
+	 */
 	@Override
-	public Set<String> getConfigElements() {
+	public List<String> getConfigElements() {
 		final String modulesProperty = settings.get(ENVCONFIG_PROPERTY_KEY);
-		return toSet(modulesProperty);
+		return toList(modulesProperty);
 	}
 
-	private static Set<String> toSet(final String modulesProperty) {
+	private static List<String> toList(final String modulesProperty) {
 		if (modulesProperty == null || modulesProperty.trim().equals("")) { //$NON-NLS-1$
-			return Collections.<String> emptySet();
+			return Collections.<String> emptyList();
 		} else {
-			return toSet(modulesProperty.split(SEPARATOR));
-		}
-	}
-
-	private static Set<String> toSet(String[] array) {
-		if (array == null) {
-			return Collections.<String> emptySet();
-		} else {
-			final Set<String> result = new TreeSet<String>();
-			for (final String module : array) {
-				result.add(module);
-			}
-			return Collections.unmodifiableSet(result);
+			return Collections.unmodifiableList(Arrays.asList(modulesProperty.split(SEPARATOR)));
 		}
 	}
 }
