@@ -26,6 +26,11 @@ import org.eclipse.swt.graphics.Image;
 public interface IColumnViewerLabelSupport extends ITableColorProvider, ITableFontProvider {
 
 	/**
+	 * @return true if cell can be edited
+	 */
+	public boolean canEdit();
+
+	/**
 	 * @param columnName
 	 * @return image
 	 */

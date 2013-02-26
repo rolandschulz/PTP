@@ -17,9 +17,11 @@ import org.eclipse.ptp.internal.rm.jaxb.control.ui.JAXBControlUIConstants;
 import org.eclipse.ptp.internal.rm.jaxb.control.ui.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.control.ui.IColumnViewerLabelSupport;
 import org.eclipse.ptp.rm.jaxb.core.data.ColumnDataType;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * Cell label provider for the viewers allows for tooltip text display.
@@ -29,6 +31,7 @@ import org.eclipse.swt.graphics.Image;
  */
 public class ViewerDataCellLabelProvider extends CellLabelProvider {
 	private final List<ColumnDataType> columnData;
+	private Color foregroundColor;
 
 	/**
 	 * @param columnData
@@ -38,79 +41,19 @@ public class ViewerDataCellLabelProvider extends CellLabelProvider {
 		this.columnData = columnData;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Delegates to the {@link IColumnViewerLabelSupport#canEdit(Object)} method.
 	 * 
-	 * @see
-	 * org.eclipse.jface.viewers.CellLabelProvider#getToolTipDisplayDelayTime
-	 * (java.lang.Object)
+	 * @param element
+	 *            model object
+	 * @return true if cell can be edited
 	 */
-	@Override
-	public int getToolTipDisplayDelayTime(Object object) {
-		return 500;
-	}
-
-	/*
-	 * Gets the tooltip related to underlying model type. (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.internal.rm.jaxb.ui.model.ValueTreeNodeUpdateModel
-	 * 
-	 * @see org.eclipse.ptp.internal.rm.jaxb.ui.model.InfoTreeNodeModel
-	 * 
-	 * @see
-	 * org.eclipse.jface.viewers.CellLabelProvider#getToolTipText(java.lang.
-	 * Object)
-	 */
-	@Override
-	public String getToolTipText(Object element) {
+	private boolean canEdit(Object element) {
 		if (element instanceof IColumnViewerLabelSupport) {
 			IColumnViewerLabelSupport support = (IColumnViewerLabelSupport) element;
-			return support.getTooltip();
+			return support.canEdit();
 		}
-		return super.getToolTipText(element);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.viewers.CellLabelProvider#getToolTipTimeDisplayed(java
-	 * .lang.Object)
-	 */
-	@Override
-	public int getToolTipTimeDisplayed(Object object) {
-		return 3000;
-	}
-
-	/*
-	 * Provides cell text, colors and font based on its column index.
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.viewers.CellLabelProvider#update(org.eclipse.jface.
-	 * viewers.ViewerCell)
-	 */
-	@Override
-	public void update(ViewerCell cell) {
-		int index = cell.getColumnIndex();
-		Object element = cell.getElement();
-		Color color = getBackground(element, index);
-		if (color != null) {
-			cell.setBackground(color);
-		}
-		color = getForeground(element, index);
-		if (color != null) {
-			cell.setForeground(color);
-		}
-		Font font = getFont(element, index);
-		if (font != null) {
-			cell.setFont(font);
-		}
-		Image img = getColumnImage(element, index);
-		if (img != null) {
-			cell.setImage(img);
-		}
-		cell.setText(getColumnText(element, index));
+		return false;
 	}
 
 	/**
@@ -207,5 +150,94 @@ public class ViewerDataCellLabelProvider extends CellLabelProvider {
 			color = support.getForeground(element, columnIndex);
 		}
 		return color;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.viewers.CellLabelProvider#getToolTipDisplayDelayTime
+	 * (java.lang.Object)
+	 */
+	@Override
+	public int getToolTipDisplayDelayTime(Object object) {
+		return 500;
+	}
+
+	/*
+	 * Gets the tooltip related to underlying model type. (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.internal.rm.jaxb.ui.model.ValueTreeNodeUpdateModel
+	 * 
+	 * @see org.eclipse.ptp.internal.rm.jaxb.ui.model.InfoTreeNodeModel
+	 * 
+	 * @see
+	 * org.eclipse.jface.viewers.CellLabelProvider#getToolTipText(java.lang.
+	 * Object)
+	 */
+	@Override
+	public String getToolTipText(Object element) {
+		if (element instanceof IColumnViewerLabelSupport) {
+			IColumnViewerLabelSupport support = (IColumnViewerLabelSupport) element;
+			return support.getTooltip();
+		}
+		return super.getToolTipText(element);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.viewers.CellLabelProvider#getToolTipTimeDisplayed(java
+	 * .lang.Object)
+	 */
+	@Override
+	public int getToolTipTimeDisplayed(Object object) {
+		return 3000;
+	}
+
+	/*
+	 * Provides cell text, colors and font based on its column index.
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.viewers.CellLabelProvider#update(org.eclipse.jface.
+	 * viewers.ViewerCell)
+	 */
+	@Override
+	public void update(ViewerCell cell) {
+		int index = cell.getColumnIndex();
+		Object element = cell.getElement();
+		Color color = getBackground(element, index);
+		if (color != null) {
+			cell.setBackground(color);
+		}
+		color = getForeground(element, index);
+		if (color != null) {
+			cell.setForeground(color);
+		} else {
+			/*
+			 * If foreground color is not specified, then we use the edit status of the
+			 * cell to determine the color. We save the default foreground color to use
+			 * when the cell is editable.
+			 */
+			if (foregroundColor == null) {
+				foregroundColor = cell.getForeground();
+			}
+			if (!canEdit(element)) {
+				cell.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_DARK_GRAY));
+			} else {
+				cell.setForeground(foregroundColor);
+			}
+		}
+		Font font = getFont(element, index);
+		if (font != null) {
+			cell.setFont(font);
+		}
+		Image img = getColumnImage(element, index);
+		if (img != null) {
+			cell.setImage(img);
+		}
+		cell.setText(getColumnText(element, index));
 	}
 }

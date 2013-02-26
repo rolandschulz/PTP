@@ -48,6 +48,15 @@ public class InfoTreeNodeModel implements IColumnViewerLabelSupport {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.IColumnViewerLabelSupport#canEdit()
+	 */
+	public boolean canEdit() {
+		return parent.canEdit();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.jface.viewers.ITableColorProvider#getBackground(java.lang .Object, int)
 	 */
 	public Color getBackground(Object element, int columnIndex) {
