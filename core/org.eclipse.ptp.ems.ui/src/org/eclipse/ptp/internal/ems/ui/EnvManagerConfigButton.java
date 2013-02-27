@@ -23,6 +23,7 @@ import org.eclipse.ptp.ems.ui.EnvManagerConfigWidget;
 import org.eclipse.ptp.ems.ui.IErrorListener;
 import org.eclipse.ptp.internal.ems.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.rm.jaxb.control.ui.AbstractWidget;
 import org.eclipse.ptp.rm.jaxb.control.ui.IWidgetDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
@@ -57,7 +58,7 @@ import org.eclipse.swt.widgets.Shell;
  * 
  * @since 6.0
  */
-public final class EnvManagerConfigButton extends Composite {
+public final class EnvManagerConfigButton extends AbstractWidget {
 
 	private static IDialogSettings dialogSettings = new DialogSettings("EnvConfigurationDialog"); //$NON-NLS-1$
 
@@ -79,7 +80,7 @@ public final class EnvManagerConfigButton extends Composite {
 	 */
 	public EnvManagerConfigButton(Composite parent, IWidgetDescriptor wd) {
 
-		super(parent, SWT.NONE);
+		super(parent, wd);
 
 		String label = wd.getTitle();
 

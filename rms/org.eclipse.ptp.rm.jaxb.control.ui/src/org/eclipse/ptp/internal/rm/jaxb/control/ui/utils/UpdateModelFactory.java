@@ -644,7 +644,8 @@ public class UpdateModelFactory {
 		if (attr != null) {
 			AttributeType a = rmVarMap.get(attr);
 			if (a == null) {
-				throw CoreExceptionUtils.newException(NLS.bind(Messages.UpdateModelFactory_Undefined_attribute_in_BrowseType, attr), null);
+				throw CoreExceptionUtils.newException(
+						NLS.bind(Messages.UpdateModelFactory_Undefined_attribute_in_BrowseType, attr), null);
 			}
 			model = new TextUpdateModel(attr, handler, (Text) control);
 			maybeAddValidator(model, a, tab.getParent());
@@ -694,7 +695,8 @@ public class UpdateModelFactory {
 		if (attr != null) {
 			attrType = rmVarMap.get(attr);
 			if (attrType == null) {
-				throw CoreExceptionUtils.newException(NLS.bind(Messages.UpdateModelFactory_Undefined_attribute_in_WidgetType, attr), null);
+				throw CoreExceptionUtils.newException(
+						NLS.bind(Messages.UpdateModelFactory_Undefined_attribute_in_WidgetType, attr), null);
 			}
 		}
 
@@ -973,7 +975,9 @@ public class UpdateModelFactory {
 		} else if (JAXBControlUIConstants.CUSTOM.equals(cd.getType())) {
 			try {
 				c = createWidget(cd, parent);
-				if (c != null) c.setLayoutData(cd.layoutData);
+				if (c != null) {
+					c.setLayoutData(cd.layoutData);
+				}
 			} catch (CoreException e) {
 				// Widget will be missing from UI
 			}

@@ -57,17 +57,17 @@
          <attribute name="widgetClass" type="string" use="required">
             <annotation>
                <documentation>
-                  A fully qualified class name for this widget. The class requires a constructor with two arguments org.eclipse.swt.widgets.Composite and org.eclipse.ptp.rm.jaxb.control.ui.IWidgetDescriptor. See the API documentation for more information.
+                  A fully qualified class name for this widget.
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn="org.eclipse.swt.widgets.Control:"/>
+                  <meta.attribute kind="java" basedOn="org.eclipse.ptp.rm.jaxb.control.ui.AbstractWidget:"/>
                </appinfo>
             </annotation>
          </attribute>
          <attribute name="updateModelClass" type="string" use="required">
             <annotation>
                <documentation>
-                  A fully qualified class name for this widget&apos;s update model. The class requires a constructor with three arguments java.lang.String,  org.eclipse.ptp.rm.jaxb.control.ui.IUpdateHandler, and org.eclipse.swt.widgets.Composite. See the API documentation for more information.
+                  A fully qualified class name for this widget&apos;s update model.
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn="org.eclipse.ptp.rm.jaxb.control.ui.AbstractUpdateModel:"/>
@@ -133,12 +133,12 @@ public MyWidgetControl extends Control {
 The updateModelClass attribute must specify a class that extends &lt;code&gt;org.eclipse.ptp.rm.jaxb.control.ui.AbstractUpdateModel&lt;/code&gt;. The constructor for the new class must have three arguments &lt;code&gt;java.lang.String&lt;/code&gt;, &lt;code&gt;org.eclipse.ptp.rm.jaxb.control.ui.IUpdatedHandler&lt;/code&gt;, and &lt;code&gt;org.eclipse.swt.widgets.Control&lt;/code&gt;:
 &lt;pre&gt;
 public MyUpdateModel extends AbstractUpdateModel {
-	
+ 
     public MyUpdateModel(String name, IUpdateHandler handler, Control control) {
         super(name, handler);
         ...
     }
-	
+ 
     ...
 }
 &lt;/pre&gt;
