@@ -43,7 +43,6 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -74,27 +73,28 @@ public class RemoteResourceBrowser extends Dialog {
 	private final static int heightHint = 300;
 
 	private Tree tree = null;
-	private TreeViewer treeViewer = null;
-	private Text remotePathText = null;
-	private Button okButton = null;
-	private Combo connectionCombo = null;
-	private Button newButton = null;
-	private Button upButton = null;
+	private TreeViewer treeViewer;
+	private Text remotePathText;
+	private Button okButton;
+	private Combo connectionCombo;
+	private Button newButton;
+	private Button upButton;
 
 	private int browserType;
 	private String dialogTitle;
 	private String dialogLabel;
 
 	private boolean showConnections = false;
+	private boolean showHidden = false;
 	private String remotePath = EMPTY_STRING;
 	private String remotePaths[];
-	private String fInitialPath = null;
-	private IPath fRootPath = null;
-	private IRemoteServices fServices = null;
-	private IRemoteFileManager fFileMgr = null;
-	private IRemoteConnection fConnection = null;
-	private IRemoteConnectionManager fConnMgr = null;
-	private IRemoteUIConnectionManager fUIConnMgr = null;
+	private String fInitialPath;
+	private IPath fRootPath;
+	private final IRemoteServices fServices;
+	private IRemoteFileManager fFileMgr;
+	private IRemoteConnection fConnection;
+	private final IRemoteConnectionManager fConnMgr;
+	private final IRemoteUIConnectionManager fUIConnMgr;
 	private int optionFlags = SINGLE;
 
 	public RemoteResourceBrowser(IRemoteServices services, IRemoteConnection conn, Shell parent, int flags) {
@@ -286,10 +286,8 @@ public class RemoteResourceBrowser extends Dialog {
 		connectionCombo = new Combo(connComp, SWT.READ_ONLY);
 		gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		connectionCombo.setLayoutData(gd);
-		connectionCombo.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent event) {
-			}
-
+		connectionCombo.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent event) {
 				if (event.getSource() == connectionCombo) {
 					connectionSelected();
@@ -346,7 +344,7 @@ public class RemoteResourceBrowser extends Dialog {
 	private void setRoot(String path) {
 		if (fFileMgr != null) {
 			IFileStore root = fFileMgr.getResource(path);
-			treeViewer.setInput(new DeferredFileStore(root));
+			treeViewer.setInput(new DeferredFileStore(root, !showHidden));
 			remotePathText.setText(path);
 			remotePathText.setSelection(remotePathText.getText().length());
 			fRootPath = new Path(path);
@@ -482,10 +480,7 @@ public class RemoteResourceBrowser extends Dialog {
 		});
 		remotePathText.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e) {
-				getShell().setDefaultButton(null); // allow text widget to
-													// receive
-													// SWT.DefaultSelection
-													// event
+				getShell().setDefaultButton(null); // allow text widget to receive SWT.DefaultSelection event
 			}
 
 			public void focusLost(FocusEvent e) {
@@ -572,6 +567,16 @@ public class RemoteResourceBrowser extends Dialog {
 				}
 			});
 		}
+
+		final Button showHiddenButton = new Button(main, SWT.CHECK);
+		showHiddenButton.setText(Messages.RemoteResourceBrowser_Show_hidden_files);
+		showHiddenButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				showHidden = showHiddenButton.getSelection();
+				setRoot(fRootPath.toString());
+			}
+		});
 
 		updateDialog();
 
