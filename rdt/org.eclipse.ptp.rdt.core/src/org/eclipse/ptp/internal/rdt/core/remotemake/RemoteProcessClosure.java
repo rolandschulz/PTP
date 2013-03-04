@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.text.MessageFormat;
 
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 
@@ -41,13 +42,17 @@ public class RemoteProcessClosure {
 		private OutputStream fOutputStream;
 		private boolean fFinished = false;
 		private String lineSeparator;
+		private boolean fIsErrorReader;
+		private IRemoteProcess theProcess;
 		/*
 		 * outputStream can be null
 		 */
-		public ReaderThread(ThreadGroup group, String name, InputStream in, OutputStream out) {
+		public ReaderThread(ThreadGroup group, String name, InputStream in, OutputStream out, boolean isErrorReader, IRemoteProcess fProcess) {
 			super(group, name);
 			fOutputStream = out;
 			fInputStream = in;
+			fIsErrorReader = isErrorReader;
+			theProcess = fProcess;
 			setDaemon(true);
 			
 			// TODO FIXME:  line separator should be taken from the remote system... but how?
@@ -56,11 +61,13 @@ public class RemoteProcessClosure {
 
 		@Override
 		public void run() {
+			String lastLine=null;
 			try {
 				try {
 					BufferedReader reader = new BufferedReader(new InputStreamReader(fInputStream));
 					String line;
 					while ((line = reader.readLine()) != null) {
+						lastLine = line;
 						line += lineSeparator;
 						
 						if(fOutputStream != null)
@@ -70,7 +77,21 @@ public class RemoteProcessClosure {
 					// ignore
 				} finally {
 					try {
-						//					writer.flush();
+						
+						if(!fIsErrorReader && !lastLine.contains(Messages.RemoteProcessClosure_0)) {
+							// make sure the Spawner has finished up and that the exit code is retrievable
+							int exit_code = 0;
+							try {
+								exit_code = theProcess.waitFor();
+							} catch (InterruptedException e) {
+								// ignore
+							}
+							
+							// output a message saying we're done... remote processes do this for us but local ones don't
+							String message = MessageFormat.format(Messages.RemoteProcessClosure_1, exit_code);
+							fOutputStream.write(message.getBytes());
+						}
+						
 						if(fOutputStream != null)
 							fOutputStream.flush();
 					} catch (IOException e) {
@@ -146,8 +167,8 @@ public class RemoteProcessClosure {
 		InputStream stdin = fProcess.getInputStream();
 		InputStream stderr = fProcess.getErrorStream();
 
-		fOutputReader = new ReaderThread(group, "OutputReader", stdin, fOutput); //$NON-NLS-1$
-		fErrorReader = new ReaderThread(group, "ErrorReader", stderr, fError); //$NON-NLS-1$
+		fOutputReader = new ReaderThread(group, "OutputReader", stdin, fOutput, false, fProcess); //$NON-NLS-1$
+		fErrorReader = new ReaderThread(group, "ErrorReader", stderr, fError, true, fProcess); //$NON-NLS-1$
 
 		fOutputReader.start();
 		fErrorReader.start();
@@ -157,7 +178,7 @@ public class RemoteProcessClosure {
 		runNonBlocking();
 
 		boolean finished = false;
-		while (!finished && !fProcess.isCompleted()) {
+		while (!finished) {
 			try {
 				fProcess.waitFor();
 			} catch (InterruptedException e) {
@@ -192,7 +213,7 @@ public class RemoteProcessClosure {
 
 	public boolean isAlive() {
 		if (fProcess != null) {
-			if (!fProcess.isCompleted() || (fOutputReader.isAlive() || fErrorReader.isAlive())) {
+			if (fOutputReader.isAlive() || fErrorReader.isAlive()) {
 				return true;
 			}
 			fProcess = null;
@@ -205,8 +226,7 @@ public class RemoteProcessClosure {
 	}
 
 	/**
-	 * The same functionality as "isAlive()"
-	 * but does not affect out streams,
+	 * The same functionality as "isAlive()" but does not affect out streams,
 	 * because they can be shared among processes
 	 */
 	public boolean isRunning() {
@@ -218,6 +238,7 @@ public class RemoteProcessClosure {
 		}
 		return false;
 	}
+
 	/**
 	 * Forces the termination the launched process
 	 */
@@ -238,4 +259,3 @@ public class RemoteProcessClosure {
 		fErrorReader = null;
 	}
 }
-

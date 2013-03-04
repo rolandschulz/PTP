@@ -52,9 +52,10 @@ public class LocalSpawnerSubsystem extends SpawnerSubsystem {
 		File dir = new File(workingDirectory);
 		
 		// use the CDT spawner to run the command, and wrap it in an IHostShell
-		PTY pty = new PTY(false);  // not a console... stderr will be redirected to stdout
-		Process process = ProcessFactory.getFactory().exec(cmdArray, envp, dir,
-				pty);
+		// NOTE: PTYs behave weirdly in the local case (can look like they are at EOF when they are not)
+		// and also it seems spawned processes are line buffered in the local case already, so we
+		// don't use a PTY here
+		Process process = ProcessFactory.getFactory().exec(cmdArray, envp, dir);
 		return new LocalHostShellWrapper(process);
 		
 	}
@@ -69,9 +70,10 @@ public class LocalSpawnerSubsystem extends SpawnerSubsystem {
 		File dir = new File(workingDirectory);
 		
 		// use the CDT spawner to run the command, and wrap it in an IHostShell
-		PTY pty = new PTY();
-		Process process = ProcessFactory.getFactory().exec(cmdArray, envp, dir,
-				pty);
+		// NOTE: PTYs behave weirdly in the local case (can look like they are at EOF when they are not)
+		// and also it seems spawned processes are line buffered in the local case already, so we
+		// don't use a PTY here
+		Process process = ProcessFactory.getFactory().exec(cmdArray, envp, dir);
 		return process;
 	}
 
