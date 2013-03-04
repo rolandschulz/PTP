@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2011 IBM Corporation and others.
+ * Copyright (c) 2008, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -413,14 +413,14 @@ public class RemoteMakeBuilder extends MakeBuilder {
 						// In theory, stderr is combined so no need to read stderr... we should set it to null.
 						// HOWEVER:  the RSE provider doesn't merge the streams... so if we want the stderr output, then
 						// we have to (for now), supply both streams.  Not sure if this will cause stderr doubling on the Remote Tools provider.
-						RemoteProcessClosure remoteProcessClosure = new RemoteProcessClosure(p, consoleOut, consoleErr);
+						RemoteProcessClosure remoteProcessClosure = new RemoteProcessClosure(p, consoleOut, null);
 						remoteProcessClosure.runNonBlocking();
 
 	
 						// wait for the process to finish
-						while (!p.isCompleted()) {
+						while (remoteProcessClosure.isRunning()) {
 							try {
-								p.waitFor();
+								Thread.sleep(100);
 							} catch (InterruptedException e) {
 								// just keep waiting until the process is done
 							}
@@ -458,19 +458,22 @@ public class RemoteMakeBuilder extends MakeBuilder {
 					cos.flush();
 				}
 
+				stdout.flush();
+				stderr.flush();
+				consoleErr.flush();
+				consoleOut.flush();
+				cos.flush();
+				cos.close();
+				consoleOut.close();
+				consoleErr.close();
 				stdout.close();
 				stderr.close();
 
 				monitor.subTask(MakeMessages.getString("MakeBuilder.Creating_Markers")); //$NON-NLS-1$
-				consoleOut.close();
-				consoleErr.close();
+				
 				epm.reportProblems();
 				
-//				if(collector instanceof IScannerInfoCollector2) {
-//					IScannerInfoCollector2 s2 = (IScannerInfoCollector2) collector;
-//					s2.updateScannerConfiguration(monitor);
-//				}
-				cos.close();
+
 			}
 		} catch (Exception e) {
 			CCorePlugin.log(e);
