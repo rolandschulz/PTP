@@ -54,6 +54,7 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 
 	protected boolean canSave;
 	protected String name;
+	protected IVariableMap rmMap;
 	protected IVariableMap lcMap;
 	protected IUpdateHandler handler;
 	protected boolean refreshing;
@@ -120,6 +121,7 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 	 * on the actual value.
 	 */
 	public void initialize(IVariableMap rmMap, IVariableMap lcMap) {
+		this.rmMap = rmMap;
 		this.lcMap = lcMap;
 		if (name != null) {
 			defaultValue = lcMap.getDefault(name);
