@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-SymbolicName: org.eclipse.ptp.rm.slurm.proxy
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
-Bundle-Version: 6.0.4.qualifier
+Bundle-Version: 6.0.5.qualifier
 Bundle-Vendor: %pluginProvider
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ptp.utils,org.eclipse.ptp.proxy
