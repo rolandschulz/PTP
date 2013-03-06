@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etfwTool xmlns="http://org.eclipse.ptp/etfw" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rm="org.eclipse.ptp"
+	xsi:schemaLocation="etfw_tool_type.xsd" name="new-tool">
+
+	<controlData>
+		<attribute name="Num_Procs" type="integer">
+			<rm:tooltip>Number of processors to use
+			</rm:tooltip>
+			<rm:default>4</rm:default>
+		</attribute>
+	</controlData>
+
+	<buildTool tool-name="New-Tool Compiler Wrapper">
+		<all-compilers tool-group="new-tool">
+			<toolPanes virtual="false" embedded="false">
+				<configId>new-tool-config</configId>
+				<configVarId>new-tool-config-env</configVarId>
+				<optionPane>
+					<rm:title>New-Tool Pane #1</rm:title>
+					<rm:layout>
+						<rm:grid-layout />
+					</rm:layout>
+					<rm:composite>
+						<rm:layout>
+							<rm:grid-layout numColumns="3" makeColumnsEqualWidth="false" />
+						</rm:layout>
+						<rm:layout-data>
+							<rm:grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="true" />
+						</rm:layout-data>
+						<rm:widget type="checkbox" title="Set Processors" buttonId="Num_Proc_CB" style="SWT.LEFT" attribute="">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="spinner" style="SWT.BORDER" readOnly="true" attribute="Num_Procs">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false" widthHint="100" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if button="Num_Proc_CB" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+				</rm:composite>
+				</optionPane>
+			</toolPanes>
+		</all-compilers>
+	</buildTool>
+	<execTool>
+		<global>
+			<toolPanes virtual="false" embedded="false">
+				<optionPane>
+					<rm:title>New-Tool Pane #2</rm:title>
+					<rm:layout>
+						<rm:grid-layout />
+					</rm:layout>
+					<rm:composite>
+						<rm:layout>
+							<rm:grid-layout numColumns="3" makeColumnsEqualWidth="false" />
+						</rm:layout>
+						<rm:layout-data>
+							<rm:grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="true" />
+						</rm:layout-data>
+						<rm:widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false" />
+							</rm:layout-data>
+							<rm:fixed-text>Name: </rm:fixed-text>
+						</rm:widget>
+						<rm:widget type="text" style="SWT.BORDER" attribute="">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
+							</rm:layout-data>
+						</rm:widget> 
+					</rm:composite>
+				</optionPane>
+			</toolPanes>
+		</global>
+
+	</execTool>
+</etfwTool>

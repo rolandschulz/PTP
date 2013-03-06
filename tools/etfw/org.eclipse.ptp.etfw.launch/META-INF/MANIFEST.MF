@@ -1,0 +1,25 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: ETFw Launch
+Bundle-SymbolicName: org.eclipse.ptp.etfw.launch;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.eclipse.ptp.etfw.launch.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.ptp.rm.jaxb.core;bundle-version="1.0.0",
+ org.eclipse.ptp.rm.jaxb.control.core;bundle-version="2.0.0",
+ org.eclipse.ptp.remote.core;bundle-version="6.0.0",
+ org.eclipse.ptp.core;bundle-version="6.0.0",
+ org.eclipse.debug.ui;bundle-version="3.8.0",
+ org.eclipse.ptp.launch;bundle-version="6.0.0",
+ org.eclipse.ptp.etfw.jaxb;bundle-version="1.0.0",
+ org.eclipse.ptp.rm.jaxb.control.ui;bundle-version="1.0.0",
+ org.eclipse.ptp.rm.jaxb.ui;bundle-version="1.0.0",
+ org.eclipse.core.variables;bundle-version="3.2.600",
+ org.eclipse.ptp.ems.core;bundle-version="1.0.0",
+ org.eclipse.ptp.etfw;bundle-version="5.0.0"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Export-Package: org.eclipse.ptp.etfw.launch,
+ org.eclipse.ptp.etfw.launch.ui.util,
+ org.eclipse.ptp.etfw.launch.variables

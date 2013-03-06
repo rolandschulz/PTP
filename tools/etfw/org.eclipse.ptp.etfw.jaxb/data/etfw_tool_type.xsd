@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ******************************************************************************* -->
+<!-- * Copyright (c) 2012 University of Illinois All rights reserved. This program -->
+<!-- * and the accompanying materials are made available under the terms of the -->
+<!-- * Eclipse Public License v1.0 which accompanies this distribution, and is -->
+<!-- * available at http://www.eclipse.org/legal/epl-v10.html -->
+<!-- * -->
+<!-- * Contributors: -->
+<!-- * Chris Navarro - Design and implementation -->
+<!-- ****************************************************************************** -->
+<xs:schema targetNamespace="http://org.eclipse.ptp/etfw" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:etfw="http://org.eclipse.ptp/etfw"
+	xmlns:rm="http://eclipse.org/ptp/schemas" elementFormDefault="qualified">
+
+	<xs:import schemaLocation="http://eclipse.org/ptp/schemas/rm.xsd" namespace="http://eclipse.org/ptp/schemas" />
+	<!-- <xs:import schemaLocation="file:/home/cnavarro/workspaces/ptp-dev/git/org.eclipse.ptp/rms/org.eclipse.ptp.rm.jaxb.core/data/resource_manager_type.xsd" 
+		namespace="org.eclipse.ptp" /> -->
+	<!-- <xs:import schemaLocation="http://eclipse.org/ptp/schemas/rm.xsd" namespace="http://org.eclipse.ptp" /> -->
+	<!-- <xs:import schemaLocation="http://localhost:8080/resource_manager_type.xsd" namespace="http://org.eclipse.ptp" /> -->
+
+	<!-- This should be uncommented once the special TAU widgets are part of the resource_manager_type.xsd file -->
+	<xs:element name="etfwTool" type="etfw:EtfwToolProcessType" />
+	<xs:complexType name="EtfwToolProcessType">
+		<xs:sequence>
+			<xs:element name="controlData" minOccurs="0" type="etfw:ControlDataType" />
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="execTool" type="etfw:ExecToolType" />
+				<xs:element name="postProcTool" type="etfw:PostProcToolType" />
+				<xs:element name="buildTool" type="etfw:BuildToolType" />
+			</xs:choice>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string" />
+		<xs:attribute name="prepend-execution" type="xs:boolean" default="false" />
+		<xs:attribute name="recompile" type="xs:boolean" default="false" />
+		<xs:attribute name="explicit-execution" type="xs:boolean" default="false" />
+	</xs:complexType>
+	<xs:complexType name="ControlDataType">
+		<xs:sequence>
+			<xs:element name="attribute" minOccurs="0" maxOccurs="unbounded" type="rm:attribute-type" />
+			<!-- similar to the start-up-command in the rm schema -->
+			<xs:element name="initialize-command" minOccurs="0" maxOccurs="unbounded" type="rm:command-type" />
+			<!-- similar to "shut-down-command in the rm schema -->
+			<xs:element name="clean-up-command" minOccurs="0" maxOccurs="unbounded" type="rm:command-type" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BuildToolType">
+		<xs:sequence>
+			<!--<xs:element name="toolId" type="xs:string" minOccurs="0" maxOccurs="1" /> <xs:element name="toolName" type="xs:string" minOccurs="0" 
+				maxOccurs="1" /> <xs:element name="toolType" type="xs:string" minOccurs="0" maxOccurs="1" /> -->
+			<xs:element name="global" type="etfw:ToolAppType" minOccurs="0" maxOccurs="1" />
+			<xs:element name="cc-compiler" minOccurs="0" maxOccurs="1" type="etfw:ToolAppType" />
+			<xs:element name="cxx-compiler" minOccurs="0" maxOccurs="1" type="etfw:ToolAppType" />
+			<xs:element name="f90-compiler" minOccurs="0" maxOccurs="1" type="etfw:ToolAppType" />
+			<xs:element name="all-compilers" minOccurs="0" maxOccurs="1" type="etfw:ToolAppType" />
+			<xs:element name="upc-compiler" minOccurs="0" maxOccurs="1" type="etfw:ToolAppType" />
+		</xs:sequence>
+		<xs:attribute name="tool-id" type="xs:string" />
+		<xs:attribute name="tool-name" type="xs:string" />
+		<xs:attribute name="tool-type" type="xs:string" />
+		<xs:attribute name="require-true" type="xs:string" />
+		<xs:attribute name="replace-compiler" type="xs:boolean" />
+
+	</xs:complexType>
+	<xs:complexType name="ExecToolType">
+		<xs:sequence>
+			<!-- <xs:element name="toolId" type="xs:string" minOccurs="0" maxOccurs="1" /> <xs:element name="toolName" type="xs:string" minOccurs="0" 
+				maxOccurs="1" /> <xs:element name="toolType" type="xs:string" minOccurs="0" maxOccurs="1" /> -->
+			<xs:element name="global" type="etfw:ToolAppType" minOccurs="0" maxOccurs="1" />
+			<xs:element name="execUtils" type="etfw:ToolAppType" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+		<xs:attribute name="tool-id" type="xs:string" />
+		<xs:attribute name="tool-name" type="xs:string" />
+		<xs:attribute name="tool-type" type="xs:string" />
+		<xs:attribute name="require-true" type="xs:string" />
+		<xs:attribute name="prepend-execution" type="xs:boolean" default="false" />
+		<xs:attribute name="replace-execution" type="xs:boolean" default="false" />
+	</xs:complexType>
+	<xs:complexType name="PostProcToolType">
+		<xs:sequence>
+			<!-- <xs:element name="toolId" type="xs:string" minOccurs="0" maxOccurs="1" /> <xs:element name="toolName" type="xs:string" minOccurs="0" 
+				maxOccurs="1" /> <xs:element name="toolType" type="xs:string" minOccurs="0" maxOccurs="1" /> -->
+			<xs:element name="global" type="etfw:ToolAppType" minOccurs="0" maxOccurs="1" />
+			<xs:element name="analysis-commands" type="etfw:ToolAppType" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="for-all-like" type="xs:string" minOccurs="0" maxOccurs="1" />
+
+		</xs:sequence>
+		<xs:attribute name="tool-id" type="xs:string" />
+		<xs:attribute name="tool-name" type="xs:string" />
+		<xs:attribute name="tool-type" type="xs:string" />
+		<xs:attribute name="require-true" type="xs:string" />
+		<xs:attribute name="depth" type="xs:int" default="-1" />
+		<xs:attribute name="useDefaultLocation" type="xs:boolean" default="false" />
+		<xs:attribute name="useLatestFileOnly" type="xs:boolean" default="true" />
+	</xs:complexType>
+
+	<xs:complexType name="ToolAppType">
+		<xs:sequence>
+			<!-- <xs:element name="toolCommand" minOccurs="0" type="xs:string" /> -->
+			<!-- <xs:element name="visualizer" minOccurs="0" maxOccurs="1" type="xs:boolean" default="false" /> -->
+			<xs:element name="inputId" minOccurs="0" type="xs:string" />
+			<!-- ToolPane[] toolpanes -->
+			<!-- IAppInput[] allInput -->
+			<xs:element name="toolPanes" minOccurs="0" maxOccurs="unbounded" type="etfw:ToolPaneType" />
+			<xs:element name="inputArgs" minOccurs="0" type="etfw:ToolIOType" maxOccurs="unbounded" />
+			<xs:element name="outputArgs" minOccurs="0" type="etfw:ToolIOType" maxOccurs="unbounded" />
+			<xs:element name="toolArguments" minOccurs="0" maxOccurs="unbounded" type="etfw:ToolArgumentType" />
+		</xs:sequence>
+		<xs:attribute name="tool-id" type="xs:string" />
+		<xs:attribute name="tool-name" type="xs:string" />
+		<xs:attribute name="tool-command" type="xs:string" />
+		<xs:attribute name="tool-group" type="xs:string" />
+		<xs:attribute name="out-to-file" type="xs:string" />
+		<xs:attribute name="visualizer" type="xs:boolean" default="false" />
+	</xs:complexType>
+	<xs:complexType name="ToolIOType">
+		<xs:sequence>
+			<xs:element name="id" type="xs:string" />
+			<xs:element name="directory" type="xs:int" default="0" minOccurs="1" maxOccurs="1" />
+			<xs:element name="file" type="xs:int" default="0" minOccurs="1" maxOccurs="1" />
+			<xs:element name="pathFlag" type="xs:string" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ToolArgumentType">
+		<xs:attribute name="flag" type="xs:string" />
+		<xs:attribute name="value" type="xs:string" />
+		<xs:attribute name="separator" type="xs:string" />
+		<xs:attribute name="conf-val" type="xs:string" />
+		<xs:attribute name="localFile" type="xs:boolean" default="false" />
+		<xs:attribute name="useConfValue" type="xs:boolean" default="false" />
+		<xs:attribute name="requireValue" type="xs:boolean" default="false" />
+		<xs:attribute name="argType" type="xs:int" default="0" />
+	</xs:complexType>
+	<xs:complexType name="ToolPaneType">
+		<xs:sequence>
+			<xs:element name="configId" type="xs:string" minOccurs="0" maxOccurs="1" default="" />
+			<xs:element name="configVarId" type="xs:string" minOccurs="0" maxOccurs="1" default="" />
+			<xs:element name="optionPane" minOccurs="0" maxOccurs="1" type="rm:tab-controller-type" />
+		</xs:sequence>
+		<xs:attribute name="pane-name" type="xs:string" />
+		<xs:attribute name="prepend-with" type="xs:string" />
+		<xs:attribute name="enclose-with" type="xs:string" />
+		<xs:attribute name="separate-with" type="xs:string" />
+		<xs:attribute name="enclose-values" type="xs:string" />
+		<xs:attribute name="separate-name-value" type="xs:string" />
+		<xs:attribute name="virtual" type="xs:boolean" default="false" />
+		<xs:attribute name="embedded" type="xs:boolean" default="false" />
+	</xs:complexType>
+	<!-- CMN: I think this can be replaced by the tab-controller-type <xs:complexType name="ToolPaneType"> <xs:sequence> <xs:choice minOccurs="0" 
+		maxOccurs="unbounded"> <xs:element name="tab-folder" type="rm:tab-folder-type" /> <xs:element name="widget" type="rm:widget-type" /> 
+		<xs:element name="browse" type="rm:browse-type" /> <xs:element name="action" type="rm:push-button-type" /> </xs:choice> </xs:sequence> 
+		</xs:complexType> -->
+</xs:schema>

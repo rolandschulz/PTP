@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTabs">
+      <tab
+            class="org.eclipse.ptp.etfw.launch.PerformanceAnalysisTab"
+            group="org.eclipse.ptp.etfw.launchConfigurationTabGroup"
+            id="org.eclipse.ptp.etfw.launch.PerformanceAnalysisTab"
+            name="Performance Analysis">
+         <placement
+               after="org.eclipse.ptp.launch.applicationLaunch.environmentTab">
+         </placement>
+         <associatedDelegate
+               delegate="org.eclipse.ptp.etfw.parallelLaunch">
+         </associatedDelegate>
+      </tab>
+   </extension>
+
+</plugin>
