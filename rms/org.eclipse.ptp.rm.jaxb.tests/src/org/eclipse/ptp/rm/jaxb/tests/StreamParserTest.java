@@ -19,6 +19,7 @@ import java.util.UUID;
 
 import junit.framework.TestCase;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.IStreamParserTokenizer;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.JAXBControlConstants;
@@ -483,7 +484,7 @@ public class StreamParserTest extends TestCase {
 
 	private void runTokenizer(TokenizerType tokenizer, InputStream stream) {
 		IStreamParserTokenizer t = new ConfigurableRegexTokenizer(tokenizer);
-		t.initialize(uuid, rmVarMap, null);
+		t.initialize(uuid, rmVarMap);
 		t.setInputStream(stream);
 		Thread thr = new Thread(t);
 		thr.start();
@@ -491,10 +492,10 @@ public class StreamParserTest extends TestCase {
 			thr.join();
 		} catch (InterruptedException ignored) {
 		}
-		Throwable throwable = t.getInternalError();
-		if (throwable != null) {
-			throwable.printStackTrace();
+		IStatus status = t.getStatus();
+		if (!status.isOK() && status.getException() != null) {
+			status.getException().printStackTrace();
 		}
-		assertNull(throwable);
+		assertNull(status.isOK());
 	}
 }
