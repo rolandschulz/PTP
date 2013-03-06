@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ptp.rm.jaxb.control.ui.widget">
+      <widget
+            id="applicationQuery"
+            updateModelClass="org.eclipse.ptp.rm.ibm.lsf.ui.model.LSFQueryModel"
+            widgetClass="org.eclipse.ptp.rm.ibm.lsf.ui.widgets.ApplicationQueryControl">
+      </widget>
+      <widget
+            id="queueQuery"
+            updateModelClass="org.eclipse.ptp.rm.ibm.lsf.ui.model.LSFQueryModel"
+            widgetClass="org.eclipse.ptp.rm.ibm.lsf.ui.widgets.QueueQueryControl">
+      </widget>
+      <widget
+            id="reservationQuery"
+            updateModelClass="org.eclipse.ptp.rm.ibm.lsf.ui.model.LSFQueryModel"
+            widgetClass="org.eclipse.ptp.rm.ibm.lsf.ui.widgets.ReservationQueryControl">
+      </widget>
+   </extension>
+
+</plugin>

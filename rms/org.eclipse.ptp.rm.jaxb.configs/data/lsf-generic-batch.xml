@@ -12,10 +12,8 @@
 	<control-data>
 		<!-- This is a necessary attribute for the functioning of LML; link it to the batch-specific variable name -->
 		<attribute name="control.queue.name" visible="false">
-			<link-value-to>LSF_QUEUE_NAMR</link-value-to>
+			<link-value-to>LSF_QUEUE</link-value-to>
 		</attribute>
-		<!-- We set this to invisible because the values are not really modifiable -->
-		<attribute name="queues" visible="false"/>
 		<!-- Needed by RM internals for fetch; name is fixed by convention -->
 		<attribute name="stdout_remote_path" visible="false">
 			<default>${ptp_rm:directory#value}/${ptp_rm:Job_Name#value}.o${ptp_rm:@jobId#default}</default>
@@ -39,7 +37,7 @@
 		<attribute name="LSF_JOB_RESIZABLE" type="boolean"
 			translateBooleanAs=" ,no">
 			<description>Job Is Resizable:</description>
-			<tooltip>Specifies that job is auto-resizable. (-ar)</tooltip>
+			<tooltip>The job is autoresizable. (-ar)</tooltip>
 			<default>no</default>
 		</attribute>
 		
@@ -63,7 +61,7 @@
 		<attribute name="LSF_NOTIFY_COMPLETION" type="boolean"
 			translateBooleanAs=" ,no">
 			<description>Completion_Notification:</description>
-			<tooltip>Send you email when your job completes. (-N)</tooltip>
+			<tooltip>Send you email when your job completes. This option is disabled if STDOUT pathnames are blank (-N)</tooltip>
 			<default>no</default>
 		</attribute>
 		
@@ -87,7 +85,7 @@
 		<attribute name="LSF_NORERUN_SYS_FAILURE" type="boolean"
 			translateBooleanAs=" ,no">
 			<description>Don't Rerun on System Failure:</description>
-			<tooltip>Don't rerun job if host or system fails. (-rn)</tooltip>
+			<tooltip>Job is never rerunnable. (-rn)</tooltip>
 			<default>no</default>
 		</attribute>
 						
@@ -99,7 +97,7 @@
 		<attribute name="LSF_PASS_USER_LIMITS" type="boolean"
 			translateBooleanAs=" ,no">
 			<description>Pass User Limits:</description>
-			<tooltip>Pass user shell limits to execution host. (-ul)</tooltip>
+			<tooltip>Pass user shell limits to execution host. User limits cannot override OS or queue limits. (-ul)</tooltip>
 			<default>no</default>
 		</attribute>
 								
@@ -111,20 +109,20 @@
 		<attribute name="LSF_EXCLUSIVE_EXECUTION" type="boolean"
 			translateBooleanAs=" ,no">
 			<description>Exclusive Execution:</description>
-			<tooltip>Submit job in exclusive execution mode. (-x)</tooltip>
+			<tooltip>Puts the host running your job into exclusive execution mode. (-x)</tooltip>
 			<default>no</default>
 		</attribute>
 				
 		<!-- -app option -->
 		<attribute name="LSF_APP_PROFILE" type="string">
 			<description>Application Profile:</description>
-			<tooltip>Specify the name of an application profile. (-app)</tooltip>
+			<tooltip>Submit the job to the specified, existing application profile. (-app)</tooltip>
 		</attribute>
 				
 		<!-- -b option -->
 		<attribute name="LSF_DISPATCH_AT" type="string">
 			<description>Dispatch At:</description>
-			<tooltip>Dispatch the job at or after the specified time. (-b)</tooltip>
+			<tooltip>Dispatch the job at or after the specified date and time. (-b)</tooltip>
             <validator>
             	<!-- Validate time spec where time can be blank, yyyy:mm:dd:hh:mm, mm:dd:hh:mm, dd:hh:mm or hh:mm -->
             	<regex expression=" *|(?:[\d]{4}:[\d]{2}:[\d]{2}:|[\d]{2}:[\d]{2}:|[\d]{2}:)?[\d]{2}:[\d]{2}"/>
@@ -136,7 +134,7 @@
 		<!-- -C option -->
 		<attribute name="LSF_COREFILE_LIMIT" type="string">
 			<description>Core File Limit:</description>
-			<tooltip>Specify core file size limit. (-C)</tooltip>
+			<tooltip>Set a soft per-process core file size limit for all processes in this batch job. (-C)</tooltip>
             <validator>
             	<regex expression=" *|[\d]+"/>
                 <error-message>Core file limit must be a numeric value.
@@ -147,13 +145,13 @@
 		<!-- -c option -->
 		<attribute name="LSF_CPUTIME_LIMIT" type="string">
 			<description>CPU Time Limit:</description>
-			<tooltip>Specify CPU time limit. (-c)</tooltip>
+			<tooltip>Limits the total CPU time for the job to prevent runaway jobs. (-c)</tooltip>
 		</attribute>
 								
 		<!-- -D option -->
 		<attribute name="LSF_DATA_LIMIT" type="string">
 			<description>Data Limit:</description>
-			<tooltip>Specify data segment size limit. (-D)</tooltip>
+			<tooltip>Set a per process soft data segment size limit for each process in the job. (-D)</tooltip>
             <validator>
             	<regex expression=" *|[\d]+"/>
                 <error-message>Data segment limit must be a numeric value.
@@ -164,60 +162,96 @@
 		<!-- -e option -->
 		<attribute name="LSF_STDERR_PATH_APPEND" type="string">
 			<description>STDERR Path (Append):</description>
-			<tooltip>Specify path for application to append STDERR output. (-e)</tooltip>
-		</attribute>
+			<tooltip>Standard error (STDERR) application output is appended to the file specified by this option. (-e)</tooltip>		</attribute>
 												
 		<!-- -eo option -->
 		<attribute name="LSF_STDERR_PATH_NEW" type="string">
 			<description>STDERR Path (New):</description>
-			<tooltip>Specify path for application to write STDERR output. (-eo)</tooltip>
+			<tooltip>Standard error (STDERR) application output is written to the file specified by this option. (-eo)</tooltip>
+			<default>stderr.%J.%I.txt</default>
 		</attribute>
 										
 		<!-- -F option -->
 		<attribute name="LSF_FILESIZE_LIMIT" type="string">
 			<description>File Size Limit:</description>
-			<tooltip>Specify file size limit. (-F)</tooltip>
+			<tooltip>Set a per process soft file size limit for each process in the job. (-F)</tooltip>
             <validator>
             	<regex expression=" *|[\d]+"/>
                 <error-message>File size limit must be a numeric value.
                 </error-message>
             </validator>
 		</attribute>
-												
+		
+		<!-- -G option -->
+		<attribute name="LSF_USER_GROUP" type="string">
+			<description>User Group:</description>
+			<tooltip>Associates the job with the specified user group. (-G)</tooltip>
+		</attribute>
+
+		<!-- -g option -->
+		<attribute name="LSF_JOB_GROUP" type="string">
+			<description>Job Group Name:</description>
+			<tooltip>Submits jobs in the specified job group. (-g)</tooltip>
+		</attribute>
+													
 		<!-- -i option -->
 		<attribute name="LSF_STDIN_PATH" type="string">
 			<description>STDIN Path:</description>
-			<tooltip>Specify path name for application STDIN. (-i)</tooltip>
+			<tooltip>Use the specified file for standard input (STDIN). (-i)</tooltip>
 		</attribute>
 														
 		<!-- -is option -->
 		<attribute name="LSF_STDIN_EDITABLE_PATH" type="string">
 			<description>STDIN Path (Editable):</description>
-			<tooltip>Specify path name for application STDIN. File may be edited or deleted after job submission. (-is)</tooltip>
+			<tooltip>Use the specified file for standard input (STDIN). The original file may be edited or deleted after job submission. (-is)</tooltip>
 		</attribute>
 											
 		<!-- -J option -->
 		<attribute name="LSF_JOB_NAME" type="string">
 			<description>Job Name:</description>
-			<tooltip>Specify job name.</tooltip>
+			<tooltip>Sets the job name for this job. (-J)</tooltip>
 		</attribute>
-													
+		
+		<!-- -Jd option -->
+		<attribute name="LSF_JOB_DESCRIPTION" type="string">
+			<description>Job Description:</description>
+			<tooltip>Sets the job description for this job. (-Jd)</tooltip>
+		</attribute>
+				
+		<!-- -jsdl option -->
+		<attribute name="LSF_JSDL_FILE" type="string">
+			<description>Submit JSDL Job (LSF Extensions):</description>
+			<tooltip>Submit a job using a JSDL file with LSF extensions schema. (-jsdl)</tooltip>
+		</attribute>
+		
+		<!-- -jsdl_strict option -->
+		<attribute name="LSF_JSDL_FILE_STRICT" type="string">
+			<description>Submit JSDL Job (strict):</description>
+			<tooltip>Submit a job using a JSDL file with standard schema. (-jsdl_strict)</tooltip>
+		</attribute>
+		
+		<!-- -k option -->
+		<attribute name="LSF_CHECKPOINT" type="string">
+			<description>Checkpointing:</description>
+			<tooltip>Make a job checkpointable and specify the checkpoint directory. (-k)</tooltip>
+		</attribute>
+															
 		<!-- -L option -->
 		<attribute name="LSF_LOGIN_SHELL" type="string">
 			<description>Login Shell:</description>
-			<tooltip>Specify login shell path name. (-L)</tooltip>
+			<tooltip>Initialize the execution environment using the specified login shell. (-L)</tooltip>
 		</attribute>
 															
 		<!-- -Lp option -->
 		<attribute name="LSF_LICENSE_SCHEDULER_PROJECT" type="string">
 			<description>License Scheduler Project:</description>
-			<tooltip>Specify License Scheduler project name. (-Lp)</tooltip>
+			<tooltip>Assigns the job to the specified License Sceduler project. (-Lp)</tooltip>
 		</attribute>
 																	
 		<!-- -M option -->
 		<attribute name="LSF_MEMORY_LIMIT" type="string">
 			<description>Memory Limit:</description>
-			<tooltip>Specify memory limit. (-m)</tooltip>
+			<tooltip>Set a per process soft memory limit for all processes in this job. (-M)</tooltip>
             <validator>
             	<regex expression=" *|[\d]+"/>
                 <error-message>Memory limit must be a numeric value.
@@ -228,13 +262,13 @@
 		<!-- -m option -->
 		<attribute name="LSF_HOST_NAMES" type="string">
 			<description>Execution Host Name(s):</description>
-			<tooltip>Specify hosts or hosts groups where job should run. (-m)</tooltip>
+			<tooltip>Run the job on one of the specified hosts, host groups or compute units. (-m)</tooltip>
 		</attribute>
 																					
 		<!-- -mig option -->
 		<attribute name="LSF_MIGRATION" type="string">
 			<description>Migration Threshold:</description>
-			<tooltip>Specify migration threhshold for checkpointable and rerunnable jobs.</tooltip>
+			<tooltip>Specify migration threhshold for checkpointable and rerunnable jobs. (-mig)</tooltip>
 		</attribute>
 																				
 		<!-- -n option -->
@@ -257,26 +291,27 @@
 												
 		<!-- -o option -->
 		<attribute name="LSF_STDOUT_PATH_APPEND" type="string">
-			<description>STDOUT Path (Append):</description>
-			<tooltip>Specify path for application to append STDOUT output. (-o)</tooltip>
+			<description>STDOUT Path (Append):</description>			
+			<tooltip>Appends standard output (STDOUT) output to the specified file. (-o)</tooltip>
 		</attribute>
 												
 		<!-- -oo option -->
 		<attribute name="LSF_STDOUT_PATH_NEW" type="string">
 			<description>STDOUT Path (New):</description>
-			<tooltip>Specify path for application to write STDOUT output. (-oo)</tooltip>
+			<tooltip>Writes standard output (STDOUT) output to the specified file. (-oo)</tooltip>
+			<default>stdout.%J.%I.txt</default>
 		</attribute>
 														
 		<!-- -P option -->
 		<attribute name="LSF_PROJECT_NAME" type="string">
 			<description>Project Name:</description>
-			<tooltip>Specify project name. (-P)</tooltip>
+			<tooltip>Assigns the job to the specified project. (-P)</tooltip>
 		</attribute>
 																
 		<!-- -p option -->
 		<attribute name="LSF_PROCESS_LIMIT" type="string">
 			<description>Process Limit:</description>
-			<tooltip>Specify process limit. (-p)</tooltip>
+			<tooltip>Sets the limit of the numer of processes for the entire job. (-p)</tooltip>
             <validator>
             	<regex expression=" *|[\d]+"/>
                 <error-message>Process limit must be a numeric value.
@@ -287,49 +322,54 @@
 		<!-- -Q option -->
 		<attribute name="LSF_REQUEUE_CODES" type="string">
 			<description>Auto Requeue Exit Codes:</description>
-			<tooltip>Specify automatic job requeue exit codes. (-Q)</tooltip>
+			<tooltip>Specify automatic job requeue exit values. (-Q)</tooltip>
 		</attribute>
 		
 		<!-- -q option -->
 		<attribute name="LSF_QUEUE" type="string">
 			<description>Job Queue:</description>
-			<tooltip>Specify the name of the batch job queue. (-q)</tooltip>
-			<items-from>queues</items-from>
+			<tooltip>Submits the job to the specified queue. (-q)</tooltip>
 		</attribute>
 				
 		<!-- -R option -->
 		<attribute name="LSF_RESOURCES" type="string">
 			<description>Resource Requirements:</description>
-			<tooltip>Specify resource requirements for job. (-R)</tooltip>
+			<tooltip>Runs the job on a host that meets the specified requirements. (-R)</tooltip>
 		</attribute>
 						
 		<!-- -S option -->
 		<attribute name="LSF_STACK_LIMIT" type="string">
 			<description>Stack Limit:</description>
-			<tooltip>Specify stack limit. (-S)</tooltip>
+			<tooltip>Sets a per process soft limit for the thye stack for each process in the job. (-S)</tooltip>
             <validator>
             	<regex expression=" *|[\d]+"/>
                 <error-message>Stack limit must be a numeric value.
                 </error-message>
             </validator>
 		</attribute>
-								
+				
+		<!-- -s option -->
+		<attribute name="LSF_SIGNAL" type="string">
+			<description>Run Window Signal:</description>
+			<tooltip>Send the specified signal qhen a queue-level run window closes. (-s)</tooltip>
+		</attribute>
+										
 		<!-- -sla option -->
 		<attribute name="LSF_SERVICE_CLASS" type="string">
 			<description>Service Class:</description>
-			<tooltip>Specify service class for job. (-sla)</tooltip>
+			<tooltip>Specifies the service class where the job is to run. (-sla)</tooltip>
 		</attribute>
 										
 		<!-- -sp option -->
 		<attribute name="LSF_JOB_PRIORITY" type="string">
 			<description>Job Priority:</description>
-			<tooltip>Specify job priority. (-sp)</tooltip>
+			<tooltip>Set user-specified job priority for this job. (-sp)</tooltip>
 		</attribute>
 											
 		<!-- -T option -->
 		<attribute name="LSF_THREAD_LIMIT" type="string">
 			<description>Thread Limit:</description>
-			<tooltip>Specify thread limit. (-T)</tooltip>
+			<tooltip>Sets the limit for the number of concurrent threads for the entire job. (-T)</tooltip>
             <validator>
             	<regex expression=" *|[\d]+"/>
                 <error-message>Thread limit must be a numeric value.
@@ -340,7 +380,7 @@
 		<!-- -t option -->
 		<attribute name="LSF_TERMINATION_DEADLINE" type="string">
 			<description>Termination Deadline:</description>
-			<tooltip>Specify job termination deadline. (-t)</tooltip>
+			<tooltip>Specifies the job termination deadline. (-t)</tooltip>
             <validator>
             	<!-- Validate time spec where time can be blank, yyyy:mm:dd:hh:mm, mm:dd:hh:mm, dd:hh:mm or hh:mm -->
             	<regex expression=" *|(?:[\d]{4}:[\d]{2}:[\d]{2}:|[\d]{2}:[\d]{2}:|[\d]{2}:)?[\d]{2}:[\d]{2}"/>
@@ -353,19 +393,19 @@
 		<!-- -U option -->
 		<attribute name="LSF_RESERVATION_ID" type="string">
 			<description>Reservation ID:</description>
-			<tooltip>Specify reservation id. (-U)</tooltip>
+			<tooltip>Use the specified reservation id when scheduling the job. (-U)</tooltip>
 		</attribute>
 														
 		<!-- -u option -->
 		<attribute name="LSF_EMAIL_ID" type="string">
 			<description>Email ID:</description>
-			<tooltip>Specify email address to receive notifications. (-u)</tooltip>
+			<tooltip>Send notification emails to the specified email address. (-u)</tooltip>
 		</attribute>
 																
 		<!-- -v option -->
 		<attribute name="LSF_SWAP_LIMIT" type="string">
 			<description>Swap Limit:</description>
-			<tooltip>Specify virtual memory limit for job. (-v)</tooltip>
+			<tooltip>Set the total process virtual memory limit for the job. (-v)</tooltip>
             <validator>
             	<regex expression=" *|[\d]+"/>
                 <error-message>Swap limit must be a numeric value.
@@ -376,13 +416,7 @@
 		<!-- -W option -->
 		<attribute name="LSF_RUNTIME_LIMIT" type="string">
 			<description>Runtime Limit:</description>
-			<tooltip>Specify runtime limit for job. (-W)</tooltip>
-		</attribute>
-																				
-		<!-- -We option -->
-		<attribute name="LSF_RUNTIME_ESTIMATE" type="string">
-			<description>Estimated Runtime:</description>
-			<tooltip>Specify estimated runtime for job. (-We)</tooltip>
+			<tooltip>Set the runtime limit for job. (-W)</tooltip>
 		</attribute>
 																						
 		<!-- -w option -->
@@ -390,27 +424,36 @@
 			<description>Job Dependencies:</description>
 			<tooltip>Specify dependencies for job. (-w)</tooltip>
 		</attribute>
+																								
+		<!-- -Wa option -->
+		<attribute name="LSF_JOB_ACTION" type="string">
+			<description>Job Action Signal:</description>
+			<tooltip>Specify job action to be taken before a job action occurs. (-Wa)</tooltip>
+		</attribute>
+																						
+		<!-- -We option -->
+		<attribute name="LSF_RUNTIME_ESTIMATE" type="string">
+			<description>Estimated Runtime:</description>
+			<tooltip>Specify estimated runtime for job. (-We)</tooltip>
+		</attribute>
+																						
+		<!-- -Wt option -->
+		<attribute name="LSF_JOB_ACTION_TIME" type="string">
+			<description>Job Action Time:</description>
+			<tooltip>Specify time before a job control action that a job action occurs. (-Wt)</tooltip>
+		</attribute>
 		
 		<!-- Other options -->
 		<attribute name="LSF_OTHER_OPTIONS" type="string">
 			<description>Other Options:</description>
 			<tooltip>Specify LSF options that don't appear elsewhere in list.</tooltip>
 		</attribute>
-		
-		<start-up-command name="get-queues">
-			<arg>perl</arg>
-			<arg>${ptp_rm:ptpDirectory#value}/rms/LSF/query_queues.pl</arg>
-			<stdout-parser delim="\n">
-				<target ref="queues">
-					<match>
-						<expression>^([^\s]+)*$</expression>
-						<add field="value">
-							<entry valueGroup="1"/>
-						</add>
-					</match>
-				</target>
-			</stdout-parser>
-		</start-up-command>
+
+		<attribute name="LSF_MPI_COMMAND" type="choice">
+			<description>MPI Command:</description>
+			<tooltip>Optional MPI command to run job.</tooltip>
+			<choice>,poe,mpiexec,mpirun</choice>
+		</attribute>
 		
 		<!-- Invocation command definition -->
 		<submit-batch name="LSF job submission"
@@ -423,7 +466,7 @@
 			<arg isUndefinedIfMatches="-rn no">-rn ${ptp_rm:LSF_NORERUN_SYS_FAILURE#value}</arg>
 			<arg isUndefinedIfMatches="-ul no">-ul ${ptp_rm:LSF_PASS_USER_LIMITS#value}</arg>
 			<arg isUndefinedIfMatches="-x no">-x ${ptp_rm:LSF_EXCLUSIVE_EXECUTION#value}</arg>
-			<arg isUndefinedIfMatches="-app">-app ${ptp_rm:LSF_APPLICATION_PROFILE#value}</arg>
+			<arg isUndefinedIfMatches="-app">-app ${ptp_rm:LSF_APP_PROFILE#value}</arg>
 			<arg isUndefinedIfMatches="-b">-b ${ptp_rm:LSF_DISPATCH_AT#value}</arg>
 			<arg isUndefinedIfMatches="-C">-C ${ptp_rm:LSF_COREFILE_LIMIT#value}</arg>
 			<arg isUndefinedIfMatches="-c">-c ${ptp_rm:LSF_CPUTIME_LIMIT#value}</arg>
@@ -431,9 +474,15 @@
 			<arg isUndefinedIfMatches="-e">-e ${ptp_rm:LSF_STDERR_PATH_APPEND#value}</arg>
 			<arg isUndefinedIfMatches="-eo">-eo ${ptp_rm:LSF_STDERR_PATH_NEW#value}</arg>
 			<arg isUndefinedIfMatches="-F">-F ${ptp_rm:LSF_FILESIZE_LIMIT#value}</arg>
+			<arg isUndefinedIfMatches="-G">-G ${ptp_rm:LSF_USER_GROUP#value}</arg>
+			<arg isUndefinedIfMatches="-g">-g ${ptp_rm:LSF_JOB_GROUP#value}</arg>
 			<arg isUndefinedIfMatches="-i">-i ${ptp_rm:LSF_STDIN_PATH#value}</arg>
 			<arg isUndefinedIfMatches="-is">-is ${ptp_rm:LSF_STDIN_EDITABLE_PATH#value}</arg>
 			<arg isUndefinedIfMatches="-J">-J ${ptp_rm:LSF_JOB_NAME#value}</arg>
+			<arg isUndefinedIfMatches="-Jd">-Jd ${ptp_rm:LSF_JOB_DESCRIPTION#value}</arg>
+			<arg isUndefinedIfMatches="-jsdl">-jsdl ${ptp_rm:LSF_JSDL_FILE#value}</arg>
+			<arg isUndefinedIfMatches="-jsdl_strict">-jsdl_strict ${ptp_rm:LSF_JSDL_FILE_STRICT#value}</arg>
+			<arg isUndefinedIfMatches="-k">-k ${ptp_rm:LSF_CHECKPOINT#value}</arg>
 			<arg isUndefinedIfMatches="-L">-L ${ptp_rm:LSF_LOGIN_SHELL#value}</arg>
 			<arg isUndefinedIfMatches="-Lp">-Lp ${ptp_rm:LSF_LICENSE_SCHEDULER_PROJECT#value}</arg>
 			<arg isUndefinedIfMatches="-M">-M ${ptp_rm:LSF_MEMORY_LIMIT#value}</arg>
@@ -449,6 +498,7 @@
 			<arg isUndefinedIfMatches="-q">-q ${ptp_rm:LSF_QUEUE#value}</arg>
 			<arg isUndefinedIfMatches="-R">-R ${ptp_rm:LSF_RESOURCES#value}</arg>
 			<arg isUndefinedIfMatches="-S">-S ${ptp_rm:LSF_STACK_LIMIT#value}</arg>
+			<arg isUndefinedIfMatches="-s">-s ${ptp_rm:LSF_SIGNAL#value}</arg>
 			<arg isUndefinedIfMatches="-sla">-sla ${ptp_rm:LSF_SERVICE_CLASS#value}</arg>
 			<arg isUndefinedIfMatches="-sp">-sp ${ptp_rm:LSF_JOB_PRIORITY#value}</arg>
 			<arg isUndefinedIfMatches="-T">-T ${ptp_rm:LSF_THREAD_LIMIT#value}</arg>
@@ -457,9 +507,12 @@
 			<arg isUndefinedIfMatches="-u">-u ${ptp_rm:LSF_EMAIL_ID#value}</arg>
 			<arg isUndefinedIfMatches="-v">-v ${ptp_rm:LSF_SWAP_LIMIT#value}</arg>
 			<arg isUndefinedIfMatches="-W">-W ${ptp_rm:LSF_RUNTIME_LIMIT#value}</arg>
-			<arg isUndefinedIfMatches="-We">-We ${ptp_rm:LSF_RUNTIME_ESTIMATE#value}</arg>
 			<arg isUndefinedIfMatches="-w">-w ${ptp_rm:LSF_DEPENDENCIES#value}</arg>
+			<arg isUndefinedIfMatches="-Wa">-Wa ${ptp_rm:LSF_JOB_ACTION#value}</arg>
+			<arg isUndefinedIfMatches="-We">-We ${ptp_rm:LSF_RUNTIME_ESTIMATE#value}</arg>
+			<arg isUndefinedIfMatches="-Wt">-Wt ${ptp_rm:LSF_JOB_ACTION_TIME#value}</arg>
 			<arg>${ptp_rm:LSF_OTHER_OPTIONS#value}</arg>
+			<arg>${ptp_rm:LSF_MPI_COMMAND#value}</arg>
 			<arg>${ptp_rm:executablePath#value}</arg>
 			<arg>${ptp_rm:progArgs#value}</arg>
 			<stdout-parser delim="\n">
@@ -571,11 +624,1061 @@
 			<arg>${ptp_rm:@jobId#name}</arg>
 		</resume-job>
 
-		<!-- Tasks Tab -->
 		<launch-tab>
+			
+			<!-- Job submission tab -->
+			<dynamic includeWidgetValuesFrom="Scheduling,Resources,Limits,I/O,Notifications">
+				<title>Job Submission</title>
+				<layout>
+					<grid-layout/>
+				</layout>
+				
+				<composite group="true">
+					<layout>
+						<grid-layout numColumns="3" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
+					</layout>
+
+					<!-- LSF_QUEUE: Job Queue -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_QUEUE#description}</fixed-text>
+					</widget>
+					
+					<widget style="SWT.BORDER" attribute="LSF_QUEUE"
+						type="text" >
+						<layout-data>
+							<grid-data widthHint="300" horizontalSpan="1"/>
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_QUEUE#tooltip}</tooltip>
+					</widget>
+					
+					<widget type="custom" typeId="queueQuery" style="SWT.LEFT" attribute="LSF_QUEUE">
+						<layout-data>
+							<grid-data widthHint="100" horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>List</fixed-text>
+					</widget>
+										
+					<!-- LSF_JOB_PRIORITY: Job priority -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_JOB_PRIORITY#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="text" attribute="LSF_JOB_PRIORITY" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_JOB_PRIORITY#tooltip}</tooltip>
+					</widget>										
+					<!-- LSF_JOB_NAME: Job name -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_JOB_NAME#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="text" attribute="LSF_JOB_NAME" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_JOB_NAME#tooltip}</tooltip>
+					</widget>
+																												
+					<!-- LSF_JOB_DESCRIPTION: Job description -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_JOB_DESCRIPTION#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="text" attribute="LSF_JOB_DESCRIPTION" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_JOB_DESCRIPTION#tooltip}</tooltip>
+					</widget>
+					
+					<!-- LSF_PROJECT_NAME: Project name -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_PROJECT_NAME#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="text" attribute="LSF_PROJECT_NAME" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_PROJECT_NAME#tooltip}</tooltip>
+					</widget>
+										
+					<!-- LSF_JOB_GROUP: Job group -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_JOB_GROUP#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="text" attribute="LSF_JOB_GROUP" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_JOB_GROUP#tooltip}</tooltip>
+					</widget>
+										
+					<!-- LSF_SERVICE_CLASS: Service class -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_SERVICE_CLASS#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="text" attribute="LSF_SERVICE_CLASS" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_SERVICE_CLASS#tooltip}</tooltip>
+					</widget>
+										
+					<!--LSF_LOGIN_SHELL: Login shell -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data verticalAlign="SWT.CENTER"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_LOGIN_SHELL#description}</fixed-text>
+					</widget>
+					
+					<browse textStyle="SWT.BORDER" attribute="LSF_LOGIN_SHELL"
+						title="Browse">
+						<text-layout-data>
+							<grid-data widthHint="300" verticalAlign="SWT.CENTER"/>
+						</text-layout-data>
+						<button-layout-data>
+							<grid-data widthHint="300" verticalAlign="SWT.CENTER"/>
+						</button-layout-data>
+						<tooltip>${ptp_rm:LSF_LOGIN_SHELL#tooltip}</tooltip>
+					</browse>
+					
+					<!-- LSF_APP_PROFILE: Application profile -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_APP_PROFILE#description}</fixed-text>
+					</widget>
+					
+					<widget style="SWT.BORDER" attribute="LSF_APP_PROFILE"
+						type="text" >
+						<layout-data>
+							<grid-data widthHint="300" horizontalSpan="1"/>
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_APP_PROFILE#tooltip}</tooltip>
+					</widget>
+										
+					<widget type="custom" typeId="applicationQuery" style="SWT.LEFT" attribute="LSF_APP_PROFILE">
+						<layout-data>
+							<grid-data widthHint="100" horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>List</fixed-text>
+					</widget>
+					
+					<!--LSF_JSDL_FILE: Submit job with JSDL file and LSF extensions -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data verticalAlign="SWT.CENTER"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_JSDL_FILE#description}</fixed-text>
+					</widget>
+					
+					<browse textStyle="SWT.BORDER" attribute="LSF_JSDL_FILE"
+						title="Browse">
+						<text-layout-data>
+							<grid-data widthHint="300" verticalAlign="SWT.CENTER"/>
+						</text-layout-data>
+						<button-layout-data>
+							<grid-data widthHint="300" verticalAlign="SWT.CENTER"/>
+						</button-layout-data>
+						<tooltip>${ptp_rm:LSF_JSDL_FILE#tooltip}</tooltip>
+					</browse>
+					
+					<!--LSF_JSDL_FILE_STRICT: Submit job with JSDL file and no LSF extensions -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data verticalAlign="SWT.CENTER"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_JSDL_FILE_STRICT#description}</fixed-text>
+					</widget>
+					
+					<browse textStyle="SWT.BORDER" attribute="LSF_JSDL_FILE_STRICT"
+						title="Browse">
+						<text-layout-data>
+							<grid-data widthHint="300" verticalAlign="SWT.CENTER"/>
+						</text-layout-data>
+						<button-layout-data>
+							<grid-data widthHint="300" verticalAlign="SWT.CENTER"/>
+						</button-layout-data>
+						<tooltip>${ptp_rm:LSF_JSDL_FILE_STRICT#tooltip}</tooltip>
+					</browse>	
+																		
+					<!-- LSF_CHECKPOINT: Job checkpoint options -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_CHECKPOINT#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="text" attribute="LSF_CHECKPOINT" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_CHECKPOINT#tooltip}</tooltip>
+					</widget>
+													
+					<!-- LSF_REQUEUE_CODES: Job requeue return codes -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_REQUEUE_CODES#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="text" attribute="LSF_REQUEUE_CODES" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_REQUEUE_CODES#tooltip}</tooltip>
+					</widget>
+																	
+					<!-- LSF_SIGNAL: Queue-level window closure signal -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_SIGNAL#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="text" attribute="LSF_SIGNAL" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_SIGNAL#tooltip}</tooltip>
+					</widget>		
+																								
+					<!-- LSF_RERUN_SYS_FAILURE - Rerun job on system failure -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_RERUN_SYS_FAILURE#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="checkbox" attribute="LSF_RERUN_SYS_FAILURE"
+						style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL"
+								grabExcessHorizontal="false" horizontalSpan="2"/>
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_RERUN_SYS_FAILURE#tooltip}</tooltip>
+					</widget>
+					
+					<!-- LSF_NORERUN_SYS_FAILURE - Don't rerun job on system failure -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_NORERUN_SYS_FAILURE#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="checkbox" attribute="LSF_NORERUN_SYS_FAILURE"
+						style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL"
+								grabExcessHorizontal="false" horizontalSpan="2"/>
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_NORERUN_SYS_FAILURE#tooltip}</tooltip>
+					</widget>
+																						
+					<!-- LSF_OTHER_OPTIONS: Other LSF bsub options -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_OTHER_OPTIONS#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="text" attribute="LSF_OTHER_OPTIONS" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_OTHER_OPTIONS#tooltip}</tooltip>
+					</widget>
+																											
+					<!-- LSF_MPI_COMMAND: MPI application invocation command -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_MPI_COMMAND#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="combo" readOnly="true" attribute="LSF_MPI_COMMAND" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_MPI_COMMAND#tooltip}</tooltip>
+					</widget>
+				</composite>
+			</dynamic>
+			
+			<!--  Scheduling tab -->
+			<dynamic includeWidgetValuesFrom="Job Submission,Resources,Limits,I/O,Notifications">
+				<title>Scheduling</title>
+				<layout>
+					<grid-layout/>
+				</layout>
+				
+				<composite group="true">
+					<layout>
+						<grid-layout numColumns="3" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
+					</layout>
+										
+					<!-- LSF_USER_GROUP: User group -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_USER_GROUP#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="text" attribute="LSF_USER_GROUP" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_USER_GROUP#tooltip}</tooltip>
+					</widget>
+										
+					<!-- LSF_DEPENDENCIES: Job dependencies -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_DEPENDENCIES#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="text" attribute="LSF_DEPENDENCIES" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_DEPENDENCIES#tooltip}</tooltip>
+					</widget>															
+					<!-- LSF_DISPATCH_AT: Dispatch job at or after time -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_DISPATCH_AT#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="text" attribute="LSF_DISPATCH_AT" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_DISPATCH_AT#tooltip}</tooltip>
+					</widget>
+																			
+					<!-- LSF_TERMINATION_DEADLINE: Job termination deadline -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_TERMINATION_DEADLINE#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="text" attribute="LSF_TERMINATION_DEADLINE" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_TERMINATION_DEADLINE#tooltip}</tooltip>
+					</widget>
+										
+					<!-- LSF_RESERVATION_ID: Reservation ID -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_RESERVATION_ID#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="text" attribute="LSF_RESERVATION_ID" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="1" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_RESERVATION_ID#tooltip}</tooltip>
+					</widget>
+										
+					<widget type="custom" typeId="reservationQuery" style="SWT.LEFT" attribute="LSF_RESERVATION_ID">
+						<layout-data>
+							<grid-data widthHint="100" horizontalAlign="SWT.BEGINNING" />
+						</layout-data>
+						<fixed-text>List</fixed-text>
+					</widget>			
+																						
+					<!-- LSF_MIGRATION: Checkpointable/rerunnable migration threshold -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_MIGRATION#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="text" attribute="LSF_MIGRATION" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_MIGRATION#tooltip}</tooltip>
+					</widget>
+				</composite>
+			</dynamic>
+			
+			<!-- Resources tab -->
+			<dynamic includeWidgetValuesFrom="Job Submission,Scheduling,Limits,I/O,Notifications">
+				<title>Resources</title>
+				<layout>
+					<grid-layout/>
+				</layout>
+				
+				<composite group="true">
+					<layout>
+						<grid-layout numColumns="3" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
+					</layout>
+																																	
+					<!-- LSF_HOST_NAMES: Hosts to run job -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_HOST_NAMES#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="text" attribute="LSF_HOST_NAMES" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_HOST_NAMES#tooltip}</tooltip>
+					</widget>
+																																						
+					<!-- LSF_NUM_PROCS: Min/max processors to run -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_NUM_PROCS#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="text" attribute="LSF_NUM_PROCS" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_NUM_PROCS#tooltip}</tooltip>
+					</widget>
+					
+					<!-- LSF_EXCLUSIVE_EXECUTION: Nodes in exclusive execution mode -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_EXCLUSIVE_EXECUTION#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="checkbox" attribute="LSF_EXCLUSIVE_EXECUTION"
+						style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL"
+								grabExcessHorizontal="false" horizontalSpan="2"/>
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_EXCLUSIVE_EXECUTION#tooltip}</tooltip>
+					</widget>
+										
+					<!-- LSF_JOB_RESIZABLE: Job is resizable -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_JOB_RESIZABLE#description}
+						</fixed-text>
+					</widget>
+					<widget type="checkbox" attribute="LSF_JOB_RESIZABLE"
+						style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL"
+								grabExcessHorizontal="false" horizontalSpan="2"/>
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_JOB_RESIZABLE#tooltip}</tooltip>
+					</widget>
+				</composite>
+			</dynamic>
+			
+			<!-- Limits tab -->
+			<dynamic includeWidgetValuesFrom="Job Submission,Scheduling,Resources,I/O,Notifications">
+				<title>Limits</title>
+				<layout>
+					<grid-layout/>
+				</layout>
+				
+				<composite group="true">
+					<layout>
+						<grid-layout numColumns="3" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
+					</layout>
+					
+					<!-- LSF_PASS_USER_LIMITS: Pass user limits -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_PASS_USER_LIMITS#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="checkbox" attribute="LSF_PASS_USER_LIMITS"
+						style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL"
+								grabExcessHorizontal="false" horizontalSpan="2"/>
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_PASS_USER_LIMITS#tooltip}</tooltip>
+					</widget>
+																							
+					<!-- LSF_COREFILE_LIMIT: Corefile limit -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_COREFILE_LIMIT#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="text" attribute="LSF_COREFILE_LIMIT" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_COREFILE_LIMIT#tooltip}</tooltip>
+					</widget>
+																												
+					<!-- LSF_CPUTIME_LIMIT: CPU Time Limit -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_CPUTIME_LIMIT#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="text" attribute="LSF_CPUTIME_LIMIT" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_CPUTIME_LIMIT#tooltip}</tooltip>
+					</widget>
+																												
+					<!-- LSF_DATA_LIMIT: Data limit -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_DATA_LIMIT#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="text" attribute="LSF_DATA_LIMIT" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_DATA_LIMIT#tooltip}</tooltip>
+					</widget>
+																												
+					<!-- LSF_FILESIZE_LIMIT: Filesize limit -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_FILESIZE_LIMIT#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="text" attribute="LSF_FILESIZE_LIMIT" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_FILESIZE_LIMIT#tooltip}</tooltip>
+					</widget>
+																												
+					<!-- LSF_MEMORY_LIMIT: Memory limit -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_MEMORY_LIMIT#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="text" attribute="LSF_MEMORY_LIMIT" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_MEMORY_LIMIT#tooltip}</tooltip>
+					</widget>
+																												
+					<!-- LSF_PROCESS_LIMIT: Process limit -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_PROCESS_LIMIT#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="text" attribute="LSF_PROCESS_LIMIT" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_PROCESS_LIMIT#tooltip}</tooltip>
+					</widget>
+																												
+					<!-- LSF_STACK_LIMIT: Stack limit -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_STACK_LIMIT#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="text" attribute="LSF_STACK_LIMIT" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_STACK_LIMIT#tooltip}</tooltip>
+					</widget>
+																												
+					<!-- LSF_THREAD_LIMIT: Thread limit -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_THREAD_LIMIT#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="text" attribute="LSF_THREAD_LIMIT" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_THREAD_LIMIT#tooltip}</tooltip>
+					</widget>
+																												
+					<!-- LSF_SWAP_LIMIT: Swap limit -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_SWAP_LIMIT#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="text" attribute="LSF_SWAP_LIMIT" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_SWAP_LIMIT#tooltip}</tooltip>
+					</widget>
+																												
+					<!-- LSF_RUNTIME_LIMIT: Runtime limit -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_RUNTIME_LIMIT#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="text" attribute="LSF_RUNTIME_LIMIT" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_RUNTIME_LIMIT#tooltip}</tooltip>
+					</widget>
+																												
+					<!-- LSF_RUNTIME_ESTIMATE: Run time estimate -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_RUNTIME_ESTIMATE#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="text" attribute="LSF_RUNTIME_ESTIMATE" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_RUNTIME_ESTIMATE#tooltip}</tooltip>
+					</widget>
+																																	
+					<!-- LSF_JOB_ACTION: Job action signal -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_JOB_ACTION#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="text" attribute="LSF_JOB_ACTION" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_JOB_ACTION#tooltip}</tooltip>
+					</widget>
+																																						
+					<!-- LSF_JOB_ACTION_TIME: Job action signal -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_JOB_ACTION_TIME#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="text" attribute="LSF_JOB_ACTION_TIME" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_JOB_ACTION_TIME#tooltip}</tooltip>
+					</widget>
+					
+				</composite>
+			</dynamic>
+			
+			<!-- I/O tab -->
+			<dynamic includeWidgetValuesFrom="Job Submission,Scheduling,Resources,Limits,Notifications">
+				<title>I/O</title>
+				<layout>
+					<grid-layout/>
+				</layout>
+				
+				<composite group="true">
+					<layout>
+						<grid-layout numColumns="3" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
+					</layout>
+					
+					<!--LSF_STDIN_PATH: Stdin Path -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data verticalAlign="SWT.CENTER"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_STDIN_PATH#description}</fixed-text>
+					</widget>
+					
+					<browse textStyle="SWT.BORDER" attribute="LSF_STDIN_PATH"
+						title="Browse">
+						<text-layout-data>
+							<grid-data widthHint="300" verticalAlign="SWT.CENTER"/>
+						</text-layout-data>
+						<button-layout-data>
+							<grid-data widthHint="300" verticalAlign="SWT.CENTER"/>
+						</button-layout-data>
+						<tooltip>${ptp_rm:LSF_STDIN_PATH#tooltip}</tooltip>
+					</browse>
+								
+					<!--LSF_STDIN_EDITABLE_PATH: Stdin Editable Path -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data verticalAlign="SWT.CENTER"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_STDIN_EDITABLE_PATH#description}</fixed-text>
+					</widget>
+					
+					<browse textStyle="SWT.BORDER" attribute="LSF_STDIN_EDITABLE_PATH"
+						title="Browse">
+						<text-layout-data>
+							<grid-data widthHint="300" verticalAlign="SWT.CENTER"/>
+						</text-layout-data>
+						<button-layout-data>
+							<grid-data widthHint="300" verticalAlign="SWT.CENTER"/>
+						</button-layout-data>
+						<tooltip>${ptp_rm:LSF_STDIN_EDITABLE_PATH#tooltip}</tooltip>
+					</browse>
+															
+					<!-- LSF_STDOUT_PATH_NEW STDOUT new file path -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data verticalAlign="SWT.CENTER"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_STDOUT_PATH_NEW#description}</fixed-text>
+					</widget>
+					
+					<browse textStyle="SWT.BORDER" attribute="LSF_STDOUT_PATH_NEW"
+						title="Browse">
+						<text-layout-data>
+							<grid-data widthHint="300" verticalAlign="SWT.CENTER"/>
+						</text-layout-data>
+						<button-layout-data>
+							<grid-data widthHint="300" verticalAlign="SWT.CENTER"/>
+						</button-layout-data>
+						<tooltip>${ptp_rm:LSF_STDOUT_PATH_NEW#tooltip}</tooltip>
+					</browse>
+					
+					<!-- LSF_STDOUT_PATH_APPEND STDOUT appendable path -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data verticalAlign="SWT.CENTER"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_STDOUT_PATH_APPEND#description}</fixed-text>
+					</widget>
+					
+					<browse textStyle="SWT.BORDER" attribute="LSF_STDOUT_PATH_APPEND"
+						title="Browse">
+						<text-layout-data>
+							<grid-data widthHint="300" verticalAlign="SWT.CENTER"/>
+						</text-layout-data>
+						<button-layout-data>
+							<grid-data widthHint="300" verticalAlign="SWT.CENTER"/>
+						</button-layout-data>
+						<tooltip>${ptp_rm:LSF_STDOUT_PATH_APPEND#tooltip}</tooltip>
+					</browse>
+					
+					<!-- LSF_STDERR_PATH_NEW STDERR new file path -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data verticalAlign="SWT.CENTER"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_STDERR_PATH_NEW#description}</fixed-text>
+					</widget>
+					
+					<browse textStyle="SWT.BORDER" attribute="LSF_STDERR_PATH_NEW"
+						title="Browse">
+						<text-layout-data>
+							<grid-data widthHint="300" verticalAlign="SWT.CENTER"/>
+						</text-layout-data>
+						<button-layout-data>
+							<grid-data widthHint="300" verticalAlign="SWT.CENTER"/>
+						</button-layout-data>
+						<tooltip>${ptp_rm:LSF_STDERR_PATH_NEW#tooltip}</tooltip>
+					</browse>
+					
+					<!-- LSF_STDERR_PATH_APPEND STDERR appendable path -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data verticalAlign="SWT.CENTER"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_STDERR_PATH_APPEND#description}</fixed-text>
+					</widget>
+					
+					<browse textStyle="SWT.BORDER" attribute="LSF_STDERR_PATH_APPEND"
+						title="Browse">
+						<text-layout-data>
+							<grid-data widthHint="300" verticalAlign="SWT.CENTER"/>
+						</text-layout-data>
+						<button-layout-data>
+							<grid-data widthHint="300" verticalAlign="SWT.CENTER"/>
+						</button-layout-data>
+						<tooltip>${ptp_rm:LSF_STDERR_PATH_APPEND#tooltip}</tooltip>
+					</browse>
+										
+				</composite>
+			</dynamic>
+						
+			<!-- Notifications tab -->
+			<dynamic includeWidgetValuesFrom="Job Submission,Scheduling,Resources,Limits,I/O">
+				<title>Notifications</title>
+				<layout>
+					<grid-layout/>
+				</layout>
+				
+				<composite group="true">
+					<layout>
+						<grid-layout numColumns="3" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
+					</layout>
+																																												
+					<!-- LSF_EMAIL_ID: Notification email address -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_EMAIL_ID#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="text" attribute="LSF_EMAIL_ID" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_EMAIL_ID#tooltip}</tooltip>
+					</widget>
+																		
+					<!-- LSF_NOTIFY_DISPATCH: Notify on job dispatch -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_NOTIFY_DISPATCH#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="checkbox" attribute="LSF_NOTIFY_DISPATCH"
+						style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL"
+								grabExcessHorizontal="false" horizontalSpan="2"/>
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_NOTIFY_DISPATCH#tooltip}</tooltip>
+					</widget>									
+																				
+					<!-- LSF_NOTIFY_COMPLETION: Notify on job completion -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_NOTIFY_COMPLETION#description}
+						</fixed-text>
+						<control-state>
+							<disable-if>
+								<and>
+									<rule attribute="LSF_STDOUT_PATH_APPEND" value=""/>
+									<rule attribute="LSF_STDOUT_PATH_NEW" value=""/>
+								</and>
+							</disable-if>
+						</control-state>
+					</widget>
+					
+					<widget type="checkbox" attribute="LSF_NOTIFY_COMPLETION"
+						style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL"
+								grabExcessHorizontal="false" horizontalSpan="2"/>
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_NOTIFY_COMPLETION#tooltip}</tooltip>
+						<control-state>
+							<disable-if>
+								<and>
+									<rule attribute="LSF_STDOUT_PATH_APPEND" value=""/>
+									<rule attribute="LSF_STDOUT_PATH_NEW" value=""/>
+								</and>
+							</disable-if>
+						</control-state>
+					</widget>
+				</composite>
+			</dynamic>
+			
 			<!-- Advanced Tab -->
 			<dynamic>
-				<title>Job Submission</title>
+				<title>Advanced</title>
 				<layout>
 					<grid-layout />
 				</layout>
@@ -601,14 +1704,24 @@
 							<include>LSF_RESOURCES</include>
 							<include>LSF_HOST_NAMES</include>
 							<include>LSF_RESERVATION_ID</include>
+							<include>LSF_APP_PROFILE</include>
 							<include>LSF_NETWORK</include>
 							<include>LSF_JOB_RESIZABLE</include>
 							<include>LSF_LICENSE_SCHEDULER_PROJECT</include>
 							<include>LSF_PROJECT_NAME</include>
 							<include>LSF_SERVICE_CLASS</include>
 							<include>LSF_JOB_NAME</include>
+							<include>LSF_JOB_DESCRIPTION</include>
 							<include>LSF_JOB_PRIORITY</include>
+							<include>LSF_USER_GROUP</include>
+							<include>LSF_JOB_GROUP</include>
 							<include>LSF_LOGIN_SHELL</include>
+							<include>LSF_JSDL_FILE</include>
+							<include>LSF_JSDL_FILE_STRICT</include>
+							<include>LSF_CHECKPOINT</include>
+							<include>LSF_SIGNAL</include>
+							<include>LSF_LOB_ACTION</include>
+							<include>LSF_JOB_ACTION_TIME</include>
 							<include>LSF_DISPATCH_AT</include>
 							<include>LSF_TERMINATION_DEADLINE</include>
 							<include>LSF_RUNTIME_ESTIMATE</include>
@@ -637,6 +1750,7 @@
 							<include>LSF_NOTIFY_COMPLETION</include>
 							<include>LSF_EMAIL_ID</include>
 							<include>LSF_OTHER_OPTIONS</include>
+							<include>LSF_MPI_COMMAND</include>
 						</items>
 					</viewer>
 				</composite>

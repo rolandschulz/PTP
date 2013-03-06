@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: IBM Platform LSF Support
+Bundle-SymbolicName: org.eclipse.ptp.rm.ibm.platform.lsf.ui;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.eclipse.ptp.rm.ibm.lsf.ui.Activator
+Bundle-Vendor: IBM
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.ptp.rm.jaxb.control.ui;bundle-version="1.1.0",
+ org.eclipse.ptp.rm.jaxb.core;bundle-version="1.1.0",
+ org.eclipse.ptp.remote.core;bundle-version="6.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
