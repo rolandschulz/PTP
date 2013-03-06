@@ -53,13 +53,12 @@ import org.eclipse.swt.widgets.Display;
 public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControllerTab implements IJAXBParentLaunchConfigurationTab,
 		IUpdateModelEnabled, SelectionListener {
 
-	private RemoteServicesDelegate delegate;
-	private final ILaunchController fControl;
-	private final LaunchTabType launchTabData;
-	private final IUpdateHandler updateHandler;
-	private final LCVariableMap lcMap;
-
-	private ScriptType script;
+	protected final ILaunchController fControl;
+	protected final LaunchTabType launchTabData;
+	protected final IUpdateHandler updateHandler;
+	protected final LCVariableMap lcMap;
+	protected RemoteServicesDelegate delegate;
+	protected ScriptType script;
 
 	/**
 	 * @param rm
