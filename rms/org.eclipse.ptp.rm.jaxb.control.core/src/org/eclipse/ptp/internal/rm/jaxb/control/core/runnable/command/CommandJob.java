@@ -56,7 +56,6 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
-import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
@@ -71,6 +70,9 @@ import org.eclipse.ui.progress.IProgressConstants;
 /**
  * Implementation of runnable Job for executing external processes. Uses the IRemoteProcessBuilder with the IRemoteConnection for
  * the resource manager's target.
+ * 
+ * The job's run method will not be used to report errors. Callers should use {@link #getRunStatus()} to check the status of the job
+ * once it is completed.
  * 
  * @author arossi
  * 
@@ -169,20 +171,15 @@ public class CommandJob extends Job implements ICommandJob {
 	 *            extension name
 	 * @return the tokenizer instance
 	 * @throws CoreException
+	 *             if unable to instantiate the tokenizer
 	 */
 	public static IStreamParserTokenizer getTokenizer(String type) throws CoreException {
 		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(JAXBControlCorePlugin.PLUGIN_ID,
 				JAXBControlConstants.TOKENIZER_EXT_PT);
 		IConfigurationElement[] elements = extensionPoint.getConfigurationElements();
 		for (IConfigurationElement element : elements) {
-			try {
-				if (element.getAttribute(JAXBControlConstants.ID).equals(type)) {
-					return (IStreamParserTokenizer) element.createExecutableExtension(JAXBControlConstants.CLASS);
-				}
-			} catch (CoreException ce) {
-				throw ce;
-			} catch (Throwable t) {
-				throw CoreExceptionUtils.newException(Messages.StreamTokenizerInstantiationError + type, t);
+			if (element.getAttribute(JAXBControlConstants.ID).equals(type)) {
+				return (IStreamParserTokenizer) element.createExecutableExtension(JAXBControlConstants.CLASS);
 			}
 		}
 		return null;
@@ -200,8 +197,9 @@ public class CommandJob extends Job implements ICommandJob {
 	private final ILaunchConfiguration launchConfig;
 	private final String launchMode;
 	private final List<Job> cmdJobs = new ArrayList<Job>();
-
 	private final StringBuffer error;
+
+	private IStatus runStatus;
 	private Thread jobThread;
 	private IRemoteProcess process;
 	private IStreamParserTokenizer stdoutTokenizer;
@@ -214,7 +212,6 @@ public class CommandJob extends Job implements ICommandJob {
 	private StreamSplitter errSplitter;
 	private IStreamMonitor[] batchMonitors;
 	private ICommandJobStatus jobStatus;
-	private IStatus status;
 	private boolean active;
 
 	/**
@@ -255,7 +252,6 @@ public class CommandJob extends Job implements ICommandJob {
 		SubMonitor progress = SubMonitor.convert(monitor, 100);
 		try {
 			synchronized (this) {
-				status = null;
 				active = false;
 			}
 			IRemoteProcessBuilder builder = prepareCommand(progress.newChild(10));
@@ -270,13 +266,13 @@ public class CommandJob extends Job implements ICommandJob {
 			try {
 				process = builder.start(flags);
 			} catch (IOException t) {
-				throw CoreExceptionUtils.newException(Messages.CouldNotLaunch + builder.command(), t);
+				return CoreExceptionUtils.getErrorStatus(Messages.CouldNotLaunch + builder.command(), t);
 			}
 			progress.worked(30);
-			maybeInitializeTokenizers(builder, progress.newChild(10));
+			maybeInitializeTokenizers(builder);
 			setOutStreamRedirection(process);
 			setErrStreamRedirection(process);
-			startConsumers(process);
+			startConsumers();
 
 			synchronized (this) {
 				active = true;
@@ -291,8 +287,8 @@ public class CommandJob extends Job implements ICommandJob {
 					} catch (Throwable t) {
 						// Ignore
 					}
-					if ((exit != 0 || error.length() > 0)) {
-						processError(builder.command().get(0), exit, null);
+					if ((exit != 0 /* || error.length() > 0 */)) {
+						return processError(builder.command().get(0), exit, null);
 					}
 					return Status.OK_STATUS;
 				}
@@ -308,17 +304,16 @@ public class CommandJob extends Job implements ICommandJob {
 				// Ignore
 			}
 
-			CoreException e = joinConsumers();
+			IStatus status = joinConsumers();
 
 			if (exit != 0) {
-				processError(builder.command().get(0), exit, e);
-			} else if (e != null) {
-				return e.getStatus();
+				return processError(builder.command().get(0), exit, status);
+			}
+			if (!status.isOK()) {
+				return status;
 			}
 		} catch (CoreException ce) {
 			return ce.getStatus();
-		} catch (Throwable t) {
-			return CoreExceptionUtils.getErrorStatus(Messages.ProcessRunError, t);
 		}
 
 		synchronized (this) {
@@ -405,7 +400,7 @@ public class CommandJob extends Job implements ICommandJob {
 	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJob#getRunStatus()
 	 */
 	public IStatus getRunStatus() {
-		return status;
+		return runStatus;
 	}
 
 	/**
@@ -435,59 +430,53 @@ public class CommandJob extends Job implements ICommandJob {
 		return jobMode == JobMode.BATCH;
 	}
 
-	/**
-	 * Wait for any special stream consumer threads to exit. We ignore the stream monitors here.
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @return CoreException
+	 * @see org.eclipse.ptp.internal.rm.jaxb.control.core.ICommandJob#joinConsumers()
 	 */
-	public CoreException joinConsumers() {
-		if (!isActive()) {
-			return null;
-		}
+	public IStatus joinConsumers() {
+		IStatus status = Status.OK_STATUS;
 
-		Throwable t = null;
+		if (isActive()) {
+			if (outSplitter != null) {
+				try {
+					outSplitter.join();
+				} catch (InterruptedException ignored) {
+					// Ignore
+				}
+			}
 
-		if (outSplitter != null) {
-			try {
-				outSplitter.join();
-			} catch (InterruptedException ignored) {
-				// Ignore
+			if (errSplitter != null) {
+				try {
+					errSplitter.join();
+				} catch (InterruptedException ignored) {
+					// Ignore
+				}
+			}
+
+			if (stdoutT != null) {
+				try {
+					stdoutT.join();
+				} catch (InterruptedException ignored) {
+					// Ignore
+				}
+				status = stdoutTokenizer.getStatus();
+			}
+
+			if (stderrT != null) {
+				try {
+					stderrT.join();
+				} catch (InterruptedException ignored) {
+					// Ignore
+				}
+				if (status.isOK()) {
+					status = stderrTokenizer.getStatus();
+				}
 			}
 		}
 
-		if (errSplitter != null) {
-			try {
-				errSplitter.join();
-			} catch (InterruptedException ignored) {
-				// Ignore
-			}
-		}
-
-		if (stdoutT != null) {
-			try {
-				stdoutT.join();
-			} catch (InterruptedException ignored) {
-				// Ignore
-			}
-			t = stdoutTokenizer.getInternalError();
-		}
-
-		if (stderrT != null) {
-			try {
-				stderrT.join();
-			} catch (InterruptedException ignored) {
-				// Ignore
-			}
-			if (t == null) {
-				t = stderrTokenizer.getInternalError();
-			}
-		}
-
-		if (t != null) {
-			return CoreExceptionUtils.newException(t.getMessage(), t);
-		}
-
-		return null;
+		return status;
 	}
 
 	/**
@@ -500,57 +489,44 @@ public class CommandJob extends Job implements ICommandJob {
 	 * @param monitor
 	 * @throws CoreException
 	 */
-	private void maybeInitializeTokenizers(IRemoteProcessBuilder builder, IProgressMonitor monitor) throws CoreException {
-		SubMonitor progress = SubMonitor.convert(monitor, 100);
-		try {
-			TokenizerType t = null;
+	private void maybeInitializeTokenizers(IRemoteProcessBuilder builder) throws CoreException {
+		TokenizerType t = null;
 
-			if (builder.redirectErrorStream()) {
-				t = command.getRedirectParser();
-			}
+		if (builder.redirectErrorStream()) {
+			t = command.getRedirectParser();
+		}
 
-			if (t == null) {
-				t = command.getStdoutParser();
-			}
+		if (t == null) {
+			t = command.getStdoutParser();
+		}
 
-			if (t != null) {
+		if (t != null) {
+			String type = t.getType();
+			if (type != null) {
 				try {
-					String type = t.getType();
-					if (type != null) {
-						stdoutTokenizer = getTokenizer(type);
-					} else {
-						stdoutTokenizer = new ConfigurableRegexTokenizer(t);
-					}
-					stdoutTokenizer.initialize(uuid, rmVarMap, progress.newChild(50));
-					if (progress.isCanceled()) {
-						return;
-					}
+					stdoutTokenizer = getTokenizer(type);
 				} catch (Throwable e) {
-					throw CoreExceptionUtils.newException(Messages.StdoutParserError, e);
+					throw CoreExceptionUtils.newException(Messages.StreamTokenizerInstantiationError, e);
 				}
+			} else {
+				stdoutTokenizer = new ConfigurableRegexTokenizer(t);
 			}
+			stdoutTokenizer.initialize(uuid, rmVarMap);
+		}
 
-			t = command.getStderrParser();
-			if (t != null) {
+		t = command.getStderrParser();
+		if (t != null) {
+			String type = t.getType();
+			if (type != null) {
 				try {
-					String type = t.getType();
-					if (type != null) {
-						stderrTokenizer = getTokenizer(type);
-					} else {
-						stderrTokenizer = new ConfigurableRegexTokenizer(t);
-					}
-					stderrTokenizer.initialize(uuid, rmVarMap, progress.newChild(50));
-					if (progress.isCanceled()) {
-						return;
-					}
+					stderrTokenizer = getTokenizer(type);
 				} catch (Throwable e) {
-					throw CoreExceptionUtils.newException(Messages.StdoutParserError, e);
+					throw CoreExceptionUtils.newException(Messages.StreamTokenizerInstantiationError, e);
 				}
+			} else {
+				stderrTokenizer = new ConfigurableRegexTokenizer(t);
 			}
-		} finally {
-			if (monitor != null) {
-				monitor.done();
-			}
+			stderrTokenizer.initialize(uuid, rmVarMap);
 		}
 	}
 
@@ -564,46 +540,36 @@ public class CommandJob extends Job implements ICommandJob {
 	 */
 	private IRemoteProcessBuilder prepareCommand(IProgressMonitor monitor) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 10);
-		try {
-			List<ArgType> args = command.getArg();
-			if (args == null) {
-				throw CoreExceptionUtils.newException(Messages.MissingArglistFromCommandError, null);
-			}
-			ArgumentParser cmdArgs = new ArgumentParser(ArgImpl.getArgs(uuid, args, rmVarMap));
-			RemoteServicesDelegate delegate = JAXBUtils.getRemoteServicesDelegate(control.getRemoteServicesId(),
-					control.getConnectionName(), progress.newChild(5));
-			if (progress.isCanceled()) {
-				return null;
-			}
-			if (delegate.getRemoteConnection() == null) {
-				throw CoreExceptionUtils.newException(Messages.MissingArglistFromCommandError, new Throwable(
-						Messages.UninitializedRemoteServices));
-			}
-			IRemoteConnection conn = delegate.getRemoteConnection();
-			try {
-				LaunchController.checkConnection(conn, progress.newChild(5));
-			} catch (RemoteConnectionException rce) {
-				throw CoreExceptionUtils.newException(rce.getLocalizedMessage(), rce);
-			}
-			if (progress.isCanceled()) {
-				return null;
-			}
-			if (DebuggingLogger.getLogger().getCommand()) {
-				System.out.println(getName() + ": " + cmdArgs.getCommandLine(false)); //$NON-NLS-1$
-			}
-			IRemoteProcessBuilder builder = delegate.getRemoteServices().getProcessBuilder(conn, cmdArgs.getTokenList());
-			String directory = command.getDirectory();
-			if (directory != null && !JAXBControlConstants.ZEROSTR.equals(directory)) {
-				directory = rmVarMap.getString(uuid, directory);
-				IFileStore dir = delegate.getRemoteFileManager().getResource(directory);
-				builder.directory(dir);
-			}
-			return builder;
-		} finally {
-			if (monitor != null) {
-				monitor.done();
-			}
+		List<ArgType> args = command.getArg();
+		if (args == null) {
+			throw CoreExceptionUtils.newException(Messages.MissingArglistFromCommandError, null);
 		}
+		ArgumentParser cmdArgs = new ArgumentParser(ArgImpl.getArgs(uuid, args, rmVarMap));
+		RemoteServicesDelegate delegate = JAXBUtils.getRemoteServicesDelegate(control.getRemoteServicesId(),
+				control.getConnectionName(), progress.newChild(5));
+		if (progress.isCanceled()) {
+			return null;
+		}
+		if (delegate.getRemoteConnection() == null) {
+			throw CoreExceptionUtils.newException(Messages.MissingArglistFromCommandError, new Throwable(
+					Messages.UninitializedRemoteServices));
+		}
+		IRemoteConnection conn = delegate.getRemoteConnection();
+		LaunchController.checkConnection(conn, progress.newChild(5));
+		if (progress.isCanceled()) {
+			return null;
+		}
+		if (DebuggingLogger.getLogger().getCommand()) {
+			System.out.println(getName() + ": " + cmdArgs.getCommandLine(false)); //$NON-NLS-1$
+		}
+		IRemoteProcessBuilder builder = delegate.getRemoteServices().getProcessBuilder(conn, cmdArgs.getTokenList());
+		String directory = command.getDirectory();
+		if (directory != null && !JAXBControlConstants.ZEROSTR.equals(directory)) {
+			directory = rmVarMap.getString(uuid, directory);
+			IFileStore dir = delegate.getRemoteFileManager().getResource(directory);
+			builder.directory(dir);
+		}
+		return builder;
 	}
 
 	/**
@@ -692,17 +658,17 @@ public class CommandJob extends Job implements ICommandJob {
 	 *            first arg of command
 	 * @param exit
 	 *            of process
-	 * @param e
-	 *            additional exception info
-	 * @throws CoreException
+	 * @param status
+	 *            additional status info
+	 * @return IStatus
 	 */
-	private void processError(String arg, int exit, CoreException e) throws CoreException {
-		if (e != null) {
-			error.append(e.getMessage()).append(JAXBControlConstants.LINE_SEP);
+	private IStatus processError(String arg, int exit, IStatus status) throws CoreException {
+		if (!status.isOK()) {
+			error.append(status.getMessage()).append(JAXBControlConstants.LINE_SEP);
 		}
 		String message = error.toString();
 		error.setLength(0);
-		throw CoreExceptionUtils.newException(arg + JAXBControlConstants.SP + Messages.ProcessExitValueError
+		return CoreExceptionUtils.getErrorStatus(arg + JAXBControlConstants.SP + Messages.ProcessExitValueError
 				+ (JAXBControlConstants.ZEROSTR + exit) + JAXBControlConstants.LINE_SEP + message, null);
 	}
 
@@ -732,142 +698,130 @@ public class CommandJob extends Job implements ICommandJob {
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
 		SubMonitor progress = SubMonitor.convert(monitor, 100);
-		try {
-			jobThread = Thread.currentThread();
+		jobThread = Thread.currentThread();
 
-			for (SimpleCommandType cmd : command.getPreLaunchCmd()) {
-				Job job = new SimpleCommandJob(uuid, cmd, command.getDirectory(), control, rmVarMap, this);
-				job.setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY, Boolean.TRUE);
-				job.schedule();
-				if (cmd.isWait()) {
-					try {
-						job.join();
-						if (!cmd.isIgnoreExitStatus()) {
-							if (!job.getResult().isOK()) {
-								return job.getResult();
-							}
-						}
-					} catch (InterruptedException ignored) {
-						// Ignore
-					}
-				} else {
-					cmdJobs.add(job);
-				}
-			}
-
-			status = execute(progress.newChild(50));
-
-			if (progress.isCanceled()) {
-				return Status.CANCEL_STATUS;
-			}
-
-			if (uuid == null || !status.isOK()) {
-				/*
-				 * these jobs will have waited for the exit of the process.
-				 */
-				return status;
-			}
-
-			/*
-			 * When there is a UUID defined for this command, set the status for it. If the submit job lacks a jobId on the standard
-			 * streams, then we assign it the UUID (it is most probably interactive); else we wait for the id to be set by the
-			 * tokenizer. NOTE that the caller should now join on all commands with this property (05.01.2011). Open connection jobs
-			 * should have their jobId tokenizers set a RUNNING state.
-			 */
-			jobStatus = null;
-			String waitUntil = keepOpen ? IJobStatus.RUNNING : IJobStatus.SUBMITTED;
-			ICommandJob parent = keepOpen ? this : null;
-
-			if (waitForId) {
-				jobStatus = new CommandJobStatus(parent, control, rmVarMap, launchMode);
-				jobStatus.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
-				jobStatus.setQueueName(rmVarMap.getString(JAXBControlConstants.CONTROL_QUEUE_NAME));
-				if (!isBatch()) {
-					jobStatus.setProcess(process);
-				}
-				jobStatus.setProxy(getProxy());
+		for (SimpleCommandType cmd : command.getPreLaunchCmd()) {
+			Job job = new SimpleCommandJob(uuid, cmd, command.getDirectory(), control, rmVarMap, this);
+			job.setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY, Boolean.TRUE);
+			job.schedule();
+			if (cmd.isWait()) {
 				try {
-					jobStatus.waitForJobId(uuid, waitUntil, progress.newChild(20));
-				} catch (CoreException failed) {
-					error.append(jobStatus.getStreamsProxy().getOutputStreamMonitor().getContents()).append(
-							JAXBCoreConstants.LINE_SEP);
-
-					status = CoreExceptionUtils.getErrorStatus(failed.getMessage() + JAXBCoreConstants.LINE_SEP + error.toString(),
-							null);
-					error.setLength(0);
-					return status;
+					job.join();
+					if (!cmd.isIgnoreExitStatus()) {
+						if (!job.getResult().isOK()) {
+							return job.getResult();
+						}
+					}
+				} catch (InterruptedException ignored) {
+					// Ignore
 				}
 			} else {
-				if (!keepOpen) {
-					CoreException e = joinConsumers();
-					if (e != null) {
-						return CoreExceptionUtils.getErrorStatus(e.getMessage(), e);
-					}
-				}
-				AttributeType a = rmVarMap.get(uuid);
-				String state = (String) a.getValue();
-				if (state == null) {
-					state = isActive() ? IJobStatus.RUNNING : IJobStatus.FAILED;
-					a.setValue(state);
-				}
-				a.setName(uuid);
-				jobStatus = new CommandJobStatus(uuid, state, parent, control, rmVarMap, launchMode);
-				jobStatus.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
-				jobStatus.setQueueName(rmVarMap.getString(JAXBControlConstants.CONTROL_QUEUE_NAME));
-				if (!isBatch()) {
-					jobStatus.setProcess(process);
-				}
-				jobStatus.setProxy(getProxy());
-			}
-
-			if (progress.isCanceled()) {
-				return status;
-			}
-
-			if (!jobStatus.getState().equals(IJobStatus.COMPLETED)) {
-				if (hasInput()) {
-					if (process != null && !process.isCompleted()) {
-						status = writeInputToProcess(process);
-					}
-				}
-
-				if (status.isOK()) {
-					/*
-					 * Once job has started running, execute any post launch commands
-					 */
-					for (SimpleCommandType cmd : command.getPostLaunchCmd()) {
-						Job job = new SimpleCommandJob(uuid, cmd, command.getDirectory(), control, rmVarMap, this);
-						job.setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY, Boolean.TRUE);
-						job.schedule();
-						if (cmd.isWait()) {
-							try {
-								job.join();
-								if (!cmd.isIgnoreExitStatus()) {
-									if (!job.getResult().isOK()) {
-										terminate();
-										status = job.getResult();
-									}
-								}
-							} catch (InterruptedException ignored) {
-								// Ignore
-							}
-						} else {
-							cmdJobs.add(job);
-						}
-					}
-				} else {
-					terminate();
-				}
-			} else if (keepOpen && IJobStatus.CANCELED.equals(jobStatus.getStateDetail())) {
-				terminate();
-			}
-
-		} finally {
-			if (monitor != null) {
-				monitor.done();
+				cmdJobs.add(job);
 			}
 		}
-		return status;
+
+		runStatus = execute(progress.newChild(50));
+
+		if (uuid == null || !runStatus.isOK()) {
+			/*
+			 * these jobs will have waited for the exit of the process.
+			 */
+			return Status.OK_STATUS;
+		}
+
+		/*
+		 * When there is a UUID defined for this command, set the status for it. If the submit job lacks a jobId on the standard
+		 * streams, then we assign it the UUID (it is most probably interactive); else we wait for the id to be set by the
+		 * tokenizer. NOTE that the caller should now join on all commands with this property (05.01.2011). Open connection jobs
+		 * should have their jobId tokenizers set a RUNNING state.
+		 */
+		jobStatus = null;
+		String waitUntil = keepOpen ? IJobStatus.RUNNING : IJobStatus.SUBMITTED;
+		ICommandJob parent = keepOpen ? this : null;
+
+		if (waitForId) {
+			jobStatus = new CommandJobStatus(parent, control, rmVarMap, launchMode);
+			jobStatus.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
+			jobStatus.setQueueName(rmVarMap.getString(JAXBControlConstants.CONTROL_QUEUE_NAME));
+			if (!isBatch()) {
+				jobStatus.setProcess(process);
+			}
+			jobStatus.setProxy(getProxy());
+			try {
+				jobStatus.waitForJobId(uuid, waitUntil, progress.newChild(20));
+			} catch (CoreException failed) {
+				error.append(jobStatus.getStreamsProxy().getOutputStreamMonitor().getContents()).append(JAXBCoreConstants.LINE_SEP);
+
+				runStatus = CoreExceptionUtils.getErrorStatus(failed.getMessage() + JAXBCoreConstants.LINE_SEP + error.toString(),
+						null);
+				error.setLength(0);
+				return Status.OK_STATUS;
+			}
+		} else {
+			if (!keepOpen) {
+				runStatus = joinConsumers();
+				if (!runStatus.isOK()) {
+					return Status.OK_STATUS;
+				}
+			}
+			AttributeType a = rmVarMap.get(uuid);
+			String state = (String) a.getValue();
+			if (state == null) {
+				state = isActive() ? IJobStatus.RUNNING : IJobStatus.FAILED;
+				a.setValue(state);
+			}
+			a.setName(uuid);
+			jobStatus = new CommandJobStatus(uuid, state, parent, control, rmVarMap, launchMode);
+			jobStatus.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
+			jobStatus.setQueueName(rmVarMap.getString(JAXBControlConstants.CONTROL_QUEUE_NAME));
+			if (!isBatch()) {
+				jobStatus.setProcess(process);
+			}
+			jobStatus.setProxy(getProxy());
+		}
+
+		if (progress.isCanceled()) {
+			return Status.CANCEL_STATUS;
+		}
+
+		if (!jobStatus.getState().equals(IJobStatus.COMPLETED)) {
+			if (hasInput()) {
+				if (process != null && !process.isCompleted()) {
+					runStatus = writeInputToProcess(process);
+				}
+			}
+
+			if (runStatus.isOK()) {
+				/*
+				 * Once job has started running, execute any post launch commands
+				 */
+				for (SimpleCommandType cmd : command.getPostLaunchCmd()) {
+					Job job = new SimpleCommandJob(uuid, cmd, command.getDirectory(), control, rmVarMap, this);
+					job.setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY, Boolean.TRUE);
+					job.schedule();
+					if (cmd.isWait()) {
+						try {
+							job.join();
+							if (!cmd.isIgnoreExitStatus()) {
+								if (!job.getResult().isOK()) {
+									terminate();
+									runStatus = job.getResult();
+								}
+							}
+						} catch (InterruptedException ignored) {
+							// Ignore
+						}
+					} else {
+						cmdJobs.add(job);
+					}
+				}
+			} else {
+				terminate();
+			}
+		} else if (keepOpen && IJobStatus.CANCELED.equals(jobStatus.getStateDetail())) {
+			terminate();
+		}
+		return Status.OK_STATUS;
 	}
 
 	/**
@@ -877,14 +831,18 @@ public class CommandJob extends Job implements ICommandJob {
 	 * @param process
 	 * @throws IOException
 	 */
-	private void setErrStreamRedirection(IRemoteProcess process) throws IOException {
+	private void setErrStreamRedirection(IRemoteProcess process) throws CoreException {
 		if (stderrTokenizer == null) {
 			proxy.setErrMonitor(new CommandJobStreamMonitor(process.getErrorStream()));
 		} else {
 			PipedInputStream tokenizerErr = new PipedInputStream();
 			this.tokenizerErr = tokenizerErr;
 			PipedInputStream monitorErr = new PipedInputStream();
-			errSplitter = new StreamSplitter(process.getErrorStream(), tokenizerErr, monitorErr);
+			try {
+				errSplitter = new StreamSplitter(process.getErrorStream(), tokenizerErr, monitorErr);
+			} catch (IOException e) {
+				throw CoreExceptionUtils.newException(e.getMessage(), e);
+			}
 			proxy.setErrMonitor(new CommandJobStreamMonitor(monitorErr, null));
 		}
 		proxy.getErrorStreamMonitor().addListener(new IStreamListener() {
@@ -901,14 +859,18 @@ public class CommandJob extends Job implements ICommandJob {
 	 * @param process
 	 * @throws IOException
 	 */
-	private void setOutStreamRedirection(IRemoteProcess process) throws IOException {
+	private void setOutStreamRedirection(IRemoteProcess process) throws CoreException {
 		if (stdoutTokenizer == null) {
 			proxy.setOutMonitor(new CommandJobStreamMonitor(process.getInputStream()));
 		} else {
 			PipedInputStream tokenizerOut = new PipedInputStream();
 			this.tokenizerOut = tokenizerOut;
 			PipedInputStream monitorOut = new PipedInputStream();
-			outSplitter = new StreamSplitter(process.getInputStream(), tokenizerOut, monitorOut);
+			try {
+				outSplitter = new StreamSplitter(process.getInputStream(), tokenizerOut, monitorOut);
+			} catch (IOException e) {
+				throw CoreExceptionUtils.newException(e.getMessage(), e);
+			}
 			proxy.setOutMonitor(new CommandJobStreamMonitor(monitorOut, null));
 		}
 	}
@@ -916,10 +878,9 @@ public class CommandJob extends Job implements ICommandJob {
 	/**
 	 * Initiates stream reading on all consumers.
 	 * 
-	 * @param process
 	 * @throws CoreException
 	 */
-	private void startConsumers(IRemoteProcess process) throws CoreException {
+	private void startConsumers() throws CoreException {
 		if (outSplitter != null) {
 			outSplitter.start();
 		}
@@ -979,9 +940,9 @@ public class CommandJob extends Job implements ICommandJob {
 				if (proxy != null) {
 					proxy.close();
 				}
-				CoreException e = joinConsumers();
-				if (e != null) {
-					JAXBControlCorePlugin.log(e);
+				IStatus status = joinConsumers();
+				if (!status.isOK()) {
+					JAXBControlCorePlugin.log(status);
 				}
 			}
 			if (jobThread != null && jobThread != Thread.currentThread()) {

@@ -11,6 +11,7 @@ package org.eclipse.ptp.internal.rm.jaxb.control.core.data;
 
 import java.util.List;
 
+import org.eclipse.ptp.rm.jaxb.control.core.exceptions.StreamParserException;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.AppendType;
 import org.eclipse.ptp.rm.jaxb.core.data.EntryType;
@@ -45,7 +46,7 @@ public class AppendImpl extends AbstractAssign {
 	}
 
 	@Override
-	protected Object[] getValue(Object previous, String[] values) throws Throwable {
+	protected Object[] getValue(Object previous, String[] values) throws StreamParserException {
 		StringBuffer buffer = new StringBuffer();
 		if (!entries.isEmpty()) {
 			if (previous != null) {

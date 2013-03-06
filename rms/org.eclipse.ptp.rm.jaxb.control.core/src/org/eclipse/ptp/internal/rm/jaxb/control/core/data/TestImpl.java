@@ -12,11 +12,13 @@ package org.eclipse.ptp.internal.rm.jaxb.control.core.data;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.ptp.core.util.CoreExceptionUtils;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.IAssign;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.JAXBControlConstants;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.control.core.exceptions.StreamParserException;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
+import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.TestType;
 import org.eclipse.ptp.rm.jaxb.core.data.TestType.Else;
 
@@ -69,7 +71,7 @@ public class TestImpl {
 	private List<IAssign> ifcond;
 	private List<IAssign> elsecond;
 
-	private Object target;
+	private AttributeType target;
 
 	/**
 	 * @param uuid
@@ -114,9 +116,9 @@ public class TestImpl {
 	 * Applies the test.
 	 * 
 	 * @return whether the test succeeded or not.
-	 * @throws Throwable
+	 * @throws StreamParserException
 	 */
-	public boolean doTest() throws Throwable {
+	public boolean doTest() throws StreamParserException {
 		boolean result = false;
 		validate(op);
 		switch (op) {
@@ -173,7 +175,7 @@ public class TestImpl {
 	 * 
 	 * @param target
 	 */
-	public void setTarget(Object target) {
+	public void setTarget(AttributeType target) {
 		this.target = target;
 		if (children != null) {
 			for (TestImpl t : children) {
@@ -189,7 +191,7 @@ public class TestImpl {
 	 *            list of assignment actions.
 	 * @throws Throwable
 	 */
-	private void doAssign(List<IAssign> assign) throws Throwable {
+	private void doAssign(List<IAssign> assign) throws StreamParserException {
 		if (assign != null) {
 			for (IAssign a : assign) {
 				a.setTarget(target);
@@ -203,8 +205,8 @@ public class TestImpl {
 	}
 
 	/**
-	 * Auxiliary. Applies <code>compareTo</code> to <code>Comparable</code>
-	 * objects. Strings are first converted to boolean or integers if
+	 * Auxiliary. Applies <code>compareTo</code> to <code>Comparable</code> objects. Strings are first converted to boolean or
+	 * integers if
 	 * appropriate.
 	 * 
 	 * @param string1
@@ -212,10 +214,10 @@ public class TestImpl {
 	 * @param string2
 	 *            to be compared
 	 * @return -1,0 or 1
-	 * @throws Throwable
+	 * @throws CoreException
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private int evaluateComparable(String string1, String string2) throws Throwable {
+	private int evaluateComparable(String string1, String string2) throws StreamParserException {
 		Object value1 = AbstractAssign.normalizedValue(target, uuid, string1, true, rmVarMap);
 		Object value2 = AbstractAssign.normalizedValue(target, uuid, string2, true, rmVarMap);
 		if (value1 == null || value2 == null) {
@@ -238,9 +240,9 @@ public class TestImpl {
 	 * @param string2
 	 *            to be compared
 	 * @return whether the two values are equal
-	 * @throws Throwable
+	 * @throws CoreException
 	 */
-	private boolean evaluateEquals(String string1, String string2) throws Throwable {
+	private boolean evaluateEquals(String string1, String string2) throws StreamParserException {
 		Object value1 = AbstractAssign.normalizedValue(target, uuid, string1, true, rmVarMap);
 		Object value2 = AbstractAssign.normalizedValue(target, uuid, string2, true, rmVarMap);
 		if (value1 == null) {
@@ -257,9 +259,9 @@ public class TestImpl {
 	 * @param string2
 	 *            to be compared
 	 * @return true if {@link #evaluateComparable(String, String)} returns -1.
-	 * @throws Throwable
+	 * @throws CoreException
 	 */
-	private boolean evaluateLessThan(String string1, String string2) throws Throwable {
+	private boolean evaluateLessThan(String string1, String string2) throws StreamParserException {
 		return evaluateComparable(string1, string2) < 0;
 	}
 
@@ -272,9 +274,9 @@ public class TestImpl {
 	 *            to be compared
 	 * @return true if {@link #evaluateComparable(String, String)} returns -1 or
 	 *         0.
-	 * @throws Throwable
+	 * @throws CoreException
 	 */
-	private boolean evaluateLessThanOrEquals(String string1, String string2) throws Throwable {
+	private boolean evaluateLessThanOrEquals(String string1, String string2) throws StreamParserException {
 		return evaluateComparable(string1, string2) <= 0;
 	}
 
@@ -354,7 +356,7 @@ public class TestImpl {
 	 * @throws Throwable
 	 *             if number of values is incorrect
 	 */
-	private void validate(short op) throws Throwable {
+	private void validate(short op) throws StreamParserException {
 		switch (op) {
 		case sEQ:
 		case sLT:
@@ -362,18 +364,18 @@ public class TestImpl {
 		case sLE:
 		case sGE:
 			if (values == null || values.size() != 2) {
-				throw CoreExceptionUtils.newException(Messages.MalformedExpressionError + getOp(op), null);
+				throw new StreamParserException(Messages.MalformedExpressionError + getOp(op));
 			}
 			break;
 		case sNOT:
 			if (children == null || children.size() != 1) {
-				throw CoreExceptionUtils.newException(Messages.MalformedExpressionError + getOp(op), null);
+				throw new StreamParserException(Messages.MalformedExpressionError + getOp(op));
 			}
 			break;
 		case sAND:
 		case sOR:
 			if (children == null || children.size() <= 1) {
-				throw CoreExceptionUtils.newException(Messages.MalformedExpressionError + getOp(op), null);
+				throw new StreamParserException(Messages.MalformedExpressionError + getOp(op));
 			}
 			break;
 		}

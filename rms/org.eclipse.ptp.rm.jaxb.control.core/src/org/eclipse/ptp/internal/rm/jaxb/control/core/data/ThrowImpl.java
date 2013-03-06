@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.eclipse.ptp.internal.rm.jaxb.control.core.data;
 
+import org.eclipse.ptp.rm.jaxb.control.core.exceptions.StreamParserException;
+import org.eclipse.ptp.rm.jaxb.control.core.exceptions.UserThrownException;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.EntryType;
 import org.eclipse.ptp.rm.jaxb.core.data.ThrowType;
@@ -45,17 +47,17 @@ public class ThrowImpl extends AbstractAssign {
 	 * Overridden to throw the exception.
 	 */
 	@Override
-	public void assign(String[] values) throws Throwable {
+	public void assign(String[] values) throws StreamParserException {
 		Object previous = get(target, field);
 		if (field != null) {
 			set(target, field, getValue(previous, values));
 			index++;
 		}
-		throw new Exception(message);
+		throw new UserThrownException(message);
 	}
 
 	@Override
-	protected Object[] getValue(Object previous, String[] values) throws Throwable {
+	protected Object[] getValue(Object previous, String[] values) throws StreamParserException {
 		if (entry == null) {
 			return null;
 		}

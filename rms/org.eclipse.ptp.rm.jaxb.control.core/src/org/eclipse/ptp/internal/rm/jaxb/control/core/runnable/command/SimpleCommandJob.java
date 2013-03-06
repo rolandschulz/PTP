@@ -32,7 +32,6 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
-import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.SimpleCommandType;
@@ -262,11 +261,7 @@ public class SimpleCommandJob extends Job {
 			return null;
 		}
 		IRemoteConnection conn = delegate.getRemoteConnection();
-		try {
-			LaunchController.checkConnection(conn, progress.newChild(5));
-		} catch (RemoteConnectionException rce) {
-			throw CoreExceptionUtils.newException(rce.getLocalizedMessage(), rce);
-		}
+		LaunchController.checkConnection(conn, progress.newChild(5));
 		if (progress.isCanceled()) {
 			return null;
 		}

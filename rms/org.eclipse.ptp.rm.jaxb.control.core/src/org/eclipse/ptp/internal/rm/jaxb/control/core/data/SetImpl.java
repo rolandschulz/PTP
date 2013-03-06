@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.internal.rm.jaxb.control.core.data;
 
+import org.eclipse.ptp.rm.jaxb.control.core.exceptions.StreamParserException;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.EntryType;
 import org.eclipse.ptp.rm.jaxb.core.data.SetType;
@@ -41,7 +42,7 @@ public class SetImpl extends AbstractAssign {
 	}
 
 	@Override
-	protected Object[] getValue(Object previous, String[] values) throws Throwable {
+	protected Object[] getValue(Object previous, String[] values) throws StreamParserException {
 		if (entry == null) {
 			return null;
 		}

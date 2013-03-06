@@ -13,8 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.messages.Messages;
-import org.eclipse.ptp.internal.rm.jaxb.core.JAXBCoreConstants;
+import org.eclipse.ptp.rm.jaxb.control.core.exceptions.StreamParserException;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.EntryType;
 import org.eclipse.ptp.rm.jaxb.core.data.PutType;
@@ -48,7 +49,7 @@ public class PutImpl extends AbstractAssign {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected Object[] getValue(Object previous, String[] values) throws Throwable {
+	protected Object[] getValue(Object previous, String[] values) throws StreamParserException {
 		Map<String, String> map = null;
 		if (previous != null && previous instanceof Map<?, ?>) {
 			map = (Map<String, String>) previous;
@@ -60,8 +61,8 @@ public class PutImpl extends AbstractAssign {
 			for (EntryType e : entries) {
 				String k = getKey(e, values);
 				if (k == null) {
-					throw new IllegalStateException(Messages.StreamParserInconsistentMapValues + e.getKey() + JAXBCoreConstants.CM
-							+ e.getKeyGroup() + JAXBCoreConstants.CM + e.getKeyIndex());
+					throw new StreamParserException(NLS.bind(Messages.StreamParserInconsistentMapValues, new Object[] { e.getKey(),
+							e.getKeyGroup(), e.getKeyIndex() }));
 				}
 				String v = (String) getValue(e, values);
 				map.put(k, v);

@@ -11,7 +11,7 @@ package org.eclipse.ptp.internal.rm.jaxb.control.core;
 
 import java.io.InputStream;
 
-import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 
 /**
@@ -30,20 +30,19 @@ import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 public interface IStreamParserTokenizer extends Runnable {
 
 	/**
-	 * @return any fatal exception raised during parsing
+	 * Get the status of the parse. Only valid once the parse is complete.
+	 * 
+	 * @return status of the parse
 	 */
-	public Throwable getInternalError();
+	public IStatus getStatus();
 
 	/**
 	 * @param uuid
 	 *            id associated with this resource manager operation (can be <code>null</code>).
-	 * @param rmVarMap
+	 * @param varMap
 	 *            resource manager environment
-	 * @param commandMonitor
-	 *            so that the operation can be canceled in the case of a thrown
-	 *            exception
 	 */
-	public void initialize(String uuid, IVariableMap rmVarMap, IProgressMonitor commandMonitor);
+	public void initialize(String uuid, IVariableMap varMap);
 
 	/**
 	 * @param stream

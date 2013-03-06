@@ -813,13 +813,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 			}
 
 			if (isInteractive()) {
-				int exit = 0;
-				try {
-					exit = process.exitValue();
-				} catch (Throwable t) {
-					// Ignore
-				}
-				if (exit != 0 && !monitor.isCanceled() && isWaitEnabled()) {
+				if (process.exitValue() != 0 && !monitor.isCanceled() && isWaitEnabled()) {
 					throw CoreExceptionUtils.newException(uuid + JAXBCoreConstants.CO + JAXBCoreConstants.SP + FAILED, null);
 				}
 			}

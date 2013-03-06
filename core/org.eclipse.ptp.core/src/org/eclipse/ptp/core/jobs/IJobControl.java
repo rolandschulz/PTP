@@ -53,7 +53,9 @@ public interface IJobControl {
 	 * @param operation
 	 *            operation to perform on the job
 	 * @param monitor
-	 *            progress monitor for monitoring operation
+	 *            the progress monitor to use for reporting progress to the user. It is the caller's responsibility
+	 *            to call done() on the given monitor. Accepts <code>null</code>, indicating that no progress should be
+	 *            reported and that the operation cannot be cancelled.
 	 * @throws CoreException
 	 * @since 5.0
 	 */
@@ -76,7 +78,9 @@ public interface IJobControl {
 	 * @param force
 	 *            if true, tells the resource manager to ignore the throttling timeout.
 	 * @param monitor
-	 *            progress monitor for monitoring or canceling the operation
+	 *            the progress monitor to use for reporting progress to the user. It is the caller's responsibility
+	 *            to call done() on the given monitor. Accepts <code>null</code>, indicating that no progress should be
+	 *            reported and that the operation cannot be cancelled.
 	 * @return status of the job or undetermined status if the progress monitor is canceled
 	 */
 	public IJobStatus getJobStatus(String jobId, boolean force, IProgressMonitor monitor) throws CoreException;
@@ -94,7 +98,9 @@ public interface IJobControl {
 	 * @param jobId
 	 *            ID of job used to obtain status
 	 * @param monitor
-	 *            progress monitor for monitoring or canceling the operation
+	 *            the progress monitor to use for reporting progress to the user. It is the caller's responsibility
+	 *            to call done() on the given monitor. Accepts <code>null</code>, indicating that no progress should be
+	 *            reported and that the operation cannot be cancelled.
 	 * @return status of the job or undetermined status if the progress monitor is canceled
 	 */
 	public IJobStatus getJobStatus(String jobId, IProgressMonitor monitor) throws CoreException;
@@ -107,7 +113,9 @@ public interface IJobControl {
 	 * @param mode
 	 *            job launch mode
 	 * @param monitor
-	 *            progress monitor
+	 *            the progress monitor to use for reporting progress to the user. It is the caller's responsibility
+	 *            to call done() on the given monitor. Accepts <code>null</code>, indicating that no progress should be
+	 *            reported and that the operation cannot be cancelled.
 	 * @return job ID that can be used to identify the job
 	 * @throws CoreException
 	 * @since 7.0

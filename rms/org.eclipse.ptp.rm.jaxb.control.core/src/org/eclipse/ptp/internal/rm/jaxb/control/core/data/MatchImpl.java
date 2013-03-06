@@ -13,10 +13,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.IAssign;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.messages.Messages;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.utils.DebuggingLogger;
+import org.eclipse.ptp.rm.jaxb.control.core.exceptions.StreamParserException;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
+import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.MatchType;
 import org.eclipse.ptp.rm.jaxb.core.data.RegexType;
 
@@ -73,9 +76,9 @@ public class MatchImpl {
 	 * @param sequence
 	 *            string segment to match.
 	 * @return index of the last character in the match
-	 * @throws Throwable
+	 * @throws CoreException
 	 */
-	public synchronized int doMatch(String sequence) throws Throwable {
+	public synchronized int doMatch(String sequence) throws StreamParserException {
 		int end = 0;
 		String[] tokens = null;
 
@@ -112,7 +115,7 @@ public class MatchImpl {
 				incr++;
 			}
 			a.incrementIndex(incr);
-			Object t = target.getTarget(a);
+			AttributeType t = target.getTarget(a);
 			a.setTarget(t);
 			a.assign(tokens);
 		}

@@ -10,23 +10,28 @@
 
 package org.eclipse.ptp.internal.rm.jaxb.control.core.data;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.IAssign;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.JAXBControlConstants;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.messages.Messages;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.utils.DebuggingLogger;
 import org.eclipse.ptp.internal.rm.jaxb.core.JAXBCoreConstants;
+import org.eclipse.ptp.rm.jaxb.control.core.exceptions.StreamParserException;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.AddType;
 import org.eclipse.ptp.rm.jaxb.core.data.AppendType;
+import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.EntryType;
 import org.eclipse.ptp.rm.jaxb.core.data.PutType;
 import org.eclipse.ptp.rm.jaxb.core.data.SetType;
@@ -87,13 +92,15 @@ public abstract class AbstractAssign implements IAssign {
 	 * Auxiliary using Java reflection to perform a get on the target.
 	 * 
 	 * @param target
-	 *            Property or Attribute
+	 *            AttributeType
 	 * @param field
 	 *            on the target from which to retrieve the value.
 	 * @return value of the field
-	 * @throws Throwable
+	 * @throws NoSuchMethodException
+	 * @throws InvocationTargetException
+	 * @throws IllegalAccessException
 	 */
-	static Object get(Object target, String field) throws Throwable {
+	static Object get(AttributeType target, String field) throws StreamParserException {
 		if (field == null) {
 			return null;
 		}
@@ -101,11 +108,17 @@ public abstract class AbstractAssign implements IAssign {
 		Method method = null;
 		try {
 			method = target.getClass().getMethod(name, (Class[]) null);
-		} catch (Throwable t) {
+		} catch (Exception e) {
 			name = JAXBControlConstants.IS + field.substring(0, 1).toUpperCase() + field.substring(1);
-			method = target.getClass().getMethod(name, (Class[]) null);
 		}
-		return method.invoke(target, (Object[]) null);
+		try {
+			if (method == null) {
+				method = target.getClass().getMethod(name, (Class[]) null);
+			}
+			return method.invoke(target, (Object[]) null);
+		} catch (Exception e) {
+			throw new StreamParserException(NLS.bind("Unable to get attribute value: {0}", e.getMessage()), e);
+		}
 	}
 
 	/**
@@ -123,10 +136,10 @@ public abstract class AbstractAssign implements IAssign {
 	 * @param rmVarMap
 	 *            resource manager environment
 	 * @return value after dereferencing or normalization
-	 * @throws Throwable
+	 * @throws CoreException
 	 */
-	static Object normalizedValue(Object target, String uuid, String expression, boolean convert, IVariableMap map)
-			throws Throwable {
+	static Object normalizedValue(AttributeType target, String uuid, String expression, boolean convert, IVariableMap map)
+			throws StreamParserException {
 		Object value = expression;
 		if (expression.startsWith(JAXBControlConstants.PD)) {
 			if (target == null) {
@@ -153,9 +166,9 @@ public abstract class AbstractAssign implements IAssign {
 	 *            on the target on which to set the value.
 	 * @param values
 	 *            corresonding to the parameter(s) of the set method (usually a single one)
-	 * @throws Throwable
+	 * @throws StreamParserException
 	 */
-	static void set(Object target, String field, Object[] values) throws Throwable {
+	static void set(Object target, String field, Object[] values) throws StreamParserException {
 		String name = JAXBControlConstants.SET + field.substring(0, 1).toUpperCase() + field.substring(1);
 		Method[] methods = target.getClass().getMethods();
 		Method setter = null;
@@ -165,14 +178,14 @@ public abstract class AbstractAssign implements IAssign {
 			}
 		}
 		if (setter == null) {
-			throw new NoSuchMethodException(name + JAXBControlConstants.CO + JAXBControlConstants.SP + target);
+			throw new StreamParserException(NLS.bind("Unable to set attribute value: No such method {0}", name));
 		}
 		if (values != null && values[0] != null) {
 			Class<?>[] mclzz = setter.getParameterTypes();
 			// better have 1 parameter
 			Class<?> param = mclzz[0];
 			Class<?> valueClass = values[0].getClass();
-			Throwable t = new IllegalArgumentException(name + JAXBControlConstants.SP + valueClass);
+			StreamParserException e = new StreamParserException("Unable to set attribute value: Invalid arguments");
 			if (!param.equals(Object.class) && !param.isAssignableFrom(values[0].getClass())) {
 				if (valueClass.equals(String.class)) {
 					if (param.equals(Boolean.class)) {
@@ -182,21 +195,25 @@ public abstract class AbstractAssign implements IAssign {
 					} else if (param.equals(BigInteger.class)) {
 						values[0] = new BigInteger(values[0].toString());
 					} else {
-						throw t;
+						throw e;
 					}
 				} else if (valueClass.equals(Integer.class) || valueClass.equals(BigInteger.class)
 						|| valueClass.equals(Boolean.class)) {
 					if (param.equals(String.class)) {
 						values[0] = values[0].toString();
 					} else {
-						throw t;
+						throw e;
 					}
 				} else {
-					throw t;
+					throw e;
 				}
 			}
 		}
-		setter.invoke(target, values);
+		try {
+			setter.invoke(target, values);
+		} catch (Exception e) {
+			throw new StreamParserException(NLS.bind("Unable to set attribute value: {0}", e.getMessage()), e);
+		}
 	}
 
 	/**
@@ -225,7 +242,7 @@ public abstract class AbstractAssign implements IAssign {
 
 	protected String uuid;
 	protected String field;
-	protected Object target;
+	protected AttributeType target;
 	protected int index;
 	protected boolean forceNew;
 	protected IVariableMap rmVarMap;
@@ -248,11 +265,12 @@ public abstract class AbstractAssign implements IAssign {
 	 * 
 	 * @param values
 	 *            from the expression parsing (groups or segments)
-	 * @throws Throwable
+	 * @throws CoreException
 	 */
-	public void assign(String[] values) throws Throwable {
+	public void assign(String[] values) throws StreamParserException {
+		Object[] value;
 		Object previous = get(target, field);
-		Object[] value = getValue(previous, values);
+		value = getValue(previous, values);
 		set(target, field, value);
 		index++;
 		DebuggingLogger.getLogger().logActionInfo(
@@ -294,7 +312,7 @@ public abstract class AbstractAssign implements IAssign {
 	 * @param target
 	 *            the current property or attribute
 	 */
-	public void setTarget(Object target) {
+	public void setTarget(AttributeType target) {
 		this.target = target;
 	}
 
@@ -340,9 +358,9 @@ public abstract class AbstractAssign implements IAssign {
 	 * @param values
 	 *            the parsed result of the expression match
 	 * @return key
-	 * @throws Throwable
+	 * @throws StreamParserException
 	 */
-	protected String getKey(final EntryType entry, final String[] values) throws Throwable {
+	protected String getKey(final EntryType entry, final String[] values) throws StreamParserException {
 		String k = entry.getKey();
 		if (k != null) {
 			return (String) normalizedValue(target, uuid, k, false, rmVarMap);
@@ -376,9 +394,9 @@ public abstract class AbstractAssign implements IAssign {
 	 * @param values
 	 *            the parsed result of the expression match
 	 * @return value
-	 * @throws Throwable
+	 * @throws StreamParserException
 	 */
-	protected Object getValue(final EntryType entry, final String[] values) throws Throwable {
+	protected Object getValue(final EntryType entry, final String[] values) throws StreamParserException {
 		String v = entry.getValue();
 		if (v != null) {
 			return normalizedValue(target, uuid, v, true, rmVarMap);
@@ -412,9 +430,9 @@ public abstract class AbstractAssign implements IAssign {
 	 * @param values
 	 *            the parsed result of the expression match
 	 * @return the value(s) retrieved from the parsed result
-	 * @throws Throwable
+	 * @throws StreamParserException
 	 */
-	protected abstract Object[] getValue(Object previous, String[] values) throws Throwable;
+	protected abstract Object[] getValue(Object previous, String[] values) throws StreamParserException;
 
 	/**
 	 * Prints indices for key.

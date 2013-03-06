@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.eclipse.ptp.internal.rm.jaxb.control.core;
 
+import org.eclipse.ptp.rm.jaxb.control.core.exceptions.StreamParserException;
+
 /**
  * Defines object for tokenizer to call to process matches against.
  * 
@@ -23,9 +25,9 @@ public interface IMatchable {
 	 * @param segment
 	 *            passed in from the tokenizer
 	 * @return whether there was a successful match
-	 * @throws Throwable
+	 * @throws StreamParserException
 	 */
-	public boolean doMatch(StringBuffer segment) throws Throwable;
+	public boolean doMatch(StringBuffer segment) throws StreamParserException;
 
 	/**
 	 * @return whether the tokenizer should promote this object to first in its
@@ -36,9 +38,9 @@ public interface IMatchable {
 	/**
 	 * Run post-processing operations on the object.
 	 * 
-	 * @throws Throwable
+	 * @throws StreamParserException
 	 */
-	public void postProcess() throws Throwable;
+	public void postProcess() throws StreamParserException;
 
 	/**
 	 * @param selected

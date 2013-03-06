@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.IAssign;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.IMatchable;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.JAXBControlConstants;
@@ -25,6 +24,7 @@ import org.eclipse.ptp.internal.rm.jaxb.control.core.messages.Messages;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.utils.DebuggingLogger;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.variables.RMVariableMap;
 import org.eclipse.ptp.internal.rm.jaxb.core.JAXBCoreConstants;
+import org.eclipse.ptp.rm.jaxb.control.core.exceptions.StreamParserException;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.AddType;
 import org.eclipse.ptp.rm.jaxb.core.data.AppendType;
@@ -127,7 +127,7 @@ public class TargetImpl implements IMatchable {
 	 * @return whether a successful match was found on this target
 	 * @throws CoreException
 	 */
-	public synchronized boolean doMatch(StringBuffer segment) throws Throwable {
+	public synchronized boolean doMatch(StringBuffer segment) throws StreamParserException {
 		int matched = 0;
 		boolean match = false;
 
@@ -170,7 +170,7 @@ public class TargetImpl implements IMatchable {
 	 * @return the appropriate target for this action
 	 * @throws CoreException
 	 */
-	public AttributeType getTarget(IAssign assign) throws CoreException {
+	public AttributeType getTarget(IAssign assign) throws StreamParserException {
 		if (refTarget != null) {
 			return refTarget;
 		}
@@ -179,7 +179,7 @@ public class TargetImpl implements IMatchable {
 			String name = rmVarMap.getString(uuid, ref);
 			target = rmVarMap.get(name);
 			if (target == null) {
-				throw CoreExceptionUtils.newException(Messages.StreamParserNoSuchVariableError + name, null);
+				throw new StreamParserException(Messages.StreamParserNoSuchVariableError + name);
 			}
 			refTarget = target;
 		} else {
@@ -208,9 +208,9 @@ public class TargetImpl implements IMatchable {
 	 * <br>
 	 * First merges any constructed targets, then applies the tests to all targets.
 	 * 
-	 * @throws Throwable
+	 * @throws StreamParserException
 	 */
-	public synchronized void postProcess() throws Throwable {
+	public synchronized void postProcess() throws StreamParserException {
 		if (refTarget == null) {
 			if (targets.isEmpty() && defaultAction != null) {
 				/*
@@ -256,9 +256,9 @@ public class TargetImpl implements IMatchable {
 	 *            Attribute
 	 * @param current
 	 *            Attribute
-	 * @throws Throwable
+	 * @throws StreamParserException
 	 */
-	private void merge(AttributeType previous, AttributeType current) throws Throwable {
+	private void merge(AttributeType previous, AttributeType current) throws StreamParserException {
 		previous.setValue(mergeObject(previous.getValue(), current.getValue()));
 		previous.setDefault(mergeString(previous.getDefault(), current.getDefault()));
 		previous.setType(mergeString(previous.getType(), current.getType()));
@@ -278,9 +278,9 @@ public class TargetImpl implements IMatchable {
 	 * 
 	 * @param targets
 	 *            list of targets constructed during tokenization
-	 * @throws Throwable
+	 * @throws StreamParserException
 	 */
-	private void mergeAttributes(List<AttributeType> targets) throws Throwable {
+	private void mergeAttributes(List<AttributeType> targets) throws StreamParserException {
 		Map<String, AttributeType> hash = new HashMap<String, AttributeType>();
 		for (Iterator<AttributeType> i = targets.iterator(); i.hasNext();) {
 			AttributeType current = i.next();
@@ -325,17 +325,17 @@ public class TargetImpl implements IMatchable {
 	 * @param i0
 	 * @param i1
 	 * @return merged value
-	 * @throws Throwable
+	 * @throws StreamParserException
 	 *             if duplicate and overwrites not allowed.
 	 */
-	private Integer mergeInteger(Integer i0, Integer i1) throws Throwable {
+	private Integer mergeInteger(Integer i0, Integer i1) throws StreamParserException {
 		if (i0 == null) {
 			return i1;
 		} else if (i1 != null) {
 			if (allowOverwrites) {
 				return i1;
 			}
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + i0 + JAXBControlConstants.CM
+			throw new StreamParserException(Messages.StreamParserInconsistentPropertyWarning + i0 + JAXBControlConstants.CM
 					+ JAXBControlConstants.SP + i1);
 		}
 		return i0;
@@ -347,11 +347,11 @@ public class TargetImpl implements IMatchable {
 	 * @param v0
 	 * @param v1
 	 * @return merged value
-	 * @throws Throwable
+	 * @throws StreamParserException
 	 *             if duplicate and overwrites not allowed.
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private Object mergeObject(Object v0, Object v1) throws Throwable {
+	private Object mergeObject(Object v0, Object v1) throws StreamParserException {
 		if (v0 == null) {
 			return v1;
 		} else if (v1 != null) {
@@ -362,7 +362,7 @@ public class TargetImpl implements IMatchable {
 			} else if (allowOverwrites) {
 				return v1;
 			}
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + v0 + JAXBControlConstants.CM
+			throw new StreamParserException(Messages.StreamParserInconsistentPropertyWarning + v0 + JAXBControlConstants.CM
 					+ JAXBControlConstants.SP + v1);
 		}
 		return v0;
@@ -374,17 +374,17 @@ public class TargetImpl implements IMatchable {
 	 * @param s0
 	 * @param s1
 	 * @return merged value
-	 * @throws Throwable
+	 * @throws StreamParserException
 	 *             if duplicate and overwrites not allowed.
 	 */
-	private String mergeString(String s0, String s1) throws Throwable {
+	private String mergeString(String s0, String s1) throws StreamParserException {
 		if (s0 == null) {
 			return s1;
 		} else if (s1 != null) {
 			if (allowOverwrites) {
 				return s1;
 			}
-			throw new Throwable(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBControlConstants.CM
+			throw new StreamParserException(Messages.StreamParserInconsistentPropertyWarning + s0 + JAXBControlConstants.CM
 					+ JAXBControlConstants.SP + s1);
 		}
 		return s0;
@@ -394,9 +394,9 @@ public class TargetImpl implements IMatchable {
 	 * Runs all the tests on the given target. If none succeed, and the default action is defined, the latter is applied.
 	 * 
 	 * @param target
-	 * @throws Throwable
+	 * @throws StreamParserException
 	 */
-	private void runTests(Object target) throws Throwable {
+	private void runTests(AttributeType target) throws StreamParserException {
 		boolean any = false;
 		boolean testSuccess = false;
 		for (TestImpl test : tests) {

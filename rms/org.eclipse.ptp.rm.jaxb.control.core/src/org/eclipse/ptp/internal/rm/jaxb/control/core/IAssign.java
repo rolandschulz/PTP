@@ -9,6 +9,9 @@
  ******************************************************************************/
 package org.eclipse.ptp.internal.rm.jaxb.control.core;
 
+import org.eclipse.ptp.rm.jaxb.control.core.exceptions.StreamParserException;
+import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
+
 /**
  * Defines methods for an Assign action connected to the stream parser
  * (tokenizer).
@@ -21,9 +24,9 @@ public interface IAssign {
 	/**
 	 * @param values
 	 *            parsed values from match expression
-	 * @throws Throwable
+	 * @throws StreamParserException
 	 */
-	public void assign(String[] values) throws Throwable;
+	public void assign(String[] values) throws StreamParserException;
 
 	/**
 	 * @return index of assign action next target
@@ -46,5 +49,5 @@ public interface IAssign {
 	 * @param target
 	 *            current target for the assign action
 	 */
-	public void setTarget(Object target);
+	public void setTarget(AttributeType target);
 }

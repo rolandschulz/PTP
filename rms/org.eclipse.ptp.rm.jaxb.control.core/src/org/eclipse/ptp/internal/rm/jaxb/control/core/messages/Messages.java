@@ -16,7 +16,6 @@ public class Messages extends NLS {
 	public static String JAXBControlCorePlugin_Exception_InternalError;
 	public static String RMVariableResolver_derefError;
 	public static String StreamParserNoSuchVariableError;
-	public static String StreamParserMissingTargetType;
 	public static String StreamParserInconsistentMapValues;
 	public static String ManagedFilesJob;
 	public static String ManagedFilesJobError;
@@ -38,17 +37,12 @@ public class Messages extends NLS {
 	public static String MalformedExpressionError;
 	public static String UnsupportedWriteException;
 	public static String ProcessRunError;
-	public static String CommandJob_UnableToDetermineTasksError;
 	public static String CommandJobStreamMonitor_label;
 	public static String CommandJobNullMonitorStreamError;
 	public static String RemoteConnectionError;
 	public static String StreamParserInconsistentPropertyWarning;
-	public static String JAXBServiceProvider_defaultDescription;
-	public static String TargetImpl_0;
-	public static String TargetImpl_1;
 	public static String TargetImpl_2;
 	public static String TargetImpl_3;
-	public static String TargetImpl_4;
 	public static String TargetImpl_6;
 
 	public static String AbstractAssign_0;
@@ -70,10 +64,7 @@ public class Messages extends NLS {
 	public static String BadEntryIndex;
 
 	public static String LaunchController_missingServicesOrConnectionName;
-	public static String LaunchController_missingURL;
 	public static String LaunchController_notStarted;
-	public static String LaunchController_unableToLoad;
-	public static String LaunchController_usingCachedDefinition;
 
 	public static String ForceXmlReload;
 	public static String ShowSegmentPattern;

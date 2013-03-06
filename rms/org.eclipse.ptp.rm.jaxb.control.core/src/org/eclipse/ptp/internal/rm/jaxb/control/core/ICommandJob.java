@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.eclipse.ptp.internal.rm.jaxb.control.core;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 
@@ -56,9 +55,11 @@ public interface ICommandJob {
 	public void join() throws InterruptedException;
 
 	/**
-	 * @return any error recorded on the streams.
+	 * Wait for any special stream consumer threads to exit.
+	 * 
+	 * @return status of the stream consumers
 	 */
-	public CoreException joinConsumers();
+	public IStatus joinConsumers();
 
 	/**
 	 * Rerun the job. This resends input to the running job.

@@ -20,8 +20,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.core.util.CoreExceptionUtils;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.IMatchable;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.IStreamParserTokenizer;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.JAXBControlConstants;
@@ -29,6 +29,7 @@ import org.eclipse.ptp.internal.rm.jaxb.control.core.data.RegexImpl;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.data.TargetImpl;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.messages.Messages;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.utils.DebuggingLogger;
+import org.eclipse.ptp.rm.jaxb.control.core.exceptions.StreamParserException;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.RegexType;
 import org.eclipse.ptp.rm.jaxb.core.data.TargetType;
@@ -95,14 +96,13 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, Runna
 	private boolean all;
 	private boolean applyToAll;
 	private List<IMatchable> toMatch;
-	private IProgressMonitor commandMonitor;
 	private StringBuffer segment;
 
 	private char delim;
 	private RegexImpl exitOn;
 	private RegexImpl exitAfter;
 	private boolean includeDelim;
-	private Throwable error;
+	private IStatus status;
 	private InputStream in;
 	private char[] chars;
 	private LinkedList<String> saved;
@@ -116,11 +116,13 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, Runna
 		this.tokenizer = tokenizer;
 	}
 
-	/**
-	 * @return error generated during thread execution
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.internal.rm.jaxb.control.core.IStreamParserTokenizer#getStatus()
 	 */
-	public Throwable getInternalError() {
-		return error;
+	public IStatus getStatus() {
+		return status;
 	}
 
 	/*
@@ -128,11 +130,9 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, Runna
 	 * 
 	 * @see
 	 * org.eclipse.ptp.internal.rm.jaxb.control.core.IStreamParserTokenizer#initialize
-	 * (java.lang.String, org.eclipse.ptp.rm.jaxb.core.IVariableMap,
-	 * org.eclipse.core.runtime.IProgressMonitor)
+	 * (java.lang.String, org.eclipse.ptp.rm.jaxb.core.IVariableMap)
 	 */
-	public void initialize(String uuid, IVariableMap rmVarMap, IProgressMonitor commandMonitor) {
-		this.commandMonitor = commandMonitor;
+	public void initialize(String uuid, IVariableMap varMap) {
 		String d = tokenizer.getDelim();
 		if (d != null) {
 			delim = getChar(d);
@@ -162,16 +162,16 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, Runna
 		toMatch = new ArrayList<IMatchable>();
 		List<TargetType> targets = tokenizer.getTarget();
 		for (TargetType target : targets) {
-			toMatch.add(new TargetImpl(uuid, target, rmVarMap));
+			toMatch.add(new TargetImpl(uuid, target, varMap));
 		}
 
 		RegexType reg = tokenizer.getExitOn();
 		if (reg != null) {
-			exitOn = new RegexImpl(reg, uuid, rmVarMap);
+			exitOn = new RegexImpl(reg, uuid, varMap);
 		}
 		reg = tokenizer.getExitAfter();
 		if (reg != null) {
-			exitAfter = new RegexImpl(reg, uuid, rmVarMap);
+			exitAfter = new RegexImpl(reg, uuid, varMap);
 		}
 
 		segment = new StringBuffer();
@@ -186,18 +186,9 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, Runna
 		try {
 			br = new BufferedReader(new InputStreamReader(in));
 			read(br);
-		} catch (Throwable t) {
-			error = t;
-			/*
-			 * attempt to stop any waiting or joining on the executing process
-			 */
-			if (commandMonitor != null) {
-				commandMonitor.setCanceled(true);
-			}
-			/*
-			 * we do not close the out here because it probably is a standard
-			 * stream
-			 */
+			status = Status.OK_STATUS;
+		} catch (StreamParserException e) {
+			status = e.getStatus();
 		}
 	}
 
@@ -238,7 +229,7 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, Runna
 	 *            the reader for the stream
 	 * @throws CoreException
 	 */
-	private void findNextSegment(BufferedReader in) throws CoreException {
+	private void findNextSegment(BufferedReader in) throws StreamParserException {
 		endOfStream = false;
 		int len = chars.length == 1 ? 1 : chars.length - segment.length();
 		char[] lookAhead = new char[1];
@@ -254,8 +245,8 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, Runna
 			} catch (EOFException eof) {
 				endOfStream = true;
 				break;
-			} catch (IOException t) {
-				throw CoreExceptionUtils.newException(Messages.ReadSegmentError, t);
+			} catch (IOException e) {
+				throw new StreamParserException(Messages.ReadSegmentError, e);
 			}
 
 			if (chars.length == 1) {
@@ -274,8 +265,8 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, Runna
 							} else {
 								in.reset();
 							}
-						} catch (IOException t) {
-							throw CoreExceptionUtils.newException(Messages.ReadSegmentError, t);
+						} catch (IOException e) {
+							throw new StreamParserException(Messages.ReadSegmentError, e);
 						}
 					}
 					break;
@@ -293,9 +284,9 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, Runna
 	 * target is also selected by one of its matches, that target is promoted to
 	 * the head of the list of targets.
 	 * 
-	 * @throws Throwable
+	 * @throws StreamParserException
 	 */
-	private void matchTargets() throws Throwable {
+	private void matchTargets() throws StreamParserException {
 		IMatchable selected = null;
 		for (IMatchable m : toMatch) {
 			if (m.doMatch(segment) && !applyToAll) {
@@ -321,9 +312,9 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, Runna
 	/**
 	 * Runs merge and tests on each of the targets.
 	 * 
-	 * @throws Throwable
+	 * @throws StreamParserException
 	 */
-	private void postProcessTargets() throws Throwable {
+	private void postProcessTargets() throws StreamParserException {
 		for (IMatchable m : toMatch) {
 			m.postProcess();
 		}
@@ -342,7 +333,7 @@ public class ConfigurableRegexTokenizer implements IStreamParserTokenizer, Runna
 	 *            the input stream reader
 	 * @throws Throwable
 	 */
-	private void read(BufferedReader in) throws Throwable {
+	private void read(BufferedReader in) throws StreamParserException {
 		boolean exit = false;
 
 		while (!exit) {

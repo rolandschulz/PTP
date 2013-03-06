@@ -12,6 +12,7 @@ package org.eclipse.ptp.internal.rm.jaxb.control.core.data;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.ptp.rm.jaxb.control.core.exceptions.StreamParserException;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.AddType;
 import org.eclipse.ptp.rm.jaxb.core.data.EntryType;
@@ -45,7 +46,7 @@ public class AddImpl extends AbstractAssign {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected Object[] getValue(Object previous, String[] values) throws Throwable {
+	protected Object[] getValue(Object previous, String[] values) throws StreamParserException {
 		List<String> list = null;
 		if (previous != null && previous instanceof List<?>) {
 			list = (List<String>) previous;
