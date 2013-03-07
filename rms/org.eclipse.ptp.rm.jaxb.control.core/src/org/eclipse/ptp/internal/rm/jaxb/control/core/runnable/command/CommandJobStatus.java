@@ -803,7 +803,8 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public void waitForJobId(String uuid, String waitUntil, IProgressMonitor monitor) throws CoreException {
-		while (!monitor.isCanceled() && isWaitEnabled() && (jobId == null || !isReached(state, waitUntil))) {
+		SubMonitor progress = SubMonitor.convert(monitor);
+		while (!progress.isCanceled() && isWaitEnabled() && (jobId == null || !isReached(state, waitUntil))) {
 			synchronized (this) {
 				try {
 					wait(1000);
@@ -812,46 +813,40 @@ public class CommandJobStatus implements ICommandJobStatus {
 				}
 			}
 
-			if (isInteractive()) {
-				if (process.exitValue() != 0 && !monitor.isCanceled() && isWaitEnabled()) {
-					throw CoreExceptionUtils.newException(uuid + JAXBCoreConstants.CO + JAXBCoreConstants.SP + FAILED, null);
-				}
+			progress.setWorkRemaining(10);
+
+			if (isInteractive() && isWaitEnabled() && process.isCompleted() && process.exitValue() != 0) {
+				throw CoreExceptionUtils.newException(uuid + JAXBCoreConstants.CO + JAXBCoreConstants.SP + FAILED, null);
 			}
 
 			AttributeType a = fVarMap.get(uuid);
-			if (a == null) {
-				continue;
-			}
+			if (a != null) {
+				jobId = a.getName();
+				String v = (String) a.getValue();
+				if (v != null) {
+					setState(v);
+				}
 
-			jobId = a.getName();
-			String v = (String) a.getValue();
-			if (v != null) {
-				setState(v);
-			}
+				if (jobId != null) {
+					if (stateChanged()) {
+						/*
+						 * guarantee the presence of intermediate state in the environment
+						 */
+						fVarMap.put(jobId, a);
 
-			if (jobId == null) {
+						/*
+						 * Update status
+						 */
+						ICommandJobStatusMap map = JobStatusMap.getInstance(control);
+						if (map != null && !map.addJobStatus(jobId, this)) {
+							JobManager.getInstance().fireJobChanged(this);
+						}
+					}
+				}
+
 				if (stateDetail == FAILED) {
 					throw CoreExceptionUtils.newException(uuid + JAXBCoreConstants.CO + JAXBCoreConstants.SP + FAILED, null);
-				} else {
-					continue;
 				}
-			}
-
-			if (!stateChanged()) {
-				continue;
-			}
-
-			/*
-			 * guarantee the presence of intermediate state in the environment
-			 */
-			fVarMap.put(jobId, a);
-
-			/*
-			 * Update status
-			 */
-			ICommandJobStatusMap map = JobStatusMap.getInstance(control);
-			if (map != null && !map.addJobStatus(jobId, this)) {
-				JobManager.getInstance().fireJobChanged(this);
 			}
 		}
 	}
