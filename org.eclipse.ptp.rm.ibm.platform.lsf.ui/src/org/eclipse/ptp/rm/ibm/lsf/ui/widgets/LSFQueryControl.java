@@ -91,8 +91,6 @@ public abstract class LSFQueryControl extends Composite {
 	 *            Value to set
 	 */
 	public void setSelectedValue(String value) {
-		System.out.printf("LSFQueryControl.setSelectedValue(%s): '%s'\n",
-				getClass(), value);
 		if ((value != null) && (!value.equals(""))) {
 			selectedValue = value;
 		}
