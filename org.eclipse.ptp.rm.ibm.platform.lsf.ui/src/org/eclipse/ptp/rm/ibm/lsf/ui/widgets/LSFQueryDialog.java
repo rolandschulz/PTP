@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 
 public class LSFQueryDialog extends Dialog {
 
@@ -48,6 +49,7 @@ public class LSFQueryDialog extends Dialog {
 	protected Vector<String[]> commandResponse;
 	private String dialogTitle;
 	protected Shell parentShell;
+	private Table queryTable;
 	private String selectedValue;
 
 	private TableSelectionListener tableSelectionListener;
@@ -85,19 +87,19 @@ public class LSFQueryDialog extends Dialog {
 		TableViewer viewer;
 		TableContentsProvider contentsProvider;
 		Composite composite;
-		Table table;
 		TableViewerColumn viewColumns[];
 		TableColumnLayout tableLayout;
+		int n;
 
 		composite = (Composite) super.createDialogArea(parent);
 		tableLayout = new TableColumnLayout();
 		composite.setLayout(tableLayout);
 		viewer = new TableViewer(composite, SWT.SINGLE | SWT.V_SCROLL
 				| SWT.H_SCROLL);
-		table = viewer.getTable();
-		table.clearAll();
-		table.setHeaderVisible(true);
-		table.setLinesVisible(true);
+		queryTable = viewer.getTable();
+		queryTable.clearAll();
+		queryTable.setHeaderVisible(true);
+		queryTable.setLinesVisible(true);
 		/*
 		 * Create columns corresponding to command output. The number of columns
 		 * created is determined by the number of blank-delimited strings in the
@@ -122,9 +124,24 @@ public class LSFQueryDialog extends Dialog {
 		contentsProvider = new TableContentsProvider();
 		viewer.setLabelProvider(contentsProvider);
 		viewer.setInput(commandResponse);
+		n = queryTable.getItemCount();
+		for (int i = 0; i < n; i++) {
+			TableItem rowData;
+
+			rowData = queryTable.getItem(i);
+			if (rowData.getText(0).equals(selectedValue)) {
+				queryTable.select(i);
+				break;
+			}
+		}
 		return composite;
 	}
 
+	/**
+	 * Return the value selected from the table
+	 * 
+	 * @return Selected value
+	 */
 	public String getSelectedValue() {
 		return selectedValue;
 	}
@@ -132,5 +149,15 @@ public class LSFQueryDialog extends Dialog {
 	@Override
 	protected boolean isResizable() {
 		return true;
+	}
+
+	/**
+	 * Set an initial selection value for this widget
+	 * 
+	 * @param value
+	 *            Initial selection value
+	 */
+	public void setSelectedValue(String value) {
+		selectedValue = value;
 	}
 }

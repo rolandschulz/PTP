@@ -91,9 +91,7 @@ public abstract class LSFQueryControl extends Composite {
 	 *            Value to set
 	 */
 	public void setSelectedValue(String value) {
-		if ((value != null) && (!value.equals(""))) {
-			selectedValue = value;
-		}
+		selectedValue = value;
 	}
 
 	/**
