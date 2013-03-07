@@ -39,7 +39,6 @@ import org.eclipse.ptp.remotetools.environment.core.TargetEnvironmentManager;
 import org.eclipse.ptp.remotetools.exception.CancelException;
 import org.eclipse.ptp.remotetools.exception.LocalPortBoundException;
 import org.eclipse.ptp.remotetools.exception.PortForwardingException;
-import org.eclipse.ptp.remotetools.exception.RemoteExecutionException;
 
 /**
  * @since 5.0
@@ -95,6 +94,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 			try {
 				fTargetControl.kill();
 			} catch (CoreException e) {
+				// Ignore
 			}
 			doClose();
 		}
@@ -305,9 +305,8 @@ public class RemoteToolsConnection implements IRemoteConnection {
 							fEnv.put(kv[0], kv[1]);
 						}
 					}
-				} catch (RemoteExecutionException e) {
-				} catch (org.eclipse.ptp.remotetools.exception.RemoteConnectionException e) {
-				} catch (CancelException e) {
+				} catch (Exception e) {
+					// Ignore
 				}
 			}
 		}
@@ -577,9 +576,8 @@ public class RemoteToolsConnection implements IRemoteConnection {
 		if (exeMgr != null) {
 			try {
 				return exeMgr.getExecutionTools().executeWithOutput("pwd").trim(); //$NON-NLS-1$
-			} catch (RemoteExecutionException e) {
-			} catch (org.eclipse.ptp.remotetools.exception.RemoteConnectionException e) {
-			} catch (CancelException e) {
+			} catch (Exception e) {
+				// Ignore
 			}
 		}
 		return null;
@@ -615,9 +613,8 @@ public class RemoteToolsConnection implements IRemoteConnection {
 					fProperties.put(OS_VERSION_PROPERTY, osVersion);
 					fProperties.put(OS_ARCH_PROPERTY, osArch);
 				}
-			} catch (RemoteExecutionException e) {
-			} catch (org.eclipse.ptp.remotetools.exception.RemoteConnectionException e) {
-			} catch (CancelException e) {
+			} catch (Exception e) {
+				// Ignore
 			}
 		}
 	}

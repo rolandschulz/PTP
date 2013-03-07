@@ -30,25 +30,29 @@ public class RemoteUIImages {
 
 	private static ImageRegistry fgImageRegistry = new ImageRegistry();
 
-	private static final String T_ELCL = "elcl16"; 	//$NON-NLS-1$
-	private static final String T_DLCL = "dlcl16"; 	//$NON-NLS-1$
+	private static final String T_ELCL = "elcl16"; //$NON-NLS-1$
+	private static final String T_DLCL = "dlcl16"; //$NON-NLS-1$
+	private static final String T_OVR = "ovr16"; //$NON-NLS-1$
 
 	/*
 	 * Keys for images available from the plug-in image registry.
 	 */
 	public static final String IMG_ELCL_UP_NAV = NAME_PREFIX + T_ELCL + ".up_nav.gif"; //$NON-NLS-1$
 	public static final String IMG_DLCL_UP_NAV = NAME_PREFIX + T_DLCL + ".up_nav.gif"; //$NON-NLS-1$
+	public static final String IMG_OVR_SYMLINK = NAME_PREFIX + T_OVR + ".symlink_ovr.gif"; //$NON-NLS-1$
 
 	/*
 	 * Set of predefined Image Descriptors.
 	 */
 	public static final ImageDescriptor DESC_ELCL_UP_NAV = createManaged(T_ELCL, "up_nav.gif", IMG_ELCL_UP_NAV); //$NON-NLS-1$
 	public static final ImageDescriptor DESC_DLCL_UP_NAV = createManaged(T_DLCL, "up_nav.gif", IMG_ELCL_UP_NAV); //$NON-NLS-1$
+	public static final ImageDescriptor DESC_OVR_SYMLINK = createManaged(T_OVR, "symlink_ovr.gif", IMG_OVR_SYMLINK); //$NON-NLS-1$
 
 	/**
 	 * Returns the image managed under the given key in this registry.
-	 *
-	 * @param key the image's key
+	 * 
+	 * @param key
+	 *            the image's key
 	 * @return the image managed under the given key
 	 */
 	public static Image get(String key) {
@@ -57,8 +61,9 @@ public class RemoteUIImages {
 
 	/**
 	 * Returns the image descriptor for the given key in this registry. Might be called in a non-UI thread.
-	 *
-	 * @param key the image's key
+	 * 
+	 * @param key
+	 *            the image's key
 	 * @return the image descriptor for the given key
 	 */
 	public static ImageDescriptor getDescriptor(String key) {
@@ -68,15 +73,17 @@ public class RemoteUIImages {
 	/**
 	 * Sets the three image descriptors for enabled, disabled, and hovered to an action. The actions
 	 * are retrieved from the *lcl16 folders.
-	 *
-	 * @param action	the action
-	 * @param iconName	the icon name
+	 * 
+	 * @param action
+	 *            the action
+	 * @param iconName
+	 *            the icon name
 	 */
 	public static void setLocalImageDescriptors(IAction action, String iconName) {
 		setImageDescriptors(action, "lcl16", iconName); //$NON-NLS-1$
 	}
 
-	//---- Helper methods to access icons on the file system --------------------------------------
+	// ---- Helper methods to access icons on the file system --------------------------------------
 
 	private static void setImageDescriptors(IAction action, String type, String relPath) {
 		ImageDescriptor id = create("d" + type, relPath, false); //$NON-NLS-1$
@@ -87,7 +94,7 @@ public class RemoteUIImages {
 		/*
 		 * id= create("c" + type, relPath, false); //$NON-NLS-1$
 		 * if (id != null)
-		 * 		action.setHoverImageDescriptor(id);
+		 * action.setHoverImageDescriptor(id);
 		 */
 
 		ImageDescriptor descriptor = create("e" + type, relPath, true); //$NON-NLS-1$

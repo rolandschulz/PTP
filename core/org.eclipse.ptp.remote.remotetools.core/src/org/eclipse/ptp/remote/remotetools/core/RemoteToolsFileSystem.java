@@ -29,11 +29,10 @@ import java.net.URISyntaxException;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.filesystem.provider.FileSystem;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 
 public class RemoteToolsFileSystem extends FileSystem {
-	private static RemoteToolsFileSystem instance = new RemoteToolsFileSystem();
-
 	/**
 	 * Return the connection name encoded in the URI.
 	 * 
@@ -44,15 +43,6 @@ public class RemoteToolsFileSystem extends FileSystem {
 	 */
 	public static String getConnectionNameFor(URI uri) {
 		return uri.getAuthority();
-	}
-
-	/**
-	 * Return the singleton instance of this file system.
-	 * 
-	 * @return the singleton instance of this file system.
-	 */
-	public static RemoteToolsFileSystem getInstance() {
-		return instance;
 	}
 
 	/**
@@ -125,5 +115,15 @@ public class RemoteToolsFileSystem extends FileSystem {
 			PTPRemoteCorePlugin.log(e);
 			return EFS.getNullFileSystem().getStore(uri);
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.filesystem.provider.FileSystem#getStore(org.eclipse.core.runtime.IPath)
+	 */
+	@Override
+	public IFileStore getStore(IPath path) {
+		return null;
 	}
 }

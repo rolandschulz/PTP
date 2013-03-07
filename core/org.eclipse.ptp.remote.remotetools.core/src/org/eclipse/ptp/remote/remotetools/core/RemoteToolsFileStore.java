@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.remote.remotetools.core.messages.Messages;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
@@ -81,14 +82,23 @@ public class RemoteToolsFileStore extends FileStore {
 	@Override
 	public IFileInfo[] childInfos(int options, IProgressMonitor monitor) throws CoreException {
 		IRemoteItem[] items;
+		SubMonitor progress = SubMonitor.convert(monitor, 100);
 		try {
-			items = getExecutionManager(monitor).getRemoteFileTools().listItems(fRemotePath.toString(), monitor);
+			items = getExecutionManager(progress.newChild(50)).getRemoteFileTools().listItems(fRemotePath.toString(), monitor);
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR, RemoteToolsAdapterCorePlugin.getDefault().getBundle()
 					.getSymbolicName(), EFS.ERROR_INTERNAL, e.getMessage(), null));
 		}
 		IFileInfo[] result = new FileInfo[items.length];
 		for (int i = 0; i < result.length; i++) {
+			if (items[i].isSymLink()) {
+				try {
+					items[i].refreshAttributes(monitor);
+				} catch (Exception e) {
+					throw new CoreException(new Status(IStatus.ERROR, RemoteToolsAdapterCorePlugin.getDefault().getBundle()
+							.getSymbolicName(), EFS.ERROR_INTERNAL, e.getLocalizedMessage(), e));
+				}
+			}
 			result[i] = convertRemoteItemToFileInfo(items[i], getNameFromPath(new Path(items[i].getPath())));
 		}
 
@@ -402,6 +412,10 @@ public class RemoteToolsFileStore extends FileStore {
 		info.setDirectory(item.isDirectory());
 		info.setAttribute(EFS.ATTRIBUTE_READ_ONLY, !item.isWritable());
 		info.setAttribute(EFS.ATTRIBUTE_EXECUTABLE, item.isExecutable());
+		info.setAttribute(EFS.ATTRIBUTE_SYMLINK, item.isSymLink());
+		if (item.isSymLink()) {
+			info.setStringAttribute(EFS.ATTRIBUTE_LINK_TARGET, item.getLinkTarget());
+		}
 		info.setLength(item.getSize());
 		return info;
 	}
@@ -506,7 +520,6 @@ public class RemoteToolsFileStore extends FileStore {
 		try {
 			fRemoteItem.refreshAttributes(monitor);
 		} catch (Exception e) {
-			e.printStackTrace();
 			throw new CoreException(new Status(IStatus.ERROR, RemoteToolsAdapterCorePlugin.getDefault().getBundle()
 					.getSymbolicName(), EFS.ERROR_INTERNAL, e.getLocalizedMessage(), e));
 		}

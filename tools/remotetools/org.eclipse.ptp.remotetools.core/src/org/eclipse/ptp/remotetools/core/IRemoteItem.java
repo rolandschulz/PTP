@@ -49,6 +49,14 @@ public interface IRemoteItem {
 	public long getAccessTime();
 
 	/**
+	 * Get the target of a symbolic link. Only valid if {@link #isSymLink()} returns true.
+	 * 
+	 * @return link target
+	 * @since 6.0
+	 */
+	public String getLinkTarget();
+
+	/**
 	 * Get the modification time of the item.
 	 * 
 	 * @return last modified time
@@ -91,6 +99,14 @@ public interface IRemoteItem {
 	 * @return true/false
 	 */
 	public boolean isReadable();
+
+	/**
+	 * Returns true if the remote item is a symbolic link.
+	 * 
+	 * @return true/false
+	 * @since 6.0
+	 */
+	public boolean isSymLink();
 
 	/**
 	 * Returns true if the remote item has a permission that allows to write

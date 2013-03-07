@@ -181,6 +181,7 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager, I
 					try {
 						conn = createConnection(element);
 					} catch (RemoteConnectionException e) {
+						// Ignore
 					}
 				}
 				newConns.put(element.getName(), conn);

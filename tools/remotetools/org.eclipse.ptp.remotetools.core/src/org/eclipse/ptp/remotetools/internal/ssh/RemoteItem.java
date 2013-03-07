@@ -29,9 +29,11 @@ import com.jcraft.jsch.SftpATTRS;
 class RemoteItem implements IRemoteItem {
 
 	protected String path;
+	protected String linkTarget;
 	protected boolean isReadable;
 	protected boolean isWritable;
 	protected boolean isExecutable;
+	protected boolean isSymLink;
 	protected boolean exist;
 	protected FileTools fileTools;
 	protected int userID;
@@ -60,6 +62,7 @@ class RemoteItem implements IRemoteItem {
 
 		RemoteFileAttributes remoteAttrs = new RemoteFileAttributes(attrs);
 		parseAttrs(remoteAttrs);
+
 	}
 
 	/*
@@ -81,6 +84,25 @@ class RemoteItem implements IRemoteItem {
 		// changes = 0;
 	}
 
+	protected void copyAttributesFrom(RemoteItem other) {
+		this.path = other.path;
+		this.isReadable = other.isReadable;
+		this.isWritable = other.isWritable;
+		this.isExecutable = other.isExecutable;
+		this.isSymLink = other.isSymLink;
+		this.linkTarget = other.linkTarget;
+		this.exist = other.exist;
+		this.fileTools = other.fileTools;
+		this.userID = other.userID;
+		this.permissions = other.permissions;
+		this.size = other.size;
+		this.accessTime = other.accessTime;
+		this.modificationTime = other.modificationTime;
+		this.groupID = other.groupID;
+		this.changes = other.changes;
+		this.isDirectory = other.isDirectory;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -97,6 +119,15 @@ class RemoteItem implements IRemoteItem {
 	 */
 	public long getAccessTime() {
 		return (long) accessTime * 1000;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.remotetools.core.IRemoteItem#getLinkTarget()
+	 */
+	public String getLinkTarget() {
+		return linkTarget;
 	}
 
 	/*
@@ -156,10 +187,85 @@ class RemoteItem implements IRemoteItem {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.ptp.remotetools.core.IRemoteItem#isSymLink()
+	 */
+	public boolean isSymLink() {
+		return isSymLink;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remotetools.core.IRemoteItemProperties#isWritableByUser()
 	 */
 	public boolean isWritable() {
 		return isWritable;
+	}
+
+	private void parseAttrs(RemoteFileAttributes attrs) {
+		/*
+		 * No file found.
+		 */
+		if (attrs == null) {
+			exist = false;
+			return;
+		}
+
+		exist = true;
+		changes = 0;
+
+		isDirectory = attrs.isDir();
+
+		userID = attrs.getUId();
+		groupID = attrs.getGId();
+		permissions = attrs.getPermissions();
+		isSymLink = attrs.isLink();
+		if (isSymLink) {
+			linkTarget = attrs.getLinkTarget();
+		}
+
+		isReadable = false;
+		isWritable = false;
+		isExecutable = false;
+
+		if (userID == fileTools.getCachedUserID()) {
+			if ((permissions & 0400) != 0) {
+				isReadable = true;
+			}
+			if ((permissions & 0200) != 0) {
+				isWritable = true;
+			}
+			if ((permissions & 0100) != 0) {
+				isExecutable = true;
+			}
+		}
+
+		Set<Integer> groupIDSet = fileTools.getCachedGroupIDSet();
+		if (groupIDSet.contains(new Integer(groupID))) {
+			if ((permissions & 0040) != 0) {
+				isReadable = true;
+			}
+			if ((permissions & 0020) != 0) {
+				isWritable = true;
+			}
+			if ((permissions & 0010) != 0) {
+				isExecutable = true;
+			}
+		}
+
+		if ((permissions & 0004) != 0) {
+			isReadable = true;
+		}
+		if ((permissions & 0002) != 0) {
+			isWritable = true;
+		}
+		if ((permissions & 0001) != 0) {
+			isExecutable = true;
+		}
+
+		size = attrs.getSize();
+		accessTime = attrs.getATime();
+		modificationTime = attrs.getMTime();
 	}
 
 	/*
@@ -294,84 +400,5 @@ class RemoteItem implements IRemoteItem {
 		} else {
 			return path + " does not exist"; //$NON-NLS-1$
 		}
-	}
-
-	private void parseAttrs(RemoteFileAttributes attrs) {
-		/*
-		 * No file found.
-		 */
-		if (attrs == null) {
-			exist = false;
-			return;
-		}
-
-		exist = true;
-		changes = 0;
-
-		isDirectory = attrs.isDir();
-
-		userID = attrs.getUId();
-		groupID = attrs.getGId();
-		permissions = attrs.getPermissions();
-
-		isReadable = false;
-		isWritable = false;
-		isExecutable = false;
-
-		if (userID == fileTools.getCachedUserID()) {
-			if ((permissions & 0400) != 0) {
-				isReadable = true;
-			}
-			if ((permissions & 0200) != 0) {
-				isWritable = true;
-			}
-			if ((permissions & 0100) != 0) {
-				isExecutable = true;
-			}
-		}
-
-		Set<Integer> groupIDSet = fileTools.getCachedGroupIDSet();
-		if (groupIDSet.contains(new Integer(groupID))) {
-			if ((permissions & 0040) != 0) {
-				isReadable = true;
-			}
-			if ((permissions & 0020) != 0) {
-				isWritable = true;
-			}
-			if ((permissions & 0010) != 0) {
-				isExecutable = true;
-			}
-		}
-
-		if ((permissions & 0004) != 0) {
-			isReadable = true;
-		}
-		if ((permissions & 0002) != 0) {
-			isWritable = true;
-		}
-		if ((permissions & 0001) != 0) {
-			isExecutable = true;
-		}
-
-		size = attrs.getSize();
-		accessTime = attrs.getATime();
-		modificationTime = attrs.getMTime();
-	}
-
-	protected void copyAttributesFrom(RemoteItem other) {
-		this.path = other.path;
-		this.isReadable = other.isReadable;
-		this.isWritable = other.isWritable;
-		this.isExecutable = other.isExecutable;
-		this.exist = other.exist;
-		this.fileTools = other.fileTools;
-		this.userID = other.userID;
-		this.permissions = other.permissions;
-		this.size = other.size;
-		this.accessTime = other.accessTime;
-		this.modificationTime = other.modificationTime;
-		this.groupID = other.groupID;
-		this.changes = other.changes;
-		this.isDirectory = other.isDirectory;
 	}
 }

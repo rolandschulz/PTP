@@ -14,9 +14,13 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Import-Package: org.eclipse.ptp.utils.extensionpoints.core
-Export-Package: org.eclipse.ptp.remotetools.environment;x-friends:="org.eclipse.ptp.remotetools.environment.generichost,org.eclipse.ptp.remotetools.environment.ui",
- org.eclipse.ptp.remotetools.environment.control;x-friends:="org.eclipse.ptp.remotetools.environment.generichost,org.eclipse.ptp.remotetools.environment.ui",
- org.eclipse.ptp.remotetools.environment.core;x-friends:="org.eclipse.ptp.remotetools.environment.generichost,org.eclipse.ptp.remotetools.environment.ui,org.eclipse.ptp.remote.remotetools.ui",
+Export-Package: org.eclipse.ptp.remotetools.environment;x-friends:="org.eclipse.ptp.remotetools.environment.generichost,org.eclipse.ptp.remotetools.environment.ui,org.eclipse.ptp.remote.remotetools.core",
+ org.eclipse.ptp.remotetools.environment.control;x-friends:="org.eclipse.ptp.remotetools.environment.generichost,org.eclipse.ptp.remotetools.environment.ui,org.eclipse.ptp.remote.remotetools.core",
+ org.eclipse.ptp.remotetools.environment.core;
+  x-friends:="org.eclipse.ptp.remotetools.environment.generichost,
+   org.eclipse.ptp.remotetools.environment.ui,
+   org.eclipse.ptp.remote.remotetools.ui,
+   org.eclipse.ptp.remote.remotetools.core",
  org.eclipse.ptp.remotetools.environment.extension;x-friends:="org.eclipse.ptp.remotetools.environment.generichost,org.eclipse.ptp.remotetools.environment.ui",
  org.eclipse.ptp.remotetools.environment.wizard;x-friends:="org.eclipse.ptp.remotetools.environment.generichost,org.eclipse.ptp.remotetools.environment.ui,org.eclipse.ptp.remote.remotetools.ui",
- org.eclipse.ptp.remotetools.utils.verification;x-friends:="org.eclipse.ptp.remotetools.environment.generichost"
+ org.eclipse.ptp.remotetools.utils.verification;x-friends:="org.eclipse.ptp.remotetools.environment.generichost,org.eclipse.ptp.remote.remotetools.core"

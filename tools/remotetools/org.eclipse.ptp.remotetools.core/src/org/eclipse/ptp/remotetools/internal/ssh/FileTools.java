@@ -1000,11 +1000,22 @@ public class FileTools implements IRemoteFileTools {
 			SftpCallable<SftpATTRS> c = new SftpCallable<SftpATTRS>() {
 				@Override
 				public SftpATTRS call() throws SftpException {
-					return getChannel().stat(path);
+					return getChannel().lstat(path);
 				}
 			};
 			SftpATTRS attrs = c.syncCmdInThread(Messages.FileTools_15, subMon.newChild(10));
-			return RemoteFileAttributes.getAttributes(attrs);
+			RemoteFileAttributes remAttrs = RemoteFileAttributes.getAttributes(attrs);
+			if (attrs.isLink()) {
+				SftpCallable<String> c2 = new SftpCallable<String>() {
+					@Override
+					public String call() throws SftpException {
+						return getChannel().readlink(path);
+					}
+				};
+				String target = c2.syncCmdInThread(Messages.FileTools_15, subMon.newChild(10));
+				remAttrs.setLINKTARGET(target);
+			}
+			return remAttrs;
 		} catch (SftpException e) {
 			if ((e).id == ChannelSftp.SSH_FX_NO_SUCH_FILE) {
 				return null;

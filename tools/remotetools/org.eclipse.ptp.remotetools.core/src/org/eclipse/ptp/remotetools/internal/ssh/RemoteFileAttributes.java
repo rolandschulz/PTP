@@ -36,108 +36,14 @@ public class RemoteFileAttributes {
 
 	private static final int pmask = 0xFFF;
 
-	public String getPermissionsString() {
-		StringBuffer buf = new StringBuffer(10);
-
-		if (isDir())
-			buf.append('d');
-		else if (isLink())
-			buf.append('l');
-		else
-			buf.append('-');
-
-		if ((permissions & S_IRUSR) != 0)
-			buf.append('r');
-		else
-			buf.append('-');
-
-		if ((permissions & S_IWUSR) != 0)
-			buf.append('w');
-		else
-			buf.append('-');
-
-		if ((permissions & S_ISUID) != 0)
-			buf.append('s');
-		else if ((permissions & S_IXUSR) != 0)
-			buf.append('x');
-		else
-			buf.append('-');
-
-		if ((permissions & S_IRGRP) != 0)
-			buf.append('r');
-		else
-			buf.append('-');
-
-		if ((permissions & S_IWGRP) != 0)
-			buf.append('w');
-		else
-			buf.append('-');
-
-		if ((permissions & S_ISGID) != 0)
-			buf.append('s');
-		else if ((permissions & S_IXGRP) != 0)
-			buf.append('x');
-		else
-			buf.append('-');
-
-		if ((permissions & S_IROTH) != 0)
-			buf.append('r');
-		else
-			buf.append('-');
-
-		if ((permissions & S_IWOTH) != 0)
-			buf.append('w');
-		else
-			buf.append('-');
-
-		if ((permissions & S_IXOTH) != 0)
-			buf.append('x');
-		else
-			buf.append('-');
-		return (buf.toString());
-	}
-
-	public String getAtimeString() {
-		SimpleDateFormat locale = new SimpleDateFormat();
-		return (locale.format(new Date(atime)));
-	}
-
-	public String getMtimeString() {
-		Date date = new Date(((long) mtime) * 1000);
-		return (date.toString());
-	}
-
 	public static final int SSH_FILEXFER_ATTR_SIZE = 0x00000001;
 	public static final int SSH_FILEXFER_ATTR_UIDGID = 0x00000002;
 	public static final int SSH_FILEXFER_ATTR_PERMISSIONS = 0x00000004;
 	public static final int SSH_FILEXFER_ATTR_ACMODTIME = 0x00000008;
 	public static final int SSH_FILEXFER_ATTR_EXTENDED = 0x80000000;
-
+	
 	static final int S_IFDIR = 0x4000;
 	static final int S_IFLNK = 0xa000;
-
-	int flags = 0;
-	long size;
-	int uid;
-	int gid;
-	int permissions;
-	int atime;
-	int mtime;
-	String[] extended = null;
-
-	public RemoteFileAttributes() {
-	}
-
-	public RemoteFileAttributes(SftpATTRS attrs) {
-		flags = attrs.getFlags();
-		permissions = attrs.getPermissions();
-		size = attrs.getSize();
-		uid = attrs.getUId();
-		gid = attrs.getGId();
-		mtime = attrs.getMTime();
-		atime = attrs.getATime();
-		extended = attrs.getExtended();
-	}
 
 	public static RemoteFileAttributes getAttributes(SftpATTRS attrs) {
 		return new RemoteFileAttributes(attrs);
@@ -164,6 +70,184 @@ public class RemoteFileAttributes {
 		attr.mtime = Integer.parseInt(args[4]);
 		attr.atime = Integer.parseInt(args[5]);
 		return attr;
+	}
+
+	int flags = 0;
+	long size;
+	int uid;
+	int gid;
+	int permissions;
+	int atime;
+	int mtime;
+	String linkTarget;
+	String[] extended = null;
+
+	public RemoteFileAttributes() {
+	}
+
+	public RemoteFileAttributes(SftpATTRS attrs) {
+		flags = attrs.getFlags();
+		permissions = attrs.getPermissions();
+		size = attrs.getSize();
+		uid = attrs.getUId();
+		gid = attrs.getGId();
+		mtime = attrs.getMTime();
+		atime = attrs.getATime();
+		extended = attrs.getExtended();
+	}
+
+	void dump(Buffer buf) {
+		buf.putInt(flags);
+		if ((flags & SSH_FILEXFER_ATTR_SIZE) != 0) {
+			buf.putLong(size);
+		}
+		if ((flags & SSH_FILEXFER_ATTR_UIDGID) != 0) {
+			buf.putInt(uid);
+			buf.putInt(gid);
+		}
+		if ((flags & SSH_FILEXFER_ATTR_PERMISSIONS) != 0) {
+			buf.putInt(permissions);
+		}
+		if ((flags & SSH_FILEXFER_ATTR_ACMODTIME) != 0) {
+			buf.putInt(atime);
+		}
+		if ((flags & SSH_FILEXFER_ATTR_ACMODTIME) != 0) {
+			buf.putInt(mtime);
+		}
+		if ((flags & SSH_FILEXFER_ATTR_EXTENDED) != 0) {
+			int count = extended.length / 2;
+			if (count > 0) {
+				for (int i = 0; i < count; i++) {
+					buf.putString(extended[i * 2].getBytes());
+					buf.putString(extended[i * 2 + 1].getBytes());
+				}
+			}
+		}
+	}
+
+	public int getATime() {
+		return atime;
+	}
+
+	public String getAtimeString() {
+		SimpleDateFormat locale = new SimpleDateFormat();
+		return (locale.format(new Date(atime)));
+	}
+
+	public String[] getExtended() {
+		return extended;
+	}
+
+	public int getFlags() {
+		return flags;
+	}
+
+	public int getGId() {
+		return gid;
+	}
+
+	public String getLinkTarget() {
+		return linkTarget;
+	}
+
+	public int getMTime() {
+		return mtime;
+	}
+
+	public String getMtimeString() {
+		Date date = new Date(((long) mtime) * 1000);
+		return (date.toString());
+	}
+
+	public int getPermissions() {
+		return permissions;
+	}
+
+	public String getPermissionsString() {
+		StringBuffer buf = new StringBuffer(10);
+
+		if (isDir()) {
+			buf.append('d');
+		} else if (isLink()) {
+			buf.append('l');
+		} else {
+			buf.append('-');
+		}
+
+		if ((permissions & S_IRUSR) != 0) {
+			buf.append('r');
+		} else {
+			buf.append('-');
+		}
+
+		if ((permissions & S_IWUSR) != 0) {
+			buf.append('w');
+		} else {
+			buf.append('-');
+		}
+
+		if ((permissions & S_ISUID) != 0) {
+			buf.append('s');
+		} else if ((permissions & S_IXUSR) != 0) {
+			buf.append('x');
+		} else {
+			buf.append('-');
+		}
+
+		if ((permissions & S_IRGRP) != 0) {
+			buf.append('r');
+		} else {
+			buf.append('-');
+		}
+
+		if ((permissions & S_IWGRP) != 0) {
+			buf.append('w');
+		} else {
+			buf.append('-');
+		}
+
+		if ((permissions & S_ISGID) != 0) {
+			buf.append('s');
+		} else if ((permissions & S_IXGRP) != 0) {
+			buf.append('x');
+		} else {
+			buf.append('-');
+		}
+
+		if ((permissions & S_IROTH) != 0) {
+			buf.append('r');
+		} else {
+			buf.append('-');
+		}
+
+		if ((permissions & S_IWOTH) != 0) {
+			buf.append('w');
+		} else {
+			buf.append('-');
+		}
+
+		if ((permissions & S_IXOTH) != 0) {
+			buf.append('x');
+		} else {
+			buf.append('-');
+		}
+		return (buf.toString());
+	}
+
+	public long getSize() {
+		return size;
+	}
+
+	public int getUId() {
+		return uid;
+	}
+
+	public boolean isDir() {
+		return ((flags & SSH_FILEXFER_ATTR_PERMISSIONS) != 0 && ((permissions & S_IFDIR) == S_IFDIR));
+	}
+
+	public boolean isLink() {
+		return ((flags & SSH_FILEXFER_ATTR_PERMISSIONS) != 0 && ((permissions & S_IFLNK) == S_IFLNK));
 	}
 
 	int length() {
@@ -196,37 +280,24 @@ public class RemoteFileAttributes {
 		return len;
 	}
 
-	void dump(Buffer buf) {
-		buf.putInt(flags);
-		if ((flags & SSH_FILEXFER_ATTR_SIZE) != 0) {
-			buf.putLong(size);
-		}
-		if ((flags & SSH_FILEXFER_ATTR_UIDGID) != 0) {
-			buf.putInt(uid);
-			buf.putInt(gid);
-		}
-		if ((flags & SSH_FILEXFER_ATTR_PERMISSIONS) != 0) {
-			buf.putInt(permissions);
-		}
-		if ((flags & SSH_FILEXFER_ATTR_ACMODTIME) != 0) {
-			buf.putInt(atime);
-		}
-		if ((flags & SSH_FILEXFER_ATTR_ACMODTIME) != 0) {
-			buf.putInt(mtime);
-		}
-		if ((flags & SSH_FILEXFER_ATTR_EXTENDED) != 0) {
-			int count = extended.length / 2;
-			if (count > 0) {
-				for (int i = 0; i < count; i++) {
-					buf.putString(extended[i * 2].getBytes());
-					buf.putString(extended[i * 2 + 1].getBytes());
-				}
-			}
-		}
+	public void setACMODTIME(int atime, int mtime) {
+		flags |= SSH_FILEXFER_ATTR_ACMODTIME;
+		this.atime = atime;
+		this.mtime = mtime;
 	}
 
 	void setFLAGS(int flags) {
 		this.flags = flags;
+	}
+
+	public void setLINKTARGET(String target) {
+		this.linkTarget = target;
+	}
+
+	public void setPERMISSIONS(int permissions) {
+		flags |= SSH_FILEXFER_ATTR_PERMISSIONS;
+		permissions = (this.permissions & ~pmask) | (permissions & pmask);
+		this.permissions = permissions;
 	}
 
 	public void setSIZE(long size) {
@@ -238,58 +309,6 @@ public class RemoteFileAttributes {
 		flags |= SSH_FILEXFER_ATTR_UIDGID;
 		this.uid = uid;
 		this.gid = gid;
-	}
-
-	public void setACMODTIME(int atime, int mtime) {
-		flags |= SSH_FILEXFER_ATTR_ACMODTIME;
-		this.atime = atime;
-		this.mtime = mtime;
-	}
-
-	public void setPERMISSIONS(int permissions) {
-		flags |= SSH_FILEXFER_ATTR_PERMISSIONS;
-		permissions = (this.permissions & ~pmask) | (permissions & pmask);
-		this.permissions = permissions;
-	}
-
-	public boolean isDir() {
-		return ((flags & SSH_FILEXFER_ATTR_PERMISSIONS) != 0 && ((permissions & S_IFDIR) == S_IFDIR));
-	}
-
-	public boolean isLink() {
-		return ((flags & SSH_FILEXFER_ATTR_PERMISSIONS) != 0 && ((permissions & S_IFLNK) == S_IFLNK));
-	}
-
-	public int getFlags() {
-		return flags;
-	}
-
-	public long getSize() {
-		return size;
-	}
-
-	public int getUId() {
-		return uid;
-	}
-
-	public int getGId() {
-		return gid;
-	}
-
-	public int getPermissions() {
-		return permissions;
-	}
-
-	public int getATime() {
-		return atime;
-	}
-
-	public int getMTime() {
-		return mtime;
-	}
-
-	public String[] getExtended() {
-		return extended;
 	}
 
 	@Override
