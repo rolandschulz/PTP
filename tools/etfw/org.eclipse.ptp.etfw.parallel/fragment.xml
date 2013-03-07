@@ -70,18 +70,6 @@
          </associatedDelegate>
       </tab>
       <tab
-            class="org.eclipse.ptp.etfw.parallel.internal.ParallelToolSelectionTab"
-            group="org.eclipse.ptp.etfw.launchConfigurationTabGroup"
-            id="org.eclipse.ptp.etfw.parallelToolSelectionTab"
-   			name="%ExternalLaunchTab.name">
-         <placement
-               after="org.eclipse.ptp.launch.applicationLaunch.environmentTab">
-         </placement>
-         <associatedDelegate
-               delegate="org.eclipse.ptp.etfw.parallelLaunch">
-         </associatedDelegate>
-      </tab>
-      <tab
     		class="org.eclipse.ptp.etfw.parallel.internal.ParallelParameterTab"
             group="org.eclipse.ptp.etfw.launchConfigurationTabGroup"
             id="org.eclipse.ptp.etfw.parametricParameterTab"

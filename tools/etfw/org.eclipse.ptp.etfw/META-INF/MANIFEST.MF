@@ -16,14 +16,15 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.debug.ui,
  org.eclipse.cdt.launch,
  org.eclipse.ptp.etfw.toolopts,
- org.eclipse.core.filesystem;bundle-version="1.3.0",
- org.eclipse.ptp.rdt.core;bundle-version="2.0.0",
- org.eclipse.ptp.remote.core;bundle-version="5.0.0",
- org.eclipse.ptp.core;bundle-version="5.0.0",
- org.eclipse.ptp.remote.ui;bundle-version="5.0.0",
- org.eclipse.ptp.rdt.sync.core;bundle-version="2.0.0",
- org.eclipse.ui.console;bundle-version="3.5.100",
- org.eclipse.ptp.ems.core;bundle-version="1.0.0"
+ org.eclipse.core.filesystem,
+ org.eclipse.ptp.rdt.core,
+ org.eclipse.ptp.remote.core,
+ org.eclipse.ptp.core,
+ org.eclipse.ptp.remote.ui,
+ org.eclipse.ptp.rdt.sync.core,
+ org.eclipse.ui.console,
+ org.eclipse.ptp.ems.core,
+ org.eclipse.ptp.etfw.jaxb
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: %pluginProvider
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

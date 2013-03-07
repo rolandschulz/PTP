@@ -71,8 +71,8 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 	IRemoteConnectionManager connMgr = null;
 	IRemoteUIFileManager fileManagerUI = null;
 	IRemoteFileManager fileManager = null;
-	IEnvManagerConfig envMgrConfig=null;
-	private IEnvManager envManager=null;
+	IEnvManagerConfig envMgrConfig = null;
+	private IEnvManager envManager = null;
 
 	public RemoteBuildLaunchUtils(ILaunchConfiguration config) {
 		this.config = config;
@@ -84,14 +84,28 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 		fileManager = remoteServices.getFileManager(conn);
 		envMgrConfig = getEnvManagerConfig(config);
 		if (envMgrConfig != null) {
-			envManager = EnvManagerRegistry.getEnvManager(null,	conn);
-//			if (envManager != null) {
-//				//moduleSetup = envManager.getBashConcatenation(";", false, envMgrConfig, null);
-//				moduleSetup = envManager.createBashScript(null, false, config, commandToExecuteAfterward)
-//				
-//			}
+			envManager = EnvManagerRegistry.getEnvManager(null, conn);
+			// if (envManager != null) {
+			// //moduleSetup = envManager.getBashConcatenation(";", false, envMgrConfig, null);
+			// moduleSetup = envManager.createBashScript(null, false, config, commandToExecuteAfterward)
+			//
+			// }
 		}
+
 		// this.selshell=PlatformUI.getWorkbench().getDisplay().getActiveShell();
+	}
+
+	public RemoteBuildLaunchUtils(IRemoteConnection conn) {
+		this.conn = conn;
+		remoteServices = conn.getRemoteServices();
+		remoteUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteServices);
+		connMgr = remoteServices.getConnectionManager();
+		// conn = connMgr.getConnection(LaunchUtils.getConnectionName(config));
+		fileManagerUI = remoteUIServices.getUIFileManager();
+		fileManager = remoteServices.getFileManager(conn);
+
+		// Can we get the envManager from the connection if we need it?
+		// envManager = null;
 	}
 
 	public String getWorkingDirectory() {
@@ -163,8 +177,15 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 	 */
 	public String getToolPath(String toolID) {
 		IPreferenceStore pstore = Activator.getDefault().getPreferenceStore();
-		String toolBinID = IToolLaunchConfigurationConstants.TOOL_BIN_ID
-				+ "." + toolID + "." + LaunchUtils.getResourceManagerUniqueName(config); //$NON-NLS-1$//$NON-NLS-2$
+		String toolBinID = null;
+		if (config != null) {
+
+			toolBinID = IToolLaunchConfigurationConstants.TOOL_BIN_ID
+					+ "." + toolID + "." + LaunchUtils.getResourceManagerUniqueName(config); //$NON-NLS-1$//$NON-NLS-2$
+		} else {
+			toolBinID = IToolLaunchConfigurationConstants.TOOL_BIN_ID
+					+ "." + toolID + "." + conn.getName(); //$NON-NLS-1$//$NON-NLS-2$
+		}
 		String path = pstore.getString(toolBinID);
 		if (path != null) {
 			return path;
@@ -270,8 +291,7 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 			}
 		}
 	}
-	
-	
+
 	/**
 	 * Get the environment manager configuration associated with the project that was specified in the launch configuration. If no
 	 * launchConfiguration was specified then this CommandJob does not need to use environment management so we can safely return
@@ -306,23 +326,22 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 	 * 
 	 */
 	public String checkToolEnvPath(String toolname) {
-		if (org.eclipse.cdt.utils.Platform.getOS().toLowerCase().trim().indexOf("win") >= 0&&!this.isRemote()) {//$NON-NLS-1$
+		if (org.eclipse.cdt.utils.Platform.getOS().toLowerCase().trim().indexOf("win") >= 0 && !this.isRemote()) {//$NON-NLS-1$
 			return null;
 		}
 		String pPath = null;
 		try {
 			IRemoteProcessBuilder rpb = remoteServices.getProcessBuilder(conn);
-			if(envManager!=null){
-				String com="";
+			if (envManager != null) {
+				String com = "";
 				try {
-					com = envManager.createBashScript(null, false, envMgrConfig, "which "+toolname);
+					com = envManager.createBashScript(null, false, envMgrConfig, "which " + toolname);
 					IFileStore envScript = fileManager.getResource(com);
-					IFileInfo envInfo=envScript.fetchInfo();
+					IFileInfo envInfo = envScript.fetchInfo();
 					envInfo.setAttribute(EFS.ATTRIBUTE_OWNER_EXECUTE, true);
 					envInfo.setAttribute(EFS.ATTRIBUTE_EXECUTABLE, true);
-					envScript.putInfo(envInfo,EFS.SET_ATTRIBUTES,null);
-					
-					
+					envScript.putInfo(envInfo, EFS.SET_ATTRIBUTES, null);
+
 				} catch (RemoteConnectionException e) {
 					e.printStackTrace();
 					return null;
@@ -332,28 +351,27 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 				}
 				rpb.command(com);
 			}
-			else{
+			else {
 				rpb.command("which", toolname);//$NON-NLS-1$
 			}
 			// rpb.
 			IRemoteProcess p = rpb.start();
 			//Process p = new ProcessBuilder("which", toolname).start();//Runtime.getRuntime().exec("which "+toolname); //$NON-NLS-1$
 			BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			String line=null;//= reader.readLine();
-			
-			
-			while ((line=reader.readLine()) != null) {
-				//System.out.println(line);
-				IFileStore test =fileManager.getResource(line);
-				if(test.fetchInfo().exists())
+			String line = null;// = reader.readLine();
+
+			while ((line = reader.readLine()) != null) {
+				// System.out.println(line);
+				IFileStore test = fileManager.getResource(line);
+				if (test.fetchInfo().exists())
 				{
-					pPath=line;
+					pPath = line;
 				}
 			}
 			reader.close();
 			reader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-			while ((line=reader.readLine()) != null) {
-				//System.out.println(line);
+			while ((line = reader.readLine()) != null) {
+				// System.out.println(line);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -468,7 +486,7 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 			// pb.environment().putAll(env);
 			// }
 
-			IRemoteProcess p = getProcess(tool, env, directory,false);// pb.start();// Runtime.getRuntime().exec(tool, env,
+			IRemoteProcess p = getProcess(tool, env, directory, false);// pb.start();// Runtime.getRuntime().exec(tool, env,
 			// directory);
 			StreamRunner outRun = new StreamRunner(p.getInputStream(), "out", fos); //$NON-NLS-1$
 			StreamRunner errRun = new StreamRunner(p.getErrorStream(), "err", null); //$NON-NLS-1$
@@ -489,10 +507,10 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 	}
 
 	public byte[] runToolGetOutput(List<String> tool, Map<String, String> env, String directory) {
-		return runToolGetOutput(tool,env,directory,false);
+		return runToolGetOutput(tool, env, directory, false);
 	}
-	
-	public byte[] runToolGetOutput(List<String> tool, Map<String, String> env, String directory,boolean showErr) {
+
+	public byte[] runToolGetOutput(List<String> tool, Map<String, String> env, String directory, boolean showErr) {
 		int eval = -1;
 		byte[] out = null;
 		try {
@@ -511,13 +529,13 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 			// fos = test.openOutputStream(EFS.NONE, null);//test.openOutputStream(options, monitor)new FileOutputStream(test);
 			// }
 
-			IRemoteProcess p = getProcess(tool, env, directory,showErr);// pb.start();// Runtime.getRuntime().exec(tool, env,
+			IRemoteProcess p = getProcess(tool, env, directory, showErr);// pb.start();// Runtime.getRuntime().exec(tool, env,
 			// directory);
 			StreamRunner outRun = new StreamRunner(p.getInputStream(), "out", fos); //$NON-NLS-1$
-			StreamRunner errRun =null;
+			StreamRunner errRun = null;
 
-			 errRun = new StreamRunner(p.getErrorStream(), "err", null); //$NON-NLS-1$
-			
+			errRun = new StreamRunner(p.getErrorStream(), "err", null); //$NON-NLS-1$
+
 			outRun.start();
 			errRun.start();
 			outRun.join();
@@ -538,25 +556,25 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 		return out;
 	}
 
-	private IRemoteProcess getProcess(List<String> tool, Map<String, String> env, String directory,boolean mergeOutput) throws IOException {
+	private IRemoteProcess getProcess(List<String> tool, Map<String, String> env, String directory, boolean mergeOutput)
+			throws IOException {
 
 		IRemoteProcessBuilder pb;
-		
-		if(envManager!=null){
-			String com="";
-			String concat="";
+
+		if (envManager != null) {
+			String com = "";
+			String concat = "";
 			try {
-				concat="";
-				for(int i=0;i<tool.size();i++){
-					concat+=" "+tool.get(i);
+				concat = "";
+				for (int i = 0; i < tool.size(); i++) {
+					concat += " " + tool.get(i);
 				}
 				com = envManager.createBashScript(null, false, envMgrConfig, concat);
 				IFileStore envScript = fileManager.getResource(com);
-				IFileInfo envInfo=envScript.fetchInfo();
+				IFileInfo envInfo = envScript.fetchInfo();
 				envInfo.setAttribute(EFS.ATTRIBUTE_OWNER_EXECUTE, true);
-				envScript.putInfo(envInfo,EFS.SET_ATTRIBUTES,null);
-				
-				
+				envScript.putInfo(envInfo, EFS.SET_ATTRIBUTES, null);
+
 			} catch (RemoteConnectionException e) {
 				e.printStackTrace();
 				return null;
@@ -566,7 +584,7 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 			}
 			pb = remoteServices.getProcessBuilder(conn, concat);
 		}
-		else{
+		else {
 			pb = remoteServices.getProcessBuilder(conn, tool);// new IRemoteProcessBuilder(tool);
 		}
 		if (directory != null) {
@@ -575,7 +593,7 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 		if (env != null) {
 			pb.environment().putAll(env);
 		}
-		
+
 		pb.redirectErrorStream(mergeOutput);
 
 		return pb.start();
@@ -593,15 +611,14 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 			//
 			// //Process p =
 			// pb.start();
-			
-			if(env==null)
-				env=new HashMap<String,String>();
-		
-			
-			if(env.get("DISPLAY")==null)
+
+			if (env == null)
+				env = new HashMap<String, String>();
+
+			if (env.get("DISPLAY") == null)
 				env.put("DISPLAY", ":0.0");
 
-			getProcess(tool, env, directory,false);
+			getProcess(tool, env, directory, false);
 
 		} catch (Exception e) {
 			e.printStackTrace();
