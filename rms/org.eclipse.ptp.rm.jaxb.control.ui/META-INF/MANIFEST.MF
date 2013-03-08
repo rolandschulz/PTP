@@ -21,13 +21,13 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ptp.ems.core
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Export-Package: org.eclipse.ptp.internal.rm.jaxb.control.ui;x-friends:="org.eclipse.ptp.launch",
+Export-Package: org.eclipse.ptp.internal.rm.jaxb.control.ui;x-friends:="org.eclipse.ptp.launch,org.eclipse.ptp.etfw.launch",
  org.eclipse.ptp.internal.rm.jaxb.control.ui.cell;x-friends:="org.eclipse.ptp.launch",
  org.eclipse.ptp.internal.rm.jaxb.control.ui.dialogs;x-friends:="org.eclipse.ptp.launch",
  org.eclipse.ptp.internal.rm.jaxb.control.ui.handlers;x-friends:="org.eclipse.ptp.launch,org.eclipse.ptp.etfw.launch",
  org.eclipse.ptp.internal.rm.jaxb.control.ui.launch;x-friends:="org.eclipse.ptp.launch,org.eclipse.ptp.etfw.launch",
  org.eclipse.ptp.internal.rm.jaxb.control.ui.messages;x-internal:=true,
- org.eclipse.ptp.internal.rm.jaxb.control.ui.model;x-friends:="org.eclipse.ptp.launch",
+ org.eclipse.ptp.internal.rm.jaxb.control.ui.model;x-friends:="org.eclipse.ptp.launch,org.eclipse.ptp.etfw.launch",
  org.eclipse.ptp.internal.rm.jaxb.control.ui.providers;x-friends:="org.eclipse.ptp.launch",
  org.eclipse.ptp.internal.rm.jaxb.control.ui.sorters;x-friends:="org.eclipse.ptp.launch",
  org.eclipse.ptp.internal.rm.jaxb.control.ui.utils;x-friends:="org.eclipse.ptp.launch,org.eclipse.ptp.etfw.launch",

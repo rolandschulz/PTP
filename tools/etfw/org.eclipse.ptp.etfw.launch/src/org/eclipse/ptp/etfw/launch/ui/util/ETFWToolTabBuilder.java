@@ -15,18 +15,29 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.CheckboxTreeViewer;
+import org.eclipse.jface.viewers.ColumnViewer;
+import org.eclipse.ptp.etfw.launch.messages.Messages;
+import org.eclipse.ptp.internal.rm.jaxb.control.ui.JAXBControlUIConstants;
 import org.eclipse.ptp.internal.rm.jaxb.control.ui.handlers.ControlStateListener;
 import org.eclipse.ptp.internal.rm.jaxb.control.ui.launch.IJAXBLaunchConfigurationTab;
+import org.eclipse.ptp.internal.rm.jaxb.control.ui.model.ViewerUpdateModel;
+import org.eclipse.ptp.internal.rm.jaxb.control.ui.utils.ControlWidgetBuilderUtils;
 import org.eclipse.ptp.internal.rm.jaxb.control.ui.utils.UpdateModelFactory;
 import org.eclipse.ptp.internal.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.ptp.launch.ui.extensions.JAXBDynamicLaunchConfigurationTab;
+import org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
+import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeViewerType;
 import org.eclipse.ptp.rm.jaxb.core.data.BrowseType;
 import org.eclipse.ptp.rm.jaxb.core.data.ButtonGroupType;
+import org.eclipse.ptp.rm.jaxb.core.data.ColumnDataType;
 import org.eclipse.ptp.rm.jaxb.core.data.CompositeType;
 import org.eclipse.ptp.rm.jaxb.core.data.ControlStateRuleType;
 import org.eclipse.ptp.rm.jaxb.core.data.ControlStateType;
@@ -45,7 +56,9 @@ import org.eclipse.ptp.rm.jaxb.core.data.RowLayoutType;
 import org.eclipse.ptp.rm.jaxb.core.data.TabControllerType;
 import org.eclipse.ptp.rm.jaxb.core.data.TabFolderType;
 import org.eclipse.ptp.rm.jaxb.core.data.TabItemType;
+import org.eclipse.ptp.rm.jaxb.core.data.ViewerItemsType;
 import org.eclipse.ptp.rm.jaxb.core.data.WidgetType;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.layout.FormAttachment;
@@ -54,6 +67,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Layout;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.Tree;
 
 /**
  * Based on LaunchTabBuilder, this class is responsible for constructing the Performance Analysis Tab as well as building and
@@ -64,7 +79,6 @@ import org.eclipse.swt.widgets.Layout;
  */
 public class ETFWToolTabBuilder {
 	private final IJAXBLaunchConfigurationTab tab;
-	// protected Composite control;
 	private final IVariableMap rmVarMap;
 	/*
 	 * Temporary maps for wiring the widgets. Sources contains buttons that have buttonId specified. Targets contain controls that
@@ -89,13 +103,11 @@ public class ETFWToolTabBuilder {
 		targets.clear();
 	}
 
-	// TODO : CMN starting to build the panel
 	public static void buildToolPane(TabControllerType toolPane, Composite parent) {
 		Layout layout = createLayout(toolPane.getLayout());
 		Object data = createLayoutData(toolPane.getLayoutData());
 		int style = WidgetBuilderUtils.getStyle(toolPane.getStyle());
 
-		// Composite composite = WidgetBuilderUtils.createComposite(parent, style, layout, data);
 		WidgetBuilderUtils.createComposite(parent, style, layout, data);
 	}
 
@@ -250,9 +262,9 @@ public class ETFWToolTabBuilder {
 		}
 
 		Set<Button> dependSet = new HashSet<Button>();
-		// Removed this because the dependency check is not thorough enough, should file a bug on this.
 		for (ControlStateListener listener : listeners) {
 			dependSet.clear();
+			// TODO re-implement this dependency check when it is more robust, tau_tool-jaxb.xml shows use case that breaks this
 			// listener.findCyclicalDependecies(dependSet);
 		}
 
@@ -265,7 +277,7 @@ public class ETFWToolTabBuilder {
 	 * @param children
 	 *            list of types
 	 */
-	private void addChildren(List<Object> children, Composite control) {
+	private void addChildren(List<Object> children, Composite control) throws CoreException {
 		for (Object o : children) {
 			if (o instanceof TabFolderType) {
 				addFolder((TabFolderType) o, control);
@@ -280,8 +292,7 @@ public class ETFWToolTabBuilder {
 			} else if (o instanceof BrowseType) {
 				addBrowse((BrowseType) o, control);
 			} else if (o instanceof AttributeViewerType) {
-				// TODO CMN : implement this if needed
-				// addAttributeViewer((AttributeViewerType) o, control);
+				addAttributeViewer((AttributeViewerType) o, control);
 			}
 		}
 	}
@@ -391,7 +402,7 @@ public class ETFWToolTabBuilder {
 	 *            control to which to add the folder
 	 * @return the SWT TabFolder
 	 */
-	private CTabFolder addFolder(TabFolderType descriptor, Composite parent) {
+	private CTabFolder addFolder(TabFolderType descriptor, Composite parent) throws CoreException {
 		CTabFolder folder = new CTabFolder(parent, WidgetBuilderUtils.getStyle(descriptor.getStyle()));
 		Layout layout = createLayout(descriptor.getLayout());
 		if (layout != null) {
@@ -439,7 +450,7 @@ public class ETFWToolTabBuilder {
 	 * @param index
 	 *            of the tab in the folder
 	 */
-	private void addItem(CTabFolder folder, TabItemType descriptor, int index) {
+	private void addItem(CTabFolder folder, TabItemType descriptor, int index) throws CoreException {
 		int style = WidgetBuilderUtils.getStyle(descriptor.getStyle());
 		Layout layout = createLayout(descriptor.getLayout());
 		if (layout != null) {
@@ -487,7 +498,7 @@ public class ETFWToolTabBuilder {
 	 *            control to which to add the composite
 	 * @return the SWT Composite
 	 */
-	private Composite addComposite(CompositeType descriptor, Composite parent) {
+	private Composite addComposite(CompositeType descriptor, Composite parent) throws CoreException {
 		Layout layout = createLayout(descriptor.getLayout());
 		Object data = createLayoutData(descriptor.getLayoutData());
 		int style = WidgetBuilderUtils.getStyle(descriptor.getStyle());
@@ -520,9 +531,171 @@ public class ETFWToolTabBuilder {
 	}
 
 	/**
-	 * The top-level control.
+	 * Constructs the viewer, its row items and their update models, and adds it to the tree.
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.data.AttributeViewer
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel
+	 * @see org.eclipse.ptp.internal.rm.jaxb.control.ui.model.ViewerUpdateModel
+	 * @see org.eclipse.ptp.internal.rm.jaxb.control.ui.utils.UpdateModelFactory#createModel(ColumnViewer, AttributeViewer,
+	 *      JAXBDynamicLaunchConfigurationTab)
+	 * 
+	 * @param descriptor
+	 *            JAXB data element describing CheckboxTableViewer or CheckboxTreeViewer for displaying a subset of the resource
+	 *            manager properties and attributes
+	 * @param parent
+	 *            control to which to add the viewer
+	 * @return the control
 	 */
-	// public Control getControl() {
-	// return control;
-	// }
+	public ColumnViewer addAttributeViewer(AttributeViewerType descriptor, Composite parent) throws CoreException {
+		Layout layout = createLayout(descriptor.getLayout());
+		Object data = createLayoutData(descriptor.getLayoutData());
+		int style = WidgetBuilderUtils.getStyle(descriptor.getStyle());
+		Button showHide = WidgetBuilderUtils.createCheckButton(parent, Messages.ETFWToolTabBuilder_ToggleShowHideSelectedAttributes, null);
+		ColumnViewer viewer = null;
+		if (JAXBControlUIConstants.TABLE.equals(descriptor.getType())) {
+			viewer = addCheckboxTableViewer(parent, data, layout, style, descriptor);
+		} else if (JAXBControlUIConstants.TREE.equals(descriptor.getType())) {
+			viewer = addCheckboxTreeViewer(parent, data, layout, style, descriptor);
+		}
+		if (viewer != null) {
+			Collection<ICellEditorUpdateModel> rows = addRows(viewer, descriptor);
+			ViewerUpdateModel model = UpdateModelFactory.createModel(viewer, descriptor, tab);
+			for (ICellEditorUpdateModel row : rows) {
+				row.setViewer(model);
+			}
+			viewer.setInput(rows);
+			showHide.addSelectionListener(model);
+			model.setShowAll(showHide);
+			tab.getLocalWidgets().put(viewer, model);
+
+			ControlStateType cst = descriptor.getControlState();
+			if (cst != null) {
+				targets.put(cst, viewer.getControl());
+			}
+		}
+		return viewer;
+	}
+
+	/**
+	 * Constructs and configures the SWT TreeViewer.
+	 * 
+	 * @see org.eclipse.jface.viewers.CheckboxTreeViewer
+	 * 
+	 * @param parent
+	 *            control to which to add the viewer
+	 * @param data
+	 *            underlying data object (Property or Attribute)
+	 * @param layout
+	 *            SWT layout applicable to the viewer
+	 * @param style
+	 *            of the viewer
+	 * @param descriptor
+	 *            JAXB data element describing CheckboxTableViewer or CheckboxTreeViewer for displaying a subset of the resource
+	 *            manager properties and attributes
+	 * @return the viewer
+	 */
+	private CheckboxTreeViewer addCheckboxTreeViewer(Composite parent, Object data, Layout layout, int style,
+			AttributeViewerType descriptor) {
+		style |= (SWT.CHECK | SWT.FULL_SELECTION);
+		Tree t = WidgetBuilderUtils.createTree(parent, style, data);
+		CheckboxTreeViewer viewer = new CheckboxTreeViewer(t);
+		ControlWidgetBuilderUtils.setupAttributeTree(viewer, descriptor.getColumnData(), null, descriptor.isSort(),
+				descriptor.isTooltipEnabled(), descriptor.isHeaderVisible(), descriptor.isLinesVisible());
+		return viewer;
+	}
+
+	/**
+	 * Constructs and configures the SWT TableViewer.
+	 * 
+	 * @see org.eclipse.jface.viewers.CheckboxTableViewer
+	 * 
+	 * @param parent
+	 *            control to which to add the viewer
+	 * @param data
+	 *            underlying data object (Property or Attribute)
+	 * @param layout
+	 *            SWT layout applicable to the viewer
+	 * @param style
+	 *            of the viewer
+	 * @param descriptor
+	 *            JAXB data element describing CheckboxTableViewer or CheckboxTreeViewer for displaying a subset of the resource
+	 *            manager properties and attributes
+	 * @return the viewer
+	 */
+	private CheckboxTableViewer addCheckboxTableViewer(Composite parent, Object data, Layout layout, int style,
+			AttributeViewerType descriptor) {
+		style |= (SWT.CHECK | SWT.FULL_SELECTION);
+		Table t = WidgetBuilderUtils.createTable(parent, style, data);
+		CheckboxTableViewer viewer = new CheckboxTableViewer(t);
+		ControlWidgetBuilderUtils.setupAttributeTable(viewer, descriptor.getColumnData(), null, descriptor.isSort(),
+				descriptor.isTooltipEnabled(), descriptor.isHeaderVisible(), descriptor.isLinesVisible());
+		return viewer;
+	}
+
+	/**
+	 * Adds the row items to the table. The row item model is both a CellEditor update model/listener, as well as the underlying
+	 * data model for the viewer provider. Adds the cell editor-to-model mappings to the local widget map of the LaunchTab being
+	 * built.
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel
+	 * @see org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel
+	 * @see org.eclipse.ptp.internal.rm.jaxb.control.ui.model.CellEditorUpdateModel
+	 * @see org.eclipse.ptp.internal.rm.jaxb.control.ui.model.TableRowUpdateModel
+	 * @see org.eclipse.ptp.internal.rm.jaxb.control.ui.model.ValueTreeNodeUpdateModel
+	 * @see org.eclipse.ptp.internal.rm.jaxb.control.ui.model.InfoTreeNodeModel
+	 * 
+	 * @param viewer
+	 *            to which to add the rows
+	 * @param descriptor
+	 *            describing the content of the viewer's rows
+	 * @return list of models for the added items
+	 */
+	private Collection<ICellEditorUpdateModel> addRows(ColumnViewer viewer, AttributeViewerType descriptor) {
+		ViewerItemsType items = descriptor.getItems();
+		List<ColumnDataType> columnData = descriptor.getColumnData();
+		ICellEditorUpdateModel model = null;
+		Map<String, ICellEditorUpdateModel> hash = new TreeMap<String, ICellEditorUpdateModel>();
+		Map<String, AttributeType> vars = null;
+		if (items.isAllPredefined()) {
+			vars = rmVarMap.getAttributes();
+			for (String key : vars.keySet()) {
+				AttributeType a = vars.get(key);
+				if (!a.isVisible()) {
+					continue;
+				}
+				model = UpdateModelFactory.createModel(a, viewer, columnData, tab);
+				hash.put(key, model);
+			}
+		}
+		if (items.isAllDiscovered()) {
+			vars = rmVarMap.getDiscovered();
+			for (String key : vars.keySet()) {
+				AttributeType a = vars.get(key);
+				if (!a.isVisible()) {
+					continue;
+				}
+				model = UpdateModelFactory.createModel(a, viewer, columnData, tab);
+				hash.put(key, model);
+			}
+		}
+		for (String key : items.getInclude()) {
+			if (!hash.containsKey(key)) {
+				AttributeType a = rmVarMap.getAttributes().get(key);
+				if (a == null) {
+					a = rmVarMap.getDiscovered().get(key);
+				}
+				if (a != null && a.isVisible()) {
+					model = UpdateModelFactory.createModel(a, viewer, columnData, tab);
+					hash.put(key, model);
+				}
+			}
+		}
+		for (String key : items.getExclude()) {
+			hash.remove(key);
+		}
+		for (ICellEditorUpdateModel m : hash.values()) {
+			tab.getLocalWidgets().put(m.getControl(), m);
+		}
+		return hash.values();
+	}
 }

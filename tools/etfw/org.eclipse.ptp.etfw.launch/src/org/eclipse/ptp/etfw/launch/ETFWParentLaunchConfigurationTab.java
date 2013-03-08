@@ -38,21 +38,6 @@ public class ETFWParentLaunchConfigurationTab extends JAXBControllerLaunchConfig
 		try {
 			// This lets us differentiate keys from the old ETFW so they can work from one Profiling Tab
 			getVariableMap().initialize(variableMap, getJobControl().getControlId());
-			// lcMap.initialize(variableMap, null);
-			// lcMap.initialize(variableMap, "etfw");
-			// lcMap.initialize(rmVars, rmId)
-			/*
-			 * Object value = lcMap.getValue("use_mpi");
-			 * System.out.println(value);
-			 * Iterator<String> iterator = lcMap.getAttributes().keySet().iterator();
-			 * while (iterator.hasNext()) {
-			 * String s = iterator.next();
-			 * AttributeType att = lcMap.getAttributes().get(s);// lcMap.get(s);
-			 * 
-			 * System.out.println("name = " + s + " type = " + att.getType() + " value = " + att.getValue());
-			 * 
-			 * }
-			 */
 			getUpdateHandler().clear();
 			getVariableMap().updateFromConfiguration(configuration);
 			delegate = RemoteServicesDelegate.getDelegate(getJobControl().getRemoteServicesId(), getJobControl()
@@ -61,22 +46,6 @@ public class ETFWParentLaunchConfigurationTab extends JAXBControllerLaunchConfig
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
-		// ProviderInfo provider = ProviderInfo.getProvider(rmType);
-		// if (provider != null) {
-		// if (fSelectedLaunchControl == null || !fSelectedLaunchControl.getControlId().equals(controlId)) {
-		// fSelectedLaunchControl = RMLaunchUtils.getLaunchControl(provider.getName(), controlId);
-
-		/*
-		 * Initialize remote connection widget
-		 */
-		// String remId = LaunchUtils.getRemoteServicesId(configuration);
-		// String remName = LaunchUtils.getConnectionName(configuration);
-		// if (remId != null && remName != null) {
-		// fLaunchControl = fSelectedLaunchControl;
-		// }
-
-		// }
-		// }
 
 		return null;
 	}

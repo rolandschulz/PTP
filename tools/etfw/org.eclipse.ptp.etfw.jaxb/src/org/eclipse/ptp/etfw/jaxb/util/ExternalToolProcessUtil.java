@@ -35,7 +35,6 @@ public class ExternalToolProcessUtil {
 				BuildToolType tool = (BuildToolType) o;
 				if ((configuration == null || canRun(tool, configuration))) {
 					buildTools.add(tool);
-					// return tool;
 				}
 			}
 		}
@@ -56,7 +55,6 @@ public class ExternalToolProcessUtil {
 
 				if ((configuration == null || canRun(tool, configuration))) {
 					execTools.add(tool);
-					// return tool;
 				}
 			}
 		}
@@ -76,7 +74,6 @@ public class ExternalToolProcessUtil {
 				PostProcToolType tool = (PostProcToolType) o;
 				if ((configuration == null || canRun(tool, configuration))) {
 					postProcTools.add(tool);
-					// return tool;
 				}
 			}
 		}

@@ -33,7 +33,7 @@ public class ToolPaneTypeUtil {
 					JAXBCoreConstants.ZEROSTR);
 			String attributeKey = controlId + JAXBCoreConstants.DOT + configID;
 			String args = new String(JAXBCoreConstants.ZEROSTR);
-			Iterator iterator = configuration.getAttributes().keySet().iterator();
+			Iterator<?> iterator = configuration.getAttributes().keySet().iterator();
 			while (iterator.hasNext()) {
 				String key = iterator.next().toString();
 				if (key.startsWith(attributeKey)) {
@@ -79,24 +79,23 @@ public class ToolPaneTypeUtil {
 			// TODO remove appending controlId to variable name, there is really no need for this
 			String controlId = configuration.getAttribute(ETFWCoreConstants.RM_NAME, JAXBCoreConstants.ZEROSTR);
 			envMap = new HashMap<String, String>();
-			Iterator iterator = configuration.getAttributes().keySet().iterator();
+			Iterator<?> iterator = configuration.getAttributes().keySet().iterator();
 			String keyStartsWith = controlId + JAXBCoreConstants.DOT + configVarID;
 			while (iterator.hasNext()) {
 				String key = iterator.next().toString();
 				if (key.startsWith(keyStartsWith)) {
 					// split the key with the variable name (after the last underscore)
-					String mapKey = key.replace(keyStartsWith, ""); //$NON-NLS-1$
+					String mapKey = key.replace(keyStartsWith, JAXBCoreConstants.ZEROSTR);
 					String value = ""; //$NON-NLS-1$
 					try {
 						// Try string attribute
-						value = configuration.getAttribute(key, "");
+						value = configuration.getAttribute(key, JAXBCoreConstants.ZEROSTR);
 					} catch (DebugException e) {
 						try {
 							// Try integer attribute
 							value = Integer.toString(configuration.getAttribute(key, 0));
 						} catch (DebugException e1) {
 							// Ignore other types
-							// e1.printStackTrace();
 						}
 					}
 					if (value != null) {
@@ -104,7 +103,7 @@ public class ToolPaneTypeUtil {
 					}
 				}
 			}
-			return envMap;// configuration.getAttribute(configVarID, nullmap);
+			return envMap;
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}

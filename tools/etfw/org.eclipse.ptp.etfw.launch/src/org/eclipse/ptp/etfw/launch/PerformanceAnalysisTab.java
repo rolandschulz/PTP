@@ -77,7 +77,6 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 	protected boolean noPTP = false;
 	private EtfwToolProcessType etfwTool;
 	private ETFWParentLaunchConfigurationTab launchTabParent;
-	// JAXBControllerLaunchConfigurationTab launchTabParent;
 	private ETFWVariableMap vmap;
 	private ILaunchConfiguration launchConfiguration = null;
 	private ILaunchController controller;
@@ -230,7 +229,6 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 	private void rebuildTab(String toolName) {
 		etfwTool = JAXBExtensionUtils.getTool(toolName);
 		vmap = new ETFWVariableMap();
-		// vmap = new LCVariableMap();
 
 		JAXBInitializationUtil.initializeMap(etfwTool, vmap);
 		try {
@@ -273,51 +271,30 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 		ETFWToolTabBuilder.initialize();
 
 		for (IJAXBLaunchConfigurationTab tabControl : tabControllers) {
-			// for (TabControllerType toolPane : tool.getAllCompilers().getToolPanes()) {
 			ETFWToolTabBuilder builder = new ETFWToolTabBuilder(tabControl, vmap);
 
 			TabItem tabItem = new TabItem(tabParent, SWT.NONE);
 			Control control = null;
 			final ScrolledComposite scroller = new ScrolledComposite(tabParent, SWT.V_SCROLL | SWT.H_SCROLL);
-			// scroller.setLayout(new FillLayout());
 			try {
-				// control = builder.build(tabParent);
 				control = builder.build(scroller);
-				// ((Composite) control).setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 				((Composite) control).layout();
-				// ((Composite) control).setLayout(new FillLayout());
 
 				tabItem.setText(tabControl.getController().getTitle());
 
-				// this would have come from the tab control of JAXBDynamicLaunchConfigurationTab
-				// Composite toolComposite = new Composite(tabParent, SWT.NONE);
-				// toolComposite.setLayout(new GridLayout(1, false));
-
-				scroller.setContent(control);// .setContent(control);
+				scroller.setContent(control);
 				scroller.setExpandHorizontal(true);
 				scroller.setExpandVertical(true);
 				scroller.setMinSize(control.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-
-				// scroller.setMinSize(toolComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-				// scTest.setMinSize(control.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-				// scTest.setMinHeight(tabParent.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);//
-				// .setMinSize(tabParent.computeSize(SWT.DEFAULT,
-				// System.out.println("Control layout data =" + control.getLayoutData().toString());
 
 				tabItem.setControl(scroller);
 			} catch (Throwable t) {
 				t.printStackTrace();
 			}
-			// tabItem.setControl(control);
-			// addChildren(toolPane.getTabFolderOrCompositeOrWidget(), toolComposite);
-			// Label label = new Label(toolComposite, SWT.NONE);
-			// label.setText("My Label");
-			// update defaults
 
 		}
 
 		handleUpdate();
-		// toolComposite.layout();
 	}
 
 	/**
@@ -353,12 +330,6 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 			}
 
 			((JAXBDynamicLaunchConfigurationTab) tabControl).initializeFrom(this.launchConfiguration);
-			// Collection<ControlStateListener> listeners = ((ETFWLaunchConfigurationTab) tabControl).getListeners();
-			// if (listeners != null) {
-			// for (ControlStateListener l : listeners) {
-			// l.setState();
-			// }
-			// }
 		}
 	}
 
@@ -436,7 +407,6 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 						}
 					}
 
-					// rebuildTab(toolName);
 				}
 			}
 		} catch (CoreException e) {
@@ -449,11 +419,11 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 
 		if (etfwCombo.getSelectionIndex() == 0) {
 			configuration
-					.setAttribute(IETFWLaunchConfigurationConstants.ETFW_VERSION, IETFWLaunchConfigurationConstants.SAX_PARSER);
+					.setAttribute(IToolLaunchConfigurationConstants.ETFW_VERSION, IToolLaunchConfigurationConstants.USE_SAX_PARSER);
 			saxETFWTab.performApply(configuration);
 		} else {
-			configuration.setAttribute(IETFWLaunchConfigurationConstants.ETFW_VERSION,
-					IETFWLaunchConfigurationConstants.JAXB_PARSER);
+			configuration.setAttribute(IToolLaunchConfigurationConstants.ETFW_VERSION,
+					IToolLaunchConfigurationConstants.USE_JAXB_PARSER);
 			if (toolCombo.getSelectionIndex() != -1) {
 				String selectedtool = toolCombo.getItem(toolCombo.getSelectionIndex());
 				configuration.setAttribute(SELECTED_TOOL, selectedtool);
@@ -501,7 +471,7 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 		}
 	}
 
-	protected class WidgetListener extends SelectionAdapter /* implements ModifyListener, IPropertyChangeListener */{
+	protected class WidgetListener extends SelectionAdapter {
 		@Override
 		public void widgetSelected(SelectionEvent e) {
 			int selection = toolCombo.getSelectionIndex();
@@ -532,7 +502,6 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 
 	@Override
 	public String getId() {
-		// return "org.eclipse.ptp.etfw.launch.PerformanceAnalysisTab";
 		return TAB_ID;
 	}
 

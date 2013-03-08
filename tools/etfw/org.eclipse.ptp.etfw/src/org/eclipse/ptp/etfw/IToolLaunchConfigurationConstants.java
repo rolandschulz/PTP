@@ -54,6 +54,11 @@ public interface IToolLaunchConfigurationConstants {
 	 * @since 6.0
 	 */
 	public static final String USE_SAX_PARSER = "sax-parser";
+
+	/**
+	 * @since 6.0
+	 */
+	public static final String USE_JAXB_PARSER = "jaxb-parser";
 	/**
 	 * ID for boolean: true = keep instrumented executable
 	 */

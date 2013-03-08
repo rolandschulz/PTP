@@ -29,10 +29,10 @@ public class ToolArgumentTypeUtil {
 		}
 
 		if (toolArg.isUseConfValue()) {
-			String carg = toolArg.getValue();// getArg();
+			String carg = toolArg.getValue();
 			String cval = JAXBCoreConstants.ZEROSTR;
 			try {
-				cval = configuration.getAttribute(toolArg.getConfVal(), JAXBCoreConstants.ZEROSTR);// getConfValue(), "");
+				cval = configuration.getAttribute(toolArg.getConfVal(), JAXBCoreConstants.ZEROSTR);
 			} catch (CoreException e) {
 				e.printStackTrace();
 			}

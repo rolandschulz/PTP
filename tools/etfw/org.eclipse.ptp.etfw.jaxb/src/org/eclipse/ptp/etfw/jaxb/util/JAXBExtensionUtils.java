@@ -93,7 +93,7 @@ public class JAXBExtensionUtils {
 
 						URI toolFileUri = new URI(FileLocator.toFileURL((Platform.getBundle(plugspace).getEntry(toolFile)))
 								.toString()
-								.replaceAll(JAXBCoreConstants.SP, "%20")); //$NON-NLS-1$
+								.replaceAll(JAXBCoreConstants.SP, ETFWCoreConstants.URL_SP));
 						ifs = EFS.getLocalFileSystem().getStore(toolFileUri);
 						fPluginWorkflows.put(name, ifs);
 					} catch (Exception e) {

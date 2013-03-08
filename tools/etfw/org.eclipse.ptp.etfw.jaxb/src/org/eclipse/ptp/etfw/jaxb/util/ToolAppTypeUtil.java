@@ -39,7 +39,7 @@ public class ToolAppTypeUtil {
 
 		if (toolArgs != null) {
 			for (ToolArgumentType toolArg : toolArgs) {
-				String nextArg = ToolArgumentTypeUtil.getArgument(configuration, toolArg);// toolArg.getArgument(configuration);
+				String nextArg = ToolArgumentTypeUtil.getArgument(configuration, toolArg);
 				if (nextArg != null) {
 					nextArg = nextArg.trim();
 
@@ -67,12 +67,7 @@ public class ToolAppTypeUtil {
 				if (toolPane.getEncloseWith() != null) {
 					arg += toolPane.getEncloseWith();
 				}
-				// if (toolPane.isVirtual()) {
-				// continue;
-				// }
-				// for (int i = 0; i < allInput.length; i++) {
-				// if (allInput[i] != null) {
-				String nextArg = ToolPaneTypeUtil.getArgument(configuration, toolPane.getConfigId());// toolPane.getArgument(configuration);
+				String nextArg = ToolPaneTypeUtil.getArgument(configuration, toolPane.getConfigId());
 				if (nextArg != null) {
 					nextArg = nextArg.trim();
 					arg += nextArg;
@@ -90,15 +85,10 @@ public class ToolAppTypeUtil {
 
 						input.add(arg);
 					}
-					// input+=nextArg;//allInput[i].getArgument(configuration);
-					// input+=" ";
 				}
-
-				// }
-				// }
 			}
 		}
-		return input;// getArgs(configuration)+" "+getPaneArgs(configuration);
+		return input;
 	}
 
 	/**
@@ -111,15 +101,12 @@ public class ToolAppTypeUtil {
 
 		if (toolPanes != null)
 			for (ToolPaneType toolPane : toolPanes) {
-				// if (toolPane.isVirtual()) {
-				// continue;
-				// }
 				if (toolPane != null) {
 					Map<String, String> test = ToolPaneTypeUtil.getEnvVars(configuration, toolPane.getConfigVarId());
 					if (test != null)
 						vars.putAll(test);
 				}
 			}
-		return vars;// getArgs(configuration)+" "+getPaneArgs(configuration);
+		return vars;
 	}
 }

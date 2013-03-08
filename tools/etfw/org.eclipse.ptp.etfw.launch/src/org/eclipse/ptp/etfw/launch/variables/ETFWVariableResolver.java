@@ -17,7 +17,9 @@ import org.eclipse.core.variables.IDynamicVariable;
 import org.eclipse.core.variables.IDynamicVariableResolver;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.ems.core.EnvManagerConfigString;
+import org.eclipse.ptp.etfw.launch.messages.Messages;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.JAXBControlConstants;
+import org.eclipse.ptp.internal.rm.jaxb.core.JAXBCoreConstants;
 
 /**
  * Resolver for the ETFWVariableMap (tag: ${etfw:). <br>
@@ -54,7 +56,7 @@ public class ETFWVariableResolver implements IDynamicVariableResolver {
 					try {
 						return invokeGetter(value, parts[1]);
 					} catch (Throwable t) {
-						throw CoreExceptionUtils.newException("ETFW Tool variable dereferencing error", t);
+						throw CoreExceptionUtils.newException(Messages.ETFWVariableResolver_DE_REF_ERROR, t);
 					}
 				} else {
 					if (value instanceof String && EnvManagerConfigString.isEnvMgmtConfigString((String) value)) {
@@ -63,7 +65,7 @@ public class ETFWVariableResolver implements IDynamicVariableResolver {
 									"\n", false, new EnvManagerConfigString((String) value), //$NON-NLS-1$
 									null);
 						} else {
-							return ""; //$NON-NLS-1$
+							return JAXBCoreConstants.ZEROSTR;
 						}
 					} else {
 						return String.valueOf(value);

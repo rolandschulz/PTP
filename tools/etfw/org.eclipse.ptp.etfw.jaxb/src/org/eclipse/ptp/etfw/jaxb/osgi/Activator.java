@@ -49,14 +49,6 @@ public class Activator extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-
-		// TODO CMN remove this when testing is finished
-		// URL url = FileLocator.toFileURL(Platform.getBundle(PLUGIN_ID).getEntry("data/tau_tool-jaxb.xml"));
-		// String xml = JAXBUtil.getETFWConfigurationXML(url);
-		// tool = JAXBUtil.initializeEtfwToolProcessType(xml);
-		// System.out.println(xml);
-
-		// System.out.println(tool.getExecToolOrPostProcToolOrBuildTool().size());
 	}
 
 	/*

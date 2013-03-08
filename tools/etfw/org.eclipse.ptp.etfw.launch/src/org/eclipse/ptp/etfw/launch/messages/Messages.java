@@ -4,6 +4,8 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.etfw.launch.messages.messages"; //$NON-NLS-1$
+	public static String ETFWToolTabBuilder_ToggleShowHideSelectedAttributes;
+	public static String ETFWVariableResolver_DE_REF_ERROR;
 	public static String PerformanceAnalysisTab_BuildInstrumentedExecutable;
 	public static String PerformanceAnalysisTab_SelectExistingPerfData;
 	static {
