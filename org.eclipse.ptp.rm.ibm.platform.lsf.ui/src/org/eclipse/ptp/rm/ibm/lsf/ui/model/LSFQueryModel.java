@@ -8,6 +8,7 @@ package org.eclipse.ptp.rm.ibm.lsf.ui.model;
 import org.eclipse.ptp.rm.ibm.lsf.ui.widgets.LSFQueryControl;
 import org.eclipse.ptp.rm.jaxb.control.ui.AbstractUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateHandler;
+import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.widgets.Control;
@@ -16,7 +17,7 @@ public class LSFQueryModel extends AbstractUpdateModel implements
 		ModifyListener {
 
 	private LSFQueryControl control;
-	private Object defaultValue;
+	private Object initialValue;
 
 	/**
 	 * Create the model for the application list widget. This model holds the
@@ -58,9 +59,11 @@ public class LSFQueryModel extends AbstractUpdateModel implements
 
 		if (control.widgetSelected()) {
 			value = control.getSelectedValue();
-			System.out.printf("Value for widget %s is '%s'\n", control, value);
 		} else {
-			value = defaultValue;
+			value = initialValue;
+		}
+		if ((value != null) && (!value.equals(""))) {
+			lcMap.putValue(name, value);
 		}
 		return value;
 	}
@@ -88,19 +91,16 @@ public class LSFQueryModel extends AbstractUpdateModel implements
 	 * The widget is read-only so this method does nothing.
 	 */
 	public void refreshValueFromMap() {
-		Object value;
-
-		value = lcMap.getValue(name);
-		if (value == null) {
-			value = "";
-			if (defaultValue == null) {
-				defaultValue = "";
+		mapValue = lcMap.getValue(name);
+		if (mapValue == null) {
+			mapValue = "";
+			if (initialValue == null) {
+				initialValue = "";
 			}
 		} else {
-			defaultValue = value;
+			initialValue = mapValue;
 		}
-		if (control.widgetSelected()) {
-			control.setSelectedValue((String) value);
-		}
+		control.setSelectedValue((String) mapValue);
 	}
+
 }

@@ -55,6 +55,7 @@ public class QueueQueryControl extends LSFQueryControl {
 					dialog = new LSFQueryDialog(getShell(),
 							Messages.QueueQueryControl_0, columnLabels,
 							commandResponse);
+					dialog.setSelectedValue(selectedValue);
 					selection = dialog.open();
 					if (selection == 0) {
 						selectedValue = dialog.getSelectedValue();

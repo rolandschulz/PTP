@@ -23,7 +23,7 @@ public abstract class LSFQueryControl extends Composite {
 	protected Vector<String[]> commandResponse;
 	protected LSFQueryDialog dialog;
 	private List<ModifyListener> modifyListeners = new LinkedList<ModifyListener>();
-	protected String selectedValue;
+	protected String selectedValue = "";
 
 	public LSFQueryControl(Composite parent, final IWidgetDescriptor wd) {
 		super(parent, wd.getStyle());
@@ -32,8 +32,8 @@ public abstract class LSFQueryControl extends Composite {
 		Button button = new Button(this, SWT.PUSH);
 		button.setText(wd.getFixedText());
 		button.setToolTipText(wd.getToolTipText());
-		configureQueryButton(button, wd.getRemoteConnection());
 		commandResponse = new Vector<String[]>();
+		configureQueryButton(button, wd.getRemoteConnection());
 	}
 
 	/**
