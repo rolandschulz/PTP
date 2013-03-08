@@ -98,7 +98,7 @@ public class ToolPaneTypeUtil {
 							// Ignore other types
 						}
 					}
-					if (value != null) {
+					if (value != null && value.trim().length() > 0) {
 						envMap.put(mapKey, value);
 					}
 				}
