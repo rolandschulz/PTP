@@ -21,7 +21,7 @@
                         </tooltip>
                         <validator>
                                 <regex expression=" *|[0-9]+" /> <!-- Blank or numeric -->
-                                <error-message>Acknowledgement threshold must be numeric
+                                <error-message>Acknowledgment threshold must be numeric
                                 </error-message>
                         </validator>
                 </attribute>
@@ -302,7 +302,7 @@
 
                 <attribute name="MP_FIFO_ROUTE_MODE_ATTR" type="string">
                         <description>FIFO routing mode:</description>
-                        <tooltip>Routing mode to be used for FIFO operations (Default: hw_direct) {MP_FIFO_ROUTE_MODE_ADDR}
+                        <tooltip>Routing mode to be used for FIFO operations (Default: hw_direct) {MP_FIFO_ROUTE_MODE}
                         </tooltip>
                         <choice>hw_direct,sw_indirect,hw_direct_striped,hw_indirect</choice>
                 </attribute>
@@ -542,7 +542,7 @@
 
                 <attribute name="MP_PMDSUFFIX_ATTR" type="string">
                         <description>Alternate PMD service suffix:</description>
-                        <tooltip>Specify the suffix for the PMD service name {MP_PMD_SUFFIX}
+                        <tooltip>Specify the suffix for the PMD service name {MP_PMDSUFFIX}
                         </tooltip>
                 </attribute>
                 
@@ -567,7 +567,7 @@
 
                 <attribute name="MP_PRINTENV_ATTR" type="string">
                         <description>Print environment:</description>
-                        <tooltip>Print MPI environment variables for all tasks (Default: no) {MP_PRINTENV_ATTR}
+                        <tooltip>Print MPI environment variables for all tasks (Default: no) {MP_PRINTENV}
                         </tooltip>
                         <choice>,yes,no</choice>
                 </attribute>
@@ -662,7 +662,7 @@
 
                 <attribute name="MP_RDMA_ROUTE_MODE_ATTR" type="string">
                         <description>RDMA routing mode:</description>
-                        <tooltip>Routing mode to be used for RDMA operations (Default: hw_direct) {MP_RDMA_ROUTE_MODE_ADDR}
+                        <tooltip>Routing mode to be used for RDMA operations (Default: hw_direct) {MP_RDMA_ROUTE_MODE}
                         </tooltip>
                         <choice>hw_direct,sw_indirect,hw_direct_striped,hw_indirect</choice>
                 </attribute>
@@ -898,7 +898,7 @@
 
                 <attribute name="MP_UDP_PACKET_SIZE_ATTR" type="integer">
                         <description>UDP packet size:</description>
-                        <tooltip>Specify UDP packet size {MP_UDP_PACKET_SIZE_ATTR}
+                        <tooltip>Specify UDP packet size {MP_UDP_PACKET_SIZE}
                         </tooltip>
                         <validator>
                                 <regex expression=" *|[0-9]+" /> <!-- Blank or numeric -->
@@ -3236,7 +3236,7 @@
 							<include>MP_CPU_USE_ATTR</include>
 							<include>MP_CSS_INTERRUPT_ATTR</include>
 							<include>MP_DBG_LAUNCH_ATTR</include>
-							<include>MP_DBG_LAUNCH_TIMEOUTATTR</include>
+							<include>MP_DBG_LAUNCH_TIMEOUT_ATTR</include>
 							<include>MP_DBG_TASKINFO_ATTR</include>
 							<include>MP_DEBUG_ATTACH_ATTR</include>
 							<include>MP_DEBUG_ATTACH_DIR_ATTR</include>
@@ -3249,7 +3249,7 @@
 							<include>MP_EUILIB_ATTR</include>
 							<include>MP_EUILIBPATH_ATTR</include>
 							<include>MP_FIFO_ROUTE_MODE_ATTR</include>
-							<include>MP_FORCED_INTERRUPS_ENABLED_ATTR</include>
+							<include>MP_FORCED_INTERRUPTS_ENABLED_ATTR</include>
 							<include>MP_HINTS_FILTERED_ATTR</include>
 							<include>MP_HOSTFILE_ATTR</include>
 							<include>MP_IMM_SEND_BUFFERS_ATTR</include>
@@ -3308,7 +3308,7 @@
 							<include>MP_STATISTICS_ATTR</include>
 							<include>MP_STDINMODE_ATTR</include>
 							<include>MP_STDOUTMODE_ATTR</include>
-							<include>MP_SAVEH_ATTR</include>
+							<include>MP_SAVEHOSTFILE_ATTR</include>
 							<include>MP_TASK_AFFINITY_ATTR</include>
 							<include>MP_THREAD_STACKSIZE_ATTR</include>
 							<include>MP_TIMEOUT_ATTR</include>
