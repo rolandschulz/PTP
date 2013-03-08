@@ -1208,6 +1208,9 @@ public class LaunchController implements ILaunchController {
 		 */
 		getRMVariableMap().maybeAddAttribute(JAXBControlConstants.LAUNCH_MODE, mode, false);
 
+		/*
+		 * Update attributes from launch configuration
+		 */
 		Map<String, Object> lcattr = RMVariableMap.getValidAttributes(configuration);
 		for (String key : lcattr.keySet()) {
 			Object value = lcattr.get(key);

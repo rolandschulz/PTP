@@ -53,7 +53,7 @@ public class ThrowImpl extends AbstractAssign {
 			set(target, field, getValue(previous, values));
 			index++;
 		}
-		throw new UserThrownException(message);
+		throw new UserThrownException(rmVarMap.getString(uuid, message));
 	}
 
 	@Override

@@ -117,7 +117,7 @@ public abstract class AbstractAssign implements IAssign {
 			}
 			return method.invoke(target, (Object[]) null);
 		} catch (Exception e) {
-			throw new StreamParserException(NLS.bind("Unable to get attribute value: {0}", e.getMessage()), e);
+			throw new StreamParserException(NLS.bind(Messages.AbstractAssign_Unable_to_get_attribute_value, e.getMessage()), e);
 		}
 	}
 
@@ -178,14 +178,14 @@ public abstract class AbstractAssign implements IAssign {
 			}
 		}
 		if (setter == null) {
-			throw new StreamParserException(NLS.bind("Unable to set attribute value: No such method {0}", name));
+			throw new StreamParserException(NLS.bind(Messages.AbstractAssign_No_such_method, name));
 		}
 		if (values != null && values[0] != null) {
 			Class<?>[] mclzz = setter.getParameterTypes();
 			// better have 1 parameter
 			Class<?> param = mclzz[0];
 			Class<?> valueClass = values[0].getClass();
-			StreamParserException e = new StreamParserException("Unable to set attribute value: Invalid arguments");
+			StreamParserException e = new StreamParserException(Messages.AbstractAssign_Invalid_arguments);
 			if (!param.equals(Object.class) && !param.isAssignableFrom(values[0].getClass())) {
 				if (valueClass.equals(String.class)) {
 					if (param.equals(Boolean.class)) {
@@ -212,7 +212,7 @@ public abstract class AbstractAssign implements IAssign {
 		try {
 			setter.invoke(target, values);
 		} catch (Exception e) {
-			throw new StreamParserException(NLS.bind("Unable to set attribute value: {0}", e.getMessage()), e);
+			throw new StreamParserException(NLS.bind(Messages.AbstractAssign_Unable_to_set_attribute_value, e.getMessage()), e);
 		}
 	}
 

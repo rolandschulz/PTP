@@ -55,6 +55,10 @@ public class Messages extends NLS {
 	public static String AbstractAssign_7;
 	public static String AbstractAssign_8;
 	public static String AbstractAssign_9;
+	public static String AbstractAssign_Invalid_arguments;
+	public static String AbstractAssign_No_such_method;
+	public static String AbstractAssign_Unable_to_get_attribute_value;
+	public static String AbstractAssign_Unable_to_set_attribute_value;
 	public static String MatchImpl_0;
 	public static String MatchImpl_1;
 	public static String MatchImpl_2;
