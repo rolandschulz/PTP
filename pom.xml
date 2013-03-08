@@ -152,6 +152,8 @@
 		<module>tools/etfw/org.eclipse.ptp.etfw.doc.user</module>
 		<module>tools/etfw/org.eclipse.ptp.etfw.feedback</module>
 		<module>tools/etfw/org.eclipse.ptp.etfw.parallel</module>
+		<module>tools/etfw/org.eclipse.ptp.etfw.jaxb</module>
+		<module>tools/etfw/org.eclipse.ptp.etfw.launch</module>
 		<module>tools/etfw/org.eclipse.ptp.etfw.tau</module>
 		<module>tools/etfw/org.eclipse.ptp.etfw.tau.papiselect</module>
 		<module>tools/etfw/org.eclipse.ptp.etfw.tau.perfdmf</module>
