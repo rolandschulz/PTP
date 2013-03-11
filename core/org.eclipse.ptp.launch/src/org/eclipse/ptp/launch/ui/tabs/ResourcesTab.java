@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007,2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,7 +21,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.fieldassist.ComboContentAdapter;
+import org.eclipse.jface.fieldassist.ContentProposalAdapter;
+import org.eclipse.jface.fieldassist.SimpleContentProposalProvider;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.jobs.IJobControl;
@@ -43,6 +47,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
@@ -95,6 +100,8 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	private final Map<IJobControl, IRMLaunchConfigurationDynamicTab> fDynamicTabs = new HashMap<IJobControl, IRMLaunchConfigurationDynamicTab>();
 	private final ContentsChangedListener launchContentsChangedListener = new ContentsChangedListener();
 
+	private final String PLEASE_SELECT_MSG = Messages.ResourcesTab_pleaseSelectTargetSystem;
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -145,10 +152,10 @@ public class ResourcesTab extends LaunchConfigurationTab {
 
 		new Label(comp, SWT.NONE).setText(Messages.ResourcesTab_targetSystemConfiguration);
 
-		fSystemTypeCombo = new Combo(comp, SWT.READ_ONLY);
+		fSystemTypeCombo = new Combo(comp, SWT.NONE);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		fSystemTypeCombo.setLayoutData(gd);
-		fSystemTypeCombo.add(Messages.ResourcesTab_pleaseSelectTargetSystem);
+		fSystemTypeCombo.add(PLEASE_SELECT_MSG);
 		String[] configNames = JAXBExtensionUtils.getConfiguationNames();
 		if (JAXBExtensionUtils.getInvalid() != null) {
 			MessageDialog.openError(Display.getCurrent().getActiveShell(), Messages.ResourcesTab_InvalidConfig_title,
@@ -165,8 +172,18 @@ public class ResourcesTab extends LaunchConfigurationTab {
 				updateEnablement();
 				handleConnectionChanged();
 			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				// this is called when 'enter' is pressed as opposed to mouse-click
+				widgetSelected(e);
+			}
 		});
+		enableContentProposal(fSystemTypeCombo);
 		fSystemTypeCombo.select(0);
+
+		// select the default message; thus if user types a filter string immediately, it will replace it
+		fSystemTypeCombo.setSelection(new Point(0, PLEASE_SELECT_MSG.length()));
 
 		fRemoteConnectionWidget = new RemoteConnectionWidget(comp, SWT.NONE, null, getLaunchConfigurationDialog());
 		fRemoteConnectionWidget.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
@@ -182,6 +199,36 @@ public class ResourcesTab extends LaunchConfigurationTab {
 
 		final ScrolledComposite scrollComp = createLaunchAttributeControlComposite(comp, numColumns);
 		setLaunchAttrsScrollComposite(scrollComp);
+	}
+
+
+
+	/**
+	 * Enable content-assist-like completion/filtering of TSC type by typing
+	 * 
+	 * @param combo
+	 *            the combo box itself (could be extended to other controls)
+	 */
+	private void enableContentProposal(Combo combo) {
+		final String LOWER_ALPHA = "abcdefghijklmnopqrstuvwxyz";
+		final String UPPER_ALPHA = LOWER_ALPHA.toUpperCase();
+		final String NUMBERS = "0123456789";
+
+		final int keynoCTRL = new Integer(SWT.CTRL).intValue();
+		final int keynoSPACE = new Integer(' ').intValue();
+		// keystroke that activates this content proposal
+		final KeyStroke ctrlSpace = KeyStroke.getInstance(keynoCTRL, keynoSPACE);
+
+		final String delete = new String(new char[] { 8 });
+		final String allChars = LOWER_ALPHA + UPPER_ALPHA + NUMBERS + delete;
+		final char[] autoActivationChars = allChars.toCharArray();
+
+		SimpleContentProposalProvider propProv = new SimpleContentProposalProvider(combo.getItems());
+		ContentProposalAdapter propAdapter = new ContentProposalAdapter(combo, new ComboContentAdapter(), propProv, ctrlSpace,
+				autoActivationChars);
+		propProv.setFiltering(true);
+		propAdapter.setPropagateKeys(true);
+		propAdapter.setProposalAcceptanceStyle(ContentProposalAdapter.PROPOSAL_REPLACE);
 	}
 
 	/*
@@ -303,11 +350,9 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 * 
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#performApply(org.eclipse .debug.core.ILaunchConfigurationWorkingCopy)
 	 */
-
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-		int index = fSystemTypeCombo.getSelectionIndex();
-		if (fLaunchControl != null && index > 0) {
-			LaunchUtils.setConfigurationName(configuration, fSystemTypeCombo.getItem(index));
+		if (fLaunchControl != null && isTSCselectionValid()) {
+			LaunchUtils.setConfigurationName(configuration, fSystemTypeCombo.getText());
 			LaunchUtils.setResourceManagerUniqueName(configuration, fLaunchControl.getControlId());
 			LaunchUtils.setConnectionName(configuration, fLaunchControl.getConnectionName());
 			LaunchUtils.setRemoteServicesId(configuration, fLaunchControl.getRemoteServicesId());
@@ -448,7 +493,8 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			updateLaunchAttributeControls(null, getLaunchConfiguration(), false);
 			updateLaunchConfigurationDialog();
 		} else if (openConnection()) {
-			String type = fSystemTypeCombo.getItem(fSystemTypeCombo.getSelectionIndex());
+			// We assume fSystemTypeCombo selection is valid based on previous tests
+			String type = fSystemTypeCombo.getText();
 			ILaunchController controller = getNewController(conn.getRemoteServices().getId(), conn.getName(), type);
 			if (controller != null) {
 				stopController(fLaunchControl);
@@ -506,17 +552,23 @@ public class ResourcesTab extends LaunchConfigurationTab {
 
 	}
 
+	/**
+	 * Enable/disable connection selection based on if a valid TSC is selected in combo box
+	 */
 	private void updateEnablement() {
-		if (fSystemTypeCombo.getSelectionIndex() > 0) {
+		if (isTSCselectionValid()) {
 			fRemoteConnectionWidget.setEnabled(true);
 			fRemoteConnectionWidget.setConnection(null);
 		} else {
+			// First "Please select" message, or an invalid (probably user-typed) selection has been made.
 			fRemoteConnectionWidget.setEnabled(false);
+			// if first one or an invalid one is selected, select its text to ease typing a filter string to replace it
+			fSystemTypeCombo.setSelection(new Point(0, PLEASE_SELECT_MSG.length()));
 		}
 	}
 
 	/**
-	 * This routine is called when the configuration has been changed via the combo boxes. It's job is to regenerate the dynamic UI
+	 * This routine is called when the configuration has been changed via the combo boxes. Its job is to regenerate the dynamic UI
 	 * components, dependent on the configuration choice. The controller will be started if startController is true. This is only
 	 * required if the connection information has been specified, in which case we want to run the start up commands
 	 * so that the UI elements will be loaded correctly.
@@ -576,5 +628,23 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			}
 		}
 		launchAttrsScrollComp.layout(true);
+	}
+
+	/**
+	 * Determine if target system configuration selection in the combo box is a valid one -
+	 * one in the existing list has been selected:
+	 * not an invalid value typed, and not the "Please Select..." message at the top.
+	 */
+	private boolean isTSCselectionValid() {
+		String selected = fSystemTypeCombo.getText();
+		boolean result = false;
+		if (!fSystemTypeCombo.getText().equals(PLEASE_SELECT_MSG)) {
+			for (String s : fSystemTypeCombo.getItems()) {
+				if (selected.equals(s)) {
+					result = true;
+				}
+			}
+		}
+		return result;
 	}
 }
