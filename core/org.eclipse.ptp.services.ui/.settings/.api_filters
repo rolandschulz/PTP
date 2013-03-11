@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?><component id="org.eclipse.ptp.services.ui" version="2">
+    <resource path="META-INF/MANIFEST.MF">
+        <filter id="924844039">
+            <message_arguments>
+                <message_argument value="2.0.0"/>
+                <message_argument value="2.0.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/eclipse/ptp/services/ui/preferences/ServiceConfigurationPreferencePage.java" type="org.eclipse.ptp.services.ui.preferences.ServiceConfigurationPreferencePage">
+        <filter id="1108344834">
+            <message_arguments>
+                <message_argument value="1.0"/>
+                <message_argument value="2.0"/>
+                <message_argument value="org.eclipse.ptp.services.ui.preferences.ServiceConfigurationPreferencePage"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/eclipse/ptp/services/ui/views/ServiceConfigurationView.java" type="org.eclipse.ptp.services.ui.views.ServiceConfigurationView">
+        <filter id="1108344834">
+            <message_arguments>
+                <message_argument value="1.0"/>
+                <message_argument value="2.0"/>
+                <message_argument value="org.eclipse.ptp.services.ui.views.ServiceConfigurationView"/>
+            </message_arguments>
+        </filter>
+    </resource>
+</component>

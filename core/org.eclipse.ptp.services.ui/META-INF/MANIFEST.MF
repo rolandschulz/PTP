@@ -14,8 +14,12 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Export-Package: org.eclipse.ptp.services.ui,
+Export-Package: org.eclipse.ptp.services.internal.ui.actions;x-internal:=true,
+ org.eclipse.ptp.services.internal.ui.adapters;x-internal:=true,
+ org.eclipse.ptp.services.ui,
  org.eclipse.ptp.services.ui.dialogs,
  org.eclipse.ptp.services.ui.messages,
+ org.eclipse.ptp.services.ui.preferences,
+ org.eclipse.ptp.services.ui.views,
  org.eclipse.ptp.services.ui.widgets,
  org.eclipse.ptp.services.ui.wizards

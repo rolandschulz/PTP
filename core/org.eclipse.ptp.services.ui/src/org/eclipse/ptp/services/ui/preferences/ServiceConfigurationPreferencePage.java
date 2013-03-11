@@ -53,6 +53,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
  * using a service configuration.
  * 
  * @author dave
+ * @since 1.0
  * 
  */
 public class ServiceConfigurationPreferencePage extends PreferencePage

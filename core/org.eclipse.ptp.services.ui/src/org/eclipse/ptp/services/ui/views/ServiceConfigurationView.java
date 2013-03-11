@@ -30,6 +30,9 @@ import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.part.ViewPart;
 
+/**
+ * @since 1.0
+ */
 public class ServiceConfigurationView extends ViewPart {
 
 	private class ServiceConfigurationLabelProvider extends WorkbenchLabelProvider {
