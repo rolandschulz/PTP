@@ -12,12 +12,8 @@
             name="edu.utk.nics.keeneland.pbs.batch">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
-            configurationFile="data/edu.illinois.ncsa.bluewaters.pbs.batch.xe.xml"
-            name="edu.illinois.ncsa.bluewaters.pbs.batch.xe">
-      </JAXBResourceManagerConfiguration>
-      <JAXBResourceManagerConfiguration
-            configurationFile="data/edu.illinois.ncsa.bluewaters.pbs.batch.xk.xml"
-            name="edu.illinois.ncsa.bluewaters.pbs.batch.xk">
+            configurationFile="data/edu.illinois.ncsa.bluewaters.pbs.batch.xml"
+            name="edu.illinois.ncsa.bluewaters.pbs.batch">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/edu.illinois.ncsa.forge.pbs.batch.mvapich2.xml"

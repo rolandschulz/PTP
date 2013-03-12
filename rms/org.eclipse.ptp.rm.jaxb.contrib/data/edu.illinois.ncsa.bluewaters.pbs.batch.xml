@@ -9,12 +9,13 @@
 <!-- * Al Rossi - initial design and implementation (PBS) -->
 <!-- * Galen Arnold - adapt to mvapich2 -->
 <!-- * Jeff Overbey - adapt to Blue Waters -->
+<!-- * Galen Arnold - adapt to Blue Waters round 2: free form aprun box -->
 <!-- ****************************************************************************** -->
 <resource-manager-builder 
 	xmlns="http://eclipse.org/ptp/schemas" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://eclipse.org/ptp/schemas http://eclipse.org/ptp/schemas/rm.xsd" 
-	name="edu.illinois.ncsa.bluewaters.pbs.batch.xe">
+	name="edu.illinois.ncsa.bluewaters.pbs.batch">
 	<control-data>
 		<!-- Set the default value of this attribute if PBS is installed in a non-standard location -->
 		<attribute name="bindir" visible="false"/>
@@ -88,31 +89,17 @@ the base name of the job script or STDIN.]]></tooltip>
 		<attribute name="modules" type="string">
 			<description>Modules to be loaded from inside the job script.</description>
 		</attribute>
-		<attribute name="numberOfTasks" min="1" type="integer">
-			<description>The total number of MPI tasks (i.e., number of nodes times number of processes per node).</description>
-			<default>32</default>
-			<validator>
-				<regex expression="[1-9][0-9]*"/>
-				<error-message>must be a positive integer</error-message>
-			</validator>
+		<attribute name="BWresources"  type="string">
+			<description>nodes=N:ppn=M:xe  where M is processes per node, xe or xk node type.</description>
+			<default>nodes=1:ppn=16:xe</default>
 		</attribute>
-		<attribute name="numberOfProcessesPerNode"  type="choice">
-			<description>The number of MPI processes per node.</description>
-			<choice>,2,4,8,16,32</choice>
-			<default>32</default>
-		</attribute>
-		<attribute name="numberOfThreadsPerProcess" type="choice">
-			<description>The number of OpenMP threads per MPI process.</description>
-			<choice>,2,4,8,16,32</choice>
-			<default></default>
+		<attribute name="aprunargs" type="string">
+			<description>aprun arguments, ex: -n 16 -S 4  for 16 procs with 4 per NUMA domain </description>
+			<default>-n 16 -S 4</default>
 		</attribute>
 		<attribute name="debugPriority" type="boolean" translateBooleanAs="debug, ">
 			<description><![CDATA[]]></description>
 			<default></default>
-		</attribute>
-		<attribute name="dualStreamMode" type="boolean" translateBooleanAs="1,0">
-			<description><![CDATA[]]></description>
-			<default>1</default>
 		</attribute>
 		<attribute name="Output_Path" type="string">
 			<description>The final path name for the file containing the job's standard output stream.</description>
@@ -138,7 +125,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 				<error-message>format must be hh:mm:ss</error-message>
 			</validator>
 		</attribute>
-		<script insertEnvironmentAfter="18">
+		<script insertEnvironmentAfter="16">
 			<file-staging-location>${ptp_rm:directory#value}</file-staging-location>
 			<line>
 				<arg>#!/bin/bash</arg>
@@ -168,22 +155,13 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 				<arg isUndefinedIfMatches="#PBS -o">#PBS -o ${ptp_rm:Output_Path#value}</arg>
 			</line>
 			<line>
-				<arg>#PBS -l feature=xe</arg>
-			</line>
-			<line>
 				<arg isUndefinedIfMatches="#PBS -l mem=">#PBS -l mem=${ptp_rm:Resource_List.mem#value}</arg>
 			</line>
 			<line>
 				<arg isUndefinedIfMatches="#PBS -l walltime=">#PBS -l walltime=${ptp_rm:Resource_List.walltime#value}</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#PBS -l mppwidth=">#PBS -l mppwidth=${ptp_rm:numberOfTasks#value}</arg>
-			</line>
-			<line>
-				<arg isUndefinedIfMatches="#PBS -l mppnppn=">#PBS -l mppnppn=${ptp_rm:numberOfProcessesPerNode#value}</arg>
-			</line>
-			<line>
-				<arg isUndefinedIfMatches="#PBS -l mppdepth=">#PBS -l mppdepth=${ptp_rm:numberOfThreadsPerProcess#value}</arg>
+				<arg isUndefinedIfMatches="#PBS -l ">#PBS -l ${ptp_rm:BWresources#value}</arg>
 			</line>
 			<line>
 				<arg isUndefinedIfMatches="#PBS -l qos=">#PBS -l qos=${ptp_rm:debugPriority#value}</arg>
@@ -192,58 +170,15 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 				<arg isUndefinedIfMatches="#PBS">#PBS ${ptp_rm:export_all#value}</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="export OMP_NUM_THREADS=">export OMP_NUM_THREADS=${ptp_rm:numberOfThreadsPerProcess#value}</arg>
-			</line>
-			<line>
 				<arg isUndefinedIfMatches="">${ptp_rm:modules#value}</arg>
 			</line>
 			<line><arg /></line>
-			<line><arg resolve="false">cd $PBS_O_WORKDIR</arg></line>
-			<line><arg /></line>
-			<line><arg>DUALSTREAMMODE=${ptp_rm:dualStreamMode#value}</arg></line>
-			<line><arg resolve="false">if [ "$DUALSTREAMMODE" -eq 1 ]; then</arg></line>
-			<line><arg>    # Dual-stream mode</arg></line>
 			<line>
-				<arg resolve="false">    aprun</arg>
-				<arg resolve="true">-n ${ptp_rm:numberOfTasks#value}</arg>
-				<arg resolve="true" isUndefinedIfMatches="-N ">-N ${ptp_rm:numberOfProcessesPerNode#value}</arg>
-				<arg resolve="true" isUndefinedIfMatches="-d ">-d ${ptp_rm:numberOfThreadsPerProcess#value}</arg>
+				<arg resolve="false">aprun</arg>
+				<arg resolve="true">${ptp_rm:aprunargs#value} </arg>
 				<arg resolve="true">${ptp_rm:executablePath#value}</arg>
 				<arg resolve="true">${ptp_rm:progArgs#value}</arg>
 			</line>
-			<line><arg resolve="false">else</arg></line>
-			<line><arg>    # Single-stream mode</arg></line>
-			<line><arg>    case "${ptp_rm:numberOfThreadsPerProcess#value}" in</arg></line>
-			<line><arg>    16)</arg></line>
-			<line><arg>        CPULIST="-cc 0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30"</arg></line>
-			<line><arg>        ;;</arg></line>
-			<line><arg>    8)</arg></line>
-			<line><arg>        CPULIST="-cc 0,2,4,6,8,10,12,14:16,18,20,22,24,26,28,30"</arg></line>
-			<line><arg>        ;;</arg></line>
-			<line><arg>    4)</arg></line>
-			<line><arg>        CPULIST="-cc 0,2,4,6:8,10,12,14:16,18,20,22:24,26,28,30"</arg></line>
-			<line><arg>        ;;</arg></line>
-			<line><arg>    2)</arg></line>
-			<line><arg>        CPULIST="-cc 0,2:4,6:8,10:12,14:16,18:20,22:24,26:28,30"</arg></line>
-			<line><arg>        ;;</arg></line>
-			<line><arg>    "")</arg></line>
-			<line><arg>        CPULIST="-d 2"</arg></line>
-			<line><arg>        ;;</arg></line>
-			<line><arg>    *)</arg></line>
-			<line><arg>        echo 'ERROR: Number of threads per process must be 1, 2, 4, 8, or 16 for single-stream mode'</arg></line>
-			<line><arg>        CPULIST=""</arg></line>
-			<line><arg>        ;;</arg></line>
-			<line><arg>    esac</arg></line>
-			<line><arg /></line>
-			<line>
-				<arg resolve="false">    aprun</arg>
-				<arg resolve="true">-n ${ptp_rm:numberOfTasks#value}</arg>
-				<arg resolve="true" isUndefinedIfMatches="-N ">-N ${ptp_rm:numberOfProcessesPerNode#value}</arg>
-				<arg resolve="false">$CPULIST</arg>
-				<arg resolve="true">${ptp_rm:executablePath#value}</arg>
-				<arg resolve="true">${ptp_rm:progArgs#value}</arg>
-			</line>
-			<line><arg resolve="false">fi</arg></line>
 		</script>
 		<!--start-up-command name="get-queues">
 			<arg>${ptp_rm:bindir#value}qstat</arg>
@@ -436,122 +371,48 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 						</layout-data>
 						<fixed-text>Description</fixed-text>
 					</widget>
-					<!-- row 1 -->
-					<!--widget type="label" style="SWT.WRAP" foreground="SWT.COLOR_DARK_BLUE">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="4" />
-						</layout-data>
-						<fixed-text>Blue Waters has more than 22,000 XE6 compute nodes.</fixed-text>
-					</widget-->
-					<!-- row 1 -->
-					<widget type="label" style="SWT.LEFT">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING"
-								grabExcessHorizontal="false" />
-						</layout-data>
-						<fixed-text>Total MPI Tasks: </fixed-text>
-					</widget>
-					<widget type="text" style="SWT.BORDER" attribute="numberOfTasks">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING"
-								horizontalSpan="2" grabExcessHorizontal="false" widthHint="100" />
-						</layout-data>
-					</widget>
-					<!--widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING"
-								grabExcessHorizontal="false" />
-						</layout-data>
-						<fixed-text>${ptp_rm:numberOfTasks#description}</fixed-text>
-					</widget-->
-					<!--widget type="label" style="SWT.WRAP" foreground="SWT.COLOR_DARK_BLUE">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" />
-						</layout-data>
-						<fixed-text/>
-					</widget-->
-					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false" verticalSpan="3" />
-						</layout-data>
-						<fixed-text>Each XE6 node has two AMD Interlagos CPUs for a total of
-32 integer cores and 16 floating point units per node.  Therefore,
-the product of the number of MPI tasks per node and the number
-of OpenMP threads per task must be less than or equal to 32
-(or 16 if running in single-stream mode).  The number of MPI
-tasks per node must not exceed the total number of MPI tasks.</fixed-text>
-					</widget>
-					<!-- row 2 -->
-					<widget type="label" style="SWT.LEFT">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false" />
-						</layout-data>
-						<fixed-text>MPI Tasks per Node: </fixed-text>
-					</widget>
-					<!--widget type="text" style="SWT.BORDER" attribute="numberOfProcessesPerNode">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING"
-								horizontalSpan="2" grabExcessHorizontal="false" widthHint="100" />
-						</layout-data>
-					</widget-->
-					<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="numberOfProcessesPerNode">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.LEFT" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="true" widthHint="100"/>
-						</layout-data>
-					</widget>
 					<!-- row 3 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
 								grabExcessHorizontal="false" />
 						</layout-data>
-						<fixed-text>OpenMP Threads per Process: </fixed-text>
+						<fixed-text>BWresources: </fixed-text>
 					</widget>
-					<!--widget type="text" style="SWT.BORDER" attribute="numberOfThreadsPerProcess">
+					<widget type="text" style="SWT.BORDER" attribute="BWresources">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING"
-								horizontalSpan="2" grabExcessHorizontal="false" widthHint="100" />
-						</layout-data>
-					</widget-->
-					<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="numberOfThreadsPerProcess">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.LEFT" horizontalSpan="2" grabExcessHorizontal="true" widthHint="100"/>
-						</layout-data>
-					</widget>
-					<!--widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING"
-								grabExcessHorizontal="false" />
-						</layout-data>
-						<fixed-text>${ptp_rm:numberOfThreadsPerProcess#description}
-						</fixed-text>
-					</widget-->
-					<!-- row 4 -->
-					<widget type="label" style="SWT.LEFT">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-						</layout-data>
-						<tooltip>${ptp_rm:dualStreamMode#tooltip}</tooltip>
-						<fixed-text>Run in Dual-Stream Mode: </fixed-text>
-					</widget>
-					<widget type="checkbox" style="SWT.NONE" attribute="dualStreamMode">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2"
+								grabExcessHorizontal="false" widthHint="150" />
 						</layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
 						</layout-data>
-						<fixed-text>XE6 nodes are normally run in &quot;dual-stream mode,&quot; where every
-integer core is allocated one task (i.e., one MPI task or one OpenMP
-thread).  However, this means that every two tasks share a floating
-point unit.  Some floating-point-intensive computations may need
-to run in &quot;single-stream mode,&quot; where every other integer
-core is idle but every task has exclusive access to a floating point
-unit.</fixed-text>
+						<fixed-text>${ptp_rm:BWresources#description}</fixed-text>
 					</widget>
-					<!-- row 5 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>aprun arguments: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="aprunargs">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								horizontalSpan="2" grabExcessHorizontal="false" widthHint="150" />
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:aprunargs#description}</fixed-text>
+					</widget>
+					<!-- row 4 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
@@ -573,7 +434,7 @@ unit.</fixed-text>
 						</layout-data>
 						<fixed-text>${ptp_rm:Job_Name#description}</fixed-text>
 					</widget>
-					<!-- row 6 -->
+					<!-- row 5 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
@@ -595,7 +456,7 @@ unit.</fixed-text>
 						</layout-data>
 						<fixed-text>${ptp_rm:Account_Name#description}</fixed-text>
 					</widget>
-					<!-- row 7 -->
+					<!-- row 6 -->
 					<!--widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
@@ -638,7 +499,7 @@ unit.</fixed-text>
 						<fixed-text>Jobs with debug priority must be &lt;30 minutes.
 Only one job is eligible at a time.</fixed-text>
 					</widget>
-					<!-- row 8 -->
+					<!-- row 7 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
@@ -660,7 +521,7 @@ Only one job is eligible at a time.</fixed-text>
 						</layout-data>
 						<fixed-text>${ptp_rm:Resource_List.mem#description}</fixed-text>
 					</widget>
-					<!-- row 9 -->
+					<!-- row 8 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
@@ -683,7 +544,7 @@ Only one job is eligible at a time.</fixed-text>
 						<fixed-text>${ptp_rm:Resource_List.walltime#description}
 						</fixed-text>
 					</widget>
-					<!-- row 10 -->
+					<!-- row 9 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -702,7 +563,7 @@ Only one job is eligible at a time.</fixed-text>
 						</layout-data>
 						<fixed-text>${ptp_rm:Mail_Users#description}</fixed-text>
 					</widget>
-					<!-- row 11 -->
+					<!-- row 10 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -721,7 +582,7 @@ Only one job is eligible at a time.</fixed-text>
 						</layout-data>
 						<fixed-text>${ptp_rm:Mail_Options#description}</fixed-text>
 					</widget>
-					<!-- row 12 -->
+					<!-- row 11 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -740,7 +601,7 @@ Only one job is eligible at a time.</fixed-text>
 						</layout-data>
 						<fixed-text>${ptp_rm:Join_Path#description}</fixed-text>
 					</widget>
-					<!-- row 13 -->
+					<!-- row 12 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
@@ -762,7 +623,7 @@ Only one job is eligible at a time.</fixed-text>
 						</layout-data>
 						<fixed-text>${ptp_rm:export_all#description}</fixed-text>
 					</widget>
-					<!-- row 14 -->
+					<!-- row 13 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
