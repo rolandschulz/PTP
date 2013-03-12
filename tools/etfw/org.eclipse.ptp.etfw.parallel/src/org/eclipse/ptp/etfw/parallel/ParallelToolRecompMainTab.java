@@ -186,8 +186,8 @@ public class ParallelToolRecompMainTab extends ApplicationTab {
 		IManagedBuildInfo info = ManagedBuildManager.getBuildInfo(project.getResource());
 		if (info == null) {
 			MessageDialog.openInformation(getShell(),
-					org.eclipse.cdt.launch.internal.ui.LaunchMessages.CMainTab_Enter_project_before_searching_for_program, //$NON-NLS-1$
-					org.eclipse.cdt.launch.internal.ui.LaunchMessages.CMainTab_Enter_project_before_searching_for_program);//.getString("CMainTab.Enter_project_before_searching_for_program")); //$NON-NLS-1$
+					org.eclipse.cdt.launch.internal.ui.LaunchMessages.CMainTab_Enter_project_before_searching_for_program,
+					org.eclipse.cdt.launch.internal.ui.LaunchMessages.CMainTab_Enter_project_before_searching_for_program);// .getString("CMainTab.Enter_project_before_searching_for_program"));
 			return;
 		}
 
