@@ -7,11 +7,11 @@
  http://www.eclipse.org/legal/epl-v10.html
 
  Contributors:
-    Wolfgang Frings (Forschungszentrum Juelich GmbH) 
+    Wolfgang Frings, Carsten Karbach (Forschungszentrum Juelich GmbH)
 -->
 
-<lml:lgui xmlns:lml="http://www.llview.de" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.llview.de lgui.xsd " version="1.0"> 
+<lml:lgui xmlns:lml="http://eclipse.org/ptp/schemas" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://eclipse.org/ptp/schemas http://eclipse.org/ptp/schemas/lgui.xsd " version="1.0"> 
 
 <objects>
 <object color="#FFFFFF" id="empty" name="Empty job" type="job"/>
@@ -31,6 +31,7 @@
     </el1>
 </el0>
 </nodedisplaylayout>
+
 <nodedisplay id="nd_1" title="system: krakenpf1">
 <scheme>
     <el1 tagname="col" min="0" max="24" mask="c%d-">
@@ -46,8 +47,12 @@
         </el2>
     </el1>
 </scheme>
+<data>
+	<el1 oid="empty" min="0" max="24"/>
+</data>
+</nodedisplay>
 
-<tablelayout id="tl_Run" gid="org.eclipse.ptp.rm.lml.ui.ActiveJobsView" active="true">
+<tablelayout id="tl_Run" gid="org.eclipse.ptp.rm.lml.ui.ActiveJobsView" active="true" contenthint="jobs">
 <column cid="1" pos="0" width="0.1" active="true" key="step"/>
 <column cid="2" pos="1" width="0.1" active="true" key="owner"/>
 <column cid="3" pos="2" width="0.1" active="true" key="queue"/>
@@ -55,21 +60,25 @@
 <column cid="5" pos="4" width="0.1" active="true" key="queuedate"/>
 <column cid="6" pos="5" width="0.1" active="true" key="dispatchdate"/>
 <column cid="7" pos="6" width="0.1" active="true" key="totalcores"/>
-<column cid="8" pos="7" width="0.3" active="true" key="status"/>
+<column cid="8" pos="7" width="0.3" active="true" key="status">
+<pattern>    
+<select rel="=" value="RUNNING"/>
+</pattern>
+</column>
 </tablelayout>
 
 <table title="Running Jobs" id="org.eclipse.ptp.rm.lml.ui.ActiveJobsView"  contenttype="jobs" description="This is the table showing all running jobs">
 <column id="1" name="step"/>
-<column id="2" name="owner">  <pattern>    <include regexp=".*"/>  </pattern></column>
+<column id="2" name="owner"/>
 <column id="3" name="queue"/>
 <column id="4" name="wall"/>
 <column id="5" name="queuedate"/>
 <column id="6" name="dispatchdate"/>
 <column id="7" name="totalcores"/>
-<column id="8" name="status" type="mandatory">  <pattern>    <include regexp="RUNNING"/>  </pattern> </column>
+<column id="8" name="status" type="mandatory"/>
 </table>
 
-<tablelayout id="tl_WAIT" gid="org.eclipse.ptp.rm.lml.ui.InactiveJobsView" active="true">
+<tablelayout id="tl_WAIT" gid="org.eclipse.ptp.rm.lml.ui.InactiveJobsView" active="true" contenthint="jobs">
 <column cid="1" pos="0" width="0.1" active="true" key="step"/>
 <column cid="2" pos="1" width="0.1" active="true" key="owner"/>
 <column cid="3" pos="2" width="0.1" active="true" key="queue"/>
@@ -77,18 +86,22 @@
 <column cid="5" pos="4" width="0.1" active="true" key="queuedate"/>
 <column cid="6" pos="5" width="0.1" active="true" key="dispatchdate"/>
 <column cid="7" pos="6" width="0.1" active="true" key="totalcores"/>
-<column cid="8" pos="7" width="0.3" active="true" key="status"/>
+<column cid="8" pos="7" width="0.3" active="true" key="status">
+<pattern>
+    <select rel="=" value="SUBMITTED"/>
+</pattern>
+</column>
 </tablelayout>
 
 <table title="Waiting Jobs" id="org.eclipse.ptp.rm.lml.ui.InactiveJobsView"  contenttype="jobs" description="This is the table showing all waiting jobs">
 <column id="1" name="step"/>
-<column id="2" name="owner">  <pattern>    <include regexp=".*"/>  </pattern></column>
+<column id="2" name="owner"/>
 <column id="3" name="queue"/>
 <column id="4" name="wall"/>
 <column id="5" name="queuedate"/>
 <column id="6" name="dispatchdate"/>
 <column id="7" name="totalcores"/>
-<column id="8" name="status" type="mandatory">  <pattern>    <include regexp="SUBMITTED"/>  </pattern> </column>
+<column id="8" name="status" type="mandatory"/>
 </table>
 
 </lml:lgui>

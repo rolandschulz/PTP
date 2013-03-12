@@ -118,7 +118,7 @@ my $system_idlistref = [];
 my ($tid,$tlayoutref);
 #print Dumper($filehandler_layout->{DATA}->{TABLELAYOUT});
 foreach $tid (keys(%{$filehandler_layout->{DATA}->{TABLELAYOUT}})) {
-    my($table_handler,$tlayoutref_gid,$tableref,$numids,$idlistref,$cnt,$active);
+    my($table_handler,$tlayoutref_gid,$numids,$idlistref,$cnt,$active);
 
     $tlayoutref     = $filehandler_layout->{DATA}->{TABLELAYOUT}->{$tid};
     $tlayoutref_gid = $filehandler_layout->{DATA}->{TABLELAYOUT}->{$tid}->{gid};
@@ -130,21 +130,9 @@ foreach $tid (keys(%{$filehandler_layout->{DATA}->{TABLELAYOUT}})) {
     }
     next if(!$active);
 
-    # check if table (columns) is given
-    $tableref=undef;
-    if(exists($filehandler_layout->{DATA}->{TABLE})) {
-	if(exists($filehandler_layout->{DATA}->{TABLE}->{$tlayoutref_gid})) {
-	    $tableref=$filehandler_layout->{DATA}->{TABLE}->{$tlayoutref_gid};
-	}
-    }
-    if(!$tableref) {
-	print STDERR "$0: no table information given in request for table $tlayoutref_gid, skipping ...\n";
-	next;
-    }
-    
     # create table handler and process request
     $table_handler = LML_gen_table->new($opt_verbose,$opt_timings);
-    $numids=$table_handler->process($tlayoutref,$tableref,$filehandler_LML);
+    $numids=$table_handler->process($tlayoutref,$filehandler_LML);
     if($numids>=0) {
 	# add elements, objects, and info to output LML files
 	$idlistref=$table_handler->get_ids();
@@ -185,21 +173,27 @@ foreach $nid (keys(%{$filehandler_layout->{DATA}->{NODEDISPLAYLAYOUT}})) {
     # check if scheme is given
     $nschemeref=undef;
     if(exists($filehandler_layout->{DATA}->{NODEDISPLAY})) {
-	if(exists($filehandler_layout->{DATA}->{NODEDISPLAY}->{$nlayoutref_gid})) {
-	    if($nlayoutref_gid ne "org.eclipse.ptp.rm.lml.ui.SystemMonitorView") {
-		# check if el1 with attribute min is available
-		if($el1=$filehandler_layout->{DATA}->{NODEDISPLAY}->{$nlayoutref_gid}->{schemeroot}->get_child({ _name => "el1" })) {
-		    if(exists($el1->{ATTR}->{min})) {
-			$nschemeref=$filehandler_layout->{DATA}->{NODEDISPLAY}->{$nlayoutref_gid}->{schemeroot};
+		if(exists($filehandler_layout->{DATA}->{NODEDISPLAY}->{$nlayoutref_gid})) {
+		    if($nlayoutref_gid ne "org.eclipse.ptp.rm.lml.ui.SystemMonitorView") {
+			# check if el1 with attribute min is available
+			if($el1=$filehandler_layout->{DATA}->{NODEDISPLAY}->{$nlayoutref_gid}->{schemeroot}->get_child({ _name => "el1" })) {
+			    if(exists($el1->{ATTR}->{min})) {
+				$nschemeref=$filehandler_layout->{DATA}->{NODEDISPLAY}->{$nlayoutref_gid}->{schemeroot};
+			    }
+			}
+		    } else {
+			# generate a new not dummy gid
+			$filehandler_layout->{DATA}->{NODEDISPLAYLAYOUT}->{$nid}->{gid}="nd_$ndcnt";
+			$cnt++;
 		    }
-		}
-	    } else {
-		# generate a new not dummy gid
-		$filehandler_layout->{DATA}->{NODEDISPLAYLAYOUT}->{$nid}->{gid}="nd_$ndcnt";
-		$cnt++;
-	    }
-	}
+		}		
     }
+    #Use schemehint in nodedisplaylayout, if hint is provided and if nodedisplay tag is missing
+	if(!defined($nschemeref) ){
+		if(defined($nlayoutref->{schemehint})){
+			$nschemeref = $nlayoutref->{schemehint};
+		}
+	}
 
     # create nd handler and process request
     $nd_handler = LML_gen_nodedisplay->new($opt_verbose,$opt_timings);

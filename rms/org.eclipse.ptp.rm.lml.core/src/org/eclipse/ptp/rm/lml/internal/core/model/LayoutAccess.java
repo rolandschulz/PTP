@@ -31,6 +31,7 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.ComponentType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ComponentlayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.GobjectType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.InfoboxlayoutType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.LayoutRoot;
 import org.eclipse.ptp.rm.lml.internal.core.elements.LguiType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplay;
 import org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplayelement;
@@ -214,6 +215,26 @@ public class LayoutAccess extends LguiHandler {
 
 			index++;
 		}
+
+		return result;
+	}
+
+	/**
+	 * Create an LML request file. This file uses the layout element as root tag.
+	 * It will only contains component layouts and global layout descriptions.
+	 * 
+	 * @param model
+	 *            lml-model with data and layout-information
+	 * @return layout instance extracted from the lml-model
+	 */
+	public LayoutRoot generateRequestFromModel() {
+		final LayoutRoot result = objectFactory.createLayoutRoot();
+		// Add all global layouts and component layouts
+		jaxbUtil.addLayoutTagsToRequest(result, lgui);
+		// Transfer schemes to nodedisplay layouts
+		jaxbUtil.addNodedisplaySchemeHints(result, lgui);
+		// Transfer table contenttypes to contenttype hint
+		jaxbUtil.addTableContenttypeHints(result, lgui);
 
 		return result;
 	}

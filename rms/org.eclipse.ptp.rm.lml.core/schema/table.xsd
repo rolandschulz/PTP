@@ -3,7 +3,7 @@
 LML - LLView markup language
 
 
-Copyright (c) 2011 Forschungszentrum Juelich GmbH
+Copyright (c) 2011-2013 Forschungszentrum Juelich GmbH
 
 All rights reserved. This program and the accompanying materials
 
@@ -13,7 +13,7 @@ which accompanies this distribution and is available at
 
 http://www.eclipse.org/legal/epl-v10.html
 -->
-<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:lml="http://www.llview.de" targetNamespace="http://www.llview.de">
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:lml="http://eclipse.org/ptp/schemas" targetNamespace="http://eclipse.org/ptp/schemas">
 
     <include schemaLocation="lgui.xsd"/>
     <complexType name="column_type">
@@ -22,23 +22,6 @@ http://www.eclipse.org/legal/epl-v10.html
     			Describes one column of table.
     		</documentation>
     	</annotation>
-    	<sequence>
-    		<element maxOccurs="1" minOccurs="0" name="pattern" type="lml:pattern_type">
-    			<annotation>
-    				<documentation>
-    					The pattern-tag defines regular expressions,
-    					which describe the allowed values of a column.
-    					For a status-column in a job-table you could
-    					define, that values of this column are taken
-    					from {RUNNING, SUSPENDED, STOPPED}. This is also
-    					used to insert new jobs into job-tables. If a
-    					job is "running" and the status-column allows
-    					running jobs, this job should be inserted into
-    					this table.
-    				</documentation>
-    			</annotation>
-    		</element>
-    	</sequence>
     	<attribute name="name" type="NCName" use="required"/>
     	<attribute name="sort" type="lml:sorting_type"/>
     	<attribute name="description" type="string"/>
@@ -123,7 +106,7 @@ Otherwise order of cells define connections to columns.</documentation>
 
     				</element>
     			</sequence>
-    			<attribute default="other" name="contenttype">
+    			<attribute default="other" name="contenttype" type="lml:content_type">
     				<annotation>
     					<documentation>
     						This attribute defines the table's content
@@ -131,17 +114,6 @@ Otherwise order of cells define connections to columns.</documentation>
     						to contain job-information.
     					</documentation>
     				</annotation>
-    				<simpleType>
-    					<restriction base="string">
-    						<enumeration value="jobs" />
-    						<enumeration value="nodes" />
-    						<enumeration value="users" />
-    						<enumeration value="groups" />
-    						<enumeration value="classes" />
-    						<enumeration value="queues" />
-    						<enumeration value="other" />
-    					</restriction>
-    				</simpleType>
     			</attribute>
     			<attribute name="form" default="sparse">
                     <annotation>
@@ -160,85 +132,4 @@ This table form could reduce transmitted data. On the other hand regular tables 
     	</complexContent>
     </complexType>
 
-
-
-
-
-    <complexType name="pattern_type">
-        <annotation>
-        	<documentation>A pattern element consists of include and exclude tags. Values of the corresponding column
-can be checked by the defined regular expressions. They must pass the regexp-checks in
-the following way: Go through all include/exclude tags. A value must be valid against the 
-include-regexps and must not match with the exclude-regexps. Therefore the order of tags
-is important.
-</documentation>
-        </annotation>
-        <sequence maxOccurs="unbounded" minOccurs="1">
-        	<element maxOccurs="1" minOccurs="0" name="include"
-        		type="lml:pattern_match_type" />
-        	<element maxOccurs="1" minOccurs="0" name="exclude"
-        		type="lml:pattern_match_type" />
-        	<element name="select" type="lml:select_type" minOccurs="0">
-        		<annotation>
-        			<documentation>The select tag is used for selecting subsets from the current table.</documentation>
-        		</annotation></element>
-        </sequence>
-    </complexType>
-    
-    <complexType name="pattern_match_type">
-    	<attribute name="regexp" type="string">
-    		<annotation>
-    			<documentation>This attribute takes regular expressions of any kind.</documentation>
-    		</annotation>
-</attribute>
-    </complexType>
-    
-    <complexType name="select_type">
-        <annotation>
-        	<documentation>One select tag describes a selection of a subset within a table.
-It is used for filtering. All table rows are traversed and they
-are checked against the relation given by the rel-attribute.
-If the comparison term is true, the table row will stay in the
-filtered result, otherwise it is removed. Example: a table has the
-row totalcores. The user is only interested in big jobs with more
-than 1000 cores. A select tag must be added with the value=1000
-and the rel=gt. Thus, only the table rows with more than 1000 cores
-are transferred to the client.
-The select tags are executed subsequently. This allows the selection
-of a subset from another subset generated by a previous select.</documentation>
-        </annotation>
-        <attribute name="value" type="string" use="required">
-        	<annotation>
-        		<documentation>The value is the parameter, with which the table row's attribute
-is compared.</documentation>
-        	</annotation></attribute>
-    	<attribute name="rel" type="lml:select_relation_type" default="=~">
-    		<annotation>
-    			<documentation>The rel attribute is the operator executed on the value and each
-table cell's value of the current column. The following comparison 
-operators are allowed:
-=	numerical or string comparison for equality
-!=	numerical or string comparison for inequality
-lt	numerical comparison for lower than
-le	numerical comparison for lower than or equality
-gt	numerical comparison for greater than
-ge	numerical comparison for greater than or equality
-=~	string matching against a regular expression
-!~	string test for not matching a regular expression</documentation>
-    		</annotation></attribute>
-    </complexType>
-
-    <simpleType name="select_relation_type">
-    	<restriction base="string">
-    		<enumeration value="="></enumeration>
-    		<enumeration value="lt"></enumeration>
-    		<enumeration value="le"></enumeration>
-    		<enumeration value="gt"></enumeration>
-    		<enumeration value="!="></enumeration>
-    		<enumeration value="=~"></enumeration>
-    		<enumeration value="!~"></enumeration>
-    		<enumeration value="ge"></enumeration>
-    	</restriction>
-    </simpleType>
-    
 </schema>

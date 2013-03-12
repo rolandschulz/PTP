@@ -34,6 +34,7 @@ import org.eclipse.ptp.rm.lml.internal.core.elements.CellType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ColumnType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ColumnlayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.Columnsortedtype;
+import org.eclipse.ptp.rm.lml.internal.core.elements.ContentType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.GobjectType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.LguiType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.PatternType;
@@ -108,20 +109,20 @@ public class TableHandler extends LguiHandler {
 	}
 
 	public void deleteOldPattern(String gid) {
-		final TableType table = getTable(gid);
-		if (table != null) {
-			for (final ColumnType column : table.getColumn()) {
+		final TablelayoutType tablelayout = lguiItem.getLayoutAccess().getTableLayout(gid);
+		if (tablelayout != null) {
+			for (final ColumnlayoutType column : tablelayout.getColumn()) {
 				column.setPattern(null);
 			}
 		}
 	}
 
 	public void deleteOldPattern(String gid, List<String> columnsTitle) {
-		final TableType table = getTable(gid);
-		if (table != null) {
-			for (final ColumnType column : table.getColumn()) {
+		final TablelayoutType tablelayout = lguiItem.getLayoutAccess().getTableLayout(gid);
+		if (tablelayout != null) {
+			for (final ColumnlayoutType column : tablelayout.getColumn()) {
 				for (final String columnTitle : columnsTitle) {
-					if (column.getName().equals(columnTitle)) {
+					if (column.getKey().equals(columnTitle)) {
 						column.setPattern(null);
 					}
 				}
@@ -172,7 +173,8 @@ public class TableHandler extends LguiHandler {
 		final TableType table = new TableType();
 		table.setId(gid);
 		table.setTitle(ILMLCoreConstants.TITLE_PREFIX + gid);
-		table.setContenttype(ILguiItem.CONTENT_JOBS);
+		final ContentType ct = ContentType.fromValue(ILguiItem.CONTENT_JOBS);
+		table.setContenttype(ct);
 
 		for (final ColumnlayoutType columnLayout : lguiItem.getLayoutAccess().getTableLayout(gid).getColumn()) {
 			if (columnLayout.isActive()) {
@@ -183,9 +185,9 @@ public class TableHandler extends LguiHandler {
 				if (columnLayout.getKey().equals(ILguiItem.JOB_STATUS)) {
 					column.setType(ITableColumnLayout.COLUMN_TYPE_MANDATORY);
 					if (gid.equals(ILMLCoreConstants.ID_ACTIVE_JOBS_VIEW)) {
-						generateDefaultPattern(JobStatusData.RUNNING, ILMLCoreConstants.EQ, column);
+						generateDefaultPattern(JobStatusData.RUNNING, ILMLCoreConstants.EQ, columnLayout);
 					} else {
-						generateDefaultPattern(JobStatusData.RUNNING, ILMLCoreConstants.NEQ, column);
+						generateDefaultPattern(JobStatusData.RUNNING, ILMLCoreConstants.NEQ, columnLayout);
 					}
 				}
 				table.getColumn().add(column);
@@ -196,11 +198,11 @@ public class TableHandler extends LguiHandler {
 	}
 
 	public void generateNewPattern(String gid, List<IPattern> filterValues) {
-		final TableType table = getTable(gid);
-		if (table != null) {
-			for (final ColumnType column : table.getColumn()) {
+		final TablelayoutType tablelayout = lguiItem.getLayoutAccess().getTableLayout(gid);
+		if (tablelayout != null) {
+			for (final ColumnlayoutType column : tablelayout.getColumn()) {
 				for (final IPattern filterValue : filterValues) {
-					if (column.getName().equals(filterValue.getColumnTitle())) {
+					if (column.getKey().equals(filterValue.getColumnTitle())) {
 						final PatternType pattern = new PatternType();
 						if (filterValue.isRange()) {
 							final SelectType selectMin = new SelectType();
@@ -288,43 +290,62 @@ public class TableHandler extends LguiHandler {
 	 * @return List of select patterns
 	 */
 	public List<IPattern> getPattern(String gid) {
+		// Expects both elements to be available table and tablelayout
+		// Requires sort datatype from table and pattern from tablelayout
+		final TablelayoutType tablelayout = lguiItem.getLayoutAccess().getTableLayout(gid);
 		final TableType table = getTable(gid);
 		final LinkedList<IPattern> patternList = new LinkedList<IPattern>();
-		if (table != null) {
-			for (final ColumnType column : table.getColumn()) {
-				if (column != null && column.getPattern() != null) {
-					final List<SelectType> selects = jaxbUtil.getSelects(column.getPattern().getIncludeAndExcludeAndSelect());
-					if (selects.size() == 1) {
-						String rel = null;
-						if (selects.get(0).getRel().equals(ILMLCoreConstants.xLT_LC)) {
-							rel = ILMLCoreConstants.LT;
-						} else if (selects.get(0).getRel().equals(ILMLCoreConstants.xLE_LC)) {
-							rel = ILMLCoreConstants.LE;
-						} else if (selects.get(0).getRel().equals(ILMLCoreConstants.xGT_LC)) {
-							rel = ILMLCoreConstants.GT;
-						} else if (selects.get(0).getRel().equals(ILMLCoreConstants.xGE_LC)) {
-							rel = ILMLCoreConstants.GE;
-						} else {
-							rel = selects.get(0).getRel();
-						}
-						if (rel != null) {
-							patternList.add((new Pattern(column.getName(), column.getSort().value())).setRelation(rel,
-									selects.get(0).getValue()));
-						}
-					} else if (selects.size() == 2) {
-						String minValue = null;
-						String maxValue = null;
-						for (final SelectType select : selects) {
-							if (select.getRel().equals(ILMLCoreConstants.xLE_LC)) {
-								maxValue = select.getValue();
-							} else if (select.getRel().equals(ILMLCoreConstants.xGE_LC)) {
-								minValue = select.getValue();
-							}
-						}
-						if (minValue != null && maxValue != null) {
-							patternList.add((new Pattern(column.getName(), column.getSort().value())).setRange(minValue, maxValue));
+		// Avoid null values
+		if (tablelayout == null || table == null) {
+			return patternList;
+		}
+		final HashMap<ColumnlayoutType, ColumnType> columnLayoutToColumn = new HashMap<ColumnlayoutType, ColumnType>();
+		// Search column for each columnlayout
+		for (final ColumnlayoutType columnLayout : tablelayout.getColumn()) {
+			for (final ColumnType aColumn : table.getColumn()) {
+				// Search for columnlayout referencing to the column's ID
+				if (aColumn.getId().intValue() == columnLayout.getCid().intValue()) {
+					columnLayoutToColumn.put(columnLayout, aColumn);
+					break;
+				}
+			}
+		}
 
+		for (final ColumnlayoutType columnLayout : tablelayout.getColumn()) {
+			final ColumnType column = columnLayoutToColumn.get(columnLayout);
+			if (column != null && columnLayout != null && columnLayout.getPattern() != null) {
+				final List<SelectType> selects = jaxbUtil.getSelects(columnLayout.getPattern().getIncludeAndExcludeAndSelect());
+				if (selects.size() == 1) {
+					String rel = null;
+					if (selects.get(0).getRel().equals(ILMLCoreConstants.xLT_LC)) {
+						rel = ILMLCoreConstants.LT;
+					} else if (selects.get(0).getRel().equals(ILMLCoreConstants.xLE_LC)) {
+						rel = ILMLCoreConstants.LE;
+					} else if (selects.get(0).getRel().equals(ILMLCoreConstants.xGT_LC)) {
+						rel = ILMLCoreConstants.GT;
+					} else if (selects.get(0).getRel().equals(ILMLCoreConstants.xGE_LC)) {
+						rel = ILMLCoreConstants.GE;
+					} else {
+						rel = selects.get(0).getRel();
+					}
+					if (rel != null) {
+						patternList.add((new Pattern(columnLayout.getKey(), column.getSort().value())).setRelation(rel,
+								selects.get(0).getValue()));
+					}
+				} else if (selects.size() == 2) {
+					String minValue = null;
+					String maxValue = null;
+					for (final SelectType select : selects) {
+						if (select.getRel().equals(ILMLCoreConstants.xLE_LC)) {
+							maxValue = select.getValue();
+						} else if (select.getRel().equals(ILMLCoreConstants.xGE_LC)) {
+							minValue = select.getValue();
 						}
+					}
+					if (minValue != null && maxValue != null) {
+						patternList.add((new Pattern(columnLayout.getKey(), column.getSort().value())).setRange(minValue,
+								maxValue));
+
 					}
 				}
 			}
@@ -754,7 +775,7 @@ public class TableHandler extends LguiHandler {
 		}
 	}
 
-	private void generateDefaultPattern(String value, String relation, ColumnType column) {
+	private void generateDefaultPattern(String value, String relation, ColumnlayoutType column) {
 		final PatternType pattern = new PatternType();
 		final SelectType select = new SelectType();
 		select.setRel(relation);

@@ -3,7 +3,7 @@
 LML - LLView markup language
 
 
-Copyright (c) 2011 Forschungszentrum Juelich GmbH
+Copyright (c) 2011-2013 Forschungszentrum Juelich GmbH
 
 All rights reserved. This program and the accompanying materials
 
@@ -13,700 +13,933 @@ which accompanies this distribution and is available at
 
 http://www.eclipse.org/legal/epl-v10.html
 -->
-<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:lml="http://www.llview.de" targetNamespace="http://www.llview.de">
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:lml="http://eclipse.org/ptp/schemas"
+	targetNamespace="http://eclipse.org/ptp/schemas">
 
-    <include schemaLocation="nodedisplay.xsd"/>
-    <complexType name="splitlayout_type">
-    	<complexContent>
-    		<extension base="lml:layout_type">
-    			<choice>
-    				<sequence>
-    					<element name="left" type="lml:pane_type"/>
-    					<element name="right" type="lml:pane_type"/>
-    				</sequence>
-    				<sequence>
-    					<element name="top" type="lml:pane_type"/>
-    					<element name="bottom" type="lml:pane_type"/>
-    				</sequence>
-    			</choice>
-    			<attribute default="0.5" name="divpos" type="lml:divpos_type"/>
-    		</extension>
-    	</complexContent>
-    </complexType>
+	<include schemaLocation="colors.xsd" />
+	<include schemaLocation="scheme.xsd" />
+	<include schemaLocation="request.xsd" />
 
-
-    <complexType name="pane_type">
-    	<annotation>
-    		<documentation>
-    			Describes one side of a splitpane. This tag is later
-    			transformed into a panel. You can split one panel with
-    			left and right-components or top and bottom-components.
-    			First split will cause a horizontal split, second will
-    			cause a vertical split. The gid-attribute is for
-    			referencing graphical object-id-attributes. If there are
-    			child-elements for a pane, gid must not be specified.
-    			Through the divpos-element you are able to set the
-    			percentage of where to put the divider.
-    		</documentation>
-    	</annotation>
-   		<sequence>
-	   		<sequence maxOccurs="1" minOccurs="0">
-	    			<element name="left" type="lml:pane_type"/>
-	    			<element name="right" type="lml:pane_type"/>
-	   		</sequence>
-	   		<sequence maxOccurs="1" minOccurs="0">
-	    			<element name="top" type="lml:pane_type"/>
-	    			<element name="bottom" type="lml:pane_type"/>
-	   		</sequence>
-   		</sequence>
-    	<attribute name="gid" type="string"/>
-    	<attribute default="0.5" name="divpos" type="lml:divpos_type"/>
-    </complexType>
-
-    <simpleType name="divpos_type">
-    	<restriction base="double">
-    		<minInclusive value="0"/>
-    		<maxInclusive value="1"/>
-    	</restriction>
-    </simpleType>
-
-    <complexType name="layout_type">
-        <annotation>
-        	<documentation>All layout-types should extend this type</documentation>
-        </annotation>
-        <attribute name="id" type="string" use="required"/>
-    </complexType>
-
-    <complexType name="abslayout_type">
-    	<annotation>
-    		<documentation>
-    			Describes a layout with absolute coordinates. Every
-    			component must be added by a comp-tag.
-    		</documentation>
-    	</annotation>
-    	<complexContent>
-    		<extension base="lml:layout_type">
-    			<sequence>
-    				<element maxOccurs="unbounded" minOccurs="1" name="comp" type="lml:component_type"/>
-    			</sequence>
-    		</extension>
-    	</complexContent>
-    </complexType>
-    
-    <complexType name="component_type">
-        <annotation>
-        	<documentation>Describes the absolute position of one graphical object</documentation>
-        </annotation>
-        <attribute name="gid" type="string" use="required">
-        	<annotation>
-        		<documentation>connection to a graphical object</documentation>
-        	</annotation>
-</attribute>
-    	<attribute name="x" type="integer" use="required">
-    		<annotation>
-    			<documentation>left coordinate</documentation>
-    		</annotation>
-</attribute>
-    	<attribute name="y" type="integer" use="required">
-    		<annotation>
-    			<documentation>upper coordinate</documentation>
-    		</annotation>
-</attribute>
-    	<attribute default="100" name="w" type="nonNegativeInteger">
-    		<annotation>
-    			<documentation>width</documentation>
-    		</annotation>
-</attribute>
-    	<attribute default="100" name="h" type="nonNegativeInteger">
-    		<annotation>
-    			<documentation>height</documentation>
-    		</annotation>
-</attribute>
-    </complexType>
-
-    <complexType name="nodedisplaylayout_type">
-        <annotation>
-        	<documentation>Settings will not be inherited through hierarchy, but default layout will be set for all scheme-elements, which are not defined</documentation>
-        </annotation>
-        <complexContent>
-    		<extension base="lml:componentlayout_type">
-    			<sequence>
-    				<element name="el0" type="lml:nodedisplayelement0"/>
-    			</sequence>
-    		</extension>
-    	</complexContent>
-    </complexType>
-
-    <complexType name="componentlayout_type">
-    	<attribute name="id" type="string">
-    		<annotation>
-    			<documentation>
-    				identification for this component
-    			</documentation>
-    		</annotation>
-    	</attribute>
-    	<attribute name="gid" type="string" use="required">
-    		<annotation>
-    			<documentation>
-    				reference to the graphical object. Layout for the
-    				graphical object is defined within this tag
-    			</documentation>
-    		</annotation>
-    	</attribute>
-    	<attribute default="true" name="active" type="boolean">
-    		<annotation>
-    			<documentation>Defines if this component is active. If active is false, then no data for this graphical component has to be passed. This can be used for requesting information from server. Not active-components do not have to be filled with data from the server.</documentation>
-    		</annotation>
-</attribute>
-    </complexType>
-
-    <complexType name="nodedisplayelement">
-    	<annotation>
-    		<documentation>
-    			Contains all attributes that are equal at all levels
-    		</documentation>
-    	</annotation>
-    	<complexContent>
-    		<extension base="lml:element_type">
-    			<sequence>
-    				<element maxOccurs="unbounded" minOccurs="0" name="img" type="lml:picture_type">
-    				</element>
-    			</sequence>
-    			<attribute default="0" name="rows" type="nonNegativeInteger">
-    				<annotation>
-    					<documentation>
-    						Amount of rows of lower elements
-    					</documentation>
-    				</annotation>
-    			</attribute>
-    			<attribute default="8" name="cols" type="nonNegativeInteger">
-    				<annotation>
-    					<documentation>
-    						Amount of columns of lower elements. This attribute must be defined. It has a higher priority than rows.
-    					</documentation>
-    				</annotation>
-    			</attribute>
-    			<attribute default="1" name="hgap" type="nonNegativeInteger">
-    				<annotation>
-    					<documentation>
-    						horizontal space between two lower element
-    					</documentation>
-    				</annotation>
-    			</attribute>
-    			<attribute default="1" name="vgap" type="nonNegativeInteger">
-    				<annotation>
-    					<documentation>
-    						vertical space between two lower elements
-    					</documentation>
-    				</annotation>
-    			</attribute>
-    			<attribute default="10" name="fontsize" type="nonNegativeInteger">
-    				<annotation>
-    					<documentation>
-    						size of fonts printed in this element (for
-    						example a title)
-    					</documentation>
-    				</annotation>
-    			</attribute>
-    			<attribute default="1" name="border" type="nonNegativeInteger">
-    				<annotation>
-    					<documentation>
-    						pixels printed for a border around
-    						rectangles
-    					</documentation>
-    				</annotation>
-    			</attribute>
-    			<attribute default="Monospaced" name="fontfamily" type="string">
-    				<annotation>
-    					<documentation>
-    						Font used for title
-    					</documentation>
-    				</annotation>
-    			</attribute>
-    			<attribute default="false" name="showtitle" type="boolean">
-    				<annotation>
-    					<documentation>
-    						if true =&gt; title for elements of this level
-    						are shown, otherwise title is hidden
-    					</documentation>
-    				</annotation>
-    			</attribute>
-    			<attribute default="#EFEFEF" name="titlebackground" type="lml:hexcolor_type">
-    				<annotation>
-    					<documentation>
-    						background-color for title-label
-    					</documentation>
-    				</annotation>
-    			</attribute>
-    			<attribute default="#FFF" name="background" type="lml:hexcolor_type">
-    				<annotation>
-    					<documentation>
-    						background-color for this element
-    					</documentation>
-    				</annotation>
-    			</attribute>
-    			<attribute name="maxlevel" type="nonNegativeInteger">
-    				<annotation>
-    					<documentation>
-    						maximum of levels which are printed in
-    						output, absolute value (maxlevel=3 means all
-    						elements till level 3 included are printed)
-    					</documentation>
-    				</annotation>
-    			</attribute>
-    			<attribute default="2" name="mouseborder" type="nonNegativeInteger">
-    				<annotation>
-    					<documentation>
-    						border printed when mouse-over this
-    						component
-    					</documentation>
-    				</annotation>
-    			</attribute>
-    			<attribute default="true" name="transparent" type="boolean">
-    				<annotation>
-    					<documentation>
-    						Defines if this panel is drawn
-    						transparently. Upper-level paintings can
-    						then be seen. If transparent == false =&gt; the
-    						whole rectangle is painted by the specific
-    						panel on its own.
-    					</documentation>
-    				</annotation>
-    			</attribute>
-    			<attribute default="#000" name="bordercolor" type="lml:hexcolor_type">
-    				<annotation>
-    					<documentation>
-    						Color of the border around inner panels.
-    					</documentation>
-    				</annotation>
-    			</attribute>
-    			<attribute default="true" name="showfulltitle" type="boolean">
-    				<annotation>
-    					<documentation>
-    						If true full implicit name over all levels
-    						of tree is shown, otherwise implicit name is
-    						only generated over current level
-    					</documentation>
-    				</annotation>
-    			</attribute>
-    			<attribute default="false" name="highestrowfirst" type="boolean">
-    				<annotation>
-    					<documentation>Defines the input order of rows within nodedisplaypanel. if true, the row with the highest id is inserted first</documentation>
-    				</annotation>
-</attribute>
-    			<attribute default="false" name="highestcolfirst" type="boolean">
-    				<annotation>
-    					<documentation>Defines the input order of columns within nodedisplaypanel. if true, the column with the highest id is inserted first. Then the first cell within a panel has the highest id of the whole row.</documentation>
-    				</annotation>
-</attribute>
-    		</extension>
-    	</complexContent>
-    </complexType>
-
-    <complexType name="picture_type">
-    	<annotation>
-    		<documentation>
-    			describes a picture, which can be aligned
-    		</documentation>
-    	</annotation>
-    	<attribute name="src" type="anyURI" use="required">
-    		<annotation>
-    			<documentation>
-    				location where to find the picture, only pictures on
-    				the same webserver where the applet lies are allowed
-    			</documentation>
-    		</annotation>
-    	</attribute>
-    	<attribute default="CENTER" name="align" type="lml:align_type">
-    		<annotation>
-    			<documentation>Position of the picture</documentation>
-    		</annotation>
-    	</attribute>
-    	<attribute default="0.1" name="width" type="lml:percent_type">
-    		<annotation>
-    			<documentation>
-    				width of the picture in percent corresponding to
-    				surrounding panel
-    			</documentation>
-    		</annotation>
-    	</attribute>
-    	<attribute default="0.1" name="height" type="lml:percent_type">
-    		<annotation>
-    			<documentation>
-    				height of the picture in percent corresponding to
-    				surrounding panel
-    			</documentation>
-    		</annotation>
-    	</attribute>
-    	<attribute default="CENTER" name="inneralign" type="lml:align_type">
-    		<annotation>
-    			<documentation>align is for positioning the image around the display-panel of one physical element. inner-align is for positioning the picture within its rectangle</documentation>
-    		</annotation>
-</attribute>
-    </complexType>
-
-    <complexType name="nodedisplayelement0">
-    	<complexContent>
-    		<extension base="lml:nodedisplayelement">
-    			<sequence>
-    				<element maxOccurs="unbounded" minOccurs="0" name="el1" type="lml:nodedisplayelement1"/>
-    			</sequence>
-    		</extension>
-    	</complexContent>
-    </complexType>
-
-    <complexType name="nodedisplayelement1">
-    	<complexContent>
-    		<extension base="lml:nodedisplayelement">
-    			<sequence>
-    				<element maxOccurs="unbounded" minOccurs="0" name="el2" type="lml:nodedisplayelement2"/>
-    			</sequence>
-    		</extension>
-    	</complexContent>
-    </complexType>
-    
-    <complexType name="nodedisplayelement2">
-    	<complexContent>
-    		<extension base="lml:nodedisplayelement">
-    			<sequence>
-    				<element maxOccurs="unbounded" minOccurs="0" name="el3" type="lml:nodedisplayelement3"/>
-    			</sequence>
-    		</extension>
-    	</complexContent>
-    </complexType>
-    
-    <complexType name="nodedisplayelement3">
-    	<complexContent>
-    		<extension base="lml:nodedisplayelement">
-    			<sequence>
-    				<element maxOccurs="unbounded" minOccurs="0" name="el4" type="lml:nodedisplayelement4"/>
-    			</sequence>
-    		</extension>
-    	</complexContent>
-    </complexType>
-    
-    <complexType name="nodedisplayelement4">
-    	<complexContent>
-    		<extension base="lml:nodedisplayelement">
-    			<sequence>
-    				<element maxOccurs="unbounded" minOccurs="0" name="el5" type="lml:nodedisplayelement5"/>
-    			</sequence>
-    		</extension>
-    	</complexContent>
-    </complexType>
-    
-    <complexType name="nodedisplayelement5">
-    	<complexContent>
-    		<extension base="lml:nodedisplayelement">
-    			<sequence>
-    				<element maxOccurs="unbounded" minOccurs="0" name="el6" type="lml:nodedisplayelement6"/>
-    			</sequence>
-    		</extension>
-    	</complexContent>
-    </complexType>
-    
-    <complexType name="nodedisplayelement6">
-    	<complexContent>
-    		<extension base="lml:nodedisplayelement">
-    			<sequence>
-    				<element maxOccurs="unbounded" minOccurs="0" name="el7" type="lml:nodedisplayelement7"/>
-    			</sequence>
-    		</extension>
-    	</complexContent>
-    </complexType>
-    
-    <complexType name="nodedisplayelement7">
-    	<complexContent>
-    		<extension base="lml:nodedisplayelement">
-    			<sequence>
-    				<element maxOccurs="unbounded" minOccurs="0" name="el8" type="lml:nodedisplayelement8"/>
-    			</sequence>
-    		</extension>
-    	</complexContent>
-    </complexType>
-    
-    <complexType name="nodedisplayelement8">
-    	<complexContent>
-    		<extension base="lml:nodedisplayelement">
-    			<sequence>
-    				<element maxOccurs="unbounded" minOccurs="0" name="el9" type="lml:nodedisplayelement9"/>
-    			</sequence>
-    		</extension>
-    	</complexContent>
-    </complexType>
-    
-    <complexType name="nodedisplayelement9">
-    	<complexContent>
-    		<extension base="lml:nodedisplayelement">
-    			<sequence>
-    				<element maxOccurs="unbounded" minOccurs="0" name="el10" type="lml:nodedisplayelement"/>
-    			</sequence>
-    		</extension>
-    	</complexContent>
-    </complexType>
+	<complexType name="splitlayout_type">
+		<complexContent>
+			<extension base="lml:layout_type">
+				<choice>
+					<sequence>
+						<element name="left" type="lml:pane_type" />
+						<element name="right" type="lml:pane_type" />
+					</sequence>
+					<sequence>
+						<element name="top" type="lml:pane_type" />
+						<element name="bottom" type="lml:pane_type" />
+					</sequence>
+				</choice>
+				<attribute default="0.5" name="divpos" type="lml:divpos_type" />
+			</extension>
+		</complexContent>
+	</complexType>
 
 
-    <simpleType name="align_type">
-    	<restriction base="string">
-    		<enumeration value="WEST"/>
-    		<enumeration value="EAST"/>
-    		<enumeration value="NORTH"/>
-    		<enumeration value="SOUTH"/>
-    		<enumeration value="CENTER"/>
-    	</restriction>
-    </simpleType>
+	<complexType name="pane_type">
+		<annotation>
+			<documentation>
+				Describes one side of a splitpane. This tag is later
+				transformed into a panel. You can split one panel with
+				left and right-components or top and bottom-components.
+				First split will cause a horizontal split, second will
+				cause a vertical split. The gid-attribute is for
+				referencing graphical object-id-attributes. If there are
+				child-elements for a pane, gid must not be specified.
+				Through the divpos-element you are able to set the
+				percentage of where to put the divider.
+			</documentation>
+		</annotation>
+		<sequence>
+			<sequence maxOccurs="1" minOccurs="0">
+				<element name="left" type="lml:pane_type" />
+				<element name="right" type="lml:pane_type" />
+			</sequence>
+			<sequence maxOccurs="1" minOccurs="0">
+				<element name="top" type="lml:pane_type" />
+				<element name="bottom" type="lml:pane_type" />
+			</sequence>
+		</sequence>
+		<attribute name="gid" type="string" />
+		<attribute default="0.5" name="divpos" type="lml:divpos_type" />
+	</complexType>
 
-    <simpleType name="percent_type">
-    	<restriction base="double">
-    		<minInclusive value="0"/>
-    		<maxInclusive value="1"/>
-    	</restriction>
-    </simpleType>
+	<simpleType name="divpos_type">
+		<restriction base="double">
+			<minInclusive value="0" />
+			<maxInclusive value="1" />
+		</restriction>
+	</simpleType>
 
+	<complexType name="layout_type">
+		<annotation>
+			<documentation>All layout-types should extend this type
+			</documentation>
+		</annotation>
+		<attribute name="id" type="string" use="required" />
+	</complexType>
 
-    <complexType name="usagebarlayout_type">
-    	<annotation>
-    		<documentation>
-    			Define special layout-options for a usagebar
-    		</documentation>
-    	</annotation>
-    	<complexContent>
-    		<extension base="lml:componentlayout_type">
-    			<attribute default="nodes" name="scale">
-    				<annotation>
-    					<documentation>
-    						defines which scale should be used. "nodes"
-    						means the scale will be displayed in the
-    						unit nodes, "cpus" means the scale will show
-    						cpus as unit
-    					</documentation>
-    				</annotation>
-    				<simpleType>
-    					<restriction base="string">
-    						<enumeration value="nodes"/>
-    						<enumeration value="cpus"/>
-    					</restriction>
-    				</simpleType>
-    			</attribute>
-    			<attribute default="4" name="interval" type="positiveInteger">
-    				<annotation>
-    					<documentation>defines the distance between two scale-lines, in other words two tics on the axis</documentation>
-    				</annotation>
-</attribute>
-    		</extension>
-    	</complexContent>
-    </complexType>
+	<complexType name="abslayout_type">
+		<annotation>
+			<documentation>
+				Describes a layout with absolute coordinates. Every
+				component must be added by a comp-tag.
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="lml:layout_type">
+				<sequence>
+					<element maxOccurs="unbounded" minOccurs="1" name="comp"
+						type="lml:component_type" />
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
 
-    <complexType name="chartlayout_type">
-    	<annotation>
-    		<documentation>
-    			Definition of layout-tag for charts
-    		</documentation>
-    	</annotation>
-    	<complexContent>
-    		<extension base="lml:componentlayout_type">
-    			<attribute default="0" name="border" type="nonNegativeInteger">
-    				<annotation>
-    					<documentation>
-    						border in pixels, which is painted around
-    						every bar of a chart
-    					</documentation>
-    				</annotation>
-    			</attribute>
-    			<attribute default="true" name="showlegend" type="boolean">
-    				<annotation>
-    					<documentation>
-    						if true, legend is shown, otherwise no
-    						legend is painted
-    					</documentation>
-    				</annotation>
-    			</attribute>
-    			<attribute default="#FFF" name="backgroundcolor" type="lml:hexcolor_type">
-    				<annotation>
-    					<documentation>
-    						Background-color of the chart, usually white
-    					</documentation>
-    				</annotation>
-    			</attribute>
-    			<attribute default="#AAA" name="innerbackgroundcolor" type="lml:hexcolor_type">
-    				<annotation>
-    					<documentation>
-    						background-color of rectangle, in which the
-    						main diagram is painted
-    					</documentation>
-    				</annotation>
-    			</attribute>
-    			<attribute default="#555" name="axescolor" type="lml:hexcolor_type">
-    				<annotation>
-    					<documentation>Color of axes</documentation>
-    				</annotation>
-    			</attribute>
-    			<attribute default="#000" name="bordercolor" type="lml:hexcolor_type">
-    				<annotation>
-    					<documentation>
-    						color of borders around rectangles painted
-    						inside the diagram
-    					</documentation>
-    				</annotation>
-    			</attribute>
-    			<attribute default="#555" name="gridcolor" type="lml:hexcolor_type">
-    				<annotation>
-    					<documentation>
-    						Color of gridlines, which are painted at
-    						every tic if wanted
-    					</documentation>
-    				</annotation>
-    			</attribute>
-    			<attribute default="true" name="cutpaint" type="boolean">
-    				<annotation>
-    					<documentation>If true, rects and bars outside the diagrams view are not displayed, otherwise rects are painted outside the diagram area if needed</documentation>
-    				</annotation>
-</attribute>
-    		</extension>
-    	</complexContent>
-    </complexType>
+	<complexType name="component_type">
+		<annotation>
+			<documentation>Describes the absolute position of one graphical
+				object</documentation>
+		</annotation>
+		<attribute name="gid" type="string" use="required">
+			<annotation>
+				<documentation>connection to a graphical object</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="x" type="integer" use="required">
+			<annotation>
+				<documentation>left coordinate</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="y" type="integer" use="required">
+			<annotation>
+				<documentation>upper coordinate</documentation>
+			</annotation>
+		</attribute>
+		<attribute default="100" name="w" type="nonNegativeInteger">
+			<annotation>
+				<documentation>width</documentation>
+			</annotation>
+		</attribute>
+		<attribute default="100" name="h" type="nonNegativeInteger">
+			<annotation>
+				<documentation>height</documentation>
+			</annotation>
+		</attribute>
+	</complexType>
 
-    <complexType name="tablelayout_type">
-        <annotation>
-        	<documentation>Layout for a table</documentation>
-        </annotation>
-        <complexContent>
-    		<extension base="lml:componentlayout_type">
-    			<sequence>
-    				<element maxOccurs="unbounded" minOccurs="0" name="column" type="lml:columnlayout_type"/>
-    			</sequence>
-    		</extension>
-    	</complexContent>
-    </complexType>
+	<complexType name="nodedisplaylayout_type">
+		<annotation>
+			<documentation>Settings will not be inherited through hierarchy, but
+				default layout will be set for all scheme-elements, which are not
+				defined</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="lml:componentlayout_type">
+				<sequence>
+					<element name="schemehint" type="lml:scheme_type"
+						minOccurs="0" maxOccurs="1">
+						<annotation>
+							<documentation>Allows to configure a hint for LML_da about the
+								expected architecture of the supercomputer.
+								This scheme might be used by LML_da as scheme in the corresponding
+								nodedisplay.
+								The schemehint at this location avoids that a nodedisplay tag has
+								to be added to an
+								LML request.
+							</documentation>
+						</annotation>
+					</element>
+					<element name="el0" type="lml:nodedisplayelement0" />
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
 
-    <complexType name="columnlayout_type">
-    	<annotation>
-    		<documentation>
-    			Layout-definitions for exactly one column of a table.
-    			Defines where to position the column, width and if this
-    			column is sorted
-    		</documentation>
-    	</annotation>
-    	<attribute name="cid" type="positiveInteger" use="required">
-    		<annotation>
-    			<documentation>
-    				Reference to the data-column of the table, for which
-    				this component defines the layout
-    			</documentation>
-    		</annotation>
-    	</attribute>
-    	<attribute name="pos" type="nonNegativeInteger">
-    		<annotation>
-    			<documentation>
-    				Position of this column among all other columns.
-    				This attribute begins with 0. If position is not
-    				defined, the applet can decide where to put the
-    				column. Usually it will keep the order defined by
-    				the data-part of this table.
-    			</documentation>
-    		</annotation>
-    	</attribute>
-    	<attribute name="width">
-    		<annotation>
-    			<documentation>
-    				Width of this column in percent corresponding to the
-    				width of the panel, which shows this table.
-    			</documentation>
-    		</annotation>
-    		<simpleType>
-    			<restriction base="double">
-    				<minInclusive value="0"/>
-    				<maxInclusive value="1"/>
-    			</restriction>
-    		</simpleType>
-    	</attribute>
-    	<attribute default="false" name="sorted" type="lml:columnsortedtype">
-    		<annotation>
-    			<documentation>
-    				Defines if the table-content is sorted by this
-    				column.
-    			</documentation>
-    		</annotation>
-    	</attribute>
-    	<attribute default="true" name="active" type="boolean">
-    		<annotation>
-    			<documentation>
-    				This attribute defines if this column should be
-    				shown. If not data for this column must not be
-    				transmitted for data-transmission reduction.
-    			</documentation>
-    		</annotation>
-    	</attribute>
-    	<attribute name="key" type="string">
-    		<annotation>
-    			<documentation>Defines the name of an attribute, which is shown in the table in this column. This is comparable with the name-attribute within the table-tag. The values do not have to be equal. The key-attribute is needed</documentation>
-    		</annotation>
-</attribute>
-    </complexType>
+	<complexType name="componentlayout_type">
+		<attribute name="id" type="string">
+			<annotation>
+				<documentation>
+					identification for this component
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="gid" type="string" use="required">
+			<annotation>
+				<documentation>
+					reference to the graphical object. Layout for the
+					graphical object is defined within this tag
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute default="true" name="active" type="boolean">
+			<annotation>
+				<documentation>Defines if this component is active. If active is
+					false, then no data for this graphical component has to be passed.
+					This can be used for requesting information from server. Not
+					active-components do not have to be filled with data from the
+					server.</documentation>
+			</annotation>
+		</attribute>
+	</complexType>
+
+	<simpleType name="layout_list_type">
+		<annotation>
+			<documentation>Type for list-attribute in scheme- or data-tag. It
+				allowes the definition of several positive integer-values seperated
+				by commas.</documentation>
+		</annotation>
+		<restriction base="string">
+			<pattern value="\s*\d+\s*(\s*,\s*\d+)*" />
+		</restriction>
+	</simpleType>
 
 
-    <simpleType name="columnsortedtype">
-    	<restriction base="string">
-    		<enumeration value="asc"/>
-    		<enumeration value="desc"/>
-    		<enumeration value="false"/>
-    	</restriction>
-    </simpleType>
+	<complexType name="nodedisplayelement">
+		<annotation>
+			<documentation>
+				Contains all attributes that are equal at all levels
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="lml:element_type">
+				<sequence>
+					<element maxOccurs="unbounded" minOccurs="0" name="img"
+						type="lml:picture_type">
+					</element>
+				</sequence>
+				<attribute default="0" name="rows" type="nonNegativeInteger">
+					<annotation>
+						<documentation>
+							Amount of rows of lower elements
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute default="8" name="cols" type="nonNegativeInteger">
+					<annotation>
+						<documentation>
+							Amount of columns of lower elements. This attribute must be defined. It
+							has a higher priority than rows.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute default="1" name="hgap" type="nonNegativeInteger">
+					<annotation>
+						<documentation>
+							horizontal space between two lower element
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute default="1" name="vgap" type="nonNegativeInteger">
+					<annotation>
+						<documentation>
+							vertical space between two lower elements
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute default="10" name="fontsize" type="nonNegativeInteger">
+					<annotation>
+						<documentation>
+							size of fonts printed in this element (for
+							example a title)
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute default="1" name="border" type="nonNegativeInteger">
+					<annotation>
+						<documentation>
+							pixels printed for a border around
+							rectangles
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute default="Monospaced" name="fontfamily" type="string">
+					<annotation>
+						<documentation>
+							Font used for title
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute default="false" name="showtitle" type="boolean">
+					<annotation>
+						<documentation>
+							if true =&gt; title for elements of this level
+							are shown, otherwise title is hidden
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute default="#EFEFEF" name="titlebackground" type="lml:hexcolor_type">
+					<annotation>
+						<documentation>
+							background-color for title-label
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute default="#FFF" name="background" type="lml:hexcolor_type">
+					<annotation>
+						<documentation>
+							background-color for this element
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="maxlevel" type="nonNegativeInteger">
+					<annotation>
+						<documentation>
+							maximum of levels which are printed in
+							output, absolute value (maxlevel=3 means all
+							elements till level 3 included are printed)
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute default="2" name="mouseborder" type="nonNegativeInteger">
+					<annotation>
+						<documentation>
+							border printed when mouse-over this
+							component
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute default="true" name="transparent" type="boolean">
+					<annotation>
+						<documentation>
+							Defines if this panel is drawn
+							transparently. Upper-level paintings can
+							then be seen. If transparent == false =&gt; the
+							whole rectangle is painted by the specific
+							panel on its own.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute default="#000" name="bordercolor" type="lml:hexcolor_type">
+					<annotation>
+						<documentation>
+							Color of the border around inner panels.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute default="true" name="showfulltitle" type="boolean">
+					<annotation>
+						<documentation>
+							If true full implicit name over all levels
+							of tree is shown, otherwise implicit name is
+							only generated over current level
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute default="false" name="highestrowfirst" type="boolean">
+					<annotation>
+						<documentation>Defines the input order of rows within
+							nodedisplaypanel. if true, the row with the highest id is
+							inserted first</documentation>
+					</annotation>
+				</attribute>
+				<attribute default="false" name="highestcolfirst" type="boolean">
+					<annotation>
+						<documentation>Defines the input order of columns within
+							nodedisplaypanel. if true, the column with the highest id is
+							inserted first. Then the first cell within a panel has the
+							highest id of the whole row.</documentation>
+					</annotation>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
 
-    <complexType name="infoboxlayout_type">
-    	<complexContent>
-    		<extension base="lml:componentlayout_type">
-    			<sequence>
-    				<element maxOccurs="1" minOccurs="0" name="typecol" type="lml:infoboxlayout_coltype">
-                        <annotation>
-                        	<documentation>this element defines properties for the column containing the keys of information</documentation>
-                        </annotation>
-    				</element>
-    				<element maxOccurs="1" minOccurs="0" name="infocol" type="lml:infoboxlayout_coltype">
-    					<annotation>
-    						<documentation>this element defines properties for the column containing the values of information</documentation>
-    					</annotation>
-</element>
-    			</sequence>
-    		</extension>
-    	</complexContent>
-    </complexType>
+	<complexType name="picture_type">
+		<annotation>
+			<documentation>
+				describes a picture, which can be aligned
+			</documentation>
+		</annotation>
+		<attribute name="src" type="anyURI" use="required">
+			<annotation>
+				<documentation>
+					location where to find the picture, only pictures on
+					the same webserver where the applet lies are allowed
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute default="CENTER" name="align" type="lml:align_type">
+			<annotation>
+				<documentation>Position of the picture</documentation>
+			</annotation>
+		</attribute>
+		<attribute default="0.1" name="width" type="lml:percent_type">
+			<annotation>
+				<documentation>
+					width of the picture in percent corresponding to
+					surrounding panel
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute default="0.1" name="height" type="lml:percent_type">
+			<annotation>
+				<documentation>
+					height of the picture in percent corresponding to
+					surrounding panel
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute default="CENTER" name="inneralign" type="lml:align_type">
+			<annotation>
+				<documentation>align is for positioning the image around the
+					display-panel of one physical element. inner-align is for
+					positioning the picture within its rectangle</documentation>
+			</annotation>
+		</attribute>
+	</complexType>
 
-    <complexType name="infoboxlayout_coltype">
-    	<attribute name="pos" type="lml:integer01type">
-    		<annotation>
-    			<documentation>
-    				position of column in view
-    			</documentation>
-    		</annotation>
-    	</attribute>
-    	<attribute default="0.5" name="width">
-    		<annotation>
-    			<documentation>
-    				width of column in percent
-    			</documentation>
-    		</annotation>
-    		<simpleType>
-    			<restriction base="double">
-    				<minInclusive value="0"/>
-    				<maxInclusive value="1"/>
-    			</restriction>
-    		</simpleType>
-    	</attribute>
-    	<attribute default="false" name="sorted" type="lml:columnsortedtype">
-    		<annotation>
-    			<documentation>defines if infos are sorted by this column</documentation>
-    		</annotation>
-</attribute>
-    </complexType>
+	<complexType name="nodedisplayelement0">
+		<complexContent>
+			<extension base="lml:nodedisplayelement">
+				<sequence>
+					<element maxOccurs="unbounded" minOccurs="0" name="el1"
+						type="lml:nodedisplayelement1" />
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
 
-    <simpleType name="integer01type">
-        <annotation>
-        	<documentation>integer values, where only e aus [0,1] is allowed ={0,1}, is used for infoboxlayout_coltype</documentation>
-        </annotation>
-        <restriction base="nonNegativeInteger">
-    		<minInclusive value="0"/>
-    		<maxInclusive value="1"/>
-    	</restriction>
-    </simpleType>
+	<complexType name="nodedisplayelement1">
+		<complexContent>
+			<extension base="lml:nodedisplayelement">
+				<sequence>
+					<element maxOccurs="unbounded" minOccurs="0" name="el2"
+						type="lml:nodedisplayelement2" />
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="nodedisplayelement2">
+		<complexContent>
+			<extension base="lml:nodedisplayelement">
+				<sequence>
+					<element maxOccurs="unbounded" minOccurs="0" name="el3"
+						type="lml:nodedisplayelement3" />
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="nodedisplayelement3">
+		<complexContent>
+			<extension base="lml:nodedisplayelement">
+				<sequence>
+					<element maxOccurs="unbounded" minOccurs="0" name="el4"
+						type="lml:nodedisplayelement4" />
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="nodedisplayelement4">
+		<complexContent>
+			<extension base="lml:nodedisplayelement">
+				<sequence>
+					<element maxOccurs="unbounded" minOccurs="0" name="el5"
+						type="lml:nodedisplayelement5" />
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="nodedisplayelement5">
+		<complexContent>
+			<extension base="lml:nodedisplayelement">
+				<sequence>
+					<element maxOccurs="unbounded" minOccurs="0" name="el6"
+						type="lml:nodedisplayelement6" />
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="nodedisplayelement6">
+		<complexContent>
+			<extension base="lml:nodedisplayelement">
+				<sequence>
+					<element maxOccurs="unbounded" minOccurs="0" name="el7"
+						type="lml:nodedisplayelement7" />
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="nodedisplayelement7">
+		<complexContent>
+			<extension base="lml:nodedisplayelement">
+				<sequence>
+					<element maxOccurs="unbounded" minOccurs="0" name="el8"
+						type="lml:nodedisplayelement8" />
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="nodedisplayelement8">
+		<complexContent>
+			<extension base="lml:nodedisplayelement">
+				<sequence>
+					<element maxOccurs="unbounded" minOccurs="0" name="el9"
+						type="lml:nodedisplayelement9" />
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="nodedisplayelement9">
+		<complexContent>
+			<extension base="lml:nodedisplayelement">
+				<sequence>
+					<element maxOccurs="unbounded" minOccurs="0" name="el10"
+						type="lml:nodedisplayelement" />
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+
+	<simpleType name="align_type">
+		<restriction base="string">
+			<enumeration value="WEST" />
+			<enumeration value="EAST" />
+			<enumeration value="NORTH" />
+			<enumeration value="SOUTH" />
+			<enumeration value="CENTER" />
+		</restriction>
+	</simpleType>
+
+	<simpleType name="percent_type">
+		<restriction base="double">
+			<minInclusive value="0" />
+			<maxInclusive value="1" />
+		</restriction>
+	</simpleType>
+
+
+	<complexType name="usagebarlayout_type">
+		<annotation>
+			<documentation>
+				Define special layout-options for a usagebar
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="lml:componentlayout_type">
+				<attribute default="nodes" name="scale">
+					<annotation>
+						<documentation>
+							defines which scale should be used. "nodes"
+							means the scale will be displayed in the
+							unit nodes, "cpus" means the scale will show
+							cpus as unit
+						</documentation>
+					</annotation>
+					<simpleType>
+						<restriction base="string">
+							<enumeration value="nodes" />
+							<enumeration value="cpus" />
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute default="4" name="interval" type="positiveInteger">
+					<annotation>
+						<documentation>defines the distance between two scale-lines, in
+							other words two tics on the axis</documentation>
+					</annotation>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="chartlayout_type">
+		<annotation>
+			<documentation>
+				Definition of layout-tag for charts
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="lml:componentlayout_type">
+				<attribute default="0" name="border" type="nonNegativeInteger">
+					<annotation>
+						<documentation>
+							border in pixels, which is painted around
+							every bar of a chart
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute default="true" name="showlegend" type="boolean">
+					<annotation>
+						<documentation>
+							if true, legend is shown, otherwise no
+							legend is painted
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute default="#FFF" name="backgroundcolor" type="lml:hexcolor_type">
+					<annotation>
+						<documentation>
+							Background-color of the chart, usually white
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute default="#AAA" name="innerbackgroundcolor"
+					type="lml:hexcolor_type">
+					<annotation>
+						<documentation>
+							background-color of rectangle, in which the
+							main diagram is painted
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute default="#555" name="axescolor" type="lml:hexcolor_type">
+					<annotation>
+						<documentation>Color of axes</documentation>
+					</annotation>
+				</attribute>
+				<attribute default="#000" name="bordercolor" type="lml:hexcolor_type">
+					<annotation>
+						<documentation>
+							color of borders around rectangles painted
+							inside the diagram
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute default="#555" name="gridcolor" type="lml:hexcolor_type">
+					<annotation>
+						<documentation>
+							Color of gridlines, which are painted at
+							every tic if wanted
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute default="true" name="cutpaint" type="boolean">
+					<annotation>
+						<documentation>If true, rects and bars outside the diagrams view
+							are not displayed, otherwise rects are painted outside the
+							diagram area if needed</documentation>
+					</annotation>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="tablelayout_type">
+		<annotation>
+			<documentation>Layout for a table</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="lml:componentlayout_type">
+				<sequence>
+					<element maxOccurs="unbounded" minOccurs="0"
+						name="column" type="lml:columnlayout_type" />
+				</sequence>
+				<attribute name="contenthint" type="lml:content_type" default="other">
+					<annotation>
+						<documentation>Hint for the server about the requested type of data.</documentation>
+					</annotation></attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="columnlayout_type">
+		<annotation>
+			<documentation>
+				Layout-definitions for exactly one column of a table.
+				Defines where to position the column, width and if this
+				column is sorted
+			</documentation>
+		</annotation>
+		<sequence>
+			<element name="pattern" type="lml:pattern_type" minOccurs="0"
+				maxOccurs="1">
+				<annotation>
+					<documentation>The pattern-tag defines regular expressions,
+						which describe the allowed values of a column.
+						For a status-column in a job-table you could
+						define, that values of this column are taken
+						from {RUNNING, SUSPENDED, STOPPED}. This is also
+						used to insert new jobs into job-tables. If a
+						job is "running" and the status-column allows
+						running jobs, this job should be inserted into
+						this table.
+					</documentation>
+				</annotation>
+			</element>
+		</sequence>
+		<attribute name="cid" type="positiveInteger" use="required">
+			<annotation>
+				<documentation>
+					Reference to the data-column of the table, for which
+					this component defines the layout
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="pos" type="nonNegativeInteger">
+			<annotation>
+				<documentation>
+					Position of this column among all other columns.
+					This attribute begins with 0. If position is not
+					defined, the applet can decide where to put the
+					column. Usually it will keep the order defined by
+					the data-part of this table.
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="width">
+			<annotation>
+				<documentation>
+					Width of this column in percent corresponding to the
+					width of the panel, which shows this table.
+				</documentation>
+			</annotation>
+			<simpleType>
+				<restriction base="double">
+					<minInclusive value="0" />
+					<maxInclusive value="1" />
+				</restriction>
+			</simpleType>
+		</attribute>
+		<attribute default="false" name="sorted" type="lml:columnsortedtype">
+			<annotation>
+				<documentation>
+					Defines if the table-content is sorted by this
+					column.
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute default="true" name="active" type="boolean">
+			<annotation>
+				<documentation>
+					This attribute defines if this column should be
+					shown. If not data for this column must not be
+					transmitted for data-transmission reduction.
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="key" type="string">
+			<annotation>
+				<documentation>
+					Defines the name of an attribute, which is shown in
+					the table in this column. This is comparable with
+					the name-attribute within the table-tag. The values
+					do not have to be equal. The key-attribute is needed
+				</documentation>
+			</annotation>
+		</attribute>
+	</complexType>
+
+
+	<simpleType name="columnsortedtype">
+		<restriction base="string">
+			<enumeration value="asc" />
+			<enumeration value="desc" />
+			<enumeration value="false" />
+		</restriction>
+	</simpleType>
+
+	<complexType name="infoboxlayout_type">
+		<complexContent>
+			<extension base="lml:componentlayout_type">
+				<sequence>
+					<element maxOccurs="1" minOccurs="0" name="typecol"
+						type="lml:infoboxlayout_coltype">
+						<annotation>
+							<documentation>this element defines properties for the column
+								containing the keys of information</documentation>
+						</annotation>
+					</element>
+					<element maxOccurs="1" minOccurs="0" name="infocol"
+						type="lml:infoboxlayout_coltype">
+						<annotation>
+							<documentation>this element defines properties for the column
+								containing the values of information</documentation>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="infoboxlayout_coltype">
+		<attribute name="pos" type="lml:integer01type">
+			<annotation>
+				<documentation>
+					position of column in view
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute default="0.5" name="width">
+			<annotation>
+				<documentation>
+					width of column in percent
+				</documentation>
+			</annotation>
+			<simpleType>
+				<restriction base="double">
+					<minInclusive value="0" />
+					<maxInclusive value="1" />
+				</restriction>
+			</simpleType>
+		</attribute>
+		<attribute default="false" name="sorted" type="lml:columnsortedtype">
+			<annotation>
+				<documentation>defines if infos are sorted by this column
+				</documentation>
+			</annotation>
+		</attribute>
+	</complexType>
+
+	<simpleType name="integer01type">
+		<annotation>
+			<documentation>integer values, where only e aus [0,1] is allowed
+				={0,1}, is used for infoboxlayout_coltype</documentation>
+		</annotation>
+		<restriction base="nonNegativeInteger">
+			<minInclusive value="0" />
+			<maxInclusive value="1" />
+		</restriction>
+	</simpleType>
+
+	<complexType name="pattern_match_type">
+		<attribute name="regexp" type="string">
+			<annotation>
+				<documentation>This attribute takes regular expressions of any kind.
+				</documentation>
+			</annotation>
+		</attribute>
+	</complexType>
+
+	<complexType name="pattern_type">
+		<annotation>
+			<documentation>A pattern element consists of include and exclude
+				tags. Values of the corresponding column
+				can be checked by the defined regular expressions. They must pass the
+				regexp-checks in
+				the following way: Go through all include/exclude tags. A value must be
+				valid against the
+				include-regexps and must not match with the exclude-regexps. Therefore the order of
+				tags
+				is important.
+			</documentation>
+		</annotation>
+		<sequence maxOccurs="unbounded" minOccurs="1">
+			<element maxOccurs="1" minOccurs="0" name="include"
+				type="lml:pattern_match_type" />
+			<element maxOccurs="1" minOccurs="0" name="exclude"
+				type="lml:pattern_match_type" />
+			<element name="select" type="lml:select_type" minOccurs="0">
+				<annotation>
+					<documentation>The select tag is used for selecting subsets from
+						the current table.</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+
+	<complexType name="select_type">
+		<annotation>
+			<documentation>One select tag describes a selection of a subset
+				within a table.
+				It is used for filtering. All table rows are traversed and they
+				are checked against the relation given by the rel-attribute.
+				If the comparison term is true, the table row will stay in the
+				filtered result, otherwise it is removed. Example: a table has the
+				row totalcores. The user is only interested in big jobs with more
+				than 1000 cores. A select tag must be added with the value=1000
+				and the rel=gt. Thus, only the table rows with more than 1000 cores
+				are transferred to the client.
+				The select tags are executed subsequently. This allows the selection
+				of a subset from another subset generated by a previous select.
+			</documentation>
+		</annotation>
+		<attribute name="value" type="string" use="required">
+			<annotation>
+				<documentation>The value is the parameter, with which the table
+					row's attribute
+					is compared.
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="rel" type="lml:select_relation_type"
+			default="=~">
+			<annotation>
+				<documentation>The rel attribute is the operator executed on the
+					value and each
+					table cell's value of the current column. The following comparison
+					operators are allowed:
+					= numerical or string comparison for equality
+					!= numerical or string comparison for inequality
+					lt numerical comparison for lower than
+					le numerical comparison for lower than or equality
+					gt numerical comparison for greater than
+					ge numerical comparison for greater than or equality
+					=~ string matching against a regular expression
+					!~ string test for not matching a regular expression
+				</documentation>
+			</annotation>
+		</attribute>
+	</complexType>
+
+	<simpleType name="select_relation_type">
+		<restriction base="string">
+			<enumeration value="="></enumeration>
+			<enumeration value="lt"></enumeration>
+			<enumeration value="le"></enumeration>
+			<enumeration value="gt"></enumeration>
+			<enumeration value="!="></enumeration>
+			<enumeration value="=~"></enumeration>
+			<enumeration value="!~"></enumeration>
+			<enumeration value="ge"></enumeration>
+		</restriction>
+	</simpleType>
+
+
+	<element name="layout" type="lml:layout_root"></element>
+
+	<complexType name="layout_root">
+		<sequence>
+			<element name="request" type="lml:RequestType" minOccurs="0"
+				maxOccurs="1">
+			</element>
+			<sequence minOccurs="0" maxOccurs="unbounded">
+				<element name="textlayout" type="lml:infoboxlayout_type"
+					minOccurs="0" maxOccurs="1">
+				</element>
+				<element name="infoboxlayout" type="lml:infoboxlayout_type"
+					minOccurs="0" maxOccurs="1">
+				</element>
+				<element name="tablelayout" type="lml:tablelayout_type"
+					minOccurs="0" maxOccurs="1">
+				</element>
+				<element name="chartlayout" type="lml:chartlayout_type"
+					minOccurs="0" maxOccurs="1">
+				</element>
+				<element name="usagebarlayout" type="lml:usagebarlayout_type"
+					minOccurs="0" maxOccurs="1">
+				</element>
+				<element name="nodedisplaylayout" type="lml:nodedisplaylayout_type"
+					minOccurs="0" maxOccurs="1">
+				</element>
+				<element name="abslayout" type="lml:abslayout_type"
+					minOccurs="0" maxOccurs="1">
+				</element>
+				<element name="splitlayout" type="lml:splitlayout_type"
+					minOccurs="0" maxOccurs="1">
+				</element>
+			</sequence>
+    	</sequence>
+		<attribute name="version" type="string" use="optional">
+			<annotation>
+				<documentation>Opportunity to provide a version number for this
+					layout file.
+					So far, there are no rules or definitions about the version names.
+				</documentation>
+			</annotation>
+		</attribute>
+	</complexType>
+
 </schema>

@@ -12,6 +12,7 @@ package org.eclipse.ptp.rm.lml.core.util;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigInteger;
@@ -22,6 +23,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -42,13 +44,13 @@ import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.internal.core.elements.AbslayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ChartType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ChartgroupType;
-import org.eclipse.ptp.rm.lml.internal.core.elements.ColumnType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ComponentType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ComponentlayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.DataType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.GobjectType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.InfoboxType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.JobType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.LayoutRoot;
 import org.eclipse.ptp.rm.lml.internal.core.elements.LayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.LguiType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplay;
@@ -69,6 +71,16 @@ import org.eclipse.ptp.rm.lml.internal.core.model.LguiItem;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+/**
+ * Encapsulates all operations working on JAXB classes.
+ * Handles marshalling and unmarshalling of LML files.
+ * It implements the Singleton pattern, so that only one marshaller/unmarshaller
+ * instance per program is generated. It represents a collection
+ * of helper functions for all LML handling classes.
+ * 
+ * @author Carsten Karbach
+ * 
+ */
 public class JAXBUtil {
 
 	private static JAXBUtil jaxbUtil;
@@ -80,10 +92,11 @@ public class JAXBUtil {
 	private static String JAXB_CLASSES = "org.eclipse.ptp.rm.lml.internal.core.elements";//$NON-NLS-1$
 
 	private static String SCHEMA_LOCATION = "jaxb.schemaLocation";//$NON-NLS-1$
-	private static String SCHEMA_FILE = "lgui.xsd";//$NON-NLS-1$
+	private static String SCHEMA_FILE = "http://eclipse.org/ptp/schemas/lgui.xsd";//$NON-NLS-1$
 	private static String SCHEMA_LGUI = "lgui";//$NON-NLS-1$
+	private static String SCHEMA_LAYOUT = "layout";//$NON-NLS-1$
 	private static String SCHEMA_LML = "lml";//$NON-NLS-1$
-	private static String SCHEMA_DIRECTORY = "http://www.llview.de";//$NON-NLS-1$
+	private static String SCHEMA_DIRECTORY = "http://eclipse.org/ptp/schemas";//$NON-NLS-1$
 
 	private static Validator validator;
 
@@ -141,12 +154,6 @@ public class JAXBUtil {
 			value = objectFactory.createTableType();
 			final TableType origin = (TableType) gobject;
 			((TableType) value).setContenttype(origin.getContenttype());
-			// copy all columns with pattern to table
-			for (final ColumnType column : origin.getColumn()) {
-				if (column.getPattern() != null) {
-					((TableType) value).getColumn().add(column);
-				}
-			}
 
 			qName = ILMLCoreConstants.TABLE_ELEMENT;
 		} else if (gobject instanceof UsagebarType) {
@@ -262,13 +269,38 @@ public class JAXBUtil {
 	}
 
 	/**
+	 * Generates the jaxbelement corresponding to the layout instance.
+	 * This element can be marshalled to XML by the marshaller.
+	 * 
+	 * @param rootValue
+	 *            layout instance
+	 * @return jaxbelement, which can be marshalled
+	 */
+	private static JAXBElement<LayoutRoot> createRootLayout(LayoutRoot rootValue) {
+		final QName qname = new QName(SCHEMA_DIRECTORY, SCHEMA_LAYOUT, SCHEMA_LML);
+		return new JAXBElement<LayoutRoot>(qname, LayoutRoot.class, rootValue);
+	}
+
+	/**
+	 * Generates the jaxbelement corresponding to the lgui instance.
+	 * This element can be marshalled to XML by the marshaller.
+	 * 
+	 * @param rootValue
+	 *            lgui instance
+	 * @return jaxbelement, which can be marshalled
+	 */
+	private static JAXBElement<LguiType> createRootLgui(LguiType rootValue) {
+		final QName qname = new QName(SCHEMA_DIRECTORY, SCHEMA_LGUI, SCHEMA_LML);
+		return new JAXBElement<LguiType>(qname, LguiType.class, rootValue);
+	}
+
+	/**
 	 * * Uses the ResourceManagerData schema.
 	 * 
 	 * @return static singleton
 	 * @throws IOException
 	 * @throws SAXException
 	 */
-	@SuppressWarnings("unused")
 	private synchronized static Validator getValidator() throws IOException, SAXException {
 		if (validator == null) {
 
@@ -293,6 +325,13 @@ public class JAXBUtil {
 		try {
 			final JAXBContext jaxbContext = JAXBContext.newInstance(JAXB_CLASSES);
 			marshaller = jaxbContext.createMarshaller();
+			try {
+				marshaller.setProperty(SCHEMA_LOCATION, SCHEMA_DIRECTORY + " " + SCHEMA_FILE); //$NON-NLS-1$
+				marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+			} catch (final PropertyException exc) {
+				// Dont fail just because of missing property
+			}
+
 			unmarshaller = jaxbContext.createUnmarshaller();
 
 		} catch (final JAXBException e) {
@@ -379,6 +418,68 @@ public class JAXBUtil {
 
 	}
 
+	/**
+	 * Adds all layout definitions (splitlayout/abslayout) and all component layout elements
+	 * from the data object to the request.
+	 * 
+	 * @param request
+	 *            LML layout request, which has to be filled
+	 * @param data
+	 *            LML data model
+	 */
+	public void addLayoutTagsToRequest(LayoutRoot request, LguiType data) {
+
+		for (final JAXBElement<?> child : data.getObjectsAndRelationsAndInformation()) {
+			if (child.getValue() instanceof ComponentlayoutType
+					|| child.getValue() instanceof SplitlayoutType
+					|| child.getValue() instanceof AbslayoutType) {
+				request.getTextlayoutAndInfoboxlayoutAndTablelayout().add(child);
+
+				if (child.getValue() instanceof ComponentlayoutType) {
+					((ComponentlayoutType) child.getValue()).setActive(true);
+				}
+			}
+		}
+
+		if (data.getRequest() != null) {
+			request.setRequest(data.getRequest());
+		}
+	}
+
+	/**
+	 * The request is already filled with nodedisplaylayout elements.
+	 * Now the scheme tags of the corresponding nodedisplay tags should be
+	 * transferred to the nodedisplay layout as scheme hints.
+	 * This function adjusts only the nodedisplay layout tags in the request.
+	 * 
+	 * @param request
+	 *            new LML layout
+	 * @param data
+	 *            last LML data
+	 */
+	public void addNodedisplaySchemeHints(LayoutRoot request, LguiType data) {
+		// Find nodedisplays identified by their IDs
+		final Map<String, Nodedisplay> gidToNodedisplay = new HashMap<String, Nodedisplay>();
+		for (final JAXBElement<?> child : data.getObjectsAndRelationsAndInformation()) {
+			if (child.getValue() instanceof Nodedisplay) {
+				final Nodedisplay display = (Nodedisplay) child.getValue();
+				gidToNodedisplay.put(display.getId(), display);
+			}
+		}
+		// Feed nodedisplay layouts with scheme hints
+		for (final JAXBElement<?> child : request.getTextlayoutAndInfoboxlayoutAndTablelayout()) {
+			if (child.getValue() instanceof NodedisplaylayoutType) {
+				final NodedisplaylayoutType layout = (NodedisplaylayoutType) child.getValue();
+				final String gid = layout.getGid();
+				final Nodedisplay display = gidToNodedisplay.get(gid);
+
+				if (display != null) {
+					layout.setSchemehint(display.getScheme());
+				}
+			}
+		}
+	}
+
 	public void addPatternInclude(PatternType pattern, PatternMatchType patternMatch) {
 		pattern.getIncludeAndExcludeAndSelect().add(
 				new JAXBElement<PatternMatchType>(new QName(
@@ -396,6 +497,66 @@ public class JAXBUtil {
 				new JAXBElement<TableType>(new QName(
 						ILMLCoreConstants.TABLE_ELEMENT), TableType.class,
 						table));
+	}
+
+	/**
+	 * The request is already filled with tablelayout elements.
+	 * Now the table layouts have to be filled with contenttype hints.
+	 * These hints are simply copied from the table tags.
+	 * 
+	 * @param request
+	 *            new LML layout
+	 * @param data
+	 *            last LML data
+	 */
+	public void addTableContenttypeHints(LayoutRoot request, LguiType data) {
+		// Find tables identified by their IDs
+		final Map<String, TableType> gidToTable = new HashMap<String, TableType>();
+		for (final JAXBElement<?> child : data.getObjectsAndRelationsAndInformation()) {
+			if (child.getValue() instanceof TableType) {
+				final TableType table = (TableType) child.getValue();
+				gidToTable.put(table.getId(), table);
+			}
+		}
+		// Feed nodedisplay layouts with scheme hints
+		for (final JAXBElement<?> child : request.getTextlayoutAndInfoboxlayoutAndTablelayout()) {
+			if (child.getValue() instanceof TablelayoutType) {
+				final TablelayoutType layout = (TablelayoutType) child.getValue();
+				final String gid = layout.getGid();
+				final TableType table = gidToTable.get(gid);
+
+				if (table != null) {
+					layout.setContenthint(table.getContenttype());
+				}
+			}
+		}
+	}
+
+	/**
+	 * Convert layout object into lgui instance. Each LML layout is
+	 * a subset of an entire LML instance with data. Thus, lml:lgui
+	 * could more or less inherit from lml:layout.
+	 * 
+	 * @param request
+	 *            LML layout request, which has to be filled
+	 * @param data
+	 *            LML data model
+	 */
+	public LguiType convertLayoutToLgui(LayoutRoot request) {
+
+		final LguiType result = new ObjectFactory().createLguiType();
+		result.setLayout(true);
+		result.setVersion(request.getVersion());
+		// Copy all global and specific component layouts
+		for (final JAXBElement<?> child : request.getTextlayoutAndInfoboxlayoutAndTablelayout()) {
+			result.getObjectsAndRelationsAndInformation().add(child);
+		}
+		// Copy request
+		if (request.getRequest() != null) {
+			result.setRequest(request.getRequest());
+		}
+
+		return result;
 	}
 
 	public void getLayoutComponents(LguiType result, LguiType lgui, HashSet<String> components) {
@@ -430,6 +591,11 @@ public class JAXBUtil {
 		}
 	}
 
+	/**
+	 * @param lgui
+	 *            LML instance, whose children have to be extracted
+	 * @return list of value objects of the direct children of the passed lgui instance
+	 */
 	public ArrayList<Object> getObjects(LguiType lgui) {
 		final ArrayList<Object> list = new ArrayList<Object>();
 		for (final JAXBElement<?> element : lgui
@@ -449,23 +615,51 @@ public class JAXBUtil {
 		return selectsList;
 	}
 
+	/**
+	 * Converts layout root element into XML.
+	 * Writes the XML into the output stream.
+	 * 
+	 * @param layout
+	 *            the jaxb instance, which has to be converted into XML
+	 * @param output
+	 *            the output stream, into which the layout is printed
+	 */
+	public void marshal(LayoutRoot layout, OutputStream output) {
+		final StringWriter sw = new StringWriter();
+		marshal(layout, sw);
+		final PrintWriter pw = new PrintWriter(output);
+		pw.print(sw.toString());
+		pw.close();
+	}
+
+	/**
+	 * Converts layout root element into XML.
+	 * Writes the layout into the writer instance.
+	 * 
+	 * @param layout
+	 *            the jaxb instance, which has to be converted into XML
+	 * @param writer
+	 *            the output writer, into which the layout is printed
+	 */
+	public void marshal(LayoutRoot layout, StringWriter writer) {
+		synchronized (LguiItem.class) {
+			try {
+				marshaller.marshal(createRootLayout(layout), writer);
+			} catch (final JAXBException e) {
+			}
+		}
+	}
+
 	public void marshal(LguiType lgui, OutputStream output) {
 		try {
-			marshaller.setProperty(SCHEMA_LOCATION, SCHEMA_DIRECTORY + SCHEMA_FILE);
-			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-			final QName tagname = new QName(SCHEMA_DIRECTORY, SCHEMA_LGUI, SCHEMA_LML);
-
-			final JAXBElement<LguiType> rootElement = new JAXBElement<LguiType>(tagname, LguiType.class, lgui);
 			/*
 			 * Synchronize to avoid the dreaded
 			 * "FWK005 parse may not be called while parsing" message
 			 */
 			synchronized (LguiItem.class) {
-				marshaller.marshal(rootElement, output);
+				marshaller.marshal(createRootLgui(lgui), output);
 			}
 			output.close(); // Must close to flush stream
-		} catch (final PropertyException e) {
-			// TODO ErrorMessage
 		} catch (final IOException e) {
 			// TODO ErrorMessage
 		} catch (final JAXBException e) {
@@ -475,22 +669,14 @@ public class JAXBUtil {
 
 	public void marshal(LguiType lgui, StringWriter writer) {
 		try {
-			marshaller.setProperty(SCHEMA_LOCATION, SCHEMA_DIRECTORY + SCHEMA_FILE);
-			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-			final QName tagname = new QName(SCHEMA_DIRECTORY, SCHEMA_LGUI, SCHEMA_LML);
-
-			final JAXBElement<LguiType> rootElement = new JAXBElement<LguiType>(
-					tagname, LguiType.class, lgui);
 			/*
 			 * Synchronize to avoid the dreaded
 			 * "FWK005 parse may not be called while parsing" message
 			 */
 			synchronized (LguiItem.class) {
-				marshaller.marshal(rootElement, writer);
+				marshaller.marshal(createRootLgui(lgui), writer);
 			}
 
-		} catch (final PropertyException e) {
-			// TODO ErrorMessage
 		} catch (final JAXBException e) {
 			// TODO ErrorMessage
 		}
@@ -601,5 +787,43 @@ public class JAXBUtil {
 			// TODO ErrorMessage
 		}
 		return jaxb.getValue();
+	}
+
+	/**
+	 * Parsing an LML layout file (<lml:layout>...</lml:layout>).
+	 * Validates the input string and returns LayoutRoot instance.
+	 * Tries to create the layout instance even, if validation fails.
+	 * 
+	 * @param string
+	 *            contains entire LML layout file
+	 * @return the generated layout instance
+	 */
+	public LayoutRoot unmarshalLayout(String string) {
+		// Validate input string at first
+		Source source = new StreamSource(new StringReader(string));
+		try {
+			validate(source);
+		} catch (final SAXException e1) {
+			e1.printStackTrace();
+		} catch (final IOException e1) {
+			e1.printStackTrace();
+		} catch (final URISyntaxException e1) {
+			e1.printStackTrace();
+		}
+
+		source = new StreamSource(new StringReader(string));
+		JAXBElement<LayoutRoot> jaxb = null;
+		try {
+			synchronized (LguiItem.class) {
+				jaxb = unmarshaller.unmarshal(source, LayoutRoot.class);
+			}
+		} catch (final JAXBException e) {
+		}
+		if (jaxb == null) {
+			return null;
+		}
+		else {
+			return jaxb.getValue();
+		}
 	}
 }

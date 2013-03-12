@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!---
  Copyright (c) 2011 Forschungszentrum Juelich GmbH.
  All rights reserved. This program and the accompanying materials
@@ -8,16 +9,24 @@
  Contributors:
     Wolfgang Frings (Forschungszentrum Juelich GmbH) 
 -->
-<?xml version="1.0" encoding="UTF-8"?>
-<lml:lgui xmlns:lml="http://www.llview.de" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.llview.de lgui.xsd " version="1.0"> 
+<lml:lgui xmlns:lml="http://eclipse.org/ptp/schemas" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://eclipse.org/ptp/schemas http://eclipse.org/ptp/schemas/lgui.xsd " version="1.0"> 
+
+<objects>
+<object color="#FFFFFF" id="empty" name="Empty job" type="job"/>
+</objects>
 
 <nodedisplaylayout id="nodedisplay" gid="1">
   <el0 rows="16" cols="0">
   </el0>
 </nodedisplaylayout>
 
-<tablelayout id="tl_RUN" gid="joblist_RUN">
+<nodedisplay title="default" id="1">
+  <scheme><el1 min="0" tagname="__empty__"></el1></scheme>
+  <data><el1 min="0" oid="empty"></el1></data>
+</nodedisplay>
+
+<tablelayout id="tl_RUN" gid="org.eclipse.ptp.rm.lml.ui.ActiveJobsView" contenthint="jobs">
  <column cid="1" pos="0" width="0.1" active="true" key="totalcores" />
  <column cid="2" pos="1" width="0.1" active="true" key="owner" />
  <column cid="3" pos="2" width="0.1" active="true" key="queue" />
@@ -26,8 +35,10 @@
  <column cid="6" pos="5" width="0.2" active="true" key="dispatchdate" />
 </tablelayout>
 
+<table id="org.eclipse.ptp.rm.lml.ui.ActiveJobsView" contenttype="jobs"/>
 
-<tablelayout id="tl_WAIT" gid="joblist_WAIT">
+
+<tablelayout id="tl_WAIT" gid="org.eclipse.ptp.rm.lml.ui.InactiveJobsView" contenthint="jobs">
  <column cid="1" pos="0" width="0.3" active="true" key="size_req" />
  <column cid="2" pos="1" width="0.1" active="true" key="owner" />
  <column cid="3" pos="2" width="0.2" active="true" key="queue" />
@@ -35,5 +46,7 @@
  <column cid="5" pos="4" width="0.15" active="true" key="queuedate" />
  <column cid="6" pos="5" width="0.15" active="true" key="name" />
 </tablelayout>
+
+<table id="org.eclipse.ptp.rm.lml.ui.InactiveJobsView" contenttype="jobs"/>
 
 </lml:lgui>

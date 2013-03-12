@@ -56,16 +56,17 @@ sub get_ids {
 sub process {
     my($self) = shift;
     my $layoutref  = shift;
-    my $tableref   = shift;
     my $filehandler_LML  = shift;
     my ($numids,$gid,$contenttype,$idlistref,$objtype_pattern,$patternsref,$selectsref);
     $numids=0;
     $self->{LAYOUT}    = $layoutref; 
-    $self->{TABLE}     = $tableref; 
     $self->{LMLFH}     = $filehandler_LML; 
     
     $gid=$layoutref->{gid};
-    $contenttype=$tableref->{contenttype};
+    $contenttype="jobs";#Default content type
+    if( exists($layoutref->{contenthint}) ){
+    	$contenttype = $layoutref->{contenthint};
+    }
     if(!$contenttype) {
 	print "LML_gen_table: ERROR no contenttype given for table $gid, skipping ...\n";
 	return(-1);
@@ -83,10 +84,10 @@ sub process {
     $self->{OBJTYPE_PATTERN}=$objtype_pattern;
 
     # check pattern
-    $patternsref=$self->_extract_patterns($layoutref,$tableref);
+    $patternsref=$self->_extract_patterns($layoutref);
 
     # check select
-    $selectsref=$self->_extract_selects($layoutref,$tableref);
+    $selectsref=$self->_extract_selects($layoutref);
 
     $idlistref=[];
     print "LML_gen_table::process: gid=$gid contenttype=$contenttype objtype_pattern=$objtype_pattern\n" 
@@ -105,33 +106,29 @@ sub process {
 
 sub _extract_patterns {
     my($self) = shift;
-    my($layoutref,$tableref) = @_;
+    my($layoutref) = @_;
     my(%patterns,$cid,$key,$ptype,$regexp,$ref);
     
     foreach $cid (keys(%{$layoutref->{column}})) {
 	if(exists($layoutref->{column}->{$cid}->{key})) {
 	    $key=$layoutref->{column}->{$cid}->{key};
-	} elsif($tableref->{column}->{$cid}->{key}) {
-	    $key=$tableref->{column}->{$cid}->{key};
 	} else {
 	    print "LML_gen_table: ERROR, could not find key for column $cid of table $layoutref->{gid}, skipping column ...\n";
 	    next;
 	}
 	$patterns{$key}=".*"; # default
-	if(exists($tableref->{column}->{$cid})) {
-	    if(exists($tableref->{column}->{$cid}->{pattern})) {
-		my (@patlist);
-		foreach $ref (@{$tableref->{column}->{$cid}->{pattern}}) {
-		    ($ptype,$regexp)=@{$ref};
-		    if($ptype eq "include") {
-			push(@patlist,"$regexp");
-		    }
-		    if($ptype eq "exclude") {
-			push(@patlist,"($regexp){0}");
-		    }
-		}
-		$patterns{$key}="(".join('|',@patlist).")";
+	if(exists($layoutref->{column}->{$cid}->{pattern})) {
+	my (@patlist);
+	foreach $ref (@{$layoutref->{column}->{$cid}->{pattern}}) {
+	    ($ptype,$regexp)=@{$ref};
+	    if($ptype eq "include") {
+		push(@patlist,"$regexp");
 	    }
+	    if($ptype eq "exclude") {
+		push(@patlist,"($regexp){0}");
+	    }
+	}
+	$patterns{$key}="(".join('|',@patlist).")";
 	}
     }
 #    print "_extract_patterns $layoutref->{gid} -> ",Dumper(\%patterns),"\n";
@@ -140,34 +137,30 @@ sub _extract_patterns {
 
 sub _extract_selects {
     my($self) = shift;
-    my($layoutref,$tableref) = @_;
+    my($layoutref) = @_;
     my(%selects,$cid,$key,$ptype,$rel,$value,$ref);
     
     foreach $cid (keys(%{$layoutref->{column}})) {
-	if(exists($layoutref->{column}->{$cid}->{key})) {
-	    $key=$layoutref->{column}->{$cid}->{key};
-	} elsif($tableref->{column}->{$cid}->{key}) {
-	    $key=$tableref->{column}->{$cid}->{key};
-	} else {
-	    print "LML_gen_table: ERROR, could not find key for column $cid of table $layoutref->{gid}, skipping column ...\n";
-	    next;
-	}
-	$selects{$key}=undef; # default
-	if(exists($tableref->{column}->{$cid})) {
-	    if(exists($tableref->{column}->{$cid}->{pattern})) {
-		my (@selectlist);
-		foreach $ref (@{$tableref->{column}->{$cid}->{pattern}}) {
-		    if($ref->[0] eq "select") {
-			($ptype,$rel,$value)=@{$ref};
-			$rel=&LML_da_util::unescape_special_characters($rel);
-			push(@selectlist,[$rel,$value]);
-		    }
+		if(exists($layoutref->{column}->{$cid}->{key})) {
+		    $key=$layoutref->{column}->{$cid}->{key};
+		} else {
+		    print "LML_gen_table: ERROR, could not find key for column $cid of table $layoutref->{gid}, skipping column ...\n";
+		    next;
 		}
-		if($#selectlist>=0) { 
-		    $selects{$key}=[@selectlist];
+		$selects{$key}=undef; # default
+		if(exists($layoutref->{column}->{$cid}->{pattern})) {
+			my (@selectlist);
+			foreach $ref (@{$layoutref->{column}->{$cid}->{pattern}}) {
+			    if($ref->[0] eq "select") {
+				($ptype,$rel,$value)=@{$ref};
+				$rel=&LML_da_util::unescape_special_characters($rel);
+				push(@selectlist,[$rel,$value]);
+			    }
+			}
+			if($#selectlist>=0) { 
+			    $selects{$key}=[@selectlist];
+			}
 		}
-	    }
-	}
     }
     return(\%selects);
 }
@@ -298,6 +291,9 @@ sub get_lml_table {
     $ds->{id}         = $layoutref->{gid};
     $ds->{title}      = $layoutref->{gid};
     $ds->{contenttype}= $tableref->{contenttype};
+    if(!defined($ds->{contenttype})){
+    	$ds->{contenttype} = $layoutref->{contenthint};
+    }
     $ds->{description}= $tableref->{description} if(exists($tableref->{description}));
     
     # define columns
@@ -322,9 +318,9 @@ sub get_lml_table {
 	$ds->{column}->{$cid}->{sort}          = "date"      if($specref->[0] eq "D");
 	$ds->{column}->{$cid}->{sort}          = "numeric"   if($specref->[0] eq "d");
 	$ds->{column}->{$cid}->{sort}          = "numeric"   if($specref->[0] eq "f");
-	if(exists($tableref->{column}->{$cid})) {
-	    if(exists($tableref->{column}->{$cid}->{pattern})) {
-		foreach $ref (@{$tableref->{column}->{$cid}->{pattern}}) {
+	if(exists($layoutref->{column}->{$cid})) {
+	    if(exists($layoutref->{column}->{$cid}->{pattern})) {
+		foreach $ref (@{$layoutref->{column}->{$cid}->{pattern}}) {
 		    push(@{$ds->{column}->{$cid}->{pattern}},$ref);
 		}
 	    }
@@ -365,6 +361,7 @@ sub get_lml_tablelayout {
 
     $ds->{id}=$layoutref->{id};
     $ds->{gid}=$layoutref->{gid};
+    $ds->{contenthint} = $layoutref->{contenthint};
     $numcolumns=scalar keys(%{$layoutref->{column}});
 
     if($numcolumns>0) {
@@ -393,6 +390,13 @@ sub get_lml_tablelayout {
 	    $ds->{column}->{$cid}->{width}=$layoutref->{column}->{$cid}->{width};
 	    $ds->{column}->{$cid}->{active}=$layoutref->{column}->{$cid}->{active};
 	    $ds->{column}->{$cid}->{sorted}=$layoutref->{column}->{$cid}->{sorted} if (exists ($layoutref->{column}->{$cid}->{sorted}));
+	    if(exists($layoutref->{column}->{$cid})) {
+		    if(exists($layoutref->{column}->{$cid}->{pattern})) {
+			foreach my $ref (@{$layoutref->{column}->{$cid}->{pattern}}) {
+			    push(@{$ds->{column}->{$cid}->{pattern}},$ref);
+			}
+		    }
+		}
 	    $lastcid=$cid if($cid>$lastcid);
 	    $activekeys{$ds->{column}->{$cid}->{key}}++;
 	}

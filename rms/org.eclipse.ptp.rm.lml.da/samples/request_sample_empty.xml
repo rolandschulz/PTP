@@ -11,6 +11,6 @@
     Wolfgang Frings (Forschungszentrum Juelich GmbH) 
 -->
 
-<lml:lgui xmlns:lml="http://www.llview.de"
+<lml:lgui xmlns:lml="http://eclipse.org/ptp/schemas"
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="true"
-version="1" xsi:schemaLocation="http://www.llview.de lgui.xsd"/>
+version="1" xsi:schemaLocation="http://eclipse.org/ptp/schemas http://eclipse.org/ptp/schemas/lgui.xsd"/>

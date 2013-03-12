@@ -14,34 +14,46 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for columnsortedtype.
+ * <p>Java class for content_type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * <p>
  * <pre>
- * &lt;simpleType name="columnsortedtype">
+ * &lt;simpleType name="content_type">
  *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *     &lt;enumeration value="asc"/>
- *     &lt;enumeration value="desc"/>
- *     &lt;enumeration value="false"/>
+ *     &lt;enumeration value="jobs"/>
+ *     &lt;enumeration value="nodes"/>
+ *     &lt;enumeration value="users"/>
+ *     &lt;enumeration value="groups"/>
+ *     &lt;enumeration value="classes"/>
+ *     &lt;enumeration value="queues"/>
+ *     &lt;enumeration value="other"/>
  *   &lt;/restriction>
  * &lt;/simpleType>
  * </pre>
  * 
  */
-@XmlType(name = "columnsortedtype")
+@XmlType(name = "content_type")
 @XmlEnum
-public enum Columnsortedtype {
+public enum ContentType {
 
-    @XmlEnumValue("asc")
-    ASC("asc"),
-    @XmlEnumValue("desc")
-    DESC("desc"),
-    @XmlEnumValue("false")
-    FALSE("false");
+    @XmlEnumValue("jobs")
+    JOBS("jobs"),
+    @XmlEnumValue("nodes")
+    NODES("nodes"),
+    @XmlEnumValue("users")
+    USERS("users"),
+    @XmlEnumValue("groups")
+    GROUPS("groups"),
+    @XmlEnumValue("classes")
+    CLASSES("classes"),
+    @XmlEnumValue("queues")
+    QUEUES("queues"),
+    @XmlEnumValue("other")
+    OTHER("other");
     private final String value;
 
-    Columnsortedtype(String v) {
+    ContentType(String v) {
         value = v;
     }
 
@@ -49,8 +61,8 @@ public enum Columnsortedtype {
         return value;
     }
 
-    public static Columnsortedtype fromValue(String v) {
-        for (Columnsortedtype c: Columnsortedtype.values()) {
+    public static ContentType fromValue(String v) {
+        for (ContentType c: ContentType.values()) {
             if (c.value.equals(v)) {
                 return c;
             }

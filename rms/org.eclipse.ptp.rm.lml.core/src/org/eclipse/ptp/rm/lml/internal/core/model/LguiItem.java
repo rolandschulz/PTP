@@ -38,11 +38,11 @@ import org.eclipse.ptp.rm.lml.core.model.IPattern;
 import org.eclipse.ptp.rm.lml.core.util.JAXBUtil;
 import org.eclipse.ptp.rm.lml.internal.core.elements.CellType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ColumnType;
-import org.eclipse.ptp.rm.lml.internal.core.elements.ComponentlayoutType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.InfoType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.InfodataType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.InformationType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.LayoutRequestType;
+import org.eclipse.ptp.rm.lml.internal.core.elements.LayoutRoot;
 import org.eclipse.ptp.rm.lml.internal.core.elements.LguiType;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectFactory;
 import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectType;
@@ -194,14 +194,14 @@ public class LguiItem implements ILguiItem {
 			System.out.print(ILMLCoreConstants.EMPTY);
 		}
 		lockUpdate = true;
-		LguiType layoutLgui = null;
+		LayoutRoot layout = null;
 		if (lgui == null) {
-			layoutLgui = firstRequest();
+			layout = firstRequest();
 		} else {
-			layoutLgui = getLayoutAccess().getLayoutFromModel();
-			layoutLgui.setRequest(request);
+			layout = getLayoutAccess().generateRequestFromModel();
+			layout.setRequest(request);
 		}
-		jaxbUtil.marshal(layoutLgui, output);
+		jaxbUtil.marshal(layout, output);
 	}
 
 	/*
@@ -407,6 +407,9 @@ public class LguiItem implements ILguiItem {
 	public boolean isEmpty() {
 		final TableHandler handler = getTableHandler();
 		if (handler != null) {
+			if (handler.getTables().size() == 0) {
+				return true;
+			}
 			return handler.getTables().get(0).getRow().size() == 0;
 		}
 		return true;
@@ -472,19 +475,15 @@ public class LguiItem implements ILguiItem {
 	 */
 	@Override
 	public void reloadLastLayout(String layout) {
-		LguiType lguiType = null;
+		LayoutRoot layoutRoot = null;
 		if (layout.length() > 0) {
-			lguiType = jaxbUtil.unmarshal(layout.toString());
+			layoutRoot = jaxbUtil.unmarshalLayout(layout.toString());
 		}
-		if (lguiType != null) {
-			for (final Object object : jaxbUtil.getObjects(lguiType)) {
-				if (object instanceof ComponentlayoutType) {
-					lgui = lguiType;
-					if (listeners.isEmpty()) {
-						createLguiHandlers();
-					}
-					break;
-				}
+		if (layoutRoot != null) {
+			// Transfer layout data into an lgui instance
+			lgui = jaxbUtil.convertLayoutToLgui(layoutRoot);
+			if (listeners.isEmpty()) {
+				createLguiHandlers();
 			}
 		}
 	}
@@ -534,11 +533,11 @@ public class LguiItem implements ILguiItem {
 	public String saveCurrentLayout() {
 
 		final StringWriter writer = new StringWriter();
-		LguiType layoutLgui = null;
+		LayoutRoot layoutLgui = null;
 		if (lgui == null) {
 			layoutLgui = firstRequest();
 		} else {
-			layoutLgui = getLayoutAccess().getLayoutFromModel();
+			layoutLgui = getLayoutAccess().generateRequestFromModel();
 		}
 		jaxbUtil.marshal(layoutLgui, writer);
 		return writer.getBuffer().toString();
@@ -574,7 +573,7 @@ public class LguiItem implements ILguiItem {
 		String s;
 		try {
 			while (null != (s = reader.readLine())) {
-				xmlStream.append(s);
+				xmlStream.append(s + "\n");
 			}
 		} catch (final IOException e) {
 			xmlStream = new StringBuilder();
@@ -587,6 +586,7 @@ public class LguiItem implements ILguiItem {
 				}
 			}
 		}
+
 		if (xmlStream.length() > 0) {
 			lgui = jaxbUtil.unmarshal(xmlStream.toString());
 			if (listeners.isEmpty()) {
@@ -758,21 +758,23 @@ public class LguiItem implements ILguiItem {
 		}
 	}
 
-	private LguiType firstRequest() {
+	/**
+	 * @return default layout instance, if there is no information about the target system
+	 */
+	private LayoutRoot firstRequest() {
 		final ObjectFactory objectFactory = new ObjectFactory();
 
-		final LguiType layoutLgui = objectFactory.createLguiType();
-		layoutLgui.setVersion("1"); //$NON-NLS-1$
-		layoutLgui.setLayout(true);
+		final LayoutRoot result = objectFactory.createLayoutRoot();
+		result.setVersion("1"); //$NON-NLS-1$
 
 		final LayoutRequestType layoutReq = objectFactory.createLayoutRequestType();
 		layoutReq.setGetDefaultData(true);
 
 		request.setLayoutManagement(layoutReq);
 
-		layoutLgui.setRequest(request);
+		result.setRequest(request);
 
-		return layoutLgui;
+		return result;
 	}
 
 	private String generateOid() {

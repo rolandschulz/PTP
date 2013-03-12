@@ -57,14 +57,15 @@ sub new {
 #                                                       ->{pos}
 #                                                       ->{width}
 #                                                       ->{active}
+#														->{pattern}=[ [include, regexp]|
+#                                                               [exclude, regexp]|                
+#                                                               [select,rel,value]  ...]
 #                 {TABLE}->{$id}->{id}
 #                               ->{title}
 #                               ->{column}->{$cid}->{id}
 #                                                 ->{name}
 #                                                 ->{sort}
-#                                                 ->{pattern}=[ [include, regexp]|
-#                                                               [exclude, regexp]|                
-#                                                               [select,rel,value]  ...]
+#                                                 
 #                               ->{row}->{$id}->{cell}->{$cid}->{value}
 #                                                             ->{cid}
 #
@@ -100,9 +101,9 @@ sub init_file_obj {
     my($self) = shift;
     $self->{DATA}->{LMLLGUI}={
 	'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance',
-	'xmlns:lml' => 'http://www.llview.de',
+	'xmlns:lml' => 'http://eclipse.org/ptp/schemas',
 	'version' => '1.0',
-	'xsi:schemaLocation' => 'http://www.llview.de lgui.xsd '
+	'xsi:schemaLocation' => 'http://eclipse.org/ptp/schemas http://eclipse.org/ptp/schemas/lgui.xsd'
 	};
     return(1);
 } 
@@ -269,6 +270,13 @@ sub lml_start {
     my %attr=(@_);
 
 #   print "LML_file_obj: lml_start >$name< ",Dumper(\%attr),"\n";
+
+	if($name =~ /(.*):layout/) {
+	foreach $k (sort keys %attr) {
+	    $o->{LMLLGUI}->{$k}=$attr{$k};
+	}
+	return(1);
+    }
 
     if($name eq "lml:lgui") {
 	foreach $k (sort keys %attr) {
@@ -444,11 +452,11 @@ sub lml_start {
 	return(1);
     }
     if($name eq "pattern") {
-	if($o->{LASTTABLEID}) {
-	    $id=$o->{LASTTABLEID};
+	if($o->{LASTTABLELAYOUTID}) {
+	    $id=$o->{LASTTABLELAYOUTID};
 	    if($o->{LASTCOLUMNID}) {
 		$cid=$o->{LASTCOLUMNID};
-		$o->{LASTPATTERNLIST}=$o->{TABLE}->{$id}->{column}->{$cid}->{pattern}=[];
+		$o->{LASTPATTERNLIST}=$o->{TABLELAYOUT}->{$id}->{column}->{$cid}->{pattern}=[];
 	    }
     	}
 	return(1);
@@ -494,6 +502,7 @@ sub lml_start {
     }
     if($name eq "nodedisplaylayout") {
 	$id=$attr{id};
+	$o->{LASTNODEDISPLAYLAYOUTID}=$id;
 	if(exists($o->{NODEDISPLAYLAYOUT}->{$id})) {
 	    print STDERR "LML_file_obj: WARNING Nodedisplaylayout with id >$id< exists, skipping\n";
 	    return(0);
@@ -512,6 +521,16 @@ sub lml_start {
 	    $o->{NODEDISPLAY}->{$id}->{schemeroot}=LML_ndtree->new("schemeroot");
 	    $o->{NODEDISPLAY}->{$id}->{schemeroot}->{_level}=-1;
 	    push(@{$o->{NODEDISPLAYSTACK}},$o->{NODEDISPLAY}->{$id}->{schemeroot});
+	}
+	return(1);
+    }
+    #Read scheme hint within nodedisplaylayout
+    if($name eq "schemehint") {
+	if($o->{LASTNODEDISPLAYLAYOUTID}) {
+	    $id=$o->{LASTNODEDISPLAYLAYOUTID};
+	    $o->{NODEDISPLAYLAYOUT}->{$id}->{schemehint}=LML_ndtree->new("schemeroot");
+	    $o->{NODEDISPLAYLAYOUT}->{$id}->{schemehint}->{_level}=-1;
+	    push(@{$o->{NODEDISPLAYSTACK}},$o->{NODEDISPLAYLAYOUT}->{$id}->{schemehint});
 	}
 	return(1);
     }
@@ -576,6 +595,9 @@ sub lml_end {
 	pop(@{$o->{NODEDISPLAYSTACK}});
     }
     if($name=~/nodedisplaylayout/) {
+	pop(@{$o->{NODEDISPLAYSTACK}});
+    }
+    if($name=~/schemehint/) {
 	pop(@{$o->{NODEDISPLAYSTACK}});
     }
     if($name=~/nodedisplay/) {
@@ -658,7 +680,7 @@ sub write_lml {
 	    my $table=$self->{DATA}->{TABLE}->{$id};
 	    printf(OUT "<table ");
 	    for $key ("id", "gid","name","contenttype","description","title") {
-		printf(OUT " %s=\"%s\"",$key,  $table->{$key}) if (exists($table->{$key}));
+		printf(OUT " %s=\"%s\"",$key,  $table->{$key}) if (exists($table->{$key}) && defined($table->{$key}));
 	    }
 	    printf(OUT ">\n");
 
@@ -668,22 +690,7 @@ sub write_lml {
 		for $key ("id","name","sort","description","type") {
 		    printf(OUT " %s=\"%s\"",$key,  $table->{column}->{$k}->{$key}) if (exists($table->{column}->{$k}->{$key}));
 		}
-		if(exists($table->{column}->{$k}->{pattern})) {
-		    printf(OUT ">\n");
-		    printf(OUT " <pattern>\n");
-		    foreach $ref (@{$table->{column}->{$k}->{pattern}}) {
-			printf(OUT " <%s regexp=\"%s\"/>\n",$ref->[0],$ref->[1]) if (($ref->[0] eq "include") || ($ref->[0] eq "exclude") );
-			printf(OUT " <%s rel=\"%s\" value=\"%s\"/>\n",
-			       $ref->[0],
-			       &LML_da_util::unescape_special_characters($ref->[1]),
-			       ,$ref->[2]) if (($ref->[0] eq "select") );
-		    }
-		    
-		    printf(OUT " </pattern>\n");
-		    printf(OUT "</column>\n");
-		} else {
-		    printf(OUT "/>\n");
-		}
+		printf(OUT "/>\n");
 	    }
  	    foreach $k (sort keys %{$table->{row}}) {
 		printf(OUT "<row  %s=\"%s\">\n","oid",$k);
@@ -705,8 +712,8 @@ sub write_lml {
 	foreach $id (sort keys %{$self->{DATA}->{TABLELAYOUT}}) {
 	    my $tablelayout=$self->{DATA}->{TABLELAYOUT}->{$id};
 	    printf(OUT "<tablelayout ");
-	    for $key ("id","gid","active") {
-		printf(OUT " %s=\"%s\"",$key,  $tablelayout->{$key}) if (exists($tablelayout->{$key}));
+	    for $key ("id","gid","active","contenthint") {
+		printf(OUT " %s=\"%s\"",$key,  $tablelayout->{$key}) if (exists($tablelayout->{$key}) && defined($tablelayout->{$key}));
 	    }
 	    printf(OUT ">\n");
  	    foreach $k (sort {$a <=> $b} keys %{$tablelayout->{column}}) {
@@ -716,7 +723,22 @@ sub write_lml {
 			printf(OUT " %s=\"%s\"",$key,  $tablelayout->{column}->{$k}->{$key});
 		    }
 		}
-		printf(OUT "/>\n");
+		if(exists($tablelayout->{column}->{$k}->{pattern})) {
+		    printf(OUT ">\n");
+		    printf(OUT " <pattern>\n");
+		    foreach $ref (@{$tablelayout->{column}->{$k}->{pattern}}) {
+			printf(OUT " <%s regexp=\"%s\"/>\n",$ref->[0],$ref->[1]) if (($ref->[0] eq "include") || ($ref->[0] eq "exclude") );
+			printf(OUT " <%s rel=\"%s\" value=\"%s\"/>\n",
+			       $ref->[0],
+			       &LML_da_util::unescape_special_characters($ref->[1]),
+			       ,$ref->[2]) if (($ref->[0] eq "select") );
+		    }
+		    
+		    printf(OUT " </pattern>\n");
+		    printf(OUT "</column>\n");
+		} else {
+		    printf(OUT "/>\n");
+		}
 	    }
 	    printf(OUT "</tablelayout>\n");
 	}
@@ -732,6 +754,11 @@ sub write_lml {
 		printf(OUT " %s=\"%s\"",$key,  $ndlayout->{$key}) if (exists($ndlayout->{$key}));
 	    }
 	    printf(OUT ">\n");
+	    if(defined($ndlayout->{schemehint}) ){
+	    	print OUT "<schemehint>\n";
+	    	print OUT $ndlayout->{schemehint}->get_xml_tree(1);
+	    	print OUT "</schemehint>\n";
+	    }
 	    print OUT $ndlayout->{tree}->get_xml_tree(0);
 	    printf(OUT "</nodedisplaylayout>\n");
 	}

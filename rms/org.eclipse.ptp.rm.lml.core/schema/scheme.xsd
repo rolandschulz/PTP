@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+LML - LLView markup language
+
+
+Copyright (c) 2011-2013 Forschungszentrum Juelich GmbH
+
+All rights reserved. This program and the accompanying materials
+
+are made available under the terms of the Eclipse Public License v1.0
+
+which accompanies this distribution and is available at
+
+http://www.eclipse.org/legal/epl-v10.html
+-->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:lml="http://eclipse.org/ptp/schemas" targetNamespace="http://eclipse.org/ptp/schemas">
+
+	<complexType name="scheme_element">
+		<annotation>
+			<documentation>
+				All el?-tags will be subtypes of this type. Tagname has
+				to be defined here. Data-elements must not repeat this
+				tagname.
+			</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="lml:element_type">
+				<attribute name="tagname" type="NCName" />
+				<attribute default="%d-" name="mask">
+					<annotation>
+						<documentation>
+							If mask is not defined, default-mask is
+							"%d-". To separate name-parts of implicit
+							names use the length of the mask or a given
+							separator. An unidentifying mask like "%d"
+							is not allowed.
+						</documentation>
+					</annotation>
+					<simpleType>
+						<restriction base="string">
+							<pattern
+								value="(([^%])*%(\-|\+|\s|#)*0(\-|\+|\s|#)*(\d)+d([^%])*)|(([^%])*%(\-|\+|\s|#)*d([^%\d])+)|(([^%])*%(\-|\+|\s|#)*1d([^%])*)">
+							</pattern>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute default="1" name="step" type="positiveInteger">
+					<annotation>
+						<documentation>
+							default-step-width is 1. This is the value,
+							which is set, if step is not defined.
+						</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="map" type="lml:namemapping_type">
+					<annotation>
+						<documentation>Map names as implicit names to these components.
+							mask and map can not be used together. map defines special names
+							for all elements within this list. names must be separated by
+							commas.</documentation>
+					</annotation>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+	
+	<complexType name="scheme_element1">
+    	<complexContent>
+    		<extension base="lml:scheme_element">
+    			<sequence>
+    				<element maxOccurs="unbounded" minOccurs="0" name="el2" type="lml:scheme_element2"/>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+    
+    <complexType name="scheme_element10">
+    	<complexContent>
+    		<extension base="lml:scheme_element"/>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="scheme_element9">
+    	<complexContent>
+    		<extension base="lml:scheme_element">
+    			<sequence>
+    				<element maxOccurs="unbounded" minOccurs="0" name="el10" type="lml:scheme_element10"/>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="scheme_element8">
+    	<complexContent>
+    		<extension base="lml:scheme_element">
+    			<sequence>
+    				<element maxOccurs="unbounded" minOccurs="0" name="el9" type="lml:scheme_element9"/>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="scheme_element7">
+    	<complexContent>
+    		<extension base="lml:scheme_element">
+    			<sequence>
+    				<element maxOccurs="unbounded" minOccurs="0" name="el8" type="lml:scheme_element8"/>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="scheme_element6">
+    	<complexContent>
+    		<extension base="lml:scheme_element">
+    			<sequence>
+    				<element maxOccurs="unbounded" minOccurs="0" name="el7" type="lml:scheme_element7"/>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="scheme_element5">
+    	<complexContent>
+    		<extension base="lml:scheme_element">
+    			<sequence>
+    				<element maxOccurs="unbounded" minOccurs="0" name="el6" type="lml:scheme_element6"/>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="scheme_element4">
+    	<complexContent>
+    		<extension base="lml:scheme_element">
+    			<sequence>
+    				<element maxOccurs="unbounded" minOccurs="0" name="el5" type="lml:scheme_element5"/>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="scheme_element3">
+    	<complexContent>
+    		<extension base="lml:scheme_element">
+    			<sequence>
+    				<element maxOccurs="unbounded" minOccurs="0" name="el4" type="lml:scheme_element4"/>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="scheme_element2">
+    	<complexContent>
+    		<extension base="lml:scheme_element">
+    			<sequence>
+    				<element maxOccurs="unbounded" minOccurs="0" name="el3" type="lml:scheme_element3"/>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+	
+
+	<complexType name="element_type">
+		<annotation>
+			<documentation>
+				Abstract element type for either scheme- or
+				data-elements. This element is repeated (max-min+1)
+				times, if step in the scheme-section is 1. max should be
+				higher then min. If max is left out, max will be set to
+				min (max=min). min="0", max="0" means there is only one
+				element.
+			</documentation>
+		</annotation>
+		<attribute name="min" type="nonNegativeInteger">
+			<annotation>
+				<documentation>
+					Defines a list of elements. In default-case (count
+					is not defined) count is set to one.
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="max" type="nonNegativeInteger" />
+		<attribute name="list" type="lml:list_type" />
+	</complexType>
+
+	<simpleType name="namemapping_type">
+		<annotation>
+			<documentation>This type is used to map special names to elements of
+				the nodedisplay. Usually a digit has to be printed with a
+				mask-atttribute, but if the name does not contain a digit, this type
+				will be used to define those special names.</documentation>
+		</annotation>
+		<restriction base="string">
+			<pattern value=".*(,.*)*" />
+		</restriction>
+	</simpleType>
+
+	<simpleType name="list_type">
+		<annotation>
+			<documentation>Type for list-attribute in scheme- or data-tag. It
+				allowes the definition of several positive integer-values seperated
+				by commas.</documentation>
+		</annotation>
+		<restriction base="string">
+			<pattern value="\s*\d+\s*(\s*,\s*\d+)*" />
+		</restriction>
+	</simpleType>
+	
+	<complexType name="scheme_type">
+		<annotation>
+			<documentation>Scheme description of batch-system. Describes an empty
+				instance of the actual batch system.</documentation>
+		</annotation>
+		<sequence>
+			<element maxOccurs="unbounded" minOccurs="1" name="el1"
+				type="lml:scheme_element1" />
+		</sequence>
+	</complexType>
+
+</schema>

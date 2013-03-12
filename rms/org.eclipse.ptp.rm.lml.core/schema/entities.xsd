@@ -3,7 +3,7 @@
 LML - LLView markup language
 
 
-Copyright (c) 2011 Forschungszentrum Juelich GmbH
+Copyright (c) 2011-2013 Forschungszentrum Juelich GmbH
 
 All rights reserved. This program and the accompanying materials
 
@@ -13,7 +13,7 @@ which accompanies this distribution and is available at
 
 http://www.eclipse.org/legal/epl-v10.html
 -->
-<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:lml="http://www.llview.de" targetNamespace="http://www.llview.de">
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:lml="http://eclipse.org/ptp/schemas" targetNamespace="http://eclipse.org/ptp/schemas">
 
 
     <include schemaLocation="colors.xsd"/>
