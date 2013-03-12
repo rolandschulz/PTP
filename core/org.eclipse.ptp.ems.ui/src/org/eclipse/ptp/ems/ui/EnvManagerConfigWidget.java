@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 University of Illinois and others.
+ * Copyright (c) 2012, 2013 University of Illinois and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *    Jeff Overbey (Illinois) - initial API and implementation
+ *    Chris Navarro (Illinois) - fix for Bug 394121
  *******************************************************************************/
 package org.eclipse.ptp.ems.ui;
 
@@ -127,10 +128,12 @@ public final class EnvManagerConfigWidget extends Composite {
 				stackLayout.topControl = envConfigTextbox;
 			} else {
 				stackLayout.topControl = envConfigChecklist;
+				stack.setSize(envConfigChecklist.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 			}
 		} else {
 			stackLayout.topControl = noEnvConfigLabel;
 		}
+		stack.getParent().layout();
 		stack.layout();
 	}
 
@@ -163,7 +166,7 @@ public final class EnvManagerConfigWidget extends Composite {
 
 	private void createStack(Composite composite) {
 		stack = new Composite(composite, SWT.NONE);
-		stack.setLayoutData(new GridData(GridData.FILL_BOTH));
+		stack.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		stackLayout = new StackLayout();
 		stack.setLayout(stackLayout);
 	}
