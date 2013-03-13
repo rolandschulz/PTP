@@ -939,6 +939,24 @@
 						</layout-data>
 						<tooltip>${ptp_rm:LSF_NORERUN_SYS_FAILURE#tooltip}</tooltip>
 					</widget>
+																															
+					<!-- LSF_MPI_COMMAND: MPI application invocation command -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_MPI_COMMAND#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="combo" readOnly="true" attribute="LSF_MPI_COMMAND" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_MPI_COMMAND#tooltip}</tooltip>
+					</widget>
 																						
 					<!-- LSF_OTHER_OPTIONS: Other LSF bsub options -->
 					<widget type="label" style="SWT.LEFT">
@@ -957,24 +975,7 @@
 						</layout-data>
 						<tooltip>${ptp_rm:LSF_OTHER_OPTIONS#tooltip}</tooltip>
 					</widget>
-																											
-					<!-- LSF_MPI_COMMAND: MPI application invocation command -->
-					<widget type="label" style="SWT.LEFT">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING"
-								grabExcessHorizontal="false" />
-						</layout-data>
-						<fixed-text>${ptp_rm:LSF_MPI_COMMAND#description}
-						</fixed-text>
-					</widget>
-					
-					<widget type="combo" readOnly="true" attribute="LSF_MPI_COMMAND" style="SWT.BORDER">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING"
-								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
-						</layout-data>
-						<tooltip>${ptp_rm:LSF_MPI_COMMAND#tooltip}</tooltip>
-					</widget>
+	
 				</composite>
 			</dynamic>
 			
