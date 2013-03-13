@@ -8,27 +8,56 @@
 </head>
 <body>
 
-	<h1 id="top">LSF</h1>
-	<p>This section describes how to set up a run configuration using
+	<h1 id="top">IBM Platform LSF</h1>
+	<p>This section describes how to set up and use a run configuration using
 		IBM Platform Load Sharing Facility (LSF) as a target system
 		configuration to support batch LSF job submission.
-	<p>This target system configuration assumes the user has set up his
-		login shell to run the profile.lsf shell script or equivalent so that
-		the LSF environment is set up for running LSF commands.
-	<p>
-		<img src="../images/rms-lsf1.png">
-		<p>Current implementation allows job submission parameters to be specifed on the single
-		<b>Job submission </b> tab as shown below.
-			<p>
-		<img src="../images/rms-lsf2.png">
-
-	<p>
-		Now continue with the <a href="../03pRunConfig.html#application">run
-			configuration setup for running your parallel application</a> by
-		specifying the Application program on the <b>Application</b> tab, and
-		any other information required.
-	<p>&nbsp
-	<p>
+	</p>
+	<h2 id="config">Initial Setup</h2>
+	<p>The user account that you will be submitting jobs to on the remote system must include an invocation of profile.lsf, 
+		cshrc.lsf or perl.lsf as part of the login shell script, depending on that account's shell command processor. By invoking 
+		the appropriate script, you ensure that the account is set up for PTP to run LSF commands.</p>
+	<p>In addition, when you define the connection to the remote host, make sure the <b>Use login shell</b> checkbox
+		 in the <b>Generic Remote Host</b> dialog is checked. Note that this dialog opens in simplified mode. 
+		 In order to check the <b>Use login shell</b> checkbox, you must click the <b>Advanced</b> button then check the 
+		 checkbox.
+	</p>
+	<img src="../images/rms-lsf0.png">
+	<h2>Submitting a Batch Job</h2>
+	<p>To submit a batch job, use the <b>Run</b> menu or the 
+		<b>run</b> icon to select an existing run configuration or to create a new run configuration. The run configuration should be a 
+		<b>Parallel Application</b> run configuration.</p>
+	<p>Next, select the <b>LSF-Generic-Batch</b> option from the Target System Configuration drop down widget.</p>
+	<p>Then select the connection for the remote system from the <b>Connection name</b> drop down widget or click the <b>New</b>
+	 	button to create a new connection to the remote system.</p>
+	<img src="../images/rms-lsf1.png"><br>
+		
+	<p>After you have selected the LSF target system configuration and the connection, the resources tab of the run
+	   configuration dialog will be populated with a set of tabbed panes where you fill in the values for any LSF job 
+	   submission parameters you need.
+	</p>
+	<img src="../images/rms-lsf3.png">
+	<p>The LSF job submission options are organized into several tabbed panes</p>
+	<ul>
+		<li><b>Job Submission</b>, such as job queue, job name, and login shell</li>
+		<li><b>Scheduling</b>, such as dependencies, requested dispatch time, and reservation id</li>
+		<li><b>Resources</b>, such as host names and number of processors</li>
+		<li><b>Limits</b>, such as CPU time limit, file size limit, and memory limit</li>
+		<li><b>I/O</b>, specifying handling for stdin, stdout and stderr</li>
+		<li><b>Notifications</b>, specifying notifications for job dispatch and completion</li>
+	</ul>
+	<p>In addition, the <b>Advanced</b> tab displays a list of all LSF job submission options where you can also fill 
+	   in the values you need.</p>
+	<img src="../images/rms-lsf2.png">
+	<p>The <b>Job Queue</b> and <b>Application Profile</b> options on the <b>Job Submission</b> tab and the
+	   <b>Reservation ID</b> on the <b>Scheduling</b> tab are comprised of a text entry field and a <b>List</b>
+	   button. You can either fill in the value in the text entry field or click the <b>List</b> button to get a dialog where
+	   you can select from one of the available choices.</p>
+	<p>The selection dialog displayed when you click the <b>List</b> button looks like the following image</p>
+	<img src="../images/rms-lsf4.png">
+	<p>You select a value from the dialog by clicking the entry in the left column and clicking the <b>OK</b>button.</p>
+	<p>Once you have filled in the values in the <b>Resources</b> tab, fill in in the remaining tabs as needed and click the <b>Run</b> button. </p>
+	
 		<a href="#top">Back to Top</a> | <a href="../toc.html">Back to
 			Table of Contents</a>
 </body>
