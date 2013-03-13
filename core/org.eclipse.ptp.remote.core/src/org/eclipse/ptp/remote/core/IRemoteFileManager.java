@@ -20,7 +20,7 @@ public interface IRemoteFileManager {
 	 * Get the resource associated with path. IFileStore can then be used to
 	 * perform operations on the file.
 	 * 
-	 * The remote connection does not need to be open to used this method, but
+	 * The remote connection does not need to be open to use this method, but
 	 * subsequent operations on the IFileStore that access the underlying remote
 	 * filesystem may require the connection to be open.
 	 * 
