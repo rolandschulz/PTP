@@ -99,8 +99,6 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	private final Map<IJobControl, IRMLaunchConfigurationDynamicTab> fDynamicTabs = new HashMap<IJobControl, IRMLaunchConfigurationDynamicTab>();
 	private final ContentsChangedListener launchContentsChangedListener = new ContentsChangedListener();
 
-	private final String PLEASE_SELECT_MSG = Messages.ResourcesTab_pleaseSelectTargetSystem;
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -154,7 +152,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		fSystemTypeCombo = new Combo(comp, SWT.NONE);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		fSystemTypeCombo.setLayoutData(gd);
-		fSystemTypeCombo.add(PLEASE_SELECT_MSG);
+		fSystemTypeCombo.add(Messages.ResourcesTab_pleaseSelectTargetSystem);
 		String[] configNames = JAXBExtensionUtils.getConfiguationNames();
 		if (JAXBExtensionUtils.getInvalid() != null) {
 			MessageDialog.openError(Display.getCurrent().getActiveShell(), Messages.ResourcesTab_InvalidConfig_title,
@@ -182,7 +180,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		fSystemTypeCombo.select(0);
 
 		// select the default message; thus if user types a filter string immediately, it will replace it
-		fSystemTypeCombo.setSelection(new Point(0, PLEASE_SELECT_MSG.length()));
+		fSystemTypeCombo.setSelection(new Point(0, Messages.ResourcesTab_pleaseSelectTargetSystem.length()));
 
 		fRemoteConnectionWidget = new RemoteConnectionWidget(comp, SWT.NONE, null, getLaunchConfigurationDialog());
 		fRemoteConnectionWidget.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
@@ -207,9 +205,9 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 *            the combo box itself (could be extended to other controls)
 	 */
 	private void enableContentProposal(Combo combo) {
-		final String LOWER_ALPHA = "abcdefghijklmnopqrstuvwxyz";
+		final String LOWER_ALPHA = "abcdefghijklmnopqrstuvwxyz"; //$NON-NLS-1$
 		final String UPPER_ALPHA = LOWER_ALPHA.toUpperCase();
-		final String NUMBERS = "0123456789";
+		final String NUMBERS = "0123456789"; //$NON-NLS-1$
 
 		final int keynoCTRL = new Integer(SWT.CTRL).intValue();
 		final int keynoSPACE = new Integer(' ').intValue();
@@ -562,7 +560,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			// First "Please select" message, or an invalid (probably user-typed) selection has been made.
 			fRemoteConnectionWidget.setEnabled(false);
 			// if first one or an invalid one is selected, select its text to ease typing a filter string to replace it
-			fSystemTypeCombo.setSelection(new Point(0, PLEASE_SELECT_MSG.length()));
+			fSystemTypeCombo.setSelection(new Point(0, Messages.ResourcesTab_pleaseSelectTargetSystem.length()));
 		}
 	}
 
@@ -637,7 +635,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	private boolean isTSCselectionValid() {
 		String selected = fSystemTypeCombo.getText();
 		boolean result = false;
-		if (!fSystemTypeCombo.getText().equals(PLEASE_SELECT_MSG)) {
+		if (!fSystemTypeCombo.getText().equals(Messages.ResourcesTab_pleaseSelectTargetSystem)) {
 			for (String s : fSystemTypeCombo.getItems()) {
 				if (selected.equals(s)) {
 					result = true;
