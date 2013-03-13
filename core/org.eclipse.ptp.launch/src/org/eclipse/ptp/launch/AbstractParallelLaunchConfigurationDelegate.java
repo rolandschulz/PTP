@@ -561,7 +561,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			 */
 			control.start(subMon.newChild(10));
 
-			if (!mode.equals(ILaunchManager.DEBUG_MODE)) {
+			if (!mode.equals(ILaunchManager.DEBUG_MODE) && LaunchUtils.getSystemType(launch.getLaunchConfiguration()) != null) {
 				IMonitorControl monitor = MonitorControlManager.getInstance().getMonitorControl(control.getControlId());
 				if (monitor == null) {
 					if (switchPerspective(ILMLUIConstants.ID_SYSTEM_MONITORING_PERSPECTIVE,
@@ -590,7 +590,8 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			JobManager.getInstance().addListener(control.getControlId(), fJobListener);
 			String jobId = control.submitJob(launch.getLaunchConfiguration(), mode, subMon.newChild(10));
 			if (subMon.isCanceled()) {
-				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(), Messages.AbstractParallelLaunchConfigurationDelegate_Launch_was_cancelled));
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
+						Messages.AbstractParallelLaunchConfigurationDelegate_Launch_was_cancelled));
 			}
 			if (control.getJobStatus(jobId, subMon.newChild(10)).equals(IJobStatus.UNDETERMINED)) {
 				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),

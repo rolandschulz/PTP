@@ -47,7 +47,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
@@ -200,8 +199,6 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		final ScrolledComposite scrollComp = createLaunchAttributeControlComposite(comp, numColumns);
 		setLaunchAttrsScrollComposite(scrollComp);
 	}
-
-
 
 	/**
 	 * Enable content-assist-like completion/filtering of TSC type by typing
@@ -356,12 +353,14 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			LaunchUtils.setResourceManagerUniqueName(configuration, fLaunchControl.getControlId());
 			LaunchUtils.setConnectionName(configuration, fLaunchControl.getConnectionName());
 			LaunchUtils.setRemoteServicesId(configuration, fLaunchControl.getRemoteServicesId());
+			String type = null;
 			if (fLaunchControl.getConfiguration() != null) {
 				MonitorType monitorData = fLaunchControl.getConfiguration().getMonitorData();
 				if (monitorData != null) {
-					LaunchUtils.setSystemType(configuration, monitorData.getSchedulerType());
+					type = monitorData.getSchedulerType();
 				}
 			}
+			LaunchUtils.setSystemType(configuration, type);
 			IRMLaunchConfigurationDynamicTab dynamicTab = getLaunchConfigurationDynamicTab(fLaunchControl);
 			if (dynamicTab == null) {
 				setErrorMessage(NLS.bind(Messages.ResourcesTab_No_Launch_Configuration, new Object[] { fLaunchControl
