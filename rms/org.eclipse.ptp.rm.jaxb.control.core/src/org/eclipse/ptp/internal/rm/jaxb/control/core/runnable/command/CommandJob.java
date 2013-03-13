@@ -190,10 +190,7 @@ public class CommandJob extends Job implements ICommandJob {
 	private final ILaunchController control;
 	private final ICommandJobStreamsProxy proxy;
 	private final IVariableMap rmVarMap;
-	private final int flags;
-	private final boolean waitForId;
 	private final JobMode jobMode;
-	private final boolean keepOpen;
 	private final ILaunchConfiguration launchConfig;
 	private final String launchMode;
 	private final List<Job> cmdJobs = new ArrayList<Job>();
@@ -236,11 +233,7 @@ public class CommandJob extends Job implements ICommandJob {
 		this.rmVarMap = map;
 		this.uuid = jobUUID;
 		this.proxy = new CommandJobStreamsProxy();
-		this.waitForId = command.isWaitForId();
 		this.error = new StringBuffer();
-		this.keepOpen = command.isKeepOpen();
-		String flags = command.getFlags();
-		this.flags = getFlags(flags);
 	}
 
 	/**
@@ -264,7 +257,7 @@ public class CommandJob extends Job implements ICommandJob {
 
 			process = null;
 			try {
-				process = builder.start(flags);
+				process = builder.start(getFlags(command.getFlags()));
 			} catch (IOException t) {
 				return CoreExceptionUtils.getErrorStatus(Messages.CouldNotLaunch + builder.command(), t);
 			}
@@ -281,7 +274,7 @@ public class CommandJob extends Job implements ICommandJob {
 
 			int exit = 0;
 			if (uuid != null) {
-				if (!waitForId) {
+				if (!command.isWaitForId()) {
 					try {
 						exit = process.exitValue();
 					} catch (Throwable t) {
@@ -293,7 +286,7 @@ public class CommandJob extends Job implements ICommandJob {
 					return Status.OK_STATUS;
 				}
 
-				if (keepOpen) {
+				if (command.isKeepOpen()) {
 					return Status.OK_STATUS;
 				}
 			}
@@ -736,10 +729,10 @@ public class CommandJob extends Job implements ICommandJob {
 		 * should have their jobId tokenizers set a RUNNING state.
 		 */
 		jobStatus = null;
-		String waitUntil = keepOpen ? IJobStatus.RUNNING : IJobStatus.SUBMITTED;
-		ICommandJob parent = keepOpen ? this : null;
+		String waitUntil = command.isKeepOpen() ? IJobStatus.RUNNING : IJobStatus.SUBMITTED;
+		ICommandJob parent = command.isKeepOpen() ? this : null;
 
-		if (waitForId) {
+		if (command.isWaitForId()) {
 			jobStatus = new CommandJobStatus(parent, control, rmVarMap, launchMode);
 			jobStatus.setOwner(rmVarMap.getString(JAXBControlConstants.CONTROL_USER_NAME));
 			jobStatus.setQueueName(rmVarMap.getString(JAXBControlConstants.CONTROL_QUEUE_NAME));
@@ -758,7 +751,7 @@ public class CommandJob extends Job implements ICommandJob {
 				return Status.OK_STATUS;
 			}
 		} else {
-			if (!keepOpen) {
+			if (!command.isKeepOpen()) {
 				runStatus = joinConsumers();
 				if (!runStatus.isOK()) {
 					return Status.OK_STATUS;
@@ -818,7 +811,7 @@ public class CommandJob extends Job implements ICommandJob {
 			} else {
 				terminate();
 			}
-		} else if (keepOpen && IJobStatus.CANCELED.equals(jobStatus.getStateDetail())) {
+		} else if (command.isKeepOpen() && IJobStatus.CANCELED.equals(jobStatus.getStateDetail())) {
 			terminate();
 		}
 		return Status.OK_STATUS;
@@ -967,7 +960,7 @@ public class CommandJob extends Job implements ICommandJob {
 	 * @return whether to wait
 	 */
 	public boolean waitForId() {
-		return waitForId;
+		return command.isWaitForId();
 	}
 
 	/**

@@ -1204,11 +1204,6 @@ public class LaunchController implements ILaunchController {
 	private void updateAttributeValues(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor)
 			throws CoreException {
 		/*
-		 * Add launch mode attribute
-		 */
-		getRMVariableMap().maybeAddAttribute(JAXBControlConstants.LAUNCH_MODE, mode, false);
-
-		/*
 		 * Update attributes from launch configuration
 		 */
 		Map<String, Object> lcattr = RMVariableMap.getValidAttributes(configuration);
@@ -1232,6 +1227,11 @@ public class LaunchController implements ILaunchController {
 				}
 			}
 		}
+
+		/*
+		 * Add launch mode attribute or update it if present
+		 */
+		getRMVariableMap().maybeAddAttribute(JAXBControlConstants.LAUNCH_MODE, mode, false);
 
 		/*
 		 * make sure these fixed properties are included
