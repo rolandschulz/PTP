@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etfwTool xmlns="http://org.eclipse.ptp/etfw" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rm="http://eclipse.org/ptp/schemas"
+	xsi:schemaLocation="etfw_tool_type.xsd" name="ppw_upc">
+
+	<controlData>
+	</controlData>
+
+	<buildTool tool-name="PPW Compiler Wrapper - UPC">
+		<all-compilers tool-group="ppw">
+			<toolPanes virtual="false" embedded="false">
+				<configId>PPW.options.configuration_id_</configId>
+				<configVarId>PPW.options.environmentvariables.configuration_id_</configVarId>
+				<!-- <toolName>PPW Compiler Wrapper - UPC</toolName> -->
+				<optionPane>
+					<rm:title>PPW Compiler Wrapper - UPC</rm:title>
+					<rm:layout>
+						<rm:grid-layout />
+					</rm:layout>
+					<rm:composite>
+						<rm:layout>
+							<rm:grid-layout numColumns="1" makeColumnsEqualWidth="true" />
+						</rm:layout>
+						<rm:layout-data>
+							<rm:grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="true" />
+						</rm:layout-data>
+						<rm:widget type="checkbox" title="Instrument functions" style="SWT.LEFT" attribute="">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Record data for shared-local accesses" style="SWT.LEFT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Use polite synchronization" style="SWT.LEFT" attribute="">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+					</rm:composite>
+				</optionPane>
+			</toolPanes>
+		</all-compilers>
+	</buildTool>
+	<execTool tool-name="PPW Program Run - UPC">
+		<global>
+			<toolPanes virtual="false" embedded="false">
+				<optionPane>
+					<rm:title>PPW Program Run - UPC</rm:title>
+					<rm:layout>
+						<rm:grid-layout />
+					</rm:layout>
+					<rm:composite>
+						<rm:layout>
+							<rm:grid-layout numColumns="3" makeColumnsEqualWidth="false" />
+						</rm:layout>
+						<rm:layout-data>
+							<rm:grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="true" />
+						</rm:layout-data>
+						<rm:widget type="checkbox" title="Enable tracing" style="SWT.LEFT" attribute="">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Trace buffer size" buttonId="PPW_TRACEBUFFERSIZE" style="SWT.LEFT" attribute="">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="text" style="SWT.BORDER" attribute="">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if button="PPW_TRACEBUFFERSIZE" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Collect communication statistics" style="SWT.LEFT" attribute="">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Collect per-line communication statistics" style="SWT.LEFT" attribute="">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+						</rm:widget>
+					</rm:composite>
+				</optionPane>
+			</toolPanes>
+		</global>
+
+	</execTool>
+</etfwTool>

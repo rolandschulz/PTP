@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ptp.rm.jaxb.control.ui.widget">
+      <widget
+            id="tau-makefile"
+            updateModelClass="org.eclipse.ptp.etfw.tau.ui.model.MakefileComboUpdateModel"
+            widgetClass="org.eclipse.ptp.etfw.tau.ui.TAUMakefileCombo">
+      </widget>
+      <widget
+            id="papi"
+            updateModelClass="org.eclipse.ptp.etfw.tau.ui.model.PapiDialogUpdateModel"
+            widgetClass="org.eclipse.ptp.etfw.tau.ui.PapiOptionDialog">
+      </widget>
+      <widget
+            id="performance-database"
+            updateModelClass="org.eclipse.ptp.etfw.tau.ui.model.PerformanceDatabaseComboModel"
+            widgetClass="org.eclipse.ptp.etfw.tau.ui.PerformanceDatabaseCombo">
+      </widget>
+   </extension>
+
+</plugin>

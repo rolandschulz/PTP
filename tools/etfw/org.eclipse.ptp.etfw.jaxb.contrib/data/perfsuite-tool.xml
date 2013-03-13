@@ -1,0 +1,215 @@
+<etfwTool xmlns="http://org.eclipse.ptp/etfw" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rm="http://eclipse.org/ptp/schemas"
+	xsi:schemaLocation="etfw_tool_type.xsd" name="perfsuite" prepend-execution="false" recompile="false" explicit-execution="false">
+	<controlData>
+		<attribute name="PERFSUITE_psrun.configuration_id_-CONFIG" type="boolean" translateBooleanAs="-c, ">
+			<rm:description>Specify configuration file</rm:description>
+			<rm:default>
+			</rm:default>
+		</attribute>
+		<attribute name="PERFSUITE_psrun.configuration_id_-CONFIG_SAVED" type="string">
+			<rm:description>Specified configuration file</rm:description>
+		</attribute>
+		<attribute name="PERFSUITE_psrun.configuration_id_-DOMAIN" type="boolean" translateBooleanAs="-d, ">
+			<rm:description>Specify domain</rm:description>
+			<rm:default>
+			</rm:default>
+		</attribute>
+		<attribute name="PERFSUITE_psrun.configuration_id_-DOMAIN_SAVED" type="choice">
+			<rm:description>Specified domain</rm:description>
+			<rm:choice>user,kernel,all</rm:choice>
+			<rm:default>user</rm:default>
+		</attribute>
+		<attribute name="PERFSUITE_psrun.environmentvariables.configuration_id_PS_HWPC_FORMAT" type="choice">
+			<rm:description>Specify the output format (xml or plain text)</rm:description>
+			<rm:choice>xml,text</rm:choice>
+			<rm:default>xml</rm:default>
+		</attribute>
+		<attribute name="PERFSUITE_psrun.configuration_id_-MD5" type="boolean" translateBooleanAs="--md5, ">
+			<rm:description>Include MD5 checksums in output</rm:description>
+			<rm:default>
+			</rm:default>
+		</attribute>
+		<!-- This could be specified as an environment variable or flag passed to psrun <attribute name="PERFSUITE_psrun.environmentvariables.configuration_id_PS_HWPC_DOMAIN" 
+			type="choice"> <rm:description>Domain to use (user|kernal|all)</rm:description> <rm:choice>user,kernel,all</rm:choice> <rm:default>user</rm:default> 
+			</attribute> -->
+		<attribute name="PERFSUITE_psrun.configuration_id_-POSIX" type="boolean" translateBooleanAs="-p, ">
+			<rm:description>Enable POSIX thread support</rm:description>
+			<rm:default>
+			</rm:default>
+		</attribute>
+		<attribute name="PERFSUITE_psrun.configuration_id_-RESOURCE_USAGE" type="boolean" translateBooleanAs="--resource=, ">
+			<rm:description>Collect resource usage</rm:description>
+			<rm:default>
+			</rm:default>
+		</attribute>
+		<attribute name="PERFSUITE_psrun.configuration_id_-RESOURCE_USAGE_SAVED" type="string">
+			<rm:description>Resource usage collection rate</rm:description>
+			<rm:default>1</rm:default>
+		</attribute>
+		<attribute name="PERFSUITE_psrun.configuration_id_-RESOURCE_USAGE_ONLY" type="boolean" translateBooleanAs="--resourceonly=, ">
+			<rm:description>Collect resource usage only</rm:description>
+			<rm:default>
+			</rm:default>
+		</attribute>
+		<attribute name="PERFSUITE_psrun.configuration_id_-RESOURCE_USAGE_ONLY_SAVED" type="string">
+			<rm:description>Resource usage collection rate</rm:description>
+			<rm:default>1</rm:default>
+		</attribute>
+		<attribute name="PERFSUITE_psrun.configuration_id_-SIGNAL_NUMBERS" type="boolean" translateBooleanAs="-S, ">
+			<rm:description>Write Signal Numbers</rm:description>
+			<rm:default>
+			</rm:default>
+		</attribute>
+		<attribute name="PERFSUITE_psrun.configuration_id_-SIGNAL_NUMBERS_SAVED" type="string">
+			<rm:description>Signal numbers to be written prior to process exit</rm:description>
+		</attribute>
+		<attribute name="PERFSUITE_psrun.configuration_id_-OVERFLOW_THRESHOLD" type="boolean" translateBooleanAs="-t, ">
+			<rm:description>Specify overflow threshold</rm:description>
+			<rm:default>
+			</rm:default>
+		</attribute>
+		<attribute name="PERFSUITE_psrun.configuration_id_-OVERFLOW_THRESHOLD_SAVED" type="string">
+			<rm:description>Overflow threshold</rm:description>
+		</attribute>
+	</controlData>
+	<execTool tool-name="PerfSuite">
+		<execUtils tool-command="psrun">
+			<toolPanes virtual="false" embedded="false">
+				<configId>PERFSUITE_psrun.configuration_id_</configId>
+				<configVarId>PERFSUITE_psrun.environmentvariables.configuration_id_</configVarId>
+				<optionPane>
+					<rm:title>PerfSuite</rm:title>
+					<rm:layout>
+						<rm:grid-layout />
+					</rm:layout>
+					<rm:composite>
+						<rm:layout>
+							<rm:grid-layout numColumns="3" makeColumnsEqualWidth="false" />
+						</rm:layout>
+						<rm:layout-data>
+							<rm:grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="true" />
+						</rm:layout-data>
+						<rm:widget type="combo" title="File Format" readOnly="true" style="SWT.LEFT"
+							attribute="PERFSUITE_psrun.environmentvariables.configuration_id_PS_HWPC_FORMAT">
+							<rm:layout-data>
+								<rm:grid-data widthHint="150" horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:tooltip>Output format, either xml or text</rm:tooltip>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Configuration" buttonId="config-dir-button" style="SWT.LEFT"
+							attribute="PERFSUITE_psrun.configuration_id_-CONFIG">
+							<rm:layout-data>
+								<rm:grid-data widthHint="150" horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+							<rm:tooltip>Specify a configuration file</rm:tooltip>
+						</rm:widget>
+						<rm:browse title="Browse..." localOnly="false" directory="false" textStyle="SWT.BORDER"
+							attribute="PERFSUITE_psrun.configuration_id_-CONFIG_SAVED">
+							<rm:text-layout-data>
+								<rm:grid-data horizontalSpan="1" horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="true" />
+							</rm:text-layout-data>
+							<rm:button-layout-data>
+								<rm:grid-data horizontalSpan="1" horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="false" />
+							</rm:button-layout-data>
+							<rm:tooltip>Location of the configuration file to use with PerfSuite</rm:tooltip>
+							<rm:text-control-state>
+								<rm:enable-if button="config-dir-button" selected="true" />
+							</rm:text-control-state>
+							<rm:button-control-state>
+								<rm:enable-if button="config-dir-button" selected="true" />
+							</rm:button-control-state>
+						</rm:browse>
+						<rm:widget type="checkbox" title="MD5 checksum" style="SWT.LEFT" attribute="PERFSUITE_psrun.configuration_id_-MD5">
+							<rm:layout-data>
+								<rm:grid-data widthHint="150" horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="3" />
+							</rm:layout-data>
+							<rm:tooltip>Include MD5 checksums in output</rm:tooltip>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Domain" buttonId="domain-button" style="SWT.LEFT" attribute="PERFSUITE_psrun.configuration_id_-DOMAIN">
+							<rm:layout-data>
+								<rm:grid-data widthHint="150" horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+							<rm:tooltip>Select counting domain (user, kernel, all)</rm:tooltip>
+						</rm:widget>
+						<rm:widget type="combo" readOnly="true" style="SWT.LEFT" attribute="PERFSUITE_psrun.configuration_id_-DOMAIN_SAVED">
+							<rm:layout-data>
+								<rm:grid-data widthHint="150" horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if button="domain-button" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="POSIX" style="SWT.LEFT" attribute="PERFSUITE_psrun.configuration_id_-POSIX">
+							<rm:layout-data>
+								<rm:grid-data widthHint="150" horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+							<rm:tooltip>Enable POSIX thread support</rm:tooltip>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Resource Usage" buttonId="resource-usage-button" style="SWT.LEFT"
+							attribute="PERFSUITE_psrun.configuration_id_-RESOURCE_USAGE">
+							<rm:layout-data>
+								<rm:grid-data widthHint="150" horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+							<rm:tooltip>Include resource usage statistics</rm:tooltip>
+						</rm:widget>
+						<rm:widget type="text" style="SWT.BORDER" attribute="PERFSUITE_psrun.configuration_id_-RESOURCE_USAGE_SAVED">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:tooltip>Optionally include resource sampling interval (seconds)</rm:tooltip>
+							<rm:control-state>
+								<rm:enable-if button="resource-usage-button" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Resource Usage Only" buttonId="resource-usage-only-button" style="SWT.LEFT"
+							attribute="PERFSUITE_psrun.configuration_id_-RESOURCE_USAGE_ONLY">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+							<rm:tooltip>Only collect resource usage data</rm:tooltip>
+						</rm:widget>
+						<rm:widget type="text" style="SWT.BORDER" attribute="PERFSUITE_psrun.configuration_id_-RESOURCE_USAGE_ONLY_SAVED">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:tooltip>Optionally include resource sampling interval (seconds)</rm:tooltip>
+							<rm:control-state>
+								<rm:enable-if button="resource-usage-only-button" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Write Signal Numbers" buttonId="signal-numbers-button" style="SWT.LEFT"
+							attribute="PERFSUITE_psrun.configuration_id_-SIGNAL_NUMBERS">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+							<rm:tooltip>Specify a comma separated list of signal numbers to write prior to process exit</rm:tooltip>
+						</rm:widget>
+						<rm:widget type="text" style="SWT.BORDER" attribute="PERFSUITE_psrun.configuration_id_-SIGNAL_NUMBERS_SAVED">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if button="signal-numbers-button" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Overflow Threshold" buttonId="overflow-threshold-button" style="SWT.LEFT"
+							attribute="PERFSUITE_psrun.configuration_id_-OVERFLOW_THRESHOLD">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+							<rm:tooltip>Specify overflow threadhold to be used for profiling</rm:tooltip>
+						</rm:widget>
+						<rm:widget type="text" style="SWT.BORDER" attribute="PERFSUITE_psrun.configuration_id_-OVERFLOW_THRESHOLD_SAVED">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if button="overflow-threshold-button" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+					</rm:composite>
+				</optionPane>
+			</toolPanes>
+		</execUtils>
+	</execTool>
+</etfwTool>

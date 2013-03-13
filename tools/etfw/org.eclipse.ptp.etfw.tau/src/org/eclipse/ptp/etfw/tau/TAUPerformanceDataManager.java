@@ -61,7 +61,15 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager {
 	 * @throws CoreException
 	 */
 	private static String getTauMakefile(ILaunchConfiguration configuration) throws CoreException {
-		return configuration.getAttribute(ITAULaunchConfigurationConstants.TAU_MAKEFILE, (String) null);
+		String etfwVersion = configuration.getAttribute(IToolLaunchConfigurationConstants.ETFW_VERSION,
+				IToolLaunchConfigurationConstants.EMPTY);
+		String attributeKey = ITAULaunchConfigurationConstants.TAU_MAKEFILE;
+		if (!etfwVersion.equals(IToolLaunchConfigurationConstants.USE_SAX_PARSER)) {
+			String controlId = configuration.getAttribute("org.eclipse.ptp.launch.RESOURCE_MANAGER_NAME", //$NON-NLS-1$
+					IToolLaunchConfigurationConstants.EMPTY);
+			attributeKey = controlId + IToolLaunchConfigurationConstants.DOT + attributeKey;
+		}
+		return configuration.getAttribute(attributeKey, (String) null);
 	}
 
 	@Override
@@ -185,39 +193,39 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager {
 		return IDs;
 	}
 
-
 	/**
 	 * Returns true if the directory exists and contains a tau profile or tau xml file.
+	 * 
 	 * @param directory
 	 * @param utils
 	 * @return
 	 */
-	private boolean checkDirectory(String directory,IBuildLaunchUtils utils){
+	private boolean checkDirectory(String directory, IBuildLaunchUtils utils) {
 		IFileStore d = utils.getFile(directory);
 		boolean check = d.fetchInfo().exists();
-		if(!check)
+		if (!check)
 			return false;
-		
+
 		try {
 			String[] children = d.childNames(EFS.NONE, null);
-			for (int i=0;i<children.length;i++)
+			for (int i = 0; i < children.length; i++)
 			{
-				if(children[i].contains(PROFXML)||children[i].contains("profile.0.0.0"))
+				if (children[i].contains(PROFXML) || children[i].contains("profile.0.0.0"))
 					return true;
 			}
-			
+
 		} catch (CoreException e) {
-			
+
 			e.printStackTrace();
 			return false;
 		}
-		
+
 		return false;
 	}
-	
+
 	@Override
 	public void process(String projname, ILaunchConfiguration configuration, String directory) throws CoreException {
-		//String projectDirectory = directory;
+		// String projectDirectory = directory;
 		boolean profsummary = configuration.getAttribute(ITAULaunchConfigurationConstants.PROFSUMMARY, false);
 		IBuildLaunchUtils tmpub = new BuildLaunchUtils();
 		String pppath = tmpub.checkToolEnvPath("paraprof");
@@ -230,28 +238,30 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager {
 		}
 
 		/*
-		 * Determining if the job was local or remote at this point is tricky.  It's safest to see if profiles are available locally and if not use the remote location.
+		 * Determining if the job was local or remote at this point is tricky. It's safest to see if profiles are available locally
+		 * and if not use the remote location.
 		 */
-		boolean dirgood=checkDirectory(directory,tmpub);
-		
-		if (!dirgood&&LaunchUtils.getRemoteServicesId(configuration) != null) {
+		boolean dirgood = checkDirectory(directory, tmpub);
+
+		if (!dirgood && LaunchUtils.getRemoteServicesId(configuration) != null) {
 			utilBlob = new RemoteBuildLaunchUtils(configuration);
 		} else {
 			utilBlob = tmpub;
 		}
 
-		String tmpDir=null;
-		if(!dirgood){
-		tmpDir = utilBlob.getWorkingDirectory();
-		if (tmpDir != null) {
-			directory = tmpDir;
-		}}
-		
-		dirgood=checkDirectory(directory,utilBlob);
-		if(!dirgood){
-			tmpDir=configuration.getAttribute(IToolLaunchConfigurationConstants.PROJECT_DIR, "");
-			if(tmpDir!=null)
-				directory=tmpDir;
+		String tmpDir = null;
+		if (!dirgood) {
+			tmpDir = utilBlob.getWorkingDirectory();
+			if (tmpDir != null) {
+				directory = tmpDir;
+			}
+		}
+
+		dirgood = checkDirectory(directory, utilBlob);
+		if (!dirgood) {
+			tmpDir = configuration.getAttribute(IToolLaunchConfigurationConstants.PROJECT_DIR, "");
+			if (tmpDir != null)
+				directory = tmpDir;
 		}
 
 		tbpath = utilBlob.getToolPath(Messages.TAUPerformanceDataManager_0);
@@ -517,8 +527,6 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager {
 	}
 
 	private static final String PARAPROFCONSOLE = "TAU Profile Output";
-
-
 
 	@Override
 	public void view() {

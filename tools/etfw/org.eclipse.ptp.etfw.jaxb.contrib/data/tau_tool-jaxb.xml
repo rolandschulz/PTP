@@ -1,0 +1,1524 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etfwTool xmlns="http://org.eclipse.ptp/etfw" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rm="http://eclipse.org/ptp/schemas"
+	xsi:schemaLocation="etfw_tool_type.xsd" name="tau" prepend-execution="false" recompile="true" explicit-execution="false" >
+	<controlData>
+		<!-- TAU Runtime tab Environment configuration -->
+		<attribute name="TAU Runtime.performance.options.environmentvariables.configuration_id_TAU_VERBOSE" type="boolean" translateBooleanAs="1, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="TAU Runtime.performance.options.environmentvariables.configuration_id_PROFILEDIR" type="string">
+			<rm:default>%%PROJECT_DIR%%</rm:default>
+		</attribute>
+		<attribute name="TAU Runtime.performance.options.environmentvariables.configuration_id_TAU_PROFILE" type="boolean" translateBooleanAs="1, ">
+			<rm:description>Generate TAU profile output</rm:description>
+			<rm:tooltip>Generate TAU profile output</rm:tooltip>
+			<rm:default>1</rm:default>
+		</attribute>
+		<attribute name="TAU Runtime.performance.options.environmentvariables.configuration_id_TAU_SYNCHRONIZE_CLOCKS" type="boolean" translateBooleanAs="1, ">
+			<rm:default>1</rm:default>
+		</attribute>
+		<attribute name="TAU Runtime.performance.options.environmentvariables.configuration_id_TAU_THROTTLE" type="boolean" translateBooleanAs="1, ">
+			<rm:default>1</rm:default>
+		</attribute>
+		<attribute name="TAU Runtime.performance.options.environmentvariables.configuration_id_TAU_THROTTLE_PERCALL" min="0" type="integer">
+			<rm:description>Runtime throttling per call threshold (e.g. less than
+				10 microseconds per call)
+			</rm:description>
+			<rm:tooltip>Runtime throttling per call threshold (e.g. less than 10
+				microseconds per call)
+			</rm:tooltip>
+			<rm:default>0</rm:default>
+		</attribute>
+		<attribute name="TAU Runtime.performance.options.environmentvariables.configuration_id_TAU_THROTTLE_NUMCALLS" min="0" type="integer">
+			<rm:description>Runtime throttling number of calls threshold (e.g. at
+				least 100000 calls)
+			</rm:description>
+			<rm:tooltip>Runtime throttling number of calls threshold (e.g. at
+				least 100000 calls)
+			</rm:tooltip>
+			<rm:default>0</rm:default>
+		</attribute>
+		<attribute name="TAU Runtime.performance.options.environmentvariables.configuration_id_TRACEDIR" type="string">
+			<rm:default>%%PROJECT_DIR%%</rm:default>
+		</attribute>
+		<attribute name="TAU Runtime.performance.options.environmentvariables.configuration_id_TAU_TRACE" type="boolean" translateBooleanAs="1, ">
+			<rm:default> </rm:default>
+		</attribute>
+		
+		<attribute name="TAU Runtime.performance.options.environmentvariables.configuration_id_TAU_CALLPATH" type="boolean" translateBooleanAs="1, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="TAU Runtime.performance.options.environmentvariables.configuration_id_TAU_COMPENSATE" type="boolean" translateBooleanAs="1, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="TAU Runtime.performance.options.environmentvariables.configuration_id_TAU_TRACK_MESSAGE" type="boolean" translateBooleanAs="1, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="TAU Runtime.performance.options.environmentvariables.configuration_id_TAU_COMM_MATRIX" type="boolean" translateBooleanAs="1, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="TAU Runtime.performance.options.environmentvariables.configuration_id_TAU_TRACK_HEAP" type="boolean" translateBooleanAs="1, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="TAU Runtime.performance.options.environmentvariables.configuration_id_TAU_TRACK_HEADROOM" type="boolean" translateBooleanAs="1, ">
+			<rm:default> </rm:default>
+		</attribute>
+		 
+		<attribute name="TAU Runtime.performance.options.environmentvariables.configuration_id_TAU_CALLPATH_DEPTH" min="0" type="integer">
+			<rm:description>Generate TAU callpath profiles</rm:description>
+			<rm:tooltip>Generate TAU callpath profiles</rm:tooltip>
+			<rm:default>0</rm:default>
+		</attribute> 
+		
+		<attribute name="TAU Runtime.performance.options.environmentvariables.configuration_id_TAU_PROFILE_FORMAT" type="choice">
+			<rm:description>Format of profile output. Note that merged output may
+				prevent automatic database uploads.
+			</rm:description>
+			<rm:tooltip></rm:tooltip>
+			<rm:choice>profile,merged,snapshot,none</rm:choice>
+			<rm:default>profile</rm:default>
+		</attribute>
+		<!-- End TAU Runtime tab Environment configuration -->
+		<!-- TAU Runtime tab -->
+		<attribute name="TAU Runtime.performance.options.configuration_id_PROFILEDIR_ARGUMENT_SAVED" type="string">
+			<rm:default>%%PROJECT_DIR%%</rm:default>
+		</attribute>
+		<attribute name="TAU Runtime.performance.options.configuration_id_TAU_PROFILE_FORMAT_ARGUMENT_DEFAULT" type="boolean">
+			<rm:default>false</rm:default>
+		</attribute>
+		<attribute name="TAU Runtime.performance.options.configuration_id_TAU_CALLPATH_DEPTH_ARGUMENT_DEFAULT" type="boolean">
+			<rm:default>false</rm:default>
+		</attribute>
+		
+		<attribute name="TAU Runtime.performance.options.configuration_id_TAU_THROTTLE_PERCALL_ARGUMENT_DEFAULT" type="boolean">
+			<rm:default>true</rm:default>
+		</attribute>
+		
+		<attribute name="TAU Runtime.performance.options.configuration_id_TAU_THROTTLE_NUMCALLS_ARGUMENT_DEFAULT" type="boolean">
+			<rm:default>true</rm:default>
+		</attribute>
+		<attribute name="TAU Runtime.performance.options.configuration_id_TRACEDIR_ARGUMENT_DEFAULT" type="boolean">
+			<rm:default>true</rm:default>
+		</attribute>
+		<attribute name="ProfileOutputDir">
+			<rm:default>true</rm:default>
+		</attribute>
+		<!-- End TAU Runtime tab -->
+		<!-- TAU Compiler tab -->
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTVERBOSE_ARGUMENT_DEFAULT" type="boolean" translateBooleanAs="-optVerbose, ">
+			<rm:description>Turn on verbose debugging message</rm:description>
+			<rm:tooltip>Turn on verbose debugging message</rm:tooltip>
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTDETECTMEMORYLEAKS_ARGUMENT_DEFAULT" type="boolean" translateBooleanAs="-optDetectMemoryLeaks, ">
+			<rm:description>Track mallocs/frees using TAU's memory wrapper
+			</rm:description>
+			<rm:tooltip>Track mallocs/frees using TAU's memory wrapper
+			</rm:tooltip>
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTPDTGNUFORTRANPARSER_ARGUMENT_DEFAULT" type="boolean" translateBooleanAs="-optPdtGnuFortranParser, ">
+			<rm:description></rm:description>
+			<rm:tooltip></rm:tooltip>
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTPDTCLEANSCAPEPARSER_ARGUMENT_DEFAULT" type="boolean" translateBooleanAs="-optPdtCleanscapeParser, ">
+			<rm:description></rm:description>
+			<rm:tooltip></rm:tooltip>
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTPREPROCESS_ARGUMENT_DEFAULT" type="boolean" translateBooleanAs="-optPreProcess, ">
+			<rm:description></rm:description>
+			<rm:tooltip></rm:tooltip>
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTKEEPFILES_ARGUMENT_DEFAULT" type="boolean" translateBooleanAs="-optKeepFiles, ">
+			<rm:description></rm:description>
+			<rm:tooltip></rm:tooltip>
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTSHARED_ARGUMENT_DEFAULT" type="boolean" translateBooleanAs="-optShared, ">
+			<rm:description></rm:description>
+			<rm:tooltip></rm:tooltip>
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTPDTDIR_ARGUMENT" type="boolean" translateBooleanAs="-optPdtDir=, ">
+			<rm:description></rm:description>
+			<rm:tooltip></rm:tooltip>
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTPDTDIR_ARGUMENT_SAVED" type="string">
+			<rm:default></rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTPDTF95OPTS_ARGUMENT" type="boolean" translateBooleanAs="-optPdtF95Opts=, ">
+			<rm:description>
+			</rm:description>
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTPDTF95OPTS_ARGUMENT_SAVED" type="string">
+			<rm:default></rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTPDTF95RESET_ARGUMENT" type="boolean" translateBooleanAs="-optPdtF95Reset=, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTPDTF95RESET_ARGUMENT_SAVED" type="string">
+			<rm:default></rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTPDTCOPTS_ARGUMENT" type="boolean" translateBooleanAs="-optPdtCOpts=, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTPDTCOPTS_ARGUMENT_SAVED" type="string">
+			<rm:default></rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTPDTCRESET_ARGUMENT" type="boolean" translateBooleanAs="-optPdtCReset=, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTPDTCRESET_ARGUMENT_SAVED" type="string">
+			<rm:default></rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTPDTCXXOPTS_ARGUMENT" type="boolean" translateBooleanAs="-optPdtCxxOpts=, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTPDTCXXOPTS_ARGUMENT_SAVED" type="string">
+			<rm:default></rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTPDTCXXRESET_ARGUMENT" type="boolean" translateBooleanAs="-optPdtCxxReset=, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTPDTCXXRESET_ARGUMENT_SAVED" type="string">
+			<rm:default></rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTPDTF90PARSER_ARGUMENT" type="boolean" translateBooleanAs="-optPdtF90Parser=, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTPDTF90PARSER_ARGUMENT_SAVED" type="string">
+			<rm:default></rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTPDTUSER_ARGUMENT" type="boolean" translateBooleanAs="-optPdtUser=, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTPDTUSER_ARGUMENT_SAVED" type="string">
+			<rm:default></rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTTAUINSTR_ARGUMENT" type="boolean" translateBooleanAs="-optTauInstr=, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTTAUINSTR_ARGUMENT_SAVED" type="string">
+			<rm:default></rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTCPP_ARGUMENT" type="boolean" translateBooleanAs="-optCPP=, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTCPP_ARGUMENT_SAVED" type="string">
+			<rm:default></rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTCPPOPTS_ARGUMENT" type="boolean" translateBooleanAs="-optCPPOpts=, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTCPPOPTS_ARGUMENT_SAVED" type="string">
+			<rm:default></rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTCPPRESET_ARGUMENT" type="boolean" translateBooleanAs="-optCPPReset=, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTCPPRESET_ARGUMENT_SAVED" type="string">
+			<rm:default></rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTPDBFILE_ARGUMENT" type="boolean" translateBooleanAs="-optPDBFile=, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTPDBFILE_ARGUMENT_SAVED" type="string">
+			<rm:default></rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTTAU_ARGUMENT" type="boolean" translateBooleanAs="-optTau=, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTTAU_ARGUMENT_SAVED" type="string">
+			<rm:default></rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTCOMPILE_ARGUMENT" type="boolean" translateBooleanAs="-optCompile=, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTCOMPILE_ARGUMENT_SAVED" type="string">
+			<rm:default></rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTTAUDEFS_ARGUMENT" type="boolean" translateBooleanAs="-optTauDefs=, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTTAUDEFS_ARGUMENT_SAVED" type="string">
+			<rm:default></rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTTAUINCLUDES_ARGUMENT" type="boolean" translateBooleanAs="-optTauIncludes=, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTTAUINCLUDES_ARGUMENT_SAVED" type="string">
+			<rm:default></rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTINCLUDEMEMORY_ARGUMENT" type="boolean" translateBooleanAs="-optIncludeMemory=, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTINCLUDEMEMORY_ARGUMENT_SAVED" type="string">
+			<rm:default></rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTRESET_ARGUMENT" type="boolean" translateBooleanAs="-optReset=, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTRESET_ARGUMENT_SAVED" type="string">
+			<rm:default></rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTLINKING_ARGUMENT" type="boolean" translateBooleanAs="-optLinking=, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTLINKING_ARGUMENT_SAVED" type="string">
+			<rm:default></rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTLINKRESET_ARGUMENT" type="boolean" translateBooleanAs="-optLinkReset=, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTLINKRESET_ARGUMENT_SAVED" type="string">
+			<rm:default></rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTTAUCC_ARGUMENT" type="boolean" translateBooleanAs="-optTauCC=, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTTAUCC_ARGUMENT_SAVED" type="string">
+			<rm:default></rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTTAUUSECXXFORC_ARGUMENT" type="boolean" translateBooleanAs="-optTauUseCXXForC, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTOPARITOOL_ARGUMENT" type="boolean" translateBooleanAs="-optOpariTool=, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTOPARITOOL_ARGUMENT_SAVED" type="string">
+			<rm:default></rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTOPARIDIR_ARGUMENT" type="boolean" translateBooleanAs="-optOpariDir=, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTOPARIDIR_ARGUMENT_SAVED" type="string">
+			<rm:default></rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTOPARIOPTS_ARGUMENT" type="boolean" translateBooleanAs="-optOpariOpts=, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTOPARIOPTS_ARGUMENT_SAVED" type="string">
+			<rm:default></rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTOPARIRESET_ARGUMENT" type="boolean" translateBooleanAs="-optOpariReset=, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTOPARIRESET_ARGUMENT_SAVED" type="string">
+			<rm:default></rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTNOMPI_ARGUMENT_DEFAULT" type="boolean" translateBooleanAs="-optNoMpi, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTMPI_ARGUMENT_DEFAULT" type="boolean" translateBooleanAs="-optMpi, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTNOREVERT_ARGUMENT_DEFAULT" type="boolean" translateBooleanAs="-optNoRevert, ">
+			<rm:description>
+			</rm:description>
+			<rm:default>-optNoRevert</rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTREVERT_ARGUMENT_DEFAULT" type="boolean" translateBooleanAs="-optRevert, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTAPPCC_ARGUMENT" type="boolean" translateBooleanAs="-optAppCC=, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTAPPCC_ARGUMENT_SAVED" type="string">
+			<rm:default></rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTAPPCXX_ARGUMENT" type="boolean" translateBooleanAs="-optAppCXX=, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTAPPCXX_ARGUMENT_SAVED" type="string">
+			<rm:default></rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTAPPF90_ARGUMENT" type="boolean" translateBooleanAs="-optAppF90=, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTAPPF90_ARGUMENT_SAVED" type="string">
+			<rm:default></rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTDISABLEHEADERINST_ARGUMENT_DEFAULT" type="boolean" translateBooleanAs="-optDisableHeaderInst, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTCOMPINST_ARGUMENT_DEFAULT" type="boolean" translateBooleanAs="-optCompInst, ">
+			<rm:description>Use compiler-based instrumentation.</rm:description>
+			<rm:tooltip>Use compiler-based instrumentation.</rm:tooltip>
+			<rm:default>-optCompInst</rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTPDTINST_ARGUMENT_DEFAULT" type="boolean" translateBooleanAs="-optPdtInst, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTNOCOMPINST_ARGUMENT_DEFAULT" type="boolean" translateBooleanAs="-optNoCompInst, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTTAUSELECTFILE_ARGUMENT" type="boolean" translateBooleanAs="-optTauSelectFile=, ">
+			<rm:default> </rm:default>
+		</attribute>
+		<attribute name="Tau Compiler.performance.options.configuration_id_-OPTTAUSELECTFILE_ARGUMENT_SAVED" type="string">
+			<rm:default></rm:default>
+		</attribute>
+		<!-- END TAU Compiler tab -->
+		
+		<!-- TAU Makefile tab -->
+		<attribute name="use_mpi" type="boolean">
+			<rm:description></rm:description>
+			<rm:tooltip>MPI Attribute</rm:tooltip>
+			<rm:default>true</rm:default>
+		</attribute>
+		<attribute name="use_callpath_profiling" type="boolean">
+			<rm:description></rm:description>
+			<rm:tooltip></rm:tooltip>
+			<rm:default>false</rm:default>
+		</attribute>
+		<attribute name="use_tau_phases" type="boolean">
+			<rm:default>false</rm:default>
+		</attribute>
+		<attribute name="use_memory_profiling" type="boolean">
+			<rm:default>false</rm:default>
+		</attribute>
+		<attribute name="use_opari" type="boolean">
+			<rm:default>false</rm:default>
+		</attribute>
+		<attribute name="use_openmp" type="boolean">
+			<rm:description></rm:description>
+			<rm:tooltip></rm:tooltip>
+		</attribute>
+		<attribute name="use_epilog" type="boolean">
+			<rm:default>false</rm:default>
+		</attribute>
+		<attribute name="use_vampirtrace" type="boolean">
+			<rm:default>false</rm:default>
+		</attribute>
+		<attribute name="use_papi_library" type="boolean">
+			<rm:description></rm:description>
+			<rm:tooltip></rm:tooltip>
+			<rm:default>false</rm:default>
+		</attribute>
+		<attribute name="tau_makefile.performance.options.configuration_id_" type="string">
+			<rm:description></rm:description>
+			<rm:tooltip></rm:tooltip>
+			<rm:default>None</rm:default>
+		</attribute>
+		<attribute name="papi_counter_type_selection" type="string">
+			<rm:description></rm:description>
+			<rm:tooltip></rm:tooltip>
+			<rm:default>Native Counters</rm:default>
+		</attribute>
+		<attribute name="use_tau_tracing" type="boolean">
+			<rm:description></rm:description>
+			<rm:tooltip></rm:tooltip>
+		</attribute>
+		<attribute name="use_tau_with_PDT" type="boolean">
+			<rm:description></rm:description>
+			<rm:tooltip></rm:tooltip>
+		</attribute>
+		<!-- End TAU Makefile tab -->
+		
+		<!-- This disables a few UI fields in the TAU Makefile tab. I have not yet determined how/when those UI fields are ever enabled -->
+		<attribute name="disabled" type="string">
+			<rm:default>disabled</rm:default>
+		</attribute>
+		<!-- Selective Instrumentation Tab -->
+		<attribute name="SelectInstrumentation" type="string">
+			<rm:description></rm:description>
+			<rm:tooltip></rm:tooltip>
+			<rm:default>None</rm:default>
+		</attribute>
+		<!-- End Selective Instrumentation Tab -->
+	</controlData>
+	<buildTool tool-id="TAU" replace-compiler="true">
+		<cc-compiler tool-command="tau_cc.sh" tool-group="tau" />
+		<cxx-compiler tool-command="tau_cxx.sh" tool-group="tau" />
+		<f90-compiler tool-command="tau_f90.sh" tool-group="tau" />
+		<all-compilers tool-group="tau">
+			<toolPanes virtual="false" embedded="false">
+				<configId>TAU Makefile.performance.options.configuration_id_</configId>
+				<configVarId>TAU Makefile.performance.options.environmentvariables.configuration_id_</configVarId>
+				<optionPane>
+					<rm:title>TAU Makefile</rm:title>
+					<rm:layout>
+						<rm:grid-layout />
+					</rm:layout>
+					<rm:composite>
+						<rm:layout>
+							<rm:grid-layout numColumns="3" makeColumnsEqualWidth="false" />
+						</rm:layout>
+						<rm:layout-data>
+							<rm:grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="true" grabExcessVertical="true" />
+						</rm:layout-data>
+						<rm:widget type="checkbox" title="MPI" style="SWT.LEFT" buttonId="MPI" attribute="use_mpi">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Generate MPI include list" style="SWT.LEFT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if button="Callpath" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Callpath Profiling" style="SWT.LEFT" buttonId="Callpath" attribute="use_callpath_profiling">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:disable-if>
+									<rm:or>
+										<rm:rule button="Opari" selected="true" />
+										<rm:rule button="Papi" selected="true" />
+										<rm:rule button="Trace" selected="true" />
+									</rm:or>
+								</rm:disable-if>
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Phase Based Profiling" style="SWT.LEFT" attribute="use_tau_phases">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if attribute="disabled" value="enabled" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Memory Profiling" style="SWT.LEFT" attribute="use_memory_profiling">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if attribute="disabled" value="enabled" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="OPARI" style="SWT.LEFT" buttonId="Opari" attribute="use_opari">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:disable-if>
+									<rm:or>
+										<rm:rule button="Callpath" selected="true" />
+										<rm:rule button="Papi" selected="true" />
+										<rm:rule button="Trace" selected="true" />
+									</rm:or>
+								</rm:disable-if>
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="OpenMP" style="SWT.LEFT" buttonId="OpenMP" attribute="use_openmp">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:disable-if>
+									<rm:or>
+										<rm:rule button="Callpath" selected="true" />
+										<rm:rule button="Papi" selected="true" />
+										<rm:rule button="Trace" selected="true" />
+									</rm:or>
+								</rm:disable-if>
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Epilog" style="SWT.LEFT" attribute="use_epilog">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if attribute="disabled" value="enabled" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="VampirTrace" style="SWT.LEFT" attribute="use_vampirtrace">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if attribute="disabled" value="enabled" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="PAPI" style="SWT.LEFT" buttonId="Papi" attribute="use_papi_library">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"
+									horizontalSpan="1" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:disable-if>
+									<rm:or>
+										<rm:rule button="Callpath" selected="true" />
+										<rm:rule button="Opari" selected="true" />
+										<rm:rule button="Trace" selected="true" />
+									</rm:or>
+								</rm:disable-if>
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="custom" typeId="papi" style="SWT.BORDER">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if>
+									<rm:or>
+										<rm:rule button="Papi" selected="true" />
+									</rm:or>
+								</rm:enable-if>
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="label" style="SWT.LEFT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"
+									horizontalSpan="1" />
+							</rm:layout-data>
+							<rm:fixed-text>PAPI Counter:</rm:fixed-text>
+						</rm:widget>
+						<rm:button-group attribute="papi_counter_type_selection">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:layout>
+								<rm:grid-layout numColumns="2" makeColumnsEqualWidth="false" />
+							</rm:layout>
+							<rm:button type="radiobutton" title="Preset Counters" style="SWT.LEFT">
+								<rm:layout-data>
+									<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+								</rm:layout-data>
+							</rm:button>
+							<rm:button type="radiobutton" title="Native Counters" style="SWT.LEFT">
+								<rm:layout-data>
+									<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+								</rm:layout-data>
+							</rm:button>
+						</rm:button-group>
+						<rm:widget type="checkbox" title="Perflib" style="SWT.LEFT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if attribute="disabled" value="enabled" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Trace" style="SWT.LEFT" buttonId="Trace" attribute="use_tau_tracing">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:disable-if>
+									<rm:or>
+										<rm:rule button="Callpath" selected="true" />
+										<rm:rule button="Opari" selected="true" />
+										<rm:rule button="Papi" selected="true" />
+									</rm:or>
+								</rm:disable-if>
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="PDT" style="SWT.LEFT" buttonId="PDT" attribute="use_tau_with_PDT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:composite group="true">
+							<rm:layout>
+								<rm:grid-layout numColumns="2" makeColumnsEqualWidth="false" />
+							</rm:layout>
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:widget type="checkbox" title="PDT Instrumentation" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTPDTINST_ARGUMENT_DEFAULT">
+								<rm:layout-data>
+									<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+								</rm:layout-data>
+								<rm:control-state>
+									<rm:enable-if>
+										<rm:or>
+											<rm:rule button="PDT" selected="true" />
+											<rm:rule button="Opari" selected="true" />
+											<rm:rule button="Trace" selected="true" />
+										</rm:or>
+									</rm:enable-if>
+								</rm:control-state>
+							</rm:widget>
+							
+							<rm:widget type="checkbox" title="Compiler Instrumentation" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTCOMPINST_ARGUMENT_DEFAULT">
+								<rm:layout-data>
+									<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+								</rm:layout-data>
+							</rm:widget>
+							<!-- 
+							<rm:button type="radiobutton" title="Compiler Instrumentation" style="SWT.LEFT" attribute="COMPILER_Instrumentation">
+								<rm:layout-data>
+									<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+								</rm:layout-data> 
+							</rm:button> -->
+						</rm:composite>
+						<rm:widget type="label" style="SWT.NONE">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"
+									horizontalSpan="1" />
+							</rm:layout-data>
+							<rm:fixed-text>Select Makefile:</rm:fixed-text>
+						</rm:widget>
+						<rm:widget type="custom" typeId="tau-makefile" style="SWT.BORDER" attribute="tau_makefile.performance.options.configuration_id_">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if>
+									<rm:or>
+										<rm:rule button="MPI" selected="true" />
+										<rm:rule button="Callpath" selected="true" />
+										<rm:rule button="Opari" selected="true" />
+										<rm:rule button="OpenMP" selected="true" />
+										<rm:rule button="Papi" selected="true" />
+										<rm:rule button="Trace" selected="true" />
+										<rm:rule button="PDT" selected="true" />
+									</rm:or>
+								</rm:enable-if>
+							</rm:control-state>
+						</rm:widget>
+					</rm:composite>
+				</optionPane>
+			</toolPanes>
+			<toolPanes virtual="false" embedded="false" pane-name="Tau Compiler" prepend-with="-tau_options=" enclose-with="'" separate-with=" ">
+				<configId>Tau Compiler.performance.options.configuration_id_</configId>
+				<configVarId>Tau Compiler.performance.options.environmentvariables.configuration_id_</configVarId>
+				<optionPane>
+					<rm:title>Tau Compiler</rm:title>
+					<rm:layout>
+						<rm:grid-layout />
+					</rm:layout>
+					<rm:composite>
+						<rm:layout>
+							<rm:grid-layout numColumns="3" makeColumnsEqualWidth="false" />
+						</rm:layout>
+						<rm:layout-data>
+							<rm:grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="true" />
+						</rm:layout-data>
+						<rm:widget type="checkbox" title="Verbose" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTVERBOSE_ARGUMENT_DEFAULT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="checkbox" title="DetectMemoryLeaks" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTDETECTMEMORYLEAKS_ARGUMENT_DEFAULT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="checkbox" title="PdtGnuFortranParser" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTPDTGNUFORTRANPARSER_ARGUMENT_DEFAULT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="checkbox" title="PdtCleanscapeParser" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTPDTCLEANSCAPEPARSER_ARGUMENT_DEFAULT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="checkbox" title="PreProcess" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTPREPROCESS_ARGUMENT_DEFAULT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="checkbox" title="KeepFiles" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTKEEPFILES_ARGUMENT_DEFAULT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Shared" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTSHARED_ARGUMENT_DEFAULT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="checkbox" title="PdtDir" buttonId="PdtDir" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTPDTDIR_ARGUMENT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:browse title="Browse..." localOnly="true" directory="true" textStyle="SWT.BORDER" attribute="Tau Compiler.performance.options.configuration_id_-OPTPDTDIR_ARGUMENT_SAVED">
+							<rm:text-layout-data>
+								<rm:grid-data horizontalSpan="1" horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="true" />
+							</rm:text-layout-data>
+							<rm:button-layout-data>
+								<rm:grid-data horizontalSpan="1" horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="false" />
+							</rm:button-layout-data>
+							<rm:text-control-state>
+								<rm:enable-if button="PdtDir" selected="true" />
+							</rm:text-control-state>
+							<rm:button-control-state>
+								<rm:enable-if button="PdtDir" selected="true" />
+							</rm:button-control-state>
+						</rm:browse>
+						<rm:widget type="checkbox" title="PdtF95Opts" buttonId="PdtF95Opts" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTPDTF95OPTS_ARGUMENT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="text" style="SWT.BORDER" attribute="Tau Compiler.performance.options.configuration_id_-OPTPDTF95OPTS_ARGUMENT_SAVED">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if button="PdtF95Opts" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="PdtF95Reset" buttonId="PdtF95Reset" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTPDTF95RESET_ARGUMENT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="text" style="SWT.BORDER" attribute="Tau Compiler.performance.options.configuration_id_-OPTPDTF95RESET_ARGUMENT_SAVED">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if button="PdtF95Reset" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="PdtCOpts" buttonId="PdtCOpts" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTPDTCOPTS_ARGUMENT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="text" style="SWT.BORDER" attribute="Tau Compiler.performance.options.configuration_id_-OPTPDTCOPTS_ARGUMENT_SAVED">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if button="PdtCOpts" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="PdtCReset" buttonId="PdtCReset" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTPDTCRESET_ARGUMENT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="text" style="SWT.BORDER" attribute="Tau Compiler.performance.options.configuration_id_-OPTPDTCRESET_ARGUMENT_SAVED">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if button="PdtCReset" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="PdtCxxOpts" buttonId="PdtCxxOpts" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTPDTCXXOPTS_ARGUMENT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="text" style="SWT.BORDER" attribute="Tau Compiler.performance.options.configuration_id_-OPTPDTCXXOPTS_ARGUMENT_SAVED">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if button="PdtCxxOpts" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="PdtCxxReset" buttonId="PdtCxxReset" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTPDTCXXRESET_ARGUMENT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="text" style="SWT.BORDER" attribute="Tau Compiler.performance.options.configuration_id_-OPTPDTCXXRESET_ARGUMENT_SAVED">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if button="PdtCxxReset" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="PdtF90Parser" buttonId="PdtF90Parser" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTPDTF90PARSER_ARGUMENT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="text" style="SWT.BORDER" attribute="Tau Compiler.performance.options.configuration_id_-OPTPDTF90PARSER_ARGUMENT_SAVED">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if button="PdtF90Parser" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="PdtUser" buttonId="PdtUser" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTPDTUSER_ARGUMENT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="text" style="SWT.BORDER" attribute="Tau Compiler.performance.options.configuration_id_-OPTPDTUSER_ARGUMENT_SAVED">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if button="PdtUser" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="TauInstr" buttonId="TauInstr" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTTAUINSTR_ARGUMENT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:browse title="Browse..." localOnly="true" textStyle="SWT.BORDER" attribute="Tau Compiler.performance.options.configuration_id_-OPTTAUINSTR_ARGUMENT_SAVED">
+							<rm:text-layout-data>
+								<rm:grid-data horizontalSpan="1" horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="true" />
+							</rm:text-layout-data>
+							<rm:button-layout-data>
+								<rm:grid-data horizontalSpan="1" horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="false" />
+							</rm:button-layout-data>
+							<rm:text-control-state>
+								<rm:enable-if button="TauInstr" selected="true" />
+							</rm:text-control-state>
+							<rm:button-control-state>
+								<rm:enable-if button="TauInstr" selected="true" />
+							</rm:button-control-state>
+						</rm:browse>
+						<rm:widget type="checkbox" title="CPP" buttonId="CPP" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTCPP_ARGUMENT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="text" style="SWT.BORDER" attribute="Tau Compiler.performance.options.configuration_id_-OPTCPP_ARGUMENT_SAVED">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if button="CPP" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="CPPOpts" buttonId="CPPOpts" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTCPPOPTS_ARGUMENT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="text" style="SWT.BORDER" attribute="Tau Compiler.performance.options.configuration_id_-OPTCPPOPTS_ARGUMENT_SAVED">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if button="CPPOpts" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="CPPReset" buttonId="CPPReset" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTCPPRESET_ARGUMENT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="text" style="SWT.BORDER" attribute="Tau Compiler.performance.options.configuration_id_-OPTCPPRESET_ARGUMENT_SAVED">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if button="CPPReset" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="PDBFile" buttonId="PDBFile" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTPDBFILE_ARGUMENT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:browse title="Browse..." localOnly="true" textStyle="SWT.BORDER" attribute="Tau Compiler.performance.options.configuration_id_-OPTPDBFILE_ARGUMENT_SAVED">
+							<rm:text-layout-data>
+								<rm:grid-data horizontalSpan="1" horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="true" />
+							</rm:text-layout-data>
+							<rm:button-layout-data>
+								<rm:grid-data horizontalSpan="1" horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="false" />
+							</rm:button-layout-data>
+							<rm:text-control-state>
+								<rm:enable-if button="PDBFile" selected="true" />
+							</rm:text-control-state>
+							<rm:button-control-state>
+								<rm:enable-if button="PDBFile" selected="true" />
+							</rm:button-control-state>
+						</rm:browse>
+						<rm:widget type="checkbox" title="Tau" buttonId="Tau" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTTAU_ARGUMENT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="text" style="SWT.BORDER" attribute="Tau Compiler.performance.options.configuration_id_-OPTTAU_ARGUMENT_SAVED">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if button="Tau" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Compile" buttonId="Compile" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTCOMPILE_ARGUMENT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="text" style="SWT.BORDER" attribute="Tau Compiler.performance.options.configuration_id_-OPTCOMPILE_ARGUMENT_SAVED">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if button="Compile" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="TauDefs" buttonId="TauDefs" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTTAUDEFS_ARGUMENT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="text" style="SWT.BORDER" attribute="Tau Compiler.performance.options.configuration_id_-OPTTAUDEFS_ARGUMENT_SAVED">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if button="TauDefs" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="TauIncludes" buttonId="TauIncludes" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTTAUINCLUDES_ARGUMENT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="text" style="SWT.BORDER" attribute="Tau Compiler.performance.options.configuration_id_-OPTTAUINCLUDES_ARGUMENT_SAVED">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if button="TauIncludes" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="IncludeMemory" buttonId="IncludedMemory" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTINCLUDEMEMORY_ARGUMENT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="text" style="SWT.BORDER" attribute="Tau Compiler.performance.options.configuration_id_-OPTINCLUDEMEMORY_ARGUMENT_SAVED">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if button="IncludedMemory" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Reset" buttonId="Reset" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTRESET_ARGUMENT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="text" style="SWT.BORDER" attribute="Tau Compiler.performance.options.configuration_id_-OPTRESET_ARGUMENT_SAVED">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if button="Reset" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Linking" buttonId="Linking" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTLINKING_ARGUMENT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="text" style="SWT.BORDER" attribute="Tau Compiler.performance.options.configuration_id_-OPTLINKING_ARGUMENT_SAVED">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if button="Linking" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="LinkReset" buttonId="LinkReset" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTLINKRESET_ARGUMENT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="text" style="SWT.BORDER" attribute="Tau Compiler.performance.options.configuration_id_-OPTLINKRESET_ARGUMENT_SAVED">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if button="LinkReset" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="TauCC" buttonId="TauCC" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTTAUCC_ARGUMENT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="text" style="SWT.BORDER" attribute="Tau Compiler.performance.options.configuration_id_-OPTTAUCC_ARGUMENT_SAVED">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if button="TauCC" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="UseCXXForC" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTTAUUSECXXFORC_ARGUMENT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="checkbox" title="OpariTool" buttonId="OpariTool" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTOPARITOOL_ARGUMENT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:browse title="Browse..." localOnly="true" textStyle="SWT.BORDER" attribute="Tau Compiler.performance.options.configuration_id_-OPTOPARITOOL_ARGUMENT_SAVED">
+							<rm:text-layout-data>
+								<rm:grid-data horizontalSpan="1" horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="true" />
+							</rm:text-layout-data>
+							<rm:button-layout-data>
+								<rm:grid-data horizontalSpan="1" horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="false" />
+							</rm:button-layout-data>
+							<rm:text-control-state>
+								<rm:enable-if button="OpariTool" selected="true" />
+							</rm:text-control-state>
+							<rm:button-control-state>
+								<rm:enable-if button="OpariTool" selected="true" />
+							</rm:button-control-state>
+						</rm:browse>
+						<rm:widget type="checkbox" title="OpariDir" buttonId="OpariDir" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTOPARIDIR_ARGUMENT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:browse title="Browse..." localOnly="true" directory="true" textStyle="SWT.BORDER" attribute="Tau Compiler.performance.options.configuration_id_-OPTOPARIDIR_ARGUMENT_SAVED">
+							<rm:text-layout-data>
+								<rm:grid-data horizontalSpan="1" horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="true" />
+							</rm:text-layout-data>
+							<rm:button-layout-data>
+								<rm:grid-data horizontalSpan="1" horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="false" />
+							</rm:button-layout-data>
+							<rm:text-control-state>
+								<rm:enable-if button="OpariDir" selected="true" />
+							</rm:text-control-state>
+							<rm:button-control-state>
+								<rm:enable-if button="OpariDir" selected="true" />
+							</rm:button-control-state>
+						</rm:browse>
+						<rm:widget type="checkbox" title="OpariOpts" buttonId="OpariOpts" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTOPARIOPTS_ARGUMENT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="text" style="SWT.BORDER" attribute="Tau Compiler.performance.options.configuration_id_-OPTOPARIOPTS_ARGUMENT_SAVED">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if button="OpariOpts" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="OpariReset" buttonId="OpariReset" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTOPARIRESET_ARGUMENT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="text" style="SWT.BORDER" attribute="Tau Compiler.performance.options.configuration_id_-OPTOPARIRESET_ARGUMENT_SAVED">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if button="OpariReset" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="NoMpi" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTNOMPI_ARGUMENT_DEFAULT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="checkbox" title="MPI" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTMPI_ARGUMENT_DEFAULT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="checkbox" title="NoRevert" attribute="Tau Compiler.performance.options.configuration_id_-OPTNOREVERT_ARGUMENT_DEFAULT" style="SWT.NONE">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Revert" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTREVERT_ARGUMENT_DEFAULT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="checkbox" title="AppCC" buttonId="AppCC" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTAPPCC_ARGUMENT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="text" style="SWT.BORDER" attribute="Tau Compiler.performance.options.configuration_id_-OPTAPPCC_ARGUMENT_SAVED">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if button="AppCC" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="AppCXX" buttonId="AppCXX" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTAPPCXX_ARGUMENT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="text" style="SWT.BORDER" attribute="Tau Compiler.performance.options.configuration_id_-OPTAPPCXX_ARGUMENT_SAVED">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if button="AppCXX" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="AppF90" buttonId="AppF90" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTAPPF90_ARGUMENT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="text" style="SWT.BORDER" attribute="Tau Compiler.performance.options.configuration_id_-OPTAPPF90_ARGUMENT_SAVED">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if button="AppF90" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="DisableHeaderInst" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTDISABLEHEADERINST_ARGUMENT_DEFAULT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="checkbox" title="CompInst" attribute="Tau Compiler.performance.options.configuration_id_-OPTCOMPINST_ARGUMENT_DEFAULT" style="SWT.LEFT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+						</rm:widget>                                                           
+						<rm:widget type="checkbox" title="PDTInst" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTPDTINST_ARGUMENT_DEFAULT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="checkbox" title="noCompInst" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTNOCOMPINST_ARGUMENT_DEFAULT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="checkbox" title="TauSelectFile" buttonId="TauSelectFile" style="SWT.LEFT" attribute="Tau Compiler.performance.options.configuration_id_-OPTTAUSELECTFILE_ARGUMENT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:browse title="Browse..." localOnly="true" textStyle="SWT.BORDER" attribute="Tau Compiler.performance.options.configuration_id_-OPTTAUSELECTFILE_ARGUMENT_SAVED">
+							<rm:text-layout-data>
+								<rm:grid-data horizontalSpan="1" horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="true" />
+							</rm:text-layout-data>
+							<rm:button-layout-data>
+								<rm:grid-data horizontalSpan="1" horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="false" />
+							</rm:button-layout-data>
+							<rm:text-control-state>
+								<rm:enable-if button="TauSelectFile" selected="true" />
+							</rm:text-control-state>
+							<rm:button-control-state>
+								<rm:enable-if button="TauSelectFile" selected="true" />
+							</rm:button-control-state>
+						</rm:browse>
+					</rm:composite>
+				</optionPane>
+			</toolPanes>
+			<toolPanes virtual="true" embedded="false" pane-name="tau_makefile" prepend-with="-tau_makefile=">
+				<configId>tau_makefile.performance.options.configuration_id_</configId>
+				<configVarId>tau_makefile.performance.options.environmentvariables.configuration_id_</configVarId>
+			</toolPanes>
+		</all-compilers>
+	</buildTool>
+	<execTool require-true="use_automatic_tau_reduce" />
+	<postProcTool require-true="use_automatic_tau_reduce">
+		<analysis-commands tool-command="pprof" tool-group="tau" out-to-file="pprof.txt">
+			<toolArguments flag="-d" />
+		</analysis-commands>
+		<analysis-commands tool-command="tau_reduce" tool-group="tau">
+			<toolArguments localFile="true" flag="-f" value="pprof.txt" separator=" " />
+			<toolArguments localFile="true" flag="-o" value="tau_select.txt" separator=" " />
+		</analysis-commands>
+	</postProcTool>
+	<buildTool tool-id="TAU" require-true="use_automatic_tau_reduce">
+		<!-- <toolId>TAU</toolId> -->
+		<cc-compiler tool-command="tau_cc.sh" tool-group="tau" />
+		<cxx-compiler tool-command="tau_cxx.sh" tool-group="tau" />
+		<f90-compiler tool-command="tau_f90.sh" tool-group="tau" />
+		<all-compilers tool-group="tau">
+			<toolPanes virtual="true" embedded="false">
+				<optionPane>
+					<rm:title>Tau Compiler</rm:title>
+				</optionPane>
+			</toolPanes>
+			<toolPanes virtual="true" embedded="false">
+				<optionPane>
+					<rm:title>tau_makefile</rm:title>
+				</optionPane>
+			</toolPanes>
+			<toolArguments localFile="true" flag="-optTauSelectFile" value="tau_select.txt" separator="=" />
+		</all-compilers>
+	</buildTool>
+	<execTool tool-name="TAU Runtime">
+		<global>
+			<toolPanes virtual="false" embedded="false">
+				<configId>TAU Runtime.performance.options.configuration_id_</configId>
+				<configVarId>TAU Runtime.performance.options.environmentvariables.configuration_id_</configVarId>
+				<optionPane>
+					<rm:title>Tau Runtime</rm:title>
+					<rm:layout>
+						<rm:grid-layout />
+					</rm:layout>
+					<rm:composite>
+						<rm:layout>
+							<rm:grid-layout numColumns="3" makeColumnsEqualWidth="false" />
+						</rm:layout>
+						<rm:layout-data>
+							<rm:grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="true" />
+						</rm:layout-data>
+						<rm:widget type="checkbox" title="Verbose Output" style="SWT.LEFT" attribute="TAU Runtime.performance.options.environmentvariables.configuration_id_TAU_VERBOSE">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Enable Profiling" buttonId="EnableProfiling" style="SWT.LEFT" attribute="TAU Runtime.performance.options.environmentvariables.configuration_id_TAU_PROFILE">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+							<rm:tooltip>Generate TAU profile output</rm:tooltip>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Profile Output Directory" buttonId="ProfileOutputDir" attribute="ProfileOutputDir"
+							style="SWT.LEFT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:browse title="Browse..." localOnly="true" directory="true" textStyle="SWT.BORDER" attribute="TAU Runtime.performance.options.environmentvariables.configuration_id_PROFILEDIR">
+							<rm:text-layout-data>
+								<rm:grid-data horizontalSpan="1" horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="true" />
+							</rm:text-layout-data>
+							<rm:button-layout-data>
+								<rm:grid-data horizontalSpan="1" horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="false" />
+							</rm:button-layout-data>
+							<rm:text-control-state>
+								<rm:enable-if button="ProfileOutputDir" selected="true" />
+							</rm:text-control-state>
+							<rm:button-control-state>
+								<rm:enable-if button="ProfileOutputDir" selected="true" />
+							</rm:button-control-state>
+						</rm:browse>
+						<rm:widget type="checkbox" title="Profile Format" buttonId="ProfileFormat" style="SWT.LEFT" attribute="TAU Runtime.performance.options.configuration_id_TAU_PROFILE_FORMAT_ARGUMENT_DEFAULT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="combo" style="SWT.BORDER" readOnly="true" attribute="TAU Runtime.performance.options.environmentvariables.configuration_id_TAU_PROFILE_FORMAT">
+							<rm:layout-data>
+								<rm:grid-data widthHint="150" horizontalAlign="SWT.FILL" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if button="ProfileFormat" selected="true" />
+							</rm:control-state>
+						</rm:widget> 
+						<rm:widget type="checkbox" title="Callpath Profiling" style="SWT.LEFT" attribute="TAU Runtime.performance.options.environmentvariables.configuration_id_TAU_CALLPATH">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Set Callpath Depth" buttonId="SetCallpathDepth" style="SWT.LEFT" attribute="TAU Runtime.performance.options.configuration_id_TAU_CALLPATH_DEPTH_ARGUMENT_DEFAULT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="spinner" style="SWT.BORDER" readOnly="true" attribute="TAU Runtime.performance.options.environmentvariables.configuration_id_TAU_CALLPATH_DEPTH">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false" widthHint="100" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if button="SetCallpathDepth" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Overhead Compensation" style="SWT.LEFT" attribute="TAU Runtime.performance.options.environmentvariables.configuration_id_TAU_COMPENSATE">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Track Message" style="SWT.LEFT" attribute="TAU Runtime.performance.options.environmentvariables.configuration_id_TAU_TRACK_MESSAGE">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Communication Matrix" style="SWT.LEFT" attribute="TAU Runtime.performance.options.environmentvariables.configuration_id_TAU_COMM_MATRIX">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Enable Throttling" style="SWT.LEFT" attribute="TAU Runtime.performance.options.environmentvariables.configuration_id_TAU_THROTTLE">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Throttle Percall" buttonId="ThrottlePerCall" style="SWT.LEFT" attribute="TAU Runtime.performance.options.configuration_id_TAU_THROTTLE_PERCALL_ARGUMENT_DEFAULT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="spinner" style="SWT.BORDER" readOnly="true" attribute="TAU Runtime.performance.options.environmentvariables.configuration_id_TAU_THROTTLE_PERCALL">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false" widthHint="100" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if button="ThrottlePerCall" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Throttle Numcalls" buttonId="TauThrottleNumcalls" style="SWT.LEFT" attribute="TAU Runtime.performance.options.configuration_id_TAU_THROTTLE_NUMCALLS_ARGUMENT_DEFAULT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="spinner" style="SWT.BORDER" readOnly="true" attribute="TAU Runtime.performance.options.environmentvariables.configuration_id_TAU_THROTTLE_NUMCALLS">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false" widthHint="100" />
+							</rm:layout-data>
+							<rm:control-state>
+								<rm:enable-if button="TauThrottleNumcalls" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Enable Tracing" style="SWT.LEFT" attribute="TAU Runtime.performance.options.environmentvariables.configuration_id_TAU_TRACE">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Trace Output Directory" buttonId="TraceOutputDir" style="SWT.LEFT" attribute="TAU Runtime.performance.options.configuration_id_TRACEDIR_ARGUMENT_DEFAULT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:browse title="Browse..." localOnly="true" directory="true" textStyle="SWT.BORDER" attribute="TAU Runtime.performance.options.environmentvariables.configuration_id_TRACEDIR">
+							<rm:text-layout-data>
+								<rm:grid-data horizontalSpan="1" horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="true" />
+							</rm:text-layout-data>
+							<rm:button-layout-data>
+								<rm:grid-data horizontalSpan="1" horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="false" />
+							</rm:button-layout-data>
+							<rm:text-control-state>
+								<rm:enable-if button="TraceOutputDir" selected="true" />
+							</rm:text-control-state>
+							<rm:button-control-state>
+								<rm:enable-if button="TraceOutputDir" selected="true" />
+							</rm:button-control-state>
+						</rm:browse>
+						<rm:widget type="checkbox" title="Synchronize Clocks" style="SWT.LEFT" attribute="TAU Runtime.performance.options.environmentvariables.configuration_id_TAU_SYNCHRONIZE_CLOCKS">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Track Heap" style="SWT.LEFT" attribute="TAU Runtime.performance.options.environmentvariables.configuration_id_TAU_TRACK_HEAP">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Track Headroom" style="SWT.LEFT" attribute="TAU Runtime.performance.options.environmentvariables.configuration_id_TAU_TRACK_HEADROOM">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+						</rm:widget>
+					</rm:composite>
+				</optionPane>
+			</toolPanes>
+			<toolPanes virtual="false" embedded="false">
+				<configId>TAU_SELECTIVE_SELECTION_PANE</configId>
+				<configVarId>TAU_SELECTIVE_SELECTION_PANE_VARS</configVarId>
+				<optionPane>
+					<rm:title>Selective Instrumentation</rm:title>
+					<rm:layout>
+						<rm:grid-layout />
+					</rm:layout>
+					<rm:composite>
+						<rm:layout>
+							<rm:grid-layout numColumns="3" makeColumnsEqualWidth="false" />
+						</rm:layout>
+						<rm:layout-data>
+							<rm:grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="true" />
+						</rm:layout-data>
+						<rm:button-group attribute="SelectInstrumentation">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+							<rm:layout>
+								<rm:row-layout type="SWT.VERTICAL" center="true" fill="true" justify="true" />
+							</rm:layout>
+							<rm:button type="radiobutton" title="None" buttonId="NoneButton" style="SWT.LEFT">
+							</rm:button>
+							<rm:button type="radiobutton" title="Internal" buttonId="InternalButton" style="SWT.LEFT">
+							</rm:button>
+							<rm:button type="radiobutton" title="Automatic" buttonId="AutomaticButton" style="SWT.LEFT">
+							</rm:button>
+							<rm:button type="radiobutton" title="User Defined" buttonId="UserDefinedButton" style="SWT.LEFT">
+							</rm:button>
+						</rm:button-group>
+						<rm:browse title="Browse..." localOnly="true" directory="true" textStyle="SWT.BORDER">
+							<rm:text-layout-data>
+								<rm:grid-data horizontalSpan="2" horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="true" />
+							</rm:text-layout-data>
+							<rm:button-layout-data>
+								<rm:grid-data horizontalSpan="1" horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="false" />
+							</rm:button-layout-data>
+							<rm:text-control-state>
+								<rm:enable-if button="UserDefinedButton" selected="true" />
+							</rm:text-control-state>
+							<rm:button-control-state>
+								<rm:enable-if button="UserDefinedButton" selected="true" />
+							</rm:button-control-state>
+						</rm:browse>
+					</rm:composite>
+				</optionPane>
+			</toolPanes>
+			<toolPanes virtual="false" embedded="false">
+				<configId> </configId>
+				<configVarId> </configVarId>
+				<optionPane>
+					<rm:title>Data Collection</rm:title>
+					<rm:layout>
+						<rm:grid-layout />
+					</rm:layout>
+					<rm:composite>
+						<rm:layout>
+							<rm:grid-layout numColumns="3" makeColumnsEqualWidth="false" />
+						</rm:layout>
+						<rm:layout-data>
+							<rm:grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="true" />
+						</rm:layout-data>
+						<rm:widget type="label" style="SWT.LEFT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"
+									horizontalSpan="1" />
+							</rm:layout-data>
+							<rm:fixed-text>Select Database:</rm:fixed-text>
+						</rm:widget>
+						<rm:widget type="custom" typeId="performance-database" style="SWT.BORDER">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false" />
+							</rm:layout-data> 
+							<!-- <rm:control-state> <rm:enable-if> <rm:or> <rm:rule button="MPI" selected="true" /> <rm:rule button="Callpath" selected="true" 
+								/> <rm:rule button="Opari" selected="true" /> <rm:rule button="OpenMP" selected="true" /> <rm:rule button="Papi" selected="true" /> <rm:rule 
+								button="Trace" selected="true" /> <rm:rule button="PDT" selected="true" /> </rm:or> </rm:enable-if> </rm:control-state> -->
+						</rm:widget> 
+						<rm:widget type="checkbox" title="Keep profiles" style="SWT.LEFT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Print Profile Summary Only" style="SWT.LEFT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Upload profile data to TAU Portal" style="SWT.LEFT">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+						</rm:widget>
+					</rm:composite>
+				</optionPane>
+			</toolPanes>
+		</global>
+	</execTool>
+	<postProcTool>
+		<analysis-commands tool-command="process-TAU-data" tool-group="internal" />
+	</postProcTool>
+	
+</etfwTool>
