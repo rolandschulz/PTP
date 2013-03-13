@@ -1154,6 +1154,24 @@
 						</layout-data>
 						<tooltip>${ptp_rm:LSF_NUM_PROCS#tooltip}</tooltip>
 					</widget>
+																																										
+					<!-- LSF_NETWORK: LSF -network option -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_NETWORK#description}
+						</fixed-text>
+					</widget>
+					
+					<widget type="text" attribute="LSF_NETWORK" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_NETWORK#tooltip}</tooltip>
+					</widget>
 					
 					<!-- LSF_EXCLUSIVE_EXECUTION: Nodes in exclusive execution mode -->
 					<widget type="label" style="SWT.LEFT">
