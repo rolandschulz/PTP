@@ -66,6 +66,10 @@ public class SyncGCCBuildCommandParser extends GCCBuildCommandParser implements 
 				String remotePath = ((CIncludePathEntry) entry).getValue();
 				String workspacePath = this.getWorkspacePath(remotePath, bs.getLocation(currentProject));
 				if (workspacePath == null) {
+					// Bug 402350: Sync scanner discovery has corrupt remote paths when using Windows
+					if (remotePath.startsWith("C:")) { //$NON-NLS-1$
+						remotePath = remotePath.substring(2);
+					}
 					newEntry = new CIncludePathEntry("//" +  conn.getName() + remotePath, entry.getFlags()); //$NON-NLS-1$
 				} else {
 					newEntry = new CIncludePathEntry(workspacePath, entry.getFlags());
