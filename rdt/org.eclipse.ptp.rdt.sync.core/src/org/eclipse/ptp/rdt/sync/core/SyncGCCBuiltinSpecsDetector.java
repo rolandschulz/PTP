@@ -204,6 +204,10 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 		for (ICLanguageSettingEntry entry : entries) {
 			if ((entry instanceof CIncludePathEntry) && ((entry.getFlags() & ICSettingEntry.VALUE_WORKSPACE_PATH) == 0)) {
 				String oldPath = ((CIncludePathEntry) entry).getValue();
+				// Bug 402350: Sync scanner discovery has corrupt remote paths when using Windows
+				if (oldPath.startsWith("C:")) { //$NON-NLS-1$
+					oldPath = oldPath.substring(2);
+				}
 				String newPath = "//" +  conn.getName() + oldPath; //$NON-NLS-1$
 				ICLanguageSettingEntry newEntry = new CIncludePathEntry(newPath, entry.getFlags());
 				newEntries.add(newEntry);
