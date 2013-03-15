@@ -11,6 +11,7 @@
 <xs:schema targetNamespace="http://eclipse.org/ptp/schemas" 
 	xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:rm="http://eclipse.org/ptp/schemas"
 	elementFormDefault="qualified" version="1.1.0">
+	<xs:import schemaLocation="http://eclipse.org/ptp/schemas/layout.xsd" namespace="http://eclipse.org/ptp/lml"/>
 	<xs:element name="resource-manager-builder" type="rm:resource-manager-data"/>
 	<xs:complexType name="resource-manager-data">
 		<xs:sequence>
@@ -696,6 +697,7 @@
 		<xs:sequence>
 			<xs:element name="driver" minOccurs="0" maxOccurs="unbounded" type="rm:monitor-driver-type"/>
 			<xs:element name="workflow" minOccurs="0" maxOccurs="unbounded" type="rm:workflow-type"/>
+			<xs:element name="layout" minOccurs="0" maxOccurs="1" type=""/>
 		</xs:sequence>
 		<xs:attribute name="schedulerType" type="xs:string"/>
 		<xs:attribute name="refreshFrequencyInSeconds" type="xs:int" default="60"/>
