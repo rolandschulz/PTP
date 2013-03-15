@@ -3,5 +3,12 @@
 <plugin>
    <extension-point id="workflows" name="Workflows" schema="schema/workflows.exsd"/>
 
+   <extension
+         point="org.eclipse.ptp.etfw.jaxb.workflows">
+      <workflowDefinitionXML
+            file="contrib/perfsuite-tool.xml"
+            name="PerfSuite">
+      </workflowDefinitionXML>
+   </extension>
 
 </plugin>
