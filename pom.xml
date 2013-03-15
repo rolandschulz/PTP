@@ -121,6 +121,7 @@
 		<module>releng/org.eclipse.ptp.remotetools-feature</module>
 		<module>releng/org.eclipse.ptp.rm.ibm.ll-feature</module>
 		<module>releng/org.eclipse.ptp.rm.ibm.pe-feature</module>
+		<module>releng/org.eclipse.ptp.rm.ibm.platform.lsf-feature</module>
 		<module>releng/org.eclipse.ptp.rm.jaxb.contrib-feature</module>
 		<module>releng/org.eclipse.ptp.rm.slurm-feature</module>
 		<module>releng/org.eclipse.ptp.sci-feature</module>
@@ -131,6 +132,7 @@
 		<module>rms/org.eclipse.ptp.rm.core</module>
 		<module>rms/org.eclipse.ptp.rm.ibm.ll.help</module>
 		<module>rms/org.eclipse.ptp.rm.ibm.pe.help</module>
+		<module>rms/org.eclipse.ptp.rm.ibm.platform.lsf.ui</module>
 		<module>rms/org.eclipse.ptp.rm.jaxb.configs</module>
 		<module>rms/org.eclipse.ptp.rm.jaxb.contrib</module>
 		<module>rms/org.eclipse.ptp.rm.jaxb.control.core</module>

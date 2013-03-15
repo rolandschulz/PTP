@@ -12,6 +12,7 @@
    <feature url="features/org.eclipse.ptp.remotetools_0.0.0.jar" id="org.eclipse.ptp.remotetools" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.rm.ibm.ll_0.0.0.jar" id="org.eclipse.ptp.rm.ibm.ll" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.rm.ibm.pe_0.0.0.jar" id="org.eclipse.ptp.rm.ibm.pe" version="0.0.0"/>
+   <feature url="features/org.eclipse.ptp.rm.ibm.platform.lsf_0.0.0.jar" id="org.eclipse.ptp.rm.ibm.platform.lsf" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.rm.jaxb.contrib_0.0.0.jar" id="org.eclipse.ptp.rm.jaxb.contrib" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.rm.slurm_0.0.0.jar" id="org.eclipse.ptp.rm.slurm" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.services_0.0.0.jar" id="org.eclipse.ptp.services" version="0.0.0"/>
