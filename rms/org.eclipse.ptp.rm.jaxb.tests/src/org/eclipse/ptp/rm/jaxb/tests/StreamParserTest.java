@@ -116,7 +116,7 @@ public class StreamParserTest extends TestCase {
 		}
 	}
 
-	private static final String tokxml = JAXBControlConstants.DATA + "tokenizer-examples.xml"; //$NON-NLS-1$
+	private static final String tokxml = JAXBControlConstants.SCHEMA + "tokenizer-examples.xml"; //$NON-NLS-1$
 
 	private static InputStream getImplicitOrdering() {
 		String content = "jobAttribute_1" + JAXBControlConstants.LINE_SEP + "java.lang.String" + JAXBControlConstants.LINE_SEP + JAXBControlConstants.LINE_SEP + JAXBControlConstants.LINE_SEP + "value_1" + JAXBControlConstants.LINE_SEP //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

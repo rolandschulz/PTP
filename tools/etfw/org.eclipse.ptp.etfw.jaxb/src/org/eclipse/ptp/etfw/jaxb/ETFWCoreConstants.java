@@ -20,8 +20,7 @@ import org.eclipse.ptp.internal.rm.jaxb.core.JAXBCoreConstants;
 public class ETFWCoreConstants {
 
 	/* JAXB */
-	public static final String DATA = "data/"; //$NON-NLS-1$
-	public static final String ETFW_XSD = JAXBCoreConstants.DATA + "etfw_tool_type.xsd";//$NON-NLS-1$
+	public static final String ETFW_XSD = JAXBCoreConstants.SCHEMA + "etfw_tool_type.xsd";//$NON-NLS-1$
 	public static final String JAXB_CONTEXT = "org.eclipse.ptp.etfw.jaxb.data";//$NON-NLS-1$
 
 	/* ETFW Workflow Extension */

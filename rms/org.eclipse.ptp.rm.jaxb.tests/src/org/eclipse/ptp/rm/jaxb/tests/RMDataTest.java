@@ -25,8 +25,8 @@ import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 
 public class RMDataTest extends TestCase {
 
-	private static final String rmxml = JAXBCoreConstants.DATA + "pbs-test-local.xml"; //$NON-NLS-1$
-	private static final String tokxml = JAXBCoreConstants.DATA + "tokenizer-examples.xml"; //$NON-NLS-1$
+	private static final String rmxml = JAXBCoreConstants.SCHEMA + "pbs-test-local.xml"; //$NON-NLS-1$
+	private static final String tokxml = JAXBCoreConstants.SCHEMA + "tokenizer-examples.xml"; //$NON-NLS-1$
 
 	@Override
 	public void setUp() {

@@ -38,7 +38,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
 
 public class ManagedFilesTest extends TestCase implements ILaunchController {
 
-	private static final String xml = JAXBControlConstants.DATA + "pbs-test-local.xml"; //$NON-NLS-1$
+	private static final String xml = JAXBControlConstants.SCHEMA + "pbs-test-local.xml"; //$NON-NLS-1$
 
 	private static ControlType controlData;
 	private static Map<String, AttributeType> env;

@@ -70,8 +70,8 @@ public class JAXBCoreConstants {
 
 	/* JAXB */
 	public static final String XMLSchema = "http://www.w3.org/2001/XMLSchema"; //$NON-NLS-1$
-	public static final String DATA = "data/"; //$NON-NLS-1$
-	public static final String RM_XSD = DATA + "resource_manager_type.xsd";//$NON-NLS-1$
+	public static final String SCHEMA = "schema/"; //$NON-NLS-1$
+	public static final String RM_XSD = SCHEMA + "resource_manager_type.xsd";//$NON-NLS-1$
 	public static final String JAXB = "JAXB";//$NON-NLS-1$
 	public static final String JAXB_CONTEXT = "org.eclipse.ptp.rm.jaxb.core.data";//$NON-NLS-1$
 	public static final String RM_XML = "rm_config_xml";//$NON-NLS-1$
