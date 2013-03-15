@@ -159,6 +159,7 @@
 		<module>tools/etfw/org.eclipse.ptp.etfw.tau.perfdmf</module>
 		<module>tools/etfw/org.eclipse.ptp.etfw.tau.selinst</module>
 		<module>tools/etfw/org.eclipse.ptp.etfw.tau.selinstfort</module>
+		<module>tools/etfw/org.eclipse.ptp.etfw.tau.ui</module>
 		<module>tools/etfw/org.eclipse.ptp.etfw.toolopts</module>
 		<module>tools/gem/org.eclipse.ptp.gem</module>
 		<module>tools/gem/org.eclipse.ptp.gem.help</module>

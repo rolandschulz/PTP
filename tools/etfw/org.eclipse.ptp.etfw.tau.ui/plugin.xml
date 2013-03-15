@@ -19,5 +19,12 @@
             widgetClass="org.eclipse.ptp.etfw.tau.ui.PerformanceDatabaseCombo">
       </widget>
    </extension>
+   <extension
+         point="org.eclipse.ptp.etfw.jaxb.workflows">
+      <workflowDefinitionXML
+            file="data/tau_tool-jaxb.xml"
+            name="TAU">
+      </workflowDefinitionXML>
+   </extension>
 
 </plugin>

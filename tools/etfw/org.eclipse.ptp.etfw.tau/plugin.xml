@@ -13,7 +13,7 @@
    <extension
          point="org.eclipse.ptp.etfw.workflows">
       <workflowDefinitionXML
-            XMLFile="toolxml/tau_tool.xml">
+            XMLFile="data/tau_tool.xml">
       </workflowDefinitionXML>
    </extension>
    <extension
