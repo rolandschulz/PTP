@@ -24,10 +24,7 @@ if [ "$(basename `dirname $PWD`)" = "releng" ] ; then # building in GIT with sub
     KNOWN_PLUGINS="\
 	core/org.eclipse.ptp.utils$VERSION\
 	core/org.eclipse.ptp.proxy$VERSION\
-	debug/org.eclipse.ptp.debug.sdm$VERSION\
-	rms/org.eclipse.ptp.rm.ibm.ll.proxy$VERSION\
-	rms/org.eclipse.ptp.rm.ibm.pe.proxy$VERSION\
-	rms/org.eclipse.ptp.rm.slurm.proxy$VERSION"
+	debug/org.eclipse.ptp.debug.sdm$VERSION"
     PARENT=$(dirname `dirname $PWD`)
 
 else
@@ -35,10 +32,7 @@ else
     KNOWN_PLUGINS="\
 	org.eclipse.ptp.utils$VERSION\
 	org.eclipse.ptp.proxy$VERSION\
-	org.eclipse.ptp.debug.sdm$VERSION\
-	org.eclipse.ptp.rm.ibm.ll.proxy$VERSION\
-	org.eclipse.ptp.rm.ibm.pe.proxy$VERSION\
-	org.eclipse.ptp.rm.slurm.proxy$VERSION"
+	org.eclipse.ptp.debug.sdm$VERSION"
     PARENT=`dirname $PWD`
 
 fi
@@ -48,18 +42,10 @@ if [ "$CMD" = "configure" ]; then
 	UTILS_CONFIGURE_OPTIONS=""
 	PROXY_CONFIGURE_OPTIONS=""
 	SDM_CONFIGURE_OPTIONS=""
-	IBM_LL_CONFIGURE_OPTIONS=""
-	IBM_PE_CONFIGURE_OPTIONS=""
-	PBS_CONFIGURE_OPTIONS="--with-pbs=/usr/local/torque"
-	SLURM_CONFIGURE_OPTIONS="--with-slurm=/usr/local/slurm"
 
 	set "$UTILS_CONFIGURE_OPTIONS"\
 	    "$PROXY_CONFIGURE_OPTIONS"\
-	    "$SDM_CONFIGURE_OPTIONS"\
-	    "$IBM_LL_CONFIGURE_OPTIONS"\
-	    "$IBM_PE_CONFIGURE_OPTIONS"\
-	    "$PBS_CONFIGURE_OPTIONS"\
-	    "$SLURM_CONFIGURE_OPTIONS"
+	    "$SDM_CONFIGURE_OPTIONS"
 fi
 
 PREFIX=$PWD
