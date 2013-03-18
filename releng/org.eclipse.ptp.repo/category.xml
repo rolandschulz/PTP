@@ -1,21 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
    <feature url="features/org.eclipse.ptp_0.0.0.jar" id="org.eclipse.ptp" version="0.0.0"/>
-   <feature url="features/org.eclipse.ptp.core_0.0.0.jar" id="org.eclipse.ptp.core" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.fortran_0.0.0.jar" id="org.eclipse.ptp.fortran" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.debug.sdm_0.0.0.jar" id="org.eclipse.ptp.debug.sdm" version="0.0.0"/>
-   <feature url="features/org.eclipse.ptp.etfw_0.0.0.jar" id="org.eclipse.ptp.etfw" version="0.0.0"/>
-   <feature url="features/org.eclipse.ptp.pldt_0.0.0.jar" id="org.eclipse.ptp.pldt" version="0.0.0"/>
-   <feature url="features/org.eclipse.ptp.remote_0.0.0.jar" id="org.eclipse.ptp.remote" version="0.0.0"/>
-   <feature url="features/org.eclipse.ptp.remote.remotetools_0.0.0.jar" id="org.eclipse.ptp.remote.remotetools" version="0.0.0"/>
-   <feature url="features/org.eclipse.ptp.remotetools_0.0.0.jar" id="org.eclipse.ptp.remotetools" version="0.0.0"/>
-   <feature url="features/org.eclipse.ptp.rm.ibm.ll_0.0.0.jar" id="org.eclipse.ptp.rm.ibm.ll" version="0.0.0"/>
-   <feature url="features/org.eclipse.ptp.rm.ibm.pe_0.0.0.jar" id="org.eclipse.ptp.rm.ibm.pe" version="0.0.0"/>
-   <feature url="features/org.eclipse.ptp.rm.ibm.platform.lsf_0.0.0.jar" id="org.eclipse.ptp.rm.ibm.platform.lsf" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.rm.jaxb.contrib_0.0.0.jar" id="org.eclipse.ptp.rm.jaxb.contrib" version="0.0.0"/>
-   <feature url="features/org.eclipse.ptp.rm.slurm_0.0.0.jar" id="org.eclipse.ptp.rm.slurm" version="0.0.0"/>
-   <feature url="features/org.eclipse.ptp.services_0.0.0.jar" id="org.eclipse.ptp.services" version="0.0.0"/>
-   <feature url="features/org.eclipse.ptp.utils_0.0.0.jar" id="org.eclipse.ptp.utils" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.gem_0.0.0.jar" id="org.eclipse.ptp.gem" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.remote.rse_0.0.0.jar" id="org.eclipse.ptp.remote.rse" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.pldt.upc_0.0.0.jar" id="org.eclipse.ptp.pldt.upc" version="0.0.0"/>
@@ -24,9 +12,6 @@
    <feature url="features/org.eclipse.ptp.sdk_0.0.0.jar" id="org.eclipse.ptp.sdk" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.rdt_0.0.0.jar" id="org.eclipse.ptp.rdt" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.rdt.xlc_0.0.0.jar" id="org.eclipse.ptp.rdt.xlc" version="0.0.0"/>
-   <feature url="features/org.eclipse.ptp.rdt.sync_0.0.0.jar" id="org.eclipse.ptp.rdt.sync" version="0.0.0"/>
-   <feature url="features/org.eclipse.ptp.rdt.remotetools_0.0.0.jar" id="org.eclipse.ptp.rdt.remotetools" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.rdt.editor_0.0.0.jar" id="org.eclipse.ptp.rdt.editor" version="0.0.0"/>
    <feature url="features/org.eclipse.ptp.rcp.sysmon_0.0.0.jar" id="org.eclipse.ptp.rcp.sysmon" version="0.0.0"/>
-   <feature url="features/org.eclipse.ptp.remote.terminal_0.0.0.jar" id="org.eclipse.ptp.remote.terminal" version="0.0.0"/>
 </site>

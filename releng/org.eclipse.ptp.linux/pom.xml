@@ -10,7 +10,7 @@
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
-  <artifactId>org.eclipse.ptp.linux.ppc</artifactId>
+  <artifactId>org.eclipse.ptp.linux</artifactId>
   <version>7.0.0-SNAPSHOT</version>
   <packaging>eclipse-plugin</packaging>
   
