@@ -69,7 +69,6 @@
 		<module>debug/org.eclipse.ptp.debug.sdm</module>
 		<module>debug/org.eclipse.ptp.debug.sdm.core</module>
 		<module>debug/org.eclipse.ptp.debug.sdm.ui</module>
-		<module>debug/org.eclipse.ptp.debug.sdm.x10</module>
 		<module>debug/org.eclipse.ptp.debug.ui</module>
 		<module>rdt/org.eclipse.ptp.rdt.core</module>
 		<module>rdt/org.eclipse.ptp.rdt.core.remotejars</module>
