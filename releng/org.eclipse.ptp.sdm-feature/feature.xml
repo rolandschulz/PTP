@@ -3,8 +3,7 @@
       id="org.eclipse.ptp.debug.sdm"
       label="%featureName"
       version="7.0.0.qualifier"
-      provider-name="%providerName"
-      plugin="org.eclipse.ptp.debug.sdm.core">
+      provider-name="%providerName">
 
    <description url="http://eclipse.org/ptp">
       %description
@@ -18,45 +17,46 @@
       %license
    </license>
 
-   <requires>
-      <import plugin="org.eclipse.ptp.proxy"/>
-      <import plugin="org.eclipse.ptp.utils"/>
-      <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.debug.core"/>
-      <import plugin="org.eclipse.core.filesystem" version="1.2.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ptp.proxy.protocol"/>
-      <import plugin="org.eclipse.ptp.core"/>
-      <import plugin="org.eclipse.ptp.debug.core"/>
-      <import plugin="org.eclipse.ptp.launch"/>
-      <import plugin="org.eclipse.ptp.remote.core"/>
-      <import plugin="org.eclipse.debug.ui"/>
-      <import plugin="org.eclipse.ui"/>
-      <import plugin="org.eclipse.ptp.debug.ui"/>
-      <import plugin="org.eclipse.ptp.ui"/>
-      <import plugin="org.eclipse.ptp.remote.ui"/>
-      <import plugin="org.eclipse.ptp.rm.core" version="1.0.1" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ptp.rm.ui" version="1.0.1" match="greaterOrEqual"/>
-   </requires>
-
    <plugin
-         id="org.eclipse.ptp.debug.sdm.core"
+         id="org.eclipse.ptp.aix"
          download-size="0"
          install-size="0"
          version="0.0.0"
-         unpack="false"/>
+         fragment="true"/>
 
    <plugin
-         id="org.eclipse.ptp.debug.sdm.ui"
+         id="org.eclipse.ptp.linux.x86_64"
+         os="linux"
+         arch="x86_64"
          download-size="0"
          install-size="0"
          version="0.0.0"
-         unpack="false"/>
+         fragment="true"/>
 
    <plugin
-         id="org.eclipse.ptp.debug.sdm.x10"
+         id="org.eclipse.ptp.macosx"
+         os="macosx"
          download-size="0"
          install-size="0"
          version="0.0.0"
-         unpack="false"/>
+         fragment="true"/>
+
+   <plugin
+         id="org.eclipse.ptp.utils"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="org.eclipse.ptp.debug.sdm"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="org.eclipse.ptp.proxy"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
 
 </feature>

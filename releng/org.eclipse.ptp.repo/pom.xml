@@ -46,27 +46,21 @@
 										</copy>
 										<unzip src="${project.build.directory}/${project.build.finalName}.zip"
 											dest="${ptp-install}"/>
-										<unzip src="${basedir}/../../releng/org.eclipse.ptp.aix.ppc/target/org.eclipse.ptp.aix.ppc-${project.version}.jar"
-											dest="${ptp-install}/proxy/org.eclipse.ptp.aix.ppc_${unqualifiedVersion}.${buildQualifier}"/>
-										<unzip src="${basedir}/../../releng/org.eclipse.ptp.linux.ppc/target/org.eclipse.ptp.linux.ppc-${project.version}.jar"
-											dest="${ptp-install}/proxy/org.eclipse.ptp.linux.ppc_${unqualifiedVersion}.${buildQualifier}"/>
-										<unzip src="${basedir}/../../releng/org.eclipse.ptp.linux.x86/target/org.eclipse.ptp.linux.x86-${project.version}.jar"
-											dest="${ptp-install}/proxy/org.eclipse.ptp.linux.x86_${unqualifiedVersion}.${buildQualifier}"/>
-										<unzip src="${basedir}/../../releng/org.eclipse.ptp.linux.x86_64/target/org.eclipse.ptp.linux.x86_64-${project.version}.jar"
-											dest="${ptp-install}/proxy/org.eclipse.ptp.linux.x86_64_${unqualifiedVersion}.${buildQualifier}"/>
-										<unzip src="${basedir}/../../releng/org.eclipse.ptp.macosx.ppc/target/org.eclipse.ptp.macosx.ppc-${project.version}.jar"
-											dest="${ptp-install}/proxy/org.eclipse.ptp.macosx.ppc_${unqualifiedVersion}.${buildQualifier}"/>
-										<unzip src="${basedir}/../../releng/org.eclipse.ptp.macosx.x86/target/org.eclipse.ptp.macosx.x86-${project.version}.jar"
-											dest="${ptp-install}/proxy/org.eclipse.ptp.macosx.x86_${unqualifiedVersion}.${buildQualifier}"/>
+										<unzip src="${basedir}/../../releng/org.eclipse.ptp.aix/target/org.eclipse.ptp.aix-${project.version}.jar"
+											dest="${ptp-install}/sdm/org.eclipse.ptp.aix_${unqualifiedVersion}.${buildQualifier}"/>
+										<unzip src="${basedir}/../../releng/org.eclipse.ptp.linux/target/org.eclipse.ptp.linux-${project.version}.jar"
+											dest="${ptp-install}/sdm/org.eclipse.ptp.linux_${unqualifiedVersion}.${buildQualifier}"/>
+										<unzip src="${basedir}/../../releng/org.eclipse.ptp.macosx/target/org.eclipse.ptp.macosx-${project.version}.jar"
+											dest="${ptp-install}/sdm/org.eclipse.ptp.macosx_${unqualifiedVersion}.${buildQualifier}"/>
 										<unzip src="${basedir}/../../debug/org.eclipse.ptp.debug.sdm/target/org.eclipse.ptp.debug.sdm-${project.version}.jar"
-											dest="${ptp-install}/proxy/org.eclipse.ptp.debug.sdm_${unqualifiedVersion}.${buildQualifier}"/>
+											dest="${ptp-install}/sdm/org.eclipse.ptp.debug.sdm_${unqualifiedVersion}.${buildQualifier}"/>
 										<unzip src="${basedir}/../../core/org.eclipse.ptp.proxy/target/org.eclipse.ptp.proxy-${project.version}.jar"
-											dest="${ptp-install}/proxy/org.eclipse.ptp.proxy_${unqualifiedVersion}.${buildQualifier}"/>
+											dest="${ptp-install}/sdm/org.eclipse.ptp.proxy_${unqualifiedVersion}.${buildQualifier}"/>
 										<unzip src="${basedir}/../../core/org.eclipse.ptp.utils/target/org.eclipse.ptp.utils-${project.version}.jar"
-											dest="${ptp-install}/proxy/org.eclipse.ptp.utils_${unqualifiedVersion}.${buildQualifier}"/>
-										<zip destfile="${ptp-install}/ptp-proxy-${unqualifiedVersion}.zip">
+											dest="${ptp-install}/sdm/org.eclipse.ptp.utils_${unqualifiedVersion}.${buildQualifier}"/>
+										<zip destfile="${ptp-install}/ptp-sdm-${unqualifiedVersion}.zip">
 											<fileset dir="${ptp-install}">
-												<include name="proxy/**/*"/>
+												<include name="sdm/**/*"/>
 											</fileset>
 										</zip>
 									</tasks>
