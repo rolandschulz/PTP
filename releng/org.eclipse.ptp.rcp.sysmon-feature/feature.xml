@@ -249,13 +249,6 @@
          version="0.0.0"/>
 
    <plugin
-         id="org.eclipse.ptp.aix.ppc"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"/>
-
-   <plugin
          id="org.eclipse.ptp.services.core"
          download-size="0"
          install-size="0"
