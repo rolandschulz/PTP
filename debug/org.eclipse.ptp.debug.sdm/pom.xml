@@ -28,6 +28,9 @@
 						<phase>prepare-package</phase>
 						<configuration>
 							<tasks>
+								<replace file="BUILD">
+									<replacefilter token="@buildVersion@" value="${unqualifiedVersion}.${buildQualifier}"/>
+								</replace>
 								<replace file="configure">
 									<replacefilter token="@buildVersion@" value="${unqualifiedVersion}.${buildQualifier}"/>
 								</replace>
