@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.internal.rm.jaxb.control.ui.model;
 
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.internal.rm.jaxb.control.ui.JAXBControlUIConstants;
 import org.eclipse.ptp.internal.rm.jaxb.control.ui.utils.WidgetActionUtils;
 import org.eclipse.ptp.internal.rm.jaxb.ui.util.WidgetBuilderUtils;
@@ -72,7 +73,7 @@ public class ComboUpdateModel extends AbstractUpdateModel implements ModifyListe
 	 * org.eclipse.ptp.rm.jaxb.core.IVariableMap)
 	 */
 	@Override
-	public void initialize(IVariableMap rmMap, IVariableMap lcMap) {
+	public void initialize(ILaunchConfiguration configuration, IVariableMap rmMap, IVariableMap lcMap) {
 		if (itemsFrom != null) {
 			String[] items = WidgetActionUtils.getItemsFrom(rmMap, itemsFrom);
 			if (items.length == 0) {
@@ -81,7 +82,7 @@ public class ComboUpdateModel extends AbstractUpdateModel implements ModifyListe
 			items = WidgetBuilderUtils.normalizeComboItems(items);
 			combo.setItems(items);
 		}
-		super.initialize(rmMap, lcMap);
+		super.initialize(configuration, rmMap, lcMap);
 	}
 
 	/*

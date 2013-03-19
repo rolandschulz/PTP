@@ -281,7 +281,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 			IVariableMap rmMap = fControl.getEnvironment();
 
 			for (IUpdateModel m : localWidgets.values()) {
-				m.initialize(rmMap, lcMap);
+				m.initialize(configuration, rmMap, lcMap);
 			}
 
 			for (IUpdateModel m : localWidgets.values()) {

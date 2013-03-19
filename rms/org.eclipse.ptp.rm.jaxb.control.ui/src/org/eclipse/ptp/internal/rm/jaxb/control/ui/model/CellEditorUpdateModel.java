@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.internal.rm.jaxb.control.ui.model;
 
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
@@ -268,7 +269,7 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 	 * org.eclipse.ptp.rm.jaxb.core.IVariableMap)
 	 */
 	@Override
-	public void initialize(IVariableMap rmMap, IVariableMap lcMap) {
+	public void initialize(ILaunchConfiguration configuration, IVariableMap rmMap, IVariableMap lcMap) {
 		this.lcMap = lcMap;
 		if (editor instanceof ComboBoxCellEditor) {
 			if (itemsFrom != null) {
@@ -280,7 +281,7 @@ public abstract class CellEditorUpdateModel extends AbstractUpdateModel implemen
 				((ComboBoxCellEditor) editor).setItems(items);
 			}
 		}
-		super.initialize(rmMap, lcMap);
+		super.initialize(configuration, rmMap, lcMap);
 	}
 
 	/*

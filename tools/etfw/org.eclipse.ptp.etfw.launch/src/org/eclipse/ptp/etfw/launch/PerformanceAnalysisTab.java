@@ -326,7 +326,7 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 
 		for (IJAXBLaunchConfigurationTab tabControl : tabControllers) {
 			for (IUpdateModel m : tabControl.getLocalWidgets().values()) {
-				m.initialize(vmap, launchTabParent.getVariableMap());
+				m.initialize(this.launchConfiguration, vmap, launchTabParent.getVariableMap());
 			}
 
 			((JAXBDynamicLaunchConfigurationTab) tabControl).initializeFrom(this.launchConfiguration);

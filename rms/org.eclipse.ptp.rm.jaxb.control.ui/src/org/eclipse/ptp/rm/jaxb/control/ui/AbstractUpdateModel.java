@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.internal.rm.jaxb.control.ui.JAXBControlUIConstants;
 import org.eclipse.ptp.internal.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
@@ -120,7 +121,7 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 	 * from the map, and if the value is <code>null</code>, the default value is restored to the map and another refresh is called
 	 * on the actual value.
 	 */
-	public void initialize(IVariableMap rmMap, IVariableMap lcMap) {
+	public void initialize(ILaunchConfiguration configuration, IVariableMap rmMap, IVariableMap lcMap) {
 		this.rmMap = rmMap;
 		this.lcMap = lcMap;
 		if (name != null) {

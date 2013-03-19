@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.rm.jaxb.control.ui;
 
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 
 /**
@@ -42,14 +43,16 @@ public interface IUpdateModel {
 	public Object getValueFromControl();
 
 	/**
-	 * Load values and settings from one attribute map to another.
+	 * Load values and settings from one attribute map to another for a launch configuration.
 	 * 
+	 * @param configuration
+	 *            launch configuration
 	 * @param toMap
 	 *            destination attribute map
 	 * @param fromMap
 	 *            source attribute map
 	 */
-	public void initialize(IVariableMap toMap, IVariableMap fromMap);
+	public void initialize(ILaunchConfiguration configuration, IVariableMap toMap, IVariableMap fromMap);
 
 	/**
 	 * Tests if the value of the associated control can be written to the map.
