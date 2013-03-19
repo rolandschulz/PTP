@@ -25,6 +25,7 @@ public class TableContentsProvider implements ITableLabelProvider {
 	 * @param arg0: The listener
 	 */
 	public void addListener(ILabelProviderListener arg0) {
+		// Do nothing
 	}
 
 	@Override
@@ -33,6 +34,7 @@ public class TableContentsProvider implements ITableLabelProvider {
 	 * Does nothing in this implementation
 	 */
 	public void dispose() {
+		// Do nothing
 	}
 
 	@Override
@@ -83,6 +85,7 @@ public class TableContentsProvider implements ITableLabelProvider {
 	 * @param arg0: The listener
 	 */
 	public void removeListener(ILabelProviderListener arg0) {
+		// Do nothing
 	}
 
 }

@@ -20,5 +20,11 @@
             widgetClass="org.eclipse.ptp.rm.ibm.lsf.ui.widgets.ReservationQueryControl">
       </widget>
    </extension>
-
+   <extension
+         point="org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagerConfigurations">
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/com.ibm.platform.lsf.xml"
+            name="IBM Platform LSF">
+      </JAXBResourceManagerConfiguration>
+   </extension>
 </plugin>

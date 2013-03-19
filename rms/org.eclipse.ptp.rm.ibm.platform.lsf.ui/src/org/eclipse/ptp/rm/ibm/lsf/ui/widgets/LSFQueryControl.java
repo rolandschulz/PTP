@@ -22,8 +22,8 @@ public abstract class LSFQueryControl extends Composite {
 	protected String columnLabels[];
 	protected Vector<String[]> commandResponse;
 	protected LSFQueryDialog dialog;
-	private List<ModifyListener> modifyListeners = new LinkedList<ModifyListener>();
-	protected String selectedValue = "";
+	private final List<ModifyListener> modifyListeners = new LinkedList<ModifyListener>();
+	protected String selectedValue = ""; //$NON-NLS-1$
 
 	public LSFQueryControl(Composite parent, final IWidgetDescriptor wd) {
 		super(parent, wd.getStyle());
@@ -48,8 +48,7 @@ public abstract class LSFQueryControl extends Composite {
 		modifyListeners.add(listener);
 	}
 
-	protected abstract void configureQueryButton(Button button,
-			IRemoteConnection connection);
+	protected abstract void configureQueryButton(Button button, IRemoteConnection connection);
 
 	protected abstract boolean getQueryResponse(IRemoteConnection connection);
 

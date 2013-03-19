@@ -8,15 +8,13 @@ package org.eclipse.ptp.rm.ibm.lsf.ui.model;
 import org.eclipse.ptp.rm.ibm.lsf.ui.widgets.LSFQueryControl;
 import org.eclipse.ptp.rm.jaxb.control.ui.AbstractUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateHandler;
-import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.widgets.Control;
 
-public class LSFQueryModel extends AbstractUpdateModel implements
-		ModifyListener {
+public class LSFQueryModel extends AbstractUpdateModel implements ModifyListener {
 
-	private LSFQueryControl control;
+	private final LSFQueryControl control;
 	private Object initialValue;
 
 	/**
@@ -62,7 +60,7 @@ public class LSFQueryModel extends AbstractUpdateModel implements
 		} else {
 			value = initialValue;
 		}
-		if ((value != null) && (!value.equals(""))) {
+		if ((value != null) && (!value.equals(""))) { //$NON-NLS-1$
 			lcMap.putValue(name, value);
 		}
 		return value;
@@ -82,6 +80,7 @@ public class LSFQueryModel extends AbstractUpdateModel implements
 			Object value = storeValue();
 			handleUpdate(value);
 		} catch (Exception ignored) {
+			// Ignore
 		}
 	}
 
@@ -93,9 +92,9 @@ public class LSFQueryModel extends AbstractUpdateModel implements
 	public void refreshValueFromMap() {
 		mapValue = lcMap.getValue(name);
 		if (mapValue == null) {
-			mapValue = "";
+			mapValue = ""; //$NON-NLS-1$
 			if (initialValue == null) {
-				initialValue = "";
+				initialValue = ""; //$NON-NLS-1$
 			}
 		} else {
 			initialValue = mapValue;

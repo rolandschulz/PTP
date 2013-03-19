@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagerConfigurations">
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/com.ibm.ll.xml"
+            name="IBM LoadLeveler">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/com.ibm.ll_bg.xml"
+            name="IBM LoadLeveler (Blue Gene)">
+      </JAXBResourceManagerConfiguration>
+   </extension>
+</plugin>

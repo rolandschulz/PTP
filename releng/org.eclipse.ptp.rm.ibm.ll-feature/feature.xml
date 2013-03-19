@@ -18,7 +18,14 @@
    </license>
 
    <plugin
-         id="org.eclipse.ptp.rm.ibm.ll.help"
+         id="org.eclipse.ptp.rm.ibm.ll.doc.user"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.rm.ibm.ll.ui"
          download-size="0"
          install-size="0"
          version="0.0.0"

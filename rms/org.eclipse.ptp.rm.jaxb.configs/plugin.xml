@@ -56,24 +56,8 @@
             name="Remote-Generic-Interactive">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
-            configurationFile="data/com.ibm.pe.xml"
-            name="IBM Parallel Environment">
-      </JAXBResourceManagerConfiguration>
-      <JAXBResourceManagerConfiguration
-            configurationFile="data/com.ibm.ll.xml"
-            name="IBM LoadLeveler">
-      </JAXBResourceManagerConfiguration>
-      <JAXBResourceManagerConfiguration
-            configurationFile="data/com.ibm.ll_bg.xml"
-            name="IBM LoadLeveler (Blue Gene)">
-      </JAXBResourceManagerConfiguration>
-      <JAXBResourceManagerConfiguration
             configurationFile="data/mpich2-generic-interactive.xml"
             name="MPICH2-Generic-Interactive">
-      </JAXBResourceManagerConfiguration>
-      <JAXBResourceManagerConfiguration
-            configurationFile="data/lsf-generic-batch.xml"
-            name="IBM Platform LSF">
       </JAXBResourceManagerConfiguration>
    </extension>
 </plugin>

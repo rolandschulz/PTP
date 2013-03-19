@@ -37,8 +37,7 @@ public class QueueQueryControl extends LSFQueryControl {
 	}
 
 	@Override
-	protected void configureQueryButton(Button button,
-			final IRemoteConnection connection) {
+	protected void configureQueryButton(Button button, final IRemoteConnection connection) {
 		button.addSelectionListener(new SelectionAdapter() {
 			@Override
 			/**
@@ -52,9 +51,7 @@ public class QueueQueryControl extends LSFQueryControl {
 				int selection;
 
 				if (getQueryResponse(connection)) {
-					dialog = new LSFQueryDialog(getShell(),
-							Messages.QueueQueryControl_0, columnLabels,
-							commandResponse);
+					dialog = new LSFQueryDialog(getShell(), Messages.QueueQueryControl_0, columnLabels, commandResponse);
 					dialog.setSelectedValue(selectedValue);
 					selection = dialog.open();
 					if (selection == 0) {
@@ -80,8 +77,7 @@ public class QueueQueryControl extends LSFQueryControl {
 		IRemoteProcess process;
 
 		remoteServices = connection.getRemoteServices();
-		processBuilder = remoteServices.getProcessBuilder(connection,
-				"bqueues", "-w"); //$NON-NLS-1$ //$NON-NLS-2$
+		processBuilder = remoteServices.getProcessBuilder(connection, "bqueues", "-w"); //$NON-NLS-1$ //$NON-NLS-2$
 		process = null;
 		try {
 			BufferedReader reader;
@@ -92,6 +88,7 @@ public class QueueQueryControl extends LSFQueryControl {
 			try {
 				process.waitFor();
 			} catch (InterruptedException e) {
+				// Do nothing
 			}
 			if (process.exitValue() == 0) {
 				String columnData[];
@@ -101,8 +98,7 @@ public class QueueQueryControl extends LSFQueryControl {
 				 * blank-delimited strings. The first line of output is the
 				 * column headings. Subsequent lines are reservation data.
 				 */
-				reader = new BufferedReader(new InputStreamReader(
-						process.getInputStream()));
+				reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 				data = reader.readLine();
 				headerLine = true;
 				commandResponse.clear();

@@ -125,8 +125,11 @@
 		<module>releng/org.eclipse.ptp.services-feature</module>
 		<module>releng/org.eclipse.ptp.utils-feature</module>
 		<module>rms/org.eclipse.ptp.rm.core</module>
-		<module>rms/org.eclipse.ptp.rm.ibm.ll.help</module>
-		<module>rms/org.eclipse.ptp.rm.ibm.pe.help</module>
+		<module>rms/org.eclipse.ptp.rm.ibm.ll.doc.user</module>
+		<module>rms/org.eclipse.ptp.rm.ibm.ll.ui</module>
+		<module>rms/org.eclipse.ptp.rm.ibm.pe.doc.user</module>
+		<module>rms/org.eclipse.ptp.rm.ibm.pe.ui</module>
+		<module>rms/org.eclipse.ptp.rm.ibm.platform.lsf.doc.user</module>
 		<module>rms/org.eclipse.ptp.rm.ibm.platform.lsf.ui</module>
 		<module>rms/org.eclipse.ptp.rm.jaxb.configs</module>
 		<module>rms/org.eclipse.ptp.rm.jaxb.contrib</module>
