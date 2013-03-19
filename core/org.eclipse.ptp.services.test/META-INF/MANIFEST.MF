@@ -4,7 +4,7 @@ Bundle-Name: PTP Services Test Plug-in
 Bundle-SymbolicName: org.eclipse.ptp.services.test;singleton:=true
 Bundle-Version: 1.0.0
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Require-Bundle: org.junit4;bundle-version="4.3.1",
+Require-Bundle: org.junit,
  org.eclipse.ptp.services.core,
  org.eclipse.ptp.services.ui,
  org.eclipse.core.resources;bundle-version="3.4.0",
