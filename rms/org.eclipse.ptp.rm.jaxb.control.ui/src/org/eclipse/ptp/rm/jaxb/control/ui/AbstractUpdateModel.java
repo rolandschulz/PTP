@@ -55,6 +55,7 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 
 	protected boolean canSave;
 	protected String name;
+	protected ILaunchConfiguration configuration;
 	protected IVariableMap rmMap;
 	protected IVariableMap lcMap;
 	protected IUpdateHandler handler;
@@ -122,6 +123,7 @@ public abstract class AbstractUpdateModel implements IUpdateModel {
 	 * on the actual value.
 	 */
 	public void initialize(ILaunchConfiguration configuration, IVariableMap rmMap, IVariableMap lcMap) {
+		this.configuration = configuration;
 		this.rmMap = rmMap;
 		this.lcMap = lcMap;
 		if (name != null) {
