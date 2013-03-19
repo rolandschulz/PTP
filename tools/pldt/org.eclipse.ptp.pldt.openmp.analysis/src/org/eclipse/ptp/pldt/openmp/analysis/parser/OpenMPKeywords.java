@@ -44,9 +44,9 @@ public class OpenMPKeywords
 	public static final char[] SHARED = "shared".toCharArray(); //$NON-NLS-1$
 	public static final char[] SINGLE = "single".toCharArray(); //$NON-NLS-1$
 	public static final char[] THREADPRIVATE = "threadprivate".toCharArray(); //$NON-NLS-1$
-	public static final char[] DYNAMIC = "dynamic".toCharArray(); // $NON-NLS-1$
-	public static final char[] STATIC = "static".toCharArray(); // $NON-NLS-1$
+	public static final char[] DYNAMIC = "dynamic".toCharArray(); //$NON-NLS-1$
+	public static final char[] STATIC = "static".toCharArray(); //$NON-NLS-1$
 
-	public static final char[] POUND = "#".toCharArray(); // $NON-NLS-1$
-	public static final char[] PRAGMA = "pragma".toCharArray(); // $NON-NLS-1$
+	public static final char[] POUND = "#".toCharArray(); //$NON-NLS-1$
+	public static final char[] PRAGMA = "pragma".toCharArray(); //$NON-NLS-1$
 }
