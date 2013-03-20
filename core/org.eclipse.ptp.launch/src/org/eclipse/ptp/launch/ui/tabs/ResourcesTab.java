@@ -55,7 +55,9 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 
 /**
  * The Resources Tab is used to specify the resources required for a successful job launch. It is populated by the selected resource
@@ -181,7 +183,15 @@ public class ResourcesTab extends LaunchConfigurationTab {
 
 		// select the default message; thus if user types a filter string immediately, it will replace it
 		fSystemTypeCombo.setSelection(new Point(0, Messages.ResourcesTab_pleaseSelectTargetSystem.length()));
-
+		
+		// adjust selection events per Bug 403704 - needed for Linux/GTK (only?)
+		fSystemTypeCombo.addListener(SWT.Traverse, new Listener() {
+			public void handleEvent(Event event) {
+				if (event.detail == SWT.TRAVERSE_RETURN) {
+					event.doit = false;
+				}
+			}
+		});
 		fRemoteConnectionWidget = new RemoteConnectionWidget(comp, SWT.NONE, null, getLaunchConfigurationDialog());
 		fRemoteConnectionWidget.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
 		fRemoteConnectionWidget.addSelectionListener(new SelectionAdapter() {
