@@ -33,6 +33,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.preferences.IScopeContext;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.CheckoutCommand;
 import org.eclipse.jgit.api.CommitCommand;
@@ -78,6 +80,8 @@ import org.eclipse.ptp.rdt.sync.git.core.RmCommandCached;
 import org.eclipse.ptp.remote.core.AbstractRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.osgi.service.prefs.BackingStoreException;
+import org.osgi.service.prefs.Preferences;
 
 /**
  * 
@@ -86,6 +90,9 @@ import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
  * 
  */
 public class GitRemoteSyncConnection {
+	private static final String instanceScopeSyncNode = "org.eclipse.ptp.rdt.sync.core"; //$NON-NLS-1$
+	private static final String GIT_LOCATION_NODE_NAME = "git-location"; //$NON-NLS-1$
+
 	private final int MAX_FILES = 100;
 	private static final String remoteProjectName = "eclipse_auto"; //$NON-NLS-1$
 	private static final String commitMessage = Messages.GRSC_CommitMessage;
@@ -1234,6 +1241,25 @@ public class GitRemoteSyncConnection {
 	
 	// Get the base git command for this system, includes the git binary plus sync-specific arguments.
 	private String gitCommand() {
-		return "git " + gitArgs; //$NON-NLS-1$
+		String gitBinary = "git"; //$NON-NLS-1$
+		IScopeContext context = InstanceScope.INSTANCE;
+		Preferences prefSyncNode = context.getNode(instanceScopeSyncNode);
+		if (prefSyncNode == null) {
+			RDTSyncCorePlugin.log(Messages.GitRemoteSyncConnection_28);
+		} else {
+			try {
+				// Avoid creating node if it doesn't exist
+				if (prefSyncNode.nodeExists(GIT_LOCATION_NODE_NAME)) {
+					Preferences prefGitNode = prefSyncNode.node(GIT_LOCATION_NODE_NAME);
+					gitBinary = prefGitNode.get(buildScenario.getRemoteConnection().getName(), "git"); //$NON-NLS-1$
+				}
+			} catch (BackingStoreException e) {
+				RDTSyncCorePlugin.log(Messages.GitRemoteSyncConnection_29, e);
+			} catch (MissingConnectionException e) {
+				// nothing to do
+			}
+		}
+		
+		return gitBinary + " " + gitArgs; //$NON-NLS-1$
 	}
 }

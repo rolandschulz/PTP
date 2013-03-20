@@ -352,9 +352,21 @@
          point="org.eclipse.ui.preferencePages">
       <page
             category="org.eclipse.ptp.remote.ui.RemoteDevelopmentPreferencePage"
-            class="org.eclipse.ptp.rdt.sync.ui.SyncFileFilterPage"
-            id="org.eclipse.ptp.rdt.sync.ui.SyncFileFilterPage"
+            class="org.eclipse.ptp.rdt.sync.ui.SyncPreferencePage"
+            id="org.eclipse.ptp.rdt.sync.ui.SyncPreferencePage"
             name="Synchronized Projects">
+      </page>
+      <page
+            category="org.eclipse.ptp.rdt.sync.ui.SyncPreferencePage"
+            class="org.eclipse.ptp.rdt.sync.ui.SyncFileFilterPage"
+            id="org.eclipse.ptp.rdt.sync.ui.SyncPreferencePage.SyncFileFilterPage"
+            name="File Filtering">
+      </page>
+      <page
+            category="org.eclipse.ptp.rdt.sync.ui.SyncPreferencePage"
+            class="org.eclipse.ptp.rdt.sync.ui.SyncGitPreferencePage"
+            id="org.eclipse.ptp.rdt.sync.ui.SyncPreferencePage.SyncGitPreferencePage"
+            name="Git Binary Locations">
       </page>
    </extension>
    <extension

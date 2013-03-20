@@ -49,6 +49,8 @@ public class Messages extends NLS {
 	public static String GitRemoteSyncConnection_25;
 	public static String GitRemoteSyncConnection_26;
 	public static String GitRemoteSyncConnection_27;
+	public static String GitRemoteSyncConnection_28;
+	public static String GitRemoteSyncConnection_29;
 	public static String GitRemoteSyncConnection_3;
 	public static String GitRemoteSyncConnection_4;
 	public static String GitRemoteSyncConnection_5;
