@@ -116,6 +116,7 @@ public class Messages extends NLS {
 	public static String SyncMergeFileTableViewer_4;
 	public static String SyncMergeFileTreeViewer_0;
 	public static String SyncMergeFileTreeViewer_1;
+	public static String SyncPreferencePage_0;
 	public static String BRPPage_RemoteProviderLabel;
 	public static String BRPPage_ConnectionLabel;
 	public static String BRPPage_RootLocation;
