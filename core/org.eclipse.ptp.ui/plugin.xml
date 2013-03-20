@@ -31,5 +31,12 @@
 		   	</adapter>
 		</factory>
 	</extension>
+ <extension
+       point="org.eclipse.ui.views">
+    <category
+          id="org.eclipse.ptp.ui.views"
+          name="%ParallelViewCategory.name">
+    </category>
+ </extension>
 
 </plugin>
