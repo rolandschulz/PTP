@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<etfwTool xmlns="http://org.eclipse.ptp/etfw" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rm="org.eclipse.ptp"
+<etfwTool xmlns="http://eclipse.org/ptp/etfw" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rm="http://eclipse.org/ptp/rm"
 	xsi:schemaLocation="etfw_tool_type.xsd" name="new-tool">
 
 	<controlData>

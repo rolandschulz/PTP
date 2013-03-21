@@ -8,14 +8,10 @@
 <!-- * Contributors: -->
 <!-- * Chris Navarro - Design and implementation -->
 <!-- ****************************************************************************** -->
-<xs:schema targetNamespace="http://org.eclipse.ptp/etfw" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:etfw="http://org.eclipse.ptp/etfw"
-	xmlns:rm="http://eclipse.org/ptp/schemas" elementFormDefault="qualified">
+<xs:schema targetNamespace="http://eclipse.org/ptp/etfw" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:etfw="http://eclipse.org/ptp/etfw"
+	xmlns:rm="http://eclipse.org/ptp/rm" elementFormDefault="qualified">
 
-	<xs:import schemaLocation="http://eclipse.org/ptp/schemas/rm.xsd" namespace="http://eclipse.org/ptp/schemas" />
-	<!-- <xs:import schemaLocation="file:/home/cnavarro/workspaces/ptp-dev/git/org.eclipse.ptp/rms/org.eclipse.ptp.rm.jaxb.core/data/resource_manager_type.xsd" 
-		namespace="org.eclipse.ptp" /> -->
-	<!-- <xs:import schemaLocation="http://eclipse.org/ptp/schemas/rm.xsd" namespace="http://org.eclipse.ptp" /> -->
-	<!-- <xs:import schemaLocation="http://localhost:8080/resource_manager_type.xsd" namespace="http://org.eclipse.ptp" /> -->
+	<xs:import schemaLocation="http://eclipse.org/ptp/schemas/v1.1/rm.xsd" namespace="http://eclipse.org/ptp/rm" />
 
 	<!-- This should be uncommented once the special TAU widgets are part of the resource_manager_type.xsd file -->
 	<xs:element name="etfwTool" type="etfw:EtfwToolProcessType" />

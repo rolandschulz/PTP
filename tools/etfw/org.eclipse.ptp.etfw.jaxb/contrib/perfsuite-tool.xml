@@ -1,4 +1,4 @@
-<etfwTool xmlns="http://org.eclipse.ptp/etfw" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rm="http://eclipse.org/ptp/schemas"
+<etfwTool xmlns="http://eclipse.org/ptp/etfw" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rm="http://eclipse.org/ptp/rm"
 	xsi:schemaLocation="etfw_tool_type.xsd" name="perfsuite" prepend-execution="false" recompile="false" explicit-execution="false">
 	<controlData>
 		<attribute name="PERFSUITE_psrun.configuration_id_-CONFIG" type="boolean" translateBooleanAs="-c, ">
