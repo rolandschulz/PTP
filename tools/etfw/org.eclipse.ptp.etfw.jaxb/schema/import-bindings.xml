@@ -1,0 +1,185 @@
+<jxb:bindings 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+    version="2.1">
+
+    <jxb:bindings schemaLocation="http://eclipse.org/ptp/schemas/v1.1/rm.xsd">
+            <jxb:bindings node="//xs:complexType[@name='add-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.AddType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='append-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.AppendType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='arg-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.ArgType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='attribute-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.AttributeType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='attribute-viewer-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.AttributeViewerType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='browse-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.BrowseType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='button-action-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.ButtonActionType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='button-group-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.ButtonGroupType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='column-data-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.ColumnDataType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='command-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.CommandType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='composite-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.CompositeType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='control-state-rule-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.ControlStateRuleType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='control-state-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.ControlStateType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='control-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.ControlType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='entry-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.EntryType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='environment-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.EnvironmentType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='file-match-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.FileMatchType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='fill-layout-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.FillLayoutType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='font-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.FontType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='form-attachment-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.FormAttachmentType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='form-data-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.FormDataType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='form-layout-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.FormLayoutType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='grid-data-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.GridDataType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='grid-layout-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.GridLayoutType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='launch-tab-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.LaunchTabType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='layout-data-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.LayoutDataType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='layout-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.LayoutType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='line-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.LineType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='managed-file-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.ManagedFileType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='managed-files-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.ManagedFilesType"/>
+            </jxb:bindings>
+             <jxb:bindings node="//xs:complexType[@name='match-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.MatchType"/>
+            </jxb:bindings>
+             <jxb:bindings node="//xs:complexType[@name='monitor-driver-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.MonitorDriverType"/>
+            </jxb:bindings>
+             <jxb:bindings node="//xs:complexType[@name='monitor-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.MonitorType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='push-button-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.PushButtonType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='put-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.PutType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='range-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.RangeType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='regex-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.RegexType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='resource-manager-data']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='row-data-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.RowDataType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='row-layout-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.RowLayoutType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='script-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.ScriptType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='set-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.SetType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='simple-command-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.SimpleCommandType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='site-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.SiteType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='step-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.StepType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='tab-controller-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.TabControllerType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='tab-folder-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.TabFolderType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='tab-item-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.TabItemType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='target-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.TargetType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='template-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.TemplateType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='test-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.TestType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='throw-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.ThrowType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='tokenizer-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.TokenizerType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='validator-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.ValidatorType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='var-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.VarType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='vardefs-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.VardefsType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='viewer-items-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.ViewerItemsType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='widget-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.WidgetType"/>
+            </jxb:bindings>
+            <jxb:bindings node="//xs:complexType[@name='workflow-type']">
+                <jxb:class ref="org.eclipse.ptp.rm.jaxb.core.data.WorkflowType"/>
+            </jxb:bindings>
+    </jxb:bindings>
+</jxb:bindings>

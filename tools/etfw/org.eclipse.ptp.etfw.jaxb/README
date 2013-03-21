@@ -7,5 +7,5 @@
 #
 ###################################################################################
 
-xjc -target 2.1 -d src -p org.eclipse.ptp.etfw.jaxb.data schema/etfw_tool_type.xsd
+xjc -target 2.1 -b schema/import-bindings.xml -d src -p org.eclipse.ptp.etfw.jaxb.data schema/etfw_tool_type.xsd
 	
