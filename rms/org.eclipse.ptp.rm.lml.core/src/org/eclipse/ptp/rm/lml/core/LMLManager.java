@@ -180,7 +180,9 @@ public class LMLManager {
 			fLguiItem = item;
 		}
 
-		fLguiItem.reloadLastLayout(layout);
+		if (layout != null) {
+			fLguiItem.reloadLastLayout(layout);
+		}
 		fLguiItem.setRequest(request);
 		restoreJobStatusData(fLguiItem, jobs);
 

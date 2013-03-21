@@ -133,7 +133,7 @@ public class MonitorControl implements IMonitorControl {
 	private final String fControlId;
 	private final LMLManager fLMLManager = LMLManager.getInstance();
 	private final JobListener fJobListener = new JobListener();
-	private final StringBuffer fSavedLayout = new StringBuffer();
+	private String fSavedLayout;
 	private final List<JobStatusData> fSavedJobs = new ArrayList<JobStatusData>();
 	private String fConfigurationName;
 	private boolean fActive;
@@ -293,7 +293,6 @@ public class MonitorControl implements IMonitorControl {
 	 */
 	@Override
 	public boolean load() throws CoreException {
-		fSavedLayout.setLength(0);
 		fSavedJobs.clear();
 
 		FileReader reader;
@@ -308,7 +307,7 @@ public class MonitorControl implements IMonitorControl {
 
 		IMemento childLayout = memento.getChild(LAYOUT_ATTR);
 		if (childLayout != null) {
-			fSavedLayout.append(childLayout.getString(LAYOUT_STRING_ATTR));
+			fSavedLayout = childLayout.getString(LAYOUT_STRING_ATTR);
 		}
 
 		childLayout = memento.getChild(JOBS_ATTR);
@@ -496,7 +495,7 @@ public class MonitorControl implements IMonitorControl {
 				 * Initialize LML classes
 				 */
 				fLMLManager.openLgui(getControlId(), conn.getUsername(), getMonitorConfigurationRequestType(controller),
-						fSavedLayout.toString(), fSavedJobs.toArray(new JobStatusData[0]));
+						fSavedLayout, fSavedJobs.toArray(new JobStatusData[0]));
 
 				fActive = true;
 

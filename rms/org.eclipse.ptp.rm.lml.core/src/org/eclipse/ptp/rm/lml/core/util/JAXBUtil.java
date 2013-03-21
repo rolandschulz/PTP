@@ -92,11 +92,11 @@ public class JAXBUtil {
 	private static String JAXB_CLASSES = "org.eclipse.ptp.rm.lml.internal.core.elements";//$NON-NLS-1$
 
 	private static String SCHEMA_LOCATION = "jaxb.schemaLocation";//$NON-NLS-1$
-	private static String SCHEMA_FILE = "http://eclipse.org/ptp/schemas/lgui.xsd";//$NON-NLS-1$
+	private static String SCHEMA_FILE = "http://eclipse.org/ptp/schemas/v1.1/lgui.xsd";//$NON-NLS-1$
 	private static String SCHEMA_LGUI = "lgui";//$NON-NLS-1$
 	private static String SCHEMA_LAYOUT = "layout";//$NON-NLS-1$
 	private static String SCHEMA_LML = "lml";//$NON-NLS-1$
-	private static String SCHEMA_DIRECTORY = "http://eclipse.org/ptp/schemas";//$NON-NLS-1$
+	private static String SCHEMA_NAMESPACE = "http://eclipse.org/ptp/lml";//$NON-NLS-1$
 
 	private static Validator validator;
 
@@ -144,8 +144,7 @@ public class JAXBUtil {
 	 *         lml-model valid
 	 */
 	@SuppressWarnings("unchecked")
-	public static JAXBElement<GobjectType> minimizeGobjectType(
-			GobjectType gobject, ObjectFactory objectFactory) {
+	public static JAXBElement<GobjectType> minimizeGobjectType(GobjectType gobject, ObjectFactory objectFactory) {
 
 		String qName = null;
 		GobjectType value = null;
@@ -204,8 +203,7 @@ public class JAXBUtil {
 		value.setId(gobject.getId());
 		value.setTitle(gobject.getTitle());
 
-		return new JAXBElement<GobjectType>(new QName(qName),
-				(Class<GobjectType>) gobject.getClass(), value);
+		return new JAXBElement<GobjectType>(new QName(qName), (Class<GobjectType>) gobject.getClass(), value);
 	}
 
 	/**
@@ -219,17 +217,13 @@ public class JAXBUtil {
 	@SuppressWarnings("unchecked")
 	public static void replaceGlobalLayout(LguiType newLayout, LguiType lgui) {
 
-		for (final JAXBElement<?> layout : newLayout
-				.getObjectsAndRelationsAndInformation()) {
+		for (final JAXBElement<?> layout : newLayout.getObjectsAndRelationsAndInformation()) {
 			if (layout.getValue() instanceof LayoutType) {
 				boolean replaced = false;
-				for (final JAXBElement<?> object : lgui
-						.getObjectsAndRelationsAndInformation()) {
+				for (final JAXBElement<?> object : lgui.getObjectsAndRelationsAndInformation()) {
 					if (object.getValue() instanceof LayoutType) {
-						if (((LayoutType) object.getValue()).getId().equals(
-								((LayoutType) layout.getValue()).getId())) {
-							((JAXBElement<LayoutType>) object)
-									.setValue((LayoutType) layout.getValue());
+						if (((LayoutType) object.getValue()).getId().equals(((LayoutType) layout.getValue()).getId())) {
+							((JAXBElement<LayoutType>) object).setValue((LayoutType) layout.getValue());
 							replaced = true;
 							break;
 						}
@@ -277,7 +271,7 @@ public class JAXBUtil {
 	 * @return jaxbelement, which can be marshalled
 	 */
 	private static JAXBElement<LayoutRoot> createRootLayout(LayoutRoot rootValue) {
-		final QName qname = new QName(SCHEMA_DIRECTORY, SCHEMA_LAYOUT, SCHEMA_LML);
+		final QName qname = new QName(SCHEMA_NAMESPACE, SCHEMA_LAYOUT, SCHEMA_LML);
 		return new JAXBElement<LayoutRoot>(qname, LayoutRoot.class, rootValue);
 	}
 
@@ -290,7 +284,7 @@ public class JAXBUtil {
 	 * @return jaxbelement, which can be marshalled
 	 */
 	private static JAXBElement<LguiType> createRootLgui(LguiType rootValue) {
-		final QName qname = new QName(SCHEMA_DIRECTORY, SCHEMA_LGUI, SCHEMA_LML);
+		final QName qname = new QName(SCHEMA_NAMESPACE, SCHEMA_LGUI, SCHEMA_LML);
 		return new JAXBElement<LguiType>(qname, LguiType.class, rootValue);
 	}
 
@@ -326,7 +320,7 @@ public class JAXBUtil {
 			final JAXBContext jaxbContext = JAXBContext.newInstance(JAXB_CLASSES);
 			marshaller = jaxbContext.createMarshaller();
 			try {
-				marshaller.setProperty(SCHEMA_LOCATION, SCHEMA_DIRECTORY + " " + SCHEMA_FILE); //$NON-NLS-1$
+				marshaller.setProperty(SCHEMA_LOCATION, SCHEMA_NAMESPACE + " " + SCHEMA_FILE); //$NON-NLS-1$
 				marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			} catch (final PropertyException exc) {
 				// Dont fail just because of missing property
@@ -341,23 +335,18 @@ public class JAXBUtil {
 		}
 	}
 
-	public void addComponentLayoutElement(LguiType lgui,
-			ComponentlayoutType component) {
+	public void addComponentLayoutElement(LguiType lgui, ComponentlayoutType component) {
 		if (component instanceof TablelayoutType) {
-			lgui.getObjectsAndRelationsAndInformation()
-					.add(new JAXBElement<TablelayoutType>(new QName(
-							ILMLCoreConstants.TABLELAYOUT_ELEMENT),
-							TablelayoutType.class, (TablelayoutType) component));
+			lgui.getObjectsAndRelationsAndInformation().add(
+					new JAXBElement<TablelayoutType>(new QName(ILMLCoreConstants.TABLELAYOUT_ELEMENT), TablelayoutType.class,
+							(TablelayoutType) component));
 		} else if (component instanceof NodedisplaylayoutType) {
 			lgui.getObjectsAndRelationsAndInformation().add(
-					new JAXBElement<NodedisplaylayoutType>(new QName(
-							ILMLCoreConstants.NODEDISPLAYLAYOUT_ELEMENT),
-							NodedisplaylayoutType.class,
-							(NodedisplaylayoutType) component));
+					new JAXBElement<NodedisplaylayoutType>(new QName(ILMLCoreConstants.NODEDISPLAYLAYOUT_ELEMENT),
+							NodedisplaylayoutType.class, (NodedisplaylayoutType) component));
 		} else {
 			lgui.getObjectsAndRelationsAndInformation().add(
-					new JAXBElement<ComponentlayoutType>(new QName(
-							ILMLCoreConstants.COMPONENTLAYOUT_ELEMENT),
+					new JAXBElement<ComponentlayoutType>(new QName(ILMLCoreConstants.COMPONENTLAYOUT_ELEMENT),
 							ComponentlayoutType.class, component));
 		}
 	}
@@ -365,14 +354,12 @@ public class JAXBUtil {
 	public void addLayoutElement(LguiType lgui, Object object) {
 		if (object instanceof SplitlayoutType) {
 			lgui.getObjectsAndRelationsAndInformation().add(
-					new JAXBElement<SplitlayoutType>(new QName(
-							ILMLCoreConstants.SPLITLAYOUT_ELEMENT),
-							SplitlayoutType.class, (SplitlayoutType) object));
+					new JAXBElement<SplitlayoutType>(new QName(ILMLCoreConstants.SPLITLAYOUT_ELEMENT), SplitlayoutType.class,
+							(SplitlayoutType) object));
 		} else if (object instanceof AbslayoutType) {
 			lgui.getObjectsAndRelationsAndInformation().add(
-					new JAXBElement<AbslayoutType>(new QName(
-							ILMLCoreConstants.ABSLAYOUT_ELEMENT),
-							AbslayoutType.class, (AbslayoutType) object));
+					new JAXBElement<AbslayoutType>(new QName(ILMLCoreConstants.ABSLAYOUT_ELEMENT), AbslayoutType.class,
+							(AbslayoutType) object));
 		}
 
 	}
@@ -383,8 +370,7 @@ public class JAXBUtil {
 	 * @param layout
 	 *            absolute or splitlayout
 	 */
-	public void addLayoutTag(LguiType lgui, ILguiItem lguiItem,
-			LayoutType layout) {
+	public void addLayoutTag(LguiType lgui, ILguiItem lguiItem, LayoutType layout) {
 
 		if (layout.getId() == null) {
 			layout.setId(ILMLCoreConstants.ZEROSTR);
@@ -396,17 +382,15 @@ public class JAXBUtil {
 
 			final AbslayoutType absLayout = (AbslayoutType) layout;
 
-			jaxbElement = new JAXBElement<AbslayoutType>(new QName(
-					ILMLCoreConstants.ABSLAYOUT_ELEMENT), AbslayoutType.class,
+			jaxbElement = new JAXBElement<AbslayoutType>(new QName(ILMLCoreConstants.ABSLAYOUT_ELEMENT), AbslayoutType.class,
 					absLayout);
 
 		} else if (layout instanceof SplitlayoutType) {
 
 			final SplitlayoutType splitLayout = (SplitlayoutType) layout;
 
-			jaxbElement = new JAXBElement<SplitlayoutType>(new QName(
-					ILMLCoreConstants.SPLITLAYOUT_ELEMENT),
-					SplitlayoutType.class, splitLayout);
+			jaxbElement = new JAXBElement<SplitlayoutType>(new QName(ILMLCoreConstants.SPLITLAYOUT_ELEMENT), SplitlayoutType.class,
+					splitLayout);
 
 		} else {
 			return;
@@ -430,8 +414,7 @@ public class JAXBUtil {
 	public void addLayoutTagsToRequest(LayoutRoot request, LguiType data) {
 
 		for (final JAXBElement<?> child : data.getObjectsAndRelationsAndInformation()) {
-			if (child.getValue() instanceof ComponentlayoutType
-					|| child.getValue() instanceof SplitlayoutType
+			if (child.getValue() instanceof ComponentlayoutType || child.getValue() instanceof SplitlayoutType
 					|| child.getValue() instanceof AbslayoutType) {
 				request.getTextlayoutAndInfoboxlayoutAndTablelayout().add(child);
 
@@ -482,9 +465,8 @@ public class JAXBUtil {
 
 	public void addPatternInclude(PatternType pattern, PatternMatchType patternMatch) {
 		pattern.getIncludeAndExcludeAndSelect().add(
-				new JAXBElement<PatternMatchType>(new QName(
-						ILMLCoreConstants.INCLUDE_ELEMENT),
-						PatternMatchType.class, patternMatch));
+				new JAXBElement<PatternMatchType>(new QName(ILMLCoreConstants.INCLUDE_ELEMENT), PatternMatchType.class,
+						patternMatch));
 	}
 
 	public void addPatternSelect(PatternType pattern, SelectType select) {
@@ -494,9 +476,7 @@ public class JAXBUtil {
 
 	public void addTable(LguiType lgui, TableType table) {
 		lgui.getObjectsAndRelationsAndInformation().add(
-				new JAXBElement<TableType>(new QName(
-						ILMLCoreConstants.TABLE_ELEMENT), TableType.class,
-						table));
+				new JAXBElement<TableType>(new QName(ILMLCoreConstants.TABLE_ELEMENT), TableType.class, table));
 	}
 
 	/**
@@ -598,8 +578,7 @@ public class JAXBUtil {
 	 */
 	public ArrayList<Object> getObjects(LguiType lgui) {
 		final ArrayList<Object> list = new ArrayList<Object>();
-		for (final JAXBElement<?> element : lgui
-				.getObjectsAndRelationsAndInformation()) {
+		for (final JAXBElement<?> element : lgui.getObjectsAndRelationsAndInformation()) {
 			list.add(element.getValue());
 		}
 		return list;
@@ -706,13 +685,11 @@ public class JAXBUtil {
 			if (object.getValue() instanceof ComponentlayoutType) {
 
 				if (((ComponentlayoutType) object.getValue()).getGid() != null
-						&& ((ComponentlayoutType) object.getValue()).getGid()
-								.equals(newLayout.getGid())) {
+						&& ((ComponentlayoutType) object.getValue()).getGid().equals(newLayout.getGid())) {
 
 					if (!replaced) {
 
-						((JAXBElement<ComponentlayoutType>) object)
-								.setValue(newLayout);
+						((JAXBElement<ComponentlayoutType>) object).setValue(newLayout);
 						lguiItem.notifyListeners();
 						replaced = true;
 					} else {// Delete this object
@@ -732,14 +709,11 @@ public class JAXBUtil {
 
 			// Differ between several layouts, create different JAXBElements
 			if (newLayout instanceof TablelayoutType) {
-				newElement = new JAXBElement<TablelayoutType>(new QName(
-						ILMLCoreConstants.TABLELAYOUT_ELEMENT),
+				newElement = new JAXBElement<TablelayoutType>(new QName(ILMLCoreConstants.TABLELAYOUT_ELEMENT),
 						TablelayoutType.class, (TablelayoutType) newLayout);
 			} else if (newLayout instanceof NodedisplaylayoutType) {
-				newElement = new JAXBElement<NodedisplaylayoutType>(new QName(
-						ILMLCoreConstants.NODEDISPLAYLAYOUT_ELEMENT),
-						NodedisplaylayoutType.class,
-						(NodedisplaylayoutType) newLayout);
+				newElement = new JAXBElement<NodedisplaylayoutType>(new QName(ILMLCoreConstants.NODEDISPLAYLAYOUT_ELEMENT),
+						NodedisplaylayoutType.class, (NodedisplaylayoutType) newLayout);
 			}
 
 			if (newElement != null) {
@@ -821,8 +795,7 @@ public class JAXBUtil {
 		}
 		if (jaxb == null) {
 			return null;
-		}
-		else {
+		} else {
 			return jaxb.getValue();
 		}
 	}
