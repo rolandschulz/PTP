@@ -9,9 +9,9 @@
 <!-- * Simon Wail - design and implementation -->
 <!-- ****************************************************************************** -->
 <resource-manager-builder 
-	xmlns="http://eclipse.org/ptp/schemas" 
+	xmlns="http://eclipse.org/ptp/rm" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://eclipse.org/ptp/schemas http://eclipse.org/ptp/schemas/rm.xsd" 
+	xsi:schemaLocation="http://eclipse.org/ptp/rm http://eclipse.org/ptp/schemas/v1.1/rm.xsd" 
 	name="SLURM-Generic-Batch">
     <control-data>
         <!-- this is a necessary attribute for the functioning of LML; link it to the batch-specific variable name -->

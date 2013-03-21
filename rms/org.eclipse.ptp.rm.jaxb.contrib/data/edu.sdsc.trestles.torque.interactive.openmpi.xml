@@ -11,9 +11,9 @@
 <!-- * Greg Watson - adapt to interactive/debug -->
 <!-- ****************************************************************************** -->
 <resource-manager-builder 
-	xmlns="http://eclipse.org/ptp/schemas" 
+	xmlns="http://eclipse.org/ptp/rm" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://eclipse.org/ptp/schemas http://eclipse.org/ptp/schemas/rm.xsd" 
+	xsi:schemaLocation="http://eclipse.org/ptp/rm http://eclipse.org/ptp/schemas/v1.1/rm.xsd" 
 	name="edu.sdsc.trestles.torque.interactive.openmpi">
 	<control-data>
 		<!-- Set the default value of this attribute if Torque is installed in a non-standard location -->

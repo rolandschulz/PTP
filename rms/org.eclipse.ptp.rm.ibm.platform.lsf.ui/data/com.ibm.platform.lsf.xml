@@ -3,9 +3,10 @@
 	This program and the accompanying materials are made available under the 
 	terms of the Eclipse Public License v1.0s which accompanies this distribution, 
 	and is available at http://www.eclipse.org/legal/epl-v10.html -->
-<resource-manager-builder xmlns="http://eclipse.org/ptp/schemas"
+<resource-manager-builder 
+	xmlns="http://eclipse.org/ptp/rm" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://eclipse.org/ptp/schemas http://eclipse.org/ptp/schemas/rm.xsd"
+	xsi:schemaLocation="http://eclipse.org/ptp/rm http://eclipse.org/ptp/schemas/v1.1/rm.xsd" 
 	name="IBM Platform LSF">
 	<!-- Make sure XML editor line length is set long enough (160) to avoid 
 		wrapping text so messages don't get wrapped when reformatting -->
