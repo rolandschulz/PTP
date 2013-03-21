@@ -526,7 +526,7 @@ sub exit_witherror {
     $xmlout.="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n";
     $xmlout.="<lml:lgui xmlns:lml=\"http://eclipse.org/ptp/lml\"\n";
     $xmlout.="          xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
-    $xmlout.="          version=\"1\" xsi:schemaLocation=\"http://eclipse.org/ptp/lml http://eclipse.org/ptp/schemas/lgui.xsd\">\n";
+    $xmlout.="          version=\"1.1\" xsi:schemaLocation=\"http://eclipse.org/ptp/lml http://eclipse.org/ptp/schemas/v1.1/lgui.xsd\">\n";
     $xmlout.=" <objects>\n";
     $xmlout.="    <object id=\"sys000001\" name=\"error\" type=\"system\"/>\n";
     $xmlout.="</objects>\n";

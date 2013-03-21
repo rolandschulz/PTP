@@ -256,8 +256,8 @@ foreach $jobid (keys(%jobs)) {
 open(OUT,"> $filename") || die "cannot open file $filename";
 printf(OUT "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 printf(OUT "<lml:lgui xmlns:lml=\"$schemaURL\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n");
-printf(OUT "	xsi:schemaLocation=\"$schemaURL http://eclipse.org/ptp/schemas/lgui.xsd\"\n");
-printf(OUT "	version=\"1.0\"\>\n");
+printf(OUT "	xsi:schemaLocation=\"$schemaURL http://eclipse.org/ptp/schemas/v1.1/lgui.xsd\"\n");
+printf(OUT "	version=\"1.1\"\>\n");
 printf(OUT "<objects>\n");
 $count=0;
 

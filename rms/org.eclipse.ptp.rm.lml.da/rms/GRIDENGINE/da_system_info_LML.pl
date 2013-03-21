@@ -24,8 +24,8 @@ open(OUT,"> $filename") || die "cannot open file $filename";
 printf OUT <<EOF;
 <?xml version="1.0" encoding="UTF-8"?>
 <lml:lgui xmlns:lml="http://eclipse.org/ptp/lml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://eclipse.org/ptp/lml http://eclipse.org/ptp/schemas/lgui.xsd"
-        version="1.0">
+        xsi:schemaLocation="http://eclipse.org/ptp/lml http://eclipse.org/ptp/schemas/v1.1/lgui.xsd"
+        version="1.1">
   <objects>
     <object id="sys000001" name="cluster" type="system"/>
   </objects>
