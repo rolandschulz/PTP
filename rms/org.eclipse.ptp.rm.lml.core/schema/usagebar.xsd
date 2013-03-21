@@ -13,7 +13,7 @@ which accompanies this distribution and is available at
 
 http://www.eclipse.org/legal/epl-v10.html
 -->
-<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:lml="http://eclipse.org/ptp/schemas" targetNamespace="http://eclipse.org/ptp/schemas">
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:lml="http://eclipse.org/ptp/lml" targetNamespace="http://eclipse.org/ptp/lml">
 
 	<include schemaLocation="lgui.xsd"/>
 

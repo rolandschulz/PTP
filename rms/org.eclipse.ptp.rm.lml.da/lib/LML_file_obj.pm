@@ -101,9 +101,9 @@ sub init_file_obj {
     my($self) = shift;
     $self->{DATA}->{LMLLGUI}={
 	'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance',
-	'xmlns:lml' => 'http://eclipse.org/ptp/schemas',
+	'xmlns:lml' => 'http://eclipse.org/ptp/lml',
 	'version' => '1.0',
-	'xsi:schemaLocation' => 'http://eclipse.org/ptp/schemas http://eclipse.org/ptp/schemas/lgui.xsd'
+	'xsi:schemaLocation' => 'http://eclipse.org/ptp/lml http://eclipse.org/ptp/schemas/lgui.xsd'
 	};
     return(1);
 } 

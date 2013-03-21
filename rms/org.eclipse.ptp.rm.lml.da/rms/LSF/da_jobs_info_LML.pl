@@ -28,7 +28,7 @@ my $patbl ="\\s+";             # Pattern for blank space (variable length)
 my $patdate = "^(.*):";		   # Pattern for date format, allow any date format here
 
 #LML definitions
-my $schemaURL = "http://eclipse.org/ptp/schemas";
+my $schemaURL = "http://eclipse.org/ptp/lml";
 
 #####################################################################
 # get user info / check system 

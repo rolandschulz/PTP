@@ -141,10 +141,10 @@ foreach $nodeid ( sort( keys(%nodes) ) ) {
 open( OUT, "> $filename" ) || die "cannot open file $filename";
 printf( OUT "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" );
 printf( OUT
-"<lml:lgui xmlns:lml=\"http://eclipse.org/ptp/schemas\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
+"<lml:lgui xmlns:lml=\"http://eclipse.org/ptp/lml\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
 );
-printf( OUT "	xsi:schemaLocation=\"http://eclipse.org/ptp/schemas http://eclipse.org/ptp/schemas/lgui.xsd\"\n" );
-printf( OUT "	version=\"0.7\"\>\n" );
+printf( OUT "	xsi:schemaLocation=\"http://eclipse.org/ptp/lml http://eclipse.org/ptp/schemas/lgui.xsd\"\n" );
+printf( OUT "	version=\"1.0\"\>\n" );
 printf( OUT "<objects>\n" );
 
 # job objs
