@@ -5,5 +5,5 @@
 // Generated on: 2013.03.21 at 10:32:34 AM EDT 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://eclipse.org/ptp/rm", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@javax.xml.bind.annotation.XmlSchema(namespace = "http://eclipse.org/ptp/etfw", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package org.eclipse.ptp.etfw.jaxb.data;
