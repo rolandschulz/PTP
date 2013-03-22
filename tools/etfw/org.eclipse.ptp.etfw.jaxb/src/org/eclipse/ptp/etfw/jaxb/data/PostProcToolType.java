@@ -30,6 +30,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="global" type="{http://eclipse.org/ptp/etfw}ToolAppType" minOccurs="0"/>
  *         &lt;element name="analysis-commands" type="{http://eclipse.org/ptp/etfw}ToolAppType" maxOccurs="unbounded" minOccurs="0"/>
  *         &lt;element name="for-all-like" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="tool-state" type="{http://eclipse.org/ptp/etfw}ToolStateType" minOccurs="0"/>
  *       &lt;/sequence>
  *       &lt;attribute name="tool-id" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="tool-name" type="{http://www.w3.org/2001/XMLSchema}string" />
@@ -38,6 +39,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="depth" type="{http://www.w3.org/2001/XMLSchema}int" default="-1" />
  *       &lt;attribute name="useDefaultLocation" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" />
  *       &lt;attribute name="useLatestFileOnly" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" />
+ *       &lt;attribute name="set_success_attribute" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -49,7 +51,8 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "PostProcToolType", propOrder = {
     "global",
     "analysisCommands",
-    "forAllLike"
+    "forAllLike",
+    "toolState"
 })
 public class PostProcToolType {
 
@@ -58,6 +61,8 @@ public class PostProcToolType {
     protected List<ToolAppType> analysisCommands;
     @XmlElement(name = "for-all-like")
     protected String forAllLike;
+    @XmlElement(name = "tool-state")
+    protected ToolStateType toolState;
     @XmlAttribute(name = "tool-id")
     protected String toolId;
     @XmlAttribute(name = "tool-name")
@@ -72,6 +77,8 @@ public class PostProcToolType {
     protected Boolean useDefaultLocation;
     @XmlAttribute(name = "useLatestFileOnly")
     protected Boolean useLatestFileOnly;
+    @XmlAttribute(name = "set_success_attribute")
+    protected String setSuccessAttribute;
 
     /**
      * Gets the value of the global property.
@@ -148,6 +155,30 @@ public class PostProcToolType {
      */
     public void setForAllLike(String value) {
         this.forAllLike = value;
+    }
+
+    /**
+     * Gets the value of the toolState property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link ToolStateType }
+     *     
+     */
+    public ToolStateType getToolState() {
+        return toolState;
+    }
+
+    /**
+     * Sets the value of the toolState property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link ToolStateType }
+     *     
+     */
+    public void setToolState(ToolStateType value) {
+        this.toolState = value;
     }
 
     /**
@@ -328,6 +359,30 @@ public class PostProcToolType {
      */
     public void setUseLatestFileOnly(Boolean value) {
         this.useLatestFileOnly = value;
+    }
+
+    /**
+     * Gets the value of the setSuccessAttribute property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getSetSuccessAttribute() {
+        return setSuccessAttribute;
+    }
+
+    /**
+     * Sets the value of the setSuccessAttribute property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setSetSuccessAttribute(String value) {
+        this.setSuccessAttribute = value;
     }
 
 }

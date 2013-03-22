@@ -380,4 +380,16 @@ public class ETFWLaunchTool extends ETFWToolStep implements IToolLaunchConfigura
 		confWC.setAttribute(appnameattrib, application);
 		configuration = confWC.doSave();
 	}
+
+	public void setSuccessAttribute(String value) {
+		if (tool != null && tool.getSetSuccessAttribute() != null) {
+			try {
+				ILaunchConfigurationWorkingCopy configuration = this.configuration.getWorkingCopy();
+				configuration.setAttribute(tool.getSetSuccessAttribute(), value);
+				configuration.doSave();
+			} catch (CoreException e) {
+				// Ignore
+			}
+		}
+	}
 }

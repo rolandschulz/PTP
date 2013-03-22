@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.AbstractToolDataManager;
 import org.eclipse.ptp.etfw.Activator;
@@ -68,7 +69,7 @@ public class ETFWPostProcessTool extends ETFWToolStep implements IToolLaunchConf
 		super(conf, Messages.PostlaunchTool_Analysis, utilBlob);
 		tool = ppTool;
 		this.utilBLob = utilBlob;
-		if (outLoc.equals(EMPTY_STRING)) {
+		if (outLoc != null && outLoc.equals(EMPTY_STRING)) {
 			syncProjectLocation = projectLocation;
 		}
 		projectLocation = outputLocation = outLoc;
@@ -344,5 +345,17 @@ public class ETFWPostProcessTool extends ETFWToolStep implements IToolLaunchConf
 		MessageConsole myConsole = new MessageConsole(name, null);
 		conMan.addConsoles(new IConsole[] { myConsole });
 		return myConsole;
+	}
+	
+	public void setSuccessAttribute(String value) {
+		if (tool != null && tool.getSetSuccessAttribute() != null) {
+			try {
+				ILaunchConfigurationWorkingCopy configuration = this.configuration.getWorkingCopy();
+				configuration.setAttribute(tool.getSetSuccessAttribute(), value);
+				configuration.doSave();
+			} catch (CoreException e) {
+				// Ignore
+			}
+		}
 	}
 }

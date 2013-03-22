@@ -124,6 +124,46 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link ToolStateRuleType }
+     * 
+     */
+    public ToolStateRuleType createToolStateRuleType() {
+        return new ToolStateRuleType();
+    }
+
+    /**
+     * Create an instance of {@link ToolStateRuleType.And }
+     * 
+     */
+    public ToolStateRuleType.And createToolStateRuleTypeAnd() {
+        return new ToolStateRuleType.And();
+    }
+
+    /**
+     * Create an instance of {@link ToolStateRuleType.Or }
+     * 
+     */
+    public ToolStateRuleType.Or createToolStateRuleTypeOr() {
+        return new ToolStateRuleType.Or();
+    }
+
+    /**
+     * Create an instance of {@link ToolStateRuleType.Not }
+     * 
+     */
+    public ToolStateRuleType.Not createToolStateRuleTypeNot() {
+        return new ToolStateRuleType.Not();
+    }
+
+    /**
+     * Create an instance of {@link ToolStateType }
+     * 
+     */
+    public ToolStateType createToolStateType() {
+        return new ToolStateType();
+    }
+
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link EtfwToolProcessType }{@code >}}
      * 
      */
