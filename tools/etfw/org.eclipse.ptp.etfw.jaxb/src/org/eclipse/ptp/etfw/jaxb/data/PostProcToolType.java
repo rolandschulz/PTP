@@ -39,7 +39,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="depth" type="{http://www.w3.org/2001/XMLSchema}int" default="-1" />
  *       &lt;attribute name="useDefaultLocation" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" />
  *       &lt;attribute name="useLatestFileOnly" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" />
- *       &lt;attribute name="set_success_attribute" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="set-success-attribute" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -77,7 +77,7 @@ public class PostProcToolType {
     protected Boolean useDefaultLocation;
     @XmlAttribute(name = "useLatestFileOnly")
     protected Boolean useLatestFileOnly;
-    @XmlAttribute(name = "set_success_attribute")
+    @XmlAttribute(name = "set-success-attribute")
     protected String setSuccessAttribute;
 
     /**

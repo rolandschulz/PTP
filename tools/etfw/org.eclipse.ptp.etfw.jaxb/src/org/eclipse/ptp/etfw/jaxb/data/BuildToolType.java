@@ -38,7 +38,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="tool-type" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="require-true" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="replace-compiler" type="{http://www.w3.org/2001/XMLSchema}boolean" />
- *       &lt;attribute name="set_success_attribute" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="set-success-attribute" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -81,7 +81,7 @@ public class BuildToolType {
     protected String requireTrue;
     @XmlAttribute(name = "replace-compiler")
     protected Boolean replaceCompiler;
-    @XmlAttribute(name = "set_success_attribute")
+    @XmlAttribute(name = "set-success-attribute")
     protected String setSuccessAttribute;
 
     /**

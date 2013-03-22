@@ -55,7 +55,7 @@
 		<xs:attribute name="tool-type" type="xs:string" />
 		<xs:attribute name="require-true" type="xs:string" />
 		<xs:attribute name="replace-compiler" type="xs:boolean" />
-		<xs:attribute name="set_success_attribute" type="xs:string" />
+		<xs:attribute name="set-success-attribute" type="xs:string" />
 	</xs:complexType>
 	<xs:complexType name="ExecToolType">
 		<xs:sequence>
@@ -71,7 +71,7 @@
 		<xs:attribute name="require-true" type="xs:string" />
 		<xs:attribute name="prepend-execution" type="xs:boolean" default="false" />
 		<xs:attribute name="replace-execution" type="xs:boolean" default="false" />
-		<xs:attribute name="set_success_attribute" type="xs:string" />
+		<xs:attribute name="set-success-attribute" type="xs:string" />
 	</xs:complexType>
 	<xs:complexType name="PostProcToolType">
 		<xs:sequence>
@@ -89,7 +89,7 @@
 		<xs:attribute name="depth" type="xs:int" default="-1" />
 		<xs:attribute name="useDefaultLocation" type="xs:boolean" default="false" />
 		<xs:attribute name="useLatestFileOnly" type="xs:boolean" default="true" />
-		<xs:attribute name="set_success_attribute" type="xs:string" />
+		<xs:attribute name="set-success-attribute" type="xs:string" />
 	</xs:complexType>
 
 	<xs:complexType name="ToolAppType">

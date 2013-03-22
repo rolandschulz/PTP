@@ -37,7 +37,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="require-true" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="prepend-execution" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" />
  *       &lt;attribute name="replace-execution" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" />
- *       &lt;attribute name="set_success_attribute" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="set-success-attribute" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -69,7 +69,7 @@ public class ExecToolType {
     protected Boolean prependExecution;
     @XmlAttribute(name = "replace-execution")
     protected Boolean replaceExecution;
-    @XmlAttribute(name = "set_success_attribute")
+    @XmlAttribute(name = "set-success-attribute")
     protected String setSuccessAttribute;
 
     /**
