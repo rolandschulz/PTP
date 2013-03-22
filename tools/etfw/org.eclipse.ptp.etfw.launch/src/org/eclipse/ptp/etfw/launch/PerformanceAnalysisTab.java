@@ -247,17 +247,19 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 			control.dispose();
 		}
 
-		for (CommandType command : etfwTool.getControlData().getInitializeCommand()) {
-			if (command != null) {
-				try {
-					controller.runCommand(command, vmap);
-				} catch (CoreException e) {
-					e.printStackTrace();
+		if (etfwTool.getControlData() != null) {
+			for (CommandType command : etfwTool.getControlData().getInitializeCommand()) {
+				if (command != null) {
+					try {
+						controller.runCommand(command, vmap);
+					} catch (CoreException e) {
+						e.printStackTrace();
+					}
 				}
 			}
+	
+			etfwTool.getControlData().getInitializeCommand();
 		}
-
-		etfwTool.getControlData().getInitializeCommand();
 
 		final TabFolder tabParent = new TabFolder(toolComposite, SWT.NONE);
 
