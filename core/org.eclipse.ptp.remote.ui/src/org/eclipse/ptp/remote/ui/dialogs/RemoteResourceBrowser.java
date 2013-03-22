@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008,2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -79,6 +79,7 @@ public class RemoteResourceBrowser extends Dialog {
 	private Combo connectionCombo;
 	private Button newButton;
 	private Button upButton;
+	private Button newFolderButton;
 
 	private int browserType;
 	private String dialogTitle;
@@ -458,13 +459,13 @@ public class RemoteResourceBrowser extends Dialog {
 		final Composite dialogComp = new Composite(main, SWT.NONE);
 		dialogComp.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 		GridLayout layout = new GridLayout();
-		layout.numColumns = 2;
+		layout.numColumns = 4;
 		dialogComp.setLayout(layout);
 
 		Label label = new Label(dialogComp, SWT.NONE);
 		label.setText(dialogLabel);
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan = 2;
+		gd.horizontalSpan = 1;
 		label.setLayoutData(gd);
 
 		if (showConnections) {
@@ -501,12 +502,27 @@ public class RemoteResourceBrowser extends Dialog {
 
 		upButton = new Button(dialogComp, SWT.PUSH | SWT.FLAT);
 		upButton.setImage(RemoteUIImages.get(RemoteUIImages.IMG_ELCL_UP_NAV));
+		upButton.setToolTipText(Messages.RemoteResourceBrowser_UpOneLevel);
 		upButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (!fRootPath.isRoot()) {
 					setRoot(fRootPath.removeLastSegments(1).toOSString());
 				}
+			}
+		});
+		// new folder: See Bug 396334
+		newFolderButton = new Button(dialogComp, SWT.PUSH | SWT.FLAT);
+		newFolderButton.setImage(RemoteUIImages.get(RemoteUIImages.IMG_ELCL_NEW_FOLDER));
+		newFolderButton.setToolTipText(Messages.RemoteResourceBrowser_NewFolder);
+		newFolderButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				String pathText = remotePathText.getText();
+				String newname = "/newfolder"; //$NON-NLS-1$  
+				remotePathText.setText(pathText + newname); 
+				remotePathText.setSelection(pathText.length() + 1, pathText.length() + newname.length());
+				remotePathText.setFocus();
 			}
 		});
 
@@ -517,7 +533,7 @@ public class RemoteResourceBrowser extends Dialog {
 		}
 
 		gd = new GridData(GridData.FILL_BOTH);
-		gd.horizontalSpan = 2;
+		gd.horizontalSpan = 4;
 		// see bug 158380
 		gd.heightHint = Math.max(main.getParent().getSize().y, heightHint);
 		tree.setLayoutData(gd);
