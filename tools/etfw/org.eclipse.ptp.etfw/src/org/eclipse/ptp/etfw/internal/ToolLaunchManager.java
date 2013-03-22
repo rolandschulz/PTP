@@ -28,7 +28,7 @@ import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.jaxb.data.BuildToolType;
 import org.eclipse.ptp.etfw.jaxb.data.EtfwToolProcessType;
 import org.eclipse.ptp.etfw.jaxb.data.ExecToolType;
-import org.eclipse.ptp.etfw.jaxb.data.PostProcToolType;
+import org.eclipse.ptp.etfw.jaxb.data.AnalysisToolType;
 import org.eclipse.ptp.etfw.jaxb.util.ExternalToolProcessUtil;
 import org.eclipse.ptp.etfw.jaxb.util.JAXBExtensionUtils;
 import org.eclipse.ptp.etfw.messages.Messages;
@@ -129,7 +129,7 @@ public class ToolLaunchManager {
 
 		BuildToolType bt = ExternalToolProcessUtil.getBuildTool(etfwTool, configuration, 0);
 		ExecToolType et = ExternalToolProcessUtil.getExecTool(etfwTool, configuration, 0);
-		PostProcToolType ppt = ExternalToolProcessUtil.getPostProcTool(etfwTool, configuration, 0);
+		AnalysisToolType ppt = ExternalToolProcessUtil.getAnalysisTool(etfwTool, configuration, 0);
 
 		// If build only, just run the first build process and we're done
 		if (buildOnly) {
@@ -146,7 +146,7 @@ public class ToolLaunchManager {
 		// //TODO: There may be cases where we have multiple analysis steps and
 		// nothing else!
 		if (analyzeOnly) {
-			ETFWPostProcessTool analyzer = new ETFWPostProcessTool(configuration, ppt, null, utilBlob);
+			ETFWAnalysisTool analyzer = new ETFWAnalysisTool(configuration, ppt, null, utilBlob);
 			runJAXBStep(analyzer);
 			return;
 		}
@@ -164,7 +164,7 @@ public class ToolLaunchManager {
 			// If there is no special execution instruction and the first
 			// workflow step is not an execution step... //TODO: And we haven't
 			// indicated to ignore this
-			if (!etfwTool.isPrependExecution() && !(etfwTool.getExecToolOrPostProcToolOrBuildTool().get(0) instanceof ExecToolType)
+			if (!etfwTool.isPrependExecution() && !(etfwTool.getExecToolOrAnalysisToolOrBuildTool().get(0) instanceof ExecToolType)
 					&& !etfwTool.isExplicitExecution()) {
 				// Run the newly built executable
 				ETFWLaunchTool launcher = new ETFWLaunchTool(configuration, null, bProgPath, paraDel, launch, utilBlob);
@@ -177,8 +177,8 @@ public class ToolLaunchManager {
 
 		// Now for every performance step...
 		boolean globalState = true; // Once set to false causes failure to cascade (to mimic old behavior) unless tool-state is specified 
-		for (int i = 0; i < etfwTool.getExecToolOrPostProcToolOrBuildTool().size(); i++) {// pproc.externalTools.size(); i++) {
-			Object t = etfwTool.getExecToolOrPostProcToolOrBuildTool().get(i);
+		for (int i = 0; i < etfwTool.getExecToolOrAnalysisToolOrBuildTool().size(); i++) {// pproc.externalTools.size(); i++) {
+			Object t = etfwTool.getExecToolOrAnalysisToolOrBuildTool().get(i);
 
 			// If this step is a build tool...
 			if (t instanceof BuildToolType) {
@@ -200,8 +200,8 @@ public class ToolLaunchManager {
 	
 					// If there is no exec step specified and the next step is not
 					// an exec step, we'd better perform the execution ourselves...
-					if (!etfwTool.isPrependExecution() && !ran && i < etfwTool.getExecToolOrPostProcToolOrBuildTool().size() - 1
-							&& !(etfwTool.getExecToolOrPostProcToolOrBuildTool().get(i + 1) instanceof ExecToolType)
+					if (!etfwTool.isPrependExecution() && !ran && i < etfwTool.getExecToolOrAnalysisToolOrBuildTool().size() - 1
+							&& !(etfwTool.getExecToolOrAnalysisToolOrBuildTool().get(i + 1) instanceof ExecToolType)
 							&& !etfwTool.isExplicitExecution()) {
 						ETFWLaunchTool launcher = new ETFWLaunchTool(configuration, null, bProgPath, paraDel, launch, utilBlob);
 						globalState &= runJAXBStep(launcher);
@@ -227,16 +227,16 @@ public class ToolLaunchManager {
 						bOutLoc = launcher.outputLocation;
 					}
 				}
-			} else if (t instanceof PostProcToolType) {
-				PostProcToolType postProcTool = (PostProcToolType) t;
-				if (!ExternalToolProcessUtil.canRun(globalState, postProcTool, configuration)) {
+			} else if (t instanceof AnalysisToolType) {
+				AnalysisToolType analysisTool = (AnalysisToolType) t;
+				if (!ExternalToolProcessUtil.canRun(globalState, analysisTool, configuration)) {
 					continue;
 				}
 				/**
 				 * Collect performance data from the execution handled in the
 				 * run step
 				 */
-				ETFWPostProcessTool analyzer = new ETFWPostProcessTool(configuration, postProcTool, bOutLoc, utilBlob);
+				ETFWAnalysisTool analyzer = new ETFWAnalysisTool(configuration, analysisTool, bOutLoc, utilBlob);
 				globalState &= runJAXBStep(analyzer); // Accumulate global state by anding in result
 			}
 		}

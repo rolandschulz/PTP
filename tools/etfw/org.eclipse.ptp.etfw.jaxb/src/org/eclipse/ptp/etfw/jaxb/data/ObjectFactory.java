@@ -67,11 +67,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link PostProcToolType }
+     * Create an instance of {@link AnalysisToolType }
      * 
      */
-    public PostProcToolType createPostProcToolType() {
-        return new PostProcToolType();
+    public AnalysisToolType createAnalysisToolType() {
+        return new AnalysisToolType();
     }
 
     /**

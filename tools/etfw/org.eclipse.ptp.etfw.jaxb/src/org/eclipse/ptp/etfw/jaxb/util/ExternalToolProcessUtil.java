@@ -17,7 +17,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.etfw.jaxb.data.BuildToolType;
 import org.eclipse.ptp.etfw.jaxb.data.EtfwToolProcessType;
 import org.eclipse.ptp.etfw.jaxb.data.ExecToolType;
-import org.eclipse.ptp.etfw.jaxb.data.PostProcToolType;
+import org.eclipse.ptp.etfw.jaxb.data.AnalysisToolType;
 
 /**
  * This class provides utility methods for obtaining specific tools from a workflow as well as some methods that were part of the
@@ -28,7 +28,7 @@ import org.eclipse.ptp.etfw.jaxb.data.PostProcToolType;
  */
 public class ExternalToolProcessUtil {
 	public static BuildToolType getBuildTool(EtfwToolProcessType etfwTool, ILaunchConfiguration configuration, int index) {
-		List<Object> tools = etfwTool.getExecToolOrPostProcToolOrBuildTool();
+		List<Object> tools = etfwTool.getExecToolOrAnalysisToolOrBuildTool();
 		List<BuildToolType> buildTools = new ArrayList<BuildToolType>();
 		for (Object o : tools) {
 			if (o instanceof BuildToolType) {
@@ -47,7 +47,7 @@ public class ExternalToolProcessUtil {
 	}
 
 	public static ExecToolType getExecTool(EtfwToolProcessType etfwTool, ILaunchConfiguration configuration, int index) {
-		List<Object> tools = etfwTool.getExecToolOrPostProcToolOrBuildTool();
+		List<Object> tools = etfwTool.getExecToolOrAnalysisToolOrBuildTool();
 		List<ExecToolType> execTools = new ArrayList<ExecToolType>();
 		for (Object o : tools) {
 			if (o instanceof ExecToolType) {
@@ -66,20 +66,20 @@ public class ExternalToolProcessUtil {
 		return null;
 	}
 
-	public static PostProcToolType getPostProcTool(EtfwToolProcessType etfwTool, ILaunchConfiguration configuration, int index) {
-		List<Object> tools = etfwTool.getExecToolOrPostProcToolOrBuildTool();
-		List<PostProcToolType> postProcTools = new ArrayList<PostProcToolType>();
+	public static AnalysisToolType getAnalysisTool(EtfwToolProcessType etfwTool, ILaunchConfiguration configuration, int index) {
+		List<Object> tools = etfwTool.getExecToolOrAnalysisToolOrBuildTool();
+		List<AnalysisToolType> analysisTools = new ArrayList<AnalysisToolType>();
 		for (Object o : tools) {
-			if (o instanceof PostProcToolType) {
-				PostProcToolType tool = (PostProcToolType) o;
+			if (o instanceof AnalysisToolType) {
+				AnalysisToolType tool = (AnalysisToolType) o;
 				if ((configuration == null || canRun(true, tool, configuration))) {
-					postProcTools.add(tool);
+					analysisTools.add(tool);
 				}
 			}
 		}
 
-		if (index < postProcTools.size()) {
-			return postProcTools.get(index);
+		if (index < analysisTools.size()) {
+			return analysisTools.get(index);
 		}
 
 		return null;
@@ -106,7 +106,7 @@ public class ExternalToolProcessUtil {
 		return true;
 	}
 
-	public static boolean canRun(boolean globalState, PostProcToolType tool, ILaunchConfiguration configuration) {
+	public static boolean canRun(boolean globalState, AnalysisToolType tool, ILaunchConfiguration configuration) {
 		boolean result = true;
 		if (result) result &= ExternalToolProcessUtil.evaluate(configuration, tool.getRequireTrue());
 		if (result) result &= ToolStateUtil.evaluate(globalState, configuration, tool.getToolState());

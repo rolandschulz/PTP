@@ -337,7 +337,7 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 
 	private List<ToolPaneType> findTabControllers() {
 		List<ToolPaneType> subTabs = new ArrayList<ToolPaneType>();
-		for (Object tool : etfwTool.getExecToolOrPostProcToolOrBuildTool()) {
+		for (Object tool : etfwTool.getExecToolOrAnalysisToolOrBuildTool()) {
 			if (tool instanceof BuildToolType) {
 				BuildToolType buildTool = (BuildToolType) tool;
 				if (buildTool.getGlobal() != null) {

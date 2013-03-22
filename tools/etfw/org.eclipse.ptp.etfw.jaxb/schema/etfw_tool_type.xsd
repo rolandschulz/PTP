@@ -20,7 +20,7 @@
 			<xs:element name="controlData" minOccurs="0" type="etfw:ControlDataType" />
 			<xs:choice minOccurs="0" maxOccurs="unbounded">
 				<xs:element name="execTool" type="etfw:ExecToolType" />
-				<xs:element name="postProcTool" type="etfw:PostProcToolType" />
+				<xs:element name="analysisTool" type="etfw:AnalysisToolType" />
 				<xs:element name="buildTool" type="etfw:BuildToolType" />
 			</xs:choice>
 		</xs:sequence>
@@ -73,7 +73,7 @@
 		<xs:attribute name="replace-execution" type="xs:boolean" default="false" />
 		<xs:attribute name="set-success-attribute" type="xs:string" />
 	</xs:complexType>
-	<xs:complexType name="PostProcToolType">
+	<xs:complexType name="AnalysisToolType">
 		<xs:sequence>
 			<!-- <xs:element name="toolId" type="xs:string" minOccurs="0" maxOccurs="1" /> <xs:element name="toolName" type="xs:string" minOccurs="0" 
 				maxOccurs="1" /> <xs:element name="toolType" type="xs:string" minOccurs="0" maxOccurs="1" /> -->
