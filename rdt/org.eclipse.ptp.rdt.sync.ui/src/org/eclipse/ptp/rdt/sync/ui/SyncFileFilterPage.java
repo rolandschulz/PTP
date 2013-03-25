@@ -426,7 +426,7 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 		});
 
 		includeButtonForRegex = new Button(patternEnterComposite, SWT.PUSH);
-		includeButtonForRegex.setText(Messages.SyncFileFilterPage_11_Include);
+		includeButtonForRegex.setText(Messages.SyncFileFilterPage_Include);
 		includeButtonForRegex.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 		includeButtonForRegex.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {

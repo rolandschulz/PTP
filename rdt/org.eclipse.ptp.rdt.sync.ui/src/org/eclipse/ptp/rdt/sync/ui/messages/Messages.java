@@ -51,9 +51,6 @@ public class Messages extends NLS {
 	public static String RemoteSyncWizardPage_description;
 	public static String ResourceChangeListener_0;
 	public static String ResourceChangeListener_1;
-	public static String SyncFileFilterPage_11_Include;
-	public static String SyncFileFilterPage_12;
-	public static String SyncFileFilterPage_4;
 	public static String SyncFileFilterPage_Attempt_to_edit_unsupported;
 	public static String SyncFileFilterPage_Cancel;
 	public static String SyncFileFilterPage_Default_Include_exclude_title;
