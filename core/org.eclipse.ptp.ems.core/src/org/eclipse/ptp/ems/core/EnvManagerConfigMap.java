@@ -11,12 +11,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.ems.core;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 /**
@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
  * Modification of EnvManagerConfigString to store data to map instead of string.
  * <p>
  * See {@link IEnvManagerConfig} for a description of the settings that are persisted.
- * @since 6.0
+ * @since 2.0
  */
 public final class EnvManagerConfigMap implements IEnvManagerConfig {
 	/** String to separate module names */
@@ -56,7 +56,7 @@ public final class EnvManagerConfigMap implements IEnvManagerConfig {
 		defaultProperties.put(ENABLE_MANUAL_CONFIG_PROPERTY_KEY, Boolean.FALSE.toString());
 		defaultProperties.put(ENVCONFIG_MANUAL_CONFIG_TEXT_PROPERTY_KEY, ""); //$NON-NLS-1$
 		defaultProperties.put(ENVCONFIG_CONNECTION_NAME_PROPERTY_KEY, null);
-		defaultProperties.put(ENVCONFIG_PROPERTY_KEY, toString(Collections.<String> emptySet()));
+		defaultProperties.put(ENVCONFIG_PROPERTY_KEY, toString(Collections.<String> emptyList()));
 	}
 
 	/**
@@ -166,18 +166,18 @@ public final class EnvManagerConfigMap implements IEnvManagerConfig {
 	 * @see org.eclipse.ptp.ems.core.IEnvManagerConfig#setConfigElements(java.util.Set)
 	 */
 	@Override
-	public void setConfigElements(Set<String> selectedModules) {
+	public void setConfigElements(List<String> selectedModules) {
 		envProperties.put(ENVCONFIG_PROPERTY_KEY, toString(selectedModules));
 	}
 
-	private static String toString(final Set<String> set) {
-		if (set == null) {
+	private static String toString(final List<String> list) {
+		if (list == null) {
 			return ""; //$NON-NLS-1$
 		}
 
 		final StringBuilder sb = new StringBuilder();
 
-		final Iterator<String> it = set.iterator();
+		final Iterator<String> it = list.iterator();
 		if (it.hasNext()) {
 			sb.append(it.next());
 		}
@@ -195,28 +195,28 @@ public final class EnvManagerConfigMap implements IEnvManagerConfig {
 	 * @see org.eclipse.ptp.ems.core.IEnvManagerConfig#getConfigElements()
 	 */
 	@Override
-	public Set<String> getConfigElements() {
+	public List<String> getConfigElements() {
 		final String modulesProperty = this.getProperty(ENVCONFIG_PROPERTY_KEY);
-		return toSet(modulesProperty);
+		return toList(modulesProperty);
 	}
 
-	private static Set<String> toSet(final String modulesProperty) {
+	private static List<String> toList(final String modulesProperty) {
 		if (modulesProperty == null || modulesProperty.trim().equals("")) { //$NON-NLS-1$
-			return Collections.<String> emptySet();
+			return Collections.<String> emptyList();
 		} else {
-			return toSet(modulesProperty.split(Pattern.quote(SEPARATOR)));
+			return toList(modulesProperty.split(Pattern.quote(SEPARATOR)));
 		}
 	}
 
-	private static Set<String> toSet(String[] array) {
+	private static List<String> toList(String[] array) {
 		if (array == null) {
-			return Collections.<String> emptySet();
+			return Collections.<String> emptyList();
 		} else {
-			final Set<String> result = new TreeSet<String>();
+			final List<String> result = new ArrayList<String>();
 			for (final String module : array) {
 				result.add(module);
 			}
-			return Collections.unmodifiableSet(result);
+			return Collections.unmodifiableList(result);
 		}
 	}
 

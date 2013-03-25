@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
 import org.eclipse.cdt.core.settings.model.ICResourceDescription;
@@ -136,7 +137,7 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 		
 		if (ui != null) {
 			IRemoteConnection connection = getConnection();
-			Set<String> settings = this.loadSettings(getCfg()).getConfigElements();
+			List<String> settings = this.loadSettings(getCfg()).getConfigElements();
 			ui.configurationChanged(getSyncURI(), connection, settings);
 		}
 	}
