@@ -77,7 +77,7 @@ import org.eclipse.ui.PlatformUI;
 
 /**
  * Window or Preference page to display a File tree and other options, where users can select the patterns/files to be sync'ed.<br>
- * This class is used for:<br>
+ * This class is used for three scenarios:<br>
  * 1. Preference Page - to specify default settings<br>
  * 2. Filter page for new sync project - to specify settings for new project<br>
  * 3. Filter page for existing project - to alter existing Sync Filter settings<br>
@@ -85,9 +85,6 @@ import org.eclipse.ui.PlatformUI;
 public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchPreferencePage {
 	private static final int ERROR_DISPLAY_SECONDS = 3;
 	private static final Display display = Display.getCurrent();
-
-	private final int windowWidth;
-	private final int viewHeight; // Used for file tree and pattern table
 
 	private final IProject project;
 	private final SyncFileFilter filter;
@@ -109,7 +106,13 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 	private Label patternErrorLabel;
 	private Button cancelButton;
 	private Button okButton;
+	/** Boolean to help tell which boolean arguments do what */
+	static final boolean GRAB_EXCESS = true;
 
+	/**
+	 * Where to save the filter information - as default (preferences), or for the current project
+	 * 
+	 */
 	private enum FilterSaveTarget {
 		NONE, DEFAULT, PROJECT
 	}
@@ -136,6 +139,7 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 		super(parent);
 		project = p;
 		if (isPreferencePage) {
+			// scenario 1 Preference page
 			preferencePage = new SyncFilePreferencePage();
 		} else {
 			preferencePage = null;
@@ -143,9 +147,11 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 
 		if (targetFilter == null) {
 			if (project == null) {
+				// scenario 1: preference page
 				filter = SyncManager.getDefaultFileFilter();
 				saveTarget = FilterSaveTarget.DEFAULT;
 			} else {
+				// scenario 2/3: project (new or existing)
 				filter = SyncManager.getFileFilter(project);
 				saveTarget = FilterSaveTarget.PROJECT;
 			}
@@ -154,8 +160,6 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 			saveTarget = FilterSaveTarget.NONE;
 		}
 
-		windowWidth = display.getBounds().width / 3;
-		viewHeight = display.getBounds().height / 5;
 		this.setReturnCode(CANCEL);
 	}
 
@@ -217,28 +221,43 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 	 *            the main window
 	 * @return Control
 	 */
+
 	protected Control createContents(Composite parent) {
+		final boolean DEBUG = false; // color composites so we can tell what's inside what
 		Composite composite = new Composite(parent, SWT.NONE);
 		GridLayout gl = new GridLayout(1, false);
 		gl.verticalSpacing = 20;
 		composite.setLayout(gl);
+		GridData gd;
+		GridData gdcomp;
 
 		// To edit existing filters for a project, create the tree viewer
 		if (project != null) {
 			// Composite for tree viewer
 			Composite treeViewerComposite = new Composite(composite, SWT.BORDER);
-			treeViewerComposite.setLayout(new GridLayout(2, false));
-			treeViewerComposite.setLayoutData(new GridData(windowWidth, viewHeight));
+			GridLayout treeLayout = new GridLayout(2, false);
+			treeLayout.verticalSpacing = 5;// back to default spacing so no excess space around 'show remote files'
+			treeViewerComposite.setLayout(treeLayout);
 
-			// Label for tree viewer
+			gdcomp = new GridData(SWT.FILL, SWT.FILL, GRAB_EXCESS, GRAB_EXCESS);
+
+			if (DEBUG) {
+				org.eclipse.swt.graphics.Color red = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
+				treeViewerComposite.setBackground(red);
+			}
+			treeViewerComposite.setLayoutData(gdcomp);
+
+			// Label for file tree viewer
 			Label treeViewerLabel = new Label(treeViewerComposite, SWT.NONE);
 			treeViewerLabel.setText(Messages.SyncFileFilterPage_File_view);
-			treeViewerLabel.setLayoutData(new GridData(SWT.LEAD, SWT.CENTER, false, false, 2, 1));
-			this.formatAsHeader(treeViewerLabel);
+			gd = new GridData(SWT.LEAD, SWT.CENTER, false, false, 2, 1);
+			treeViewerLabel.setLayoutData(gd);
+			// this.formatAsHeader(treeViewerLabel);// use SWT.BOLD instead
 
 			// File tree viewer
 			treeViewer = new CheckboxTreeViewer(treeViewerComposite);
-			treeViewer.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
+			gd = new GridData(SWT.FILL, SWT.FILL, GRAB_EXCESS, GRAB_EXCESS, 2, 1);
+			treeViewer.getTree().setLayoutData(gd);
 			treeViewer.setContentProvider(new SFTTreeContentProvider());
 			treeViewer.setLabelProvider(new SFTTreeLabelProvider());
 			treeViewer.setCheckStateProvider(new ICheckStateProvider() {
@@ -280,24 +299,39 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 
 			remoteErrorLabel = new Label(treeViewerComposite, SWT.CENTER);
 			remoteErrorLabel.setForeground(display.getSystemColor(SWT.COLOR_DARK_RED));
-			remoteErrorLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+			gd = new GridData(SWT.FILL, SWT.CENTER, GRAB_EXCESS, false);
+			remoteErrorLabel.setLayoutData(gd);
+			if (DEBUG) {
+				remoteErrorLabel.setText("remote error label here"); //$NON-NLS-1$
+			}
 		}
 
 		// Composite for pattern table and buttons
 		Composite patternTableComposite = new Composite(composite, SWT.BORDER);
-		patternTableComposite.setLayout(new GridLayout(2, false));
-		patternTableComposite.setLayoutData(new GridData(windowWidth, viewHeight));
-		patternTableComposite.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+		if (DEBUG) {
+			org.eclipse.swt.graphics.Color blue = Display.getCurrent().getSystemColor(SWT.COLOR_BLUE);
+			patternTableComposite.setBackground(blue);
+		}
+
+		GridLayout patternTableLayout = new GridLayout(2, false);
+		patternTableLayout.verticalSpacing = 5;
+		patternTableComposite.setLayout(patternTableLayout);
+
+		gdcomp = new GridData(SWT.FILL, SWT.TOP, GRAB_EXCESS, GRAB_EXCESS);
+		// patternTableComposite.setLayoutData(new GridData(windowWidth, viewHeight));
+		patternTableComposite.setLayoutData(gdcomp);
 
 		// Label for pattern table
 		Label patternTableLabel = new Label(patternTableComposite, SWT.NONE);
 		patternTableLabel.setText(Messages.SyncFileFilterPage_Pattern_View);
 		this.formatAsHeader(patternTableLabel);
-		patternTableLabel.setLayoutData(new GridData(SWT.LEAD, SWT.CENTER, false, false, 4, 1));
+		gd = new GridData(SWT.LEAD, SWT.CENTER, false, false, 4, 1);// LEFT==LEAD
+		patternTableLabel.setLayoutData(gd);
 
 		// Pattern table
 		patternTable = new Table(patternTableComposite, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
-		patternTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 4));
+		gd = new GridData(SWT.FILL, SWT.FILL, GRAB_EXCESS, GRAB_EXCESS, 1, 4); // room for 4 buttons at the right
+		patternTable.setLayoutData(gd);
 		new TableColumn(patternTable, SWT.LEAD, 0);
 		new TableColumn(patternTable, SWT.LEAD, 1); // Separate column for pattern for alignment and font change.
 		patternTable.addMouseListener(new MouseListener() {
@@ -317,7 +351,29 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 			}
 		});
 
-		// Pattern table buttons (up, down, and delete)
+		// =====
+		// put buttons within a separate composite to try to get pattern composite to stretch on resize (grab vert sp)
+		// (doesn't make a difference)
+		/*
+		 * Composite buttonComp=new Composite(patternTableComposite, SWT.NONE);
+		 * GridLayout buttonCompLayout = new GridLayout();
+		 * buttonCompLayout.verticalSpacing = 5;
+		 * gdcomp=new GridData(SWT.FILL,SWT.TOP,false,GRAB_EXCESS);
+		 * buttonComp.setLayout(buttonCompLayout);
+		 * buttonComp.setData(gdcomp);
+		 * 
+		 * if (DEBUG) {
+		 * org.eclipse.swt.graphics.Color cyan = Display.getCurrent().getSystemColor(SWT.COLOR_CYAN);
+		 * buttonComp.setBackground(cyan);
+		 * }
+		 * buttonComp.setLayout(new GridLayout(1, false));
+		 * gdcomp = new GridData(SWT.FILL, SWT.TOP, false, GRAB_EXCESS);
+		 * patternTableComposite.setLayoutData(gdcomp);
+		 */
+		// change patternTableComposite to buttonComp in the four buttons
+		// buttonComp=patternTableComposite;
+		// =====
+		// Pattern table buttons (up, down, edit, remove)
 		upButton = new Button(patternTableComposite, SWT.PUSH);
 		upButton.setText(Messages.SyncFileFilterPage_Up);
 		upButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
@@ -356,7 +412,7 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 
 		editButton = new Button(patternTableComposite, SWT.PUSH);
 		editButton.setText(Messages.SyncFileFilterPage_Edit);
-		editButton.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, false, false));
+		editButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
 		editButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				editPattern();
@@ -365,7 +421,7 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 
 		removeButton = new Button(patternTableComposite, SWT.PUSH);
 		removeButton.setText(Messages.SyncFileFilterPage_Remove);
-		removeButton.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, false, false));
+		removeButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
 		removeButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				TableItem[] selectedPatternItems = patternTable.getSelection();
@@ -376,18 +432,29 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 				update();
 			}
 		});
-
+		/*
+		 * //dummy widget to grab excess vertical space in the button column so the pattern table will expand
+		 * Label spacer = new Label(patternTableComposite,SWT.NONE);
+		 * //spacer.setText("");
+		 * gd=new GridData(SWT.FILL,SWT.FILL,false,GRAB_EXCESS);
+		 * spacer.setLayoutData(gd);
+		 */
 		// Composite for text box, combo, and buttons to enter a new pattern
 		Composite patternEnterComposite = new Composite(composite, SWT.NONE);
 		patternEnterComposite.setLayout(new GridLayout(4, false));
-		patternEnterComposite.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+		gdcomp = new GridData(SWT.FILL, SWT.TOP, GRAB_EXCESS, false);
+		patternEnterComposite.setLayoutData(gdcomp);
+		if (DEBUG) {
+			org.eclipse.swt.graphics.Color green = Display.getCurrent().getSystemColor(SWT.COLOR_GREEN);
+			patternEnterComposite.setBackground(green);
+		}
 
 		// Label for entering new path
 		new Label(patternEnterComposite, SWT.NONE).setText(Messages.SyncFileFilterPage_Enter_Path);
 
 		// Text box to enter new path
 		newPath = new Text(patternEnterComposite, SWT.NONE);
-		newPath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		newPath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, GRAB_EXCESS, false));
 
 		// Submit buttons (exclude and include)
 		excludeButtonForPath = new Button(patternEnterComposite, SWT.PUSH);
@@ -467,8 +534,10 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 			okButton.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent event) {
 					if (saveTarget == FilterSaveTarget.DEFAULT) {
+						// scenario 1: preference page
 						SyncManager.saveDefaultFileFilter(filter);
 					} else if (saveTarget == FilterSaveTarget.PROJECT) {
+						// scenario 2/3: new or existing project
 						assert (project != null);
 						SyncManager.saveFileFilter(project, filter);
 					} else {
@@ -484,7 +553,9 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 		return composite;
 	}
 
-	// Utility function to bold and resize labels to be headers
+	/*
+	 * Utility function to bold and resize labels to be headers
+	 */
 	private void formatAsHeader(Label widget) {
 		FontData[] fontData = widget.getFont().getFontData();
 		for (FontData data : fontData) {
@@ -930,6 +1001,7 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 	// This is a hack to implement multiple inheritance so that this class can also serve as a preference page.
 
 	// First, define a preference page inner class and any needed methods
+	// Scenario 1 Preference page
 	public class SyncFilePreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
 		public SyncFilePreferencePage() {
 			super();
