@@ -145,6 +145,10 @@ public class LauncherTool extends ToolStep implements IToolLaunchConfigurationCo
 					if(jaxbAtt.length()>0){
 						confWC.setAttribute(jaxbAtt, progStore.toURI().getPath());
 					}
+					jaxbAtt=confWC.getAttribute(EXTOOL_JAXB_EXECUTABLE_DIRECTORY_TAG, EMPTY_STRING);
+					if(jaxbAtt.length()>0){
+						confWC.setAttribute(jaxbAtt, progStore.getParent().toURI().getPath());
+					}
 				}
 				
 				

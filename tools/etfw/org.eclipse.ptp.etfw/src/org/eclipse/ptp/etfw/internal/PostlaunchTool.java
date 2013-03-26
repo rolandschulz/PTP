@@ -55,7 +55,7 @@ public class PostlaunchTool extends ToolStep implements IToolLaunchConfiguration
 		super(conf, Messages.PostlaunchTool_Analysis, utilBlob);
 		tool = ppTool;
 		this.utilBLob=utilBlob;
-		if(outLoc.equals(EMPTY_STRING)){
+		if(outLoc==null||outLoc.equals(EMPTY_STRING)){
 			syncProjectLocation=projectLocation;
 		}
 		projectLocation = outputLocation = outLoc;
@@ -144,6 +144,7 @@ public class PostlaunchTool extends ToolStep implements IToolLaunchConfiguration
 								manager.setExternalTarget(true);
 							} else {
 								projName = thisCProject.getElementName();
+								manager.setExternalTarget(false);
 							}
 					
 							
@@ -186,7 +187,7 @@ public class PostlaunchTool extends ToolStep implements IToolLaunchConfiguration
 			/*
 			 * Otherwise we need to ask the user where the performance data is located
 			 */
-			else {//TODO: This needs to support remote filesystems!
+			else {
 				Display.getDefault().syncExec(new Runnable() {
 
 					public void run() {
@@ -194,9 +195,15 @@ public class PostlaunchTool extends ToolStep implements IToolLaunchConfiguration
 						if (s == null) {
 							s = PlatformUI.getWorkbench().getDisplay().getShells()[0];
 						}
-						DirectoryDialog dl = new DirectoryDialog(s);
-						dl.setText(Messages.PostlaunchTool_SelectPerfDir);
-						outputLocation = dl.open();
+						if(utilBlob.isRemote())
+						{
+							outputLocation = utilBlob.askToolPath(utilBlob.getWorkingDirectory(), "Performance Data Location");
+						}
+						else{
+							DirectoryDialog dl = new DirectoryDialog(s);
+							dl.setText(Messages.PostlaunchTool_SelectPerfDir);
+							outputLocation = dl.open();
+						}
 					}
 				});
 				if (outputLocation == null) {

@@ -38,6 +38,7 @@ import org.eclipse.ptp.rm.launch.ParallelLaunchConfigurationDelegate;
 /**
  * Launches parallel C/C++ (or Fortran) applications after rebuilding them with performance instrumentation
  */
+@SuppressWarnings("restriction")
 public class ParallelToolLaunchConfigurationDelegate extends ParallelLaunchConfigurationDelegate implements
 		IToolLaunchConfigurationConstants,IToolLaunchConfigurationDelegate {
 
@@ -76,6 +77,7 @@ public class ParallelToolLaunchConfigurationDelegate extends ParallelLaunchConfi
 		rmId += DOT;
 		wc.setAttribute(EXTOOL_JAXB_ATTR_ARGUMENTS_TAG, rmId + JAXBControlConstants.PROG_ARGS);
 		wc.setAttribute(EXTOOL_JAXB_EXECUTABLE_PATH_TAG, rmId + JAXBControlConstants.EXEC_PATH);
+		wc.setAttribute(EXTOOL_JAXB_EXECUTABLE_DIRECTORY_TAG, rmId + JAXBControlConstants.EXEC_DIR);
 
 		// put(JAXBControlConstants.DIRECTORY, configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, dir));
 

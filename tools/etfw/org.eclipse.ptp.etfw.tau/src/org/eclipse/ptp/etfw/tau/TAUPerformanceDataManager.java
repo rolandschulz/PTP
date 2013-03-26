@@ -241,13 +241,25 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager {
 		}
 
 		String tmpDir=null;
+		
+		/*
+		 * Now check the entered directory on the remote connection, if any.
+		 */
+		if(!dirgood)
+		{
+			dirgood=checkDirectory(directory,utilBlob);
+		}
+		
 		if(!dirgood){
 		tmpDir = utilBlob.getWorkingDirectory();
 		if (tmpDir != null) {
 			directory = tmpDir;
 		}}
 		
-		dirgood=checkDirectory(directory,utilBlob);
+		if(!dirgood){
+			dirgood=checkDirectory(directory,utilBlob);
+		}
+		
 		if(!dirgood){
 			tmpDir=configuration.getAttribute(IToolLaunchConfigurationConstants.PROJECT_DIR, "");
 			if(tmpDir!=null)
@@ -255,11 +267,19 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager {
 		}
 
 		tbpath = utilBlob.getToolPath(Messages.TAUPerformanceDataManager_0);
+		if(tbpath==null||tbpath.length()==0){
+			tbpath=utilBlob.findToolBinPath("paraprof",null,"paraprof");
+		}
 
 		profiles = getProfiles(directory);
 		xmlFile = utilBlob.getFile(directory).getChild(PROFXML);
 		if (!xmlFile.fetchInfo().exists()) {
 			xmlFile = null;
+		}
+		
+		if(profiles==null&&xmlFile==null){
+			printNoProfsError();
+			return;
 		}
 
 		String projtype = null;
@@ -285,6 +305,8 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager {
 		boolean usePortal = configuration.getAttribute(ITAULaunchConfigurationConstants.PORTAL, false);
 		if (xmlFile == null && profiles != null && profiles.size() > 0 || usePortal) {
 			ppkFile = getPPKFile(directory, projname, projtype, projtrial);
+			if(!ppkFile.fetchInfo().exists())
+				ppkFile=null;
 		}
 
 		// If we are doing a profile summary but have no 'exposed' profiles we must expose them.
@@ -327,7 +349,7 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager {
 		// {
 		// new File(directory+File.separatorChar+PROFXML);
 
-		if (profsummary) {
+		if (profsummary||(profiles!=null&&profiles.size()>0&&xmlFile==null&&ppkFile==null)) {
 
 			displayProfileSummary(directory);
 
@@ -351,7 +373,7 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager {
 				hasdb = addToDatabase(ppkFile, database, projname, projtype, projtrial, xmlMetaData);
 			}
 			if (!hasdb && !useParametric) {
-
+				
 				Display.getDefault().syncExec(new Runnable() {
 					public void run() {
 						MessageDialog.openInformation(PlatformUI.getWorkbench().getDisplay().getActiveShell(),
@@ -406,8 +428,8 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager {
 			}
 		}
 		// }
-
-		removeProfiles(profiles);// TODO: xml profiles don't make a mess, so save?
+		if(xmlFile!=null||ppkFile!=null)
+			removeProfiles(profiles);// TODO: xml profiles don't make a mess, so save?
 
 		// TODO: This needs to be tested remotely.
 		if (hasLocalParaprof && database != null) {

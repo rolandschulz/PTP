@@ -130,6 +130,11 @@ public interface IToolLaunchConfigurationConstants {
 	public static final String EXTOOL_JAXB_EXECUTABLE_PATH_TAG= "perf_executable_path_tag_for_JAXB_path_value";
 	
 	/**
+	 * @since 6.0
+	 */
+	public static final String EXTOOL_JAXB_EXECUTABLE_DIRECTORY_TAG= "perf_executable_directory_tag_for_JAXB_exec_dir_value";
+	
+	/**
 	 * @since 5.0
 	 */
 	public static final String DOT = ".";
