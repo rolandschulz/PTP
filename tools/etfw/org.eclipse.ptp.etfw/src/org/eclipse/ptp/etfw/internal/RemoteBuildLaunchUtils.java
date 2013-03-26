@@ -61,6 +61,7 @@ import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.PlatformUI;
 
 public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 	Shell selshell = null;
@@ -81,6 +82,7 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 		connMgr = remoteServices.getConnectionManager();
 		conn = connMgr.getConnection(LaunchUtils.getConnectionName(config));
 		fileManagerUI = remoteUIServices.getUIFileManager();
+		fileManagerUI.setConnection(conn);
 		fileManager = remoteServices.getFileManager(conn);
 		envMgrConfig = getEnvManagerConfig(config);
 		if (envMgrConfig != null) {
@@ -403,8 +405,8 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 	public String askToolPath(String archpath, String toolText, String toolMessage) {
 		// Shell
 		// ourshell=PlatformUI.getWorkbench().getDisplay().getActiveShell();
-		if (selshell == null) {
-			return null;
+		if (selshell == null||selshell.isDisposed()) {
+			selshell = PlatformUI.getWorkbench().getDisplay().getShells()[0];
 		}
 
 		// DirectoryDialog dialog = new DirectoryDialog(selshell);
@@ -579,10 +581,9 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 				e.printStackTrace();
 				return null;
 			} catch (CoreException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			pb = remoteServices.getProcessBuilder(conn, concat);
+			pb = remoteServices.getProcessBuilder(conn, com);
 		}
 		else {
 			pb = remoteServices.getProcessBuilder(conn, tool);// new IRemoteProcessBuilder(tool);
