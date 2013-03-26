@@ -46,11 +46,11 @@ sub new {
 	$self->{HEX2INT}{$hex}=$i;
     }
 
+	# initialize list of fix colors
+    $self->initcolor();
+
     # initialize obj
     $self->init();
-
-    # initialize list of fix colors
-    $self->initcolor();
 
     return $self;
 }
@@ -100,6 +100,32 @@ sub read_colorconfig {
 			next;
 		    }
 		}
+		if( $key=~ "FILE" ){
+			#If file not existent try to find it relatively placed to the calling script
+			if(!(-e $value)){
+				my $srcDir = $0;
+				print $0."\n";
+				if($srcDir =~ /\// ){
+					$srcDir =~ s/[^\/]+\.pl$//;
+				}
+				else{
+					$srcDir = "./";
+				}
+				$value=$srcDir.$value;
+			}
+			
+			if(!(-e $value)){
+				print STDERR "ERROR: could not find color config file for category $catname at $value\n";
+			}
+			
+			$self->{VALUECOLFILE}[$cat] = $value;
+			next;
+		}
+		if( $key=~ "RANDOM" ){
+			$self->{RANDOM}[$cat] = int($value);
+			next;
+		}
+		
 		print "read_colorconfig[$cat]: unknown option $key=$value\n" if($debug>=0);
 	    }
 	    # register new category
@@ -121,7 +147,10 @@ sub init {
 
     # initalize buffers
     for($cat=0;$cat<=$#{$self->{CATEGORIES}};$cat++) {
-	$self->{RANDOM}[$cat]        = 1;
+	#Randomize if not otherwise defined
+	if(!exists($self->{RANDOM}[$cat])){
+		$self->{RANDOM}[$cat]        = 1;
+	}
  	$self->{BUFFER}[$cat]        = [];
 
 	$self->{KNOWNIDSSIZE}[$cat]  = 0;
@@ -344,27 +373,24 @@ sub fill_buffer {
 	$#{$self->{BUFFER}[$cat]}=-1;
 
 	open(IN,$self->{VALUECOLFILE}[$cat]) || return(0);
-	$c=1;
+	
+	my $i=0;
 	while($line=<IN>) {
 	    if($line=~/^\s*\d+\s*([^\s]+)\s*$/) {
-		$color=lc($1);
-		push(@{$self->{BUFFER}[$cat]},$color);
-		$self->{COLORTONR}[$cat]->{$color}=$c;
-		$self->{NRTOCOLOR}[$cat]->[$c]=$color;
-		$c++;
-		last if($c>$self->{BUFFERSIZE_INT}[$cat]);
+			$color=lc($1);
+			$work[$i++]=$color;
 	    }
 	}
 	close(IN);
 	
-	# fill rest with grey colors
-	if($c<$self->{BUFFERSIZE_INT}[$cat]) {
-	    my ($r);
-	    for($r=0;$r<($self->{BUFFERSIZE_INT}[$cat]-$c);$r++) {
-		$work[$r]=sprintf( "\#%02x%02x%02x", $r, $r, $r);
-	    }
-	    while(@work) {
-		$color=splice(@work,int(rand(scalar @work)),1);
+	$c=1;  
+	# put colors in buffer
+	while(@work) {
+		if($self->{RANDOM}[$cat]==1) {
+		    $color=splice(@work,int(rand(scalar @work)),1);
+		} else {
+		    $color=shift(@work);
+		}
 		if(!(exists($self->{COLORTONR}[$cat]->{$color}))) {
 		    push(@{$self->{BUFFER}[$cat]},$color);
 		    $self->{COLORTONR}[$cat]->{$color}=$c;
@@ -372,6 +398,20 @@ sub fill_buffer {
 		    $c++;
 		    last if($c>$self->{BUFFERSIZE_INT}[$cat]);
 		}
+	}
+	
+	# fill rest with random colors
+	while($c<=$self->{BUFFERSIZE_INT}[$cat]) {
+	    my $red = int(rand(256));
+	    my $green = int(rand(256));
+	    my $blue = int(rand(256));
+	    
+	    $color = sprintf( "\#%02x%02x%02x", $red, $green, $blue);
+	    if(!(exists($self->{COLORTONR}[$cat]->{$color}))) {
+	    	push(@{$self->{BUFFER}[$cat]},$color);
+		    $self->{COLORTONR}[$cat]->{$color}=$c;
+		    $self->{NRTOCOLOR}[$cat]->[$c]=$color;
+		    $c++;
 	    }
 	}
     
@@ -522,6 +562,7 @@ sub get_color {
 	printf( "llview_manage_color: %-15s new color for %-15s -> %-20s nr=%3d #buffer=%3d (%s)\n",$category,$id,$color,
 		$self->{COLORTONR}[$cat]->{$color},$#{$self->{BUFFER}[$cat]},join(",",caller())) if($debug>=3);
     }
+    
     return($color);
 }
 
