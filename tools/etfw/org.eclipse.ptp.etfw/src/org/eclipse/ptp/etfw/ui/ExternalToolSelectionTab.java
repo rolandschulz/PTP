@@ -18,8 +18,7 @@
 package org.eclipse.ptp.etfw.ui;
 
 //import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.io.File;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 
@@ -205,11 +204,12 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 			return;
 
 		IFileStore test=null;
-			try {
-				test = EFS.getLocalFileSystem().getStore(new URI(out));
-			} catch (URISyntaxException e) {
-				e.printStackTrace();
-			}
+		test = EFS.getLocalFileSystem().getStore(new File(out).toURI());
+//			try {
+//				test = EFS.getLocalFileSystem().getStore(new URI(out));
+//			} catch (URISyntaxException e) {
+//				e.printStackTrace();
+//			}
 
 		//File test = new File(out);
 		if (test==null || !test.fetchInfo().exists() || test.fetchInfo().isDirectory()) {
