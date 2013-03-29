@@ -632,12 +632,17 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 
 				InputStreamReader isr = new InputStreamReader(is);
 				BufferedReader br = new BufferedReader(isr);
+				/*
+				 * The opening newline and script info can kill some utilities. Scrub them.
+				 */
 				String line = null;
+				boolean start = false;
 				while ((line = br.readLine()) != null) {
-					if (pw != null) {
+					if (pw != null&&!line.startsWith("**** Environment configuration script temporarily stored in")&&(line.length()>0||start)) {
 						pw.println(line);
 					} else {
 						System.out.println(line);
+						start=true;
 					}
 				}
 				if (pw != null) {
