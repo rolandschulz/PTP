@@ -13,6 +13,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
 
@@ -28,6 +29,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;sequence>
  *         &lt;element name="global" type="{http://eclipse.org/ptp/etfw}ToolAppType" minOccurs="0"/>
  *         &lt;element name="execUtils" type="{http://eclipse.org/ptp/etfw}ToolAppType" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element name="tool-state" type="{http://eclipse.org/ptp/etfw}ToolStateType" minOccurs="0"/>
  *       &lt;/sequence>
  *       &lt;attribute name="tool-id" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="tool-name" type="{http://www.w3.org/2001/XMLSchema}string" />
@@ -35,6 +37,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="require-true" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="prepend-execution" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" />
  *       &lt;attribute name="replace-execution" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" />
+ *       &lt;attribute name="set-success-attribute" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -45,12 +48,15 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ExecToolType", propOrder = {
     "global",
-    "execUtils"
+    "execUtils",
+    "toolState"
 })
 public class ExecToolType {
 
     protected ToolAppType global;
     protected List<ToolAppType> execUtils;
+    @XmlElement(name = "tool-state")
+    protected ToolStateType toolState;
     @XmlAttribute(name = "tool-id")
     protected String toolId;
     @XmlAttribute(name = "tool-name")
@@ -63,6 +69,8 @@ public class ExecToolType {
     protected Boolean prependExecution;
     @XmlAttribute(name = "replace-execution")
     protected Boolean replaceExecution;
+    @XmlAttribute(name = "set-success-attribute")
+    protected String setSuccessAttribute;
 
     /**
      * Gets the value of the global property.
@@ -115,6 +123,30 @@ public class ExecToolType {
             execUtils = new ArrayList<ToolAppType>();
         }
         return this.execUtils;
+    }
+
+    /**
+     * Gets the value of the toolState property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link ToolStateType }
+     *     
+     */
+    public ToolStateType getToolState() {
+        return toolState;
+    }
+
+    /**
+     * Sets the value of the toolState property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link ToolStateType }
+     *     
+     */
+    public void setToolState(ToolStateType value) {
+        this.toolState = value;
     }
 
     /**
@@ -267,6 +299,30 @@ public class ExecToolType {
      */
     public void setReplaceExecution(Boolean value) {
         this.replaceExecution = value;
+    }
+
+    /**
+     * Gets the value of the setSuccessAttribute property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getSetSuccessAttribute() {
+        return setSuccessAttribute;
+    }
+
+    /**
+     * Sets the value of the setSuccessAttribute property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setSetSuccessAttribute(String value) {
+        this.setSuccessAttribute = value;
     }
 
 }

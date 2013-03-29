@@ -89,7 +89,7 @@ print STDERR "processing objs  ...\n" if($opt_verbose);
 	if(exists( $filehandler->{DATA}->{OBJECT}->{$key}->{name} )){
 		$colorkey=$filehandler->{DATA}->{OBJECT}->{$key}->{name};
 	}
-	$type=$filehandler->{DATA}->{OBJECT}->{$key}->{type};
+	$type=getType($key, $filehandler);
 	$color=$colormanager->get_color($type,$colorkey);
 	if($color) {
 	    $filehandler->{DATA}->{OBJECT}->{$key}->{color}=$color;
@@ -114,6 +114,51 @@ if($opt_verbose) {
 $filehandler->write_lml($opt_outfile);
 
 exit(0);
+
+#*********************************************
+#
+# Get the type corresponding to the id of an
+# object. In general, this function returns the 
+# value of the type attribute for the object with
+# the passed id.
+# This functions is especially needed for detecting, if 
+# a job is a running or waiting job. This allows two 
+# separate these two job classes.
+#
+# @param id the ID of the object, whose type is requested
+#
+# @param filehandler LML file handler providing all the 
+#	data necessary for retrieving object types
+#
+#
+#*********************************************
+sub getType{
+	my ($id,$filehandler) = @_;
+	if(!exists($filehandler->{DATA}->{OBJECT}->{$id}->{type})){
+		return "";
+	}
+	
+	my $type = $filehandler->{DATA}->{OBJECT}->{$id}->{type};
+	
+	#Detect if this is a running/waiting job
+	if($type eq "job"){
+		if( exists($filehandler->{DATA}->{INFODATA}->{$id}->{status}) ){
+			my $status = $filehandler->{DATA}->{INFODATA}->{$id}->{status};
+			if($status eq "RUNNING"){
+				return "runjob";
+			}
+			else{
+				return "waitjob";
+			}
+		}
+		else{#Cannot determine if running or waiting job
+			return "job";
+		}
+	}
+	else{
+		return $type;
+	}
+}
 
 sub usage {
     die "Usage: $_[0] <options> <filenames> 

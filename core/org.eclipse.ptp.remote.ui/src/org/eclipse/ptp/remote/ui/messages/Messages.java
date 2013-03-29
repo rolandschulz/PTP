@@ -47,7 +47,11 @@ public class Messages extends NLS {
 	public static String RemoteResourceBrowser_connectonLabel;
 	public static String RemoteResourceBrowser_newConnection;
 
+	public static String RemoteResourceBrowser_NewFolder;
+
 	public static String RemoteResourceBrowser_Show_hidden_files;
+
+	public static String RemoteResourceBrowser_UpOneLevel;
 	public static String RemoteUIServicesProxy_1;
 	public static String RemoteUIServicesProxy_2;
 

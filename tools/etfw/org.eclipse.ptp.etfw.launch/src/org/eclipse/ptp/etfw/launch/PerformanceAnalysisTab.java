@@ -247,17 +247,19 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 			control.dispose();
 		}
 
-		for (CommandType command : etfwTool.getControlData().getInitializeCommand()) {
-			if (command != null) {
-				try {
-					controller.runCommand(command, vmap);
-				} catch (CoreException e) {
-					e.printStackTrace();
+		if (etfwTool.getControlData() != null) {
+			for (CommandType command : etfwTool.getControlData().getInitializeCommand()) {
+				if (command != null) {
+					try {
+						controller.runCommand(command, vmap);
+					} catch (CoreException e) {
+						e.printStackTrace();
+					}
 				}
 			}
+	
+			etfwTool.getControlData().getInitializeCommand();
 		}
-
-		etfwTool.getControlData().getInitializeCommand();
 
 		final TabFolder tabParent = new TabFolder(toolComposite, SWT.NONE);
 
@@ -335,7 +337,7 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 
 	private List<ToolPaneType> findTabControllers() {
 		List<ToolPaneType> subTabs = new ArrayList<ToolPaneType>();
-		for (Object tool : etfwTool.getExecToolOrPostProcToolOrBuildTool()) {
+		for (Object tool : etfwTool.getExecToolOrAnalysisToolOrBuildTool()) {
 			if (tool instanceof BuildToolType) {
 				BuildToolType buildTool = (BuildToolType) tool;
 				if (buildTool.getGlobal() != null) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 IBM Corporation and others.
+ * Copyright (c) 2010,2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,13 +40,16 @@ public class RemoteUIImages {
 	public static final String IMG_ELCL_UP_NAV = NAME_PREFIX + T_ELCL + ".up_nav.gif"; //$NON-NLS-1$
 	public static final String IMG_DLCL_UP_NAV = NAME_PREFIX + T_DLCL + ".up_nav.gif"; //$NON-NLS-1$
 	public static final String IMG_OVR_SYMLINK = NAME_PREFIX + T_OVR + ".symlink_ovr.gif"; //$NON-NLS-1$
-
+	public static final String IMG_ELCL_NEW_FOLDER = NAME_PREFIX + T_ELCL + ".new_folder.gif"; //$NON-NLS-1$
+	public static final String IMG_DLCL_NEW_FOLDER = NAME_PREFIX + T_DLCL + ".new_folder.gif"; //$NON-NLS-1$
 	/*
 	 * Set of predefined Image Descriptors.
 	 */
 	public static final ImageDescriptor DESC_ELCL_UP_NAV = createManaged(T_ELCL, "up_nav.gif", IMG_ELCL_UP_NAV); //$NON-NLS-1$
 	public static final ImageDescriptor DESC_DLCL_UP_NAV = createManaged(T_DLCL, "up_nav.gif", IMG_ELCL_UP_NAV); //$NON-NLS-1$
 	public static final ImageDescriptor DESC_OVR_SYMLINK = createManaged(T_OVR, "symlink_ovr.gif", IMG_OVR_SYMLINK); //$NON-NLS-1$
+	public static final ImageDescriptor DESC_ELCL_NEW_FOLDER = createManaged(T_ELCL, "new_folder.gif", IMG_ELCL_NEW_FOLDER); //$NON-NLS-1$
+	public static final ImageDescriptor DESC_DLCL_NEW_FOLDER = createManaged(T_DLCL, "new_folder.gif", IMG_DLCL_NEW_FOLDER); //$NON-NLS-1$
 
 	/**
 	 * Returns the image managed under the given key in this registry.

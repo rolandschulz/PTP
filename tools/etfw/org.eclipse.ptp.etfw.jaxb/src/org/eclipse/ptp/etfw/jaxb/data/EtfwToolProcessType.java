@@ -31,7 +31,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="controlData" type="{http://eclipse.org/ptp/etfw}ControlDataType" minOccurs="0"/>
  *         &lt;choice maxOccurs="unbounded" minOccurs="0">
  *           &lt;element name="execTool" type="{http://eclipse.org/ptp/etfw}ExecToolType"/>
- *           &lt;element name="postProcTool" type="{http://eclipse.org/ptp/etfw}PostProcToolType"/>
+ *           &lt;element name="analysisTool" type="{http://eclipse.org/ptp/etfw}AnalysisToolType"/>
  *           &lt;element name="buildTool" type="{http://eclipse.org/ptp/etfw}BuildToolType"/>
  *         &lt;/choice>
  *       &lt;/sequence>
@@ -49,17 +49,17 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "EtfwToolProcessType", propOrder = {
     "controlData",
-    "execToolOrPostProcToolOrBuildTool"
+    "execToolOrAnalysisToolOrBuildTool"
 })
 public class EtfwToolProcessType {
 
     protected ControlDataType controlData;
     @XmlElements({
+        @XmlElement(name = "buildTool", type = BuildToolType.class),
         @XmlElement(name = "execTool", type = ExecToolType.class),
-        @XmlElement(name = "postProcTool", type = PostProcToolType.class),
-        @XmlElement(name = "buildTool", type = BuildToolType.class)
+        @XmlElement(name = "analysisTool", type = AnalysisToolType.class)
     })
-    protected List<Object> execToolOrPostProcToolOrBuildTool;
+    protected List<Object> execToolOrAnalysisToolOrBuildTool;
     @XmlAttribute(name = "name")
     protected String name;
     @XmlAttribute(name = "prepend-execution")
@@ -94,34 +94,34 @@ public class EtfwToolProcessType {
     }
 
     /**
-     * Gets the value of the execToolOrPostProcToolOrBuildTool property.
+     * Gets the value of the execToolOrAnalysisToolOrBuildTool property.
      * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the execToolOrPostProcToolOrBuildTool property.
+     * This is why there is not a <CODE>set</CODE> method for the execToolOrAnalysisToolOrBuildTool property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getExecToolOrPostProcToolOrBuildTool().add(newItem);
+     *    getExecToolOrAnalysisToolOrBuildTool().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link ExecToolType }
-     * {@link PostProcToolType }
      * {@link BuildToolType }
+     * {@link ExecToolType }
+     * {@link AnalysisToolType }
      * 
      * 
      */
-    public List<Object> getExecToolOrPostProcToolOrBuildTool() {
-        if (execToolOrPostProcToolOrBuildTool == null) {
-            execToolOrPostProcToolOrBuildTool = new ArrayList<Object>();
+    public List<Object> getExecToolOrAnalysisToolOrBuildTool() {
+        if (execToolOrAnalysisToolOrBuildTool == null) {
+            execToolOrAnalysisToolOrBuildTool = new ArrayList<Object>();
         }
-        return this.execToolOrPostProcToolOrBuildTool;
+        return this.execToolOrAnalysisToolOrBuildTool;
     }
 
     /**

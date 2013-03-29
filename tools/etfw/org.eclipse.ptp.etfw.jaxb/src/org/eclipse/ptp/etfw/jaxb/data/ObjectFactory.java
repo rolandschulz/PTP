@@ -67,11 +67,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link PostProcToolType }
+     * Create an instance of {@link AnalysisToolType }
      * 
      */
-    public PostProcToolType createPostProcToolType() {
-        return new PostProcToolType();
+    public AnalysisToolType createAnalysisToolType() {
+        return new AnalysisToolType();
     }
 
     /**
@@ -121,6 +121,46 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://eclipse.org/ptp/rm", name = "resource-manager-builder")
     public JAXBElement<ResourceManagerData> createResourceManagerBuilder(ResourceManagerData value) {
         return new JAXBElement<ResourceManagerData>(_ResourceManagerBuilder_QNAME, ResourceManagerData.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link ToolStateRuleType }
+     * 
+     */
+    public ToolStateRuleType createToolStateRuleType() {
+        return new ToolStateRuleType();
+    }
+
+    /**
+     * Create an instance of {@link ToolStateRuleType.And }
+     * 
+     */
+    public ToolStateRuleType.And createToolStateRuleTypeAnd() {
+        return new ToolStateRuleType.And();
+    }
+
+    /**
+     * Create an instance of {@link ToolStateRuleType.Or }
+     * 
+     */
+    public ToolStateRuleType.Or createToolStateRuleTypeOr() {
+        return new ToolStateRuleType.Or();
+    }
+
+    /**
+     * Create an instance of {@link ToolStateRuleType.Not }
+     * 
+     */
+    public ToolStateRuleType.Not createToolStateRuleTypeNot() {
+        return new ToolStateRuleType.Not();
+    }
+
+    /**
+     * Create an instance of {@link ToolStateType }
+     * 
+     */
+    public ToolStateType createToolStateType() {
+        return new ToolStateType();
     }
 
     /**

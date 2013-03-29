@@ -1224,7 +1224,7 @@
 		</all-compilers>
 	</buildTool>
 	<execTool require-true="use_automatic_tau_reduce" />
-	<postProcTool require-true="use_automatic_tau_reduce">
+	<analysisTool require-true="use_automatic_tau_reduce">
 		<analysis-commands tool-command="pprof" tool-group="tau" out-to-file="pprof.txt">
 			<toolArguments flag="-d" />
 		</analysis-commands>
@@ -1232,7 +1232,7 @@
 			<toolArguments localFile="true" flag="-f" value="pprof.txt" separator=" " />
 			<toolArguments localFile="true" flag="-o" value="tau_select.txt" separator=" " />
 		</analysis-commands>
-	</postProcTool>
+	</analysisTool>
 	<buildTool tool-id="TAU" require-true="use_automatic_tau_reduce">
 		<!-- <toolId>TAU</toolId> -->
 		<cc-compiler tool-command="tau_cc.sh" tool-group="tau" />
@@ -1517,8 +1517,8 @@
 			</toolPanes>
 		</global>
 	</execTool>
-	<postProcTool>
+	<analysisTool>
 		<analysis-commands tool-command="process-TAU-data" tool-group="internal" />
-	</postProcTool>
+	</analysisTool>
 	
 </etfwTool>

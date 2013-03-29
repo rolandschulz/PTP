@@ -417,4 +417,7 @@ public abstract class ETFWToolStep extends Job implements IToolLaunchConfigurati
 		command.addAll(args);
 		return command;
 	}
+	
+	public abstract void setSuccessAttribute(String value);
+	
 }

@@ -140,10 +140,16 @@ public class LauncherTool extends ToolStep implements IToolLaunchConfigurationCo
 				//IFileStore progStore=utilBlob.getFile(projectLocation);
 				if(progStoreGood){
 					//progStore=progStore.getChild(progPath);
-					
+					/*
+					 * If the randomly generated JAXB path tags are in use we need to replace the values linked with those tags with the values used by ETFW
+					 */
 					String jaxbAtt=confWC.getAttribute(EXTOOL_JAXB_EXECUTABLE_PATH_TAG, EMPTY_STRING);
 					if(jaxbAtt.length()>0){
 						confWC.setAttribute(jaxbAtt, progStore.toURI().getPath());
+					}
+					jaxbAtt=confWC.getAttribute(EXTOOL_JAXB_EXECUTABLE_DIRECTORY_TAG, EMPTY_STRING);
+					if(jaxbAtt.length()>0){
+						confWC.setAttribute(jaxbAtt, progStore.getParent().toURI().getPath());
 					}
 				}
 				

@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
@@ -169,6 +170,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		fSystemTypeCombo.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				System.out.println("combo selected");
 				rmTypeSelectionChanged();
 				updateEnablement();
 				handleConnectionChanged();
@@ -186,14 +188,16 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		// select the default message; thus if user types a filter string immediately, it will replace it
 		fSystemTypeCombo.setSelection(new Point(0, Messages.ResourcesTab_pleaseSelectTargetSystem.length()));
 
-		// adjust selection events per Bug 403704 - needed for Linux/GTK (only?)
-		fSystemTypeCombo.addListener(SWT.Traverse, new Listener() {
-			public void handleEvent(Event event) {
-				if (event.detail == SWT.TRAVERSE_RETURN) {
-					event.doit = false;
+		// adjust selection events per Bug 403704 - for Linux/GTK only
+		if (Platform.getOS().equals(Platform.OS_LINUX) && Platform.getWS().equals(Platform.WS_GTK)) {
+			fSystemTypeCombo.addListener(SWT.Traverse, new Listener() {
+				public void handleEvent(Event event) {
+					if (event.detail == SWT.TRAVERSE_RETURN) {
+						event.doit = false;
+					}
 				}
-			}
-		});
+			});
+		}
 		fRemoteConnectionWidget = new RemoteConnectionWidget(comp, SWT.NONE, null, getLaunchConfigurationDialog());
 		fRemoteConnectionWidget.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
 		fRemoteConnectionWidget.addSelectionListener(new SelectionAdapter() {
@@ -236,6 +240,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		propProv.setFiltering(true);
 		propAdapter.setPropagateKeys(true);
 		propAdapter.setProposalAcceptanceStyle(ContentProposalAdapter.PROPOSAL_REPLACE);
+		// avoid double-enter required
 		propAdapter.addContentProposalListener(new IContentProposalListener() {
 			public void proposalAccepted(IContentProposal proposal) {
 				rmTypeSelectionChanged();

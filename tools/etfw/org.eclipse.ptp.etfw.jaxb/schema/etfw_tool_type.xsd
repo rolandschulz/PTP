@@ -20,7 +20,7 @@
 			<xs:element name="controlData" minOccurs="0" type="etfw:ControlDataType" />
 			<xs:choice minOccurs="0" maxOccurs="unbounded">
 				<xs:element name="execTool" type="etfw:ExecToolType" />
-				<xs:element name="postProcTool" type="etfw:PostProcToolType" />
+				<xs:element name="analysisTool" type="etfw:AnalysisToolType" />
 				<xs:element name="buildTool" type="etfw:BuildToolType" />
 			</xs:choice>
 		</xs:sequence>
@@ -48,13 +48,14 @@
 			<xs:element name="f90-compiler" minOccurs="0" maxOccurs="1" type="etfw:ToolAppType" />
 			<xs:element name="all-compilers" minOccurs="0" maxOccurs="1" type="etfw:ToolAppType" />
 			<xs:element name="upc-compiler" minOccurs="0" maxOccurs="1" type="etfw:ToolAppType" />
+			<xs:element name="tool-state" minOccurs="0" type="etfw:ToolStateType"/>
 		</xs:sequence>
 		<xs:attribute name="tool-id" type="xs:string" />
 		<xs:attribute name="tool-name" type="xs:string" />
 		<xs:attribute name="tool-type" type="xs:string" />
 		<xs:attribute name="require-true" type="xs:string" />
 		<xs:attribute name="replace-compiler" type="xs:boolean" />
-
+		<xs:attribute name="set-success-attribute" type="xs:string" />
 	</xs:complexType>
 	<xs:complexType name="ExecToolType">
 		<xs:sequence>
@@ -62,6 +63,7 @@
 				maxOccurs="1" /> <xs:element name="toolType" type="xs:string" minOccurs="0" maxOccurs="1" /> -->
 			<xs:element name="global" type="etfw:ToolAppType" minOccurs="0" maxOccurs="1" />
 			<xs:element name="execUtils" type="etfw:ToolAppType" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="tool-state" minOccurs="0" type="etfw:ToolStateType"/>
 		</xs:sequence>
 		<xs:attribute name="tool-id" type="xs:string" />
 		<xs:attribute name="tool-name" type="xs:string" />
@@ -69,15 +71,16 @@
 		<xs:attribute name="require-true" type="xs:string" />
 		<xs:attribute name="prepend-execution" type="xs:boolean" default="false" />
 		<xs:attribute name="replace-execution" type="xs:boolean" default="false" />
+		<xs:attribute name="set-success-attribute" type="xs:string" />
 	</xs:complexType>
-	<xs:complexType name="PostProcToolType">
+	<xs:complexType name="AnalysisToolType">
 		<xs:sequence>
 			<!-- <xs:element name="toolId" type="xs:string" minOccurs="0" maxOccurs="1" /> <xs:element name="toolName" type="xs:string" minOccurs="0" 
 				maxOccurs="1" /> <xs:element name="toolType" type="xs:string" minOccurs="0" maxOccurs="1" /> -->
 			<xs:element name="global" type="etfw:ToolAppType" minOccurs="0" maxOccurs="1" />
 			<xs:element name="analysis-commands" type="etfw:ToolAppType" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="for-all-like" type="xs:string" minOccurs="0" maxOccurs="1" />
-
+			<xs:element name="tool-state" minOccurs="0" type="etfw:ToolStateType"/>
 		</xs:sequence>
 		<xs:attribute name="tool-id" type="xs:string" />
 		<xs:attribute name="tool-name" type="xs:string" />
@@ -86,6 +89,7 @@
 		<xs:attribute name="depth" type="xs:int" default="-1" />
 		<xs:attribute name="useDefaultLocation" type="xs:boolean" default="false" />
 		<xs:attribute name="useLatestFileOnly" type="xs:boolean" default="true" />
+		<xs:attribute name="set-success-attribute" type="xs:string" />
 	</xs:complexType>
 
 	<xs:complexType name="ToolAppType">
@@ -139,6 +143,41 @@
 		<xs:attribute name="separate-name-value" type="xs:string" />
 		<xs:attribute name="virtual" type="xs:boolean" default="false" />
 		<xs:attribute name="embedded" type="xs:boolean" default="false" />
+	</xs:complexType>
+	<xs:complexType name="ToolStateType">
+		<xs:sequence>
+			<xs:choice minOccurs="0">
+				<xs:element name="execute-if" minOccurs="0" type="etfw:ToolStateRuleType"/>
+				<xs:element name="do-not-execute-if" minOccurs="0" type="etfw:ToolStateRuleType"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ToolStateRuleType">
+		<xs:choice>
+			<xs:element name="not" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="rule" type="etfw:ToolStateRuleType"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="and" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="rule" maxOccurs="unbounded" type="etfw:ToolStateRuleType"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="or" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="rule" maxOccurs="unbounded" type="etfw:ToolStateRuleType"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:choice>
+		<xs:attribute name="attribute" type="xs:string"/>
+		<xs:attribute name="value" type="xs:string"/>
 	</xs:complexType>
 	<!-- CMN: I think this can be replaced by the tab-controller-type <xs:complexType name="ToolPaneType"> <xs:sequence> <xs:choice minOccurs="0" 
 		maxOccurs="unbounded"> <xs:element name="tab-folder" type="rm:tab-folder-type" /> <xs:element name="widget" type="rm:widget-type" /> 

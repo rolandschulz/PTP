@@ -39,6 +39,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.ptp.etfw.IBuildLaunchUtils;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.jaxb.data.BuildToolType;
@@ -618,4 +619,15 @@ public class ETFWBuildTool extends ETFWToolStep implements IToolLaunchConfigurat
 		return outputLocation;
 	}
 
+	public void setSuccessAttribute(String value) {
+		if (tool != null && tool.getSetSuccessAttribute() != null) {
+			try {
+				ILaunchConfigurationWorkingCopy configuration = this.configuration.getWorkingCopy();
+				configuration.setAttribute(tool.getSetSuccessAttribute(), value);
+				configuration.doSave();
+			} catch (CoreException e) {
+				// Ignore
+			}
+		}
+	}
 }

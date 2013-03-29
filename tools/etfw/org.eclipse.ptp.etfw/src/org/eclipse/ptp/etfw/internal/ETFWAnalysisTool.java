@@ -23,12 +23,13 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.AbstractToolDataManager;
 import org.eclipse.ptp.etfw.Activator;
 import org.eclipse.ptp.etfw.IBuildLaunchUtils;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
-import org.eclipse.ptp.etfw.jaxb.data.PostProcToolType;
+import org.eclipse.ptp.etfw.jaxb.data.AnalysisToolType;
 import org.eclipse.ptp.etfw.jaxb.data.ToolAppType;
 import org.eclipse.ptp.etfw.messages.Messages;
 import org.eclipse.swt.widgets.DirectoryDialog;
@@ -47,14 +48,14 @@ import org.eclipse.ui.console.MessageConsole;
  * @author "Chris Navarro"
  * 
  */
-public class ETFWPostProcessTool extends ETFWToolStep implements IToolLaunchConfigurationConstants {
+public class ETFWAnalysisTool extends ETFWToolStep implements IToolLaunchConfigurationConstants {
 	// String outputLocation;
 
 	String currentFile;
 
 	// FileFilter dFil = new DirFilter();
 
-	private PostProcToolType tool = null;
+	private AnalysisToolType tool = null;
 	/**
 	 * True only if the directory containing performance data is user-specified and not strictly part of the project.
 	 */
@@ -63,12 +64,12 @@ public class ETFWPostProcessTool extends ETFWToolStep implements IToolLaunchConf
 	private final IBuildLaunchUtils utilBLob;
 	private String syncProjectLocation = null;
 
-	public ETFWPostProcessTool(ILaunchConfiguration conf, PostProcToolType ppTool, String outLoc, IBuildLaunchUtils utilBlob)
+	public ETFWAnalysisTool(ILaunchConfiguration conf, AnalysisToolType ppTool, String outLoc, IBuildLaunchUtils utilBlob)
 			throws CoreException {
 		super(conf, Messages.PostlaunchTool_Analysis, utilBlob);
 		tool = ppTool;
 		this.utilBLob = utilBlob;
-		if (outLoc.equals(EMPTY_STRING)) {
+		if (outLoc != null && outLoc.equals(EMPTY_STRING)) {
 			syncProjectLocation = projectLocation;
 		}
 		projectLocation = outputLocation = outLoc;
@@ -344,5 +345,17 @@ public class ETFWPostProcessTool extends ETFWToolStep implements IToolLaunchConf
 		MessageConsole myConsole = new MessageConsole(name, null);
 		conMan.addConsoles(new IConsole[] { myConsole });
 		return myConsole;
+	}
+	
+	public void setSuccessAttribute(String value) {
+		if (tool != null && tool.getSetSuccessAttribute() != null) {
+			try {
+				ILaunchConfigurationWorkingCopy configuration = this.configuration.getWorkingCopy();
+				configuration.setAttribute(tool.getSetSuccessAttribute(), value);
+				configuration.doSave();
+			} catch (CoreException e) {
+				// Ignore
+			}
+		}
 	}
 }
