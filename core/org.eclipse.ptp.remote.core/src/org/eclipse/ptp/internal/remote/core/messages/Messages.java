@@ -1,4 +1,4 @@
-package org.eclipse.ptp.remote.core.messages;
+package org.eclipse.ptp.internal.remote.core.messages;
 
 import org.eclipse.osgi.util.NLS;
 
@@ -18,6 +18,8 @@ public class Messages extends NLS {
 	public static String LocalConnection_1;
 	public static String LocalConnection_2;
 	public static String PTPRemoteCorePlugin_0;
+	public static String RemoteProcessClosure_exit_code;
+	public static String RemoteProcessClosure_shell_completed;
 	public static String RemoteServicesProxy_0;
 	public static String RemoteServicesProxy_1;
 

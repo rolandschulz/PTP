@@ -7,7 +7,7 @@
    <extension
          point="org.eclipse.ptp.remote.core.remoteServices">
       <remoteServices
-            class="org.eclipse.ptp.remote.internal.core.LocalServicesFactory"
+            class="org.eclipse.ptp.internal.remote.core.LocalServicesFactory"
             id="org.eclipse.ptp.remote.LocalServices"
             name="Local"
             newConnections="false"
@@ -33,7 +33,7 @@
          point="org.eclipse.core.runtime.adapters">
       <factory
             adaptableType="org.eclipse.core.resources.IResource"
-            class="org.eclipse.ptp.remote.internal.core.RemoteResourceAdapterFactory">
+            class="org.eclipse.ptp.internal.remote.core.RemoteResourceAdapterFactory">
          <adapter
                type="org.eclipse.ptp.remote.core.IRemoteResource">
          </adapter>

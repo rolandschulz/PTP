@@ -8,15 +8,15 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.remote.internal.core;
+package org.eclipse.ptp.internal.remote.core;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.internal.remote.core.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.IRemoteServicesDescriptor;
 import org.eclipse.ptp.remote.core.IRemoteServicesFactory;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
-import org.eclipse.ptp.remote.core.messages.Messages;
 
 public class RemoteServicesProxy implements IRemoteServicesDescriptor {
 	private static final String ATTR_ID = "id"; //$NON-NLS-1$

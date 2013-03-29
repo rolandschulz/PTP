@@ -26,7 +26,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.ptp.remote.core.messages.Messages;
+import org.eclipse.ptp.internal.remote.core.messages.Messages;
 
 /**
  * A wrapper for holding initialized remote services information. <br>
@@ -123,6 +123,7 @@ public class RemoteServicesDelegate {
 		try {
 			Thread.sleep(1000 * intervalInSecs);
 		} catch (InterruptedException ignored) {
+			// Ignore
 		}
 		info = lres.fetchInfo(EFS.NONE, subProgress.newChild(5));
 		if (subProgress.isCanceled()) {

@@ -8,7 +8,7 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.remote.internal.core;
+package org.eclipse.ptp.internal.remote.core;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,6 +51,7 @@ public class LocalProcess extends AbstractRemoteProcess {
 			}
 		}
 
+		@Override
 		public void run() {
 			int len;
 			byte b[] = new byte[BUF_SIZE];
@@ -60,12 +61,14 @@ public class LocalProcess extends AbstractRemoteProcess {
 					output.write(b, 0, len);
 				}
 			} catch (IOException e) {
+				// Ignore
 			}
 			synchronized (output) {
 				if (--refCount == 0) {
 					try {
 						output.close();
 					} catch (IOException e) {
+						// Ignore
 					}
 				}
 			}
@@ -92,6 +95,7 @@ public class LocalProcess extends AbstractRemoteProcess {
 		}
 
 		completedChecker = new Thread(new Runnable() {
+			@Override
 			public void run() {
 				while (!isCompleted) {
 					try {

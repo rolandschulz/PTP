@@ -8,7 +8,7 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.remote.internal.core;
+package org.eclipse.ptp.internal.remote.core;
 
 import java.net.URI;
 
@@ -32,6 +32,7 @@ public class LocalConnectionManager implements IRemoteConnectionManager {
 	 * org.eclipse.ptp.remote.core.IRemoteConnectionManager#getConnection(java
 	 * .lang.String)
 	 */
+	@Override
 	public IRemoteConnection getConnection(String name) {
 		if (name.equals(fLocalConnection.getName())) {
 			return fLocalConnection;
@@ -46,6 +47,7 @@ public class LocalConnectionManager implements IRemoteConnectionManager {
 	 * org.eclipse.ptp.remote.core.IRemoteConnectionManager#getConnection(java
 	 * .net.URI)
 	 */
+	@Override
 	public IRemoteConnection getConnection(URI uri) {
 		if (uri.getScheme().equals(EFS.getLocalFileSystem().getScheme())) {
 			return fLocalConnection;
@@ -59,6 +61,7 @@ public class LocalConnectionManager implements IRemoteConnectionManager {
 	 * @see
 	 * org.eclipse.ptp.remote.core.IRemoteConnectionManager#getConnections()
 	 */
+	@Override
 	public IRemoteConnection[] getConnections() {
 		return new IRemoteConnection[] { fLocalConnection };
 	}
@@ -70,6 +73,7 @@ public class LocalConnectionManager implements IRemoteConnectionManager {
 	 * org.eclipse.ptp.remote.core.IRemoteConnectionManager#newConnection(java
 	 * .lang.String)
 	 */
+	@Override
 	public IRemoteConnection newConnection(String name) throws RemoteConnectionException {
 		return fLocalConnection;
 	}
@@ -81,6 +85,8 @@ public class LocalConnectionManager implements IRemoteConnectionManager {
 	 * org.eclipse.ptp.remote.core.IRemoteConnectionManager#removeConnection
 	 * (org.eclipse.ptp.remote.core.IRemoteConnection)
 	 */
+	@Override
 	public void removeConnection(IRemoteConnection connection) {
+		// Nothing
 	}
 }
