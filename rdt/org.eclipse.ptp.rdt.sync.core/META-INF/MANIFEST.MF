@@ -22,8 +22,3 @@ Bundle-Localization: plugin
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin
 Bundle-Vendor: %providerName
-Import-Package: org.eclipse.ptp.internal.rdt.core.index,
- org.eclipse.ptp.internal.rdt.core.remotemake,
- org.eclipse.ptp.rdt.core.remotemake,
- org.eclipse.ptp.rdt.core.serviceproviders,
- org.eclipse.ptp.rdt.core.services

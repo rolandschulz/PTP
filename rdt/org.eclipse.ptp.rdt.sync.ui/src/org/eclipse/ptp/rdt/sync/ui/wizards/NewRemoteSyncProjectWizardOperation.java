@@ -24,7 +24,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
@@ -49,15 +48,17 @@ public class NewRemoteSyncProjectWizardOperation {
 	 * Does the actual initialization of a new synchronized project.
 	 * Creates the service configuration, initializes the project with the BuildConfigurationManager, modifies and creates build
 	 * configurations, and initializes file filtering.
-	 *
+	 * 
 	 * @param project
-	 * @param mainPage - the main wizard page, which contains the user's entries
+	 * @param mainPage
+	 *            - the main wizard page, which contains the user's entries
 	 * @param monitor
 	 */
 	public static void run(IProject project, SyncMainWizardPage mainPage, IProgressMonitor monitor) {
 		// monitor.beginTask("configure model services", 100); //$NON-NLS-1$
-	
-		// Add sync nature here so that "Synchronize" properties page does not appear inside wizard, before sync data has been added.
+
+		// Add sync nature here so that "Synchronize" properties page does not appear inside wizard, before sync data has been
+		// added.
 		try {
 			RemoteSyncNature.addNature(project, new NullProgressMonitor());
 		} catch (CoreException e1) {
@@ -68,14 +69,14 @@ public class NewRemoteSyncProjectWizardOperation {
 			// monitor.done();
 			return;
 		}
-	
+
 		// Build the service configuration
 		ServiceModelManager smm = ServiceModelManager.getInstance();
 		IServiceConfiguration serviceConfig = smm.newServiceConfiguration(getConfigName(project.getName()));
 		IService syncService = smm.getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
 		serviceConfig.setServiceProvider(syncService, participant.getProvider(project));
-	
-		IService buildService = smm.getService(IRDTServiceConstants.SERVICE_BUILD);
+
+		IService buildService = smm.getService(IRemoteSyncServiceConstants.SERVICE_BUILD);
 		IServiceProviderDescriptor descriptor = buildService.getProviderDescriptor(SyncBuildServiceProvider.ID);
 		SyncBuildServiceProvider rbsp = (SyncBuildServiceProvider) smm.getServiceProvider(descriptor);
 		if (rbsp != null) {
@@ -83,25 +84,24 @@ public class NewRemoteSyncProjectWizardOperation {
 			rbsp.setRemoteToolsConnection(remoteConnection);
 			serviceConfig.setServiceProvider(buildService, rbsp);
 		}
-	
+
 		smm.addConfiguration(project, serviceConfig);
 		try {
 			smm.saveModelConfiguration();
 		} catch (IOException e) {
 			RDTSyncUIPlugin.log(e.toString(), e);
 		}
-	
-		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();	
+
+		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
 		// Create build scenario based on initial remote location information
 		ISyncServiceProvider provider = participant.getProvider(project);
 		BuildScenario remoteBuildScenario = new BuildScenario(provider.getName(), provider.getRemoteConnection(),
 				provider.getLocation());
-		
+
 		// Initialize project with this build scenario, which will be applied to all current configurations.
 		// Note then that we initially assume all configs are remote.
 		bcm.setBuildScenarioForAllBuildConfigurations(project, remoteBuildScenario);
-		
-	
+
 		// Create a local build scenario
 		BuildScenario localBuildScenario = null;
 		try {
@@ -109,7 +109,7 @@ public class NewRemoteSyncProjectWizardOperation {
 		} catch (CoreException e) {
 			// TODO: What to do here?
 		}
-		
+
 		// Iterate through all configurations, modifying them as indicated based on their type.
 		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
 		if (buildInfo == null) {
@@ -120,7 +120,7 @@ public class NewRemoteSyncProjectWizardOperation {
 		for (IConfiguration config : allConfigs) {
 			boolean isRemote = mainPage.isRemoteConfig(config);
 			boolean isLocal = mainPage.isLocalConfig(config);
-			
+
 			// If config is both local and remote, then we need to create a config. Let the existing config be the remote and
 			// create a new local config based on the remote config.
 			if (isLocal && isRemote) {
@@ -128,37 +128,37 @@ public class NewRemoteSyncProjectWizardOperation {
 						config.getName(), null);
 				bcm.modifyConfigurationAsSyncLocal(localConfig);
 			}
-			
+
 			// If local only, change its build scenario to the local build scenario.
 			if (isLocal && !isRemote) {
 				bcm.setBuildScenarioForBuildConfiguration(localBuildScenario, config);
 				bcm.modifyConfigurationAsSyncLocal(config);
 			}
-			
+
 			// If type is remote, change to the sync builder and set environment variable support.
 			if (isRemote) {
 				bcm.modifyConfigurationAsSyncRemote(config);
-				
+
 				// The first remote found will be the initial default (active) configuration.
 				if (!defaultConfigSet) {
 					ManagedBuildManager.setDefaultConfiguration(project, config);
 					defaultConfigSet = true;
 				}
 			}
-			
+
 			// Bug 389899 - Synchronized project: "remote toolchain name" contains spaces
 			config.setName(config.getName().replace(' ', '_'));
 		}
 		ManagedBuildManager.saveBuildInfo(project, true);
-		
-	    SyncFileFilter customFilter = mainPage.getCustomFileFilter();
-	    if (customFilter != null) {
-	            SyncManager.saveFileFilter(project, customFilter);
-	    }
+
+		SyncFileFilter customFilter = mainPage.getCustomFileFilter();
+		if (customFilter != null) {
+			SyncManager.saveFileFilter(project, customFilter);
+		}
 		// monitor.done();
-	
-	    // Enable sync'ing
-	    SyncManager.setSyncMode(project, SyncManager.SYNC_MODE.ACTIVE);
+
+		// Enable sync'ing
+		SyncManager.setSyncMode(project, SyncManager.SYNC_MODE.ACTIVE);
 	}
 
 	/**
