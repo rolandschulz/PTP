@@ -3,7 +3,7 @@ package org.eclipse.ptp.internal.remote.core.messages;
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-	private static final String BUNDLE_NAME = "org.eclipse.ptp.remote.core.messages.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.internal.remote.core.messages.messages"; //$NON-NLS-1$
 	public static String AbstractRemoteServerRunner_1;
 	public static String AbstractRemoteServerRunner_11;
 	public static String AbstractRemoteServerRunner_12;
