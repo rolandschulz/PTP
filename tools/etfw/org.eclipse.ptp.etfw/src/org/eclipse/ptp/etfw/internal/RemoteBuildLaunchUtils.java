@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -565,7 +566,11 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 			} catch (CoreException e) {
 				e.printStackTrace();
 			}
-			pb = remoteServices.getProcessBuilder(conn, com);
+			List<String> scom = new ArrayList(3);
+			scom.add("bash");
+			scom.add("-l");
+			scom.add(com);
+			pb = remoteServices.getProcessBuilder(conn, scom);
 		}
 		else{
 			pb = remoteServices.getProcessBuilder(conn, tool);// new IRemoteProcessBuilder(tool);
