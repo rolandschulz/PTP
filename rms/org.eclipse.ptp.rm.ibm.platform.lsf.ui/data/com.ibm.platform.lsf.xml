@@ -951,7 +951,7 @@
 						</fixed-text>
 					</widget>
 					
-					<widget type="combo" readOnly="true" attribute="LSF_MPI_COMMAND" style="SWT.BORDER">
+					<widget type="combo" readOnly="false" attribute="LSF_MPI_COMMAND" style="SWT.BORDER">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
 								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
