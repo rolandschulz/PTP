@@ -84,6 +84,9 @@ public class Messages extends NLS {
 	public static String SyncGitPreferencePage_12;
 	public static String SyncGitPreferencePage_13;
 	public static String SyncGitPreferencePage_14;
+	public static String SyncGitPreferencePage_15;
+	public static String SyncGitPreferencePage_16;
+	public static String SyncGitPreferencePage_17;
 	public static String SyncGitPreferencePage_2;
 	public static String SyncGitPreferencePage_3;
 	public static String SyncGitPreferencePage_4;
