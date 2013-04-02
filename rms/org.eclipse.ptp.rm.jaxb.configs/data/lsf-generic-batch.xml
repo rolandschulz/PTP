@@ -26,9 +26,9 @@
 			<default>${ptp_rm:directory#value}/${ptp_rm:Job_Name#value}.e${ptp_rm:@jobId#default}</default>
 			<link-value-to>LSF_STDERR_PATH_NEW</link-value-to>
 		</attribute>
-		<attribute name="mpiCommand" type="choice">
-			<description>Optional MPI command to run job.</description>
-			<choice>,poe,mpiexec,mpirun</choice>
+		<attribute name="mpiCommand" type="string">
+			<description>MPI Command</description>
+			<choice>,poe,mpiexec,mpirun,mpirun.lsf</choice>
 		</attribute>
 				
 		<!-- -ar option -->
@@ -460,6 +460,7 @@
 			<arg isUndefinedIfMatches="-We">-We ${ptp_rm:LSF_RUNTIME_ESTIMATE#value}</arg>
 			<arg isUndefinedIfMatches="-w">-w ${ptp_rm:LSF_DEPENDENCIES#value}</arg>
 			<arg>${ptp_rm:LSF_OTHER_OPTIONS#value}</arg>
+			<arg>${ptp_rm:mpiCommand#value}</arg>
 			<arg>${ptp_rm:executablePath#value}</arg>
 			<arg>${ptp_rm:progArgs#value}</arg>
 			<stdout-parser delim="\n">
@@ -594,6 +595,7 @@
 						<column-data name="Description" width="300" />
 						<column-data name="Value" width="300" />
 						<items>
+						    <include>mpiCommand</include>
 							<include>LSF_QUEUE</include>
 							<include>LSF_EXCLUSIVE_EXECUTION</include>
 							<include>LSF_NUM_PROCS</include>
