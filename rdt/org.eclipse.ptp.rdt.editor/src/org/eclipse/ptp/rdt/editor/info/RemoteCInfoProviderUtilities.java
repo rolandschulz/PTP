@@ -52,23 +52,18 @@ public class RemoteCInfoProviderUtilities {
 		return editorProviders;
 	}
 
-	public static IRemoteCEditorInfoProvider getApplicableEditorInfoProvider(List<IRemoteCEditorInfoProvider> infoProviders,
-			IEditorInput input) {
-		List<IRemoteCEditorInfoProvider> handled = new ArrayList<IRemoteCEditorInfoProvider>();
-		List<IRemoteCEditorInfoProvider> ambiguous = new ArrayList<IRemoteCEditorInfoProvider>();
-		
+	public static IRemoteCEditorInfoProvider getApplicableEditorInfoProvider(List<IRemoteCEditorInfoProvider> infoProviders, IEditorInput input) {
+		IRemoteCEditorInfoProvider winner = null;
+		int highestVal = 0;
 		for (IRemoteCEditorInfoProvider provider: infoProviders) {
-			if (provider.isApplicableEditorInput(input)==IRemoteCEditorInfoProvider.HANDLES_INPUT)
-				handled.add(provider);
-			else if (provider.isApplicableEditorInput(input)==IRemoteCEditorInfoProvider.INPUT_AMBIGUOUS)
-				ambiguous.add(provider);
+			int applicable = Math.min(100, provider.isApplicableEditorInput(input));
+			if(applicable <= 0)
+				continue;
+			if(applicable > highestVal)
+				winner = provider;
 		}
-		if (handled.size()==1)
-			return handled.get(0);
-		else {
-			//TODO: prompt the user for which context they would prefer for the editor
-		}
-		return null;
+		
+		return winner;
 	}
 
 }
