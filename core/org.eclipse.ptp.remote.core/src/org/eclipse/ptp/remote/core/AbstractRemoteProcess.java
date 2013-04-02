@@ -14,14 +14,19 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public abstract class AbstractRemoteProcess extends Process implements IRemoteProcess {
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Process#destroy()
 	 */
 	@Override
 	public void destroy() {
+		// Nothing
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Process#exitValue()
 	 */
 	@Override
@@ -29,7 +34,9 @@ public abstract class AbstractRemoteProcess extends Process implements IRemotePr
 		return 0;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Process#getErrorStream()
 	 */
 	@Override
@@ -37,7 +44,9 @@ public abstract class AbstractRemoteProcess extends Process implements IRemotePr
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Process#getInputStream()
 	 */
 	@Override
@@ -45,7 +54,9 @@ public abstract class AbstractRemoteProcess extends Process implements IRemotePr
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Process#getOutputStream()
 	 */
 	@Override
@@ -53,19 +64,22 @@ public abstract class AbstractRemoteProcess extends Process implements IRemotePr
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Process#waitFor()
 	 */
 	@Override
 	public int waitFor() throws InterruptedException {
 		return 0;
 	}
-	
-	/**
-	 * Check if the remote process has completed
+
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @return true if remote process has completed
+	 * @see org.eclipse.ptp.remote.core.IRemoteProcess#isCompleted()
 	 */
+	@Override
 	public boolean isCompleted() {
 		return true;
 	}

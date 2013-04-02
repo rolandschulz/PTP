@@ -36,11 +36,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.ptp.ems.core.EnvManagerRegistry;
 import org.eclipse.ptp.ems.core.EnvManagerProjectProperties;
+import org.eclipse.ptp.ems.core.EnvManagerRegistry;
 import org.eclipse.ptp.ems.core.IEnvManager;
-import org.eclipse.ptp.internal.rdt.core.index.IndexBuildSequenceController;
-import org.eclipse.ptp.internal.rdt.core.remotemake.RemoteProcessClosure;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.MissingConnectionException;
@@ -53,6 +51,7 @@ import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.RemoteProcessAdapter;
+import org.eclipse.ptp.remote.core.RemoteProcessClosure;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
 /**
@@ -101,8 +100,8 @@ public class SyncCommandLauncher implements ICommandLauncher {
 	}
 
 	private boolean isCleanBuild(String[] args) {
-		for (int i = 0; i < args.length; i++) {
-			if (IBuilder.DEFAULT_TARGET_CLEAN.equals(args[i])) {
+		for (String arg : args) {
+			if (IBuilder.DEFAULT_TARGET_CLEAN.equals(arg)) {
 				return true;
 			}
 		}
@@ -119,11 +118,6 @@ public class SyncCommandLauncher implements ICommandLauncher {
 	public Process execute(IPath commandPath, String[] args, String[] env, IPath changeToDirectory, final IProgressMonitor monitor)
 			throws CoreException {
 		isCleanBuild = isCleanBuild(args);
-		IndexBuildSequenceController projectStatus = IndexBuildSequenceController.getIndexBuildSequenceController(getProject());
-
-		if (projectStatus != null) {
-			projectStatus.setRuntimeBuildStatus(null);
-		}
 
 		// if there is no project associated to us then we cannot function... throw an exception
 		if (getProject() == null) {
@@ -149,8 +143,8 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		try {
 			connection = bs.getRemoteConnection();
 		} catch (MissingConnectionException e2) {
-            throw new CoreException(new Status(IStatus.CANCEL,
-                    "org.eclipse.ptp.rdt.sync.core", "Build canceled because connection does not exist")); //$NON-NLS-1$ //$NON-NLS-2$
+			throw new CoreException(new Status(IStatus.CANCEL,
+					"org.eclipse.ptp.rdt.sync.core", "Build canceled because connection does not exist")); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		if (!connection.isOpen()) {
 			try {
@@ -199,18 +193,9 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		try {
 			p = processBuilder.start();
 		} catch (IOException e) {
-			if (projectStatus != null) {
-				projectStatus.setRuntimeBuildStatus(IndexBuildSequenceController.STATUS_INCOMPLETE);
-			}
 			// rethrow as CoreException
-			throw new CoreException(new Status(IStatus.ERROR,
-					"org.eclipse.ptp.rdt.sync.core", "Error launching remote process.", e)); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-
-		if (projectStatus != null) {
-			if (!isCleanBuild) {
-				projectStatus.setBuildRunning();
-			}
+			throw new CoreException(
+					new Status(IStatus.ERROR, "org.eclipse.ptp.rdt.sync.core", "Error launching remote process.", e)); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		fRemoteProcess = p;
@@ -218,27 +203,29 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		return fProcess;
 	}
 
-	private List<String> constructCommand(IPath commandPath, String[] args, IRemoteConnection connection, IProgressMonitor monitor) throws CoreException {
+	private List<String> constructCommand(IPath commandPath, String[] args, IRemoteConnection connection, IProgressMonitor monitor)
+			throws CoreException {
 		/*
 		 * Prior to Modules/SoftEnv support, this was the following:
 		 * 
 		 * List<String> command = new LinkedList<String>();
 		 * command.add(commandPath.toString());
 		 * for (int k = 0; k < args.length; k++) {
-		 *     command.add(args[k]);
+		 * command.add(args[k]);
 		 * }
 		 */
 
 		final EnvManagerProjectProperties projectProperties = new EnvManagerProjectProperties(getProject());
 		if (projectProperties.isEnvMgmtEnabled()) {
-			// Environment management is enabled for the build.  Issue custom Modules/SoftEnv commands to configure the environment.
+			// Environment management is enabled for the build. Issue custom Modules/SoftEnv commands to configure the environment.
 			IEnvManager envManager = EnvManagerRegistry.getEnvManager(monitor, connection);
 			try {
 				// Create and execute a Bash script which will configure the environment and then execute the command
 				final List<String> command = new LinkedList<String>();
 				command.add("bash"); //$NON-NLS-1$
 				command.add("-l"); //$NON-NLS-1$
-				final String bashScriptFilename = envManager.createBashScript(monitor, true, projectProperties, getCommandAsString(commandPath, args));
+				final String bashScriptFilename = envManager.createBashScript(monitor, true, projectProperties,
+						getCommandAsString(commandPath, args));
 				command.add(bashScriptFilename);
 				return command;
 			} catch (final Exception e) {
@@ -248,12 +235,14 @@ public class SyncCommandLauncher implements ICommandLauncher {
 				command.add("bash"); //$NON-NLS-1$
 				command.add("-l"); //$NON-NLS-1$
 				command.add("-c"); //$NON-NLS-1$
-				final String bashCommand = envManager.getBashConcatenation("; ", true, projectProperties, getCommandAsString(commandPath, args)); //$NON-NLS-1$
+				final String bashCommand = envManager.getBashConcatenation(
+						"; ", true, projectProperties, getCommandAsString(commandPath, args)); //$NON-NLS-1$
 				command.add(bashCommand);
 				return command;
 			}
 		} else {
-			// Environment management disabled.  Execute the build command in a login shell (so the default environment is configured).
+			// Environment management disabled. Execute the build command in a login shell (so the default environment is
+			// configured).
 			final List<String> command = new LinkedList<String>();
 			command.add("bash"); //$NON-NLS-1$
 			command.add("-l"); //$NON-NLS-1$
@@ -267,8 +256,8 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		final StringBuilder sb = new StringBuilder();
 		sb.append(escape(commandPath.toOSString()));
 		sb.append(' ');
-		for (int k = 0; k < args.length; k++) {
-			sb.append(escape(args[k]));
+		for (String arg : args) {
+			sb.append(escape(arg));
 			sb.append(' ');
 		}
 		return sb.toString();
@@ -280,7 +269,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 			return null;
 		}
 
-		final StringBuilder newString = new StringBuilder(inputString.length()+16);
+		final StringBuilder newString = new StringBuilder(inputString.length() + 16);
 		final CharacterIterator it = new StringCharacterIterator(inputString);
 		for (char c = it.first(); c != CharacterIterator.DONE; c = it.next()) {
 			if (c == '\'') {
@@ -449,21 +438,16 @@ public class SyncCommandLauncher implements ICommandLauncher {
 				// ignore
 			}
 		}
-		
+
 		// Poorly named function - actually closes streams and resets variables
 		closure.isAlive();
 
 		int state = OK;
-		final IndexBuildSequenceController projectStatus = IndexBuildSequenceController
-				.getIndexBuildSequenceController(getProject());
 		// Operation canceled by the user, terminate abnormally.
 		if (monitor.isCanceled()) {
 			closure.terminate();
 			state = COMMAND_CANCELED;
 			setErrorMessage(CCorePlugin.getResourceString("CommandLauncher.error.commandCanceled")); //$NON-NLS-1$
-			if (projectStatus != null) {
-				projectStatus.setRuntimeBuildStatus(IndexBuildSequenceController.STATUS_INCOMPLETE);
-			}
 		}
 
 		try {
@@ -482,23 +466,6 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		} catch (CoreException e) {
 			// this should never happen because we should never be building from a
 			// state where ressource changes are disallowed
-		}
-
-		if (projectStatus != null) {
-			if (isCleanBuild) {
-
-				projectStatus.setBuildInCompletedForCleanBuild();
-
-			} else {
-
-				if (projectStatus.isIndexAfterBuildSet()) {
-
-					projectStatus.invokeIndex();
-				} else {
-					projectStatus.setFinalBuildStatus();
-				}
-
-			}
 		}
 
 		return state;

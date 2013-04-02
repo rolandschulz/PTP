@@ -17,7 +17,6 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -38,14 +37,13 @@ import org.eclipse.ptp.services.core.ServiceProvider;
  * 
  * @author crecoskie
  */
-public class SyncBuildServiceProvider extends ServiceProvider implements IRemoteExecutionServiceProvider {
+public class SyncBuildServiceProvider extends ServiceProvider {
 
 	public static final String REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_PROVIDER_ID = "SyncBuildServiceProvider.remoteToolsProviderID"; //$NON-NLS-1$
 	public static final String REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_CONNECTION_NAME = "SyncBuildServiceProvider.remoteToolsConnectionName"; //$NON-NLS-1$
 	public static final String REMOTE_BUILD_SERVICE_PROVIDER_CONFIG_LOCATION = "SyncBuildServiceProvider.configLocation"; //$NON-NLS-1$
 
 	public static final String ID = "org.eclipse.ptp.rdt.sync.BuildServiceProvider"; //$NON-NLS-1$
-	public static final String SERVICE_ID = "org.eclipse.ptp.rdt.core.BuildService"; //$NON-NLS-1$
 	public static final String NAME = Messages.SyncBuildServiceProvider_name;
 	public static final String DEFAULT_CONFIG_DIR_NAME = Messages.SyncBuildServiceProvider_configDir;
 
@@ -169,6 +167,7 @@ public class SyncBuildServiceProvider extends ServiceProvider implements IRemote
 		return getString(REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_PROVIDER_ID, null);
 	}
 
+	@Override
 	public boolean isConfigured() {
 		return (getRemoteToolsProviderID() != null && getRemoteConnectionName() != null);
 	}

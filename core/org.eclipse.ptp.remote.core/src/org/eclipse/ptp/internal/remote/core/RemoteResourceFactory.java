@@ -8,7 +8,7 @@
  * Contributors:
  *    IBM - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.remote.internal.core;
+package org.eclipse.ptp.internal.remote.core;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;

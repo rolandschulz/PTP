@@ -34,6 +34,8 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.internal.remote.core.DebugUtil;
+import org.eclipse.ptp.internal.remote.core.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
@@ -41,8 +43,6 @@ import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remote.core.RemoteVariableManager;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
-import org.eclipse.ptp.remote.core.messages.Messages;
-import org.eclipse.ptp.remote.internal.core.DebugUtil;
 import org.osgi.framework.Bundle;
 
 /**
@@ -530,6 +530,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 					try {
 						wait(100);
 					} catch (InterruptedException e) {
+						// Ignore
 					}
 				}
 			}
@@ -558,6 +559,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 				}
 				timeout -= dec;
 			} catch (InterruptedException e) {
+				// Ignore
 			}
 		}
 	}
@@ -577,6 +579,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 					try {
 						wait(100);
 					} catch (InterruptedException e) {
+						// Ignore
 					}
 				}
 			}
@@ -786,6 +789,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 					try {
 						wait(100);
 					} catch (InterruptedException e) {
+						// Ignore
 					}
 				}
 			}

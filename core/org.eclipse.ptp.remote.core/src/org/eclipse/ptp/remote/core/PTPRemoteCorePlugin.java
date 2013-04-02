@@ -37,10 +37,10 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.ptp.remote.core.messages.Messages;
-import org.eclipse.ptp.remote.internal.core.DebugUtil;
-import org.eclipse.ptp.remote.internal.core.LocalServices;
-import org.eclipse.ptp.remote.internal.core.RemoteServicesProxy;
+import org.eclipse.ptp.internal.remote.core.DebugUtil;
+import org.eclipse.ptp.internal.remote.core.LocalServices;
+import org.eclipse.ptp.internal.remote.core.RemoteServicesProxy;
+import org.eclipse.ptp.internal.remote.core.messages.Messages;
 import org.osgi.framework.BundleContext;
 
 /**

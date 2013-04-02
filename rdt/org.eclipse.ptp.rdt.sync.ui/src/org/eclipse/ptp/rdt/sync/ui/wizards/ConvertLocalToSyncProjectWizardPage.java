@@ -45,8 +45,6 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.Window;
-import org.eclipse.ptp.rdt.core.resources.RemoteNature;
-import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
@@ -83,11 +81,12 @@ import org.eclipse.swt.widgets.Label;
 
 /**
  * Converts existing CDT projects to sync projects.
+ * 
  * @since 1.0
  */
 public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPage {
 	private final boolean showProviderCombo = false; // Change this variable to support multiple sync providers
-													 // Otherwise, the first provider is used automatically
+														// Otherwise, the first provider is used automatically
 	private Combo fProviderCombo;
 	private Composite fProviderArea;
 	private StackLayout fProviderStack;
@@ -100,6 +99,8 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 	private final Map<Integer, ISynchronizeParticipantDescriptor> fComboIndexToDescriptorMap = new HashMap<Integer, ISynchronizeParticipantDescriptor>();
 
 	protected Map<IProject, IServiceConfiguration> projectConfigs = new HashMap<IProject, IServiceConfiguration>();
+
+	private static final String REMOTE_NATURE_ID = "org.eclipse.ptp.rdt.core.remoteNature"; //$NON-NLS-1$
 
 	/**
 	 * Constructor for ConvertToRemoteWizardPage.
@@ -174,9 +175,10 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 			fProviderCombo.select(0);
 		}
 		handleProviderSelected(0);
-		
+
 		// Need to update whenever the project selection changes
 		this.tableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				update();
 			}
@@ -197,16 +199,18 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 			public void dispose() {
 				// nothing to do
 			}
+
 			@Override
 			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 				// nothing to do
 			}
+
 			@Override
 			public Object[] getElements(Object inputElement) {
 				if (inputElement == null) {
 					return new IConfiguration[0];
 				}
-				assert(inputElement instanceof IProject);
+				assert (inputElement instanceof IProject);
 				if (getCheckedElements().length != 1) {
 					return new IConfiguration[0];
 				}
@@ -224,29 +228,34 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 			public void addListener(ILabelProviderListener listener) {
 				// not implemented
 			}
+
 			@Override
 			public void dispose() {
 				// nothing to do
 			}
+
 			@Override
 			public boolean isLabelProperty(Object element, String property) {
 				return true; // safe option
 			}
+
 			@Override
 			public void removeListener(ILabelProviderListener listener) {
 				// not implemented
 			}
+
 			@Override
 			public Image getImage(Object element) {
 				return null;
 			}
+
 			@Override
 			public String getText(Object element) {
-				assert(element instanceof IConfiguration);
+				assert (element instanceof IConfiguration);
 				return ((IConfiguration) element).getName();
 			}
 		});
-		
+
 		// Button to switch to remote config after conversion
 		switchToRemoteConfigButton = new Button(comp, SWT.CHECK);
 		switchToRemoteConfigButton.setText(Messages.ConvertLocalToSyncProjectWizardPage_4);
@@ -274,7 +283,7 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 				}
 			}
 		});
-		
+
 		// These buttons are useless when only one project should be selected
 		this.selectAllButton.setVisible(false);
 		this.deselectAllButton.setVisible(false);
@@ -282,14 +291,14 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 
 	protected void convertProject(final IProject project, IProgressMonitor monitor) throws CoreException {
 		monitor.beginTask(Messages.ConvertToSyncProjectWizardPage_convertingToSyncProject, 3);
-		
+
 		// Add project natures
 		RemoteSyncNature.addNature(project, new NullProgressMonitor());
-//		try {
-//			RemoteMakeNature.updateProjectDescription(project, RemoteMakeBuilder.REMOTE_MAKE_BUILDER_ID, new NullProgressMonitor());
-//		} catch (CoreException e) {
-//			StatusManager.getManager().handle(e, RDTSyncUIPlugin.PLUGIN_ID);
-//		}
+		// try {
+		// RemoteMakeNature.updateProjectDescription(project, RemoteMakeBuilder.REMOTE_MAKE_BUILDER_ID, new NullProgressMonitor());
+		// } catch (CoreException e) {
+		// StatusManager.getManager().handle(e, RDTSyncUIPlugin.PLUGIN_ID);
+		// }
 
 		try {
 			ISynchronizeParticipant participant = fSelectedProvider.getParticipant();
@@ -300,7 +309,7 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 			IService syncService = smm.getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
 			serviceConfig.setServiceProvider(syncService, participant.getProvider(project));
 
-			IService buildService = smm.getService(IRDTServiceConstants.SERVICE_BUILD);
+			IService buildService = smm.getService(IRemoteSyncServiceConstants.SERVICE_BUILD);
 			IServiceProviderDescriptor descriptor = buildService.getProviderDescriptor(SyncBuildServiceProvider.ID);
 			SyncBuildServiceProvider rbsp = (SyncBuildServiceProvider) smm.getServiceProvider(descriptor);
 			if (rbsp != null) {
@@ -332,7 +341,7 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 			if (buildInfo == null) {
 				throw new RuntimeException("Build information for project not found. Project name: " + project.getName()); //$NON-NLS-1$
 			}
-			
+
 			// Iterate through all configs
 			boolean switchToRemoteConfig = switchToRemoteConfigButton.getSelection();
 			boolean defaultConfigSet = false;
@@ -350,18 +359,18 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 						defaultConfigSet = true;
 					}
 				}
-				
+
 				bcm.modifyConfigurationAsSyncLocal(config);
 			}
 			ManagedBuildManager.saveBuildInfo(project, true);
-			
+
 			if (customFilter != null) {
 				SyncManager.saveFileFilter(project, customFilter);
 			}
-			
-		    // Enable sync'ing and force an initial sync
-		    SyncManager.setSyncMode(project, SyncManager.SYNC_MODE.ACTIVE);
-		    SyncManager.sync(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(false, true));
+
+			// Enable sync'ing and force an initial sync
+			SyncManager.setSyncMode(project, SyncManager.SYNC_MODE.ACTIVE);
+			SyncManager.sync(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(false, true));
 		} finally {
 			monitor.done();
 		}
@@ -408,13 +417,13 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 			monitor.done();
 		}
 	}
-	
+
 	// Helper function to disable/enable auto build during project conversion
 	// Returns the value of auto build before function was called.
 	private static boolean setAutoBuild(boolean shouldBeEnabled) {
-		IWorkspace workspace= ResourcesPlugin.getWorkspace();
-		IWorkspaceDescription desc= workspace.getDescription();
-		boolean isAutoBuilding= desc.isAutoBuilding();
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IWorkspaceDescription desc = workspace.getDescription();
+		boolean isAutoBuilding = desc.isAutoBuilding();
 		if (isAutoBuilding != shouldBeEnabled) {
 			desc.setAutoBuilding(shouldBeEnabled);
 			try {
@@ -524,7 +533,7 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 		try {
 			b = project.hasNature(CProjectNature.C_NATURE_ID) || project.hasNature(CCProjectNature.CC_NATURE_ID);
 			c = !project.hasNature(RemoteSyncNature.NATURE_ID);
-			d = !project.hasNature(RemoteNature.REMOTE_NATURE_ID);
+			d = !project.hasNature(REMOTE_NATURE_ID);
 		} catch (CoreException e) {
 			RDTSyncUIPlugin.log(e);
 		}

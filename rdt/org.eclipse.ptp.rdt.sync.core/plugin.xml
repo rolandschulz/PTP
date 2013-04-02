@@ -17,6 +17,10 @@
             id="org.eclipse.ptp.rdt.sync.core.SyncService"
             name="%SyncService.name">
       </service>
+      <service
+            id="org.eclipse.ptp.rdt.sync.core.BuildService"
+            name="%SyncBuildService.name">
+      </service>
    </extension>
    <extension
          point="org.eclipse.cdt.core.UNCPathConverter">
@@ -29,9 +33,9 @@
       <provider
             class="org.eclipse.ptp.rdt.sync.core.serviceproviders.SyncBuildServiceProvider"
             id="org.eclipse.ptp.rdt.sync.BuildServiceProvider"
-            name="%SyncBuildService.name"
+            name="%SyncBuildProvider.name"
             priority="1"
-            serviceId="org.eclipse.ptp.rdt.core.BuildService">
+            serviceId="org.eclipse.ptp.rdt.sync.core.BuildService">
       </provider>
    </extension>
    <extension

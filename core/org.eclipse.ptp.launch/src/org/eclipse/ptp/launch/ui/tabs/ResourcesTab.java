@@ -313,13 +313,15 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			 * exist. If no, revert to no connection selected.
 			 */
 			fRemoteConnectionWidget.setConnection(remId, remName);
-			if (openConnection()) {
-				fRemoteConnection = fRemoteConnectionWidget.getConnection();
-				if (fLaunchControl == null) {
-					fLaunchControl = getNewController(remId, remName, rmType);
+			IRemoteConnection conn = fRemoteConnectionWidget.getConnection();
+			if (conn != null) {
+				ILaunchController control = getNewController(remId, remName, rmType);
+				if (changeConnection(conn, control)) {
+					fRemoteConnection = conn;
+					fLaunchControl = control;
+				} else {
+					fRemoteConnectionWidget.setConnection(null);
 				}
-			} else {
-				fRemoteConnectionWidget.setConnection(null);
 			}
 			updateLaunchAttributeControls(fLaunchControl, getLaunchConfiguration(), true);
 			updateLaunchConfigurationDialog();
@@ -513,38 +515,34 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			fRemoteConnection = null;
 			updateLaunchAttributeControls(null, getLaunchConfiguration(), false);
 			updateLaunchConfigurationDialog();
-		} else if (openConnection()) {
+		} else {
 			// We assume fSystemTypeCombo selection is valid based on previous tests
 			String type = fSystemTypeCombo.getText();
 			ILaunchController controller = getNewController(conn.getRemoteServices().getId(), conn.getName(), type);
-			if (controller != null) {
+			if (controller != null && changeConnection(conn, controller)) {
 				stopController(fLaunchControl);
 				fLaunchControl = controller;
 				fRemoteConnection = conn;
 				updateLaunchAttributeControls(fLaunchControl, getLaunchConfiguration(), true);
 				updateLaunchConfigurationDialog();
+			} else {
+				/*
+				 * Failed to change connection, reset back to the previous one
+				 */
+				fRemoteConnectionWidget.setConnection(fRemoteConnection);
 			}
-		} else {
-			/*
-			 * Failed to change connection, reset back to the previous one
-			 */
-			fRemoteConnectionWidget.setConnection(fRemoteConnection);
 		}
 	}
 
-	private boolean openConnection() {
-		IRemoteConnection conn = fRemoteConnectionWidget.getConnection();
-		if (conn != null) {
-			if (!conn.isOpen()) {
-				boolean result = MessageDialog.openQuestion(getShell(), Messages.ResourcesTab_openConnection,
-						NLS.bind(Messages.ResourcesTab_noInformation, conn.getName()));
-				if (!result) {
-					return false;
-				}
+	private boolean changeConnection(IRemoteConnection conn, ILaunchController controller) {
+		if (controller.getConfiguration().getControlData().getStartUpCommand() != null) {
+			boolean result = MessageDialog.openQuestion(getShell(), Messages.ResourcesTab_openConnection,
+					NLS.bind(Messages.ResourcesTab_noInformation, conn.getName()));
+			if (!result) {
+				return false;
 			}
-			return true;
 		}
-		return false;
+		return true;
 	}
 
 	/**

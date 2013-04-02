@@ -16,7 +16,6 @@ Require-Bundle: org.eclipse.cdt.core,
  org.eclipse.ptp.remote.ui,
  org.eclipse.ptp.services.core,
  org.eclipse.ptp.rdt.sync.core,
- org.eclipse.ptp.rdt.core,
  org.eclipse.ptp.ems.core,
  org.eclipse.ptp.ems.ui
 Bundle-Localization: plugin

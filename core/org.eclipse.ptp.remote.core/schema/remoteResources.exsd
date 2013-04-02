@@ -55,7 +55,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn=":org.eclipse.ptp.remote.internal.core.IRemoteResource"/>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.ptp.internal.remote.core.IRemoteResource"/>
                </appInfo>
             </annotation>
          </attribute>
