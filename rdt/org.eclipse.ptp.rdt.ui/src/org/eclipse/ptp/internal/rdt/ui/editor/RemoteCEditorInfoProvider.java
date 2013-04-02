@@ -78,6 +78,11 @@ public class RemoteCEditorInfoProvider implements IRemoteCEditorInfoProvider {
 		editor = remoteCEditor;
 	}
 
+	
+	protected RemoteCEditor getEditor() {
+		return editor;
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rdt.editor.info.IRemoteCEditorInfoProvider#preDoSetInput(org.eclipse.ui.IEditorInput)
 	 */
@@ -98,11 +103,11 @@ public class RemoteCEditorInfoProvider implements IRemoteCEditorInfoProvider {
 	public int isApplicableEditorInput(IEditorInput input) {
 		ICProject cproject = EditorUtility.getCProject(input);
 		if (cproject == null)
-			return INPUT_UNKNOWN;
+			return 0;
 		IProject project = cproject.getProject();
 		if (RemoteNature.hasRemoteNature(project))
-			return HANDLES_INPUT;
-		return INPUT_UNKNOWN;
+			return 1;
+		return 0;
 	}
 
 	/* (non-Javadoc)
@@ -354,7 +359,7 @@ public class RemoteCEditorInfoProvider implements IRemoteCEditorInfoProvider {
 	 * Returns true if the input element is a C element and it comes from a remote project. Also returns true if the
 	 * editor is opened on an external translation unit that was navigated to from a remote resource.
 	 */
-	private boolean isRemote() {
+	protected boolean isRemote() {
 		ICElement element = editor.getInputCElement();
 		if (element == null)
 			return false;
@@ -410,6 +415,7 @@ public class RemoteCEditorInfoProvider implements IRemoteCEditorInfoProvider {
 			actionBars.setGlobalActionHandler(CdtActionConstants.EXTRACT_LOCAL_VARIABLE, null);
 			actionBars.setGlobalActionHandler(CdtActionConstants.EXTRACT_METHOD, null);
 			actionBars.setGlobalActionHandler(CdtActionConstants.HIDE_METHOD, null);
+			actionBars.setGlobalActionHandler(CdtActionConstants.TOGGLE_FUNCTION, null);
 
 			actionBars.setGlobalActionHandler(CdtActionConstants.GETTERS_AND_SETTERS, null);
 			actionBars.setGlobalActionHandler(CdtActionConstants.IMPLEMENT_METHOD, null);

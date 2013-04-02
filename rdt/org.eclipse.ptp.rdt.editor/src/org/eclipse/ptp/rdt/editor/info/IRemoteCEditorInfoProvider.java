@@ -31,9 +31,6 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 
 public interface IRemoteCEditorInfoProvider {
 
-	public static int INPUT_UNKNOWN = 0;
-	public static int HANDLES_INPUT = 1;
-	public static int INPUT_AMBIGUOUS = 2;
 
 	/**
 	 * Called when the editor is initialized to initialize any necessary values in the info provider
@@ -54,9 +51,12 @@ public interface IRemoteCEditorInfoProvider {
 	public void postDoSetInput(IEditorInput input) throws CoreException;
 
 	/**
-	 * Indicates whether or not the specified editor input is applicable to this info provider
-	 * @param input the editor input
-	 * @return one of INPUT_UNKNOWN, HANDLES_INPUT or INPUT_AMBIGUOUS
+	 * Indicates whether or not the specified editor input is applicable to this info provider.
+	 * Return an integer less than or equal to 0 to indicate that it does not handle the input.
+	 * Return an integer between 1 and 100 inclusive to indicate that it does handle the input.
+	 * The value will be used to break ties, a greater value wins. If there is still a tie
+	 * then the winning provider is indeterminate. Values greater than 100 will be treated
+	 * like 100.
 	 */
 	public int isApplicableEditorInput(IEditorInput input);
 
