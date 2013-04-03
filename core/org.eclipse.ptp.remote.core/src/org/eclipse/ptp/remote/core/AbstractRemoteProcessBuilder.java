@@ -40,6 +40,7 @@ public abstract class AbstractRemoteProcessBuilder implements IRemoteProcessBuil
 	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#command()
 	 */
+	@Override
 	public List<String> command() {
 		return fCommandArgs;
 	}
@@ -50,6 +51,7 @@ public abstract class AbstractRemoteProcessBuilder implements IRemoteProcessBuil
 	 * @see
 	 * org.eclipse.ptp.remote.core.IRemoteProcessBuilder#command(java.util.List)
 	 */
+	@Override
 	public IRemoteProcessBuilder command(List<String> command) {
 		fCommandArgs = command;
 		return this;
@@ -62,6 +64,7 @@ public abstract class AbstractRemoteProcessBuilder implements IRemoteProcessBuil
 	 * org.eclipse.ptp.remote.core.IRemoteProcessBuilder#command(java.lang.String
 	 * )
 	 */
+	@Override
 	public IRemoteProcessBuilder command(String... command) {
 		fCommandArgs = Arrays.asList(command);
 		return this;
@@ -72,6 +75,7 @@ public abstract class AbstractRemoteProcessBuilder implements IRemoteProcessBuil
 	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#connection()
 	 */
+	@Override
 	public IRemoteConnection connection() {
 		return fRemoteConnection;
 	}
@@ -83,6 +87,7 @@ public abstract class AbstractRemoteProcessBuilder implements IRemoteProcessBuil
 	 * org.eclipse.ptp.remote.core.IRemoteProcessBuilder#connection(org.eclipse
 	 * .ptp.remote.core.IRemoteConnection)
 	 */
+	@Override
 	public IRemoteProcessBuilder connection(IRemoteConnection conn) {
 		fRemoteConnection = conn;
 		return this;
@@ -93,6 +98,7 @@ public abstract class AbstractRemoteProcessBuilder implements IRemoteProcessBuil
 	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#directory()
 	 */
+	@Override
 	public IFileStore directory() {
 		return fRemoteDir;
 	}
@@ -104,6 +110,7 @@ public abstract class AbstractRemoteProcessBuilder implements IRemoteProcessBuil
 	 * org.eclipse.ptp.remote.core.IRemoteProcessBuilder#directory(org.eclipse
 	 * .core.filesystem.IFileStore)
 	 */
+	@Override
 	public IRemoteProcessBuilder directory(IFileStore directory) {
 		fRemoteDir = directory;
 		return this;
@@ -114,6 +121,7 @@ public abstract class AbstractRemoteProcessBuilder implements IRemoteProcessBuil
 	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#environment()
 	 */
+	@Override
 	public abstract Map<String, String> environment();
 
 	/*
@@ -125,6 +133,7 @@ public abstract class AbstractRemoteProcessBuilder implements IRemoteProcessBuil
 	/**
 	 * @since 5.0
 	 */
+	@Override
 	public abstract int getSupportedFlags();
 
 	/*
@@ -133,6 +142,7 @@ public abstract class AbstractRemoteProcessBuilder implements IRemoteProcessBuil
 	 * @see
 	 * org.eclipse.ptp.remote.core.IRemoteProcessBuilder#redirectErrorStream()
 	 */
+	@Override
 	public boolean redirectErrorStream() {
 		return fRedirectErrorStream;
 	}
@@ -144,6 +154,7 @@ public abstract class AbstractRemoteProcessBuilder implements IRemoteProcessBuil
 	 * org.eclipse.ptp.remote.core.IRemoteProcessBuilder#redirectErrorStream
 	 * (boolean)
 	 */
+	@Override
 	public IRemoteProcessBuilder redirectErrorStream(boolean redirectErrorStream) {
 		this.fRedirectErrorStream = redirectErrorStream;
 		return this;
@@ -154,6 +165,7 @@ public abstract class AbstractRemoteProcessBuilder implements IRemoteProcessBuil
 	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteProcessBuilder#start()
 	 */
+	@Override
 	public IRemoteProcess start() throws IOException {
 		return start(NONE);
 	}
@@ -166,5 +178,21 @@ public abstract class AbstractRemoteProcessBuilder implements IRemoteProcessBuil
 	/**
 	 * @since 5.0
 	 */
+	@Override
 	public abstract IRemoteProcess start(int flags) throws IOException;
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		StringBuilder res = new StringBuilder();
+		for (String arg : command()) {
+			res.append(arg);
+			res.append(" "); //$NON-NLS-1$
+		}
+		return res.toString();
+	}
 }
