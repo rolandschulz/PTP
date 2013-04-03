@@ -259,7 +259,7 @@ public class CommandJob extends Job implements ICommandJob {
 			try {
 				process = builder.start(getFlags(command.getFlags()));
 			} catch (IOException t) {
-				return CoreExceptionUtils.getErrorStatus(Messages.CouldNotLaunch + builder.command(), t);
+				return CoreExceptionUtils.getErrorStatus(Messages.CouldNotLaunch + builder, t);
 			}
 			progress.worked(30);
 			maybeInitializeTokenizers(builder);
