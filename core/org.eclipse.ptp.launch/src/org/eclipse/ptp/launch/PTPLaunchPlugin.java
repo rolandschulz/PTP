@@ -63,10 +63,20 @@ public class PTPLaunchPlugin extends AbstractUIPlugin {
 	 * @param t
 	 */
 	public static void errorDialog(String message, Throwable t) {
-		log(t);
+		if (t != null) {
+			log(t);
+		} else {
+			logErrorMessage(message);
+		}
 		Shell shell = getActiveWorkbenchShell();
 		if (shell != null) {
-			IStatus status = new Status(IStatus.ERROR, getUniqueIdentifier(), 1, t.getMessage(), null);
+			String errMsg = message;
+			if (t != null) {
+				errMsg = t.getMessage();
+			} else {
+				message = null;
+			}
+			IStatus status = new Status(IStatus.ERROR, getUniqueIdentifier(), 1, errMsg, null);
 			ErrorDialog.openError(shell, Messages.Launch_common_Error, message, status);
 		}
 	}
