@@ -1,0 +1,84 @@
+<html>
+<head>
+<title>LSF</title>
+<link rel="stylesheet" type="text/css" href="../help.css">
+<script type="text/javascript" src="thumb.js">
+	
+</script>
+</head>
+<body>
+
+	<h1 id="top">IBM Platform LSF</h1>
+	<p>This section describes how to set up and use a run configuration using
+		IBM Platform Load Sharing Facility (LSF) as a target system
+		configuration to support batch LSF job submission.
+	</p>
+	<h2 id="config">Initial Setup</h2>
+	<p>The user account that you will be submitting jobs to on the remote system must include an invocation of profile.lsf, 
+		cshrc.lsf or perl.lsf as part of the login shell script, depending on that account's shell command processor. By invoking 
+		the appropriate script, you ensure that the account is set up for PTP to run LSF commands.</p>
+	<p>In addition, when you define the connection to the remote host, make sure the <b>Use login shell</b> checkbox
+		 in the <b>Generic Remote Host</b> dialog is checked. Note that this dialog opens in simplified mode. 
+		 In order to check the <b>Use login shell</b> checkbox, you must click the <b>Advanced</b> button then check the 
+		 checkbox.
+	</p>
+	<img src="./images/rms-lsf0.png">
+	<h2 id="submit">Submitting a Batch Job</h2>
+	<p>To submit a batch job, use the <b>Run</b> menu or the 
+		<b>run</b> icon to select an existing run configuration or to create a new run configuration. The run configuration should be a 
+		<b>Parallel Application</b> run configuration.</p>
+	<p>Next, select the <b>LSF-Generic-Batch</b> option from the Target System Configuration drop down widget.</p>
+	<p>Then select the connection for the remote system from the <b>Connection name</b> drop down widget or click the <b>New</b>
+	 	button to create a new connection to the remote system.</p>
+	<img src="./images/rms-lsf1.png"><br>
+	<h2 id="options">Specifying Job Submission Options</h2>
+	<p>After you have selected the LSF target system configuration and the connection, the resources tab of the run
+	   configuration dialog will be populated with a set of tabbed panes where you fill in the values for any LSF job 
+	   submission parameters you need.
+	</p>	
+	<p>The LSF job submission options are organized into several tabbed panes</p>
+	<ul>
+		<li><b>Job Submission</b>, such as job queue, job name, and login shell</li>
+		<br>
+		<img src="./images/rms-lsf3.png">
+		<br>	
+		<li><b>Scheduling</b>, such as dependencies, requested dispatch time, and reservation id</li>
+		<br>
+		<img src="./images/rms-lsf5.png">
+		<br>
+		<li><b>Resources</b>, such as host names and number of processors</li>
+		<br>
+		<img src="./images/rms-lsf6.png">
+		<br>
+		<li><b>Limits</b>, such as CPU time limit, file size limit, and memory limit</li>
+		<br>
+		<img src="./images/rms-lsf7.png">
+		<br>
+		<li><b>I/O</b>, specifying handling for stdin, stdout and stderr</li>
+		<br>
+		<img src="./images/rms-lsf8.png">
+		<br>
+		<li><b>Notifications</b>, specifying notifications for job dispatch and completion</li>
+		<br>
+		<img src="./images/rms-lsf9.png">
+	</ul>
+	<p>In addition, the <b>Advanced</b> tab displays a list of all LSF job submission options where you can also fill 
+	   in the values you need.</p>
+	<img src="./images/rms-lsf2.png">
+	<p>The <b>Job Queue</b> and <b>Application Profile</b> options on the <b>Job Submission</b> tab and the
+	   <b>Reservation ID</b> on the <b>Scheduling</b> tab are comprised of a text entry field and a <b>List</b>
+	   button. You can either fill in the value in the text entry field or click the <b>List</b> button to get a dialog where
+	   you can select from one of the available choices.</p>
+	<p>The selection dialog displayed when you click the <b>List</b> button looks like the following image</p>
+	<img src="./images/rms-lsf4.png">
+	<p>You select a value from the dialog by clicking the entry in the left column and clicking the <b>OK</b>button.</p>
+	<p>Once you have filled in the values in the <b>Resources</b> tab, fill in in the remaining tabs as needed and click the <b>Run</b> button. </p>
+	
+		<a href="#top">Back to Top</a> | <a href="../toc.html">Back to
+			Table of Contents</a>
+</body>
+</html>
+
+
+
+
