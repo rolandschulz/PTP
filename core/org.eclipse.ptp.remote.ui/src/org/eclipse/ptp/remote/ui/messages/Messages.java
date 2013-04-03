@@ -20,16 +20,17 @@ public class Messages extends NLS {
 	public static String LocalUIConnectionManager_1;
 	public static String LocalUIConnectionManager_2;
 	public static String LocalUIConnectionManager_3;
+	
 	public static String PTPRemoteUIPlugin_3;
 	public static String PTPRemoteUIPlugin_4;
+	
+	public static String RemoteConnectionWidget_Connection_Type;
 	public static String RemoteConnectionWidget_connectionName;
-
+	public static String RemoteConnectionWidget_Local;
 	public static String RemoteConnectionWidget_new;
-
+	public static String RemoteConnectionWidget_Remote;
 	public static String RemoteConnectionWidget_remoteServiceProvider;
-
 	public static String RemoteConnectionWidget_selectConnection;
-
 	public static String RemoteConnectionWidget_selectRemoteProvider;
 
 	public static String RemoteDevelopmentPreferencePage_defaultRemoteServicesProvider;
@@ -38,6 +39,7 @@ public class Messages extends NLS {
 	public static String RemoteDirectoryWidget_1;
 	public static String RemoteDirectoryWidget_2;
 	public static String RemoteDirectoryWidget_3;
+	
 	public static String RemoteResourceBrowser_resourceTitle;
 	public static String RemoteResourceBrowser_fileTitle;
 	public static String RemoteResourceBrowser_directoryTitle;
@@ -46,12 +48,10 @@ public class Messages extends NLS {
 	public static String RemoteResourceBrowser_directoryLabel;
 	public static String RemoteResourceBrowser_connectonLabel;
 	public static String RemoteResourceBrowser_newConnection;
-
 	public static String RemoteResourceBrowser_NewFolder;
-
 	public static String RemoteResourceBrowser_Show_hidden_files;
-
 	public static String RemoteResourceBrowser_UpOneLevel;
+	
 	public static String RemoteUIServicesProxy_1;
 	public static String RemoteUIServicesProxy_2;
 
