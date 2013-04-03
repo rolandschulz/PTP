@@ -25,7 +25,6 @@ import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.remote.ui.messages.Messages;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
@@ -46,6 +45,24 @@ import org.eclipse.swt.widgets.Label;
  * 
  */
 public class RemoteConnectionWidget extends Composite {
+	/**
+	 * Force the use of a remote provider dialog, regardless of the PRE_REMOTE_SERVICES_ID preference setting.
+	 * 
+	 * @since 7.0
+	 */
+	public static int FLAG_FORCE_PROVIDER_SELECTION = 1 << 0;
+
+	/**
+	 * Do not provide a selection for local services.
+	 * 
+	 * @since 7.0
+	 */
+	public static int FLAG_NO_LOCAL_SELECTION = 1 << 1;
+
+	/**
+	 * Listener for widget selected events. Allows the events to be enabled/disabled.
+	 * 
+	 */
 	protected class WidgetListener implements SelectionListener {
 		/** State of the listener (enabled/disabled). */
 		private boolean listenerEnabled = true;
@@ -99,6 +116,8 @@ public class RemoteConnectionWidget extends Composite {
 					handleConnectionSelected();
 				} else if (source == fNewConnectionButton) {
 					handleNewRemoteConnectionSelected();
+				} else if (source == fLocalButton) {
+					handleButtonSelected();
 				}
 			}
 		}
@@ -112,7 +131,6 @@ public class RemoteConnectionWidget extends Composite {
 	private Button fRemoteButton;
 	private final Combo fConnectionCombo;
 	private final Button fNewConnectionButton;
-	private final Group fConnectionGroup;
 
 	private final IRemoteServices[] fRemoteServices;
 	private IRemoteConnection fSelectedConnection;
@@ -137,104 +155,103 @@ public class RemoteConnectionWidget extends Composite {
 	 *            style or SWT.NONE
 	 * @param title
 	 *            title is supplied then the widget will be placed in a group
+	 * @param forceProvider
+	 *            If true, a combo will always be used to allow selection of a remote services provider. If false, and a preferred
+	 *            remote services provider has been specified, then all connections will use this provider. In this case a local
+	 *            button will be provided to allow selection of local services.
 	 * @param context
 	 *            runnable context, or null
+	 * @since 7.0
 	 */
-	public RemoteConnectionWidget(Composite parent, int style, String title, IRunnableContext context) {
+	public RemoteConnectionWidget(Composite parent, int style, String title, int flags, IRunnableContext context) {
 		super(parent, style);
 		fContext = context;
+
+		Composite body = this;
 
 		GridLayout layout = new GridLayout(1, false);
 		layout.marginHeight = 0;
 		layout.marginWidth = 0;
-		setLayout(layout);
-		setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-
-		Composite body = this;
+		layout.numColumns = 4;
 
 		if (title != null) {
 			Group group = new Group(this, SWT.NONE);
 			group.setText(title);
-			group.setLayout(new GridLayout(1, false));
+			GridLayout groupLayout = new GridLayout(1, false);
+			groupLayout.marginHeight = 0;
+			groupLayout.marginWidth = 0;
+			groupLayout.numColumns = 4;
+			group.setLayout(groupLayout);
 			group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+			layout.numColumns = 1;
 			body = group;
 		}
 
-		/*
-		 * Composite for remote information
-		 */
-		fConnectionGroup = new Group(body, SWT.NONE);
-		fConnectionGroup.setText(Messages.RemoteConnectionWidget_Connection_Type);
-		GridLayout remoteLayout = new GridLayout();
-		remoteLayout.numColumns = 4;
-		remoteLayout.marginWidth = 0;
-		fConnectionGroup.setLayout(remoteLayout);
-		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-		fConnectionGroup.setLayoutData(gd);
+		setLayout(layout);
+		setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		/*
 		 * Check if we need a remote services combo, or we should just use the default provider
 		 */
-		String id = Preferences.getString(PTPRemoteCorePlugin.getUniqueIdentifier(),
-				IRemotePreferenceConstants.PREF_REMOTE_SERVICES_ID);
-		if (id != null) {
-			fDefaultServices = getRemoteServices(id);
+		if ((flags & FLAG_FORCE_PROVIDER_SELECTION) == 0) {
+			String id = Preferences.getString(PTPRemoteCorePlugin.getUniqueIdentifier(),
+					IRemotePreferenceConstants.PREF_REMOTE_SERVICES_ID);
+			if (id != null) {
+				fDefaultServices = getRemoteServices(id);
+			}
 		}
+
 		if (fDefaultServices == null) {
 			/*
 			 * Remote provider
 			 */
-			Label label = new Label(fConnectionGroup, SWT.NONE);
+			Label label = new Label(body, SWT.NONE);
 			label.setText(Messages.RemoteConnectionWidget_remoteServiceProvider);
-			gd = new GridData();
+			GridData gd = new GridData();
 			gd.horizontalSpan = 1;
 			label.setLayoutData(gd);
 
-			fServicesCombo = new Combo(fConnectionGroup, SWT.DROP_DOWN | SWT.READ_ONLY);
+			fServicesCombo = new Combo(body, SWT.DROP_DOWN | SWT.READ_ONLY);
 			gd = new GridData(GridData.FILL_HORIZONTAL);
 			gd.horizontalSpan = 3;
 			fServicesCombo.setLayoutData(gd);
 			fServicesCombo.addSelectionListener(fWidgetListener);
 			fServicesCombo.setFocus();
+		}
 
-			Label remoteLabel = new Label(fConnectionGroup, SWT.NONE);
-			remoteLabel.setText(Messages.RemoteConnectionWidget_connectionName);
-			gd = new GridData();
-			gd.horizontalSpan = 1;
-			label.setLayoutData(gd);
-		} else {
-			fLocalButton = new Button(fConnectionGroup, SWT.RADIO);
+		if ((flags & FLAG_NO_LOCAL_SELECTION) == 0) {
+			fLocalButton = new Button(body, SWT.RADIO);
 			fLocalButton.setText(Messages.RemoteConnectionWidget_Local);
 			GridData data = new GridData();
 			data.horizontalSpan = 1;
 			fLocalButton.setLayoutData(data);
-			fLocalButton.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-					updateEnablement();
-					handleConnectionSelected();
-				}
-			});
+			fLocalButton.addSelectionListener(fWidgetListener);
 			fLocalButton.setSelection(false);
 
-			fRemoteButton = new Button(fConnectionGroup, SWT.RADIO);
+			fRemoteButton = new Button(body, SWT.RADIO);
 			fRemoteButton.setText(Messages.RemoteConnectionWidget_Remote);
 			data = new GridData();
 			data.horizontalSpan = 1;
 			fRemoteButton.setLayoutData(data);
+		} else {
+			Label remoteLabel = new Label(body, SWT.NONE);
+			remoteLabel.setText(Messages.RemoteConnectionWidget_connectionName);
+			GridData gd = new GridData();
+			gd.horizontalSpan = 1;
+			remoteLabel.setLayoutData(gd);
 		}
 
-		fConnectionCombo = new Combo(fConnectionGroup, SWT.DROP_DOWN | SWT.READ_ONLY);
-		gd = new GridData(GridData.FILL_HORIZONTAL);
+		fConnectionCombo = new Combo(body, SWT.DROP_DOWN | SWT.READ_ONLY);
+		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 1;
 		fConnectionCombo.setLayoutData(gd);
 		fConnectionCombo.addSelectionListener(fWidgetListener);
-		if (id != null) {
+		if (fDefaultServices != null) {
 			fConnectionCombo.setFocus();
 		}
 		fConnectionCombo.setEnabled(false);
 
-		fNewConnectionButton = new Button(fConnectionGroup, SWT.PUSH);
+		fNewConnectionButton = new Button(body, SWT.PUSH);
 		fNewConnectionButton.setText(Messages.RemoteConnectionWidget_new);
 		gd = new GridData();
 		fNewConnectionButton.setLayoutData(gd);
@@ -247,6 +264,16 @@ public class RemoteConnectionWidget extends Composite {
 		}
 
 		handleRemoteServiceSelected(null);
+
+		if (fLocalButton != null) {
+			handleButtonSelected();
+		}
+	}
+
+	private void handleButtonSelected() {
+		fRemoteButton.setSelection(!fLocalButton.getSelection());
+		updateEnablement();
+		handleConnectionSelected();
 	}
 
 	/**
@@ -327,7 +354,7 @@ public class RemoteConnectionWidget extends Composite {
 		final boolean enabled = fWidgetListener.isEnabled();
 		fWidgetListener.disable();
 		IRemoteConnection selectedConnection = null;
-		if (fDefaultServices != null && fLocalButton.getSelection()) {
+		if (fLocalButton != null && fLocalButton.getSelection()) {
 			selectedConnection = PTPRemoteCorePlugin.getDefault().getDefaultServices().getConnectionManager()
 					.getConnection(IRemoteConnectionManager.DEFAULT_CONNECTION_NAME);
 		} else {
@@ -518,9 +545,10 @@ public class RemoteConnectionWidget extends Composite {
 	 */
 	public void setConnection(IRemoteConnection connection) {
 		fSelectionListernersEnabled = false;
-		if (fDefaultServices != null && connection != null
+		if (fLocalButton != null && connection != null
 				&& connection.getRemoteServices() == PTPRemoteCorePlugin.getDefault().getDefaultServices()) {
 			fLocalButton.setSelection(true);
+			handleButtonSelected();
 		} else {
 			handleRemoteServiceSelected(connection);
 		}
@@ -570,21 +598,16 @@ public class RemoteConnectionWidget extends Composite {
 		fAttrHintValues = attrHintValues;
 	}
 
-	/**
-	 * Set the receivers text. Used to change the label for the connection type group.
-	 * 
-	 * @param string
-	 *            the new text
-	 * @since 7.0
-	 */
-	public void setText(String string) {
-		fConnectionGroup.setText(string);
-	}
-
 	private void updateEnablement() {
 		if (fDefaultServices != null) {
-			fConnectionCombo.setEnabled(fEnabled && !fLocalButton.getSelection());
-			fNewConnectionButton.setEnabled(fEnabled && !fLocalButton.getSelection() && fDefaultServices.canCreateConnections());
+			boolean isRemote = true;
+			if (fLocalButton != null) {
+				fLocalButton.setEnabled(fEnabled);
+				fRemoteButton.setEnabled(fEnabled);
+				isRemote = !fLocalButton.getSelection();
+			}
+			fConnectionCombo.setEnabled(fEnabled && isRemote);
+			fNewConnectionButton.setEnabled(fEnabled && isRemote && fDefaultServices.canCreateConnections());
 		} else {
 			IRemoteServices services = getSelectedServices();
 			fConnectionCombo.setEnabled(fEnabled && services != null);

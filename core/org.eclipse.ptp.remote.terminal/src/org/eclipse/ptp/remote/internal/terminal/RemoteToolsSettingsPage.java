@@ -55,7 +55,7 @@ public class RemoteToolsSettingsPage extends AbstractSettingsPage {
 		composite.setLayout(gridLayout);
 		composite.setLayoutData(gridData);
 
-		fRemoteConnectionWidget = new RemoteConnectionWidget(composite, SWT.NONE, null, null);
+		fRemoteConnectionWidget = new RemoteConnectionWidget(composite, SWT.NONE, null, 0, null);
 		loadSettings();
 	}
 }

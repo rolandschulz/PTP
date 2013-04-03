@@ -20,6 +20,8 @@ public class Messages extends NLS {
 
 	public static String AddMonitorDialog_Add_Monitor;
 	public static String AddMonitorDialog_Choose_a_monitor_type;
+
+	public static String AddMonitorDialog_Connection_Type;
 	public static String AddMonitorDialog_Monitor_Type;
 	public static String AddMonitorDialog_Please_select_a_monitor_type;
 	public static String AddMonitorDialog_Select_new_monitor;

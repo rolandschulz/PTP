@@ -170,7 +170,6 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		fSystemTypeCombo.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				System.out.println("combo selected");
 				rmTypeSelectionChanged();
 				updateEnablement();
 				handleConnectionChanged();
@@ -198,7 +197,8 @@ public class ResourcesTab extends LaunchConfigurationTab {
 				}
 			});
 		}
-		fRemoteConnectionWidget = new RemoteConnectionWidget(comp, SWT.NONE, null, getLaunchConfigurationDialog());
+
+		fRemoteConnectionWidget = new RemoteConnectionWidget(comp, SWT.NONE, Messages.ResourcesTab_Connection_Type, 0, getLaunchConfigurationDialog());
 		fRemoteConnectionWidget.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
 		fRemoteConnectionWidget.addSelectionListener(new SelectionAdapter() {
 			@Override

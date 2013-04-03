@@ -12,8 +12,6 @@
 package org.eclipse.ptp.rdt.sync.git.ui;
 
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Path;
@@ -22,17 +20,17 @@ import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
-import org.eclipse.ptp.rdt.sync.git.ui.messages.Messages;
 import org.eclipse.ptp.rdt.sync.git.core.GitServiceProvider;
+import org.eclipse.ptp.rdt.sync.git.ui.messages.Messages;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
+import org.eclipse.ptp.remote.ui.widgets.RemoteConnectionWidget;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.swt.SWT;
@@ -43,7 +41,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
@@ -56,28 +53,17 @@ import org.eclipse.swt.widgets.Text;
 public class GitParticipant implements ISynchronizeParticipant {
 	private static final String FILE_SCHEME = "file"; //$NON-NLS-1$
 
-	// private IServiceConfiguration fConfig;
 	private IRemoteConnection fSelectedConnection;
-	private IRemoteServices fSelectedProvider;
-	// private final IRunnableContext fContext;
 	private String fProjectName = ""; //$NON-NLS-1$
 
-	private final Map<Integer, IRemoteServices> fComboIndexToRemoteServicesProviderMap = new HashMap<Integer, IRemoteServices>();
-	private final Map<Integer, IRemoteConnection> fComboIndexToRemoteConnectionMap = new HashMap<Integer, IRemoteConnection>();
-
-//	private Control fDialogControl;
-//	private Point fDialogSize;
-//	private Text fNameText;
 	private Button fBrowseButton;
-	private Button fNewConnectionButton;
-	private Combo fProviderCombo;
-	private Combo fConnectionCombo;
 	private Text fLocationText;
+	private RemoteConnectionWidget fRemoteConnectionWidget;
 
 	private IWizardContainer container;
-	
+
 	// If false, automatically select "Remote Tools" provider instead of letting the user select the provider.
-	private boolean showProviderCombo = false;
+	private final boolean showProviderCombo = false;
 
 	/**
 	 * Attempt to open a connection.
@@ -85,7 +71,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 	private void checkConnection() {
 		IRemoteUIConnectionManager mgr = getUIConnectionManager();
 		if (mgr != null) {
-			mgr.openConnectionWithProgress(fConnectionCombo.getShell(), null, fSelectedConnection);
+			mgr.openConnectionWithProgress(fRemoteConnectionWidget.getShell(), null, fSelectedConnection);
 		}
 	}
 
@@ -97,8 +83,9 @@ public class GitParticipant implements ISynchronizeParticipant {
 	 * (org.eclipse.swt.widgets.Composite,
 	 * org.eclipse.jface.operation.IRunnableContext)
 	 */
+	@Override
 	public void createConfigurationArea(Composite parent, IRunnableContext context) {
-		this.container = (IWizardContainer)context;
+		this.container = (IWizardContainer) context;
 		final Composite configArea = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 3;
@@ -106,82 +93,17 @@ public class GitParticipant implements ISynchronizeParticipant {
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		configArea.setLayoutData(gd);
 
-		if (showProviderCombo) {
-			// Label for "Provider:"
-			Label providerLabel = new Label(configArea, SWT.LEFT);
-			providerLabel.setText(Messages.GitParticipant_remoteProvider);
-
-			// combo for providers
-			fProviderCombo = new Combo(configArea, SWT.DROP_DOWN | SWT.READ_ONLY);
-			gd = new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false);
-			gd.horizontalSpan = 2;
-			fProviderCombo.setLayoutData(gd);
-			fProviderCombo.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-					handleServicesSelected();
-				}
-			});
-		}
-
-		// attempt to restore settings from saved state
-		// IRemoteServices providerSelected = fProvider.getRemoteServices();
-
-		// populate the combo with a list of providers
-		IRemoteServices[] providers = PTPRemoteUIPlugin.getDefault().getRemoteServices(context);
-		int toSelect = 0;
-
-		for (int k = 0; k < providers.length; k++) {
-			if (showProviderCombo) {
-				fProviderCombo.add(providers[k].getName(), k);
-			}
-			if  (providers[k].getName().equals("Remote Tools")) { //$NON-NLS-1$
-				toSelect = k;
-			}
-			fComboIndexToRemoteServicesProviderMap.put(k, providers[k]);
-		}
-
-		if (showProviderCombo) {
-			fProviderCombo.select(toSelect);
-		}
-		fSelectedProvider = fComboIndexToRemoteServicesProviderMap.get(toSelect);
-
-		// connection combo
-		// Label for "Connection:"
-		Label connectionLabel = new Label(configArea, SWT.LEFT);
-		connectionLabel.setText(Messages.GitParticipant_connection);
-
-		// combo for providers
-		fConnectionCombo = new Combo(configArea, SWT.DROP_DOWN | SWT.READ_ONLY);
-		// set layout to grab horizontal space
-		fConnectionCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		fConnectionCombo.addSelectionListener(new SelectionAdapter() {
+		int flags = showProviderCombo ? RemoteConnectionWidget.FLAG_FORCE_PROVIDER_SELECTION : 0;
+		flags |= RemoteConnectionWidget.FLAG_NO_LOCAL_SELECTION;
+		fRemoteConnectionWidget = new RemoteConnectionWidget(configArea, SWT.NONE, null, flags, context);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 3;
+		gd.grabExcessHorizontalSpace = true;
+		fRemoteConnectionWidget.setLayoutData(gd);
+		fRemoteConnectionWidget.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				handleConnectionSelected();
-			}
-		});
-
-		// populate the combo with a list of providers
-		populateConnectionCombo(fConnectionCombo);
-
-		// new connection button
-		fNewConnectionButton = new Button(configArea, SWT.PUSH);
-		fNewConnectionButton.setText(Messages.GitParticipant_new);
-		updateNewConnectionButtonEnabled(fNewConnectionButton);
-		fNewConnectionButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				IRemoteUIConnectionManager connectionManager = getUIConnectionManager();
-				IRemoteConnection newConn = null;
-				if (connectionManager != null) {
-					newConn = connectionManager.newConnection(fNewConnectionButton.getShell());
-				}
-				// refresh list of connections
-				if (newConn != null) {
-					populateConnectionCombo(fConnectionCombo, newConn.getName());
-					update();
-				}
 			}
 		});
 
@@ -195,6 +117,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 		gd.widthHint = 250;
 		fLocationText.setLayoutData(gd);
 		fLocationText.addModifyListener(new ModifyListener() {
+			@Override
 			public void modifyText(ModifyEvent e) {
 				// MBSCustomPageManager.addPageProperty(REMOTE_SYNC_WIZARD_PAGE_ID,
 				// PATH_PROPERTY, fLocationText.getText());
@@ -212,7 +135,8 @@ public class GitParticipant implements ISynchronizeParticipant {
 				if (fSelectedConnection != null) {
 					checkConnection();
 					if (fSelectedConnection.isOpen()) {
-						IRemoteUIServices remoteUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fSelectedProvider);
+						IRemoteUIServices remoteUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(
+								fSelectedConnection.getRemoteServices());
 						if (remoteUIServices != null) {
 							IRemoteUIFileManager fileMgr = remoteUIServices.getUIFileManager();
 							if (fileMgr != null) {
@@ -242,13 +166,13 @@ public class GitParticipant implements ISynchronizeParticipant {
 	 * @return String
 	 */
 	private String getDefaultPathDisplayString() {
-//		String projectName = ""; //$NON-NLS-1$
+		//		String projectName = ""; //$NON-NLS-1$
 		// IWizardPage page = getWizard().getStartingPage();
 		// if (page instanceof CDTMainWizardPage) {
 		// projectName = ((CDTMainWizardPage) page).getProjectName();
 		// }
 		if (fSelectedConnection != null && fSelectedConnection.isOpen()) {
-			IRemoteFileManager fileMgr = fSelectedProvider.getFileManager(fSelectedConnection);
+			IRemoteFileManager fileMgr = fSelectedConnection.getRemoteServices().getFileManager(fSelectedConnection);
 			URI defaultURI = fileMgr.toURI(fSelectedConnection.getWorkingDirectory());
 
 			// Handle files specially. Assume a file if there is no project to
@@ -263,20 +187,22 @@ public class GitParticipant implements ISynchronizeParticipant {
 		}
 		return ""; //$NON-NLS-1$
 	}
-	
-	/** 
+
+	/**
 	 * @see ISynchronizeParticipant#getErrorMessage()
 	 */
+	@Override
 	public String getErrorMessage() {
-		if (fSelectedProvider == null) 
-			return Messages.GitParticipant_0;
-		if (fSelectedConnection == null) 
+		if (fSelectedConnection == null) {
 			return Messages.GitParticipant_1;
-		if (fLocationText.getText().length() == 0 ) 
+		}
+		if (fLocationText.getText().length() == 0) {
 			return Messages.GitParticipant_2;
-		IRemoteFileManager fileManager = fSelectedProvider.getFileManager(fSelectedConnection);
-		if ( fileManager.toURI(fLocationText.getText()) == null) 
+		}
+		IRemoteFileManager fileManager = fSelectedConnection.getRemoteServices().getFileManager(fSelectedConnection);
+		if (fileManager.toURI(fLocationText.getText()) == null) {
 			return Messages.GitParticipant_3;
+		}
 		// should we check permissions of: fileManager.getResource(fLocationText.getText()).getParent() ?
 		return null;
 	}
@@ -287,6 +213,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 	 * @see
 	 * org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant#getProvider(org.eclipse.core.resources.IProject)
 	 */
+	@Override
 	public ISyncServiceProvider getProvider(IProject project) {
 		ServiceModelManager smm = ServiceModelManager.getInstance();
 		IService syncService = smm.getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
@@ -294,7 +221,7 @@ public class GitParticipant implements ISynchronizeParticipant {
 				.getProviderDescriptor(GitServiceProvider.ID));
 		provider.setLocation(fLocationText.getText());
 		provider.setRemoteConnection(fSelectedConnection);
-		provider.setRemoteServices(fSelectedProvider);
+		provider.setRemoteServices(fSelectedConnection != null ? fSelectedConnection.getRemoteServices() : null);
 		return provider;
 	}
 
@@ -302,31 +229,20 @@ public class GitParticipant implements ISynchronizeParticipant {
 	 * @return
 	 */
 	private IRemoteUIConnectionManager getUIConnectionManager() {
-		IRemoteUIConnectionManager connectionManager = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fSelectedProvider)
-				.getUIConnectionManager();
-		return connectionManager;
+		if (fSelectedConnection != null) {
+			IRemoteUIConnectionManager connectionManager = PTPRemoteUIPlugin.getDefault()
+					.getRemoteUIServices(fSelectedConnection.getRemoteServices()).getUIConnectionManager();
+			return connectionManager;
+		}
+		return null;
 	}
 
 	/**
 	 * Handle new connection selected
 	 */
 	private void handleConnectionSelected() {
-		int selectionIndex = fConnectionCombo.getSelectionIndex();
-		fSelectedConnection = fComboIndexToRemoteConnectionMap.get(selectionIndex);
-		updateNewConnectionButtonEnabled(fNewConnectionButton);
+		fSelectedConnection = fRemoteConnectionWidget.getConnection();
 		fLocationText.setText(getDefaultPathDisplayString());
-		update();
-	}
-
-	/**
-	 * Handle new remote services selected
-	 */
-	private void handleServicesSelected() {
-		int selectionIndex = fProviderCombo.getSelectionIndex();
-		fSelectedProvider = fComboIndexToRemoteServicesProviderMap.get(selectionIndex);
-		populateConnectionCombo(fConnectionCombo);
-		updateNewConnectionButtonEnabled(fNewConnectionButton);
-		handleConnectionSelected();
 		update();
 	}
 
@@ -336,62 +252,27 @@ public class GitParticipant implements ISynchronizeParticipant {
 	 * @see
 	 * org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant#isConfigComplete()
 	 */
+	@Override
 	public boolean isConfigComplete() {
 		return getErrorMessage() == null;
 	}
 
-	/**
-	 * @param connectionCombo
-	 */
-	private void populateConnectionCombo(final Combo connectionCombo) {
-		this.populateConnectionCombo(connectionCombo, null);
-	}
-
-	/**
-	 * @param connectionCombo
-	 * @param initSelection
-	 */
-	private void populateConnectionCombo(final Combo connectionCombo, String initSelection) {
-		connectionCombo.removeAll();
-
-		int initIndex = 0;
-		IRemoteConnection[] connections = fSelectedProvider.getConnectionManager().getConnections();
-
-		for (int k = 0; k < connections.length; k++) {
-			connectionCombo.add(connections[k].getName(), k);
-			fComboIndexToRemoteConnectionMap.put(k, connections[k]);
-			if (connections[k].getName().equals(initSelection)) {
-				initIndex = k;
-			}
-		}
-
-		connectionCombo.select(initIndex);
-		fSelectedConnection = fComboIndexToRemoteConnectionMap.get(initIndex);
-	}
-
 	private void update() {
 		container.updateMessage();
-		// updateButtons() may fail if current page is null. This can happen if update() is called during wizard/page creation. 
+		// updateButtons() may fail if current page is null. This can happen if update() is called during wizard/page creation.
 		if (container.getCurrentPage() == null) {
 			return;
 		}
 		container.updateButtons();
 	}
 
-	/**
-	 * @param button
-	 */
-	private void updateNewConnectionButtonEnabled(Button button) {
-		IRemoteUIConnectionManager connectionManager = getUIConnectionManager();
-		button.setEnabled(connectionManager != null);
-	}
-	
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
 	 * org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant#setProjectName(String projectName)
 	 */
+	@Override
 	public void setProjectName(String projectName) {
 		fProjectName = projectName;
 		fLocationText.setText(getDefaultPathDisplayString());

@@ -56,6 +56,8 @@ public class Messages extends NLS {
 	public static String ApplicationTab_Selection_must_be_a_file;
 	public static String ApplicationTab_Unable_to_open_connection;
 
+	public static String ResourcesTab_Connection_Type;
+
 	public static String ResourcesTab_Resources;
 	public static String ResourcesTab_No_Launch_Configuration;
 	public static String ResourcesTab_InvalidConfig_message;

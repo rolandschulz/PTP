@@ -20,8 +20,8 @@ import org.eclipse.ptp.remote.ui.widgets.RemoteConnectionWidget;
 import org.eclipse.ptp.rm.jaxb.control.core.LaunchControllerManager;
 import org.eclipse.ptp.rm.lml.monitor.core.MonitorControlManager;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -70,6 +70,7 @@ public class AddMonitorDialog extends TitleAreaDialog {
 				valid = (LaunchControllerManager.getInstance().getLaunchController(fRemoteConnection.getRemoteServices().getId(),
 						fRemoteConnection.getName(), getConfigurationName()) != null);
 			} catch (CoreException e) {
+				// Ignore
 			}
 		}
 		fRemoteConnectionWidget.setEnabled(fConfigNameCombo.getSelectionIndex() > 0);
@@ -121,11 +122,7 @@ public class AddMonitorDialog extends TitleAreaDialog {
 		fConfigNameCombo.setItems(MonitorControlManager.getConfigurationNames());
 		fConfigNameCombo.add(Messages.AddMonitorDialog_Please_select_a_monitor_type, 0);
 		fConfigNameCombo.select(0);
-		fConfigNameCombo.addSelectionListener(new SelectionListener() {
-			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-
+		fConfigNameCombo.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (fConfigNameCombo.getSelectionIndex() > 0) {
@@ -135,13 +132,9 @@ public class AddMonitorDialog extends TitleAreaDialog {
 			}
 		});
 
-		fRemoteConnectionWidget = new RemoteConnectionWidget(composite, SWT.NONE, null, null);
+		fRemoteConnectionWidget = new RemoteConnectionWidget(composite, SWT.NONE, Messages.AddMonitorDialog_Connection_Type, 0, null);
 		fRemoteConnectionWidget.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
-		fRemoteConnectionWidget.addSelectionListener(new SelectionListener() {
-			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-
+		fRemoteConnectionWidget.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				updateEnablement();
