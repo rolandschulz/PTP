@@ -22,11 +22,14 @@ import java.util.regex.Pattern;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.preferences.IScopeContext;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.CommandRunner;
 import org.eclipse.ptp.rdt.sync.core.RecursiveSubMonitor;
 import org.eclipse.ptp.rdt.sync.core.RemoteExecutionException;
@@ -55,9 +58,12 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.osgi.service.prefs.BackingStoreException;
+import org.osgi.service.prefs.Preferences;
 
 public class SyncGitPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
-	private static final String GIT_BINARY_KEY = "git-binary"; //$NON-NLS-1$
+	private static final String instanceScopeSyncNode = "org.eclipse.ptp.rdt.sync.core"; //$NON-NLS-1$
+	private static final String GIT_LOCATION_NODE_NAME = "git-location"; //$NON-NLS-1$
 
 	Map<Integer, IRemoteConnection> fComboIndexToRemoteConnectionMap = new HashMap<Integer, IRemoteConnection>();
 	Map<IRemoteConnection, String> fConnectionNameToGitPathMap = new HashMap<IRemoteConnection, String>();
@@ -143,9 +149,8 @@ public class SyncGitPreferencePage extends PreferencePage implements IWorkbenchP
 					return;
 				}
 				fileMgr.setConnection(fSelectedConnection);
-				String correctPath = fGitLocationText.getText();
-				String selectedPath = fileMgr.browseDirectory(fGitLocationText.getShell(),
-						Messages.SyncGitPreferencePage_3 + fSelectedConnection.getName() + ")", correctPath, //$NON-NLS-1$
+				String selectedPath = fileMgr.browseFile(fGitLocationText.getShell(),
+						Messages.SyncGitPreferencePage_3 + fSelectedConnection.getName() + ")", null, //$NON-NLS-1$
 						IRemoteUIConstants.NONE);
 				if (selectedPath != null) {
 					fGitLocationText.setText(selectedPath);
@@ -188,10 +193,8 @@ public class SyncGitPreferencePage extends PreferencePage implements IWorkbenchP
 	
 	@Override
 	public void performApply() {
-		this.saveConnectionSettings();
-		for (Map.Entry<IRemoteConnection, String> entry : fConnectionNameToGitPathMap.entrySet()) {
-			entry.getKey().setAttribute(GIT_BINARY_KEY, entry.getValue());
-		}
+		this.storeConnectionSettings();
+		this.saveAllConnectionSettings();
 	}
 
 	@Override
@@ -231,7 +234,7 @@ public class SyncGitPreferencePage extends PreferencePage implements IWorkbenchP
 	}
 
 	private void handleConnectionSelected() {
-		this.saveConnectionSettings();
+		this.storeConnectionSettings();
 		this.clearMessages();
 		int sel = fConnectionCombo.getSelectionIndex();
 		if (sel == -1) {
@@ -243,7 +246,7 @@ public class SyncGitPreferencePage extends PreferencePage implements IWorkbenchP
 	}
 
 	// Save settings to internal map for currently selected connection
-	private void saveConnectionSettings() {
+	private void storeConnectionSettings() {
 		if (fSelectedConnection == null) {
 			return;
 		}
@@ -260,12 +263,32 @@ public class SyncGitPreferencePage extends PreferencePage implements IWorkbenchP
 		if (fSelectedConnection == null) {
 			return;
 		}
-		String gitDir;
+
+		String gitDir = null;
+		// Try retrieving settings from map
 		if (fConnectionNameToGitPathMap.containsKey(fSelectedConnection)) {
 			gitDir = fConnectionNameToGitPathMap.get(fSelectedConnection);
+
+		// If not there, load from preference store
 		} else {
-			gitDir = fSelectedConnection.getAttributes().get(GIT_BINARY_KEY);
+			IScopeContext context = InstanceScope.INSTANCE;
+			Preferences prefSyncNode = context.getNode(instanceScopeSyncNode);
+			if (prefSyncNode == null) {
+				RDTSyncUIPlugin.getDefault().logErrorMessage(Messages.SyncGitPreferencePage_18);
+			} else {
+				try {
+					// Avoid creating node if it doesn't exist
+					if (prefSyncNode.nodeExists(GIT_LOCATION_NODE_NAME)) {
+						Preferences prefGitNode = prefSyncNode.node(GIT_LOCATION_NODE_NAME);
+						gitDir = prefGitNode.get(fSelectedConnection.getName(), null);
+					}
+				} catch (BackingStoreException e) {
+					RDTSyncUIPlugin.log(Messages.SyncGitPreferencePage_19, e);
+				}
+			}
 		}
+
+		// Set UI elements
 		if (gitDir == null) {
 			fUseDefaultGitLocationCheckbox.setSelection(true);
 			this.handleCheckDefaultGitLocation();
@@ -497,6 +520,48 @@ public class SyncGitPreferencePage extends PreferencePage implements IWorkbenchP
 		}
 
 		return errorMessage;
+	}
+
+	private void saveAllConnectionSettings() {
+		if (fConnectionNameToGitPathMap.size() == 0) {
+			return;
+		}
+
+		IScopeContext context = InstanceScope.INSTANCE;
+		Preferences prefSyncNode = context.getNode(instanceScopeSyncNode);
+		if (prefSyncNode == null) {
+			RDTSyncUIPlugin.getDefault().logErrorMessage(Messages.SyncGitPreferencePage_20);
+			return;
+		}
+
+		// Avoid creating node if not needed. Connections set to default (null) are not stored.
+		Preferences prefGitNode = null;
+		try {
+			if (prefSyncNode.nodeExists(GIT_LOCATION_NODE_NAME)) {
+				prefGitNode = prefSyncNode.node(GIT_LOCATION_NODE_NAME);
+			}
+		} catch (BackingStoreException e) {
+			RDTSyncUIPlugin.log(Messages.SyncGitPreferencePage_21, e);
+		}
+
+		for (Map.Entry<IRemoteConnection, String> entry : fConnectionNameToGitPathMap.entrySet()) {
+			// Avoid creating node if not necessary. Connections set to default (null) are not stored.
+			if (prefGitNode == null) {
+				if (entry.getValue() == null) {
+					continue;
+				} else {
+					prefGitNode = prefSyncNode.node(GIT_LOCATION_NODE_NAME);
+				}
+			}
+			
+			if (entry.getValue() == null) {
+				prefGitNode.remove(entry.getKey().getName());
+			} else {
+				prefGitNode.put(entry.getKey().getName(), entry.getValue());
+			}
+		}
+
+		BuildConfigurationManager.flushNode(prefSyncNode);
 	}
 
 	/**
