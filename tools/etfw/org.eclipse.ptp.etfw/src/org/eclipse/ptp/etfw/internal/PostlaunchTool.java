@@ -227,6 +227,8 @@ public class PostlaunchTool extends ToolStep implements IToolLaunchConfiguration
 			if(customOutLoc!=null)
 			{	
 				outputLocation=customOutLoc;			
+			}else if (syncProjectLocation!=null){
+				outputLocation=syncProjectLocation;
 			}
 			else if(utilBlob.isRemote()){
 				outputLocation=utilBlob.getWorkingDirectory();

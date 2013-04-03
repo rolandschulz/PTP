@@ -607,7 +607,8 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 			if(env.get("DISPLAY")==null)
 				env.put("DISPLAY", ":0.0");
 
-			getProcess(tool, env, directory,false);
+			runTool(tool,env,directory,null);
+			//getProcess(tool, env, directory,false);
 
 		} catch (Exception e) {
 			e.printStackTrace();
