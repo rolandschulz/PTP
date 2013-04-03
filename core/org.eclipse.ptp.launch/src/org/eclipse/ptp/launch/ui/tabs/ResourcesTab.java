@@ -481,7 +481,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 				return dynamicTab;
 			} catch (Throwable e) {
 				setErrorMessage(e.getMessage());
-				PTPLaunchPlugin.errorDialog(e.getMessage(), e);
+				PTPLaunchPlugin.errorDialog(e.getMessage(), e.getCause());
 				return null;
 			}
 		}
@@ -492,7 +492,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		try {
 			return LaunchControllerManager.getInstance().getLaunchController(remId, connName, type);
 		} catch (CoreException e) {
-			PTPLaunchPlugin.errorDialog(e.getMessage(), e);
+			PTPLaunchPlugin.errorDialog(e.getMessage(), e.getCause());
 			return null;
 		}
 	}
@@ -618,7 +618,8 @@ public class ResourcesTab extends LaunchConfigurationTab {
 								controller.start(progress.newChild(10));
 								dynamicTab[0] = getLaunchConfigurationDynamicTab(controller, progress.newChild(10));
 							} catch (CoreException e) {
-								PTPLaunchPlugin.errorDialog(e.getMessage(), e);
+								PTPLaunchPlugin.errorDialog(e.getMessage(), e.getCause());
+
 							}
 						}
 					});
@@ -638,11 +639,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 					dynamicTab[0].initializeFrom(launchConfiguration);
 				} catch (CoreException e) {
 					setErrorMessage(e.getMessage());
-					Throwable t = e.getCause();
-					if (t == null) {
-						t = e;
-					}
-					PTPLaunchPlugin.errorDialog(e.getMessage(), t);
+					PTPLaunchPlugin.errorDialog(e.getMessage(), e.getCause());
 				}
 			}
 		}
