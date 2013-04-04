@@ -338,6 +338,11 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 				((Composite) control).layout();
 
 				tabItem.setText(tabControl.getController().getTitle());
+				String tooltip = tabControl.getController().getTooltip();
+				if (tooltip != null) {
+					tabItem.setToolTipText(tooltip);
+					scroller.setToolTipText(tooltip);
+				}
 
 				scroller.setContent(control);
 				scroller.setExpandHorizontal(true);

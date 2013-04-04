@@ -31,6 +31,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="title" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="layout" type="{http://eclipse.org/ptp/rm}layout-type" minOccurs="0"/>
  *         &lt;element name="layout-data" type="{http://eclipse.org/ptp/rm}layout-data-type" minOccurs="0"/>
+ *         &lt;element name="tooltip" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="font" type="{http://eclipse.org/ptp/rm}font-type" minOccurs="0"/>
  *         &lt;choice maxOccurs="unbounded" minOccurs="0">
  *           &lt;element name="tab-folder" type="{http://eclipse.org/ptp/rm}tab-folder-type"/>
@@ -41,6 +42,7 @@ import javax.xml.bind.annotation.XmlType;
  *           &lt;element name="button-group" type="{http://eclipse.org/ptp/rm}button-group-type"/>
  *           &lt;element name="viewer" type="{http://eclipse.org/ptp/rm}attribute-viewer-type"/>
  *         &lt;/choice>
+ *         &lt;element name="control-state" type="{http://eclipse.org/ptp/rm}control-state-type" minOccurs="0"/>
  *       &lt;/sequence>
  *       &lt;attribute name="style" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="background" type="{http://www.w3.org/2001/XMLSchema}string" />
@@ -59,8 +61,10 @@ import javax.xml.bind.annotation.XmlType;
     "title",
     "layout",
     "layoutData",
+    "tooltip",
     "font",
-    "tabFolderOrCompositeOrWidget"
+    "tabFolderOrCompositeOrWidget",
+    "controlState"
 })
 public class TabControllerType {
 
@@ -69,6 +73,7 @@ public class TabControllerType {
     protected LayoutType layout;
     @XmlElement(name = "layout-data")
     protected LayoutDataType layoutData;
+    protected String tooltip;
     protected FontType font;
     @XmlElements({
         @XmlElement(name = "tab-folder", type = TabFolderType.class),
@@ -80,6 +85,8 @@ public class TabControllerType {
         @XmlElement(name = "viewer", type = AttributeViewerType.class)
     })
     protected List<Object> tabFolderOrCompositeOrWidget;
+    @XmlElement(name = "control-state")
+    protected ControlStateType controlState;
     @XmlAttribute(name = "style")
     protected String style;
     @XmlAttribute(name = "background")
@@ -164,6 +171,30 @@ public class TabControllerType {
     }
 
     /**
+     * Gets the value of the tooltip property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getTooltip() {
+        return tooltip;
+    }
+
+    /**
+     * Sets the value of the tooltip property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setTooltip(String value) {
+        this.tooltip = value;
+    }
+
+    /**
      * Gets the value of the font property.
      * 
      * @return
@@ -220,6 +251,30 @@ public class TabControllerType {
             tabFolderOrCompositeOrWidget = new ArrayList<Object>();
         }
         return this.tabFolderOrCompositeOrWidget;
+    }
+
+    /**
+     * Gets the value of the controlState property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link ControlStateType }
+     *     
+     */
+    public ControlStateType getControlState() {
+        return controlState;
+    }
+
+    /**
+     * Sets the value of the controlState property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link ControlStateType }
+     *     
+     */
+    public void setControlState(ControlStateType value) {
+        this.controlState = value;
     }
 
     /**

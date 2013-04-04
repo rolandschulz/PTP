@@ -224,6 +224,11 @@ public class ETFWToolTabBuilder {
 			composite.setFont(WidgetBuilderUtils.getFont(fontType));
 		}
 
+		ControlStateType cst = tab.getController().getControlState();
+		if (cst != null) {
+			targets.put(cst, composite);
+		}
+
 		maybeWireWidgets();
 
 		return composite;

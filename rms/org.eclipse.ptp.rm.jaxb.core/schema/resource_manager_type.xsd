@@ -192,6 +192,7 @@
 			<xs:element name="title" type="xs:string"/>
 			<xs:element name="layout" minOccurs="0" type="rm:layout-type"/>
 			<xs:element name="layout-data" minOccurs="0" type="rm:layout-data-type"/>
+			<xs:element name="tooltip" minOccurs="0" type="xs:string"/>
 			<xs:element name="font" minOccurs="0" type="rm:font-type"/>
 			<xs:choice minOccurs="0" maxOccurs="unbounded">
 				<xs:element name="tab-folder" type="rm:tab-folder-type"/>
@@ -202,6 +203,7 @@
 				<xs:element name="button-group" type="rm:button-group-type"/>
 				<xs:element name="viewer" type="rm:attribute-viewer-type"/>
 			</xs:choice>
+			<xs:element name="control-state" minOccurs="0" type="rm:control-state-type"/>
 		</xs:sequence>
 		<xs:attribute name="style" type="xs:string"/>
 		<xs:attribute name="background" type="xs:string"/>
