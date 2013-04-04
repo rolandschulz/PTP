@@ -237,7 +237,6 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 	 * @param value
 	 */
 	private void addAttribute(String name, String value) {
-		System.out.println("@@@ In PerformanceAnalysisTab.addAttribute vmap="+vmap+" name="+name+" value="+value);
 		AttributeType attr = vmap.get(name);
 		if (attr == null) {
 			attr = new AttributeType();
@@ -255,7 +254,6 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 	 * @param conn
 	 */
 	private void setConnectionPropertyAttributes(IRemoteConnection conn) {
-		System.out.println("@@@ In PerformanceAnalysisTab.setConnectionPropertyAttributes");
 		String property = conn.getProperty(IRemoteConnection.OS_ARCH_PROPERTY);
 		if (property != null) {
 			addAttribute(IRemoteConnection.OS_ARCH_PROPERTY, property);
