@@ -179,8 +179,4 @@
 		<xs:attribute name="attribute" type="xs:string"/>
 		<xs:attribute name="value" type="xs:string"/>
 	</xs:complexType>
-	<!-- CMN: I think this can be replaced by the tab-controller-type <xs:complexType name="ToolPaneType"> <xs:sequence> <xs:choice minOccurs="0" 
-		maxOccurs="unbounded"> <xs:element name="tab-folder" type="rm:tab-folder-type" /> <xs:element name="widget" type="rm:widget-type" /> 
-		<xs:element name="browse" type="rm:browse-type" /> <xs:element name="action" type="rm:push-button-type" /> </xs:choice> </xs:sequence> 
-		</xs:complexType> -->
 </xs:schema>
