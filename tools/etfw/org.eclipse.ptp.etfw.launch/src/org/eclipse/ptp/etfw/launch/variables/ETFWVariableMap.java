@@ -29,7 +29,7 @@ import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 
 /**
- * Based on LCVariableMap by Albert Rossi and Jeff Overbey, this contais all the properties
+ * Based on RMVariableMap by Albert Rossi and Jeff Overbey, this contains all the properties
  * and attributes defined in the XML configuration.
  * 
  * It is possible this can all be accomplished using the LCVariableMap without having a separate map and variable resolver; however,
@@ -39,18 +39,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
  * 
  */
 public class ETFWVariableMap implements IVariableMap {
-
 	private static final Object monitor = new Object();
-	private final Map<String, AttributeType> variables;
-	private final Map<String, AttributeType> discovered;
-	private boolean initialized;
-	private IEnvManager envManager;
-
-	public ETFWVariableMap() {
-		this.variables = Collections.synchronizedMap(new TreeMap<String, AttributeType>());
-		this.discovered = Collections.synchronizedMap(new TreeMap<String, AttributeType>());
-		this.initialized = false;
-	}
 
 	/**
 	 * Checks for current valid attributes by examining the valid list for the current controller, excluding <code>null</code> or
@@ -144,6 +133,20 @@ public class ETFWVariableMap implements IVariableMap {
 				|| name.equals(JAXBControlConstants.PTP_DIRECTORY);
 	}
 
+	private final Map<String, AttributeType> variables;
+
+	private final Map<String, AttributeType> discovered;
+
+	private boolean initialized;
+	/** Environment manager for this connection, or <code>null</code> */
+	private IEnvManager envManager;
+
+	public ETFWVariableMap() {
+		this.variables = Collections.synchronizedMap(new TreeMap<String, AttributeType>());
+		this.discovered = Collections.synchronizedMap(new TreeMap<String, AttributeType>());
+		this.initialized = false;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -154,6 +157,25 @@ public class ETFWVariableMap implements IVariableMap {
 		variables.clear();
 		discovered.clear();
 		initialized = false;
+	}
+
+	/**
+	 * Calls the string substitution method on the variable manager. Under synchronization, sets the variable resolver's map
+	 * reference to this instance.
+	 * 
+	 * @param expression
+	 *            to be resolved (recursively dereferenced from the map).
+	 * @return the resolved expression
+	 * @throws CoreException
+	 */
+	private String dereference(String expression) throws CoreException {
+		if (expression == null) {
+			return null;
+		}
+		synchronized (monitor) {
+			ETFWVariableResolver.setActive(this);
+			return VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution(expression);
+		}
 	}
 
 	/*
@@ -176,11 +198,20 @@ public class ETFWVariableMap implements IVariableMap {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getAttributes()
+	 */
+	@Override
+	public Map<String, AttributeType> getAttributes() {
+		return variables;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getDefault(java.lang.String)
 	 */
 	@Override
 	public String getDefault(String name) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -194,6 +225,11 @@ public class ETFWVariableMap implements IVariableMap {
 		return discovered;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getEnvManager()
+	 */
 	public IEnvManager getEnvManager() {
 		return envManager;
 	}
@@ -229,11 +265,15 @@ public class ETFWVariableMap implements IVariableMap {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getAttributes()
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#getValue(java.lang.String)
 	 */
 	@Override
-	public Map<String, AttributeType> getAttributes() {
-		return variables;
+	public Object getValue(String name) {
+		AttributeType a = variables.get(name);
+		if (a != null) {
+			return a.getValue();
+		}
+		return null;
 	}
 
 	/**
@@ -309,6 +349,28 @@ public class ETFWVariableMap implements IVariableMap {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#putValue(java.lang.String, java.lang.Object)
+	 */
+	@Override
+	public void putValue(String name, Object value) {
+		if (name == null || JAXBControlConstants.ZEROSTR.equals(name)) {
+			return;
+		}
+		if (value != null) {
+			AttributeType a = variables.get(name);
+			if (a == null) {
+				a = new AttributeType();
+				a.setName(name);
+				a.setValue(value);
+				variables.put(name, a);
+			}
+			a.setValue(value);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.IVariableMap#remove(java.lang.String)
 	 */
 	@Override
@@ -330,8 +392,7 @@ public class ETFWVariableMap implements IVariableMap {
 	 */
 	@Override
 	public void setDefault(String name, String defaultValue) {
-		// TODO Auto-generated method stub
-
+		// This map does not support default values
 	}
 
 	/*
@@ -343,51 +404,4 @@ public class ETFWVariableMap implements IVariableMap {
 	public void setInitialized(boolean initialized) {
 		this.initialized = initialized;
 	}
-
-	/**
-	 * Calls the string substitution method on the variable manager. Under synchronization, sets the variable resolver's map
-	 * reference to this instance.
-	 * 
-	 * @param expression
-	 *            to be resolved (recursively dereferenced from the map).
-	 * @return the resolved expression
-	 * @throws CoreException
-	 */
-	private String dereference(String expression) throws CoreException {
-		if (expression == null) {
-			return null;
-		}
-		synchronized (monitor) {
-			ETFWVariableResolver.setActive(this);
-			return VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution(expression);
-		}
-	}
-
-	@Override
-	public Object getValue(String name) {
-		AttributeType a = variables.get(name);
-		if (a != null) {
-			return a.getValue();
-		}
-		return null;
-	}
-
-	@Override
-	public void putValue(String name, Object value) {
-		if (name == null || JAXBControlConstants.ZEROSTR.equals(name)) {
-			return;
-		}
-		if (value != null) {
-			AttributeType a = variables.get(name);
-			if (a == null) {
-				a = new AttributeType();
-				a.setName(name);
-				a.setValue(value);
-				variables.put(name, a);
-			}
-			a.setValue(value);
-		}
-
-	}
-
 }
