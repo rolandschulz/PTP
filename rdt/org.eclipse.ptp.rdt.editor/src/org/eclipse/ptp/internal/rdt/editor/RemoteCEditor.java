@@ -101,6 +101,9 @@ public class RemoteCEditor extends CEditor implements HelpListener {
 		if (provider != null){
 			if (isSemanticHighlightingEnabled())
 				provider.installSemanticHighlighting(getSourceViewer(), getPreferenceStore());
+			if(provider.isInactiveHighlightingEnabled(getPreferenceStore())) {
+				provider.installInactiveHighlighting(getPreferenceStore(), getSharedColors());
+			}
 			provider.doPostCreatePartControl(parent);
 		}
 	}
@@ -414,22 +417,34 @@ public class RemoteCEditor extends CEditor implements HelpListener {
 		}
 		return result;
 	}
-	
+
 	protected void handlePreferenceStoreChanged(PropertyChangeEvent event) {
 		super.handlePreferenceStoreChanged(event);
-		
-		if (provider != null && SemanticHighlightings.affectsEnablement(getPreferenceStore(), event )
-				|| (isEnableScalablilityMode() && PreferenceConstants.SCALABILITY_SEMANTIC_HIGHLIGHT.equals(event.getProperty()))) {
-			if (isSemanticHighlightingEnabled()) {
-				provider.installSemanticHighlighting(getSourceViewer(), getPreferenceStore());
-				provider.refreshRemoteSemanticManager();
-			} else {
-				provider.uninstallSemanticHighlighting();
+
+		if (provider != null) {
+			IPreferenceStore store = getPreferenceStore();
+
+			if (SemanticHighlightings.affectsEnablement(store, event)
+					|| (isEnableScalablilityMode() && PreferenceConstants.SCALABILITY_SEMANTIC_HIGHLIGHT.equals(event.getProperty()))) {
+				if (isSemanticHighlightingEnabled()) {
+					provider.installSemanticHighlighting(getSourceViewer(), store);
+					provider.refreshRemoteSemanticManager();
+				} else {
+					provider.uninstallSemanticHighlighting();
+				}
 			}
-			return;
+
+			if (provider.isInactiveHighlightingEnabled(store)) {
+				provider.installInactiveHighlighting(store, getSharedColors());
+				if (event.getProperty().equals(provider.getInactiveHighlightColorKey())) {
+					provider.updateInactiveHighlightColor();
+				}
+			} else {
+				provider.uninstallInactiveHighlighting();
+			}
 		}
 	}
-	
+
 	public void uninstallProjectionModelUpdater() {
 		super.uninstallProjectionModelUpdater();
 	}

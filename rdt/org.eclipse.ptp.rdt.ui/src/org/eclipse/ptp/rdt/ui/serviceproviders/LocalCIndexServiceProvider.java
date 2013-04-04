@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2012 IBM Corporation and others.
+ * Copyright (c) 2011, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,9 +16,11 @@ import org.eclipse.ptp.internal.rdt.ui.contentassist.IContentAssistService;
 import org.eclipse.ptp.internal.rdt.ui.contentassist.LocalContentAssistService;
 import org.eclipse.ptp.internal.rdt.ui.editor.IRemoteCCodeFoldingService;
 import org.eclipse.ptp.internal.rdt.ui.editor.IRemoteCodeFormattingService;
+import org.eclipse.ptp.internal.rdt.ui.editor.IRemoteInactiveHighlightingService;
 import org.eclipse.ptp.internal.rdt.ui.editor.IRemoteSemanticHighlightingService;
 import org.eclipse.ptp.internal.rdt.ui.editor.RemoteCCodeFoldingService;
 import org.eclipse.ptp.internal.rdt.ui.editor.RemoteCodeFormattingService;
+import org.eclipse.ptp.internal.rdt.ui.editor.RemoteInactiveHighlightingService;
 import org.eclipse.ptp.internal.rdt.ui.editor.RemoteSemanticHighlightingService;
 import org.eclipse.ptp.internal.rdt.ui.navigation.INavigationService;
 import org.eclipse.ptp.internal.rdt.ui.navigation.LocalNavigationService;
@@ -30,13 +32,14 @@ import org.eclipse.ptp.internal.rdt.ui.search.LocalSearchService;
  * @since 4.1
  *
  */
-public class LocalCIndexServiceProvider extends AbstractLocalCIndexServiceProvider implements IIndexServiceProvider2 {
+public class LocalCIndexServiceProvider extends AbstractLocalCIndexServiceProvider implements IIndexServiceProvider3 {
 	public static final String ID = "org.eclipse.ptp.rdt.ui.LocalCIndexServiceProvider"; //$NON-NLS-1$
 
 	private ISearchService fSearchService;
 	private IContentAssistService fContentAssistService;
 	private INavigationService fNavigationService;
 	private IRemoteSemanticHighlightingService fRemoteSemanticHighlightingService;
+	private IRemoteInactiveHighlightingService fRemoteInactiveHighlightingService;
 	private IRemoteCCodeFoldingService fRemoteCCodeFoldingService;
 	private IRemoteCodeFormattingService fRemoteCodeFormattingService;
 	
@@ -70,6 +73,19 @@ public class LocalCIndexServiceProvider extends AbstractLocalCIndexServiceProvid
 			fRemoteSemanticHighlightingService = new RemoteSemanticHighlightingService(fConnectorService);
 
 		return fRemoteSemanticHighlightingService;
+	}
+
+	/**
+	 * @since 4.3
+	 */
+	public IRemoteInactiveHighlightingService getRemoteInactiveHighlightingService() {
+		if(!isConfigured())
+			return null;
+
+		if(fRemoteInactiveHighlightingService== null)
+			fRemoteInactiveHighlightingService = new RemoteInactiveHighlightingService(fConnectorService);
+
+		return fRemoteInactiveHighlightingService;
 	}
 
 	public IRemoteCCodeFoldingService getRemoteCodeFoldingService() {

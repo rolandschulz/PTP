@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import org.eclipse.cdt.core.dom.ILinkage;
 import org.eclipse.cdt.core.dom.ast.DOMException;
 import org.eclipse.cdt.core.dom.ast.IASTCompletionNode;
 import org.eclipse.cdt.core.dom.ast.IASTName;
@@ -167,6 +168,8 @@ public class CDTMiner extends Miner {
 	//semantic highlighting and code folding
 	public static final String C_SEMANTIC_HIGHTLIGHTING_COMPUTE_POSITIONS = "C_SEMANTIC_HIGHTLIGHTING_COMPUTE_POSITIONS"; //$NON-NLS-1$
 	public static final String T_HIGHTLIGHTING_POSITIONS_RESULT = "Highlighting.Positions.Result"; //$NON-NLS-1$
+	public static final String C_INACTIVE_HIGHTLIGHTING_COMPUTE_POSITIONS = "C_INACTIVE_HIGHTLIGHTING_COMPUTE_POSITIONS"; //$NON-NLS-1$
+	public static final String T_INACTIVE_HIGHTLIGHTING_POSITIONS_RESULT = "InactiveHighlighting.Positions.Result"; //$NON-NLS-1$
 	public static final String C_CODE_FOLDING_COMPUTE_REGIONS = "C_CODE_FOLDING_COMPUTE_REGIONS"; //$NON-NLS-1$
 	public static final String T_CODE_FOLDING_RESULT = "Folding.Region.Result"; //$NON-NLS-1$
 	
@@ -768,6 +771,18 @@ public class CDTMiner extends Miner {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
 			}
 		}
+		else if (name.equals(C_INACTIVE_HIGHTLIGHTING_COMPUTE_POSITIONS)) {
+			try {
+				String scopeName = getString(theCommand, 1);
+				ITranslationUnit tu = (ITranslationUnit) Serializer.deserialize(getString(theCommand, 2));
+
+				handleComputeInactiveHightlightingPositions(scopeName, tu, status);
+			} catch (IOException e) {
+				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+			} catch (ClassNotFoundException e) {
+				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+			}
+		}
 		else if (name.equals(C_CODE_FOLDING_COMPUTE_REGIONS)) {
 			try {
 				String scopeName = getString(theCommand, 1);
@@ -810,7 +825,8 @@ public class CDTMiner extends Miner {
 			IIndex index = RemoteIndexManager.getInstance().getIndexForScope(scopeName, _dataStore);
 			index.acquireReadLock();
 			try  {
-				IASTTranslationUnit ast = tu.getAST(index,  ITranslationUnit.AST_SKIP_ALL_HEADERS);
+				// what's the right style flag to use here?
+				IASTTranslationUnit ast = tu.getAST(index, ITranslationUnit.AST_SKIP_INDEXED_HEADERS);
 				RemoteCodeFormatterVisitor codeFormatter = new RemoteCodeFormatterVisitor(preferences, offset, length, LOG_TAG, _dataStore);
 				TextEdit edit= codeFormatter.format(source, ast);
 				
@@ -885,7 +901,32 @@ public class CDTMiner extends Miner {
 			statusDone(status);
 		}
 	}
-	
+
+
+	protected void handleComputeInactiveHightlightingPositions(String scopeName, ITranslationUnit tu, DataElement status) {
+		try {
+			IIndex index = RemoteIndexManager.getInstance().getIndexForScope(scopeName, _dataStore);
+			index.acquireReadLock();
+
+			try {
+				IASTTranslationUnit ast = tu.getAST(index, ITranslationUnit.AST_SKIP_ALL_HEADERS | ITranslationUnit.AST_CONFIGURE_USING_SOURCE_CONTEXT);
+				String positions = RemoteInactiveHighlightingHandler.collectInactiveCodePositions(ast);
+				status.getDataStore().createObject(status, T_INACTIVE_HIGHTLIGHTING_POSITIONS_RESULT, positions);
+			}
+			finally {
+				index.releaseReadLock();
+			}
+		} catch (CoreException e) {
+			UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+		} catch (InterruptedException e) {
+			UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+		}
+		finally {
+			statusDone(status);
+		}
+	}
+
+
 	protected void handleComputeCodeFoldingRegions(String scopeName, ITranslationUnit tu, DataElement status, 
 			boolean statementsFoldingEnabled, boolean preprocessorFoldingEnabled, int docSize) {
 		try {
@@ -1835,6 +1876,7 @@ public class CDTMiner extends Miner {
 		
 		// semantic highlighting and code folding
 		createCommandDescriptor(schemaRoot, "Compute added & removed positions for semantic highlighting", C_SEMANTIC_HIGHTLIGHTING_COMPUTE_POSITIONS, false); //$NON-NLS-1$
+		createCommandDescriptor(schemaRoot, "Compute added & removed positions for inactive highlighting", C_INACTIVE_HIGHTLIGHTING_COMPUTE_POSITIONS, false); //$NON-NLS-1$
 		createCommandDescriptor(schemaRoot, "Compute code folding regions for the Remote C Editor", C_CODE_FOLDING_COMPUTE_REGIONS, false); //$NON-NLS-1$
 		
 		// navigation

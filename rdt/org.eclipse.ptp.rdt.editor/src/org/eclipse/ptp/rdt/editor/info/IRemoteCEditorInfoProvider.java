@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 IBM Corporation and others.
+ * Copyright (c) 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.source.ISharedTextColors;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
@@ -127,14 +128,25 @@ public interface IRemoteCEditorInfoProvider {
 	public boolean shouldProcessLocalParsingCompletions();
 
 	public boolean isSemanticHighlightingEnabled(IPreferenceStore store);
-	
+
 	public void installSemanticHighlighting(ISourceViewer sourceViewer, IPreferenceStore prefStore);
 
 	public void installRemoteCodeFolding(ISourceViewer sourceViewer);
-	
+
 	public void uninstallRemoteCodeFolding();
 
 	public void uninstallSemanticHighlighting();
-	
+
 	public void refreshRemoteSemanticManager();
+
+	public boolean isInactiveHighlightingEnabled(IPreferenceStore prefStore);
+
+	public void installInactiveHighlighting(IPreferenceStore prefStore, ISharedTextColors colors);
+
+	public void uninstallInactiveHighlighting();
+
+	public String getInactiveHighlightColorKey();
+
+	public void updateInactiveHighlightColor();
+
 }

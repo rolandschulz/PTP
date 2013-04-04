@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2012 IBM Corporation and others.
+ * Copyright (c) 2008, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,6 +14,7 @@ import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.internal.ui.editor.CContentOutlinePage;
+import org.eclipse.cdt.internal.ui.editor.CEditor;
 import org.eclipse.cdt.internal.ui.editor.CSourceViewer;
 import org.eclipse.cdt.internal.ui.editor.SemanticHighlightings;
 import org.eclipse.cdt.internal.ui.text.CTextTools;
@@ -28,6 +29,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.help.IContextProvider;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.source.ISharedTextColors;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
@@ -70,6 +72,9 @@ public class RemoteCEditorInfoProvider implements IRemoteCEditorInfoProvider {
 	private RemoteSemanticHighlightingManager fRemoteSemanticManager;
 	
 	private RemoteCFoldingStructureProvider fRemoteFoldingProvider; 
+	
+	private RemoteInactiveHighlighting fRemoteInactiveCodeHighlighting;
+	
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ptp.rdt.editor.info.IRemoteCEditorInfoProvider#initializeEditor(org.eclipse.ptp.internal.rdt.editor.RemoteCEditor)
@@ -474,4 +479,35 @@ public class RemoteCEditorInfoProvider implements IRemoteCEditorInfoProvider {
 			fRemoteSemanticManager= null;
 		}
 	}
+
+	public boolean isInactiveHighlightingEnabled(IPreferenceStore prefStore) {
+		return prefStore.getBoolean(CEditor.INACTIVE_CODE_ENABLE) && !editor.isEnableScalablilityMode();
+	}
+
+	public void installInactiveHighlighting(IPreferenceStore prefStore, ISharedTextColors colors) {
+		if (fRemoteInactiveCodeHighlighting == null && !isLocalServiceProvider()
+				&& isInactiveHighlightingEnabled(prefStore)) {
+			fRemoteInactiveCodeHighlighting = new RemoteInactiveHighlighting(prefStore, colors);
+			fRemoteInactiveCodeHighlighting.install(editor);
+		} else if (isLocalServiceProvider()) {
+			uninstallInactiveHighlighting();
+		}
+	}
+
+	public void uninstallInactiveHighlighting() {
+		if (fRemoteInactiveCodeHighlighting != null) {
+			fRemoteInactiveCodeHighlighting.uninstall();
+			fRemoteInactiveCodeHighlighting = null;
+		}
+	}
+
+	public String getInactiveHighlightColorKey() {
+		return RemoteInactiveHighlighting.INACTIVE_CODE_COLOR;
+	}
+
+	public void updateInactiveHighlightColor() {
+		if (fRemoteInactiveCodeHighlighting != null)
+			fRemoteInactiveCodeHighlighting.updateInactiveCodeColor();
+	}
+
 }

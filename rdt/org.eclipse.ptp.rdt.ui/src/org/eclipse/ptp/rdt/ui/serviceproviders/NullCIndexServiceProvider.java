@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2012 IBM Corporation and others.
+ * Copyright (c) 2008, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,7 +28,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.jface.text.Position;
 import org.eclipse.ptp.internal.rdt.core.callhierarchy.CalledByResult;
 import org.eclipse.ptp.internal.rdt.core.callhierarchy.CallsToResult;
 import org.eclipse.ptp.internal.rdt.core.callhierarchy.ICallHierarchyService;
@@ -46,6 +48,7 @@ import org.eclipse.ptp.internal.rdt.core.typehierarchy.THGraph;
 import org.eclipse.ptp.internal.rdt.ui.contentassist.IContentAssistService;
 import org.eclipse.ptp.internal.rdt.ui.editor.IRemoteCCodeFoldingService;
 import org.eclipse.ptp.internal.rdt.ui.editor.IRemoteCodeFormattingService;
+import org.eclipse.ptp.internal.rdt.ui.editor.IRemoteInactiveHighlightingService;
 import org.eclipse.ptp.internal.rdt.ui.editor.IRemoteSemanticHighlightingService;
 import org.eclipse.ptp.internal.rdt.ui.navigation.INavigationService;
 import org.eclipse.ptp.internal.rdt.ui.search.ISearchService;
@@ -70,7 +73,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
  *
  */
 public class NullCIndexServiceProvider extends
-		AbstractRemoteCIndexServiceProvider implements IIndexServiceProvider2 {
+		AbstractRemoteCIndexServiceProvider implements IIndexServiceProvider3 {
 
 	
 	/**
@@ -328,6 +331,17 @@ public class NullCIndexServiceProvider extends
 		 return new IRemoteSemanticHighlightingService() {
 			public String computeSemanticHighlightingPositions(
 					IWorkingCopy workingCopy) {
+				return null;
+			}
+		 };
+	}
+
+	/**
+	 * @since 4.3
+	 */
+	public IRemoteInactiveHighlightingService getRemoteInactiveHighlightingService() {
+		 return new IRemoteInactiveHighlightingService() {
+			public List<Position> computeInactiveHighlightingPositions(IDocument document, IWorkingCopy wc) {
 				return null;
 			}
 		 };
