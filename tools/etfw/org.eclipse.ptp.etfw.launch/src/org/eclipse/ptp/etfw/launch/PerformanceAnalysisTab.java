@@ -110,7 +110,7 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 	}
 
 	/**
-	 * Generates the UI for the analyis tab, consisting of sub-tabs which may be
+	 * Generates the UI for the analysis tab, consisting of sub-tabs which may be
 	 * dynamically generated
 	 * 
 	 * @see ILaunchConfigurationTab#createControl(Composite)
