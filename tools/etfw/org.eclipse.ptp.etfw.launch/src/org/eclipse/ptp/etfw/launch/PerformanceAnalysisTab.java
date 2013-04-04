@@ -38,6 +38,10 @@ import org.eclipse.ptp.internal.rm.jaxb.control.ui.launch.IJAXBLaunchConfigurati
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationContentsChangedListener;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.JAXBDynamicLaunchConfigurationTab;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
+import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.core.LaunchControllerManager;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel;
@@ -226,11 +230,62 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 		toolComposite.layout();
 	}
 
+	/**
+	 * Helper to add a read-only attribute
+	 * 
+	 * @param name
+	 * @param value
+	 */
+	private void addAttribute(String name, String value) {
+		System.out.println("@@@ In PerformanceAnalysisTab.addAttribute vmap="+vmap+" name="+name+" value="+value);
+		AttributeType attr = vmap.get(name);
+		if (attr == null) {
+			attr = new AttributeType();
+			attr.setName(name);
+			attr.setVisible(true);
+			attr.setReadOnly(true);
+			vmap.put(name, attr);
+		}
+		attr.setValue(value);
+	}
+
+	/**
+	 * Add connection properties to the attribute map.
+	 * 
+	 * @param conn
+	 */
+	private void setConnectionPropertyAttributes(IRemoteConnection conn) {
+		System.out.println("@@@ In PerformanceAnalysisTab.setConnectionPropertyAttributes");
+		String property = conn.getProperty(IRemoteConnection.OS_ARCH_PROPERTY);
+		if (property != null) {
+			addAttribute(IRemoteConnection.OS_ARCH_PROPERTY, property);
+		}
+		property = conn.getProperty(IRemoteConnection.OS_NAME_PROPERTY);
+		if (property != null) {
+			addAttribute(IRemoteConnection.OS_NAME_PROPERTY, property);
+		}
+		property = conn.getProperty(IRemoteConnection.OS_VERSION_PROPERTY);
+		if (property != null) {
+			addAttribute(IRemoteConnection.OS_VERSION_PROPERTY, property);
+		}
+	}
+
 	private void rebuildTab(String toolName) {
 		etfwTool = JAXBExtensionUtils.getTool(toolName);
 		vmap = new ETFWVariableMap();
 
 		JAXBInitializationUtil.initializeMap(etfwTool, vmap);
+		
+		// Add in connection property attributes to ETFW variable map
+		final IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(controller.getRemoteServicesId(), new NullProgressMonitor());
+		if (services != null) {
+			final IRemoteConnectionManager connMgr = services.getConnectionManager();
+			IRemoteConnection remoteConnection = connMgr.getConnection(controller.getConnectionName());
+			if (remoteConnection != null) {
+				setConnectionPropertyAttributes(remoteConnection);
+			}
+		}
+		
 		try {
 			launchTabParent = new ETFWParentLaunchConfigurationTab(controller, new NullProgressMonitor(), vmap);
 		} catch (Throwable e1) {
