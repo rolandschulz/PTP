@@ -310,7 +310,7 @@
                 <attribute name="MP_FORCED_INTERRUPTS_ENABLED_ATTR" type="boolean"
                         translateBooleanAs="yes,no">
                         <description>Use forced interrupts:</description>
-                        <tooltip>Use forced interrupts for rondezvous message in RDMA transfer (Default: no) {MP_FORCED_INTERRUPTS_ENABLED}
+                        <tooltip>Use forced interrupts for rendezvous message in RDMA transfer (Default: no) {MP_FORCED_INTERRUPTS_ENABLED}
                         </tooltip>
                         <default>no</default>
                 </attribute>
@@ -507,7 +507,7 @@
                 <attribute name="MP_PE_AFFINITY_ATTR" type="boolean"
                         translateBooleanAs="yes,no">
                         <description>PE sets affinity:</description>
-                        <tooltip>Enamle PE to perform affinity setup {MP_PE_AFFINITY}
+                        <tooltip>Enable PE to perform affinity setup {MP_PE_AFFINITY}
                         </tooltip>
                         <default>no</default>
                 </attribute>
@@ -910,7 +910,7 @@
                 <attribute name="MP_USE_BULK_XFER_ATTR" type="boolean"
                         translateBooleanAs="yes,no">
                         <description>Use bulk transfer:</description>
-                        <tooltip>Use adapter bult data transfer mechanisms (Default: no) {MP_USE_BULK_XFER}
+                        <tooltip>Use adapter built data transfer mechanisms (Default: no) {MP_USE_BULK_XFER}
                         </tooltip>
                         <default>no</default>
                 </attribute>
