@@ -1273,6 +1273,43 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
     	return ""; //$NON-NLS-1$
 	}
 
+	
+	/**
+	 * @since 3.2
+	 */
+	public String computeInactiveHighlightPositions(ITranslationUnit targetUnit) {
+		DataStore dataStore = getDataStore(null);
+		if (dataStore == null) {
+			return ""; //$NON-NLS-1$
+		}
+		DataElement queryCmd = dataStore.localDescriptorQuery(dataStore.getDescriptorRoot(), CDTMiner.C_INACTIVE_HIGHTLIGHTING_COMPUTE_POSITIONS);
+		if (queryCmd == null) {
+			return ""; //$NON-NLS-1$
+		}
+
+		Scope scope = new Scope(targetUnit.getCProject().getProject());
+
+		ArrayList<Object> args = new ArrayList<Object>();
+		args.add(dataStore.createObject(null, CDTMiner.T_SCOPE_SCOPENAME_DESCRIPTOR, scope.getName()));
+		args.add(createSerializableElement(dataStore, targetUnit));
+
+		DataElement status = dataStore.command(queryCmd, args, dataStore.getDescriptorRoot());
+
+		StatusMonitor smonitor = StatusMonitor.getStatusMonitorFor(fProvider.getConnection(), dataStore);
+		try {
+			smonitor.waitForUpdate(status, new NullProgressMonitor());
+		} catch (Exception e) {
+			RDTLog.logError(e);
+		}
+
+		DataElement element = status.get(0);
+		if (element == null)
+			return ""; //$NON-NLS-1$
+		String result = element.getName();
+		return result == null ? "" : result; //$NON-NLS-1$
+	}
+	
+	
 	/**
 	 * @since 3.0
 	 */

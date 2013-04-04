@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2012 IBM Corporation and others.
+ * Copyright (c) 2008, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -903,7 +903,44 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 		}
     	return ""; //$NON-NLS-1$
 	}
-	
+
+
+	/**
+	 * @since 4.3
+	 */
+	public String computeInactiveHighlightPositions(ITranslationUnit targetUnit) {
+		DataStore dataStore = getDataStore(null);
+		if (dataStore == null) {
+			return ""; //$NON-NLS-1$
+		}
+		DataElement queryCmd = dataStore.localDescriptorQuery(dataStore.getDescriptorRoot(), CDTMiner.C_INACTIVE_HIGHTLIGHTING_COMPUTE_POSITIONS);
+		if (queryCmd == null) {
+			return ""; //$NON-NLS-1$
+		}
+
+		Scope scope = new Scope(targetUnit.getCProject().getProject());
+
+		ArrayList<Object> args = new ArrayList<Object>();
+		args.add(dataStore.createObject(null, CDTMiner.T_SCOPE_SCOPENAME_DESCRIPTOR, scope.getName()));
+		args.add(createSerializableElement(dataStore, targetUnit));
+
+		DataElement status = dataStore.command(queryCmd, args, dataStore.getDescriptorRoot());
+
+		StatusMonitor smonitor = StatusMonitorFactory.getInstance().getStatusMonitorFor(getConnectorService(), dataStore);
+		try {
+			smonitor.waitForUpdate(status, new NullProgressMonitor());
+		} catch (Exception e) {
+			RDTLog.logError(e);
+		}
+
+		DataElement element = status.get(0);
+		if (element == null)
+			return ""; //$NON-NLS-1$
+		String result = element.getName();
+		return result == null ? "" : result; //$NON-NLS-1$
+	}
+
+
 	/**
 	 * @since 4.1
 	 */
