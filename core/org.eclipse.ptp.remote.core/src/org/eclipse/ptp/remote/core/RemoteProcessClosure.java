@@ -29,7 +29,7 @@ import org.eclipse.ptp.internal.remote.core.messages.Messages;
  *         This class is a modified version of ProcessClosure from CDT that can handle remote processes.
  * 
  * @see org.eclipse.cdt.internal.core.ProcessClosure
- * @since 6.1
+ * @since 7.0
  */
 @SuppressWarnings("restriction")
 public class RemoteProcessClosure {

@@ -66,7 +66,7 @@ public class RemoteToolsCIndexServiceProvider extends ServiceProvider implements
 	 */
 	protected RemoteCCodeFoldingService fRemoteCCodeFoldingService = null;
 	/**
-	 * @since 3.1
+	 * @since 3.2
 	 */
 	protected IRemoteCodeFormattingService fRemoteCodeFormattingService = null;
 	protected RemoteToolsCIndexSubsystem fSubsystem = null;
@@ -99,14 +99,13 @@ public class RemoteToolsCIndexServiceProvider extends ServiceProvider implements
 		setDescriptor(provider.getDescriptor());
 	}
 
-	
 	/**
 	 * @since 3.0
 	 */
 	public boolean isRemote() {
 		return true;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -124,11 +123,13 @@ public class RemoteToolsCIndexServiceProvider extends ServiceProvider implements
 	 * getCallHierarchyService()
 	 */
 	public synchronized ICallHierarchyService getCallHierarchyService() {
-		if (!isConfigured())
+		if (!isConfigured()) {
 			return null;
+		}
 
-		if (fCallHierarchyService == null)
+		if (fCallHierarchyService == null) {
 			fCallHierarchyService = new RemoteCallHierarchyService(fSubsystem);
+		}
 
 		return fCallHierarchyService;
 	}
@@ -149,11 +150,13 @@ public class RemoteToolsCIndexServiceProvider extends ServiceProvider implements
 	 * getContentAssistService()
 	 */
 	public IContentAssistService getContentAssistService() {
-		if (!isConfigured())
+		if (!isConfigured()) {
 			return null;
+		}
 
-		if (fContentAssistService == null)
+		if (fContentAssistService == null) {
 			fContentAssistService = new RemoteContentAssistService(fSubsystem);
+		}
 
 		return fContentAssistService;
 	}
@@ -165,11 +168,13 @@ public class RemoteToolsCIndexServiceProvider extends ServiceProvider implements
 	 * getIncludeBrowserService()
 	 */
 	public synchronized IIncludeBrowserService getIncludeBrowserService() {
-		if (!isConfigured())
+		if (!isConfigured()) {
 			return null;
+		}
 
-		if (fIncludeBrowserService == null)
+		if (fIncludeBrowserService == null) {
 			fIncludeBrowserService = new RemoteIncludeBrowserService(fSubsystem);
+		}
 
 		return fIncludeBrowserService;
 	}
@@ -181,11 +186,13 @@ public class RemoteToolsCIndexServiceProvider extends ServiceProvider implements
 	 * getIndexLifeCycleService()
 	 */
 	public synchronized IIndexLifecycleService getIndexLifeCycleService() {
-		if (!isConfigured())
+		if (!isConfigured()) {
 			return null;
+		}
 
-		if (fIndexLifecycleService == null)
+		if (fIndexLifecycleService == null) {
 			fIndexLifecycleService = new RemoteIndexLifecycleService(fSubsystem);
+		}
 
 		return fIndexLifecycleService;
 	}
@@ -208,11 +215,13 @@ public class RemoteToolsCIndexServiceProvider extends ServiceProvider implements
 	 * getModelBuilderService()
 	 */
 	public synchronized IModelBuilderService getModelBuilderService() {
-		if (!isConfigured())
+		if (!isConfigured()) {
 			return null;
+		}
 
-		if (fModelBuilderService == null)
+		if (fModelBuilderService == null) {
 			fModelBuilderService = new RemoteModelBuilderService(fSubsystem);
+		}
 
 		return fModelBuilderService;
 	}
@@ -227,11 +236,13 @@ public class RemoteToolsCIndexServiceProvider extends ServiceProvider implements
 	 * @since 3.0
 	 */
 	public synchronized INavigationService getNavigationService() {
-		if (!isConfigured())
+		if (!isConfigured()) {
 			return null;
+		}
 
-		if (fNavigationService == null)
+		if (fNavigationService == null) {
 			fNavigationService = new RemoteNavigationService(fSubsystem);
+		}
 
 		return fNavigationService;
 	}
@@ -281,11 +292,13 @@ public class RemoteToolsCIndexServiceProvider extends ServiceProvider implements
 	 * getSearchService()
 	 */
 	public ISearchService getSearchService() {
-		if (!isConfigured())
+		if (!isConfigured()) {
 			return null;
+		}
 
-		if (fSearchService == null)
+		if (fSearchService == null) {
 			fSearchService = new RemoteSearchService(fSubsystem);
+		}
 
 		return fSearchService;
 	}
@@ -307,11 +320,13 @@ public class RemoteToolsCIndexServiceProvider extends ServiceProvider implements
 	 * getTypeHierarchyService()
 	 */
 	public synchronized ITypeHierarchyService getTypeHierarchyService() {
-		if (!isConfigured())
+		if (!isConfigured()) {
 			return null;
+		}
 
-		if (fTypeHierarchyService == null)
+		if (fTypeHierarchyService == null) {
 			fTypeHierarchyService = new RemoteTypeHierarchyService(fSubsystem);
+		}
 
 		return fTypeHierarchyService;
 	}
@@ -451,16 +466,18 @@ public class RemoteToolsCIndexServiceProvider extends ServiceProvider implements
 		fSubsystem = new RemoteToolsCIndexSubsystem(this);
 		setConfigured(true);
 	}
-	
+
 	/**
 	 * @since 3.0
 	 */
 	public IRemoteSemanticHighlightingService getRemoteSemanticHighlightingService() {
-		if(!isConfigured())
+		if (!isConfigured()) {
 			return null;
+		}
 
-		if(fRemoteSemanticHighlightingService== null)
+		if (fRemoteSemanticHighlightingService == null) {
 			fRemoteSemanticHighlightingService = new RemoteSemanticHighlightingService(fSubsystem);
+		}
 
 		return fRemoteSemanticHighlightingService;
 	}
@@ -469,24 +486,28 @@ public class RemoteToolsCIndexServiceProvider extends ServiceProvider implements
 	 * @since 3.0
 	 */
 	public IRemoteCCodeFoldingService getRemoteCodeFoldingService() {
-		if(!isConfigured())
+		if (!isConfigured()) {
 			return null;
+		}
 
-		if(fRemoteCCodeFoldingService== null)
+		if (fRemoteCCodeFoldingService == null) {
 			fRemoteCCodeFoldingService = new RemoteCCodeFoldingService(fSubsystem);
+		}
 
 		return fRemoteCCodeFoldingService;
 	}
 
 	/**
-	 * @since 3.1
+	 * @since 3.2
 	 */
 	public IRemoteCodeFormattingService getRemoteCodeFormattingService() {
-		if(!isConfigured())
+		if (!isConfigured()) {
 			return null;
+		}
 
-		if(fRemoteCodeFormattingService== null)
+		if (fRemoteCodeFormattingService == null) {
 			fRemoteCodeFormattingService = new RemoteCodeFormattingService(fSubsystem);
+		}
 
 		return fRemoteCodeFormattingService;
 	}

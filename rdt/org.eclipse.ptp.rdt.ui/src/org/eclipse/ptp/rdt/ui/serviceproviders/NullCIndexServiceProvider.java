@@ -359,7 +359,7 @@ public class NullCIndexServiceProvider extends
 	}
 
 	/**
-	 * @since 4.2
+	 * @since 4.3
 	 */
 	public IRemoteCodeFormattingService getRemoteCodeFormattingService() {
 		return new IRemoteCodeFormattingService() {

@@ -126,8 +126,9 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 
 		for (IProject project : workspaceRoot.getProjects()) {
 			// is the project open? if not, there's not much we can do
-			if (!project.isOpen())
+			if (!project.isOpen()) {
 				continue;
+			}
 
 			// is this an RDT C/C++ project?
 			// check the project natures... we care about the project if it has
@@ -135,8 +136,9 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 			// at least one of the CDT natures
 			try {
 				if (!project.hasNature(RemoteNature.REMOTE_NATURE_ID)
-						|| !(project.hasNature(CProjectNature.C_NATURE_ID) || project.hasNature(CCProjectNature.CC_NATURE_ID)))
+						|| !(project.hasNature(CProjectNature.C_NATURE_ID) || project.hasNature(CCProjectNature.CC_NATURE_ID))) {
 					continue;
+				}
 
 				checkProject(project, monitor);
 			} catch (Throwable e) {
@@ -438,14 +440,15 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 		}
 		return (ICElement[]) result;
 	}
-	
+
 	/**
 	 * @since 2.0
 	 */
 	public Map<String, ICElement[]> findOverriders(Scope scope, ICElement subject, IProgressMonitor monitor) {
-    	monitor.beginTask(Messages.getString("RSECIndexSubsystem.7") + subject, 100); //$NON-NLS-1$
-    	String path = EFSExtensionManager.getDefault().getPathFromURI(subject.getLocationURI());
-		Object result = sendRequest(CDTMiner.C_CALL_HIERARCHY_GET_OVERRIDERS, new Object[] { scope, getHostName(), subject, path }, null);
+		monitor.beginTask(Messages.getString("RSECIndexSubsystem.7") + subject, 100); //$NON-NLS-1$
+		String path = EFSExtensionManager.getDefault().getPathFromURI(subject.getLocationURI());
+		Object result = sendRequest(CDTMiner.C_CALL_HIERARCHY_GET_OVERRIDERS, new Object[] { scope, getHostName(), subject, path },
+				null);
 		if (result == null) {
 			return new HashMap<String, ICElement[]>();
 		}
@@ -484,8 +487,9 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 
 		removeProblems(scope);
 		DataStore dataStore = getDataStore(monitor);
-		if (dataStore == null)
+		if (dataStore == null) {
 			return Status.OK_STATUS;
+		}
 
 		DataElement result = getDataStore(monitor).createObject(null, CDTMiner.T_INDEX_STATUS_DESCRIPTOR, "index"); //$NON-NLS-1$
 		StatusMonitor smonitor = StatusMonitor.getStatusMonitorFor(fProvider.getConnection(), dataStore);
@@ -544,8 +548,9 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 				try {
 					smonitor.waitForUpdate(status, monitor);
 				} catch (InterruptedException e) { // Canceled
-					if (monitor.isCanceled())
+					if (monitor.isCanceled()) {
 						cancelOperation(status.getParent());
+					}
 				}
 			} catch (Exception e) {
 				RDTLog.logError(e);
@@ -620,8 +625,9 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 		String path = EFSExtensionManager.getDefault().getPathFromURI(unit.getLocationURI());
 		Object result = sendRequest(CDTMiner.C_NAVIGATION_OPEN_DECLARATION, new Object[] { scope, unit, path, selectedText,
 				selectionStart, selectionLength }, monitor);
-		if (result == null)
+		if (result == null) {
 			return OpenDeclarationResult.failureUnexpectedError();
+		}
 		return (OpenDeclarationResult) result;
 	}
 
@@ -705,8 +711,9 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 			RemoteIndexerTask task) {
 		removeProblems(scope);
 		DataStore dataStore = getDataStore(monitor);
-		if (dataStore == null)
+		if (dataStore == null) {
 			return Status.OK_STATUS;
+		}
 
 		DataElement result = getDataStore(monitor).createObject(null, CDTMiner.T_INDEX_STATUS_DESCRIPTOR, "index"); //$NON-NLS-1$
 		StatusMonitor smonitor = StatusMonitor.getStatusMonitorFor(fProvider.getConnection(), dataStore);
@@ -749,8 +756,9 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 				try {
 					smonitor.waitForUpdate(status, monitor);
 				} catch (InterruptedException e) { // Canceled
-					if (monitor.isCanceled())
+					if (monitor.isCanceled()) {
 						cancelOperation(status.getParent());
+					}
 				}
 			} catch (Exception e) {
 				RDTLog.logError(e);
@@ -808,21 +816,19 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 		}
 		return (List<RemoteSearchMatch>) result;
 	}
-	
+
 	/**
-	 * @see
-	 * org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#runQuery2
+	 * @see org.eclipse.ptp.internal.rdt.core.subsystems.ICIndexSubsystem#runQuery2
 	 * @since 2.0
 	 */
 	public RemoteSearchQuery runQuery2(Scope scope, RemoteSearchQuery query, IProgressMonitor monitor) {
-    	monitor.beginTask(Messages.getString("RSECIndexSubsystem.8") + query.getScopeDescription(), 100); //$NON-NLS-1$
-		Object result = sendRequest(CDTMiner.C_SEARCH_RUN_QUERY2, new Object[] { scope, getHostName(), query  }, null);
+		monitor.beginTask(Messages.getString("RSECIndexSubsystem.8") + query.getScopeDescription(), 100); //$NON-NLS-1$
+		Object result = sendRequest(CDTMiner.C_SEARCH_RUN_QUERY2, new Object[] { scope, getHostName(), query }, null);
 		if (result == null) {
 			return null;
 		}
 		return (RemoteSearchQuery) result;
 	}
-	
 
 	/**
 	 * @param requestType
@@ -982,12 +988,14 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 	 */
 	private Object sendRequest(String requestType, Object[] arguments, IProgressMonitor monitor, boolean deserializeResult) {
 		DataStore dataStore = getDataStore(monitor);
-		if (dataStore == null)
+		if (dataStore == null) {
 			return null;
+		}
 
 		DataElement queryCmd = dataStore.localDescriptorQuery(dataStore.getDescriptorRoot(), requestType);
-		if (queryCmd == null)
+		if (queryCmd == null) {
 			return null;
+		}
 
 		StatusMonitor smonitor = StatusMonitor.getStatusMonitorFor(fProvider.getConnection(), dataStore);
 		ArrayList<Object> args = new ArrayList<Object>();
@@ -1045,8 +1053,9 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 		}
 
 		String data = element.getName();
-		if (!deserializeResult)
+		if (!deserializeResult) {
 			return data;
+		}
 
 		try {
 			Object result = Serializer.deserialize(data);
@@ -1080,8 +1089,9 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 				try {
 					ICElement[] children = ((IParent) element).getChildren();
 
-					for (int k = 0; k < children.length; k++)
-						addElement(dataStore, args, children[k]);
+					for (ICElement element2 : children) {
+						addElement(dataStore, args, element2);
+					}
 
 				} catch (CModelException e) {
 					RDTLog.logError(e);
@@ -1156,8 +1166,9 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 		String errorMessage = message.substring(errorMessageStart + 9, errorMessageEnd);
 
 		boolean includeError = true;
-		if (errorMessage.indexOf("inclusion") < 0) //$NON-NLS-1$
+		if (errorMessage.indexOf("inclusion") < 0) {
 			includeError = false;
+		}
 
 		// parser for include/macro name
 		int includeStart = errorMessageEnd + 2;
@@ -1176,10 +1187,11 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 		// put error message back together
 		Object[] args = new Object[] { include, fileName, new Integer(lineNumber.replace(",", "")) }; //$NON-NLS-1$ //$NON-NLS-2$
 		String info = ParserMessages.getFormattedString("BaseProblemFactory.problemPattern", args); //$NON-NLS-1$
-		if (includeError)
+		if (includeError) {
 			info = ParserMessages.getFormattedString("ScannerProblemFactory.error.preproc.inclusionNotFound", info); //$NON-NLS-1$
-		else
+		} else {
 			info = ParserMessages.getFormattedString("ScannerProblemFactory.error.preproc.definitionNotFound", info); //$NON-NLS-1$
+		}
 
 		String infoMsg = Messages.getString("RSECIndexSubsystem.11"); //$NON-NLS-1$
 		String wholeMessage = NLS.bind(Messages.getString("RSECIndexSubsystem.12"), new Object[] { info }) + "  " + infoMsg; //$NON-NLS-1$ //$NON-NLS-2$
@@ -1231,35 +1243,35 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 
 		checkAllProjects(new NullProgressMonitor());
 		DataStore dataStore = getDataStore(null);
-	    if (dataStore == null) {
-	    	return ""; //$NON-NLS-1$
-	    }
-        DataElement queryCmd = dataStore.localDescriptorQuery(dataStore.getDescriptorRoot(), CDTMiner.C_SEMANTIC_HIGHTLIGHTING_COMPUTE_POSITIONS);
-        if (queryCmd == null) {
-	    	return ""; //$NON-NLS-1$
-        }
-     	NullProgressMonitor monitor = new NullProgressMonitor();
-     	StatusMonitor smonitor = StatusMonitor.getStatusMonitorFor(fProvider.getConnection(), dataStore);
-    	ArrayList<Object> args = new ArrayList<Object>();
+		if (dataStore == null) {
+			return ""; //$NON-NLS-1$
+		}
+		DataElement queryCmd = dataStore.localDescriptorQuery(dataStore.getDescriptorRoot(),
+				CDTMiner.C_SEMANTIC_HIGHTLIGHTING_COMPUTE_POSITIONS);
+		if (queryCmd == null) {
+			return ""; //$NON-NLS-1$
+		}
+		NullProgressMonitor monitor = new NullProgressMonitor();
+		StatusMonitor smonitor = StatusMonitor.getStatusMonitorFor(fProvider.getConnection(), dataStore);
+		ArrayList<Object> args = new ArrayList<Object>();
 		Scope scope = new Scope(targetUnit.getCProject().getProject());
-    	DataElement dataElement = dataStore.createObject(null, CDTMiner.T_SCOPE_SCOPENAME_DESCRIPTOR, scope.getName());
+		DataElement dataElement = dataStore.createObject(null, CDTMiner.T_SCOPE_SCOPENAME_DESCRIPTOR, scope.getName());
 
-    	args.add(dataElement);
-    	args.add(createSerializableElement(dataStore, targetUnit));
+		args.add(dataElement);
+		args.add(createSerializableElement(dataStore, targetUnit));
 
-    	// execute the command
-    	DataElement status = dataStore.command(queryCmd, args, dataStore.getDescriptorRoot());
+		// execute the command
+		DataElement status = dataStore.command(queryCmd, args, dataStore.getDescriptorRoot());
 
-    	try {
-        	smonitor.waitForUpdate(status, monitor);
-        }
-        catch (Exception e) {
-        	RDTLog.logError(e);
-        }
+		try {
+			smonitor.waitForUpdate(status, monitor);
+		} catch (Exception e) {
+			RDTLog.logError(e);
+		}
 
-    	DataElement element = status.get(0);
-    	String data = element.getName();
-    	try {
+		DataElement element = status.get(0);
+		String data = element.getName();
+		try {
 			Object result = Serializer.deserialize(data);
 			if (result == null || !(result instanceof String)) {
 				return ""; //$NON-NLS-1$;
@@ -1270,10 +1282,9 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 		} catch (ClassNotFoundException e) {
 			RDTLog.logError(e);
 		}
-    	return ""; //$NON-NLS-1$
+		return ""; //$NON-NLS-1$
 	}
 
-	
 	/**
 	 * @since 3.2
 	 */
@@ -1282,7 +1293,8 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 		if (dataStore == null) {
 			return ""; //$NON-NLS-1$
 		}
-		DataElement queryCmd = dataStore.localDescriptorQuery(dataStore.getDescriptorRoot(), CDTMiner.C_INACTIVE_HIGHTLIGHTING_COMPUTE_POSITIONS);
+		DataElement queryCmd = dataStore.localDescriptorQuery(dataStore.getDescriptorRoot(),
+				CDTMiner.C_INACTIVE_HIGHTLIGHTING_COMPUTE_POSITIONS);
 		if (queryCmd == null) {
 			return ""; //$NON-NLS-1$
 		}
@@ -1303,75 +1315,78 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 		}
 
 		DataElement element = status.get(0);
-		if (element == null)
+		if (element == null) {
 			return ""; //$NON-NLS-1$
+		}
 		String result = element.getName();
 		return result == null ? "" : result; //$NON-NLS-1$
 	}
-	
-	
+
 	/**
 	 * @since 3.0
 	 */
-	public FoldingRegionsResult computeFoldingRegions(ITranslationUnit targetUnit, int docLength, boolean fPreprocessorBranchFoldingEnabled, boolean fStatementsFoldingEnabled) {
+	public FoldingRegionsResult computeFoldingRegions(ITranslationUnit targetUnit, int docLength,
+			boolean fPreprocessorBranchFoldingEnabled, boolean fStatementsFoldingEnabled) {
 		checkAllProjects(new NullProgressMonitor());
 		DataStore dataStore = getDataStore(null);
-	    if (dataStore == null) {
-	    	return null;
-	    }
-        DataElement queryCmd = dataStore.localDescriptorQuery(dataStore.getDescriptorRoot(), CDTMiner.C_CODE_FOLDING_COMPUTE_REGIONS);
-        if (queryCmd == null) {
-	    	return null;
-        }
-     	NullProgressMonitor monitor = new NullProgressMonitor();
-     	StatusMonitor smonitor = StatusMonitor.getStatusMonitorFor(fProvider.getConnection(), dataStore);
-    	ArrayList<Object> args = new ArrayList<Object>();
+		if (dataStore == null) {
+			return null;
+		}
+		DataElement queryCmd = dataStore.localDescriptorQuery(dataStore.getDescriptorRoot(),
+				CDTMiner.C_CODE_FOLDING_COMPUTE_REGIONS);
+		if (queryCmd == null) {
+			return null;
+		}
+		NullProgressMonitor monitor = new NullProgressMonitor();
+		StatusMonitor smonitor = StatusMonitor.getStatusMonitorFor(fProvider.getConnection(), dataStore);
+		ArrayList<Object> args = new ArrayList<Object>();
 		Scope scope = new Scope(targetUnit.getCProject().getProject());
-    	DataElement dataElement = dataStore.createObject(null, CDTMiner.T_SCOPE_SCOPENAME_DESCRIPTOR, scope.getName());
+		DataElement dataElement = dataStore.createObject(null, CDTMiner.T_SCOPE_SCOPENAME_DESCRIPTOR, scope.getName());
 
-    	args.add(dataElement);
-    	args.add(createSerializableElement(dataStore, targetUnit));
-    	args.add(dataStore.createObject(null, CDTMiner.T_INDEX_INT_DESCRIPTOR, Integer.toString(docLength)));
-    	args.add(dataStore.createObject(null, CDTMiner.T_INDEX_BOOLEAN_DESCRIPTOR, Boolean.toString(fPreprocessorBranchFoldingEnabled)));
-    	args.add(dataStore.createObject(null, CDTMiner.T_INDEX_BOOLEAN_DESCRIPTOR, Boolean.toString(fStatementsFoldingEnabled)));
-    
-    	// execute the command
-    	DataElement status = dataStore.command(queryCmd, args, dataStore.getDescriptorRoot());
+		args.add(dataElement);
+		args.add(createSerializableElement(dataStore, targetUnit));
+		args.add(dataStore.createObject(null, CDTMiner.T_INDEX_INT_DESCRIPTOR, Integer.toString(docLength)));
+		args.add(dataStore.createObject(null, CDTMiner.T_INDEX_BOOLEAN_DESCRIPTOR,
+				Boolean.toString(fPreprocessorBranchFoldingEnabled)));
+		args.add(dataStore.createObject(null, CDTMiner.T_INDEX_BOOLEAN_DESCRIPTOR, Boolean.toString(fStatementsFoldingEnabled)));
 
-    	try {
-        	smonitor.waitForUpdate(status, monitor);
-        }
-        catch (Exception e) {
-        	RDTLog.logError(e);
-        }
+		// execute the command
+		DataElement status = dataStore.command(queryCmd, args, dataStore.getDescriptorRoot());
 
-    	DataElement element = status.get(0);
-    	
-    	String data = element.getName();
-    	try {
-    		Object result = Serializer.deserialize(data);
+		try {
+			smonitor.waitForUpdate(status, monitor);
+		} catch (Exception e) {
+			RDTLog.logError(e);
+		}
+
+		DataElement element = status.get(0);
+
+		String data = element.getName();
+		try {
+			Object result = Serializer.deserialize(data);
 			if (result == null || !(result instanceof FoldingRegionsResult)) {
 				return null;
 			}
 			return (FoldingRegionsResult) result;
-    	} catch (IOException e) {
+		} catch (IOException e) {
 			RDTLog.logError(e);
 		} catch (ClassNotFoundException e) {
 			RDTLog.logError(e);
 		}
-    	return null;
+		return null;
 	}
-	
+
 	/**
-	 * @since 3.1
+	 * @since 3.2
 	 */
-	public TextEdit computeCodeFormatting(Scope scope, ITranslationUnit targetUnit, String source, RemoteDefaultCodeFormatterOptions preferences, int offset, int length, IProgressMonitor monitor) {
-		Object result = sendRequest(CDTMiner.C_CODE_FORMATTING, new Object[] {scope.getName(), targetUnit, source, preferences, offset, length}, monitor);
-		if (result == null) 
-		{
+	public TextEdit computeCodeFormatting(Scope scope, ITranslationUnit targetUnit, String source,
+			RemoteDefaultCodeFormatterOptions preferences, int offset, int length, IProgressMonitor monitor) {
+		Object result = sendRequest(CDTMiner.C_CODE_FORMATTING, new Object[] { scope.getName(), targetUnit, source, preferences,
+				offset, length }, monitor);
+		if (result == null) {
 			return null;
 		}
-		
+
 		return transformEdit((RemoteTextEdit) result);
 	}
 
@@ -1380,17 +1395,17 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 		if (remoteEdit instanceof RemoteMultiTextEdit) {
 			RemoteMultiTextEdit source = (RemoteMultiTextEdit) remoteEdit;
 			edit = new MultiTextEdit(source.getOffset(), source.getLength());
-			 
+
 		} else if (remoteEdit instanceof RemoteReplaceEdit) {
 			RemoteReplaceEdit source = (RemoteReplaceEdit) remoteEdit;
 			edit = new ReplaceEdit(source.getOffset(), source.getLength(), source.getText());
 		}
-		
+
 		if (edit != null) {
 			RemoteTextEdit[] children = remoteEdit.getChildren();
-			 for (int i = 0; i < children.length; i++) {
-				 edit.addChild(transformEdit(children[i]));				 
-			 }
+			for (RemoteTextEdit element : children) {
+				edit.addChild(transformEdit(element));
+			}
 		}
 		return edit;
 	}
