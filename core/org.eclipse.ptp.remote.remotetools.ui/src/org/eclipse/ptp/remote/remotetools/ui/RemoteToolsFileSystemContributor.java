@@ -28,12 +28,13 @@ import java.net.URISyntaxException;
 
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.RemoteServices;
 import org.eclipse.ptp.remote.remotetools.core.RemoteToolsAdapterCorePlugin;
 import org.eclipse.ptp.remote.remotetools.core.RemoteToolsFileSystem;
 import org.eclipse.ptp.remote.remotetools.ui.messages.Messages;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
-import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
+import org.eclipse.ptp.remote.ui.RemoteUIServices;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.ide.fileSystem.FileSystemContributor;
 
@@ -47,8 +48,8 @@ public class RemoteToolsFileSystemContributor extends FileSystemContributor {
 	 */
 	@Override
 	public URI browseFileSystem(String initialPath, Shell shell) {
-		IRemoteServices services = PTPRemoteUIPlugin.getDefault().getRemoteServices(RemoteToolsAdapterCorePlugin.SERVICES_ID, null);
-		IRemoteUIServices uiServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(services);
+		IRemoteServices services = RemoteServices.getRemoteServices(RemoteToolsAdapterCorePlugin.SERVICES_ID);
+		IRemoteUIServices uiServices = RemoteUIServices.getRemoteUIServices(services);
 		IRemoteUIFileManager uiFileMgr = uiServices.getUIFileManager();
 		uiFileMgr.showConnections(true);
 		String path = uiFileMgr.browseDirectory(shell, Messages.RemoteToolsFileSystemContributor_0, initialPath, 0);

@@ -13,7 +13,7 @@ package org.eclipse.ptp.rdt.ui.serviceproviders;
 import org.eclipse.ptp.internal.rdt.ui.editor.IRemoteInactiveHighlightingService;
 
 /**
- * @since 4.3
+ * @since 5.0
  */
 public interface IIndexServiceProvider3 extends IIndexServiceProvider2 {
 

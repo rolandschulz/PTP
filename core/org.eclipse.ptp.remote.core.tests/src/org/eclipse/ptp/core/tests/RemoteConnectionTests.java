@@ -21,7 +21,7 @@ import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.core.RemoteServices;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
 public class RemoteConnectionTests extends TestCase {
@@ -121,7 +121,7 @@ public class RemoteConnectionTests extends TestCase {
 	 */
 	@Override
 	protected void setUp() throws Exception {
-		fRemoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices("org.eclipse.ptp.remote.RemoteTools"); //$NON-NLS-1$
+		fRemoteServices = RemoteServices.getRemoteServices("org.eclipse.ptp.remote.RemoteTools"); //$NON-NLS-1$
 		assertNotNull(fRemoteServices);
 
 		IRemoteConnectionManager connMgr = fRemoteServices.getConnectionManager();

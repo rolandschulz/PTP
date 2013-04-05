@@ -17,7 +17,7 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
-import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
+import org.eclipse.ptp.remote.ui.RemoteUIServices;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
@@ -76,16 +76,17 @@ public class RemoteDirectoryFieldEditor extends DirectoryFieldEditor {
 	 * @param path
 	 * @return
 	 */
-	public String browseRemoteLocation(Shell shell, String path) {		
-		IRemoteUIServices remoteUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fRemoteConnection.getRemoteServices());
+	public String browseRemoteLocation(Shell shell, String path) {
+		IRemoteUIServices remoteUIServices = RemoteUIServices.getRemoteUIServices(fRemoteConnection.getRemoteServices());
 		if (remoteUIServices != null) {
 			IRemoteUIFileManager fileMgr = remoteUIServices.getUIFileManager();
 			if (fileMgr != null) {
 				fileMgr.setConnection(fRemoteConnection);
 				String correctPath = path;
-				String selectedPath = fileMgr.browseDirectory(
-						shell,
-						Messages.getString("RemoteDirectoryFieldEditor_0", fRemoteConnection.getName()), correctPath, IRemoteUIConstants.NONE); //$NON-NLS-1$
+				String selectedPath = fileMgr
+						.browseDirectory(
+								shell,
+								Messages.getString("RemoteDirectoryFieldEditor_0", fRemoteConnection.getName()), correctPath, IRemoteUIConstants.NONE); //$NON-NLS-1$
 				return selectedPath;
 			}
 		}
@@ -101,7 +102,8 @@ public class RemoteDirectoryFieldEditor extends DirectoryFieldEditor {
 			// reset currentRemoteFileStore first
 			fCurrentRemoteFileStore = null;
 			if (fRemoteConnection != null) {
-				fCurrentRemoteFileStore = fRemoteConnection.getRemoteServices().getFileManager(fRemoteConnection).getResource(dirName);
+				fCurrentRemoteFileStore = fRemoteConnection.getRemoteServices().getFileManager(fRemoteConnection)
+						.getResource(dirName);
 			}
 		}
 

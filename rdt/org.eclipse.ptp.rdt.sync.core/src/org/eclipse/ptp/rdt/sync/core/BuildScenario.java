@@ -17,7 +17,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.core.RemoteServices;
 
 /**
  * Class for build information that will be mapped to a specific service configuration. Utility methods for reading and writing
@@ -32,16 +32,16 @@ public class BuildScenario {
 	final String remoteConnection;
 	final IRemoteServices remoteServices;
 	final String location;
-	
+
 	/**
 	 * Create a new build scenario
 	 * 
 	 * @param sp
-	 *           Name of sync provider
+	 *            Name of sync provider
 	 * @param rc
-	 * 			 Remote connection to use - cannot be null
+	 *            Remote connection to use - cannot be null
 	 * @param l
-	 * 			 Location (directory) on remote host
+	 *            Location (directory) on remote host
 	 */
 	public BuildScenario(String sp, IRemoteConnection rc, String l) {
 		syncProvider = sp;
@@ -49,23 +49,23 @@ public class BuildScenario {
 		remoteServices = rc.getRemoteServices();
 		location = l;
 	}
-	
+
 	/**
 	 * Create a new build scenario
-	 *
+	 * 
 	 * @param sp
-	 * 			Name of sync provider
+	 *            Name of sync provider
 	 * @param rc
-	 * 			Name of remote connection
+	 *            Name of remote connection
 	 * @param rs
-	 * 			Name of remote service - must be a valid service
+	 *            Name of remote service - must be a valid service
 	 * @param l
-	 * 			Location (directory) on remote host
+	 *            Location (directory) on remote host
 	 */
 	public BuildScenario(String sp, String rc, String rs, String l) {
 		syncProvider = sp;
 		remoteConnection = rc;
-		remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(rs);
+		remoteServices = RemoteServices.getRemoteServices(rs);
 		if (remoteServices == null) {
 			throw new IllegalArgumentException(Messages.BuildScenario_0 + rs);
 		}
@@ -74,6 +74,7 @@ public class BuildScenario {
 
 	/**
 	 * Get sync provider name
+	 * 
 	 * @return sync provider name
 	 */
 	public String getSyncProvider() {
@@ -86,11 +87,12 @@ public class BuildScenario {
 	 * callers only need to worry about recovering gracefully.
 	 * 
 	 * @return remote connection - never null
-	 *
-	 * @throws MissingConnectionException if no connection with the stored name exist. This can happen for various reasons:
-	 * 1) The connection was renamed
-	 * 2) The connection was deleted
-	 * 3) The connection never existed, such as when a project is imported to a different workspace
+	 * 
+	 * @throws MissingConnectionException
+	 *             if no connection with the stored name exist. This can happen for various reasons:
+	 *             1) The connection was renamed
+	 *             2) The connection was deleted
+	 *             3) The connection never existed, such as when a project is imported to a different workspace
 	 */
 	public IRemoteConnection getRemoteConnection() throws MissingConnectionException {
 		IRemoteConnection conn = remoteServices.getConnectionManager().getConnection(remoteConnection);
@@ -108,33 +110,34 @@ public class BuildScenario {
 			return conn;
 		}
 	}
-	
+
 	/**
 	 * Get remote provider
+	 * 
 	 * @return remote provider - never null
 	 */
 	public IRemoteServices getRemoteProvider() {
 		return remoteServices;
 	}
-	
+
 	/**
 	 * Get location (directory), resolved in terms of the passed project
-	 *
+	 * 
 	 * @param project
 	 * @return location
 	 */
 	public String getLocation(IProject project) {
 		return resolveString(project, location);
 	}
-	
+
 	/**
 	 * Utility function to resolve a string based on path variables for a certain project. Unless string is in the form:
 	 * ${path_variable:/remainder}, where "path_variable" is a path variable defined for the project, the original string
 	 * is returned unchanged.
-	 *
+	 * 
 	 * The Eclipse platform should provide a standard mechanism for doing this, but various combinations of URIUtil and
 	 * PathVariableManager methods failed.
-	 *
+	 * 
 	 * @param project
 	 * @param path
 	 * @return resolved string
@@ -145,8 +148,8 @@ public class BuildScenario {
 			return path;
 		}
 
-		String newPath = path.substring(2, path.length()-1);
-		
+		String newPath = path.substring(2, path.length() - 1);
+
 		// Extract variable's value
 		String variable = newPath.split(":")[0]; //$NON-NLS-1$
 		IPathVariableManager pvm = project.getPathVariableManager();
@@ -154,18 +157,18 @@ public class BuildScenario {
 		if (value == null) {
 			return path;
 		}
-		
+
 		// Build and return new path
 		value = value.replaceFirst("file:", ""); //$NON-NLS-1$ //$NON-NLS-2$
 		if (value.endsWith("/") || value.endsWith("\\")) { //$NON-NLS-1$ //$NON-NLS-2$
-			value = value.substring(0, path.length()-1);
+			value = value.substring(0, path.length() - 1);
 		}
 		return newPath.replaceFirst(variable + ":*", value); //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * Store scenario in the given map
-	 *
+	 * 
 	 * @param map
 	 */
 	public void saveScenario(Map<String, String> map) {
@@ -176,13 +179,13 @@ public class BuildScenario {
 		map.put(ATTR_LOCATION, location);
 		map.put(ATTR_REMOTE_SERVICES_ID, remoteServices.getId());
 	}
-	
+
 	/**
 	 * Load data from a map into a new build scenario.
-	 *
+	 * 
 	 * @param map
 	 * @return a new build scenario or null if one of the values is not found or if something goes wrong while trying to find the
-	 * specified IRemoteConnection.
+	 *         specified IRemoteConnection.
 	 */
 	public static BuildScenario loadScenario(Map<String, String> map) {
 		String sp = map.get(ATTR_SYNC_PROVIDER);
@@ -200,47 +203,53 @@ public class BuildScenario {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((location == null) ? 0 : location.hashCode());
-		result = prime
-				* result
-				+ ((remoteConnection == null) ? 0 : remoteConnection.hashCode());
-		result = prime * result
-				+ ((remoteServices == null) ? 0 : remoteServices.hashCode());
-		result = prime * result
-				+ ((syncProvider == null) ? 0 : syncProvider.hashCode());
+		result = prime * result + ((location == null) ? 0 : location.hashCode());
+		result = prime * result + ((remoteConnection == null) ? 0 : remoteConnection.hashCode());
+		result = prime * result + ((remoteServices == null) ? 0 : remoteServices.hashCode());
+		result = prime * result + ((syncProvider == null) ? 0 : syncProvider.hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		BuildScenario other = (BuildScenario) obj;
 		if (location == null) {
-			if (other.location != null)
+			if (other.location != null) {
 				return false;
-		} else if (!location.equals(other.location))
+			}
+		} else if (!location.equals(other.location)) {
 			return false;
+		}
 		if (remoteConnection == null) {
-			if (other.remoteConnection != null)
+			if (other.remoteConnection != null) {
 				return false;
-		} else if (!remoteConnection.equals(other.remoteConnection))
+			}
+		} else if (!remoteConnection.equals(other.remoteConnection)) {
 			return false;
+		}
 		if (remoteServices == null) {
-			if (other.remoteServices != null)
+			if (other.remoteServices != null) {
 				return false;
-		} else if (!remoteServices.equals(other.remoteServices))
+			}
+		} else if (!remoteServices.equals(other.remoteServices)) {
 			return false;
+		}
 		if (syncProvider == null) {
-			if (other.syncProvider != null)
+			if (other.syncProvider != null) {
 				return false;
-		} else if (!syncProvider.equals(other.syncProvider))
+			}
+		} else if (!syncProvider.equals(other.syncProvider)) {
 			return false;
+		}
 		return true;
 	}
 }

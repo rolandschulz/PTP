@@ -53,7 +53,7 @@ import org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemotePreferenceConstants;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.core.RemoteServices;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.core.server.RemoteServerManager;
@@ -546,7 +546,7 @@ public class LaunchController implements ILaunchController {
 	}
 
 	private IRemoteServices getRemoteServices(IProgressMonitor monitor) {
-		return PTPRemoteCorePlugin.getDefault().getRemoteServices(servicesId, monitor);
+		return RemoteServices.getRemoteServices(servicesId, monitor);
 	}
 
 	/*

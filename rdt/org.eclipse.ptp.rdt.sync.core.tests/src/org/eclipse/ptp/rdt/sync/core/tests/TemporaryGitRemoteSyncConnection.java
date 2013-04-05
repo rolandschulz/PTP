@@ -23,8 +23,9 @@ import org.eclipse.ptp.rdt.sync.git.core.GitRemoteSyncConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
+import org.eclipse.ptp.remote.core.IRemotePreferenceConstants;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.core.RemoteServices;
 import org.eclipse.ptp.remotetools.environment.generichost.core.ConfigFactory;
 import org.junit.rules.ExternalResource;
 import org.junit.rules.TemporaryFolder;
@@ -77,7 +78,7 @@ public class TemporaryGitRemoteSyncConnection extends ExternalResource {
 		/* setup remote connection */
 		IRemoteServices fRemoteServices;
 
-		fRemoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices("org.eclipse.ptp.remote.RemoteTools"); //$NON-NLS-1$
+		fRemoteServices = RemoteServices.getRemoteServices(IRemotePreferenceConstants.REMOTE_TOOLS_REMOTE_SERVICES_ID);
 		assertNotNull(fRemoteServices);
 
 		connMgr = fRemoteServices.getConnectionManager();

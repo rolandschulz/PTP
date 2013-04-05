@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.remote.ui;singleton:=true
 Bundle-Version: 7.0.0.qualifier
-Bundle-Activator: org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin
+Bundle-Activator: org.eclipse.ptp.internal.remote.ui.PTPRemoteUIPlugin
 Bundle-Vendor: %pluginProvider
 Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.ide,
@@ -13,7 +13,10 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.resources
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
-Export-Package: org.eclipse.ptp.remote.ui,
+Export-Package: org.eclipse.ptp.internal.remote.ui;x-internal:=true,
+ org.eclipse.ptp.internal.remote.ui.messages;x-internal:=true,
+ org.eclipse.ptp.internal.remote.ui.preferences;x-internal:=true,
+ org.eclipse.ptp.remote.ui,
  org.eclipse.ptp.remote.ui.dialogs,
  org.eclipse.ptp.remote.ui.widgets
 Bundle-Localization: plugin

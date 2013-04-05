@@ -50,10 +50,10 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteResource;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.core.RemoteServices;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
-import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
+import org.eclipse.ptp.remote.ui.RemoteUIServices;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -516,7 +516,7 @@ public class ApplicationTab extends LaunchConfigurationTab {
 			// Ignore
 		}
 		if (conn[0] != null) {
-			IRemoteUIServices remoteUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(conn[0].getRemoteServices());
+			IRemoteUIServices remoteUIServices = RemoteUIServices.getRemoteUIServices(conn[0].getRemoteServices());
 			if (remoteUIServices != null) {
 				IRemoteUIFileManager fileManager = remoteUIServices.getUIFileManager();
 				if (fileManager != null) {
@@ -545,11 +545,11 @@ public class ApplicationTab extends LaunchConfigurationTab {
 			}
 			initPath = project.getLocationURI().getPath();
 		}
-		IRemoteServices localServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
-		IRemoteUIServices localUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(localServices);
+		IRemoteServices localServices = RemoteServices.getLocalServices();
+		IRemoteUIServices localUIServices = RemoteUIServices.getRemoteUIServices(localServices);
 		if (localServices != null && localUIServices != null) {
 			IRemoteConnectionManager lconnMgr = localServices.getConnectionManager();
-			IRemoteConnection lconn = lconnMgr.getConnection(IRemoteConnectionManager.DEFAULT_CONNECTION_NAME);
+			IRemoteConnection lconn = lconnMgr.getConnection(IRemoteConnectionManager.LOCAL_CONNECTION_NAME);
 			IRemoteUIFileManager localUIFileMgr = localUIServices.getUIFileManager();
 			localUIFileMgr.setConnection(lconn);
 			String path = localUIFileMgr

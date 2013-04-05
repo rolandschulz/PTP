@@ -11,7 +11,6 @@
 package org.eclipse.ptp.internal.remote.core;
 
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 
 public class DebugUtil {
 	private static final String SERVER_TRACING_OPTION = "org.eclipse.ptp.remote.core/debug/server/tracing"; //$NON-NLS-1$

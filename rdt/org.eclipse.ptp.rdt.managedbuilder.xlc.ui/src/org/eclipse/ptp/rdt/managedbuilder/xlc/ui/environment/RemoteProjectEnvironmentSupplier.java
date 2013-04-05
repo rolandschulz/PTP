@@ -117,10 +117,6 @@ public class RemoteProjectEnvironmentSupplier implements IProjectEnvironmentVari
 					return null;
 				}
 
-				if (!remoteServices.isInitialized()) {
-					remoteServices.initialize();
-				}
-
 				IRemoteConnection connection = executionProvider.getConnection();
 
 				if (connection == null) {

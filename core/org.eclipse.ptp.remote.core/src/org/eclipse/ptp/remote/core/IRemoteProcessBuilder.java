@@ -91,8 +91,7 @@ public interface IRemoteProcessBuilder {
 
 	/**
 	 * Returns a string map view of this process builder's environment. The
-	 * returned map behaves in the same manner as described in
-	 * {@link java.lang.ProcessBuilder#environment()}.
+	 * returned map behaves in the same manner as described in {@link java.lang.ProcessBuilder#environment()}.
 	 * 
 	 * @return the process builder's environment
 	 */
@@ -146,6 +145,8 @@ public interface IRemoteProcessBuilder {
 	 * 
 	 * @param flags
 	 *            bitwise-or of flags to use when starting process
+	 * @return remote process object
+	 * @throws IOException
 	 * @since 5.0
 	 */
 	public IRemoteProcess start(int flags) throws IOException;

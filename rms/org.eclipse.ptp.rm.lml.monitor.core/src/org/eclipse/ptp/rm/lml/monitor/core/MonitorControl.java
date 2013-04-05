@@ -33,7 +33,7 @@ import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.core.RemoteServices;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.core.server.RemoteServerManager;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
@@ -243,7 +243,7 @@ public class MonitorControl implements IMonitorControl {
 	 * @return connection for the monitor
 	 */
 	private IRemoteConnection getRemoteConnection(IProgressMonitor monitor) throws CoreException {
-		final IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(getRemoteServicesId(), monitor);
+		final IRemoteServices services = RemoteServices.getRemoteServices(getRemoteServicesId(), monitor);
 		if (services != null) {
 			final IRemoteConnectionManager connMgr = services.getConnectionManager();
 			return connMgr.getConnection(getConnectionName());

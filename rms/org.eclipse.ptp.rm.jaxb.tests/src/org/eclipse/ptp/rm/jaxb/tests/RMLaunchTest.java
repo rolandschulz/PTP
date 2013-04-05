@@ -41,7 +41,7 @@ import org.eclipse.ptp.internal.rm.jaxb.core.JAXBCoreConstants;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.core.RemoteServices;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.core.LaunchControllerManager;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
@@ -303,11 +303,11 @@ public class RMLaunchTest extends TestCase {
 	 * We do here what is done through the wizard.
 	 */
 	private void emulateConfigureWizard() throws Throwable {
-		IRemoteServices localServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
+		IRemoteServices localServices = RemoteServices.getLocalServices();
 		assert (localServices != null);
 		IRemoteConnectionManager localConnectionManager = localServices.getConnectionManager();
 		assert (localConnectionManager != null);
-		IRemoteConnection localConnection = localConnectionManager.getConnection(IRemoteConnectionManager.DEFAULT_CONNECTION_NAME);
+		IRemoteConnection localConnection = localConnectionManager.getConnection(IRemoteConnectionManager.LOCAL_CONNECTION_NAME);
 		assert (localConnection != null);
 		rm = LaunchControllerManager.getInstance().getLaunchController(localServices.getId(), localConnection.getName(), xml);
 		// JAXBRMConfigurationSelectionWizardPage

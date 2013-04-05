@@ -67,7 +67,7 @@ import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.core.RemoteServices;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -81,9 +81,7 @@ import org.eclipse.ui.PlatformUI;
 public class GemUtilities {
 
 	public static enum TaskStatus {
-		IDLE,
-		ACTIVE,
-		ABORTED;
+		IDLE, ACTIVE, ABORTED;
 	}
 
 	private static Process process;
@@ -364,7 +362,9 @@ public class GemUtilities {
 			final String ispccStr = stringBuffer.toString();
 			exitValue = runCommand(ispccStr, true);
 		} else { // Deal with C++ compile
-			final String ispCppPath = GemPlugin.getDefault().getPreferenceStore()
+			final String ispCppPath = GemPlugin
+					.getDefault()
+					.getPreferenceStore()
 					.getString(
 							(isRemoteProject(resource) ? PreferenceConstants.GEM_PREF_REMOTE_ISPCPP_PATH
 									: PreferenceConstants.GEM_PREF_ISPCPP_PATH));
@@ -563,12 +563,12 @@ public class GemUtilities {
 	 */
 	public static IRemoteFileManager getRemoteFileManager(IFile projectResource) {
 		final URI projectURI = projectResource.getProject().getLocationURI();
-		final IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(projectURI);
-		services.initialize();
-		final IRemoteConnection connection = services.getConnectionManager().getConnection(projectURI);
-		final IRemoteFileManager manager = services.getFileManager(connection);
-
-		return manager;
+		final IRemoteServices services = RemoteServices.getRemoteServices(projectURI);
+		if (services != null) {
+			final IRemoteConnection connection = services.getConnectionManager().getConnection(projectURI);
+			return services.getFileManager(connection);
+		}
+		return null;
 	}
 
 	/**
@@ -595,8 +595,7 @@ public class GemUtilities {
 			projectURI = currentProject.getLocationURI();
 		}
 
-		final IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(projectURI);
-		services.initialize();
+		final IRemoteServices services = RemoteServices.getRemoteServices(projectURI); // FIXME: This can return null!
 		final IRemoteConnection connection = getRemoteConnection(services, projectURI);
 		final IRemoteProcessBuilder rpb = services.getProcessBuilder(connection, args);
 
@@ -834,8 +833,7 @@ public class GemUtilities {
 						analyzer.activate();
 					} else if (activeView.equals(PreferenceConstants.GEM_BROWSER)) {
 						browser.activate();
-					}
-					else {
+					} else {
 						console.activate();
 					}
 				}
@@ -1104,10 +1102,10 @@ public class GemUtilities {
 				process = Runtime.getRuntime().exec(command);
 			}
 
-			final BufferedReader stdOutReader = new BufferedReader(new InputStreamReader(
-					isRemote ? remoteProcess.getInputStream() : process.getInputStream()));
-			final BufferedReader stdErrReader = new BufferedReader(new InputStreamReader(
-					isRemote ? remoteProcess.getErrorStream() : process.getErrorStream()));
+			final BufferedReader stdOutReader = new BufferedReader(new InputStreamReader(isRemote ? remoteProcess.getInputStream()
+					: process.getInputStream()));
+			final BufferedReader stdErrReader = new BufferedReader(new InputStreamReader(isRemote ? remoteProcess.getErrorStream()
+					: process.getErrorStream()));
 			consoleStdOutMessage = ""; //$NON-NLS-1$
 			consoleStdErrMessage = ""; //$NON-NLS-1$
 

@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.remote.core.RemoteServices;
 import org.eclipse.ptp.remote.remotetools.core.messages.Messages;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
 import org.eclipse.ptp.remotetools.core.IRemoteFileTools;
@@ -430,13 +431,12 @@ public class RemoteToolsFileStore extends FileStore {
 	 * @throws CoreException
 	 */
 	private IRemoteExecutionManager getExecutionManager(IProgressMonitor monitor) throws CoreException {
-		final RemoteToolsServices services = RemoteToolsServices.getInstance();
-		if (!services.isInitialized()) {
-			services.initialize();
-			if (!services.isInitialized()) {
-				throw new CoreException(new Status(IStatus.ERROR, RemoteToolsAdapterCorePlugin.getDefault().getBundle()
-						.getSymbolicName(), EFS.ERROR_INTERNAL, Messages.RemoteToolsFileStore_5, null));
-			}
+		SubMonitor progress = SubMonitor.convert(monitor, 100);
+		final RemoteToolsServices services = (RemoteToolsServices) RemoteServices.getRemoteServices(
+				RemoteToolsServices.REMOTE_TOOLS_ID, progress.newChild(20));
+		if (services == null) {
+			throw new CoreException(new Status(IStatus.ERROR, RemoteToolsAdapterCorePlugin.getDefault().getBundle()
+					.getSymbolicName(), EFS.ERROR_INTERNAL, Messages.RemoteToolsFileStore_5, null));
 		}
 		final RemoteToolsConnectionManager connMgr = (RemoteToolsConnectionManager) services.getConnectionManager();
 		if (connMgr == null) {
@@ -450,12 +450,12 @@ public class RemoteToolsFileStore extends FileStore {
 		}
 		if (!conn.isOpen()) {
 			try {
-				conn.open(monitor);
+				conn.open(progress.newChild(80));
 			} catch (Exception e) {
 				throw new CoreException(new Status(IStatus.ERROR, RemoteToolsAdapterCorePlugin.getDefault().getBundle()
 						.getSymbolicName(), EFS.ERROR_INTERNAL, e.getLocalizedMessage(), e));
 			}
-			if (monitor.isCanceled()) {
+			if (progress.isCanceled()) {
 				throw new CoreException(new Status(IStatus.ERROR, RemoteToolsAdapterCorePlugin.getDefault().getBundle()
 						.getSymbolicName(), EFS.ERROR_INTERNAL, Messages.RemoteToolsFileStore_12, null));
 			}

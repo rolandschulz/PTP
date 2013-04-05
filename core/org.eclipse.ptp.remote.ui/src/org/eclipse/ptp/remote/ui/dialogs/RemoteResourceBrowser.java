@@ -28,14 +28,17 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.ptp.internal.remote.ui.DeferredFileStore;
+import org.eclipse.ptp.internal.remote.ui.RemoteContentProvider;
+import org.eclipse.ptp.internal.remote.ui.RemoteResourceComparator;
+import org.eclipse.ptp.internal.remote.ui.RemoteUIImages;
+import org.eclipse.ptp.internal.remote.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.internal.ui.RemoteUIImages;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
-import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
-import org.eclipse.ptp.remote.ui.messages.Messages;
+import org.eclipse.ptp.remote.ui.RemoteUIServices;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -108,7 +111,7 @@ public class RemoteResourceBrowser extends Dialog {
 			showConnections = true;
 		}
 		fConnMgr = services.getConnectionManager();
-		fUIConnMgr = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(services).getUIConnectionManager();
+		fUIConnMgr = RemoteUIServices.getRemoteUIServices(services).getUIConnectionManager();
 		setTitle(Messages.RemoteResourceBrowser_resourceTitle);
 		setType(FILE_BROWSER | DIRECTORY_BROWSER);
 	}
@@ -520,7 +523,7 @@ public class RemoteResourceBrowser extends Dialog {
 			public void widgetSelected(SelectionEvent e) {
 				String pathText = remotePathText.getText();
 				String newname = "/newfolder"; //$NON-NLS-1$  
-				remotePathText.setText(pathText + newname); 
+				remotePathText.setText(pathText + newname);
 				remotePathText.setSelection(pathText.length() + 1, pathText.length() + newname.length());
 				remotePathText.setFocus();
 			}

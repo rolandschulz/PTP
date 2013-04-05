@@ -122,10 +122,6 @@ public class RemoteConfigurationEnvironmentSupplier implements IConfigurationEnv
 					return null;
 				}
 
-				if (!remoteServices.isInitialized()) {
-					remoteServices.initialize();
-				}
-
 				IRemoteConnection connection = executionProvider.getConnection();
 
 				if (connection == null) {

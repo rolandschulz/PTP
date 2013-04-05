@@ -24,11 +24,10 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.internal.rdt.ui.RSEUtils;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
-import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
+import org.eclipse.ptp.remote.ui.RemoteUIServices;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -38,7 +37,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
 
@@ -48,7 +46,6 @@ import org.eclipse.swt.widgets.Text;
 public class RemoteBuildServiceFileLocationWidget extends Composite {
 
 	private IRemoteConnection fRemoteConnection = null;
-	private IRemoteServices fRemoteServices = null;
 
 	// /private final Label label;
 	private final Text text;
@@ -60,11 +57,13 @@ public class RemoteBuildServiceFileLocationWidget extends Composite {
 
 	private final Map<String, String> previousSelections = new HashMap<String, String>();
 
-	public RemoteBuildServiceFileLocationWidget(Composite parent, int style, final IRemoteServices remoteServices,
+	/**
+	 * @since 5.0
+	 */
+	public RemoteBuildServiceFileLocationWidget(Composite parent, int style,
 			IRemoteConnection initialConnection, String defaultPath) {
 		super(parent, style);
 
-		fRemoteServices = remoteServices;
 		fRemoteConnection = initialConnection;
 
 		GridLayout layout = new GridLayout(1, false);
@@ -87,7 +86,7 @@ public class RemoteBuildServiceFileLocationWidget extends Composite {
 			public void modifyText(ModifyEvent e) {
 				String path = text.getText();
 
-				previousSelections.put(key(remoteServices, fRemoteConnection), path);
+				previousSelections.put(key(fRemoteConnection), path);
 
 				for (Object listener : pathListeners.getListeners()) {
 					((IIndexFilePathChangeListener) listener).pathChanged(path);
@@ -140,12 +139,15 @@ public class RemoteBuildServiceFileLocationWidget extends Composite {
 	// text.setText(path); // modify event listener updates map
 	// }
 
-	public static String getDefaultPath(IRemoteServices remoteServices, IRemoteConnection connection) {
+	/**
+	 * @since 5.0
+	 */
+	public static String getDefaultPath(IRemoteConnection connection) {
 		// get the user's home directory
-		if(connection.isOpen()) {
+		if(connection != null && connection.isOpen()) {
 			String homeDir = connection.getProperty(IRemoteConnection.USER_HOME_PROPERTY);
 			if (homeDir != null) {
-				IFileStore homeStore = remoteServices.getFileManager(connection).getResource(homeDir);
+				IFileStore homeStore = connection.getRemoteServices().getFileManager(connection).getResource(homeDir);
 				URI uri = homeStore.toURI();
 				String pathString = EFSExtensionManager.getDefault().getPathFromURI(uri);
 				if(pathString!=null){
@@ -158,8 +160,8 @@ public class RemoteBuildServiceFileLocationWidget extends Composite {
 		return null;
 	}
 
-	private static String key(IRemoteServices remoteServices, IRemoteConnection connection) {
-		return remoteServices.getName() + ":" + connection.getName(); //$NON-NLS-1$
+	private static String key(IRemoteConnection connection) {
+		return connection.getRemoteServices().getName() + ":" + connection.getName(); //$NON-NLS-1$
 	}
 
 	public String getConfigLocationPath() {
@@ -175,7 +177,7 @@ public class RemoteBuildServiceFileLocationWidget extends Composite {
 	}
 
 	private void browse() {
-		IRemoteUIServices uiServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fRemoteServices);
+		IRemoteUIServices uiServices = RemoteUIServices.getRemoteUIServices(fRemoteConnection.getRemoteServices());
 		IRemoteUIFileManager fmConnection = uiServices.getUIFileManager();
 		fmConnection.setConnection(fRemoteConnection);
 		
@@ -185,24 +187,31 @@ public class RemoteBuildServiceFileLocationWidget extends Composite {
 	}
 
 	private void restoreDefault() {
-		String defaultPath = getDefaultPath(fRemoteServices, fRemoteConnection);
+		String defaultPath = getDefaultPath(fRemoteConnection);
+		if (defaultPath == null) {
+			defaultPath = ""; //$NON-NLS-1$
+		}
 		text.setText(defaultPath);
 	}
 
-	public void update(IRemoteServices services, IRemoteConnection connection) {
-		fRemoteServices = services;
+	/**
+	 * @since 5.0
+	 */
+	public void update(IRemoteConnection connection) {
 		fRemoteConnection = connection;
-		if (!connection.isOpen()) {
-			boolean res = MessageDialog.openQuestion(getShell(), Messages.getString("RemoteBuildServiceFileLocationWidget.2"),  //$NON-NLS-1$
-					NLS.bind(Messages.getString("RemoteBuildServiceFileLocationWidget.3"), connection.getName()));  //$NON-NLS-1$
-			if (res) {
-				IRemoteUIServices uiServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(services);
-				uiServices.getUIConnectionManager().openConnectionWithProgress(getShell(), null, connection);
+		if (connection != null) {
+			if (!connection.isOpen()) {
+				boolean res = MessageDialog.openQuestion(getShell(), Messages.getString("RemoteBuildServiceFileLocationWidget.2"),  //$NON-NLS-1$
+						NLS.bind(Messages.getString("RemoteBuildServiceFileLocationWidget.3"), connection.getName()));  //$NON-NLS-1$
+				if (res) {
+					IRemoteUIServices uiServices = RemoteUIServices.getRemoteUIServices(fRemoteConnection.getRemoteServices());
+					uiServices.getUIConnectionManager().openConnectionWithProgress(getShell(), null, connection);
+				}
 			}
-		}
-		String defaultPath = getDefaultPath(fRemoteServices, fRemoteConnection);
-		if (defaultPath != null) {
-			text.setText(defaultPath);
+			String defaultPath = getDefaultPath(fRemoteConnection);
+			if (defaultPath != null) {
+				text.setText(defaultPath);
+			}
 		}
 	}
 

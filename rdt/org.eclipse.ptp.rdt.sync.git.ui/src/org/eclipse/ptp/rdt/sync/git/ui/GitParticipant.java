@@ -29,7 +29,7 @@ import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
-import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
+import org.eclipse.ptp.remote.ui.RemoteUIServices;
 import org.eclipse.ptp.remote.ui.widgets.RemoteConnectionWidget;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.ServiceModelManager;
@@ -135,8 +135,8 @@ public class GitParticipant implements ISynchronizeParticipant {
 				if (fSelectedConnection != null) {
 					checkConnection();
 					if (fSelectedConnection.isOpen()) {
-						IRemoteUIServices remoteUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(
-								fSelectedConnection.getRemoteServices());
+						IRemoteUIServices remoteUIServices = RemoteUIServices.getRemoteUIServices(fSelectedConnection
+								.getRemoteServices());
 						if (remoteUIServices != null) {
 							IRemoteUIFileManager fileMgr = remoteUIServices.getUIFileManager();
 							if (fileMgr != null) {
@@ -230,8 +230,8 @@ public class GitParticipant implements ISynchronizeParticipant {
 	 */
 	private IRemoteUIConnectionManager getUIConnectionManager() {
 		if (fSelectedConnection != null) {
-			IRemoteUIConnectionManager connectionManager = PTPRemoteUIPlugin.getDefault()
-					.getRemoteUIServices(fSelectedConnection.getRemoteServices()).getUIConnectionManager();
+			IRemoteUIConnectionManager connectionManager = RemoteUIServices.getRemoteUIServices(
+					fSelectedConnection.getRemoteServices()).getUIConnectionManager();
 			return connectionManager;
 		}
 		return null;

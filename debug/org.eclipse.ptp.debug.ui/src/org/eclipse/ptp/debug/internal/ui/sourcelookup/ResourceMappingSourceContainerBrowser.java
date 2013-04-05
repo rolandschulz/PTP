@@ -23,7 +23,7 @@ import org.eclipse.ptp.debug.internal.core.sourcelookup.ResourceMappingSourceCon
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
+import org.eclipse.ptp.remote.core.RemoteServices;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
@@ -95,7 +95,7 @@ public class ResourceMappingSourceContainerBrowser extends AbstractSourceContain
 	private IRemoteConnection getRemoteConnection(ILaunchConfiguration configuration) {
 		String remId = LaunchUtils.getRemoteServicesId(configuration);
 		String connName = LaunchUtils.getConnectionName(configuration);
-		IRemoteServices rsrv = PTPRemoteUIPlugin.getDefault().getRemoteServices(remId, null);
+		IRemoteServices rsrv = RemoteServices.getRemoteServices(remId);
 		if (rsrv != null) {
 			IRemoteConnectionManager connMgr = rsrv.getConnectionManager();
 			if (connMgr != null) {

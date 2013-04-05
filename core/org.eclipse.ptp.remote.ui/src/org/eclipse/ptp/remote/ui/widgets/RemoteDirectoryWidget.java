@@ -14,11 +14,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.ptp.internal.remote.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
-import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
-import org.eclipse.ptp.remote.ui.messages.Messages;
+import org.eclipse.ptp.remote.ui.RemoteUIServices;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -228,15 +228,14 @@ public class RemoteDirectoryWidget extends Composite {
 
 	private IRemoteUIFileManager getUIFileManager() {
 		if (fRemoteConnection != null) {
-			return PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fRemoteConnection.getRemoteServices()).getUIFileManager();
+			return RemoteUIServices.getRemoteUIServices(fRemoteConnection.getRemoteServices()).getUIFileManager();
 		}
 		return null;
 	}
 
 	private IRemoteUIConnectionManager getUIConnectionManager() {
 		if (fRemoteConnection != null) {
-			return PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fRemoteConnection.getRemoteServices())
-					.getUIConnectionManager();
+			return RemoteUIServices.getRemoteUIServices(fRemoteConnection.getRemoteServices()).getUIConnectionManager();
 		}
 		return null;
 	}

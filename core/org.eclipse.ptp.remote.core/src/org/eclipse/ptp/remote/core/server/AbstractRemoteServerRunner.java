@@ -35,13 +35,12 @@ import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.internal.remote.core.DebugUtil;
+import org.eclipse.ptp.internal.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.internal.remote.core.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
-import org.eclipse.ptp.remote.core.RemoteVariableManager;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.osgi.framework.Bundle;
 

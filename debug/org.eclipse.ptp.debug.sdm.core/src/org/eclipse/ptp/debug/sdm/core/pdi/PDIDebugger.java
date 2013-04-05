@@ -53,7 +53,7 @@ import org.eclipse.ptp.debug.sdm.core.proxy.ProxyDebugClient;
 import org.eclipse.ptp.proxy.debug.event.IProxyDebugEventListener;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.core.RemoteServices;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
 /**
@@ -311,7 +311,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 			throws CoreException {
 		String remId = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_REMOTE_SERVICES_ID, (String) null);
 		if (remId != null) {
-			IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(remId, monitor);
+			IRemoteServices services = RemoteServices.getRemoteServices(remId, monitor);
 			if (services != null) {
 				String name = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_CONNECTION_NAME, (String) null);
 				if (name != null) {

@@ -24,7 +24,6 @@ import java.util.Set;
 
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.ICommandLauncher;
-import org.eclipse.cdt.managedbuilder.core.IBuilder;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.core.resources.IProject;
@@ -35,7 +34,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ptp.ems.core.EnvManagerProjectProperties;
 import org.eclipse.ptp.ems.core.EnvManagerRegistry;
 import org.eclipse.ptp.ems.core.IEnvManager;
@@ -49,18 +48,10 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
-import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.RemoteProcessAdapter;
 import org.eclipse.ptp.remote.core.RemoteProcessClosure;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
-/**
- * <strong>EXPERIMENTAL</strong>. This class or interface has been added as part of a work in progress. There is no guarantee that
- * this API will work or that it will remain the same. Please do not use this API without consulting with the RDT team.
- * 
- * @author crecoskie
- * @author Jeff Overbey
- */
 // TODO (Jeff): Remove/replace NON_ESCAPED_ASCII_CHARS, static initializer, and escape(String) after Bug 371691 is fixed
 public class SyncCommandLauncher implements ICommandLauncher {
 
@@ -86,27 +77,10 @@ public class SyncCommandLauncher implements ICommandLauncher {
 
 	protected Map<String, String> remoteEnvMap;
 
-	private boolean isCleanBuild;
-
 	/**
 	 * The number of milliseconds to pause between polling.
 	 */
 	protected static final long DELAY = 50L;
-
-	/**
-	 * 
-	 */
-	public SyncCommandLauncher() {
-	}
-
-	private boolean isCleanBuild(String[] args) {
-		for (String arg : args) {
-			if (IBuilder.DEFAULT_TARGET_CLEAN.equals(arg)) {
-				return true;
-			}
-		}
-		return false;
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -117,12 +91,12 @@ public class SyncCommandLauncher implements ICommandLauncher {
 	@Override
 	public Process execute(IPath commandPath, String[] args, String[] env, IPath changeToDirectory, final IProgressMonitor monitor)
 			throws CoreException {
-		isCleanBuild = isCleanBuild(args);
+		SubMonitor progress = SubMonitor.convert(monitor, 100);
 
 		// if there is no project associated to us then we cannot function... throw an exception
 		if (getProject() == null) {
-			throw new CoreException(new Status(IStatus.ERROR,
-					"org.eclipse.ptp.rdt.core", "RemoteCommandLauncher has not been associated with a project.")); //$NON-NLS-1$ //$NON-NLS-2$
+			throw new CoreException(new Status(IStatus.ERROR, RDTSyncCorePlugin.PLUGIN_ID,
+					"RemoteCommandLauncher has not been associated with a project.")); //$NON-NLS-1$
 		}
 
 		// Set correct directory
@@ -143,30 +117,22 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		try {
 			connection = bs.getRemoteConnection();
 		} catch (MissingConnectionException e2) {
-			throw new CoreException(new Status(IStatus.CANCEL,
-					"org.eclipse.ptp.rdt.sync.core", "Build canceled because connection does not exist")); //$NON-NLS-1$ //$NON-NLS-2$
+			throw new CoreException(new Status(IStatus.CANCEL, RDTSyncCorePlugin.PLUGIN_ID,
+					"Build canceled because connection does not exist")); //$NON-NLS-1$ 
 		}
 		if (!connection.isOpen()) {
 			try {
-				connection.open(monitor);
+				connection.open(progress.newChild(20));
 			} catch (RemoteConnectionException e1) {
 				// rethrow as CoreException
-				throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.ptp.rdt.core", "Error opening connection.", e1)); //$NON-NLS-1$ //$NON-NLS-2$
+				throw new CoreException(new Status(IStatus.ERROR, RDTSyncCorePlugin.PLUGIN_ID, "Error opening connection.", e1)); //$NON-NLS-1$
 			}
 		}
 
-		IRemoteServices remoteServices = connection.getRemoteServices();
-		if (remoteServices == null) {
-			return null;
-		}
-		if (!remoteServices.isInitialized()) {
-			remoteServices.initialize();
-		}
-
 		// Set process's command and environment
-		List<String> command = constructCommand(commandPath, args, connection, monitor);
+		List<String> command = constructCommand(commandPath, args, connection, progress.newChild(10));
 
-		IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, command);
+		IRemoteProcessBuilder processBuilder = connection.getRemoteServices().getProcessBuilder(connection, command);
 
 		remoteEnvMap = processBuilder.environment();
 
@@ -181,21 +147,20 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		}
 
 		// set the directory in which to run the command
-		IRemoteFileManager fileManager = remoteServices.getFileManager(connection);
+		IRemoteFileManager fileManager = connection.getRemoteServices().getFileManager(connection);
 		if (changeToDirectory != null && fileManager != null) {
 			processBuilder.directory(fileManager.getResource(changeToDirectory.toString()));
 		}
 
 		// Synchronize before building
-		SyncManager.syncBlocking(null, getProject(), SyncFlag.FORCE, new SubProgressMonitor(monitor, 10), null);
+		SyncManager.syncBlocking(null, getProject(), SyncFlag.FORCE, progress.newChild(60), null);
 
 		IRemoteProcess p = null;
 		try {
 			p = processBuilder.start();
 		} catch (IOException e) {
 			// rethrow as CoreException
-			throw new CoreException(
-					new Status(IStatus.ERROR, "org.eclipse.ptp.rdt.sync.core", "Error launching remote process.", e)); //$NON-NLS-1$ //$NON-NLS-2$
+			throw new CoreException(new Status(IStatus.ERROR, RDTSyncCorePlugin.PLUGIN_ID, "Error launching remote process.", e)); //$NON-NLS-1$ 
 		}
 
 		fRemoteProcess = p;
@@ -205,26 +170,18 @@ public class SyncCommandLauncher implements ICommandLauncher {
 
 	private List<String> constructCommand(IPath commandPath, String[] args, IRemoteConnection connection, IProgressMonitor monitor)
 			throws CoreException {
-		/*
-		 * Prior to Modules/SoftEnv support, this was the following:
-		 * 
-		 * List<String> command = new LinkedList<String>();
-		 * command.add(commandPath.toString());
-		 * for (int k = 0; k < args.length; k++) {
-		 * command.add(args[k]);
-		 * }
-		 */
+		SubMonitor progress = SubMonitor.convert(monitor, 100);
 
 		final EnvManagerProjectProperties projectProperties = new EnvManagerProjectProperties(getProject());
 		if (projectProperties.isEnvMgmtEnabled()) {
 			// Environment management is enabled for the build. Issue custom Modules/SoftEnv commands to configure the environment.
-			IEnvManager envManager = EnvManagerRegistry.getEnvManager(monitor, connection);
+			IEnvManager envManager = EnvManagerRegistry.getEnvManager(progress.newChild(50), connection);
 			try {
 				// Create and execute a Bash script which will configure the environment and then execute the command
 				final List<String> command = new LinkedList<String>();
 				command.add("bash"); //$NON-NLS-1$
 				command.add("-l"); //$NON-NLS-1$
-				final String bashScriptFilename = envManager.createBashScript(monitor, true, projectProperties,
+				final String bashScriptFilename = envManager.createBashScript(progress.newChild(50), true, projectProperties,
 						getCommandAsString(commandPath, args));
 				command.add(bashScriptFilename);
 				return command;

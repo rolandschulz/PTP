@@ -162,7 +162,7 @@ public class RSECIndexServiceProvider extends AbstractRemoteCIndexServiceProvide
 	}
 
 	/**
-	 * @since 4.3
+	 * @since 5.0
 	 */
 	public IRemoteInactiveHighlightingService getRemoteInactiveHighlightingService() {
 		if(!isConfigured())
@@ -188,7 +188,7 @@ public class RSECIndexServiceProvider extends AbstractRemoteCIndexServiceProvide
 	}
 
 	/**
-	 * @since 4.3
+	 * @since 5.0
 	 */
 	public IRemoteCodeFormattingService getRemoteCodeFormattingService() {
 		if(!isConfigured())

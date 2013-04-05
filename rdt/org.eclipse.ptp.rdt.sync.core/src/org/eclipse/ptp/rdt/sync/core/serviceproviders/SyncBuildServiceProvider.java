@@ -22,7 +22,7 @@ import org.eclipse.ptp.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.core.RemoteServices;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.services.core.ServiceProvider;
 
@@ -47,13 +47,7 @@ public class SyncBuildServiceProvider extends ServiceProvider {
 	public static final String NAME = Messages.SyncBuildServiceProvider_name;
 	public static final String DEFAULT_CONFIG_DIR_NAME = Messages.SyncBuildServiceProvider_configDir;
 
-	private IRemoteConnection fRemoteConnection = null;
-
 	private static String getDefaultPath(IRemoteServices remoteServices, IRemoteConnection connection) {
-		if (!remoteServices.isInitialized()) {
-			remoteServices.initialize();
-		}
-
 		if (remoteServices == null || connection == null) {
 			return null;
 		}
@@ -70,23 +64,12 @@ public class SyncBuildServiceProvider extends ServiceProvider {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider
-	 * #getConfigLocation()
-	 */
+	private IRemoteConnection fRemoteConnection = null;
+
 	/**
 	 */
 	public String getConfigLocation() {
 		return getString(REMOTE_BUILD_SERVICE_PROVIDER_CONFIG_LOCATION, getDefaultPath(getRemoteServices(), getConnection()));
-	}
-
-	/**
-	 */
-	public void setConfigLocation(String configLocation) {
-		putString(REMOTE_BUILD_SERVICE_PROVIDER_CONFIG_LOCATION, configLocation);
 	}
 
 	@Override
@@ -97,20 +80,10 @@ public class SyncBuildServiceProvider extends ServiceProvider {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider
-	 * #getConnection()
-	 */
-	public IRemoteConnection getConnection() {
+	private IRemoteConnection getConnection() {
 		if (fRemoteConnection == null && getRemoteConnectionName() != null) {
 			IRemoteServices services = getRemoteServices();
 			if (services != null) {
-				if (!services.isInitialized()) {
-					services.initialize();
-				}
 				IRemoteConnectionManager manager = services.getConnectionManager();
 				if (manager != null) {
 					fRemoteConnection = manager.getConnection(getRemoteConnectionName());
@@ -139,22 +112,8 @@ public class SyncBuildServiceProvider extends ServiceProvider {
 		return getString(REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_CONNECTION_NAME, null);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider
-	 * #getRemoteServices()
-	 */
-	public IRemoteServices getRemoteServices() {
-		IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(getRemoteToolsProviderID());
-		if (!services.isInitialized()) {
-			services.initialize();
-		}
-		if (!services.isInitialized()) {
-			return null;
-		}
-		return services;
+	private IRemoteServices getRemoteServices() {
+		return RemoteServices.getRemoteServices(getRemoteToolsProviderID());
 	}
 
 	/**
@@ -163,13 +122,19 @@ public class SyncBuildServiceProvider extends ServiceProvider {
 	 * 
 	 * @return remote tools provider ID
 	 */
-	public String getRemoteToolsProviderID() {
+	private String getRemoteToolsProviderID() {
 		return getString(REMOTE_BUILD_SERVICE_PROVIDER_REMOTE_TOOLS_PROVIDER_ID, null);
 	}
 
 	@Override
 	public boolean isConfigured() {
 		return (getRemoteToolsProviderID() != null && getRemoteConnectionName() != null);
+	}
+
+	/**
+	 */
+	public void setConfigLocation(String configLocation) {
+		putString(REMOTE_BUILD_SERVICE_PROVIDER_CONFIG_LOCATION, configLocation);
 	}
 
 	/**

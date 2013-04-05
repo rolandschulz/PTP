@@ -17,7 +17,7 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.core.RemoteServices;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
 public class FileStoreTests extends TestCase {
@@ -105,7 +105,7 @@ public class FileStoreTests extends TestCase {
 	 */
 	@Override
 	protected void setUp() throws Exception {
-		fRemoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices("org.eclipse.ptp.remote.RemoteTools");
+		fRemoteServices = RemoteServices.getRemoteServices("org.eclipse.ptp.remote.RemoteTools");
 		assertNotNull(fRemoteServices);
 
 		IRemoteConnectionManager connMgr = fRemoteServices.getConnectionManager();

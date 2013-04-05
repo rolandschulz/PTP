@@ -29,7 +29,7 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.core.RemoteServices;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.core.LaunchControllerManager;
@@ -168,8 +168,8 @@ public class ActionUtils {
 		String controlId = status.getString(JobStatusData.CONTROL_ID_ATTR);
 		if (controlId != null) {
 			ILaunchController control = LaunchControllerManager.getInstance().getLaunchController(controlId);
-			IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(control.getRemoteServicesId());
-			if (services.isInitialized()) {
+			IRemoteServices services = RemoteServices.getRemoteServices(control.getRemoteServicesId());
+			if (services != null) {
 				IRemoteConnection connection = services.getConnectionManager().getConnection(control.getConnectionName());
 				if (connection != null && connection.getUsername().equals(status.getString(JobStatusData.OWNER_ATTR))) {
 					return true;
@@ -293,11 +293,7 @@ public class ActionUtils {
 	 * @return file, if retrieval was successful
 	 */
 	private static IFileStore getRemoteFile(String remoteServicesId, String remoteConnectionName, String path, SubMonitor progress) {
-		if (PTPRemoteCorePlugin.getDefault() == null) {
-			return null;
-		}
-		IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault()
-				.getRemoteServices(remoteServicesId, progress.newChild(25));
+		IRemoteServices remoteServices = RemoteServices.getRemoteServices(remoteServicesId, progress.newChild(25));
 		if (remoteServices != null) {
 			IRemoteConnectionManager remoteConnectionManager = remoteServices.getConnectionManager();
 			if (remoteConnectionManager != null) {

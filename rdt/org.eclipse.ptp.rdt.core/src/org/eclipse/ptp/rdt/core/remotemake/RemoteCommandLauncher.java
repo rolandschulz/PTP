@@ -133,13 +133,6 @@ public class RemoteCommandLauncher implements ICommandLauncher {
 			if (remoteServices == null)
 				return null;
 			
-			if(!remoteServices.isInitialized()) {
-				remoteServices.initialize();
-			}
-			
-			if (remoteServices == null)
-				return null;
-			
 			IRemoteConnection connection = executionProvider.getConnection();
 			
 			if(!connection.isOpen()) {

@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.remote.core;singleton:=true
 Bundle-Version: 7.0.0.qualifier
-Bundle-Activator: org.eclipse.ptp.remote.core.PTPRemoteCorePlugin
+Bundle-Activator: org.eclipse.ptp.internal.remote.core.PTPRemoteCorePlugin
 Bundle-Vendor: %pluginProvider
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.filesystem,
@@ -11,7 +11,11 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.variables,
  org.eclipse.cdt.core
 Bundle-ActivationPolicy: lazy
-Export-Package: org.eclipse.ptp.remote.core,
+Export-Package: org.eclipse.ptp.internal.remote.core;x-friends:="org.eclipse.ptp.remote.ui",
+ org.eclipse.ptp.internal.remote.core.messages;x-internal:=true,
+ org.eclipse.ptp.internal.remote.core.preferences;x-friends:="org.eclipse.ptp.remote.ui",
+ org.eclipse.ptp.internal.remote.core.services.local;x-internal:=true,
+ org.eclipse.ptp.remote.core,
  org.eclipse.ptp.remote.core.exception,
  org.eclipse.ptp.remote.core.server
 Bundle-Localization: plugin

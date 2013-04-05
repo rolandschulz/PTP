@@ -16,7 +16,6 @@ import org.eclipse.ptp.internal.remote.core.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.IRemoteServicesDescriptor;
 import org.eclipse.ptp.remote.core.IRemoteServicesFactory;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 
 public class RemoteServicesProxy implements IRemoteServicesDescriptor {
 	private static final String ATTR_ID = "id"; //$NON-NLS-1$
@@ -70,6 +69,7 @@ public class RemoteServicesProxy implements IRemoteServicesDescriptor {
 	 * org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#canCreateConnections
 	 * ()
 	 */
+	@Override
 	public boolean canCreateConnections() {
 		return fNewConnections;
 	}
@@ -98,6 +98,7 @@ public class RemoteServicesProxy implements IRemoteServicesDescriptor {
 	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteServices#getId()
 	 */
+	@Override
 	public String getId() {
 		return fId;
 	}
@@ -107,6 +108,7 @@ public class RemoteServicesProxy implements IRemoteServicesDescriptor {
 	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteServices#getName()
 	 */
+	@Override
 	public String getName() {
 		return fName;
 	}
@@ -116,15 +118,15 @@ public class RemoteServicesProxy implements IRemoteServicesDescriptor {
 	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteServices#getScheme()
 	 */
+	@Override
 	public String getScheme() {
 		return fScheme;
 	}
 
 	/**
-	 * Get the remote services implementation for this descriptor.
+	 * Get the remote services implementation for this descriptor. The service has not been initialized.
 	 * 
-	 * @return the remote services implementation, or null if initialization
-	 *         failed
+	 * @return the remote services implementation
 	 */
 	public IRemoteServices getServices() {
 		loadServices();

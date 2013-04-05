@@ -26,7 +26,7 @@ import org.eclipse.ptp.launch.internal.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.core.RemoteServices;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateHandler;
@@ -123,8 +123,8 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	}
 
 	private IRemoteConnection getConnection(final ILaunchController control) {
-		final IRemoteServices remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(control.getRemoteServicesId(),
-				getProgressMonitor());
+		final IRemoteServices remoteServices = RemoteServices
+				.getRemoteServices(control.getRemoteServicesId(), getProgressMonitor());
 
 		if (remoteServices != null) {
 			IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();

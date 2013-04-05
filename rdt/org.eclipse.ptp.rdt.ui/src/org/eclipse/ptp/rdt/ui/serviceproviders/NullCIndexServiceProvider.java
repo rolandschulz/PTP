@@ -337,7 +337,7 @@ public class NullCIndexServiceProvider extends
 	}
 
 	/**
-	 * @since 4.3
+	 * @since 5.0
 	 */
 	public IRemoteInactiveHighlightingService getRemoteInactiveHighlightingService() {
 		 return new IRemoteInactiveHighlightingService() {
@@ -359,7 +359,7 @@ public class NullCIndexServiceProvider extends
 	}
 
 	/**
-	 * @since 4.3
+	 * @since 5.0
 	 */
 	public IRemoteCodeFormattingService getRemoteCodeFormattingService() {
 		return new IRemoteCodeFormattingService() {

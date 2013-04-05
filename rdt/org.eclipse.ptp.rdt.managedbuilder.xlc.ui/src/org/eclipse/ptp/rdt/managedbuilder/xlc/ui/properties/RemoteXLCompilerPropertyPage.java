@@ -24,7 +24,7 @@ import org.eclipse.ptp.rdt.core.resources.RemoteNature;
 import org.eclipse.ptp.rdt.managedbuilder.xlc.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
+import org.eclipse.ptp.remote.core.RemoteServices;
 import org.eclipse.swt.widgets.Composite;
 
 /**
@@ -49,16 +49,16 @@ public class RemoteXLCompilerPropertyPage extends XLCompilerPropertyPage {
 			super.createPathEditor();
 		}
 	}
-	
-		
+
 	/**
 	 * Get the remote connection of a given project
+	 * 
 	 * @param project
 	 * @since 3.0
 	 */
 	protected IRemoteConnection getRemoteConnection(IProject project) {
-		IRemoteServices[] providers = PTPRemoteUIPlugin.getDefault().getRemoteServices(null);
-		for (IRemoteServices provider:providers){
+		IRemoteServices provider = RemoteServices.getRemoteServices(project.getLocationURI());
+		if (provider != null) {
 			IRemoteConnection connection = provider.getConnectionManager().getConnection(project.getLocationURI());
 			if (connection != null) {
 				return connection;
@@ -102,7 +102,8 @@ public class RemoteXLCompilerPropertyPage extends XLCompilerPropertyPage {
 					// always return true, as we don't want to fail cases when
 					// compiler path is not existed
 					else if (!super.doCheckState()) {
-						setMessage(Messages.getString("XLCompilerPropertyPage_ErrorMsg", projectConnectedConnection.getName()), IMessageProvider.WARNING); //$NON-NLS-1$
+						setMessage(
+								Messages.getString("XLCompilerPropertyPage_ErrorMsg", projectConnectedConnection.getName()), IMessageProvider.WARNING); //$NON-NLS-1$
 					} else {
 						setMessage(originalMessage);
 					}

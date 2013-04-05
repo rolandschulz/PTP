@@ -26,10 +26,10 @@ import org.eclipse.ptp.debug.sdm.core.SDMPreferenceConstants;
 import org.eclipse.ptp.debug.sdm.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.core.RemoteServices;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
-import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
+import org.eclipse.ptp.remote.ui.RemoteUIServices;
 import org.eclipse.ptp.ui.preferences.ScrolledPageContent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -267,6 +267,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 					|| (fRemoteConnection.supportsTCPPortForwarding() && fSessionAddressText.getText().equals(LOCALHOST)));
 			updateEnablement();
 		} catch (CoreException e) {
+			// Ignore
 		}
 	}
 
@@ -335,8 +336,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 */
 	private String browseFile() {
 		if (fRemoteConnection != null) {
-			IRemoteUIServices remoteUISrv = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(
-					fRemoteConnection.getRemoteServices());
+			IRemoteUIServices remoteUISrv = RemoteUIServices.getRemoteUIServices(fRemoteConnection.getRemoteServices());
 			if (remoteUISrv != null) {
 				IRemoteUIFileManager fileManager = remoteUISrv.getUIFileManager();
 				if (fileManager != null) {
@@ -379,11 +379,13 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 				try {
 					getLaunchConfigurationDialog().run(false, true, new IRunnableWithProgress() {
 						public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-							services[0] = PTPRemoteCorePlugin.getDefault().getRemoteServices(remId, monitor);
+							services[0] = RemoteServices.getRemoteServices(remId, monitor);
 						}
 					});
 				} catch (InvocationTargetException e) {
+					// Ignore
 				} catch (InterruptedException e) {
+					// Ignore
 				}
 				if (services[0] != null) {
 					String name = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_CONNECTION_NAME, (String) null);
@@ -393,6 +395,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 				}
 			}
 		} catch (CoreException e) {
+			// Ignore
 		}
 		return null;
 	}

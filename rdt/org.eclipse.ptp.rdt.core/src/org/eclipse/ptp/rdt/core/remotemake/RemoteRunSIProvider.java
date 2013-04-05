@@ -130,13 +130,6 @@ public abstract class RemoteRunSIProvider implements IExternalScannerInfoProvide
 		if (remoteServices == null)
 			return false;
 		
-		if(!remoteServices.isInitialized()) {
-			remoteServices.initialize();
-		}
-		
-		if (remoteServices == null)
-			return false;
-		
 		IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, runCommand);
 		processBuilder.redirectErrorStream(true);
 

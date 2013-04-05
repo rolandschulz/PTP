@@ -16,7 +16,7 @@
          point="org.eclipse.tm.terminal.terminalConnectors">
       <connector name="%connectionName"
       id="org.eclipse.ptp.remote.internal.terminal.RemoteToolsConnector"
-      class="org.eclipse.ptp.remote.internal.terminal.RemoteToolsConnector"/>
+      class="org.eclipse.ptp.internal.remote.terminal.RemoteToolsConnector"/>
    </extension>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">

@@ -18,7 +18,7 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.core.RemoteServices;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.core.LaunchControllerManager;
 
@@ -59,7 +59,7 @@ public class RMLaunchUtils {
 			throws CoreException {
 		String remId = LaunchUtils.getRemoteServicesId(configuration);
 		if (remId != null) {
-			IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(remId, monitor);
+			IRemoteServices services = RemoteServices.getRemoteServices(remId, monitor);
 			if (services != null) {
 				String name = LaunchUtils.getConnectionName(configuration);
 				if (name != null) {
@@ -71,15 +71,10 @@ public class RMLaunchUtils {
 	}
 
 	public static IRemoteFileManager getLocalFileManager(ILaunchConfiguration configuration) throws CoreException {
-		IRemoteServices localServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
-		assert (localServices != null);
+		IRemoteServices localServices = RemoteServices.getLocalServices();
 		IRemoteConnectionManager lconnMgr = localServices.getConnectionManager();
-		assert (lconnMgr != null);
-		IRemoteConnection lconn = lconnMgr.getConnection(IRemoteConnectionManager.DEFAULT_CONNECTION_NAME);
-		assert (lconn != null);
-		IRemoteFileManager localFileManager = localServices.getFileManager(lconn);
-		assert (localFileManager != null);
-		return localFileManager;
+		IRemoteConnection lconn = lconnMgr.getConnection(IRemoteConnectionManager.LOCAL_CONNECTION_NAME);
+		return localServices.getFileManager(lconn);
 	}
 
 	public static IRemoteFileManager getRemoteFileManager(ILaunchConfiguration configuration, IProgressMonitor monitor)

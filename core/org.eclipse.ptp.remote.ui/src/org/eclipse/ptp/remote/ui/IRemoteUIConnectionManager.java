@@ -61,12 +61,14 @@ public interface IRemoteUIConnectionManager {
 	public IRemoteConnection newConnection(Shell shell, String[] attrHints, String[] attrHintValues);
 
 	/**
-	 * Attempt to open a connection using a progress monitor. Can be called on
-	 * either open or closed connections. Users should check connection.isOpen()
-	 * on return to determine if the connection was actually opened.
+	 * Attempt to open a connection using a progress monitor. Can be called on either open or closed connections, and will
+	 * initialize the remote services if necessary. Users should check connection.isOpen() on return to determine if the connection
+	 * was actually opened.
 	 * 
 	 * @param shell
 	 *            shell used to display dialogs
+	 * @param context
+	 *            runnable context for displaying progress indicator. Can be null.
 	 * @param connection
 	 *            connection to open
 	 * @since 5.0

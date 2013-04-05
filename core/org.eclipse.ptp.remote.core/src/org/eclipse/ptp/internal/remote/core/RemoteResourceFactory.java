@@ -14,7 +14,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.ptp.remote.core.IRemoteResource;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 
 /**
  * Factory to create an IRemoteResource

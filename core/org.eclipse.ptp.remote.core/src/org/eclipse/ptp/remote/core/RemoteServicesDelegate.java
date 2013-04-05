@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.ptp.internal.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.internal.remote.core.messages.Messages;
 
 /**
@@ -90,6 +91,20 @@ public class RemoteServicesDelegate {
 	}
 
 	/**
+	 * Replicated from core to avoid dependencies.
+	 * 
+	 * @param message
+	 * @param t
+	 * @return error status object
+	 */
+	private static IStatus getErrorStatus(String message, Throwable t) {
+		if (t != null) {
+			PTPRemoteCorePlugin.log(t);
+		}
+		return new Status(Status.ERROR, PTPRemoteCorePlugin.getUniqueIdentifier(), Status.ERROR, message, t);
+	}
+
+	/**
 	 * Checks for existence of file. If it does exist, tests to see if it is stable by checking size after the given timeout.
 	 * 
 	 * @param manager
@@ -131,6 +146,17 @@ public class RemoteServicesDelegate {
 		}
 		long l1 = info.getLength();
 		return l0 == l1;
+	}
+
+	/**
+	 * Replicated from core to avoid dependencies.
+	 * 
+	 * @param message
+	 * @param t
+	 * @return exception
+	 */
+	private static CoreException newException(String message, Throwable t) {
+		return new CoreException(getErrorStatus(message, t));
 	}
 
 	/**
@@ -228,31 +254,6 @@ public class RemoteServicesDelegate {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Replicated from core to avoid dependencies.
-	 * 
-	 * @param message
-	 * @param t
-	 * @return error status object
-	 */
-	private static IStatus getErrorStatus(String message, Throwable t) {
-		if (t != null) {
-			PTPRemoteCorePlugin.log(t);
-		}
-		return new Status(Status.ERROR, PTPRemoteCorePlugin.getUniqueIdentifier(), Status.ERROR, message, t);
-	}
-
-	/**
-	 * Replicated from core to avoid dependencies.
-	 * 
-	 * @param message
-	 * @param t
-	 * @return exception
-	 */
-	private static CoreException newException(String message, Throwable t) {
-		return new CoreException(getErrorStatus(message, t));
 	}
 
 	private final String remoteServicesId;
@@ -357,11 +358,11 @@ public class RemoteServicesDelegate {
 			return;
 		}
 		try {
-			localServices = PTPRemoteCorePlugin.getDefault().getDefaultServices();
+			localServices = RemoteServices.getLocalServices();
 			if (localServices != null) {
 				localConnectionManager = localServices.getConnectionManager();
 				if (localConnectionManager != null) {
-					localConnection = localConnectionManager.getConnection(IRemoteConnectionManager.DEFAULT_CONNECTION_NAME);
+					localConnection = localConnectionManager.getConnection(IRemoteConnectionManager.LOCAL_CONNECTION_NAME);
 				}
 				if (localConnection != null) {
 					localFileManager = localServices.getFileManager(localConnection);
@@ -369,7 +370,7 @@ public class RemoteServicesDelegate {
 			}
 
 			if (remoteServicesId != null) {
-				remoteServices = PTPRemoteCorePlugin.getDefault().getRemoteServices(remoteServicesId, progress.newChild(1));
+				remoteServices = RemoteServices.getRemoteServices(remoteServicesId, progress.newChild(1));
 				if (remoteServices != null) {
 					remoteConnectionManager = remoteServices.getConnectionManager();
 					if (remoteConnectionManager != null) {

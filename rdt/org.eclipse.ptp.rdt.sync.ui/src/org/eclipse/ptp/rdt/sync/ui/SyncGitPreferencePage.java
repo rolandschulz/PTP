@@ -31,19 +31,21 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.CommandRunner;
+import org.eclipse.ptp.rdt.sync.core.CommandRunner.CommandResults;
 import org.eclipse.ptp.rdt.sync.core.RecursiveSubMonitor;
 import org.eclipse.ptp.rdt.sync.core.RemoteExecutionException;
 import org.eclipse.ptp.rdt.sync.core.RemoteSyncException;
-import org.eclipse.ptp.rdt.sync.core.CommandRunner.CommandResults;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemotePreferenceConstants;
 import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.RemoteServices;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
-import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
+import org.eclipse.ptp.remote.ui.RemoteUIServices;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -98,7 +100,7 @@ public class SyncGitPreferencePage extends PreferencePage implements IWorkbenchP
 				update();
 			}
 		});
-		
+
 		fUseDefaultGitLocationCheckbox = new Button(composite, SWT.CHECK);
 		gd = new GridData();
 		gd.horizontalSpan = 2;
@@ -130,7 +132,7 @@ public class SyncGitPreferencePage extends PreferencePage implements IWorkbenchP
 				if (fSelectedConnection == null) {
 					return;
 				}
-				if(!fSelectedConnection.isOpen()) {
+				if (!fSelectedConnection.isOpen()) {
 					IRemoteUIConnectionManager mgr = getUIConnectionManager();
 					if (mgr != null) {
 						mgr.openConnectionWithProgress(fConnectionCombo.getShell(), null, fSelectedConnection);
@@ -139,8 +141,7 @@ public class SyncGitPreferencePage extends PreferencePage implements IWorkbenchP
 				if (!fSelectedConnection.isOpen()) {
 					return;
 				}
-				IRemoteUIServices remoteUIServices = PTPRemoteUIPlugin.getDefault().
-						getRemoteUIServices(fSelectedConnection.getRemoteServices());
+				IRemoteUIServices remoteUIServices = RemoteUIServices.getRemoteUIServices(fSelectedConnection.getRemoteServices());
 				if (remoteUIServices == null) {
 					return;
 				}
@@ -149,15 +150,15 @@ public class SyncGitPreferencePage extends PreferencePage implements IWorkbenchP
 					return;
 				}
 				fileMgr.setConnection(fSelectedConnection);
-				String selectedPath = fileMgr.browseFile(fGitLocationText.getShell(),
-						Messages.SyncGitPreferencePage_3 + fSelectedConnection.getName() + ")", null, //$NON-NLS-1$
+				String selectedPath = fileMgr.browseFile(fGitLocationText.getShell(), Messages.SyncGitPreferencePage_3
+						+ fSelectedConnection.getName() + ")", null, //$NON-NLS-1$
 						IRemoteUIConstants.NONE);
 				if (selectedPath != null) {
 					fGitLocationText.setText(selectedPath);
 				}
 			}
 		});
-		
+
 		fGitValidateButton = new Button(composite, SWT.PUSH);
 		gd = new GridData();
 		gd.horizontalSpan = 2;
@@ -171,10 +172,10 @@ public class SyncGitPreferencePage extends PreferencePage implements IWorkbenchP
 				update();
 			}
 		});
-		
+
 		this.populateConnectionCombo(fConnectionCombo);
 		this.handleConnectionSelected();
-		
+
 		return composite;
 	}
 
@@ -182,7 +183,7 @@ public class SyncGitPreferencePage extends PreferencePage implements IWorkbenchP
 	public void init(IWorkbench arg0) {
 		// nothing to do
 	}
-	
+
 	public void update() {
 		this.validatePath();
 		this.validatePage();
@@ -190,7 +191,7 @@ public class SyncGitPreferencePage extends PreferencePage implements IWorkbenchP
 		getContainer().updateButtons();
 		updateApplyButton();
 	}
-	
+
 	@Override
 	public void performApply() {
 		this.storeConnectionSettings();
@@ -217,7 +218,7 @@ public class SyncGitPreferencePage extends PreferencePage implements IWorkbenchP
 			return gitWarningMessage;
 		}
 	}
-	
+
 	@Override
 	public int getMessageType() {
 		// Currently all messages are warning messages.
@@ -269,7 +270,7 @@ public class SyncGitPreferencePage extends PreferencePage implements IWorkbenchP
 		if (fConnectionNameToGitPathMap.containsKey(fSelectedConnection)) {
 			gitBinary = fConnectionNameToGitPathMap.get(fSelectedConnection);
 
-		// If not there, load from preference store
+			// If not there, load from preference store
 		} else {
 			IScopeContext context = InstanceScope.INSTANCE;
 			Preferences prefSyncNode = context.getNode(instanceScopeSyncNode);
@@ -338,25 +339,17 @@ public class SyncGitPreferencePage extends PreferencePage implements IWorkbenchP
 	// Return the remote service to use or null if it cannot be found.
 	// Currently, we simply always return the remote tools provider, which *should* always be available.
 	IRemoteServices remoteServicesProvider = null;
+
 	private IRemoteServices getRemoteServicesProvider() {
-		if (remoteServicesProvider != null) {
-			return remoteServicesProvider;
+		if (remoteServicesProvider == null) {
+			remoteServicesProvider = RemoteServices.getRemoteServices(IRemotePreferenceConstants.REMOTE_TOOLS_REMOTE_SERVICES_ID);
 		}
-
-		IRemoteServices[] providers = PTPRemoteUIPlugin.getDefault().getRemoteServices(null);
-		for (int i = 0; i < providers.length; i++) {
-			if  (providers[i].getName().equals("Remote Tools")) { //$NON-NLS-1$
-				remoteServicesProvider = providers[i];
-				break;
-			}
-		}
-
 		return remoteServicesProvider;
 	}
-	
+
 	private IRemoteUIConnectionManager getUIConnectionManager() {
 		IRemoteServices rs = this.getRemoteServicesProvider();
-		IRemoteUIConnectionManager connectionManager = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(rs).getUIConnectionManager();
+		IRemoteUIConnectionManager connectionManager = RemoteUIServices.getRemoteUIServices(rs).getUIConnectionManager();
 		return connectionManager;
 	}
 
@@ -372,11 +365,11 @@ public class SyncGitPreferencePage extends PreferencePage implements IWorkbenchP
 			pathErrorMessage = Messages.SyncGitPreferencePage_4;
 			return false;
 		}
-    	if (!gitPath.isAbsolute()) {
-    		pathErrorMessage = Messages.SyncGitPreferencePage_5;
-    		return false;
-    	}
-    	return true;
+		if (!gitPath.isAbsolute()) {
+			pathErrorMessage = Messages.SyncGitPreferencePage_5;
+			return false;
+		}
+		return true;
 	}
 
 	// Deeper path validation that uses Git on the remote machine
@@ -386,7 +379,7 @@ public class SyncGitPreferencePage extends PreferencePage implements IWorkbenchP
 		if (!this.validatePath()) {
 			return false;
 		}
-		
+
 		// If use default is selected, assume the user wants to retrieve and validate the system default Git.
 		if (fUseDefaultGitLocationCheckbox.getSelection()) {
 			gitErrorMessage = this.setSystemDefaultGit();
@@ -397,7 +390,7 @@ public class SyncGitPreferencePage extends PreferencePage implements IWorkbenchP
 		// Otherwise, assume the user wants to validate whatever is in the textbox.
 		IPath gitPath;
 		gitPath = new Path(fGitLocationText.getText());
-    	List<String> args = Arrays.asList(gitPath.toString(), "--version"); //$NON-NLS-1$
+		List<String> args = Arrays.asList(gitPath.toString(), "--version"); //$NON-NLS-1$
 		String errorMessage = null;
 		CommandResults cr = null;
 		try {
@@ -434,7 +427,7 @@ public class SyncGitPreferencePage extends PreferencePage implements IWorkbenchP
 		// Prefer false positives to false negatives. Return true by default.
 		return true;
 	}
-	
+
 	// Retrieve system default Git and place in textbox
 	// Return error message
 	private String setSystemDefaultGit() {
@@ -468,6 +461,7 @@ public class SyncGitPreferencePage extends PreferencePage implements IWorkbenchP
 
 	// Wrapper for running commands - wraps exceptions and invoking of command runner inside container run command.
 	private CommandResults remoteCommandResults;
+
 	private CommandResults runRemoteCommand(final List<String> command, final String commandDesc) throws RemoteExecutionException {
 		try {
 			new ProgressMonitorDialog(composite.getShell()).run(true, true, new IRunnableWithProgress() {
@@ -476,7 +470,8 @@ public class SyncGitPreferencePage extends PreferencePage implements IWorkbenchP
 					RecursiveSubMonitor progress = RecursiveSubMonitor.convert(monitor, 100);
 					progress.subTask(commandDesc);
 					try {
-						remoteCommandResults = CommandRunner.executeRemoteCommand(fSelectedConnection, command, null, progress.newChild(100));
+						remoteCommandResults = CommandRunner.executeRemoteCommand(fSelectedConnection, command, null,
+								progress.newChild(100));
 					} catch (RemoteSyncException e) {
 						throw new InvocationTargetException(e);
 					} catch (IOException e) {
@@ -553,7 +548,7 @@ public class SyncGitPreferencePage extends PreferencePage implements IWorkbenchP
 					prefGitNode = prefSyncNode.node(GIT_LOCATION_NODE_NAME);
 				}
 			}
-			
+
 			if (entry.getValue() == null) {
 				prefGitNode.remove(entry.getKey().getName());
 			} else {
@@ -566,14 +561,14 @@ public class SyncGitPreferencePage extends PreferencePage implements IWorkbenchP
 
 	/**
 	 * Parse raw output of "git --version" and return an integer representation of the version, suitable for comparisons.
+	 * 
 	 * @param versionCommandOutput
 	 * @return version integer or 0 on failure to parse
 	 */
 	public static int parseGitVersionAsInt(String versionCommandOutput) {
 		Matcher m = Pattern.compile("git version ([0-9]+)\\.([0-9]+)\\.([0-9]+).*").matcher(versionCommandOutput.trim()); //$NON-NLS-1$
 		if (m.matches()) {
-			return Integer.parseInt(m.group(1)) * 10000 +
-					Integer.parseInt(m.group(2)) * 100 + Integer.parseInt(m.group(3));
+			return Integer.parseInt(m.group(1)) * 10000 + Integer.parseInt(m.group(2)) * 100 + Integer.parseInt(m.group(3));
 		} else {
 			return 0;
 		}
@@ -581,6 +576,7 @@ public class SyncGitPreferencePage extends PreferencePage implements IWorkbenchP
 
 	/**
 	 * Parse raw output of "git --version" and return the version string, suitable for displaying to users.
+	 * 
 	 * @param versionCommandOutput
 	 * @return version string or null on failure to parse
 	 */

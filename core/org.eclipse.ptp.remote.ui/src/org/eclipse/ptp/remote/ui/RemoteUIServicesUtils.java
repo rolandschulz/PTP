@@ -9,15 +9,25 @@
  ******************************************************************************/
 package org.eclipse.ptp.remote.ui;
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableContext;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.ptp.internal.remote.ui.PTPRemoteUIPlugin;
+import org.eclipse.ptp.internal.remote.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
-import org.eclipse.ptp.remote.ui.messages.Messages;
+import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.ui.widgets.RemoteConnectionWidget;
 import org.eclipse.swt.widgets.Shell;
 
@@ -49,8 +59,7 @@ public class RemoteUIServicesUtils {
 	 *            whether to use the remote or the local connection and service
 	 *            provided by the delegate
 	 * @param readOnly
-	 *            whether to disallow the user to type in a path (default is
-	 *            <code>true</code>)
+	 *            whether to disallow the user to type in a path (default is <code>true</code>)
 	 * @param dir
 	 *            whether to browse/return a directory (default is file)
 	 * @return the selected file path as URI or <code>null</code> if canceled
@@ -68,13 +77,13 @@ public class RemoteUIServicesUtils {
 		int type = readOnly ? IRemoteUIConstants.OPEN : IRemoteUIConstants.SAVE;
 
 		if (!remote) {
-			uIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(delegate.getLocalServices());
+			uIServices = RemoteUIServices.getRemoteUIServices(delegate.getLocalServices());
 			uiFileManager = uIServices.getUIFileManager();
 			manager = delegate.getLocalFileManager();
 			conn = delegate.getLocalConnection();
 			home = delegate.getLocalHome();
 		} else {
-			uIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(delegate.getRemoteServices());
+			uIServices = RemoteUIServices.getRemoteUIServices(delegate.getRemoteServices());
 			uiFileManager = uIServices.getUIFileManager();
 			manager = delegate.getRemoteFileManager();
 			conn = delegate.getRemoteConnection();
@@ -101,6 +110,44 @@ public class RemoteUIServicesUtils {
 		}
 
 		return manager.toURI(path);
+	}
+
+	/**
+	 * @param shell
+	 * @param context
+	 * @param connection
+	 * @since 7.0
+	 */
+	public static void openConnectionWithProgress(final Shell shell, IRunnableContext context, final IRemoteConnection connection) {
+		if (!connection.isOpen()) {
+			IRunnableWithProgress op = new IRunnableWithProgress() {
+				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+					try {
+						connection.open(monitor);
+					} catch (RemoteConnectionException e) {
+						throw new InvocationTargetException(e);
+					}
+					if (monitor.isCanceled()) {
+						throw new InterruptedException();
+					}
+				}
+			};
+			try {
+				if (context != null) {
+					context.run(true, true, op);
+				} else {
+					new ProgressMonitorDialog(shell).run(true, true, op);
+				}
+			} catch (InvocationTargetException e) {
+				ErrorDialog.openError(shell, Messages.AbstractRemoteUIConnectionManager_Connection_Error,
+						Messages.AbstractRemoteUIConnectionManager_Could_not_open_connection, new Status(IStatus.ERROR,
+								PTPRemoteUIPlugin.PLUGIN_ID, e.getCause().getMessage()));
+			} catch (InterruptedException e) {
+				ErrorDialog.openError(shell, Messages.AbstractRemoteUIConnectionManager_Connection_Error,
+						Messages.AbstractRemoteUIConnectionManager_Could_not_open_connection, new Status(IStatus.ERROR,
+								PTPRemoteUIPlugin.PLUGIN_ID, e.getMessage()));
+			}
+		}
 	}
 
 	/**

@@ -16,18 +16,17 @@ import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
 public interface IRemoteConnectionManager {
 	/**
-	 * The name of the connection for the default remote services
+	 * The name of the connection for the local services
 	 * 
-	 * @since 5.0
+	 * @since 7.0
 	 */
-	public static String DEFAULT_CONNECTION_NAME = "Local"; //$NON-NLS-1$
+	public static String LOCAL_CONNECTION_NAME = "Local"; //$NON-NLS-1$
 
 	/**
 	 * Gets the remote connection corresponding to the supplied name.
 	 * 
 	 * @param name
-	 *            name of the connection (as returned by
-	 *            {@link IRemoteConnection#getName()})
+	 *            name of the connection (as returned by {@link IRemoteConnection#getName()})
 	 * @return remote connection or null if no connection exists
 	 */
 	public IRemoteConnection getConnection(String name);

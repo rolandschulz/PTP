@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.ems.core.IEnvManagerConfig;
 import org.eclipse.ptp.internal.ems.core.EMSCorePlugin;
@@ -131,7 +132,8 @@ public abstract class AbstractEnvManager implements IEnvManager {
 	 * @throws RemoteConnectionException
 	 * @throws IOException
 	 */
-	protected final List<String> runCommand(IProgressMonitor pm, boolean requireCleanExit, String... command) throws RemoteConnectionException,
+	protected final List<String> runCommand(IProgressMonitor pm, boolean requireCleanExit, String... command)
+			throws RemoteConnectionException,
 			IOException {
 		log(IStatus.INFO, "Running remote command; clean exit%s required:", requireCleanExit ? "" : " not"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		for (int i = 0; i < command.length; i++) {
@@ -197,25 +199,19 @@ public abstract class AbstractEnvManager implements IEnvManager {
 		return p.isCompleted();
 	}
 
-	private IRemoteProcessBuilder createRemoteProcessBuilder(IProgressMonitor pm, String... command) throws RemoteConnectionException {
+	private IRemoteProcessBuilder createRemoteProcessBuilder(IProgressMonitor pm, String... command)
+			throws RemoteConnectionException {
+		SubMonitor monitor = SubMonitor.convert(pm, 100);
 		final IRemoteConnection connection = getRemoteConnection();
 		if (connection == null) {
 			return null;
 		}
 
-		final IRemoteServices remoteServices = getRemoteServices();
-		if (remoteServices == null) {
-			return null;
-		}
-		if (!remoteServices.isInitialized()) {
-			remoteServices.initialize();
-		}
-
 		if (!connection.isOpen()) {
-			connection.open(pm);
+			connection.open(monitor.newChild(80));
 		}
 
-		return remoteServices.getProcessBuilder(connection, command);
+		return connection.getRemoteServices().getProcessBuilder(connection, command);
 	}
 
 	private void readLines(InputStream input, List<String> result) throws IOException {
@@ -227,8 +223,8 @@ public abstract class AbstractEnvManager implements IEnvManager {
 	}
 
 	/**
-	 * Runs the given command on the remote machine that has been configured by {@link #configure(IRemoteConnection)}
-	 * using <tt>bash --login -c </tt><i>command</i>.
+	 * Runs the given command on the remote machine that has been configured by {@link #configure(IRemoteConnection)} using
+	 * <tt>bash --login -c </tt><i>command</i>.
 	 * <p>
 	 * This is a convenience method equivalent to <tt>runCommand(pm, true, "bash", "--login", "-c", command)</tt>.
 	 * 
@@ -243,7 +239,8 @@ public abstract class AbstractEnvManager implements IEnvManager {
 	 * @throws RemoteConnectionException
 	 * @throws IOException
 	 */
-	protected final List<String> runCommandInBashLoginShell(IProgressMonitor pm, String command) throws RemoteConnectionException, IOException {
+	protected final List<String> runCommandInBashLoginShell(IProgressMonitor pm, String command) throws RemoteConnectionException,
+			IOException {
 		return runCommand(pm, false, "bash", "--login", "-c", command); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 

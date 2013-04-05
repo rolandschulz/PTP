@@ -36,7 +36,7 @@ import org.eclipse.ptp.launch.internal.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
-import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
+import org.eclipse.ptp.remote.ui.RemoteUIServices;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -256,7 +256,7 @@ public class WorkingDirectoryBlock extends LaunchConfigurationTab {
 			// Ignore
 		}
 		if (conn[0] != null) {
-			IRemoteUIServices remoteUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(conn[0].getRemoteServices());
+			IRemoteUIServices remoteUIServices = RemoteUIServices.getRemoteUIServices(conn[0].getRemoteServices());
 			if (remoteUIServices != null) {
 				IRemoteUIFileManager fileManager = remoteUIServices.getUIFileManager();
 				if (fileManager != null) {

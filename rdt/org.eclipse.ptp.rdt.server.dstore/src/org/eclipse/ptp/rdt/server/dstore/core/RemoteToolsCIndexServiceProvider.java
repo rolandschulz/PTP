@@ -38,7 +38,7 @@ import org.eclipse.ptp.rdt.server.dstore.messages.Messages;
 import org.eclipse.ptp.rdt.ui.serviceproviders.IRemoteToolsIndexServiceProvider;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.core.RemoteServices;
 import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.IServiceProviderWorkingCopy;
 import org.eclipse.ptp.services.core.ServiceProvider;
@@ -275,14 +275,7 @@ public class RemoteToolsCIndexServiceProvider extends ServiceProvider implements
 		if (!isConfigured()) {
 			return null;
 		}
-		IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(getServiceId());
-		if (!services.isInitialized()) {
-			services.initialize();
-		}
-		if (!services.isInitialized()) {
-			return null;
-		}
-		return services;
+		return RemoteServices.getRemoteServices(getServiceId());
 	}
 
 	/*
@@ -431,15 +424,10 @@ public class RemoteToolsCIndexServiceProvider extends ServiceProvider implements
 
 	private void initialize() {
 		if (fSubsystem == null && getServiceId() != null) {
-			IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(getServiceId());
-			if (services != null) {
-				if (!services.isInitialized()) {
-					services.initialize();
-				}
-				if (services.isInitialized() && getConnectionName() != null) {
-					IRemoteConnection connection = services.getConnectionManager().getConnection(getConnectionName());
-					setConnection(connection, false);
-				}
+			IRemoteServices services = RemoteServices.getRemoteServices(getServiceId());
+			if (services != null && getConnectionName() != null) {
+				IRemoteConnection connection = services.getConnectionManager().getConnection(getConnectionName());
+				setConnection(connection, false);
 			}
 		}
 	}

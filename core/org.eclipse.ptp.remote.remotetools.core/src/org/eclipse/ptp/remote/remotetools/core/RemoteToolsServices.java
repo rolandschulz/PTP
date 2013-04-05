@@ -10,38 +10,27 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.remotetools.core;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.remote.core.AbstractRemoteServices;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
+import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServicesDescriptor;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.remotetools.environment.EnvironmentPlugin;
 import org.eclipse.ptp.remotetools.environment.core.TargetEnvironmentManager;
 import org.eclipse.ptp.remotetools.environment.core.TargetTypeElement;
 
 public class RemoteToolsServices extends AbstractRemoteServices {
-	private static final String TARGET_ELEMENT_NAME = "Remote Host"; //$NON-NLS-1$
-	private static final String REMOTE_TOOLS_ID = "org.eclipse.ptp.remote.RemoteTools"; //$NON-NLS-1$
-	private static RemoteToolsServices instance = null;
+	public static final String REMOTE_TOOLS_ID = "org.eclipse.ptp.remote.RemoteTools"; //$NON-NLS-1$
 
-	/**
-	 * Get shared instance of this class
-	 * 
-	 * @return instance
-	 */
-	public static RemoteToolsServices getInstance() {
-		if (instance == null) {
-			IRemoteServicesDescriptor descriptor = PTPRemoteCorePlugin.getDefault().getRemoteServicesDescriptor(REMOTE_TOOLS_ID);
-			instance = new RemoteToolsServices(descriptor);
-		}
-		return instance;
-	}
+	private static final String TARGET_ELEMENT_NAME = "Remote Host"; //$NON-NLS-1$
 
 	/**
 	 * Find the target type element for the PTP remote services target type.
@@ -65,6 +54,15 @@ public class RemoteToolsServices extends AbstractRemoteServices {
 
 	public RemoteToolsServices(IRemoteServicesDescriptor descriptor) {
 		super(descriptor);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.remote.core.IRemoteServices#getCommandShell(org.eclipse.ptp.remote.core.IRemoteConnection, int)
+	 */
+	public IRemoteProcess getCommandShell(IRemoteConnection conn, int flags) throws IOException {
+		throw new IOException("Not currently implemented"); //$NON-NLS-1$
 	}
 
 	/*
@@ -119,20 +117,9 @@ public class RemoteToolsServices extends AbstractRemoteServices {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#initialize()
+	 * @see org.eclipse.ptp.remote.core.IRemoteServices#initialize(org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public void initialize() {
-		// Nothing to do
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#isInitialized()
-	 */
-	public boolean isInitialized() {
-		initialize();
-		return connMgr != null;
+	public boolean initialize(IProgressMonitor monitor) {
+		return true;
 	}
 }

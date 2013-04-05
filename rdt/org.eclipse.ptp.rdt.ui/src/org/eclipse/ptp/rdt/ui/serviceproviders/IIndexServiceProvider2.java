@@ -48,7 +48,7 @@ public interface IIndexServiceProvider2 extends IIndexServiceProvider {
 	public IRemoteCCodeFoldingService getRemoteCodeFoldingService();
 
 	/**
-	 * @since 4.3
+	 * @since 5.0
 	 */
 	public IRemoteCodeFormattingService getRemoteCodeFormattingService();
 }

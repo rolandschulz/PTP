@@ -43,7 +43,7 @@ import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.git.core.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.core.RemoteServices;
 import org.eclipse.ptp.services.core.ServiceProvider;
 
 public class GitServiceProvider extends ServiceProvider implements ISyncServiceProvider {
@@ -61,14 +61,14 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	private Integer fWaitingThreadsCount = 0;
 	private Integer syncTaskId = -1; // ID for most recent synchronization task, functions as a time-stamp
 	private int finishedSyncTaskId = -1; // all synchronizations up to this ID (including it) have finished
-	
+
 	// Simple pair class for bundling a project and build scenario.
 	// Since we use this as a key, equality testing is important.
 	// Note that we use the project location in equality testing, as this can change even though the project object stays the same.
 	private static class ProjectAndScenario {
-		private IProject project;
-		private BuildScenario scenario;
-		private String projectLocation;
+		private final IProject project;
+		private final BuildScenario scenario;
+		private final String projectLocation;
 
 		ProjectAndScenario(IProject p, BuildScenario bs) {
 			project = p;
@@ -80,53 +80,59 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;
-			result = prime * result
-					+ ((project == null) ? 0 : project.hashCode());
-			result = prime
-					* result
-					+ ((projectLocation == null) ? 0 : projectLocation
-							.hashCode());
-			result = prime * result
-					+ ((scenario == null) ? 0 : scenario.hashCode());
+			result = prime * result + ((project == null) ? 0 : project.hashCode());
+			result = prime * result + ((projectLocation == null) ? 0 : projectLocation.hashCode());
+			result = prime * result + ((scenario == null) ? 0 : scenario.hashCode());
 			return result;
 		}
 
 		@Override
 		public boolean equals(Object obj) {
-			if (this == obj)
+			if (this == obj) {
 				return true;
-			if (obj == null)
+			}
+			if (obj == null) {
 				return false;
-			if (getClass() != obj.getClass())
+			}
+			if (getClass() != obj.getClass()) {
 				return false;
+			}
 			ProjectAndScenario other = (ProjectAndScenario) obj;
 			if (project == null) {
-				if (other.project != null)
+				if (other.project != null) {
 					return false;
-			} else if (!project.equals(other.project))
+				}
+			} else if (!project.equals(other.project)) {
 				return false;
+			}
 			if (projectLocation == null) {
-				if (other.projectLocation != null)
+				if (other.projectLocation != null) {
 					return false;
-			} else if (!projectLocation.equals(other.projectLocation))
+				}
+			} else if (!projectLocation.equals(other.projectLocation)) {
 				return false;
+			}
 			if (scenario == null) {
-				if (other.scenario != null)
+				if (other.scenario != null) {
 					return false;
-			} else if (!scenario.equals(other.scenario))
+				}
+			} else if (!scenario.equals(other.scenario)) {
 				return false;
+			}
 			return true;
 		}
 
 	}
-	private Map<ProjectAndScenario, GitRemoteSyncConnection> syncConnectionMap = Collections.synchronizedMap(
-			new HashMap<ProjectAndScenario, GitRemoteSyncConnection>());
+
+	private final Map<ProjectAndScenario, GitRemoteSyncConnection> syncConnectionMap = Collections
+			.synchronizedMap(new HashMap<ProjectAndScenario, GitRemoteSyncConnection>());
 
 	/**
 	 * Get the remote directory that will be used for synchronization
 	 * 
 	 * @return path
 	 */
+	@Override
 	public String getLocation() {
 		if (fLocation == null) {
 			fLocation = getString(GIT_LOCATION, null);
@@ -139,6 +145,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * 
 	 * @return remote connection
 	 */
+	@Override
 	public IRemoteConnection getRemoteConnection() {
 		if (fConnection == null) {
 			final String name = getString(GIT_CONNECTION_NAME, null);
@@ -157,10 +164,11 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * 
 	 * @return remote services
 	 */
+	@Override
 	public IRemoteServices getRemoteServices() {
 		final String id = getString(GIT_SERVICES_ID, null);
 		if (id != null) {
-			return PTPRemoteCorePlugin.getDefault().getRemoteServices(id);
+			return RemoteServices.getRemoteServices(id);
 		}
 		return null;
 	}
@@ -170,6 +178,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * 
 	 * @see org.eclipse.ptp.services.core.IServiceProvider#isConfigured()
 	 */
+	@Override
 	public boolean isConfigured() {
 		return getLocation() != null && getRemoteConnection() != null;
 	}
@@ -220,16 +229,21 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#synchronize(org.eclipse.core.resources.IProject, org.eclipse.core.resources.IResourceDelta, org.eclipse.ptp.rdt.sync.core.SyncFileFilter, org.eclipse.core.runtime.IProgressMonitor, java.util.EnumSet)
+	 * 
+	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#synchronize(org.eclipse.core.resources.IProject,
+	 * org.eclipse.core.resources.IResourceDelta, org.eclipse.ptp.rdt.sync.core.SyncFileFilter,
+	 * org.eclipse.core.runtime.IProgressMonitor, java.util.EnumSet)
 	 */
+	@Override
 	public void synchronize(final IProject project, BuildScenario buildScenario, IResourceDelta delta, SyncFileFilter fileFilter,
 			IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException {
 		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 1000);
-		
+
 		// On first sync, place .gitignore in directories. This is useful for folders that are already present and thus are never
 		// captured by a resource add or change event. (This can happen for projects converted to sync projects.)
 		if (!hasBeenSynced) {
 			project.accept(new IResourceVisitor() {
+				@Override
 				public boolean visit(IResource resource) throws CoreException {
 					if (irrelevantPath(project, resource)) {
 						return false;
@@ -257,6 +271,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		class SyncResourceDeltaVisitor implements IResourceDeltaVisitor {
 			private boolean relevantChangeFound = false;
 
+			@Override
 			public boolean visit(IResourceDelta delta) throws CoreException {
 				if (irrelevantPath(project, delta.getResource())) {
 					return false;
@@ -269,8 +284,8 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				// Add .gitignore to empty directories
 				if (delta.getResource().getType() == IResource.FOLDER
 						&& (delta.getKind() == IResourceDelta.ADDED || delta.getKind() == IResourceDelta.CHANGED)) {
-					IFile emptyFile = project.getFile(
-							delta.getResource().getProjectRelativePath().addTrailingSeparator() + ".gitignore"); //$NON-NLS-1$
+					IFile emptyFile = project.getFile(delta.getResource().getProjectRelativePath().addTrailingSeparator()
+							+ ".gitignore"); //$NON-NLS-1$
 					try {
 						if (!(emptyFile.exists())) {
 							emptyFile.create(new ByteArrayInputStream("".getBytes()), false, null); //$NON-NLS-1$
@@ -364,12 +379,13 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				}
 
 				subMon.subTask(Messages.GitServiceProvider_7);
-				GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, buildScenario, fileFilter, subMon.newChild(98));
+				GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, buildScenario, fileFilter,
+						subMon.newChild(98));
 				if (fSyncConnection == null) {
 					// Should never happen
 					if (buildScenario.getSyncProvider() == null) {
 						throw new RemoteSyncException(Messages.GitServiceProvider_5);
-					// Happens whenever connection does not exist
+						// Happens whenever connection does not exist
 					} else {
 						return;
 					}
@@ -384,12 +400,12 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 				synchronized (syncTaskId) {
 					willFinishTaskId = syncTaskId;
 				}
-				
+
 				try {
 					subMon.subTask(Messages.GitServiceProvider_8);
 					fSyncConnection.sync(subMon.newChild(900), true);
-				// Unlike other exceptions, we need to do some post-sync activities after a merge exception.
-				// TODO: Refactor code to get rid of duplication of post-sync activities.
+					// Unlike other exceptions, we need to do some post-sync activities after a merge exception.
+					// TODO: Refactor code to get rid of duplication of post-sync activities.
 				} catch (RemoteSyncMergeConflictException e) {
 					subMon.subTask(Messages.GitServiceProvider_9);
 					project.refreshLocal(IResource.DEPTH_INFINITE, subMon.newChild(1));
@@ -404,7 +420,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			// Sync successful - re-enable error messages. This is really UI code, but there is no way at the moment to notify UI
 			// of a successful sync.
 			SyncManager.setShowErrors(project, true);
-			
+
 			// Refresh after sync to display changes
 			subMon.subTask(Messages.GitServiceProvider_10);
 			project.refreshLocal(IResource.DEPTH_INFINITE, subMon.newChild(1));
@@ -414,7 +430,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			}
 		}
 	}
-	
+
 	// Return appropriate sync connection or null for scenarios with no sync provider or if the connection is missing.
 	// Creates a new sync connection if necessary. This function must properly maintain the map of connections and also remember
 	// to set the file filter (always, not just for new connections).
@@ -447,6 +463,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#getMergeConflictFiles()
 	 */
 	@Override
@@ -462,7 +479,9 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#getMergeConflictParts(org.eclipse.core.resources.IFile)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#getMergeConflictParts(org.eclipse.core.resources.IFile)
 	 */
 	@Override
 	public String[] getMergeConflictParts(IProject project, BuildScenario buildScenario, IFile file) throws RemoteSyncException {
@@ -480,7 +499,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 		if (SyncManager.getFileFilter(project).shouldIgnore(resource)) {
 			return true;
 		}
-		
+
 		String path = resource.getFullPath().toString();
 		if (path.endsWith("/" + GitRemoteSyncConnection.gitDir)) { //$NON-NLS-1$
 			return true;
@@ -498,6 +517,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * 
 	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#getConnection()
 	 */
+	@Override
 	public IRemoteConnection getConnection() {
 		return fConnection;
 	}
@@ -507,6 +527,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * 
 	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#getConfigLocation()
 	 */
+	@Override
 	public String getConfigLocation() {
 		return fLocation;
 	}
@@ -516,6 +537,7 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * 
 	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#setRemoteToolsConnection()
 	 */
+	@Override
 	public void setRemoteToolsConnection(IRemoteConnection connection) {
 		fConnection = connection;
 		putString(GIT_CONNECTION_NAME, connection.getName());
@@ -526,13 +548,15 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 	 * 
 	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#setConfigLocation()
 	 */
+	@Override
 	public void setConfigLocation(String configLocation) {
 		fLocation = configLocation;
 		putString(GIT_LOCATION, configLocation);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#close(org.eclipse.core.resources.IProject)
 	 */
 	@Override
@@ -546,7 +570,9 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#setResolved(org.eclipse.core.resources.IProject, org.eclipse.ptp.rdt.sync.core.BuildScenario, org.eclipse.core.runtime.IPath)
+	 * 
+	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#setResolved(org.eclipse.core.resources.IProject,
+	 * org.eclipse.ptp.rdt.sync.core.BuildScenario, org.eclipse.core.runtime.IPath)
 	 */
 	@Override
 	public void setMergeAsResolved(IProject project, BuildScenario buildScenario, IPath[] paths) throws RemoteSyncException {
@@ -559,7 +585,9 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#checkout(org.eclipse.core.resources.IProject, org.eclipse.ptp.rdt.sync.core.BuildScenario, org.eclipse.core.runtime.IPath)
+	 * 
+	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#checkout(org.eclipse.core.resources.IProject,
+	 * org.eclipse.ptp.rdt.sync.core.BuildScenario, org.eclipse.core.runtime.IPath)
 	 */
 	@Override
 	public void checkout(IProject project, BuildScenario buildScenario, IPath[] paths) throws RemoteSyncException {
@@ -569,10 +597,12 @@ public class GitServiceProvider extends ServiceProvider implements ISyncServiceP
 			fSyncConnection.checkout(paths);
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#checkoutRemote(org.eclipse.core.resources.IProject, org.eclipse.ptp.rdt.sync.core.BuildScenario, org.eclipse.core.runtime.IPath)
+	 * 
+	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#checkoutRemote(org.eclipse.core.resources.IProject,
+	 * org.eclipse.ptp.rdt.sync.core.BuildScenario, org.eclipse.core.runtime.IPath)
 	 */
 	@Override
 	public void checkoutRemoteCopy(IProject project, BuildScenario buildScenario, IPath[] paths) throws RemoteSyncException {

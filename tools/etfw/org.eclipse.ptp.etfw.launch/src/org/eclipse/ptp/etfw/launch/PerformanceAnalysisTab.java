@@ -41,7 +41,7 @@ import org.eclipse.ptp.launch.ui.extensions.JAXBDynamicLaunchConfigurationTab;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.core.RemoteServices;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.core.LaunchControllerManager;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel;
@@ -273,9 +273,9 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 		vmap = new ETFWVariableMap();
 
 		JAXBInitializationUtil.initializeMap(etfwTool, vmap);
-		
+
 		// Add in connection property attributes to ETFW variable map
-		final IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(controller.getRemoteServicesId(), new NullProgressMonitor());
+		final IRemoteServices services = RemoteServices.getRemoteServices(controller.getRemoteServicesId());
 		if (services != null) {
 			final IRemoteConnectionManager connMgr = services.getConnectionManager();
 			IRemoteConnection remoteConnection = connMgr.getConnection(controller.getConnectionName());
@@ -283,7 +283,7 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 				setConnectionPropertyAttributes(remoteConnection);
 			}
 		}
-		
+
 		try {
 			launchTabParent = new ETFWParentLaunchConfigurationTab(controller, new NullProgressMonitor(), vmap);
 		} catch (Throwable e1) {
@@ -310,7 +310,7 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 					}
 				}
 			}
-	
+
 			etfwTool.getControlData().getInitializeCommand();
 		}
 
@@ -478,8 +478,8 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 
 		if (etfwCombo.getSelectionIndex() == 0) {
-			configuration
-					.setAttribute(IToolLaunchConfigurationConstants.ETFW_VERSION, IToolLaunchConfigurationConstants.USE_SAX_PARSER);
+			configuration.setAttribute(IToolLaunchConfigurationConstants.ETFW_VERSION,
+					IToolLaunchConfigurationConstants.USE_SAX_PARSER);
 			saxETFWTab.performApply(configuration);
 		} else {
 			configuration.setAttribute(IToolLaunchConfigurationConstants.ETFW_VERSION,

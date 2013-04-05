@@ -27,9 +27,7 @@ import org.eclipse.ptp.ems.ui.EnvManagerConfigWidget;
 import org.eclipse.ptp.ems.ui.IErrorListener;
 import org.eclipse.ptp.internal.ems.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
-import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
+import org.eclipse.ptp.remote.ui.RemoteUIServicesUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -189,24 +187,10 @@ public final class EnvManagerChecklist extends Composite {
 		if (remoteConnection == null) {
 			return false;
 		}
-
-		final IRemoteServices remoteServices = remoteConnection.getRemoteServices();
-		if (!remoteServices.isInitialized()) {
-			remoteServices.initialize();
+		if (!remoteConnection.isOpen()) {
+			RemoteUIServicesUtils.openConnectionWithProgress(getShell(), null, remoteConnection);
 		}
-
-		if (remoteConnection.isOpen()) {
-			return true;
-		} else {
-			final IRemoteUIConnectionManager connectionManager =
-					PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteServices).getUIConnectionManager();
-			if (connectionManager == null) {
-				return false;
-			}
-
-			connectionManager.openConnectionWithProgress(getShell(), null, remoteConnection);
-			return true;
-		}
+		return remoteConnection.isOpen();
 	}
 
 	private void createChecklist() {

@@ -24,7 +24,7 @@ import org.eclipse.ptp.rdt.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.remote.core.RemoteServices;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.services.core.ServiceProvider;
 
@@ -53,10 +53,6 @@ public class RemoteBuildServiceProvider extends ServiceProvider implements IRemo
 	public static final String NAME = Messages.getString("RemoteBuildServiceProvider.0"); //$NON-NLS-1$
 
 	private static String getDefaultPath(IRemoteServices remoteServices, IRemoteConnection connection) {
-		if(!remoteServices.isInitialized()) {
-			remoteServices.initialize();
-		}
-		
 		if (remoteServices == null || connection == null) {
 			return null;
 		}
@@ -114,9 +110,6 @@ public class RemoteBuildServiceProvider extends ServiceProvider implements IRemo
 		if (getRemoteConnectionName() != null) {
 			IRemoteServices services = getRemoteServices();
 			if (services != null) {
-				if(!services.isInitialized()) {
-					services.initialize();
-				}
 				IRemoteConnectionManager manager = services.getConnectionManager();
 				if (manager != null) {
 					conn = manager.getConnection(getRemoteConnectionName());
@@ -153,14 +146,7 @@ public class RemoteBuildServiceProvider extends ServiceProvider implements IRemo
 	 * #getRemoteServices()
 	 */
 	public IRemoteServices getRemoteServices() {
-		IRemoteServices services = PTPRemoteCorePlugin.getDefault().getRemoteServices(getRemoteToolsProviderID());
-		if (!services.isInitialized()) {
-			services.initialize();
-		}
-		if (!services.isInitialized()) {
-			return null;
-		}
-		return services;
+		return RemoteServices.getRemoteServices(getRemoteToolsProviderID());
 	}
 
 	/**

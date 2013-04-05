@@ -16,7 +16,7 @@ import org.eclipse.ptp.rdt.sync.core.IMissingConnectionHandler;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
-import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
+import org.eclipse.ptp.remote.ui.RemoteUIServices;
 
 public class CommonMissingConnectionHandler implements IMissingConnectionHandler {
 	private static long lastMissingConnectiontDialogTimeStamp = 0;
@@ -37,14 +37,14 @@ public class CommonMissingConnectionHandler implements IMissingConnectionHandler
 				buttonLabels[1] = Messages.CommonMissingConnectionHandler_6;
 				String newline = System.getProperty("line.separator"); //$NON-NLS-1$
 				MessageDialog dialog = new MessageDialog(null, Messages.CommonMissingConnectionHandler_0, null,
-                        Messages.CommonMissingConnectionHandler_1 + connectionName + Messages.CommonMissingConnectionHandler_2 +
-                        newline + newline + Messages.CommonMissingConnectionHandler_3 + newline +
-                        Messages.CommonMissingConnectionHandler_4 + newline + Messages.CommonMissingConnectionHandler_5,
-                        MessageDialog.ERROR, buttonLabels, 0);
+						Messages.CommonMissingConnectionHandler_1 + connectionName + Messages.CommonMissingConnectionHandler_2
+								+ newline + newline + Messages.CommonMissingConnectionHandler_3 + newline
+								+ Messages.CommonMissingConnectionHandler_4 + newline + Messages.CommonMissingConnectionHandler_5,
+						MessageDialog.ERROR, buttonLabels, 0);
 				int buttonPressed = dialog.open();
 				if (buttonPressed == 1) {
-					IRemoteUIConnectionManager connectionManager = PTPRemoteUIPlugin.getDefault().
-							getRemoteUIServices(remoteServices).getUIConnectionManager();
+					IRemoteUIConnectionManager connectionManager = RemoteUIServices.getRemoteUIServices(remoteServices)
+							.getUIConnectionManager();
 					if (connectionManager != null) {
 						connectionManager.newConnection(dialog.getShell());
 					}

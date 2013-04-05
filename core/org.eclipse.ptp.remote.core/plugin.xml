@@ -7,7 +7,7 @@
    <extension
          point="org.eclipse.ptp.remote.core.remoteServices">
       <remoteServices
-            class="org.eclipse.ptp.internal.remote.core.LocalServicesFactory"
+            class="org.eclipse.ptp.internal.remote.core.services.local.LocalServicesFactory"
             id="org.eclipse.ptp.remote.LocalServices"
             name="Local"
             newConnections="false"
@@ -42,7 +42,7 @@
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
-            class="org.eclipse.ptp.remote.core.PreferenceInitializer">
+            class="org.eclipse.ptp.internal.remote.core.preferences.PreferenceInitializer">
       </initializer>
    </extension>
 

@@ -56,10 +56,11 @@ import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.RemoteServices;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
-import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
+import org.eclipse.ptp.remote.ui.RemoteUIServices;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
@@ -77,8 +78,8 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 
 	public RemoteBuildLaunchUtils(ILaunchConfiguration config) {
 		this.config = config;
-		remoteServices = PTPRemoteUIPlugin.getDefault().getRemoteServices(LaunchUtils.getRemoteServicesId(config), null);// ,getLaunchConfigurationDialog()
-		remoteUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteServices);
+		remoteServices = RemoteServices.getRemoteServices(LaunchUtils.getRemoteServicesId(config));// ,getLaunchConfigurationDialog()
+		remoteUIServices = RemoteUIServices.getRemoteUIServices(remoteServices);
 		connMgr = remoteServices.getConnectionManager();
 		conn = connMgr.getConnection(LaunchUtils.getConnectionName(config));
 		fileManagerUI = remoteUIServices.getUIFileManager();
@@ -100,7 +101,7 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 	public RemoteBuildLaunchUtils(IRemoteConnection conn) {
 		this.conn = conn;
 		remoteServices = conn.getRemoteServices();
-		remoteUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(remoteServices);
+		remoteUIServices = RemoteUIServices.getRemoteUIServices(remoteServices);
 		connMgr = remoteServices.getConnectionManager();
 		// conn = connMgr.getConnection(LaunchUtils.getConnectionName(config));
 		fileManagerUI = remoteUIServices.getUIFileManager();
@@ -185,8 +186,7 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 			toolBinID = IToolLaunchConfigurationConstants.TOOL_BIN_ID
 					+ "." + toolID + "." + LaunchUtils.getResourceManagerUniqueName(config); //$NON-NLS-1$//$NON-NLS-2$
 		} else {
-			toolBinID = IToolLaunchConfigurationConstants.TOOL_BIN_ID
-					+ "." + toolID + "." + conn.getName(); //$NON-NLS-1$//$NON-NLS-2$
+			toolBinID = IToolLaunchConfigurationConstants.TOOL_BIN_ID + "." + toolID + "." + conn.getName(); //$NON-NLS-1$//$NON-NLS-2$
 		}
 		String path = pstore.getString(toolBinID);
 		if (path != null) {
@@ -211,8 +211,8 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 		Map.Entry<String, String> me = null;
 		String entry = null;
 
-		for (int i = 0; i < tools.length; i++) {
-			eIt = tools[i].groupApp.entrySet().iterator();
+		for (ExternalToolProcess tool : tools) {
+			eIt = tool.groupApp.entrySet().iterator();
 			while (eIt.hasNext()) {
 				me = eIt.next();
 				entry = me.getKey();
@@ -352,8 +352,7 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 					e.printStackTrace();
 				}
 				rpb.command(com);
-			}
-			else {
+			} else {
 				rpb.command("which", toolname);//$NON-NLS-1$
 			}
 			// rpb.
@@ -365,8 +364,7 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 			while ((line = reader.readLine()) != null) {
 				// System.out.println(line);
 				IFileStore test = fileManager.getResource(line);
-				if (test.fetchInfo().exists())
-				{
+				if (test.fetchInfo().exists()) {
 					pPath = line;
 				}
 			}
@@ -405,7 +403,7 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 	public String askToolPath(String archpath, String toolText, String toolMessage) {
 		// Shell
 		// ourshell=PlatformUI.getWorkbench().getDisplay().getActiveShell();
-		if (selshell == null||selshell.isDisposed()) {
+		if (selshell == null || selshell.isDisposed()) {
 			selshell = PlatformUI.getWorkbench().getDisplay().getShells()[0];
 		}
 
@@ -584,8 +582,7 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 				e.printStackTrace();
 			}
 			pb = remoteServices.getProcessBuilder(conn, com);
-		}
-		else {
+		} else {
 			pb = remoteServices.getProcessBuilder(conn, tool);// new IRemoteProcessBuilder(tool);
 		}
 		if (directory != null) {
@@ -613,11 +610,13 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 			// //Process p =
 			// pb.start();
 
-			if (env == null)
+			if (env == null) {
 				env = new HashMap<String, String>();
+			}
 
-			if (env.get("DISPLAY") == null)
+			if (env.get("DISPLAY") == null) {
 				env.put("DISPLAY", ":0.0");
+			}
 
 			getProcess(tool, env, directory, false);
 

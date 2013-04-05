@@ -11,8 +11,6 @@
 package org.eclipse.ptp.rdt.ui.wizards;
 
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.resources.IProject;
@@ -28,7 +26,8 @@ import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
-import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
+import org.eclipse.ptp.remote.ui.RemoteUIServices;
+import org.eclipse.ptp.remote.ui.widgets.RemoteConnectionWidget;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -37,7 +36,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
@@ -91,25 +89,15 @@ public class RemoteProjectContentsLocationArea {
 
 	private RemoteBuildServiceProvider fProvider;
 
-	private final Map<Integer, IRemoteServices> fComboIndexToRemoteServicesProviderMap = new HashMap<Integer, IRemoteServices>();
-
-	private IRemoteServices fSelectedProvider;
-
-	private final Map<Integer, IRemoteConnection> fComboIndexToRemoteConnectionMap = new HashMap<Integer, IRemoteConnection>();
-
 	private IRemoteConnection fSelectedConnection;
 
 	private String fProjectName = IDEResourceInfoUtils.EMPTY_STRING;
 
 	private Button fBrowseButton;
 
-	private Button fNewConnectionButton;
-
-	private Combo fProviderCombo;
-
-	private Combo fConnectionCombo;
-
 	private Text fLocationText;
+	
+	private RemoteConnectionWidget fRemoteConnectionWidget;
 
 	// public RemoteProjectContentsLocationArea(IServiceProvider provider,
 	// Composite composite) {
@@ -163,7 +151,7 @@ public class RemoteProjectContentsLocationArea {
 	 * @return Button
 	 */
 	public Button[] getButtons() {
-		return new Button[] { fBrowseButton, fNewConnectionButton };
+		return new Button[] { fBrowseButton, fRemoteConnectionWidget.getButton() };
 	}
 
 	/**
@@ -188,7 +176,9 @@ public class RemoteProjectContentsLocationArea {
 	 * @return URI or <code>null</code> if it is not valid.
 	 */
 	public URI getProjectLocationURI() {
-		return fSelectedProvider.getFileManager(fSelectedConnection).toURI(fLocationText.getText());
+		if (fSelectedConnection == null)
+			return null;
+		return fSelectedConnection.getRemoteServices().getFileManager(fSelectedConnection).toURI(fLocationText.getText());
 	}
 
 	public IRemoteConnection getRemoteConnection() {
@@ -196,7 +186,9 @@ public class RemoteProjectContentsLocationArea {
 	}
 
 	public IRemoteServices getRemoteServices() {
-		return fSelectedProvider;
+		if (fSelectedConnection != null)
+			return fSelectedConnection.getRemoteServices();
+		return null;
 	}
 
 	/**
@@ -241,7 +233,7 @@ public class RemoteProjectContentsLocationArea {
 	private void checkConnection() {
 		IRemoteUIConnectionManager mgr = getUIConnectionManager();
 		if (mgr != null) {
-			mgr.openConnectionWithProgress(fConnectionCombo.getShell(), fContext, fSelectedConnection);
+			mgr.openConnectionWithProgress(fRemoteConnectionWidget.getShell(), fContext, fSelectedConnection);
 		}
 	}
 
@@ -256,7 +248,7 @@ public class RemoteProjectContentsLocationArea {
 	 */
 	private String getDefaultPathDisplayString() {
 		if (getRemoteConnection() != null && getRemoteConnection().isOpen()) {
-			IRemoteFileManager fileMgr = getRemoteServices().getFileManager(getRemoteConnection());
+			IRemoteFileManager fileMgr = fSelectedConnection.getRemoteServices().getFileManager(getRemoteConnection());
 			URI defaultURI = fileMgr.toURI(getRemoteConnection().getWorkingDirectory());
 
 			// Handle files specially. Assume a file if there is no project to
@@ -276,61 +268,14 @@ public class RemoteProjectContentsLocationArea {
 	 * @return
 	 */
 	private IRemoteUIConnectionManager getUIConnectionManager() {
-		IRemoteUIConnectionManager connectionManager = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fSelectedProvider)
+		IRemoteUIConnectionManager connectionManager = RemoteUIServices.getRemoteUIServices(fSelectedConnection.getRemoteServices())
 				.getUIConnectionManager();
 		return connectionManager;
 	}
 
 	private void handleConnectionSelected() {
-		int selectionIndex = fConnectionCombo.getSelectionIndex();
-		fSelectedConnection = fComboIndexToRemoteConnectionMap.get(selectionIndex);
-		updateNewConnectionButtonEnabled(fNewConnectionButton);
+		fSelectedConnection = fRemoteConnectionWidget.getConnection();
 		fLocationText.setText(getDefaultPathDisplayString());
-	}
-
-	private void handleServicesSelected() {
-		int selectionIndex = fProviderCombo.getSelectionIndex();
-		fSelectedProvider = fComboIndexToRemoteServicesProviderMap.get(selectionIndex);
-		populateConnectionCombo(fConnectionCombo);
-		updateNewConnectionButtonEnabled(fNewConnectionButton);
-		handleConnectionSelected();
-	}
-
-	/**
-	 * @param connectionCombo
-	 */
-	private void populateConnectionCombo(final Combo connectionCombo) {
-		connectionCombo.removeAll();
-
-		// attempt to restore settings from saved state
-		// IRemoteConnection connectionSelected = fProvider.getConnection();
-
-		IRemoteConnection[] connections = fSelectedProvider.getConnectionManager().getConnections();
-		int toSelect = 0;
-
-		for (int k = 0; k < connections.length; k++) {
-			connectionCombo.add(connections[k].getName(), k);
-			fComboIndexToRemoteConnectionMap.put(k, connections[k]);
-
-			// if (connectionSelected != null &&
-			// connectionSelected.getName().compareTo(connections[k].getName())
-			// == 0) {
-			// toSelect = k;
-			// }
-		}
-
-		// set selected connection to be the first one if we're not restoring
-		// from settings
-		connectionCombo.select(toSelect);
-		fSelectedConnection = fComboIndexToRemoteConnectionMap.get(toSelect);
-	}
-
-	/**
-	 * @param button
-	 */
-	private void updateNewConnectionButtonEnabled(Button button) {
-		IRemoteUIConnectionManager connectionManager = getUIConnectionManager();
-		button.setEnabled(connectionManager != null);
 	}
 
 	protected Control createContents(Composite parent) {
@@ -341,80 +286,15 @@ public class RemoteProjectContentsLocationArea {
 		container.setLayout(layout);
 		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
 		container.setLayoutData(gd);
-
-		// Label for "Provider:"
-		Label providerLabel = new Label(container, SWT.LEFT);
-		providerLabel.setText(Messages.getString("RemoteProjectContentsLocationArea.0")); //$NON-NLS-1$
-
-		// combo for providers
-		fProviderCombo = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-		// set layout to grab horizontal space
-		fProviderCombo.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
+		
+		fRemoteConnectionWidget = new RemoteConnectionWidget(container, SWT.NONE, null, RemoteConnectionWidget.FLAG_FORCE_PROVIDER_SELECTION, null);
 		gd = new GridData();
-		gd.horizontalSpan = 2;
-		fProviderCombo.setLayoutData(gd);
-		fProviderCombo.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				handleServicesSelected();
-			}
-		});
-
-		// attempt to restore settings from saved state
-		// IRemoteServices providerSelected = fProvider.getRemoteServices();
-
-		// populate the combo with a list of providers
-		IRemoteServices[] providers = PTPRemoteUIPlugin.getDefault().getRemoteServices(fContext);
-		int toSelect = 0;
-
-		for (int k = 0; k < providers.length; k++) {
-			fProviderCombo.add(providers[k].getName(), k);
-			fComboIndexToRemoteServicesProviderMap.put(k, providers[k]);
-
-			// if (providerSelected != null &&
-			// providerSelected.getName().compareTo(providers[k].getName()) ==
-			// 0) {
-			// toSelect = k;
-			// }
-		}
-
-		// set selected host to be the first one if we're not restoring from
-		// settings
-		fProviderCombo.select(toSelect);
-		fSelectedProvider = fComboIndexToRemoteServicesProviderMap.get(toSelect);
-
-		// connection combo
-		// Label for "Connection:"
-		Label connectionLabel = new Label(container, SWT.LEFT);
-		connectionLabel.setText(Messages.getString("RemoteProjectContentsLocationArea.1")); //$NON-NLS-1$
-
-		// combo for providers
-		fConnectionCombo = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-		// set layout to grab horizontal space
-		fConnectionCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		fConnectionCombo.addSelectionListener(new SelectionAdapter() {
+		gd.horizontalSpan = 3;
+		fRemoteConnectionWidget.setLayoutData(gd);
+		fRemoteConnectionWidget.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				handleConnectionSelected();
-			}
-		});
-
-		// populate the combo with a list of providers
-		populateConnectionCombo(fConnectionCombo);
-
-		// new connection button
-		fNewConnectionButton = new Button(container, SWT.PUSH);
-		fNewConnectionButton.setText(Messages.getString("RemoteProjectContentsLocationArea.2")); //$NON-NLS-1$
-		updateNewConnectionButtonEnabled(fNewConnectionButton);
-		fNewConnectionButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				IRemoteUIConnectionManager connectionManager = getUIConnectionManager();
-				if (connectionManager != null) {
-					connectionManager.newConnection(fNewConnectionButton.getShell());
-				}
-				// refresh list of connections
-				populateConnectionCombo(fConnectionCombo);
 			}
 		});
 
@@ -442,7 +322,7 @@ public class RemoteProjectContentsLocationArea {
 				if (fSelectedConnection != null) {
 					checkConnection();
 					if (fSelectedConnection.isOpen()) {
-						IRemoteUIServices remoteUIServices = PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fSelectedProvider);
+						IRemoteUIServices remoteUIServices = RemoteUIServices.getRemoteUIServices(fSelectedConnection.getRemoteServices());
 						if (remoteUIServices != null) {
 							IRemoteUIFileManager fileMgr = remoteUIServices.getUIFileManager();
 							if (fileMgr != null) {

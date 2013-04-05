@@ -28,7 +28,7 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
-import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
+import org.eclipse.ptp.remote.ui.RemoteUIServices;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -167,8 +167,7 @@ public class ResourceMappingSourceContainerDialog extends ElementTreeSelectionDi
 	 */
 	private IRemoteConnection getRemoteConnection(IProject project) {
 		if (!fRemoteConnection.isOpen()) {
-			IRemoteUIServices uiServices = PTPRemoteUIPlugin.getDefault()
-					.getRemoteUIServices(fRemoteConnection.getRemoteServices());
+			IRemoteUIServices uiServices = RemoteUIServices.getRemoteUIServices(fRemoteConnection.getRemoteServices());
 			if (uiServices != null) {
 				IRemoteUIConnectionManager connUIMgr = uiServices.getUIConnectionManager();
 				if (connUIMgr != null) {
@@ -185,13 +184,7 @@ public class ResourceMappingSourceContainerDialog extends ElementTreeSelectionDi
 	 * @return IRemoteUIServices
 	 */
 	private IRemoteUIServices getRemoteUIServices(IProject project) {
-		// IRemoteServices rsrv =
-		// PTPRemoteCorePlugin.getDefault().getRemoteServices(project.getLocationURI());
-		// if (rsrv != null) {
-		// return PTPRemoteUIPlugin.getDefault().getRemoteUIServices(rsrv);
-		// }
-		// return null;
-		return PTPRemoteUIPlugin.getDefault().getRemoteUIServices(fRemoteConnection.getRemoteServices());
+		return RemoteUIServices.getRemoteUIServices(fRemoteConnection.getRemoteServices());
 	}
 
 	@Override
