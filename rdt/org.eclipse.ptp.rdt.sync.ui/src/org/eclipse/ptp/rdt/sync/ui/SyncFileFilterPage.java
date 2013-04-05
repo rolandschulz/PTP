@@ -36,6 +36,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.jface.window.Window;
+import org.eclipse.ptp.internal.rdt.sync.ui.SyncImages;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.MissingConnectionException;
@@ -108,6 +109,8 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 	private Button okButton;
 	/** Boolean to help tell which boolean arguments do what */
 	static final boolean GRAB_EXCESS = true;
+	/** Boolean to turn on funky colors to debug which composites contain what */
+	static final boolean DEBUG = false;
 
 	/**
 	 * Where to save the filter information - as default (preferences), or for the current project
@@ -223,7 +226,6 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 	 */
 
 	protected Control createContents(Composite parent) {
-		final boolean DEBUG = false; // color composites so we can tell what's inside what
 		Composite composite = new Composite(parent, SWT.NONE);
 		GridLayout gl = new GridLayout(1, false);
 		gl.verticalSpacing = 20;
@@ -240,11 +242,9 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 			treeViewerComposite.setLayout(treeLayout);
 
 			gdcomp = new GridData(SWT.FILL, SWT.FILL, GRAB_EXCESS, GRAB_EXCESS);
+			if (DEBUG)
+				colorComposite(treeViewerComposite, SWT.COLOR_RED);
 
-			if (DEBUG) {
-				org.eclipse.swt.graphics.Color red = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
-				treeViewerComposite.setBackground(red);
-			}
 			treeViewerComposite.setLayoutData(gdcomp);
 
 			// Label for file tree viewer
@@ -309,8 +309,7 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 		// Composite for pattern table and buttons
 		Composite patternTableComposite = new Composite(composite, SWT.BORDER);
 		if (DEBUG) {
-			org.eclipse.swt.graphics.Color blue = Display.getCurrent().getSystemColor(SWT.COLOR_BLUE);
-			patternTableComposite.setBackground(blue);
+			colorComposite(patternTableComposite, SWT.COLOR_BLUE);
 		}
 
 		GridLayout patternTableLayout = new GridLayout(2, false);
@@ -351,28 +350,6 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 			}
 		});
 
-		// =====
-		// put buttons within a separate composite to try to get pattern composite to stretch on resize (grab vert sp)
-		// (doesn't make a difference)
-		/*
-		 * Composite buttonComp=new Composite(patternTableComposite, SWT.NONE);
-		 * GridLayout buttonCompLayout = new GridLayout();
-		 * buttonCompLayout.verticalSpacing = 5;
-		 * gdcomp=new GridData(SWT.FILL,SWT.TOP,false,GRAB_EXCESS);
-		 * buttonComp.setLayout(buttonCompLayout);
-		 * buttonComp.setData(gdcomp);
-		 * 
-		 * if (DEBUG) {
-		 * org.eclipse.swt.graphics.Color cyan = Display.getCurrent().getSystemColor(SWT.COLOR_CYAN);
-		 * buttonComp.setBackground(cyan);
-		 * }
-		 * buttonComp.setLayout(new GridLayout(1, false));
-		 * gdcomp = new GridData(SWT.FILL, SWT.TOP, false, GRAB_EXCESS);
-		 * patternTableComposite.setLayoutData(gdcomp);
-		 */
-		// change patternTableComposite to buttonComp in the four buttons
-		// buttonComp=patternTableComposite;
-		// =====
 		// Pattern table buttons (up, down, edit, remove)
 		upButton = new Button(patternTableComposite, SWT.PUSH);
 		upButton.setText(Messages.SyncFileFilterPage_Up);
@@ -432,21 +409,27 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 				update();
 			}
 		});
-		/*
-		 * //dummy widget to grab excess vertical space in the button column so the pattern table will expand
-		 * Label spacer = new Label(patternTableComposite,SWT.NONE);
-		 * //spacer.setText("");
-		 * gd=new GridData(SWT.FILL,SWT.FILL,false,GRAB_EXCESS);
-		 * spacer.setLayoutData(gd);
-		 */
+
 		// Composite for text box, combo, and buttons to enter a new pattern
+		createPatternEnterComposite(composite);
+
+		// Cancel and OK buttons
+		if (preferencePage == null) {
+			createOKcancelButtons(composite);
+		}
+
+		update();
+		return composite;
+	}
+
+	private void createPatternEnterComposite(Composite composite) {
+		GridData gdcomp;
 		Composite patternEnterComposite = new Composite(composite, SWT.NONE);
 		patternEnterComposite.setLayout(new GridLayout(4, false));
 		gdcomp = new GridData(SWT.FILL, SWT.TOP, GRAB_EXCESS, false);
 		patternEnterComposite.setLayoutData(gdcomp);
 		if (DEBUG) {
-			org.eclipse.swt.graphics.Color green = Display.getCurrent().getSystemColor(SWT.COLOR_GREEN);
-			patternEnterComposite.setBackground(green);
+			colorComposite(patternEnterComposite, SWT.COLOR_GREEN);
 		}
 
 		// Label for entering new path
@@ -457,8 +440,9 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 		newPath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, GRAB_EXCESS, false));
 
 		// Submit buttons (exclude and include)
-		excludeButtonForPath = new Button(patternEnterComposite, SWT.PUSH);
-		excludeButtonForPath.setText(Messages.SyncFileFilterPage_Exclude);
+		excludeButtonForPath = new Button(patternEnterComposite, SWT.PUSH | SWT.FLAT);
+		excludeButtonForPath.setImage(SyncImages.get(SyncImages.EXCLUDE));
+		excludeButtonForPath.setToolTipText(Messages.SyncFileFilterPage_Exclude);
 		excludeButtonForPath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 		excludeButtonForPath.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
@@ -466,8 +450,9 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 			}
 		});
 
-		includeButtonForPath = new Button(patternEnterComposite, SWT.PUSH);
-		includeButtonForPath.setText(Messages.SyncFileFilterPage_Include);
+		includeButtonForPath = new Button(patternEnterComposite, SWT.PUSH | SWT.FLAT);
+		includeButtonForPath.setImage(SyncImages.get(SyncImages.INCLUDE));
+		includeButtonForPath.setToolTipText(Messages.SyncFileFilterPage_Include);
 		includeButtonForPath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 		includeButtonForPath.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
@@ -483,8 +468,9 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 		newRegex.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
 		// Submit buttons (exclude and include)
-		excludeButtonForRegex = new Button(patternEnterComposite, SWT.PUSH);
-		excludeButtonForRegex.setText(Messages.SyncFileFilterPage_Exclude);
+		excludeButtonForRegex = new Button(patternEnterComposite, SWT.PUSH | SWT.FLAT);
+		excludeButtonForRegex.setImage(SyncImages.get(SyncImages.EXCLUDE));
+		excludeButtonForRegex.setToolTipText(Messages.SyncFileFilterPage_Exclude);
 		excludeButtonForRegex.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 		excludeButtonForRegex.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
@@ -492,8 +478,9 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 			}
 		});
 
-		includeButtonForRegex = new Button(patternEnterComposite, SWT.PUSH);
-		includeButtonForRegex.setText(Messages.SyncFileFilterPage_Include);
+		includeButtonForRegex = new Button(patternEnterComposite, SWT.PUSH | SWT.FLAT);
+		includeButtonForRegex.setImage(SyncImages.get(SyncImages.INCLUDE));
+		includeButtonForRegex.setToolTipText(Messages.SyncFileFilterPage_Include);
 		includeButtonForRegex.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 		includeButtonForRegex.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
@@ -505,52 +492,66 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 		patternErrorLabel = new Label(patternEnterComposite, SWT.NONE);
 		patternErrorLabel.setForeground(display.getSystemColor(SWT.COLOR_DARK_RED));
 		patternErrorLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1));
+	}
 
-		// Cancel and OK buttons
-		// Logically, these should be in a separate composite, but this will align the buttons with the exclude/include buttons
-		if (preferencePage == null) {
-			// Separator
-			Label horizontalLine = new Label(patternEnterComposite, SWT.SEPARATOR | SWT.HORIZONTAL);
-			horizontalLine.setLayoutData(new GridData(GridData.FILL, GridData.BEGINNING, true, false, 4, 1));
+	/**
+	 * Create composite with OK and Cancel buttons<br>
+	 * Note: since this isn't using the standard OK/Cancel dialog from the platform, the buttons
+	 * may be in the wrong place for some platforms
+	 * 
+	 * @param composite
+	 */
+	private void createOKcancelButtons(Composite composite) {
+		GridData gdcomp;
+		Composite okCancelComposite1 = new Composite(composite, SWT.NONE);
+		okCancelComposite1.setLayout(new GridLayout(2, false));
+		gdcomp = new GridData(SWT.FILL, SWT.TOP, GRAB_EXCESS, false);
+		okCancelComposite1.setLayoutData(gdcomp);
+		if (DEBUG) {
+			colorComposite(okCancelComposite1, SWT.COLOR_GRAY);
+		}
+		// Separator
+		Label horizontalLine = new Label(okCancelComposite1, SWT.SEPARATOR | SWT.HORIZONTAL);
+		horizontalLine.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, GRAB_EXCESS, false, 2/* 4 */, 1));
 
-			// For spacing
-			new Label(patternEnterComposite, SWT.NONE).setVisible(false);
-			new Label(patternEnterComposite, SWT.NONE).setVisible(false);
-
-			// Cancel button
-			cancelButton = new Button(patternEnterComposite, SWT.PUSH);
-			cancelButton.setText(Messages.SyncFileFilterPage_Cancel);
-			cancelButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
-			cancelButton.addSelectionListener(new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent event) {
-					SyncFileFilterPage.this.close();
-				}
-			});
-
-			// OK button
-			okButton = new Button(patternEnterComposite, SWT.PUSH);
-			okButton.setText(Messages.SyncFileFilterPage_OK);
-			okButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
-			okButton.addSelectionListener(new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent event) {
-					if (saveTarget == FilterSaveTarget.DEFAULT) {
-						// scenario 1: preference page
-						SyncManager.saveDefaultFileFilter(filter);
-					} else if (saveTarget == FilterSaveTarget.PROJECT) {
-						// scenario 2/3: new or existing project
-						assert (project != null);
-						SyncManager.saveFileFilter(project, filter);
-					} else {
-						// Nothing to do
-					}
-					SyncFileFilterPage.this.setReturnCode(OK);
-					SyncFileFilterPage.this.close();
-				}
-			});
+		Composite okCancelComposite = new Composite(okCancelComposite1, SWT.NONE);
+		okCancelComposite.setLayout(new GridLayout(2, false));
+		gdcomp = new GridData(SWT.RIGHT, SWT.TOP, GRAB_EXCESS, false);
+		okCancelComposite.setLayoutData(gdcomp);
+		if (DEBUG) {
+			colorComposite(okCancelComposite, SWT.COLOR_CYAN);
 		}
 
-		update();
-		return composite;
+		// Cancel button
+		cancelButton = new Button(okCancelComposite, SWT.PUSH);
+		cancelButton.setText(Messages.SyncFileFilterPage_Cancel);
+		cancelButton.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
+		cancelButton.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				SyncFileFilterPage.this.close();
+			}
+		});
+
+		// OK button
+		okButton = new Button(okCancelComposite, SWT.PUSH);
+		okButton.setText(Messages.SyncFileFilterPage_OK);
+		okButton.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
+		okButton.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				if (saveTarget == FilterSaveTarget.DEFAULT) {
+					// scenario 1: preference page
+					SyncManager.saveDefaultFileFilter(filter);
+				} else if (saveTarget == FilterSaveTarget.PROJECT) {
+					// scenario 2/3: new or existing project
+					assert (project != null);
+					SyncManager.saveFileFilter(project, filter);
+				} else {
+					// Nothing to do
+				}
+				SyncFileFilterPage.this.setReturnCode(OK);
+				SyncFileFilterPage.this.close();
+			}
+		});
 	}
 
 	/*
@@ -614,7 +615,7 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 		update();
 	}
 
-	// Creates a modal dialog to edit the selected pattern and replaces it if user hits "OK"
+	/** Creates a modal dialog to edit the selected pattern and replaces it if user hits "OK" */
 	private void editPattern() {
 		TableItem[] selectedPatternItem = patternTable.getSelection();
 		// Modifying more than one pattern at a time is not supported
@@ -1110,5 +1111,14 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 
 	public void init(IWorkbench workbench) {
 		preferencePage.init(workbench);
+	}
+
+	private void colorComposite(Composite comp, int color) {
+		if (DEBUG) {
+			// color e.g. SWT.COLOR_RED
+			org.eclipse.swt.graphics.Color gcolor = Display.getCurrent().getSystemColor(color);
+			comp.setBackground(gcolor);
+		}
+
 	}
 }
