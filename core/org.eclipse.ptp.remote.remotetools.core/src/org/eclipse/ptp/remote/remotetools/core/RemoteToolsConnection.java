@@ -583,6 +583,59 @@ public class RemoteToolsConnection implements IRemoteConnection {
 		return null;
 	}
 
+	/**
+	 * 
+	 * Load the following hard-coded properties at runtime:
+	 * 
+	 * <dl>
+	 * <dt>file.separator
+	 * <dd>File separator character of the (remote) connection. Hardcoded "/" (forward slash).
+	 * <dt>path.separator
+	 * <dd>Path separator character of the (remote) connection. Hardcoded ":" (colon).
+	 * <dt>line.separator
+	 * <dd>Line separator character of the (remote) connection. Hardcoded "\n" (new-line).
+	 * <dt>user.home
+	 * <dd>User home directory on the (remote) connection.
+	 * <dt>os.name
+	 * <dd>Operating system name of the (remote) connection.
+	 * For example, given results from the "uname" command:
+	 * <ul>
+	 * <li>Linux</li>
+	 * <li>AIX</li>
+	 * <li>Mac OS X - if results equal "Darwin" then results from "sw_vers -productName"</li>
+	 * <li>everything else - results from "uname" command</li>
+	 * </ul>
+	 * <dt>os.version
+	 * <dd>Operating system version of the (remote) connection.
+	 * For example:
+	 * <ul>
+	 * <li>For Linux - results from "uname -r" such as "2.6.32-279.2.1.el6.x86_64"</li>
+	 * <li>For AIX - results from "oslevel" such as "7.1.0.0"</li>
+	 * <li>For Mac OS X - results from "sw_vers -productVersion" such as "10.8.3"</li>
+	 * <li>For everything else - "unknown"</li>
+	 * </ul>
+	 * <dt>os.arch
+	 * <dd>Machine architecture of the (remote) connection.
+	 * For example:
+	 * <ul>
+	 * <li>For Linux - results from "uname -m" such as "x86_64"</li>
+	 * <li>For AIX - if results from "uname -p" equals "powerpc"
+	 * <ul style="list-style: none;">
+	 * <li>then if "prtconf -k" contains "64-bit" then "ppc64" else "ppc"</li>
+	 * <li>else the result from "uname -p"</li>
+	 * </ul>
+	 * </li>
+	 * <li>For Mac OS X - if results from "uname -m" equals "i386"
+	 * <ul style="list-style: none;">
+	 * <li>then if results from "sysctl -n hw.optional.x86_64" equals "1" then "x86_64" else the results from "uname -m"</li>
+	 * <li>else the results from "uname -m"</li>
+	 * </ul>
+	 * </li>
+	 * <li>For everything else - "unknown"</li>
+	 * </ul>
+	 * <dl>
+	 *  
+	 */
 	private void loadProperties() {
 		if (fProperties == null) {
 			fProperties = new HashMap<String, String>();
@@ -595,19 +648,36 @@ public class RemoteToolsConnection implements IRemoteConnection {
 				IRemoteExecutionManager exeMgr = createExecutionManager();
 				if (exeMgr != null) {
 					String osVersion;
-					String osArch = exeMgr.getExecutionTools().executeWithOutput("uname -m").trim(); //$NON-NLS-1$
+					String osArch;
 					String osName = exeMgr.getExecutionTools().executeWithOutput("uname").trim(); //$NON-NLS-1$
-					if (osName.equalsIgnoreCase("Darwin")) { //$NON-NLS-1$
+					if (osName.equalsIgnoreCase("Linux")) { //$NON-NLS-1$
+						osArch = exeMgr.getExecutionTools().executeWithOutput("uname -m").trim(); //$NON-NLS-1$
+						osVersion = exeMgr.getExecutionTools().executeWithOutput("uname -r").trim(); //$NON-NLS-1$
+					} else if (osName.equalsIgnoreCase("Darwin")) { //$NON-NLS-1$
 						osName = exeMgr.getExecutionTools().executeWithOutput("sw_vers -productName").trim(); //$NON-NLS-1$
 						osVersion = exeMgr.getExecutionTools().executeWithOutput("sw_vers -productVersion").trim(); //$NON-NLS-1$
+						osArch = exeMgr.getExecutionTools().executeWithOutput("uname -m").trim(); //$NON-NLS-1$
 						if (osArch.equalsIgnoreCase("i386")) { //$NON-NLS-1$
 							String opt = exeMgr.getExecutionTools().executeWithOutput("sysctl -n hw.optional.x86_64").trim(); //$NON-NLS-1$
 							if (opt.equals("1")) { //$NON-NLS-1$
 								osArch = "x86_64"; //$NON-NLS-1$
 							}
 						}
+					} else if (osName.equalsIgnoreCase("AIX")) { //$NON-NLS-1$
+						osArch = exeMgr.getExecutionTools().executeWithOutput("uname -p").trim(); //$NON-NLS-1$
+						osVersion = exeMgr.getExecutionTools().executeWithOutput("oslevel").trim(); //$NON-NLS-1$
+						if (osArch.equalsIgnoreCase("powerpc")) { //$NON-NLS-1$
+							/* Make the architecture match what Linux produces: either ppc or ppc64 */
+							osArch = "ppc"; //$NON-NLS-1$
+							/* Get Kernel type either 32-bit or 64-bit */
+							String opt = exeMgr.getExecutionTools().executeWithOutput("prtconf -k").trim(); //$NON-NLS-1$
+							if (opt.indexOf("64-bit") > 0) { //$NON-NLS-1$
+								osArch += "64"; //$NON-NLS-1$
+							}
+						}
 					} else {
-						osVersion = exeMgr.getExecutionTools().executeWithOutput("uname -r").trim(); //$NON-NLS-1$
+						osVersion = "unknown"; //$NON-NLS-1$
+						osArch = "unknown"; //$NON-NLS-1$
 					}
 					fProperties.put(OS_NAME_PROPERTY, osName);
 					fProperties.put(OS_VERSION_PROPERTY, osVersion);
