@@ -31,6 +31,8 @@ import org.eclipse.ptp.internal.ems.core.EMSCorePlugin;
  * @author Jeff Overbey
  * 
  * @since 6.0
+ * @deprecated EMS data should not be stored at project-level (see bug 393244) but at configuration level. Instead use:
+ * org.eclipse.ptp.rdt.sync.core.EnvManagerHostConfigProperties
  */
 public final class EnvManagerProjectProperties implements IEnvManagerConfig {
 
