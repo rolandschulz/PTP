@@ -77,16 +77,6 @@
          point="org.eclipse.ui.commands">
       <command
             defaultHandler="org.eclipse.ptp.pldt.openshmem.actions.RunAnalyseOpenSHMEMcommandHandler"
-            id="org.eclipse.ptp.pldt.openshmem.command2"
-            name="%find.openshmem.artifacts.command.name">
-      </command>
-      <command
-            defaultHandler="org.eclipse.ptp.pldt.openshmem.actions.RunAnalyseOpenSHMEMcommandHandler"
-            id="org.eclipse.ptp.pldt.openshmem.command4"
-            name="%find.openshmem.artifacts.command.name">
-      </command>
-      <command
-            defaultHandler="org.eclipse.ptp.pldt.openshmem.actions.RunAnalyseOpenSHMEMcommandHandler"
             id="org.eclipse.ptp.pldt.openshmem.command4"
             name="%find.openshmem.artifacts.command.name">
       </command>
@@ -96,7 +86,7 @@
       <menuContribution
             locationURI="menu:org.eclipse.ptp.pldt.common.toolbar.command1 ">
              <command
-               commandId="org.eclipse.ptp.pldt.openshmem.command2"
+               commandId="org.eclipse.ptp.pldt.openshmem.command4"
                icon="icons/openshmem.png"
                label="%show.openshmem.artifacts.command.label">
          </command>
