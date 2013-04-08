@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: IBM Platform LSF Support
+Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.rm.ibm.platform.lsf.ui;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.eclipse.ptp.rm.ibm.lsf.ui.Activator
-Bundle-Vendor: IBM
+Bundle-Vendor: %pluginProvider
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.ptp.rm.jaxb.control.ui,
