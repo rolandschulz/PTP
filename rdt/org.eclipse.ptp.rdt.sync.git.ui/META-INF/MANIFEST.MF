@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.rdt.sync.git.ui;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: org.eclipse.ptp.rdt.sync.git.ui.Activator
+Bundle-Activator: org.eclipse.ptp.internal.rdt.sync.git.ui.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,

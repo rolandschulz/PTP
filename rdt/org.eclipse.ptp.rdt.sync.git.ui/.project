@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>org.eclipse.ptp.rdt.sync.git.ui</name>
+	<name>org.eclipse.ptp.internal.rdt.sync.git.ui</name>
 	<comment></comment>
 	<projects>
 	</projects>

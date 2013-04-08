@@ -8,7 +8,7 @@
  * Contributors:
  *    John Eblen - initial implementation
  *******************************************************************************/
-package org.eclipse.ptp.rdt.sync.ui;
+package org.eclipse.ptp.internal.rdt.sync.git.ui.preferences;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -29,13 +29,15 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.ptp.internal.rdt.sync.git.ui.Activator;
+import org.eclipse.ptp.internal.rdt.sync.git.ui.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.CommandRunner;
 import org.eclipse.ptp.rdt.sync.core.CommandRunner.CommandResults;
 import org.eclipse.ptp.rdt.sync.core.RecursiveSubMonitor;
 import org.eclipse.ptp.rdt.sync.core.RemoteExecutionException;
 import org.eclipse.ptp.rdt.sync.core.RemoteSyncException;
-import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
+import org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemotePreferenceConstants;
 import org.eclipse.ptp.remote.core.IRemoteServices;
@@ -275,7 +277,7 @@ public class SyncGitPreferencePage extends PreferencePage implements IWorkbenchP
 			IScopeContext context = InstanceScope.INSTANCE;
 			Preferences prefSyncNode = context.getNode(instanceScopeSyncNode);
 			if (prefSyncNode == null) {
-				RDTSyncUIPlugin.getDefault().logErrorMessage(Messages.SyncGitPreferencePage_18);
+				Activator.getDefault().logErrorMessage(Messages.SyncGitPreferencePage_18);
 			} else {
 				try {
 					// Avoid creating node if it doesn't exist
@@ -284,7 +286,7 @@ public class SyncGitPreferencePage extends PreferencePage implements IWorkbenchP
 						gitBinary = prefGitNode.get(fSelectedConnection.getName(), null);
 					}
 				} catch (BackingStoreException e) {
-					RDTSyncUIPlugin.log(Messages.SyncGitPreferencePage_19, e);
+					Activator.log(Messages.SyncGitPreferencePage_19, e);
 				}
 			}
 		}

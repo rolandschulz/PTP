@@ -9,7 +9,7 @@
  *    John Eblen - initial implementation
  *******************************************************************************/
 
-package org.eclipse.ptp.rdt.sync.git.ui;
+package org.eclipse.ptp.internal.rdt.sync.git.ui;
 
 import java.net.URI;
 
@@ -18,10 +18,10 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.wizard.IWizardContainer;
+import org.eclipse.ptp.internal.rdt.sync.git.ui.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
 import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
 import org.eclipse.ptp.rdt.sync.git.core.GitServiceProvider;
-import org.eclipse.ptp.rdt.sync.git.ui.messages.Messages;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;

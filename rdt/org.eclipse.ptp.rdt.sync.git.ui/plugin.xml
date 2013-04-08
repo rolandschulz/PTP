@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.ptp.rdt.sync.ui.synchronizeParticipants">
       <synchronizeParticipant
-            class="org.eclipse.ptp.rdt.sync.git.ui.GitParticipant"
+            class="org.eclipse.ptp.internal.rdt.sync.git.ui.GitParticipant"
             id="org.eclipse.ptp.rdt.sync.git.ui.gitParticipant"
             name="Git">
       </synchronizeParticipant>
