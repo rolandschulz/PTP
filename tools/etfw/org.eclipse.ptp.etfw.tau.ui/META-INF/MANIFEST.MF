@@ -22,3 +22,5 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: org.eclipse.ptp.etfw.tau.ui,
  org.eclipse.ptp.etfw.tau.ui.model
 Bundle-Vendor: %pluginProvider
+Bundle-Localization: plugin
+
