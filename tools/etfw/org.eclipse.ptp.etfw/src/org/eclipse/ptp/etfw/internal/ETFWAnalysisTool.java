@@ -182,7 +182,7 @@ public class ETFWAnalysisTool extends ETFWToolStep implements IToolLaunchConfigu
 		 * If there is no tool we have a failure
 		 */
 		if (tool == null) {
-			return new Status(IStatus.WARNING, "com.ibm.jdg2e.concurrency", IStatus.OK, Messages.PostlaunchTool_NoToolNoData, null); //$NON-NLS-1$
+			return new Status(IStatus.WARNING, "com.ibm.jdg2e.concurrency", IStatus.OK, Messages.PostlaunchTool_NoToolNoAnalysis, null); //$NON-NLS-1$
 		}
 
 		/*
@@ -259,9 +259,9 @@ public class ETFWAnalysisTool extends ETFWToolStep implements IToolLaunchConfigu
 
 		} catch (Exception e) {
 			return new Status(IStatus.ERROR,
-					"com.ibm.jdg2e.concurrency", IStatus.ERROR, Messages.PostlaunchTool_DataCollectError, e); //$NON-NLS-1$
+					"com.ibm.jdg2e.concurrency", IStatus.ERROR, Messages.PostlaunchTool_AnalysisError, e); //$NON-NLS-1$
 		}
-		return new Status(IStatus.OK, "com.ibm.jdg2e.concurrency", IStatus.OK, Messages.PostlaunchTool_DataCollected, null); //$NON-NLS-1$
+		return new Status(IStatus.OK, "com.ibm.jdg2e.concurrency", IStatus.OK, Messages.PostlaunchTool_AnalysisSuccessful, null); //$NON-NLS-1$
 	}
 
 	private List<IFileStore> listFiles(IFileStore root, String matchSuffix) {

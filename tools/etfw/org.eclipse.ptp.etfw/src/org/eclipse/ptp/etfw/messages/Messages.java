@@ -32,10 +32,10 @@ public class Messages extends NLS {
 	public static String ParametricToolLaunchManager_OptimizationLevel;
 	public static String PostlaunchTool_Analysis;
 	public static String PostlaunchTool_CouldNotRun;
-	public static String PostlaunchTool_DataCollected;
-	public static String PostlaunchTool_DataCollectError;
+	public static String PostlaunchTool_AnalysisSuccessful;
+	public static String PostlaunchTool_AnalysisError;
 	public static String PostlaunchTool_NoData;
-	public static String PostlaunchTool_NoToolNoData;
+	public static String PostlaunchTool_NoToolNoAnalysis;
 	public static String PostlaunchTool_NoValidFiles;
 	public static String PostlaunchTool_SelectPerfDir;
 	public static String PostlaunchTool_TheCommand;
