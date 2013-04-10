@@ -17,10 +17,9 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.internal.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipantDescriptor;
-import org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin;
-import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 
 public class SynchronizeParticipantDescriptor implements ISynchronizeParticipantDescriptor {
 	public static final String ATTR_ID = "id"; //$NON-NLS-1$

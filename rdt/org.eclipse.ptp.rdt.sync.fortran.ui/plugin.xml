@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <wizard
+            canFinishEarly="false"
+            category="org.eclipse.ptp.rdt.ui.wizardCategory.Remote"
+            class="org.eclipse.ptp.internal.rdt.sync.fortran.ui.wizards.NewFortranSyncProjectWizard"
+            finalPerspective="org.eclipse.photran.ui.FortranPerspective"
+            hasPages="true"
+            icon="icons/etool16/new_sync_f_proj.gif"
+            id="org.eclipse.ptp.rdt.sync.fortran.ui.newFortranProjectWizard"
+            name="%wizard.name"
+            project="true">
+         <description>
+            %syncProject.desc
+         </description>
+      </wizard>
+      
+      
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.navigatorContent">
+      <navigatorContent
+            activeByDefault="true"
+            contentProvider="org.eclipse.cdt.internal.ui.navigator.CNavigatorContentProvider"
+            id="org.eclipse.ptp.rdt.sync.ui.fortran.navigator.content"
+            labelProvider="org.eclipse.cdt.internal.ui.navigator.CNavigatorLabelProvider"
+            name="Synchronize Elements"
+            priority="highest">
+         <triggerPoints>
+            <or>
+               <adapt
+                     type="org.eclipse.core.resources.IProject">
+                  <test
+                        property="org.eclipse.core.resources.projectNature"
+                        value="org.eclipse.cdt.core.cnature">
+                  </test>
+               </adapt>
+               <instanceof
+                     value="org.eclipse.cdt.ui.CElementGrouping">
+               </instanceof>
+               <instanceof
+                     value="org.eclipse.cdt.core.model.ICElement">
+               </instanceof>
+               <instanceof
+                     value="org.eclipse.core.resources.IResource">
+               </instanceof>
+            </or>
+         </triggerPoints>
+         <possibleChildren>
+            <or>
+               <instanceof
+                     value="org.eclipse.core.resources.IResource">
+               </instanceof>
+               <instanceof
+                     value="org.eclipse.cdt.core.model.ICElement">
+               </instanceof>
+               <instanceof
+                     value="org.eclipse.cdt.ui.CElementGrouping">
+               </instanceof>
+            </or>
+         </possibleChildren>
+         <override
+               policy="InvokeAlwaysRegardlessOfSuppressedExt"
+               suppressedExtensionId="org.eclipse.cdt.ui.navigator.content">
+         </override>
+       <commonWizard
+             associatedExtensionId="org.eclipse.ptp.rdt.sync.ui.fortran.navigator.content"
+             menuGroupId="org.eclipse.ptp.rdt.ui.newProject"
+             type="new"
+             wizardId="org.eclipse.ptp.rdt.sync.fortran.ui.newFortranProjectWizard">
+          <enablement></enablement>
+       </commonWizard>
+      </navigatorContent>
+   </extension>
+   <extension
+       point="org.eclipse.ui.navigator.viewer">
+       <viewerContentBinding viewerId="org.eclipse.ui.navigator.ProjectExplorer">
+          <includes>
+              <contentExtension pattern="org.eclipse.ptp.rdt.sync.ui.fortran.navigator.content"/>
+          </includes>
+       </viewerContentBinding>
+   </extension>
+</plugin>

@@ -14,10 +14,11 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.core.resources.IResource;
-import org.eclipse.ptp.rdt.sync.core.messages.Messages;
+import org.eclipse.ptp.internal.rdt.sync.core.messages.Messages;
 import org.osgi.service.prefs.Preferences;
 
 /**

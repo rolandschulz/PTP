@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
+   <extension-point id="synchronizePolicy" name="Synchronize Policy" schema="schema/synchronizePolicy.exsd"/>
    <extension
          id="remoteSyncNature"
          name="%RemoteSyncNature.name"
@@ -23,30 +24,14 @@
       </service>
    </extension>
    <extension
-         point="org.eclipse.cdt.core.UNCPathConverter">
-      <UNCPathConverter
-            class="org.eclipse.ptp.rdt.sync.core.SyncUNCPathConverter">
-      </UNCPathConverter>
-   </extension>
-   <extension
          point="org.eclipse.ptp.services.core.providers">
       <provider
-            class="org.eclipse.ptp.rdt.sync.core.serviceproviders.SyncBuildServiceProvider"
-            id="org.eclipse.ptp.rdt.sync.BuildServiceProvider"
+            class="org.eclipse.ptp.rdt.sync.core.services.SyncBuildServiceProvider"
+            id="org.eclipse.ptp.rdt.sync.core.BuildServiceProvider"
             name="%SyncBuildProvider.name"
             priority="1"
             serviceId="org.eclipse.ptp.rdt.sync.core.BuildService">
       </provider>
-   </extension>
-   <extension
-         point="org.eclipse.cdt.managedbuilder.core.buildDefinitions">
-      <builder
-            commandLauncher="org.eclipse.ptp.rdt.sync.core.remotemake.SyncCommandLauncher"
-            id="org.eclipse.ptp.rdt.sync.core.SyncBuilder"
-            isAbstract="false"
-            isVariableCaseSensitive="false"
-            name="%Builder.name">
-      </builder>
    </extension>
    <extension
          point="org.eclipse.ptp.remote.core.remoteResources">
@@ -54,34 +39,5 @@
             class="org.eclipse.ptp.rdt.sync.core.SynchronizedResource"
             nature="org.eclipse.ptp.rdt.sync.core.remoteSyncNature">
       </remoteResource>
-   </extension>
-   <extension
-         point="org.eclipse.cdt.core.LanguageSettingsProvider">
-      <provider
-            class="org.eclipse.ptp.rdt.sync.core.SyncGCCBuiltinSpecsDetector"
-            id="org.eclipse.ptp.rdt.sync.core.SyncGCCBuiltinSpecsDetector"
-            name="Sync GCC Builtin Compiler Settings"
-            parameter="${COMMAND} -E -P -v -dD ${INPUTS}"
-            prefer-non-shared="true">
-         <language-scope
-               id="org.eclipse.cdt.core.gcc">
-         </language-scope>
-         <language-scope
-               id="org.eclipse.cdt.core.g++">
-         </language-scope>
-      </provider>
-      <provider
-            class="org.eclipse.ptp.rdt.sync.core.SyncGCCBuildCommandParser"
-            id="org.eclipse.ptp.rdt.sync.core.SyncGCCBuildCommandParser"
-            name="Sync GCC Build Output Parser"
-            parameter="(gcc)|([gc]\+\+)|(clang)"
-            prefer-non-shared="true">
-         <language-scope
-               id="org.eclipse.cdt.core.gcc">
-         </language-scope>
-         <language-scope
-               id="org.eclipse.cdt.core.g++">
-         </language-scope>
-      </provider>
    </extension>
 </plugin>

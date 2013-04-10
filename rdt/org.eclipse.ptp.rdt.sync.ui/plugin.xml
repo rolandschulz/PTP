@@ -3,95 +3,6 @@
 <plugin>
    <extension-point id="synchronizeParticipants" name="Synchronize Participant" schema="schema/synchronizeParticipants.exsd"/>
    <extension
-         point="org.eclipse.ui.newWizards">
-      <wizard
-            canFinishEarly="false"
-            category="org.eclipse.ptp.rdt.ui.wizardCategory.Remote"
-            class="org.eclipse.ptp.rdt.sync.ui.wizards.NewRemoteSyncProjectWizard"
-            finalPerspective="org.eclipse.cdt.ui.CPerspective"
-            hasPages="true"
-            icon="icons/etool16/new_sync_c_proj.gif"
-            id="org.eclipse.ptp.rdt.sync.ui.newRemoteProjectWizard"
-            name="%wizard.name.0"
-            project="true">
-            <description>
-             	%syncProject.desc
-         	</description>
-      </wizard>
-      
-      
-      <wizard
-            category="org.eclipse.ptp.rdt.ui.wizardCategory.Remote"
-            class="org.eclipse.ptp.rdt.sync.ui.wizards.ConvertLocalToSyncProjectWizard"
-            hasPages="true"
-            icon="icons/obj16/convert-normal.gif"
-            id="org.eclipse.ptp.rdt.sync.ui.wizards.ConvertLocalToSyncProjectWizard"
-            name="%WizardConvertLocalProject.name"
-            >
-         <description>
-            %WizardConvertProject.description
-         </description>
-         <selection
-            class="org.eclipse.core.resources.IProject">
-         </selection>
-      </wizard>
-   </extension>
-   <extension
-         point="org.eclipse.ui.navigator.navigatorContent">
-      <navigatorContent
-            activeByDefault="true"
-            contentProvider="org.eclipse.cdt.internal.ui.navigator.CNavigatorContentProvider"
-            id="org.eclipse.ptp.rdt.sync.ui.navigator.content"
-            labelProvider="org.eclipse.cdt.internal.ui.navigator.CNavigatorLabelProvider"
-            name="Synchronize Elements"
-            priority="highest">
-         <triggerPoints>
-            <or>
-               <adapt
-                     type="org.eclipse.core.resources.IProject">
-                  <test
-                        property="org.eclipse.core.resources.projectNature"
-                        value="org.eclipse.cdt.core.cnature">
-                  </test>
-               </adapt>
-               <instanceof
-                     value="org.eclipse.cdt.ui.CElementGrouping">
-               </instanceof>
-               <instanceof
-                     value="org.eclipse.cdt.core.model.ICElement">
-               </instanceof>
-               <instanceof
-                     value="org.eclipse.core.resources.IResource">
-               </instanceof>
-            </or>
-         </triggerPoints>
-         <possibleChildren>
-            <or>
-               <instanceof
-                     value="org.eclipse.core.resources.IResource">
-               </instanceof>
-               <instanceof
-                     value="org.eclipse.cdt.core.model.ICElement">
-               </instanceof>
-               <instanceof
-                     value="org.eclipse.cdt.ui.CElementGrouping">
-               </instanceof>
-            </or>
-         </possibleChildren>
-         <override
-               policy="InvokeAlwaysRegardlessOfSuppressedExt"
-               suppressedExtensionId="org.eclipse.cdt.ui.navigator.content">
-         </override>
-       <commonWizard
-	         associatedExtensionId="org.eclipse.ptp.rdt.sync.ui.navigator.content"
-	         menuGroupId="org.eclipse.ptp.rdt.ui.newProject"
-	         type="new"
-	         wizardId="org.eclipse.ptp.rdt.sync.ui.newRemoteProjectWizard">
-		 <enablement/>
-	   </commonWizard>
-      </navigatorContent>
-   </extension>
-   <extension
        point="org.eclipse.ui.navigator.viewer">
        <viewerContentBinding viewerId="org.eclipse.ui.navigator.ProjectExplorer">
           <includes>
@@ -99,44 +10,10 @@
           </includes>
        </viewerContentBinding>
    </extension> 
-     <extension
-           point="org.eclipse.ui.propertyPages">
-        <page
-              category="org.eclipse.cdt.managedbuilder.ui.properties.Page_head_build"
-              class="org.eclipse.ptp.rdt.sync.ui.properties.BuildRemotePropertiesPage"
-              id="org.eclipse.ptp.rdt.sync.ui.properties.BuildRemotePropertiesPage"
-              name="Synchronize">
-  <enabledWhen>
-     <adapt
-           type="org.eclipse.core.resources.IProject">
-        <test
-              property="org.eclipse.core.resources.projectNature"
-              value="org.eclipse.ptp.rdt.sync.core.remoteSyncNature">
-        </test>
-     </adapt>
-  </enabledWhen>
-        </page>
-        <!-- category="org.eclipse.cdt.managedbuilder.ui.properties.Page_Environment -->
-        <page
-              category="org.eclipse.cdt.managedbuilder.ui.properties.Page_head_build"
-              class="org.eclipse.ptp.rdt.sync.ui.properties.EnvManagerPropertiesPage"
-              id="org.eclipse.ptp.rdt.sync.ui.properties.ModulesPropertiesPage"
-              name="Environment Management">
-           <enabledWhen>
-              <adapt type="org.eclipse.core.resources.IProject">
-                 <test
-                    property="org.eclipse.core.resources.projectNature"
-                    value="org.eclipse.ptp.rdt.sync.core.remoteSyncNature">
-                 </test>
-              </adapt>
-           </enabledWhen>
-        </page>
-
-     </extension>
    <extension
          point="org.eclipse.ui.commands">
       <command
-            defaultHandler="org.eclipse.ptp.rdt.sync.ui.SyncMenuOperation"
+            defaultHandler="org.eclipse.ptp.internal.rdt.sync.ui.SyncMenuOperation"
             id="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
             name="Sync Operations">
          <commandParameter
@@ -225,7 +102,7 @@
                </iterate>
             </visibleWhen>
             <dynamic
-                  class="org.eclipse.ptp.rdt.sync.ui.InitSyncMenu"
+                  class="org.eclipse.ptp.internal.rdt.sync.ui.InitSyncMenu"
                   id="org.eclipse.ptp.rdt.sync.ui.InitSyncMenu">
             </dynamic>
             <command
@@ -352,13 +229,13 @@
          point="org.eclipse.ui.preferencePages">
       <page
             category="org.eclipse.ptp.remote.ui.RemoteDevelopmentPreferencePage"
-            class="org.eclipse.ptp.rdt.sync.ui.SyncPreferencePage"
+            class="org.eclipse.ptp.internal.rdt.sync.ui.preferences.SyncPreferencePage"
             id="org.eclipse.ptp.rdt.sync.ui.SyncPreferencePage"
             name="Synchronized Projects">
       </page>
       <page
             category="org.eclipse.ptp.rdt.sync.ui.SyncPreferencePage"
-            class="org.eclipse.ptp.rdt.sync.ui.SyncFileFilterPage"
+            class="org.eclipse.ptp.internal.rdt.sync.ui.preferences.SyncFileFilterPage"
             id="org.eclipse.ptp.rdt.sync.ui.SyncPreferencePage.SyncFileFilterPage"
             name="File Filtering">
       </page>
@@ -368,7 +245,7 @@
       <view
             allowMultiple="false"
             category="org.eclipse.ptp.rdt.ui.views"
-            class="org.eclipse.ptp.rdt.sync.ui.SyncMergeFileTableViewer"
+            class="org.eclipse.ptp.internal.rdt.sync.ui.SyncMergeFileTableViewer"
             id="org.eclipse.ptp.rdt.sync.ui.SyncMergeFileTableViewer"
             name="Synchronized Merge View"
             restorable="false">

@@ -15,7 +15,6 @@ import java.net.URL;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
-import org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin;
 import org.eclipse.swt.graphics.Image;
 
 public class SyncImages {
@@ -27,14 +26,14 @@ public class SyncImages {
 
 	// Subdirectory (under the icons directory within this plugin) where 16 color images are
 	private static final String T_TABS = "obj16/"; //$NON-NLS-1$
-	
+
 	private static URL fgIconBaseURL;
 	static {
 		try {
 			fgIconBaseURL = new URL(RDTSyncUIPlugin.getDefault().getBundle().getEntry("/"), "icons/");//$NON-NLS-1$ //$NON-NLS-2$
 		} catch (MalformedURLException e) {
 			RDTSyncUIPlugin.log(e);
-		} 	
+		}
 	}
 
 	public static String EXCLUDE = NAME_PREFIX + "exclude_minus.png"; //$NON-NLS-1$
@@ -58,7 +57,7 @@ public class SyncImages {
 		return result;
 	}
 
-	public static Image get(String key) {
+	public static Image getImage(String key) {
 		return imageRegistry.get(key);
 	}
 

@@ -13,8 +13,6 @@ package org.eclipse.ptp.rdt.sync.core;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 
-import org.eclipse.cdt.managedbuilder.core.IConfiguration;
-import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
@@ -29,7 +27,9 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.ptp.rdt.sync.core.messages.Messages;
+import org.eclipse.ptp.internal.rdt.sync.core.RDTSyncCorePlugin;
+import org.eclipse.ptp.internal.rdt.sync.core.messages.Messages;
+import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 
@@ -50,7 +50,7 @@ public class RemoteContentProvider implements ITreeContentProvider {
 
 	/**
 	 * Create a new content provider at the given location (connection and directory) for the given project.
-	 *
+	 * 
 	 * @param conn
 	 * @param dir
 	 * @param proj
@@ -68,6 +68,7 @@ public class RemoteContentProvider implements ITreeContentProvider {
 	/**
 	 * Dispose of content provider.
 	 */
+	@Override
 	public void dispose() {
 		// Nothing to do
 	}
@@ -75,16 +76,19 @@ public class RemoteContentProvider implements ITreeContentProvider {
 	/**
 	 * Respond to changed input.
 	 */
+	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		// Nothing to do
 	}
 
 	/**
 	 * Get the root elements of the remote directory. The root requires special handling, since there is no IFolder for root.
-	 *
-	 * @param Ignored - but should probably be an IProject
+	 * 
+	 * @param Ignored
+	 *            - but should probably be an IProject
 	 * @return the elements
 	 */
+	@Override
 	public Object[] getElements(Object inputElement) {
 		IFileStore fileStore = fileManager.getResource(rootDir.toString());
 		IFileInfo[] childFiles;
@@ -94,16 +98,16 @@ public class RemoteContentProvider implements ITreeContentProvider {
 			// This can happen if the remote directory does not exist.
 			return new Object[0];
 		}
-		
+
 		IResource[] childObjects = new IResource[childFiles.length];
-		for (int i=0; i<childFiles.length; i++) {
+		for (int i = 0; i < childFiles.length; i++) {
 			if (childFiles[i].isDirectory()) {
 				childObjects[i] = project.getFolder(childFiles[i].getName());
 			} else {
 				childObjects[i] = project.getFile(childFiles[i].getName());
 			}
 		}
-		
+
 		return childObjects;
 	}
 
@@ -113,13 +117,14 @@ public class RemoteContentProvider implements ITreeContentProvider {
 	 * @param element
 	 * @return the elements
 	 */
+	@Override
 	public Object[] getChildren(Object parentElement) {
 		if (!(parentElement instanceof IFolder)) {
 			return new Object[0];
 		}
 
-		IFileStore fileStore = fileManager.getResource(rootDir.toString()).
-				getFileStore(((IFolder) parentElement).getProjectRelativePath());
+		IFileStore fileStore = fileManager.getResource(rootDir.toString()).getFileStore(
+				((IFolder) parentElement).getProjectRelativePath());
 		IFileInfo[] childFiles;
 		try {
 			childFiles = fileStore.childInfos(EFS.NONE, null);
@@ -127,78 +132,85 @@ public class RemoteContentProvider implements ITreeContentProvider {
 			// This can happen if the directory only exists locally.
 			return new Object[0];
 		}
-		
+
 		IResource[] childObjects = new IResource[childFiles.length];
-		for (int i=0; i<childFiles.length; i++) {
-			IPath childPath = ((IFolder) parentElement).getProjectRelativePath().addTrailingSeparator().append(childFiles[i].getName());
+		for (int i = 0; i < childFiles.length; i++) {
+			IPath childPath = ((IFolder) parentElement).getProjectRelativePath().addTrailingSeparator()
+					.append(childFiles[i].getName());
 			if (childFiles[i].isDirectory()) {
 				childObjects[i] = project.getFolder(childPath);
 			} else {
 				childObjects[i] = project.getFile(childPath);
 			}
 		}
-		
+
 		return childObjects;
 	}
 
 	/**
 	 * Get the parent of the given element
-	 *
-	 * @param the element
+	 * 
+	 * @param the
+	 *            element
 	 * @return the parent element
 	 */
+	@Override
 	public Object getParent(Object element) {
 		if (!(element instanceof IResource)) {
 			return null;
 		}
-		
+
 		return ((IResource) element).getParent();
 	}
 
 	/**
 	 * See if element has children
-	 *
-	 * @param the element
+	 * 
+	 * @param the
+	 *            element
 	 * @return whether the element has any children.
 	 */
+	@Override
 	public boolean hasChildren(Object element) {
 		Object[] obj = getChildren(element);
 		return obj == null ? false : obj.length > 0;
 	}
-	
+
 	/**
 	 * Provide a way to test if the remote connection is still open.
+	 * 
 	 * @return whether connection is still open
 	 */
 	public boolean isOpen() {
 		return connection.isOpen();
 	}
-	
+
 	/**
 	 * Get the contents of the corresponding remote file for the given IFile. (IFile should belong to a synchronized project.)
-	 *
+	 * 
 	 * @param file
 	 * @return a stream
-	 * @throws CoreException on problems accessing the remote file.
-	 * @throws MissingConnectionException 
+	 * @throws CoreException
+	 *             on problems accessing the remote file.
+	 * @throws MissingConnectionException
 	 */
 	public static BufferedInputStream getFileContents(IFile file) throws CoreException, MissingConnectionException {
 		BufferedInputStream retStream = null;
 		IProject project = file.getProject();
-		IConfiguration bconf = ManagedBuildManager.getBuildInfo(project).getDefaultConfiguration();
-		BuildScenario bs = BuildConfigurationManager.getInstance().getBuildScenarioForBuildConfiguration(bconf);
-		if (bs != null) {
-			IRemoteFileManager fileManager = bs.getRemoteConnection().getRemoteServices().getFileManager(bs.getRemoteConnection());
-			IPath remotePath = new Path(bs.getLocation(project)).addTrailingSeparator().append(file.getProjectRelativePath());
+		BuildScenario scenario = BuildConfigurationManager.getInstance().getActiveBuildScenario(project);
+		if (scenario != null) {
+			IRemoteFileManager fileManager = scenario.getRemoteConnection().getRemoteServices()
+					.getFileManager(scenario.getRemoteConnection());
+			IPath remotePath = new Path(scenario.getLocation(project)).addTrailingSeparator().append(file.getProjectRelativePath());
 			IFileStore fileStore = fileManager.getResource(remotePath.toString()); // Assumes "/" separator on remote
 			InputStream fileInput = fileStore.openInputStream(EFS.NONE, null);
 			if (fileInput != null) {
 				retStream = new BufferedInputStream(fileInput);
 			}
 		} else {
-			throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.ptp.rdt.sync.core", Messages.RemoteContentProvider_1)); //$NON-NLS-1$
+			throw new CoreException(new Status(IStatus.ERROR, RDTSyncCorePlugin.PLUGIN_ID, Messages.RemoteContentProvider_1));
 		}
-		
+
 		return retStream;
 	}
 }

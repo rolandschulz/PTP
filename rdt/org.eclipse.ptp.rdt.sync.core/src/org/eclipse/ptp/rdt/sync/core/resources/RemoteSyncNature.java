@@ -55,6 +55,7 @@ public class RemoteSyncNature implements IProjectNature {
 	 * 
 	 * @see org.eclipse.core.resources.IProjectNature#configure()
 	 */
+	@Override
 	public void configure() throws CoreException {
 		// TODO Auto-generated method stub
 
@@ -65,6 +66,7 @@ public class RemoteSyncNature implements IProjectNature {
 	 * 
 	 * @see org.eclipse.core.resources.IProjectNature#deconfigure()
 	 */
+	@Override
 	public void deconfigure() throws CoreException {
 		// TODO Auto-generated method stub
 
@@ -75,6 +77,7 @@ public class RemoteSyncNature implements IProjectNature {
 	 * 
 	 * @see org.eclipse.core.resources.IProjectNature#getProject()
 	 */
+	@Override
 	public IProject getProject() {
 		return fProject;
 	}
@@ -86,6 +89,7 @@ public class RemoteSyncNature implements IProjectNature {
 	 * org.eclipse.core.resources.IProjectNature#setProject(org.eclipse.core
 	 * .resources.IProject)
 	 */
+	@Override
 	public void setProject(IProject project) {
 		fProject = project;
 	}

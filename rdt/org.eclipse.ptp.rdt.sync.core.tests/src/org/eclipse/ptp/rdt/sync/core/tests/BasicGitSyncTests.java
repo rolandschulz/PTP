@@ -31,7 +31,7 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.rdt.sync.core.CommandRunner;
 import org.eclipse.ptp.rdt.sync.core.CommandRunner.CommandResults;
-import org.eclipse.ptp.rdt.sync.core.RemoteSyncException;
+import org.eclipse.ptp.rdt.sync.core.exceptions.RemoteSyncException;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.junit.Rule;
 import org.junit.Test;

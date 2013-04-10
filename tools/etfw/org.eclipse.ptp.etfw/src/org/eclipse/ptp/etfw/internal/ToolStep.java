@@ -27,8 +27,6 @@ import java.util.Map.Entry;
 
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.model.ICProject;
-import org.eclipse.cdt.managedbuilder.core.IConfiguration;
-import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -95,7 +93,7 @@ public abstract class ToolStep extends Job implements IToolLaunchConfigurationCo
 	protected ILaunchConfiguration configuration = null;
 	// protected final ExternalToolProcess tool;
 	protected Map<String, String> IOMap = null;
-	protected boolean isSyncProject=false;
+	protected boolean isSyncProject = false;
 	IBuildLaunchUtils utilBlob = null;
 
 	protected ToolStep(ILaunchConfiguration conf, String name, IBuildLaunchUtils utilBlob) throws CoreException {
@@ -104,23 +102,20 @@ public abstract class ToolStep extends Job implements IToolLaunchConfigurationCo
 
 		thisProject = getProject(configuration);
 		thisCProject = CCorePlugin.getDefault().getCoreModel().create(thisProject);
-		
-		isSyncProject=RemoteSyncNature.hasNature(thisProject);//BuildConfigurationManager.getInstance().isInitialized(thisProject);
-		
-		if(isSyncProject){
-			IConfiguration configuration = ManagedBuildManager.getBuildInfo(thisProject).getDefaultConfiguration();
-			projectLocation = BuildConfigurationManager.getInstance().getBuildScenarioForBuildConfiguration(configuration).getLocation(thisProject);
-		}
-		else
-		{
+
+		isSyncProject = RemoteSyncNature.hasNature(thisProject);// BuildConfigurationManager.getInstance().isInitialized(thisProject);
+
+		if (isSyncProject) {
+			projectLocation = BuildConfigurationManager.getInstance().getActiveBuildScenario(thisProject).getLocation();
+		} else {
 			projectLocation = thisCProject.getResource().getLocationURI().getPath();
 		}
-		
+
 		outputLocation = projectLocation;
 
 		projectBinary = Messages.ToolStep_Unknown;
 		projectName = Messages.ToolStep_Unknown;
-		this.utilBlob=utilBlob;
+		this.utilBlob = utilBlob;
 		IOMap = new HashMap<String, String>();
 		// this.tool=Activator.getTool(configuration.getAttribute(SELECTED_TOOL,
 		// (String)null));
@@ -227,8 +222,9 @@ public abstract class ToolStep extends Job implements IToolLaunchConfigurationCo
 	}
 
 	protected List<String> getToolArgumentList(ToolApp app, ILaunchConfiguration configuration) throws CoreException {
-		if (app == null)
+		if (app == null) {
 			return null;
+		}
 		// Formerly replaced with projectLocation global variable. May be the
 		// same?
 		List<String> allargs = app.getArguments(configuration);
@@ -239,19 +235,22 @@ public abstract class ToolStep extends Job implements IToolLaunchConfigurationCo
 			allargs.set(i, tmp);
 		}
 		String io = parseInput(app).trim();
-		if (io.length() > 0)
+		if (io.length() > 0) {
 			allargs.add(io);
+		}
 		io = parseOutput(app).trim();
-		if (io.length() > 0)
+		if (io.length() > 0) {
 			allargs.add(io);
+		}
 		return allargs;
 	}
 
 	protected String getToolArguments(ToolApp app, ILaunchConfiguration configuration) throws CoreException {
 		List<String> argList = getToolArgumentList(app, configuration);
 		String args = ""; //$NON-NLS-1$
-		if (argList == null)
+		if (argList == null) {
 			return (args);
+		}
 
 		for (String a : argList) {
 			args += a + " "; //$NON-NLS-1$
@@ -289,14 +288,14 @@ public abstract class ToolStep extends Job implements IToolLaunchConfigurationCo
 
 	private String parseInput(ToolApp app) {
 		String input = ""; //$NON-NLS-1$
-//		String oneIn = ""; //$NON-NLS-1$
-		if (app.inputArgs != null)
-			for (int i = 0; i < app.inputArgs.length; i++) {
-//				oneIn = ""; //$NON-NLS-1$
-//				if (app.inputArgs[i].pathFlag != null)
-//					oneIn += app.inputArgs[i].pathFlag + " "; //$NON-NLS-1$
-				if (IOMap.containsKey(app.inputArgs[i].ID)) {
-					input += IOMap.get(app.inputArgs[i].ID);
+		//		String oneIn = ""; //$NON-NLS-1$
+		if (app.inputArgs != null) {
+			for (ToolIO inputArg : app.inputArgs) {
+				//				oneIn = ""; //$NON-NLS-1$
+				// if (app.inputArgs[i].pathFlag != null)
+				//					oneIn += app.inputArgs[i].pathFlag + " "; //$NON-NLS-1$
+				if (IOMap.containsKey(inputArg.ID)) {
+					input += IOMap.get(inputArg.ID);
 					/*
 					 * If input type is not directory, get a file list from the
 					 * specified directory
@@ -310,6 +309,7 @@ public abstract class ToolStep extends Job implements IToolLaunchConfigurationCo
 				// if(app.inputArgs[i].)
 
 			}
+		}
 		return input;
 	}
 
@@ -320,18 +320,19 @@ public abstract class ToolStep extends Job implements IToolLaunchConfigurationCo
 		 * Make and the new directory, associate it with the ID and stick -that-
 		 * in the iomap!
 		 */
-		if (app.outputArgs != null)
-			for (int i = 0; i < app.outputArgs.length; i++) {
-				if (app.outputArgs[i].pathFlag != null)
-					output += app.outputArgs[i].pathFlag + " "; //$NON-NLS-1$
-				if (IOMap.containsKey(app.outputArgs[i].ID)) {
-					output += IOMap.get(app.outputArgs[i].ID);
+		if (app.outputArgs != null) {
+			for (ToolIO outputArg : app.outputArgs) {
+				if (outputArg.pathFlag != null) {
+					output += outputArg.pathFlag + " "; //$NON-NLS-1$
+				}
+				if (IOMap.containsKey(outputArg.ID)) {
+					output += IOMap.get(outputArg.ID);
 					/*
 					 * If input type is not directory, get a file list from the
 					 * specified directory
 					 */
 				} else {
-					output += createOutputPath(app.outputArgs[i]);
+					output += createOutputPath(outputArg);
 				}
 				/*
 				 * 
@@ -339,6 +340,7 @@ public abstract class ToolStep extends Job implements IToolLaunchConfigurationCo
 				// if(app.inputArgs[i].)
 
 			}
+		}
 
 		return output;
 	}
@@ -367,12 +369,14 @@ public abstract class ToolStep extends Job implements IToolLaunchConfigurationCo
 		String command = app.toolCommand;
 
 		String toolPath = utilBlob.getToolPath(app.toolGroup); // checkToolEnvPath(app.toolCommand);
-		if(toolPath==null||toolPath.length()==0)
-			toolPath=utilBlob.checkToolEnvPath(command);
+		if (toolPath == null || toolPath.length() == 0) {
+			toolPath = utilBlob.checkToolEnvPath(command);
+		}
 		if (toolPath != null && toolPath.length() > 0) {
-			String fiSep=File.separator;
-			if(toolPath.startsWith(UNIX_SLASH))
-				fiSep=UNIX_SLASH;
+			String fiSep = File.separator;
+			if (toolPath.startsWith(UNIX_SLASH)) {
+				fiSep = UNIX_SLASH;
+			}
 			command = toolPath + fiSep + command;
 		}
 
@@ -392,8 +396,9 @@ public abstract class ToolStep extends Job implements IToolLaunchConfigurationCo
 	 */
 	protected String getToolCommand(ToolApp app, ILaunchConfiguration configuration) throws CoreException {
 		String command = getToolExecutable(app);
-		if (command == null)
+		if (command == null) {
 			return null;
+		}
 
 		return command + " " + getToolArguments(app, configuration); //$NON-NLS-1$
 	}
@@ -406,8 +411,9 @@ public abstract class ToolStep extends Job implements IToolLaunchConfigurationCo
 	protected List<String> getToolCommandList(ToolApp app, ILaunchConfiguration configuration) throws CoreException {
 		List<String> command = new ArrayList<String>();
 		String exec = getToolExecutable(app);
-		if (exec == null)
+		if (exec == null) {
 			return null;
+		}
 
 		command.add(exec.trim());
 

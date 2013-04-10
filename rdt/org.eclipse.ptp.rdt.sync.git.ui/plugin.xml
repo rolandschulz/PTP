@@ -12,9 +12,9 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            category="org.eclipse.ptp.rdt.sync.ui.SyncPreferencePage"
+            category="org.eclipse.ptp.internal.rdt.sync.ui.preferences.SyncPreferencePage"
             class="org.eclipse.ptp.internal.rdt.sync.git.ui.preferences.SyncGitPreferencePage"
-            id="org.eclipse.ptp.rdt.sync.ui.SyncPreferencePage.SyncGitPreferencePage"
+            id="org.eclipse.ptp.internal.rdt.sync.ui.preferences.SyncPreferencePage.SyncGitPreferencePage"
             name="%preferencePage.name">
       </page>
    </extension>

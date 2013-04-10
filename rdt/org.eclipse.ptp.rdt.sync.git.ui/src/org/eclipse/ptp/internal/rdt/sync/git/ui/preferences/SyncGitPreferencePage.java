@@ -35,9 +35,8 @@ import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.CommandRunner;
 import org.eclipse.ptp.rdt.sync.core.CommandRunner.CommandResults;
 import org.eclipse.ptp.rdt.sync.core.RecursiveSubMonitor;
-import org.eclipse.ptp.rdt.sync.core.RemoteExecutionException;
-import org.eclipse.ptp.rdt.sync.core.RemoteSyncException;
-import org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin;
+import org.eclipse.ptp.rdt.sync.core.exceptions.RemoteExecutionException;
+import org.eclipse.ptp.rdt.sync.core.exceptions.RemoteSyncException;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemotePreferenceConstants;
 import org.eclipse.ptp.remote.core.IRemoteServices;
@@ -277,7 +276,7 @@ public class SyncGitPreferencePage extends PreferencePage implements IWorkbenchP
 			IScopeContext context = InstanceScope.INSTANCE;
 			Preferences prefSyncNode = context.getNode(instanceScopeSyncNode);
 			if (prefSyncNode == null) {
-				Activator.getDefault().logErrorMessage(Messages.SyncGitPreferencePage_18);
+				Activator.log(Messages.SyncGitPreferencePage_18);
 			} else {
 				try {
 					// Avoid creating node if it doesn't exist
@@ -405,10 +404,12 @@ public class SyncGitPreferencePage extends PreferencePage implements IWorkbenchP
 			MessageDialog.openError(null, Messages.SyncGitPreferencePage_8, errorMessage);
 			gitErrorMessage = Messages.SyncGitPreferencePage_7;
 			return false;
-		} else if (cr.getExitCode() == 126) {
+		}
+		if (cr.getExitCode() == 126) {
 			gitErrorMessage = Messages.SyncGitPreferencePage_9;
 			return false;
-		} else if (cr.getExitCode() == 127) {
+		}
+		if (cr.getExitCode() == 127) {
 			gitErrorMessage = Messages.SyncGitPreferencePage_10;
 			return false;
 		}
@@ -527,7 +528,7 @@ public class SyncGitPreferencePage extends PreferencePage implements IWorkbenchP
 		IScopeContext context = InstanceScope.INSTANCE;
 		Preferences prefSyncNode = context.getNode(instanceScopeSyncNode);
 		if (prefSyncNode == null) {
-			RDTSyncUIPlugin.getDefault().logErrorMessage(Messages.SyncGitPreferencePage_20);
+			Activator.log(Messages.SyncGitPreferencePage_20);
 			return;
 		}
 
@@ -538,7 +539,7 @@ public class SyncGitPreferencePage extends PreferencePage implements IWorkbenchP
 				prefGitNode = prefSyncNode.node(GIT_LOCATION_NODE_NAME);
 			}
 		} catch (BackingStoreException e) {
-			RDTSyncUIPlugin.log(Messages.SyncGitPreferencePage_21, e);
+			Activator.log(Messages.SyncGitPreferencePage_21, e);
 		}
 
 		for (Map.Entry<IRemoteConnection, String> entry : fConnectionNameToGitPathMap.entrySet()) {

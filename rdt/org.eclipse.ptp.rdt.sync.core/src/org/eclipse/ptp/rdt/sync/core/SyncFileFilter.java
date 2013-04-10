@@ -21,7 +21,8 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.ptp.rdt.sync.core.messages.Messages;
+import org.eclipse.ptp.internal.rdt.sync.core.RDTSyncCorePlugin;
+import org.eclipse.ptp.internal.rdt.sync.core.messages.Messages;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 

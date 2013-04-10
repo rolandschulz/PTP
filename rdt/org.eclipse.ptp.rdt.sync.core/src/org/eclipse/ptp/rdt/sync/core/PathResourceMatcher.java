@@ -15,7 +15,7 @@ import java.util.NoSuchElementException;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.ptp.rdt.sync.core.messages.Messages;
+import org.eclipse.ptp.internal.rdt.sync.core.messages.Messages;
 import org.osgi.service.prefs.Preferences;
 
 /**

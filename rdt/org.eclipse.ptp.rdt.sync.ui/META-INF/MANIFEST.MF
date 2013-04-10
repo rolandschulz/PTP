@@ -4,14 +4,10 @@ Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.ptp.rdt.sync.ui;singleton:=true
 Bundle-Version: 2.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Require-Bundle: org.eclipse.cdt.core,
- org.eclipse.cdt.ui,
- org.eclipse.core.runtime,
+Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
  org.eclipse.ui.ide,
  org.eclipse.core.resources,
- org.eclipse.cdt.managedbuilder.core,
- org.eclipse.cdt.managedbuilder.ui,
  org.eclipse.ptp.remote.core,
  org.eclipse.ptp.remote.ui,
  org.eclipse.ptp.services.core,
@@ -20,10 +16,13 @@ Require-Bundle: org.eclipse.cdt.core,
  org.eclipse.ptp.ems.ui
 Bundle-Localization: plugin
 Bundle-ActivationPolicy: lazy
-Bundle-Activator: org.eclipse.ptp.rdt.sync.ui.RDTSyncUIPlugin
+Bundle-Activator: org.eclipse.ptp.internal.rdt.sync.ui.RDTSyncUIPlugin
 Bundle-Vendor: %providerName
-Export-Package: org.eclipse.ptp.rdt.sync.ui;x-friends:="org.eclipse.ptp.rdt.sync.git.ui",
- org.eclipse.ptp.rdt.sync.ui.wizards;x-friends:="org.eclipse.ptp.rdt.sync.ui.fortran"
+Export-Package: org.eclipse.ptp.internal.rdt.sync.ui;x-internal:=true,
+ org.eclipse.ptp.internal.rdt.sync.ui.handlers;x-internal:=true,
+ org.eclipse.ptp.internal.rdt.sync.ui.messages;x-internal:=true,
+ org.eclipse.ptp.internal.rdt.sync.ui.preferences;x-internal:=true,
+ org.eclipse.ptp.rdt.sync.ui;x-friends:="org.eclipse.ptp.rdt.sync.git.ui"
 Import-Package: org.eclipse.compare,
  org.eclipse.compare.structuremergeviewer,
  org.eclipse.core.filesystem,

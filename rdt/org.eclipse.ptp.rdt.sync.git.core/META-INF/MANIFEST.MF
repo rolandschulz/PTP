@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.rdt.sync.git.core;singleton:=true
 Bundle-Version: 2.0.0.qualifier
-Bundle-Activator: org.eclipse.ptp.rdt.sync.git.core.Activator
+Bundle-Activator: org.eclipse.ptp.internal.rdt.sync.git.core.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
  org.eclipse.ptp.rdt.sync.core,
@@ -14,4 +14,4 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: %pluginProvider
 Bundle-Localization: plugin
-Export-Package: org.eclipse.ptp.rdt.sync.git.core;x-friends:="org.eclipse.ptp.rdt.sync.git.ui"
+Export-Package: org.eclipse.ptp.internal.rdt.sync.git.core;x-friends:="org.eclipse.ptp.rdt.sync.git.ui"

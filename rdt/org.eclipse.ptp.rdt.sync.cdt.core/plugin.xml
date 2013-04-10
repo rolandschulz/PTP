@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.cdt.core.UNCPathConverter">
+      <UNCPathConverter
+            class="org.eclipse.ptp.internal.rdt.sync.cdt.core.SyncUNCPathConverter">
+      </UNCPathConverter>
+   </extension>
+   <extension
+         point="org.eclipse.cdt.managedbuilder.core.buildDefinitions">
+      <builder
+            commandLauncher="org.eclipse.ptp.internal.rdt.sync.cdt.core.remotemake.SyncCommandLauncher"
+            id="org.eclipse.ptp.rdt.sync.cdt.core.SyncBuilder"
+            isAbstract="false"
+            isVariableCaseSensitive="false"
+            name="%Builder.name">
+      </builder>
+   </extension>
+   <extension
+         point="org.eclipse.cdt.core.LanguageSettingsProvider">
+      <provider
+            class="org.eclipse.ptp.internal.rdt.sync.cdt.core.SyncGCCBuiltinSpecsDetector"
+            id="org.eclipse.ptp.rdt.sync.core.SyncGCCBuiltinSpecsDetector"
+            name="Sync GCC Builtin Compiler Settings"
+            parameter="${COMMAND} -E -P -v -dD ${INPUTS}"
+            prefer-non-shared="true">
+         <language-scope
+               id="org.eclipse.cdt.core.gcc">
+         </language-scope>
+         <language-scope
+               id="org.eclipse.cdt.core.g++">
+         </language-scope>
+      </provider>
+      <provider
+            class="org.eclipse.ptp.internal.rdt.sync.cdt.core.SyncGCCBuildCommandParser"
+            id="org.eclipse.ptp.rdt.sync.core.SyncGCCBuildCommandParser"
+            name="Sync GCC Build Output Parser"
+            parameter="(gcc)|([gc]\+\+)|(clang)"
+            prefer-non-shared="true">
+         <language-scope
+               id="org.eclipse.cdt.core.gcc">
+         </language-scope>
+         <language-scope
+               id="org.eclipse.cdt.core.g++">
+         </language-scope>
+      </provider>
+   </extension>
+   <extension
+         point="org.eclipse.ptp.rdt.sync.core.synchronizePolicy">
+      <synchronizePolicy
+            class="org.eclipse.ptp.internal.rdt.sync.cdt.core.SyncPolicy"
+            nature="org.eclipse.cdt.core.cnature">
+      </synchronizePolicy>
+   </extension>
+</plugin>

@@ -77,7 +77,7 @@ public class Activator extends AbstractUIPlugin {
 		getDefault().getLog().log(status);
 	}
 
-	public void logErrorMessage(String message) {
+	public static void log(String message) {
 		log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, message, null));
 	}
 }

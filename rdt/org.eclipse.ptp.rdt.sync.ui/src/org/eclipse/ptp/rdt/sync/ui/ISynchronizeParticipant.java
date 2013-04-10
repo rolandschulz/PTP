@@ -12,7 +12,7 @@ package org.eclipse.ptp.rdt.sync.ui;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.operation.IRunnableContext;
-import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
+import org.eclipse.ptp.rdt.sync.core.services.ISyncServiceProvider;
 import org.eclipse.swt.widgets.Composite;
 
 /**

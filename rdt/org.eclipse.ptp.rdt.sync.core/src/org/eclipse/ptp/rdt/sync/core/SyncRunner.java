@@ -16,7 +16,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider;
+import org.eclipse.ptp.rdt.sync.core.services.ISyncServiceProvider;
 
 /**
  * Simple class with a single public method for sync'ing. This serves as an adapter for an ISyncServiceProvider so that clients

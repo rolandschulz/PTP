@@ -16,15 +16,11 @@ import org.eclipse.osgi.util.NLS;
 @SuppressWarnings("javadoc")
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.internal.rdt.sync.git.ui.messages.messages"; //$NON-NLS-1$
-	public static String GitParticipant_0;
 	public static String GitParticipant_1;
 	public static String GitParticipant_2;
 	public static String GitParticipant_3;
 	public static String GitParticipant_browse;
-	public static String GitParticipant_connection;
 	public static String GitParticipant_location;
-	public static String GitParticipant_new;
-	public static String GitParticipant_remoteProvider;
 	public static String SyncGitPreferencePage_0;
 	public static String SyncGitPreferencePage_1;
 	public static String SyncGitPreferencePage_10;
@@ -37,7 +33,6 @@ public class Messages extends NLS {
 	public static String SyncGitPreferencePage_17;
 	public static String SyncGitPreferencePage_18;
 	public static String SyncGitPreferencePage_19;
-	public static String SyncGitPreferencePage_2;
 	public static String SyncGitPreferencePage_20;
 	public static String SyncGitPreferencePage_21;
 	public static String SyncGitPreferencePage_3;

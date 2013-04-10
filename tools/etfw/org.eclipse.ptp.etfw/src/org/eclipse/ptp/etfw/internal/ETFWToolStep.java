@@ -19,8 +19,6 @@ import java.util.Map.Entry;
 
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.model.ICProject;
-import org.eclipse.cdt.managedbuilder.core.IConfiguration;
-import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -104,12 +102,8 @@ public abstract class ETFWToolStep extends Job implements IToolLaunchConfigurati
 		isSyncProject = RemoteSyncNature.hasNature(thisProject);// BuildConfigurationManager.getInstance().isInitialized(thisProject);
 
 		if (isSyncProject) {
-			IConfiguration configuration = ManagedBuildManager.getBuildInfo(thisProject).getDefaultConfiguration();
-			projectLocation = BuildConfigurationManager.getInstance().getBuildScenarioForBuildConfiguration(configuration)
-					.getLocation(thisProject);
-		}
-		else
-		{
+			projectLocation = BuildConfigurationManager.getInstance().getActiveBuildScenario(thisProject).getLocation();
+		} else {
 			projectLocation = thisCProject.getResource().getLocationURI().getPath();
 		}
 
@@ -224,8 +218,9 @@ public abstract class ETFWToolStep extends Job implements IToolLaunchConfigurati
 	}
 
 	protected List<String> getToolArgumentList(ToolAppType app, ILaunchConfiguration configuration) throws CoreException {
-		if (app == null)
+		if (app == null) {
 			return null;
+		}
 		// Formerly replaced with projectLocation global variable. May be the
 		// same?
 		List<String> allargs = ToolAppTypeUtil.getArguments(configuration, app.getToolPanes(), app.getToolArguments());// app.getArguments(configuration);
@@ -236,19 +231,22 @@ public abstract class ETFWToolStep extends Job implements IToolLaunchConfigurati
 			allargs.set(i, tmp);
 		}
 		String io = parseInput(app).trim();
-		if (io.length() > 0)
+		if (io.length() > 0) {
 			allargs.add(io);
+		}
 		io = parseOutput(app).trim();
-		if (io.length() > 0)
+		if (io.length() > 0) {
 			allargs.add(io);
+		}
 		return allargs;
 	}
 
 	protected String getToolArguments(ToolAppType app, ILaunchConfiguration configuration) throws CoreException {
 		List<String> argList = getToolArgumentList(app, configuration);
 		String args = ""; //$NON-NLS-1$
-		if (argList == null)
+		if (argList == null) {
 			return (args);
+		}
 
 		for (String a : argList) {
 			args += a + " "; //$NON-NLS-1$
@@ -287,7 +285,7 @@ public abstract class ETFWToolStep extends Job implements IToolLaunchConfigurati
 	private String parseInput(ToolAppType app) {
 		String input = ""; //$NON-NLS-1$
 		//			String oneIn = ""; //$NON-NLS-1$
-		if (app.getInputArgs() != null)
+		if (app.getInputArgs() != null) {
 			for (ToolIOType inputArg : app.getInputArgs()) {
 				// for (int i = 0; i < app.inputArgs.length; i++) {
 				//					oneIn = ""; //$NON-NLS-1$
@@ -308,6 +306,7 @@ public abstract class ETFWToolStep extends Job implements IToolLaunchConfigurati
 				// if(app.inputArgs[i].)
 
 			}
+		}
 		return input;
 	}
 
@@ -318,11 +317,12 @@ public abstract class ETFWToolStep extends Job implements IToolLaunchConfigurati
 		 * Make and the new directory, associate it with the ID and stick -that-
 		 * in the iomap!
 		 */
-		if (app.getOutputArgs() != null)
+		if (app.getOutputArgs() != null) {
 			for (ToolIOType outputArg : app.getOutputArgs()) {
 				// for (int i = 0; i < app.outputArgs.length; i++) {
-				if (outputArg.getPathFlag() != null)
+				if (outputArg.getPathFlag() != null) {
 					output += outputArg.getPathFlag() + " "; //$NON-NLS-1$
+				}
 				if (IOMap.containsKey(outputArg.getId())) {
 					output += IOMap.get(outputArg.getId());
 					/*
@@ -338,6 +338,7 @@ public abstract class ETFWToolStep extends Job implements IToolLaunchConfigurati
 				// if(app.inputArgs[i].)
 
 			}
+		}
 
 		return output;
 	}
@@ -366,12 +367,14 @@ public abstract class ETFWToolStep extends Job implements IToolLaunchConfigurati
 		String command = app.getToolCommand();// .toolCommand;
 
 		String toolPath = utilBlob.getToolPath(app.getToolGroup());// app.toolGroup); // checkToolEnvPath(app.toolCommand);
-		if (toolPath == null || toolPath.length() == 0)
+		if (toolPath == null || toolPath.length() == 0) {
 			toolPath = utilBlob.checkToolEnvPath(command);
+		}
 		if (toolPath != null && toolPath.length() > 0) {
 			String fiSep = File.separator;
-			if (toolPath.startsWith(UNIX_SLASH))
+			if (toolPath.startsWith(UNIX_SLASH)) {
 				fiSep = UNIX_SLASH;
+			}
 			command = toolPath + fiSep + command;
 		}
 
@@ -391,8 +394,9 @@ public abstract class ETFWToolStep extends Job implements IToolLaunchConfigurati
 	 */
 	protected String getToolCommand(ToolAppType app, ILaunchConfiguration configuration) throws CoreException {
 		String command = getToolExecutable(app);
-		if (command == null)
+		if (command == null) {
 			return null;
+		}
 
 		return command + " " + getToolArguments(app, configuration); //$NON-NLS-1$
 	}
@@ -405,8 +409,9 @@ public abstract class ETFWToolStep extends Job implements IToolLaunchConfigurati
 	protected List<String> getToolCommandList(ToolAppType app, ILaunchConfiguration configuration) throws CoreException {
 		List<String> command = new ArrayList<String>();
 		String exec = getToolExecutable(app);
-		if (exec == null)
+		if (exec == null) {
 			return null;
+		}
 
 		command.add(exec.trim());
 
@@ -417,7 +422,7 @@ public abstract class ETFWToolStep extends Job implements IToolLaunchConfigurati
 		command.addAll(args);
 		return command;
 	}
-	
+
 	public abstract void setSuccessAttribute(String value);
-	
+
 }
