@@ -23,6 +23,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.ControlStateRuleType;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Listener;
@@ -104,9 +105,19 @@ public class ControlStateListener implements SelectionListener {
 					break;
 				case SHOW:
 					target.setVisible(true);
+					/* Showing means that the control's area is used, that is, 
+					 * it is included by the layout manager */
+					if (target.getLayoutData() instanceof GridData) {
+						((GridData)target.getLayoutData()).exclude = false;
+					}
 					break;
 				case HIDE:
 					target.setVisible(false);
+					/* Hiding means that the control's area is not used, that is, 
+					 * it is excluded by the layout manager */
+					if (target.getLayoutData() instanceof GridData) {
+						((GridData)target.getLayoutData()).exclude = true;
+					}
 					break;
 				default:
 					break;
@@ -121,9 +132,19 @@ public class ControlStateListener implements SelectionListener {
 					break;
 				case SHOW:
 					target.setVisible(false);
+					/* Hiding means that the control's area is not used, that is, 
+					 * it is excluded by the layout manager */
+					if (target.getLayoutData() instanceof GridData) {
+						((GridData)target.getLayoutData()).exclude = true;
+					}
 					break;
 				case HIDE:
 					target.setVisible(true);
+					/* Showing means that the control's area is used, that is, 
+					 * it is included by the layout manager */
+					if (target.getLayoutData() instanceof GridData) {
+						((GridData)target.getLayoutData()).exclude = false;
+					}
 					break;
 				default:
 					break;
