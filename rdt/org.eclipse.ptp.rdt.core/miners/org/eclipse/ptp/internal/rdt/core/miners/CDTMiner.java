@@ -274,14 +274,10 @@ public class CDTMiner extends Miner {
 				provider = (IRemoteIndexerInfoProvider) Serializer.deserialize(getString(theCommand, 6));
 			} catch (IOException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
-				status.getDataStore().refresh(status);
-				status.getDataStore().disconnectObject(status.getParent());
-				return status;
+				return statusDone(status);
 			} catch (ClassNotFoundException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
-				status.getDataStore().refresh(status);
-				status.getDataStore().disconnectObject(status.getParent());
-				return status;
+				return statusDone(status);
 			}
 			
 			UniversalServerUtilities.logDebugMessage(LOG_TAG, "Indexing delta for scope: " + scopeName, _dataStore); //$NON-NLS-1$
@@ -335,8 +331,10 @@ public class CDTMiner extends Miner {
 				
 			} catch (IOException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			} catch (ClassNotFoundException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			}
 
 		}
@@ -369,6 +367,7 @@ public class CDTMiner extends Miner {
 				
 			} catch (IOException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			}
 		}
 		
@@ -390,8 +389,10 @@ public class CDTMiner extends Miner {
 				
 			} catch (IOException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			} catch (ClassNotFoundException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			}
 		}
 
@@ -413,8 +414,10 @@ public class CDTMiner extends Miner {
 				
 			} catch (IOException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			} catch (ClassNotFoundException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			}
 		}
 		
@@ -437,8 +440,10 @@ public class CDTMiner extends Miner {
 				
 			} catch (IOException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			} catch (ClassNotFoundException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			}
 		}
 		
@@ -462,8 +467,10 @@ public class CDTMiner extends Miner {
 				
 			} catch (IOException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			} catch (ClassNotFoundException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			}
 		}
 		
@@ -487,8 +494,10 @@ public class CDTMiner extends Miner {
 				
 			} catch (IOException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			} catch (ClassNotFoundException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			}
 		}
 
@@ -509,8 +518,10 @@ public class CDTMiner extends Miner {
 				
 			} catch (IOException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			} catch (ClassNotFoundException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			}
 		}
 		
@@ -531,8 +542,10 @@ public class CDTMiner extends Miner {
 				
 			} catch (IOException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			} catch (ClassNotFoundException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			}
 		}
 
@@ -547,8 +560,10 @@ public class CDTMiner extends Miner {
 				handleComputeCompletionProposals(scopeName, context, unit, path, status);
 			} catch (IOException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			} catch (ClassNotFoundException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			}
 		}
 		
@@ -568,8 +583,10 @@ public class CDTMiner extends Miner {
 				handleComputeTypeGraph(scopeName, hostName, input, path, status);
 			} catch (IOException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			} catch (ClassNotFoundException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			}
 		}
 		else if (name.equals(C_TYPE_HIERARCHY_FIND_INPUT1)) {
@@ -589,8 +606,10 @@ public class CDTMiner extends Miner {
 				handleFindTypeHierarchyInput(scopeName, hostName, projectName, input, path, status);
 			} catch (IOException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			} catch (ClassNotFoundException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			}
 		}
 		else if (name.equals(C_TYPE_HIERARCHY_FIND_INPUT2)) {
@@ -611,8 +630,10 @@ public class CDTMiner extends Miner {
 				handleFindTypeHierarchyInput(scopeName, hostName, unit, path, projectName, selectionStart, selectionLength, status);
 			} catch (IOException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			} catch (ClassNotFoundException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			}
 		}
 		else if (name.equals(C_NAVIGATION_OPEN_DECLARATION)) {
@@ -664,8 +685,10 @@ public class CDTMiner extends Miner {
 
 			} catch (IOException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			} catch (ClassNotFoundException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			}
 			
 		}
@@ -688,8 +711,10 @@ public class CDTMiner extends Miner {
 
 			} catch (IOException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			} catch (ClassNotFoundException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			}
 			
 		}
@@ -714,8 +739,10 @@ public class CDTMiner extends Miner {
 
 			} catch (IOException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			} catch (ClassNotFoundException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			}
 			
 		}
@@ -738,8 +765,10 @@ public class CDTMiner extends Miner {
 
 			} catch (IOException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			} catch (ClassNotFoundException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			}
 			
 		}
@@ -755,8 +784,10 @@ public class CDTMiner extends Miner {
 				
 			} catch (IOException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			} catch (ClassNotFoundException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			}			
 		}
 		else if (name.equals(C_SEMANTIC_HIGHTLIGHTING_COMPUTE_POSITIONS)) {
@@ -767,8 +798,10 @@ public class CDTMiner extends Miner {
 				handleComputeSemanticHightlightingPositions(scopeName, tu, status);
 			} catch (IOException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			} catch (ClassNotFoundException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			}
 		}
 		else if (name.equals(C_INACTIVE_HIGHTLIGHTING_COMPUTE_POSITIONS)) {
@@ -794,8 +827,10 @@ public class CDTMiner extends Miner {
 				handleComputeCodeFoldingRegions(scopeName, tu, status, statementsFoldingEnabled, preprocessorFoldingEnabled, docSize);
 			} catch (IOException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			} catch (ClassNotFoundException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			}
 		}
 		else if (name.equals(C_CODE_FORMATTING)) {
@@ -810,13 +845,13 @@ public class CDTMiner extends Miner {
 				handleComputeCodeFormatting(scopeName, tu, source, preferences, offset, length, status);
 			} catch (IOException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			} catch (ClassNotFoundException e) {
 				UniversalServerUtilities.logError(LOG_TAG, e.toString(), e, _dataStore);
+				return statusDone(status);
 			}
 		}
 		
-		status.getDataStore().refresh(status);
-		status.getDataStore().disconnectObject(status.getParent());
 		return status;
 	}
 	
