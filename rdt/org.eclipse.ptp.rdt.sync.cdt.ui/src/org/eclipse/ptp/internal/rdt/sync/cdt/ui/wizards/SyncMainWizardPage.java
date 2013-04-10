@@ -27,7 +27,6 @@ import org.eclipse.cdt.managedbuilder.core.IToolChain;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 import org.eclipse.cdt.ui.CDTSharedImages;
-import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.cdt.ui.newui.PageLayout;
 import org.eclipse.cdt.ui.wizards.CDTMainWizardPage;
 import org.eclipse.cdt.ui.wizards.CNewWizard;
@@ -56,6 +55,7 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.osgi.util.TextProcessor;
+import org.eclipse.ptp.internal.rdt.sync.cdt.ui.Activator;
 import org.eclipse.ptp.internal.rdt.sync.cdt.ui.messages.Messages;
 import org.eclipse.ptp.internal.rdt.sync.ui.preferences.SyncFileFilterPage;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
@@ -315,7 +315,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 		try {
 			return new URI("file://" + getLocationPath().toString()); //$NON-NLS-1$
 		} catch (URISyntaxException e) {
-			CUIPlugin.log(e);
+			Activator.log(e);
 			return null;
 		}
 	}
@@ -393,7 +393,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 				}
 			}
 		} catch (CoreException e) {
-			CUIPlugin.log(e.getStatus());
+			Activator.log(e.getStatus());
 		}
 
 		return true;
