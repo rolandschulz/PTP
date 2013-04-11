@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2012 Wind River Systems, Inc. and others.
+ * Copyright (c) 2006, 2013 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -37,6 +37,7 @@ import org.eclipse.ptp.internal.rdt.core.includebrowser.IIncludeBrowserService;
 import org.eclipse.ptp.internal.rdt.core.includebrowser.IIndexIncludeValue;
 import org.eclipse.ptp.internal.rdt.core.includebrowser.IncludeBrowserServiceFactory;
 import org.eclipse.ptp.internal.rdt.core.miners.RemoteIndexFileLocation;
+import org.eclipse.ptp.internal.rdt.ui.util.PathReplacer;
 import org.eclipse.ptp.rdt.core.serviceproviders.IIndexServiceProvider;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.services.core.IService;
@@ -124,7 +125,7 @@ public class IBContentProvider extends AsyncTreeContentProvider {
 						if (fComputeIncludedBy) {
 							IIndexFileLocation loc= include.getIncludedByLocation();
 							if (loc != null) {
-								final URI uri = replacePath(project.getProject(), project.getLocationURI(), loc.getURI().getPath());
+								final URI uri = PathReplacer.replacePath(project.getProject(), project.getLocationURI(), loc.getURI().getPath());
 								loc = new RemoteIndexFileLocation(uri.getPath(), uri, true);
 							}
 							directiveFile= targetFile= new IBFile(project, loc);
@@ -135,7 +136,7 @@ public class IBContentProvider extends AsyncTreeContentProvider {
 								targetFile= new IBFile(include.getFullName());
 							}
 							else {
-								final URI uri = replacePath(project.getProject(), project.getLocationURI(), includesPath.getURI().getPath());
+								final URI uri = PathReplacer.replacePath(project.getProject(), project.getLocationURI(), includesPath.getURI().getPath());
 								includesPath = new RemoteIndexFileLocation(uri.getPath(), uri, true);
 								
 								targetFile= new IBFile(project, includesPath);
@@ -160,8 +161,6 @@ public class IBContentProvider extends AsyncTreeContentProvider {
 		return NO_CHILDREN;
 	}
 
-	
-	
 	public void setComputeIncludedBy(boolean value) {
 		fComputeIncludedBy = value;
 	}
@@ -175,27 +174,4 @@ public class IBContentProvider extends AsyncTreeContentProvider {
 		return this.fServiceFactory;
 	}
 	
-	/**
-	 * Replaces the path portion of the given URI.
-	 */
-	private static URI replacePath(IProject project, URI u, String path) {
-		if (isLocalServiceConfiguration(project))
-			return new EFSExtensionProvider(){}.createNewURIFromPath(u, path);
-		return EFSExtensionManager.getDefault().createNewURIFromPath(u, path);
-	}
-	
-	private static boolean isLocalServiceConfiguration (IProject project) {
-		IServiceModelManager smm = ServiceModelManager.getInstance();
-		
-		if(smm.isConfigured(project)) {
-			IServiceConfiguration serviceConfig = smm.getActiveConfiguration(project);
-			IService indexingService = smm.getService(IRDTServiceConstants.SERVICE_C_INDEX);
-			IServiceProvider serviceProvider = serviceConfig.getServiceProvider(indexingService);
-	
-			if (serviceProvider instanceof IIndexServiceProvider) {
-				return !((IIndexServiceProvider)serviceProvider).isRemote();
-			}
-		}
-		return false;
-	}
 }

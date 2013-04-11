@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2012 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2013 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,6 +40,7 @@ import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.ptp.internal.rdt.core.includebrowser.IIncludeBrowserService;
 import org.eclipse.ptp.internal.rdt.core.includebrowser.IIndexIncludeValue;
 import org.eclipse.ptp.internal.rdt.core.includebrowser.IncludeBrowserServiceFactory;
+import org.eclipse.ptp.internal.rdt.ui.util.PathReplacer;
 import org.eclipse.ptp.rdt.core.serviceproviders.IIndexServiceProvider;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.ui.UIPlugin;
@@ -97,7 +98,7 @@ public class IncludeBrowserUI {
 			if (include != null) {
 				IIndexFileLocation loc= include.getIncludesLocation();
 				if (loc != null) {
-					final URI uri = replacePath(project.getProject(), input.getLocationURI(), loc.getURI().getPath());
+					final URI uri = PathReplacer.replacePath(project.getProject(), input.getLocationURI(), loc.getURI().getPath());
 					if(uri != null)
 						return CoreModelUtil.findTranslationUnitForLocation(uri, project);
 				}
@@ -127,60 +128,5 @@ public class IncludeBrowserUI {
 		}
 		return false;
 	}
-	
-	/**
-	 * Replaces the path portion of the given URI.
-	 */
-	private static URI replacePath(IProject project, URI u, String path) {
-		if (isLocalServiceConfiguration(project))
-			return new EFSExtensionProvider(){}.createNewURIFromPath(u, path);
-		return EFSExtensionManager.getDefault().createNewURIFromPath(u, path);
-	}
-	
-	private static boolean isLocalServiceConfiguration (IProject project) {
-		IServiceModelManager smm = ServiceModelManager.getInstance();
-		
-		if(smm.isConfigured(project)) {
-			IServiceConfiguration serviceConfig = smm.getActiveConfiguration(project);
-			IService indexingService = smm.getService(IRDTServiceConstants.SERVICE_C_INDEX);
-			IServiceProvider serviceProvider = serviceConfig.getServiceProvider(indexingService);
-	
-			if (serviceProvider instanceof IIndexServiceProvider) {
-				return !((IIndexServiceProvider)serviceProvider).isRemote();
-			}
-		}
-		return false;
-	}
-	
-//	private static ITranslationUnit findTranslationUnitForLocation(IIndexFileLocation ifl, ICProject preferredProject) throws CModelException {
-//		String fullPath= ifl.getFullPath();
-//		if (fullPath != null) {
-//			IResource file= ResourcesPlugin.getWorkspace().getRoot().findMember(fullPath);
-//			if (file instanceof IFile) {
-//				return CoreModelUtil.findTranslationUnit((IFile) file);
-//			}
-//			return null;
-//		}
-//		URI location= ifl.getURI();
-//		if (location != null) { 
-//			CoreModel coreModel = CoreModel.getDefault();
-//			ITranslationUnit tu= null;
-//			if (preferredProject != null) {
-//				tu= coreModel.createTranslationUnitFrom(preferredProject, location);
-//			}
-//			if (tu == null) {
-//				ICProject[] projects= coreModel.getCModel().getCProjects();
-//				for (int i = 0; i < projects.length && tu == null; i++) {
-//					ICProject project = projects[i];
-//					if (!project.equals(preferredProject)) {
-//						tu= coreModel.createTranslationUnitFrom(project, location);
-//					}
-//				}
-//			}
-//			return tu;
-//		}
-//		return null;
-//	}	
-//	
-//	
+
 }
