@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2011 Wind River Systems, Inc. and others.
+ * Copyright (c) 2009, 2013 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -57,6 +57,7 @@ import org.eclipse.ptp.internal.rdt.core.model.Scope;
 import org.eclipse.ptp.internal.rdt.core.model.WorkingCopy;
 import org.eclipse.ptp.internal.rdt.core.navigation.OpenDeclarationResult;
 import org.eclipse.ptp.internal.rdt.ui.navigation.INavigationService;
+import org.eclipse.ptp.internal.rdt.ui.util.PathReplacer;
 import org.eclipse.ptp.rdt.core.RDTLog;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
 import org.eclipse.ptp.rdt.ui.serviceproviders.IIndexServiceProvider2;
@@ -158,26 +159,13 @@ class OpenDeclarationsJob extends Job{
 		
 		return Status.OK_STATUS;
 	}
-	
-	/**
-	 * Replaces the path portion of the given URI.
-	 */
-	private URI replacePath(IProject project, URI u, String path) {
-		// TODO: PATHFIX this is a HACK, fix EFSExtensionProvider please!
-		if("org.eclipse.cdt.core.fastIndexer".equals(IndexerPreferences.get(project, IndexerPreferences.KEY_INDEXER_ID, null))) { // //$NON-NLS-1$
-			return new EFSExtensionProvider(){}.createNewURIFromPath(u, path);
-		}
-				
-		return EFSExtensionManager.getDefault().createNewURIFromPath(u, path);
-	}
-	
-	
+
 	private void open(IProject project, String path, ICElement element) {
 		open(project, path, element, -1, -1);
 	}
 	
 	private void open(IProject project, String path, final ICElement element, final int offset, final int length) {
-		final URI uri = replacePath(project, element.getLocationURI(), path);
+		final URI uri = PathReplacer.replacePath(project, element.getLocationURI(), path);
 		if(uri == null)
 			return;
 		open(uri, element, offset, length);
@@ -244,7 +232,7 @@ class OpenDeclarationsJob extends Job{
 				if (target instanceof ISourceReference) {
 					try {
 						ISourceRange sourceRange = ((ISourceReference) target).getSourceRange();
-						URI uri = replacePath(project.getProject(), target.getLocationURI(), target.getPath().toString());
+						URI uri = PathReplacer.replacePath(project.getProject(), target.getLocationURI(), target.getPath().toString());
 						
 						open(uri, project, sourceRange.getIdStartPos(), sourceRange.getIdLength());
 						

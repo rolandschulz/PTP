@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?><component id="org.eclipse.ptp.rdt.ui" version="2">
+    <resource path="src/org/eclipse/ptp/internal/rdt/ui/util/ImportRemotePathSymbolsHandler.java" type="org.eclipse.ptp.internal.rdt.ui.util.ImportRemotePathSymbolsHandler">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.eclipse.ptp.internal.rdt.ui.util.ImportRemotePathSymbolsHandler"/>
+                <message_argument value="org.eclipse.ptp.rdt.ui_4.3.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/eclipse/ptp/internal/rdt/ui/util/ScannerConfigExporter.java" type="org.eclipse.ptp.internal.rdt.ui.util.ScannerConfigExporter">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.eclipse.ptp.internal.rdt.ui.util.ScannerConfigExporter"/>
+                <message_argument value="org.eclipse.ptp.rdt.ui_4.3.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
     <resource path="src/org/eclipse/ptp/rdt/ui/serviceproviders/IIndexServiceProvider2.java" type="org.eclipse.ptp.rdt.ui.serviceproviders.IIndexServiceProvider2">
         <filter id="403804204">
             <message_arguments>
