@@ -61,6 +61,7 @@ public class RemoteCInfoProviderUtilities {
 				continue;
 			if(applicable > highestVal)
 				winner = provider;
+			highestVal = Math.max(applicable, highestVal);
 		}
 		
 		return winner;
