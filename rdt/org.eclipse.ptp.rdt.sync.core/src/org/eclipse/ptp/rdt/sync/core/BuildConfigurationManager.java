@@ -11,11 +11,17 @@
 package org.eclipse.ptp.rdt.sync.core;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.eclipse.cdt.core.language.settings.providers.ILanguageSettingsProvider;
+import org.eclipse.cdt.core.language.settings.providers.LanguageSettingsManager;
 import org.eclipse.cdt.core.model.CoreModel;
 import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
 import org.eclipse.cdt.core.settings.model.ICProjectDescription;
@@ -65,6 +71,12 @@ public class BuildConfigurationManager {
 	private static final String localConfigAnnotation = "_local"; //$NON-NLS-1$
 	private static final String remoteConfigAnnotation = "_remote"; //$NON-NLS-1$
 	private static final String syncServiceProviderID = "org.eclipse.ptp.rdt.sync.git.core.GitServiceProvider"; //$NON-NLS-1$
+	private static final String[] initialLSPs = {
+		 "org.eclipse.ptp.rdt.sync.core.SyncGCCBuiltinSpecsDetector", //$NON-NLS-1$
+		 "org.eclipse.cdt.ui.UserLanguageSettingsProvider", //$NON-NLS-1$
+		 "org.eclipse.ptp.rdt.sync.core.SyncGCCBuildCommandParser"}; //$NON-NLS-1$
+	private static final Set<String> initialLanguageSettingsProviders = new HashSet<String>(Arrays.asList(initialLSPs));
+
 	private final ISyncServiceProvider provider;
 
 	// Setup as a singleton
@@ -841,6 +853,15 @@ public class BuildConfigurationManager {
 		}
 
 		ManagedBuildManager.saveBuildInfo(config.getOwner().getProject(), true);
+
+//		List<ILanguageSettingsProvider> initialProviders = new ArrayList<ILanguageSettingsProvider>();
+//		List<ILanguageSettingsProvider> allProviders = LanguageSettingsManager.getWorkspaceProviders();
+//		for (ILanguageSettingsProvider p : allProviders) {
+//			if (initialLanguageSettingsProviders.contains(p.getId())) {
+//				initialProviders.add(p);
+//			}
+//		}
+		c_mb_confgDes.setExternalSettingsProviderIds(initialLSPs);
 	}
 
 	/**
