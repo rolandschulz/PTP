@@ -44,7 +44,7 @@ public class SyncGCCBuildCommandParser extends GCCBuildCommandParser implements 
 			super.setSettingEntries(entries);
 			return;
 		}
-		SyncConfig bs = SyncPolicy.getBuildScenarioForProject(currentProject);
+		SyncConfig bs = BuildConfigUtils.getBuildScenarioForProject(currentProject);
 		if (bs.getSyncProviderId() == null) {
 			// For local configurations, no special processing is needed.
 			super.setSettingEntries(entries);
@@ -94,7 +94,7 @@ public class SyncGCCBuildCommandParser extends GCCBuildCommandParser implements 
 		if (compilerPath == null) {
 			return compilerPath;
 		}
-		SyncConfig bs = SyncPolicy.getBuildScenarioForProject(currentProject);
+		SyncConfig bs = BuildConfigUtils.getBuildScenarioForProject(currentProject);
 		if (bs.getSyncProviderId() == null) {
 			// For local configurations, no special processing is needed.
 			return compilerPath;

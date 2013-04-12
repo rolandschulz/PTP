@@ -42,7 +42,6 @@ import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.SyncManager.SyncMode;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
-import org.eclipse.ptp.rdt.sync.core.listeners.ISynchronizePolicy;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
@@ -54,7 +53,7 @@ import org.osgi.service.prefs.Preferences;
  * build configurations and specific build scenarios. During creation of a sync project, a build scenario should be set for all
  * build configurations using the methods provided.
  */
-public class SyncPolicy implements ISynchronizePolicy {
+public class BuildConfigUtils {
 	private static final String configSyncDataStorageName = "org.eclipse.ptp.rdt.sync.cdt.core"; //$NON-NLS-1$
 	private static final String localConfigAnnotation = "_local"; //$NON-NLS-1$
 	private static final String remoteConfigAnnotation = "_remote"; //$NON-NLS-1$
@@ -596,7 +595,6 @@ public class SyncPolicy implements ISynchronizePolicy {
 	 * @return SyncRunner - can be null if this configuration does not require sync'ing, such as a local configuration, or if there
 	 *         are problems retrieving the sync provider or information.
 	 */
-	@Override
 	public SyncConfig[] getSyncronizePolicy(IProject project, SyncMode mode) {
 		checkProject(project);
 

@@ -186,7 +186,7 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 			super.setSettingEntries(entries);
 			return;
 		}
-		SyncConfig bs = SyncPolicy.getBuildScenarioForProject(currentProject);
+		SyncConfig bs = BuildConfigUtils.getBuildScenarioForProject(currentProject);
 		if (bs.getSyncProviderId() == null) {
 			// For local configurations, no special processing is needed.
 			super.setSettingEntries(entries);
@@ -227,7 +227,7 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 	 */
 	@Override
 	protected String getSpecFile(String languageId) {
-		SyncConfig bs = SyncPolicy.getBuildScenarioForProject(currentProject);
+		SyncConfig bs = BuildConfigUtils.getBuildScenarioForProject(currentProject);
 		// For local configurations, we can fall back to the original implementation.
 		if (bs.getSyncProviderId() == null) {
 			return super.getSpecFile(languageId);

@@ -39,7 +39,7 @@ import org.eclipse.ptp.ems.core.EnvManagerProjectProperties;
 import org.eclipse.ptp.ems.core.EnvManagerRegistry;
 import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.internal.rdt.sync.cdt.core.Activator;
-import org.eclipse.ptp.internal.rdt.sync.cdt.core.SyncPolicy;
+import org.eclipse.ptp.internal.rdt.sync.cdt.core.BuildConfigUtils;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
@@ -103,12 +103,12 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		// For managed projects and configurations other than workspace, the directory is incorrect and needs to be fixed.
 		IConfiguration configuration = ManagedBuildManager.getBuildInfo(getProject()).getDefaultConfiguration();
 		String projectLocalRoot = getProject().getLocation().toPortableString();
-		String projectActualRoot = SyncPolicy.getBuildScenarioForBuildConfiguration(configuration).getLocation(getProject());
+		String projectActualRoot = BuildConfigUtils.getBuildScenarioForBuildConfiguration(configuration).getLocation(getProject());
 		changeToDirectory = new Path(changeToDirectory.toString().replaceFirst(projectLocalRoot, projectActualRoot));
 		fCommandArgs = constructCommandArray(commandPath.toPortableString(), args);
 
 		// Get and setup the connection and remote services for this build configuration.
-		SyncConfig bs = SyncPolicy.getBuildScenarioForBuildConfiguration(configuration);
+		SyncConfig bs = BuildConfigUtils.getBuildScenarioForBuildConfiguration(configuration);
 		if (bs == null) {
 			return null;
 		}

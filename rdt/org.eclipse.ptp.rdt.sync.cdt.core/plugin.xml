@@ -46,11 +46,4 @@
          </language-scope>
       </provider>
    </extension>
-   <extension
-         point="org.eclipse.ptp.rdt.sync.core.synchronizePolicy">
-      <synchronizePolicy
-            class="org.eclipse.ptp.internal.rdt.sync.cdt.core.SyncPolicy"
-            nature="org.eclipse.cdt.core.cnature">
-      </synchronizePolicy>
-   </extension>
 </plugin>

@@ -20,7 +20,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.ems.core.EnvManagerProjectProperties;
 import org.eclipse.ptp.ems.ui.EnvManagerConfigWidget;
 import org.eclipse.ptp.ems.ui.IErrorListener;
-import org.eclipse.ptp.internal.rdt.sync.cdt.core.SyncPolicy;
+import org.eclipse.ptp.internal.rdt.sync.cdt.core.BuildConfigUtils;
 import org.eclipse.ptp.internal.rdt.sync.cdt.ui.Activator;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
@@ -69,7 +69,7 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 			return null;
 		}
 
-		final SyncConfig bs = SyncPolicy.getBuildScenarioForBuildConfiguration(getCfg());
+		final SyncConfig bs = BuildConfigUtils.getBuildScenarioForBuildConfiguration(getCfg());
 		if (bs == null) {
 			return null;
 		}
@@ -117,7 +117,7 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 
 	private URI getSyncURI() {
 		try {
-			return SyncPolicy.getSyncLocationURI(getCfg(), getCfg().getOwner().getProject());
+			return BuildConfigUtils.getSyncLocationURI(getCfg(), getCfg().getOwner().getProject());
 		} catch (final CoreException e) {
 			setErrorMessage(e.getClass().getSimpleName() + ": " + e.getLocalizedMessage()); //$NON-NLS-1$
 			Activator.log(e);

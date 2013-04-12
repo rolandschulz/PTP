@@ -25,7 +25,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.internal.rdt.sync.cdt.core.SyncPolicy;
+import org.eclipse.ptp.internal.rdt.sync.cdt.core.BuildConfigUtils;
 import org.eclipse.ptp.internal.rdt.sync.cdt.ui.Activator;
 import org.eclipse.ptp.internal.rdt.sync.cdt.ui.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
@@ -237,15 +237,15 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 						this.saveConfig(config, settings);
 						if ((systemSettings == null) || (settings.syncProvider != systemSettings.syncProvider)) {
 							if (settings.syncProvider == null) {
-								SyncPolicy.modifyConfigurationAsSyncLocal(config);
+								BuildConfigUtils.modifyConfigurationAsSyncLocal(config);
 								try {
 									SyncConfig localConfig = SyncConfigManager.createLocal(project);
-									SyncPolicy.setBuildScenarioForBuildConfiguration(localConfig, config);
+									BuildConfigUtils.setBuildScenarioForBuildConfiguration(localConfig, config);
 								} catch (CoreException e) {
 									Activator.log(Messages.BuildRemotePropertiesPage_2, e);
 								}
 							} else {
-								SyncPolicy.modifyConfigurationAsSyncRemote(config);
+								BuildConfigUtils.modifyConfigurationAsSyncRemote(config);
 							}
 						}
 					}
@@ -273,7 +273,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		// Register with build configuration manager. This must be done after saving build info with ManagedBuildManager, as
 		// the BuildConfigurationManager relies on the data being up-to-date.
 		SyncConfig syncConfig = new SyncConfig(null, settings.syncProvider, settings.connection, settings.rootLocation);
-		SyncPolicy.setBuildScenarioForBuildConfiguration(syncConfig, config);
+		BuildConfigUtils.setBuildScenarioForBuildConfiguration(syncConfig, config);
 	}
 
 	// Connection button handling
@@ -373,7 +373,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	 * @return Configuration settings or null if config not found in BuildConfigurationManager
 	 */
 	private PageSettings loadSettings(IConfiguration config) {
-		SyncConfig syncConfig = SyncPolicy.getBuildScenarioForBuildConfiguration(config);
+		SyncConfig syncConfig = BuildConfigUtils.getBuildScenarioForBuildConfiguration(config);
 		if (syncConfig == null) {
 			IStatus status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Error loading configuration data"); //$NON-NLS-1$
 			StatusManager.getManager().handle(status, StatusManager.SHOW);

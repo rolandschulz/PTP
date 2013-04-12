@@ -23,7 +23,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.ptp.internal.rdt.sync.cdt.core.SyncPolicy;
+import org.eclipse.ptp.internal.rdt.sync.cdt.core.BuildConfigUtils;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
@@ -72,7 +72,7 @@ public class NewRemoteSyncProjectWizardOperation {
 
 		// Initialize project with this build scenario, which will be applied to all current configurations.
 		// Note then that we initially assume all configs are remote.
-		SyncPolicy.setBuildScenarioForAllBuildConfigurations(project, remoteBuildScenario);
+		BuildConfigUtils.setBuildScenarioForAllBuildConfigurations(project, remoteBuildScenario);
 
 		// Create a local build scenario
 		SyncConfig localBuildScenario = null;
@@ -96,20 +96,20 @@ public class NewRemoteSyncProjectWizardOperation {
 			// If config is both local and remote, then we need to create a config. Let the existing config be the remote and
 			// create a new local config based on the remote config.
 			if (isLocal && isRemote) {
-				IConfiguration localConfig = SyncPolicy.createConfiguration(project, (Configuration) config, localBuildScenario,
+				IConfiguration localConfig = BuildConfigUtils.createConfiguration(project, (Configuration) config, localBuildScenario,
 						config.getName(), null);
-				SyncPolicy.modifyConfigurationAsSyncLocal(localConfig);
+				BuildConfigUtils.modifyConfigurationAsSyncLocal(localConfig);
 			}
 
 			// If local only, change its build scenario to the local build scenario.
 			if (isLocal && !isRemote) {
-				SyncPolicy.setBuildScenarioForBuildConfiguration(localBuildScenario, config);
-				SyncPolicy.modifyConfigurationAsSyncLocal(config);
+				BuildConfigUtils.setBuildScenarioForBuildConfiguration(localBuildScenario, config);
+				BuildConfigUtils.modifyConfigurationAsSyncLocal(config);
 			}
 
 			// If type is remote, change to the sync builder and set environment variable support.
 			if (isRemote) {
-				SyncPolicy.modifyConfigurationAsSyncRemote(config);
+				BuildConfigUtils.modifyConfigurationAsSyncRemote(config);
 
 				// The first remote found will be the initial default (active) configuration.
 				if (!defaultConfigSet) {

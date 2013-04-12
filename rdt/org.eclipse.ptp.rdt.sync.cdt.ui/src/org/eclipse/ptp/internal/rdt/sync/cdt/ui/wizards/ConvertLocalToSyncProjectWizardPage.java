@@ -45,7 +45,7 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.Window;
-import org.eclipse.ptp.internal.rdt.sync.cdt.core.SyncPolicy;
+import org.eclipse.ptp.internal.rdt.sync.cdt.core.BuildConfigUtils;
 import org.eclipse.ptp.internal.rdt.sync.cdt.ui.Activator;
 import org.eclipse.ptp.internal.rdt.sync.cdt.ui.messages.Messages;
 import org.eclipse.ptp.internal.rdt.sync.ui.handlers.CommonSyncExceptionHandler;
@@ -301,7 +301,7 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 			ISynchronizeParticipant participant = fSelectedProvider.getParticipant();
 
 			// Initialize project with a local build scenario, which is applied to all configurations
-			SyncPolicy.setBuildScenarioForAllBuildConfigurations(project, SyncConfigManager.createLocal(project));
+			BuildConfigUtils.setBuildScenarioForAllBuildConfigurations(project, SyncConfigManager.createLocal(project));
 
 			// Create a remote build scenario
 			ISynchronizeService provider = participant.getProvider(project);
@@ -322,10 +322,10 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 			for (IConfiguration config : allConfigs) {
 				// For selected configs, create a new remote config
 				if (selectedConfigsSet.contains(config)) {
-					IConfiguration remoteConfig = SyncPolicy.createConfiguration(project, (Configuration) config,
+					IConfiguration remoteConfig = BuildConfigUtils.createConfiguration(project, (Configuration) config,
 							remoteBuildScenario, config.getName().replace(' ', '_'), null); // Bug 389899 - "remote toolchain name"
 																							// contains spaces
-					SyncPolicy.modifyConfigurationAsSyncRemote(remoteConfig);
+					BuildConfigUtils.modifyConfigurationAsSyncRemote(remoteConfig);
 
 					// The first remote found will be the initial default (active) configuration.
 					if (switchToRemoteConfig && !defaultConfigSet) {
@@ -334,7 +334,7 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 					}
 				}
 
-				SyncPolicy.modifyConfigurationAsSyncLocal(config);
+				BuildConfigUtils.modifyConfigurationAsSyncLocal(config);
 			}
 			ManagedBuildManager.saveBuildInfo(project, true);
 
