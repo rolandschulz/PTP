@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.eclipse.cdt.core.language.settings.providers.ILanguageSettingsProvider;
+import org.eclipse.cdt.core.language.settings.providers.ILanguageSettingsProvidersKeeper;
 import org.eclipse.cdt.core.language.settings.providers.LanguageSettingsManager;
 import org.eclipse.cdt.core.model.CoreModel;
 import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
@@ -71,11 +72,18 @@ public class BuildConfigurationManager {
 	private static final String localConfigAnnotation = "_local"; //$NON-NLS-1$
 	private static final String remoteConfigAnnotation = "_remote"; //$NON-NLS-1$
 	private static final String syncServiceProviderID = "org.eclipse.ptp.rdt.sync.git.core.GitServiceProvider"; //$NON-NLS-1$
-	private static final String[] initialLSPs = {
-		 "org.eclipse.ptp.rdt.sync.core.SyncGCCBuiltinSpecsDetector", //$NON-NLS-1$
-		 "org.eclipse.cdt.ui.UserLanguageSettingsProvider", //$NON-NLS-1$
-		 "org.eclipse.ptp.rdt.sync.core.SyncGCCBuildCommandParser"}; //$NON-NLS-1$
-	private static final Set<String> initialLanguageSettingsProviders = new HashSet<String>(Arrays.asList(initialLSPs));
+
+	// Map from CDT language settings providers to their sync replacements. The list of providers is modified only by swapping
+	// the keys with their corresponding values. If the value is null, the provider is simply removed.
+	// TODO: If ever needed, provide a mechanism to add a provider without replacing one.
+	private static final Map<String, String> languageSettingsProviderReplacementsMap;
+	static {
+		languageSettingsProviderReplacementsMap = new HashMap<String, String>();
+		languageSettingsProviderReplacementsMap.put("org.eclipse.cdt.managedbuilder.core.GCCBuiltinSpecsDetector", //$NON-NLS-1$
+													"org.eclipse.ptp.rdt.sync.core.SyncGCCBuiltinSpecsDetector"); //$NON-NLS-1$
+		languageSettingsProviderReplacementsMap.put("org.eclipse.cdt.managedbuilder.core.GCCBuildCommandParser", //$NON-NLS-1$
+													"org.eclipse.ptp.rdt.sync.core.SyncGCCBuildCommandParser"); //$NON-NLS-1$
+	}
 
 	private final ISyncServiceProvider provider;
 
@@ -854,14 +862,34 @@ public class BuildConfigurationManager {
 
 		ManagedBuildManager.saveBuildInfo(config.getOwner().getProject(), true);
 
-//		List<ILanguageSettingsProvider> initialProviders = new ArrayList<ILanguageSettingsProvider>();
-//		List<ILanguageSettingsProvider> allProviders = LanguageSettingsManager.getWorkspaceProviders();
-//		for (ILanguageSettingsProvider p : allProviders) {
-//			if (initialLanguageSettingsProviders.contains(p.getId())) {
-//				initialProviders.add(p);
-//			}
-//		}
-		c_mb_confgDes.setExternalSettingsProviderIds(initialLSPs);
+		// Replace CDT language setting providers with sync versions
+		// We first have to get a writable description. The description used earlier is read-only.
+		ICProjectDescription projectDesc = CoreModel.getDefault().getProjectDescription(config.getOwner().getProject());
+		ICConfigurationDescription configDesc = projectDesc.getConfigurationById(config.getId());
+		if (configDesc == null) {
+			// Should never happen
+			throw new RuntimeException(Messages.BuildConfigurationManager_18);
+		}
+
+		// Now do the actual replacing
+		ILanguageSettingsProvidersKeeper lspk = ((ILanguageSettingsProvidersKeeper) configDesc);
+		List<ILanguageSettingsProvider> oldProviders = lspk.getLanguageSettingProviders();
+		List<ILanguageSettingsProvider> newProviders = new ArrayList<ILanguageSettingsProvider>();
+		for (ILanguageSettingsProvider p : oldProviders) {
+			if (languageSettingsProviderReplacementsMap.containsKey(p.getId())) {
+				String replacementId = languageSettingsProviderReplacementsMap.get(p.getId());
+				if (replacementId == null) {
+					continue;
+				}
+				p = LanguageSettingsManager.getWorkspaceProvider(replacementId);
+			}
+			newProviders.add(p);
+		}
+		lspk.setLanguageSettingProviders(newProviders);
+
+		// and save results
+		config.setDirty(true);
+		setProjectDescription(config.getOwner().getProject(), projectDesc);
 	}
 
 	/**
