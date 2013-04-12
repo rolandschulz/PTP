@@ -25,7 +25,7 @@
       <navigatorContent
             activeByDefault="true"
             contentProvider="org.eclipse.cdt.internal.ui.navigator.CNavigatorContentProvider"
-            id="org.eclipse.ptp.rdt.sync.ui.fortran.navigator.content"
+            id="org.eclipse.ptp.rdt.sync.fortran.ui.navigator.content"
             labelProvider="org.eclipse.cdt.internal.ui.navigator.CNavigatorLabelProvider"
             name="Synchronize Elements"
             priority="highest">
@@ -79,7 +79,7 @@
        point="org.eclipse.ui.navigator.viewer">
        <viewerContentBinding viewerId="org.eclipse.ui.navigator.ProjectExplorer">
           <includes>
-              <contentExtension pattern="org.eclipse.ptp.rdt.sync.ui.fortran.navigator.content"/>
+              <contentExtension pattern="org.eclipse.ptp.rdt.sync.fortran.ui.navigator.content"/>
           </includes>
        </viewerContentBinding>
    </extension>

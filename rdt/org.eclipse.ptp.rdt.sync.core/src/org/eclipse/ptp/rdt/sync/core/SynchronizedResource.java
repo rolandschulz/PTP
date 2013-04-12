@@ -28,7 +28,7 @@ public class SynchronizedResource implements IRemoteResource {
 	@Override
 	public URI getActiveLocationURI() {
 		try {
-			return BuildConfigurationManager.getInstance().getActiveSyncLocationURI(fResource);
+			return SyncConfigManager.getActiveSyncLocationURI(fResource);
 		} catch (CoreException e) {
 			return null;
 		}

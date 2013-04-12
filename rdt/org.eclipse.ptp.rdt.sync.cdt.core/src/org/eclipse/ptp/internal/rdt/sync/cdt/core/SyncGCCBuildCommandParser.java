@@ -20,7 +20,7 @@ import org.eclipse.cdt.core.settings.model.ICSettingEntry;
 import org.eclipse.cdt.managedbuilder.language.settings.providers.GCCBuildCommandParser;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.ptp.rdt.sync.core.BuildScenario;
+import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 
@@ -44,8 +44,8 @@ public class SyncGCCBuildCommandParser extends GCCBuildCommandParser implements 
 			super.setSettingEntries(entries);
 			return;
 		}
-		BuildScenario bs = SyncPolicy.getBuildScenarioForProject(currentProject);
-		if (bs.getSyncProvider() == null) {
+		SyncConfig bs = SyncPolicy.getBuildScenarioForProject(currentProject);
+		if (bs.getSyncProviderId() == null) {
 			// For local configurations, no special processing is needed.
 			super.setSettingEntries(entries);
 			return;
@@ -94,8 +94,8 @@ public class SyncGCCBuildCommandParser extends GCCBuildCommandParser implements 
 		if (compilerPath == null) {
 			return compilerPath;
 		}
-		BuildScenario bs = SyncPolicy.getBuildScenarioForProject(currentProject);
-		if (bs.getSyncProvider() == null) {
+		SyncConfig bs = SyncPolicy.getBuildScenarioForProject(currentProject);
+		if (bs.getSyncProviderId() == null) {
 			// For local configurations, no special processing is needed.
 			return compilerPath;
 		}

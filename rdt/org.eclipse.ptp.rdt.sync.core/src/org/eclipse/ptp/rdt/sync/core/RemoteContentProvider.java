@@ -197,11 +197,11 @@ public class RemoteContentProvider implements ITreeContentProvider {
 	public static BufferedInputStream getFileContents(IFile file) throws CoreException, MissingConnectionException {
 		BufferedInputStream retStream = null;
 		IProject project = file.getProject();
-		BuildScenario scenario = BuildConfigurationManager.getInstance().getActiveBuildScenario(project);
-		if (scenario != null) {
-			IRemoteFileManager fileManager = scenario.getRemoteConnection().getRemoteServices()
-					.getFileManager(scenario.getRemoteConnection());
-			IPath remotePath = new Path(scenario.getLocation(project)).addTrailingSeparator().append(file.getProjectRelativePath());
+		SyncConfig config = SyncConfigManager.getActive(project);
+		if (config != null) {
+			IRemoteFileManager fileManager = config.getRemoteConnection().getRemoteServices()
+					.getFileManager(config.getRemoteConnection());
+			IPath remotePath = new Path(config.getLocation(project)).addTrailingSeparator().append(file.getProjectRelativePath());
 			IFileStore fileStore = fileManager.getResource(remotePath.toString()); // Assumes "/" separator on remote
 			InputStream fileInput = fileStore.openInputStream(EFS.NONE, null);
 			if (fileInput != null) {

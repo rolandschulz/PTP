@@ -22,7 +22,7 @@ import org.eclipse.ptp.ems.ui.EnvManagerConfigWidget;
 import org.eclipse.ptp.ems.ui.IErrorListener;
 import org.eclipse.ptp.internal.rdt.sync.cdt.core.SyncPolicy;
 import org.eclipse.ptp.internal.rdt.sync.cdt.ui.Activator;
-import org.eclipse.ptp.rdt.sync.core.BuildScenario;
+import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.swt.widgets.Composite;
@@ -69,7 +69,7 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 			return null;
 		}
 
-		final BuildScenario bs = SyncPolicy.getBuildScenarioForBuildConfiguration(getCfg());
+		final SyncConfig bs = SyncPolicy.getBuildScenarioForBuildConfiguration(getCfg());
 		if (bs == null) {
 			return null;
 		}

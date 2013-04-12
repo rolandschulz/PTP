@@ -28,8 +28,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.internal.rdt.sync.ui.messages.Messages;
-import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
-import org.eclipse.ptp.rdt.sync.core.BuildScenario;
+import org.eclipse.ptp.rdt.sync.core.SyncConfig;
+import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
+import org.eclipse.ptp.rdt.sync.core.services.ISynchronizeService;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.team.ui.synchronize.SaveableCompareEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
@@ -78,17 +79,12 @@ public class SyncMergeEditor {
 		protected ICompareInput prepareCompareInput(IProgressMonitor monitor) throws InvocationTargetException,
 				InterruptedException {
 			IProject project = file.getProject();
-			BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
-			BuildScenario buildScenario;
-			try {
-				buildScenario = bcm.getActiveBuildScenario(project);
-			} catch (CoreException e) {
-				throw new InvocationTargetException(e);
-			}
+			ISynchronizeService syncService = SyncConfigManager.getActive(project).getSyncService();
+			SyncConfig syncConfig = SyncConfigManager.getActive(project);
 			String[] mergeParts = null;
 
 			try {
-				mergeParts = bcm.getMergeConflictParts(project, buildScenario, file);
+				mergeParts = syncService.getMergeConflictParts(project, syncConfig, file);
 			} catch (CoreException e) {
 				RDTSyncUIPlugin.log(e);
 				return new DiffNode(null, Differencer.CONFLICTING, new SyncMergeItem(Messages.SyncMergeEditor_1),

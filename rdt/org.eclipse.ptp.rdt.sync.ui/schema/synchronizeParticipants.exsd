@@ -73,6 +73,13 @@
                </documentation>
             </annotation>
          </attribute>
+         <attribute name="serviceId" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 

@@ -19,38 +19,36 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.rdt.sync.core.BuildScenario;
+import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.services.core.IServiceProvider;
 
 /**
  * Provides synchronization services.
  */
-public interface ISyncServiceProvider extends IServiceProvider {
+public interface ISynchronizeService extends ISynchronizeServiceDescriptor {
 
 	/**
 	 * Replace the current contents of the given paths with the previous versions in the repository
 	 * 
 	 * @param project
-	 * @param buildScenario
+	 * @param syncConfig
 	 * @param path
 	 * @throws CoreException
 	 */
-	public void checkout(IProject project, BuildScenario buildScenario, IPath[] paths) throws CoreException;
+	public void checkout(IProject project, SyncConfig syncConfig, IPath[] paths) throws CoreException;
 
 	/**
 	 * Replace the current contents of the given paths with the current local copies of the remote (not necessarily the same as what
 	 * is on the remote site). This is useful in merge-conflict resolution.
 	 * 
 	 * @param project
-	 * @param buildScenario
+	 * @param syncConfig
 	 * @param path
 	 * @throws CoreException
 	 */
-	public void checkoutRemoteCopy(IProject project, BuildScenario buildScenario, IPath[] paths) throws CoreException;
+	public void checkoutRemoteCopy(IProject project, SyncConfig syncConfig, IPath[] paths) throws CoreException;
 
 	/**
 	 * Close any resources (files, sockets) that were open by the sync provider for the given project. Resources not open by the
@@ -59,25 +57,9 @@ public interface ISyncServiceProvider extends IServiceProvider {
 	public void close(IProject project);
 
 	/**
-	 * Gets the path to the configuration area on the server.
+	 * Get the remote directory that will be used for synchronization
 	 * 
 	 * @return String
-	 * @since 2.0
-	 */
-	public String getConfigLocation();
-
-	/**
-	 * Gets the connection to use for this service. The connection may not be
-	 * open, so clients should check to make sure it is open before using it.
-	 * 
-	 * @return IRemoteConnection
-	 */
-	public IRemoteConnection getConnection();
-
-	/**
-	 * Get the build location specified by this sync service provider.
-	 * 
-	 * @return location
 	 */
 	public String getLocation();
 
@@ -85,24 +67,24 @@ public interface ISyncServiceProvider extends IServiceProvider {
 	 * Get the current list of merge-conflicted files for the passed project and build scenario
 	 * 
 	 * @param project
-	 * @param buildScenario
+	 * @param syncConfig
 	 * @return set of files as project-relative IPaths. This may be an empty set but never null.
 	 * @throws CoreException
 	 *             for system-level problems retrieving merge information
 	 */
-	public Set<IPath> getMergeConflictFiles(IProject project, BuildScenario buildScenario) throws CoreException;
+	public Set<IPath> getMergeConflictFiles(IProject project, SyncConfig syncConfig) throws CoreException;
 
 	/**
 	 * Get the three parts of the merge-conflicted file (left, right, and ancestor, respectively)
 	 * 
 	 * @param project
-	 * @param buildScenario
+	 * @param syncConfig
 	 * @param file
 	 * @return the three parts as strings. Either three strings (some may be empty) or null if file is not merge-conflicted.
 	 * @throws CoreException
 	 *             for system-level problems retrieving merge information
 	 */
-	public String[] getMergeConflictParts(IProject project, BuildScenario buildScenario, IFile file) throws CoreException;
+	public String[] getMergeConflictParts(IProject project, SyncConfig syncConfig, IFile file) throws CoreException;
 
 	/**
 	 * Get the remote connection used by this sync service provider.
@@ -112,40 +94,35 @@ public interface ISyncServiceProvider extends IServiceProvider {
 	public IRemoteConnection getRemoteConnection();
 
 	/**
-	 * Gets the provider of remote services.
+	 * Set the remote directory that will be used for synchronization
 	 * 
-	 * @return IRemoteServices
+	 * @param location
+	 *            directory path
+	 * @throws RuntimeException
+	 *             if already set. Changing these local parameters is not currently supported but should be possible.
 	 */
-	public IRemoteServices getRemoteServices();
-
-	/**
-	 * Set the path to the configuration area on the server.
-	 * 
-	 * @param configLocation
-	 *            path to the configuration area
-	 * @since 3.1
-	 */
-	public void setConfigLocation(String configLocation);
+	public void setLocation(String location);
 
 	/**
 	 * Set the given file paths as resolved (merge conflict does not exist)
 	 * 
 	 * @param project
-	 * @param buildScenario
+	 * @param syncConfig
 	 * @param path
 	 * @throws CoreException
 	 *             for system-level problems setting the state
 	 */
-	public void setMergeAsResolved(IProject project, BuildScenario buildScenario, IPath[] paths) throws CoreException;
+	public void setMergeAsResolved(IProject project, SyncConfig syncConfig, IPath[] paths) throws CoreException;
 
 	/**
-	 * Set the connection to use for this service.
+	 * set the remote connection used for synchronization
 	 * 
-	 * @param connection
+	 * @param conn
 	 *            remote connection
-	 * @since 3.1
+	 * @throws RuntimeException
+	 *             if already set. Changing these local parameters is not currently supported but should be possible.
 	 */
-	public void setRemoteToolsConnection(IRemoteConnection connection);
+	public void setRemoteConnection(IRemoteConnection conn);
 
 	/**
 	 * Perform synchronization
@@ -164,6 +141,6 @@ public interface ISyncServiceProvider extends IServiceProvider {
 	 * @throws CoreException
 	 *             if synchronization fails
 	 */
-	public void synchronize(IProject project, BuildScenario buildScenario, IResourceDelta delta, SyncFileFilter filter,
+	public void synchronize(IProject project, SyncConfig syncConfig, IResourceDelta delta, SyncFileFilter filter,
 			IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException;
 }

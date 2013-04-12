@@ -11,7 +11,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.sync.ui;
 
-import org.eclipse.core.runtime.CoreException;
+import java.lang.reflect.Constructor;
+
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
@@ -23,16 +24,19 @@ import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipantDescriptor;
 
 public class SynchronizeParticipantDescriptor implements ISynchronizeParticipantDescriptor {
 	public static final String ATTR_ID = "id"; //$NON-NLS-1$
+	public static final String ATTR_SERVICE_ID = "serviceId"; //$NON-NLS-1$
 	public static final String ATTR_NAME = "name"; //$NON-NLS-1$
 	public static final String ATTR_CLASS = "class"; //$NON-NLS-1$
 
 	private final String fName;
 	private final String fId;
+	private final String fServiceId;
 	private ISynchronizeParticipant fParticipant;
 
 	public SynchronizeParticipantDescriptor(IConfigurationElement configElement) {
 		fId = configElement.getAttribute(ATTR_ID);
 		fName = configElement.getAttribute(ATTR_NAME);
+		fServiceId = configElement.getAttribute(ATTR_SERVICE_ID);
 	}
 
 	/*
@@ -41,6 +45,7 @@ public class SynchronizeParticipantDescriptor implements ISynchronizeParticipant
 	 * @see
 	 * org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipantDescriptor#getId()
 	 */
+	@Override
 	public String getId() {
 		return fId;
 	}
@@ -51,6 +56,7 @@ public class SynchronizeParticipantDescriptor implements ISynchronizeParticipant
 	 * @see
 	 * org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipantDescriptor#getName()
 	 */
+	@Override
 	public String getName() {
 		return fName;
 	}
@@ -62,6 +68,7 @@ public class SynchronizeParticipantDescriptor implements ISynchronizeParticipant
 	 * org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipantDescriptor#getParticipant
 	 * ()
 	 */
+	@Override
 	public ISynchronizeParticipant getParticipant() {
 		if (fParticipant == null) {
 			IExtensionPoint point = Platform.getExtensionRegistry().getExtensionPoint(RDTSyncUIPlugin.PLUGIN_ID,
@@ -72,11 +79,12 @@ public class SynchronizeParticipantDescriptor implements ISynchronizeParticipant
 						String extensionId = configElement.getAttribute(ATTR_ID);
 						if (extensionId != null && extensionId.equals(fId)) {
 							try {
-								fParticipant = (ISynchronizeParticipant) configElement.createExecutableExtension(ATTR_CLASS);
-								return fParticipant;
-							} catch (CoreException e) {
-								RDTSyncUIPlugin.log(e);
-							} catch (ClassCastException e) {
+								String serviceClass = configElement.getAttribute(ATTR_CLASS);
+								Class<?> cls = Platform.getBundle(configElement.getDeclaringExtension().getContributor().getName())
+										.loadClass(serviceClass);
+								Constructor<?> cons = cls.getConstructor(ISynchronizeParticipantDescriptor.class);
+								return (ISynchronizeParticipant) cons.newInstance(this);
+							} catch (Exception e) {
 								String className = configElement.getAttribute(ATTR_CLASS);
 								RDTSyncUIPlugin.log(
 										NLS.bind(Messages.SynchronizeParticipantDescriptor_invalidClass, new String[] { className,
@@ -90,5 +98,15 @@ public class SynchronizeParticipantDescriptor implements ISynchronizeParticipant
 			return null;
 		}
 		return fParticipant;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipantDescriptor#getServiceId()
+	 */
+	@Override
+	public String getServiceId() {
+		return fServiceId;
 	}
 }

@@ -12,7 +12,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.sync.cdt.ui.wizards;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,21 +24,15 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.internal.rdt.sync.cdt.core.SyncPolicy;
-import org.eclipse.ptp.internal.rdt.sync.cdt.ui.Activator;
-import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
-import org.eclipse.ptp.rdt.sync.core.BuildScenario;
+import org.eclipse.ptp.rdt.sync.core.SyncConfig;
+import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.SyncManager.SyncMode;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
-import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
-import org.eclipse.ptp.rdt.sync.core.services.ISyncServiceProvider;
-import org.eclipse.ptp.rdt.sync.core.services.SyncBuildServiceProvider;
+import org.eclipse.ptp.rdt.sync.core.services.ISynchronizeService;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
-import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 
 /**
@@ -72,32 +65,9 @@ public class NewRemoteSyncProjectWizardOperation {
 			return;
 		}
 
-		// Build the service configuration
-		ServiceModelManager smm = ServiceModelManager.getInstance();
-		IServiceConfiguration serviceConfig = smm.newServiceConfiguration(getConfigName(project.getName()));
-		IService syncService = smm.getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
-		serviceConfig.setServiceProvider(syncService, participant.getProvider(project));
-
-		IService buildService = smm.getService(IRemoteSyncServiceConstants.SERVICE_BUILD);
-		IServiceProviderDescriptor descriptor = buildService.getProviderDescriptor(SyncBuildServiceProvider.ID);
-		SyncBuildServiceProvider rbsp = (SyncBuildServiceProvider) smm.getServiceProvider(descriptor);
-		if (rbsp != null) {
-			IRemoteConnection remoteConnection = participant.getProvider(project).getRemoteConnection();
-			rbsp.setRemoteToolsConnection(remoteConnection);
-			serviceConfig.setServiceProvider(buildService, rbsp);
-		}
-
-		smm.addConfiguration(project, serviceConfig);
-		try {
-			smm.saveModelConfiguration();
-		} catch (IOException e) {
-			Activator.log(e.toString(), e);
-		}
-
-		BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
 		// Create build scenario based on initial remote location information
-		ISyncServiceProvider provider = participant.getProvider(project);
-		BuildScenario remoteBuildScenario = new BuildScenario(provider.getName(), provider.getRemoteConnection(),
+		ISynchronizeService provider = participant.getProvider(project);
+		SyncConfig remoteBuildScenario = new SyncConfig(null, provider.getId(), provider.getRemoteConnection(),
 				provider.getLocation());
 
 		// Initialize project with this build scenario, which will be applied to all current configurations.
@@ -105,9 +75,9 @@ public class NewRemoteSyncProjectWizardOperation {
 		SyncPolicy.setBuildScenarioForAllBuildConfigurations(project, remoteBuildScenario);
 
 		// Create a local build scenario
-		BuildScenario localBuildScenario = null;
+		SyncConfig localBuildScenario = null;
 		try {
-			localBuildScenario = bcm.createLocalBuildScenario(project);
+			localBuildScenario = SyncConfigManager.createLocal(project);
 		} catch (CoreException e) {
 			// TODO: What to do here?
 		}

@@ -29,12 +29,13 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.ptp.internal.rdt.sync.ui.messages.Messages;
-import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
-import org.eclipse.ptp.rdt.sync.core.BuildScenario;
-import org.eclipse.ptp.rdt.sync.core.ISyncListener;
+import org.eclipse.ptp.rdt.sync.core.SyncConfig;
+import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.SyncEvent;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
+import org.eclipse.ptp.rdt.sync.core.listeners.ISyncListener;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
+import org.eclipse.ptp.rdt.sync.core.services.ISynchronizeService;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -179,10 +180,10 @@ public class SyncMergeFileTableViewer extends ViewPart {
 		// Get merge-conflicted files
 		Set<IPath> mergeConflictFiles = new HashSet<IPath>();
 		if (project != null) {
-			BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
+			ISynchronizeService syncService = SyncConfigManager.getActive(project).getSyncService();
+			SyncConfig syncConfig = SyncConfigManager.getActive(project);
 			try {
-				BuildScenario buildScenario = bcm.getActiveBuildScenario(project);
-				mergeConflictFiles = bcm.getMergeConflictFiles(project, buildScenario);
+				mergeConflictFiles = syncService.getMergeConflictFiles(project, syncConfig);
 			} catch (CoreException e) {
 				RDTSyncUIPlugin.log(e);
 			}

@@ -37,7 +37,7 @@
       <navigatorContent
             activeByDefault="true"
             contentProvider="org.eclipse.cdt.internal.ui.navigator.CNavigatorContentProvider"
-            id="org.eclipse.ptp.rdt.sync.ui.navigator.content"
+            id="org.eclipse.ptp.rdt.sync.cdt.ui.navigator.content"
             labelProvider="org.eclipse.cdt.internal.ui.navigator.CNavigatorLabelProvider"
             name="Synchronize Elements"
             priority="highest">
@@ -79,7 +79,7 @@
                suppressedExtensionId="org.eclipse.cdt.ui.navigator.content">
          </override>
        <commonWizard
-	         associatedExtensionId="org.eclipse.ptp.rdt.sync.ui.navigator.content"
+	         associatedExtensionId="org.eclipse.ptp.rdt.sync.cdt.ui.navigator.content"
 	         menuGroupId="org.eclipse.ptp.rdt.ui.newProject"
 	         type="new"
 	         wizardId="org.eclipse.ptp.rdt.sync.cdt.ui.newSyncProjectWizard">
@@ -91,13 +91,13 @@
        point="org.eclipse.ui.navigator.viewer">
        <viewerContentBinding viewerId="org.eclipse.ui.navigator.ProjectExplorer">
           <includes>
-              <contentExtension pattern="org.eclipse.ptp.rdt.sync.ui.navigator.content"/>
+              <contentExtension pattern="org.eclipse.ptp.rdt.sync.cdt.ui.navigator.content"/>
           </includes>
        </viewerContentBinding>
    </extension> 
      <extension
            point="org.eclipse.ui.propertyPages">
-        <page
+        <!--page
               category="org.eclipse.cdt.managedbuilder.ui.properties.Page_head_build"
               class="org.eclipse.ptp.internal.rdt.sync.cdt.ui.properties.BuildRemotePropertiesPage"
               id="org.eclipse.ptp.rdt.sync.cdt.ui.properties.BuildRemotePropertiesPage"
@@ -111,7 +111,7 @@
         </test>
      </adapt>
   </enabledWhen>
-        </page>
+        </page-->
         <!-- category="org.eclipse.cdt.managedbuilder.ui.properties.Page_Environment -->
         <page
               category="org.eclipse.cdt.managedbuilder.ui.properties.Page_head_build"

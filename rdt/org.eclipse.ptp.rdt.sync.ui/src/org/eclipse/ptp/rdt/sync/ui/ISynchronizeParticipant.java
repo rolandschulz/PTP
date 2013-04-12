@@ -12,7 +12,7 @@ package org.eclipse.ptp.rdt.sync.ui;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.operation.IRunnableContext;
-import org.eclipse.ptp.rdt.sync.core.services.ISyncServiceProvider;
+import org.eclipse.ptp.rdt.sync.core.services.ISynchronizeService;
 import org.eclipse.swt.widgets.Composite;
 
 /**
@@ -20,7 +20,7 @@ import org.eclipse.swt.widgets.Composite;
  * point.
  * 
  */
-public interface ISynchronizeParticipant {
+public interface ISynchronizeParticipant extends ISynchronizeParticipantDescriptor {
 	/**
 	 * Create a control to configure a synchronize provider
 	 * 
@@ -44,15 +44,15 @@ public interface ISynchronizeParticipant {
 	 *            project that will be synchronized by this provider
 	 * @return configured sync service provider
 	 */
-	public ISyncServiceProvider getProvider(IProject project);
-	
+	public ISynchronizeService getProvider(IProject project);
+
 	/**
 	 * Check if the configuration is complete
 	 * 
 	 * @return true if the configuration is complete
 	 */
 	public boolean isConfigComplete();
-	
+
 	/**
 	 * Set project name so that the participant can use it in the UI
 	 * 

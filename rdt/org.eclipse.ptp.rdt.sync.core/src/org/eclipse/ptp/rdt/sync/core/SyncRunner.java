@@ -16,23 +16,23 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.rdt.sync.core.services.ISyncServiceProvider;
+import org.eclipse.ptp.rdt.sync.core.services.ISynchronizeService;
 
 /**
- * Simple class with a single public method for sync'ing. This serves as an adapter for an ISyncServiceProvider so that clients
+ * Simple class with a single public method for sync'ing. This serves as an adapter for an ISynchronizeService so that clients
  * can use the provider but without the ability to change the provider or read from it. As of 6.0.0, sync providers are dynamic
  * and may handle multiple projects and build configurations. Thus, clients need a way to use the provider but without creating
  * a dependency on the provider's internal data.
  */
 public class SyncRunner {
-	private ISyncServiceProvider provider;
+	private ISynchronizeService provider;
 	
-	public SyncRunner(ISyncServiceProvider ssp) {
+	public SyncRunner(ISynchronizeService ssp) {
 		provider = ssp;
 	}
 	
-	public void synchronize(IProject project, BuildScenario buildScenario, IResourceDelta delta, SyncFileFilter filter,
+	public void synchronize(IProject project, SyncConfig syncConfig, IResourceDelta delta, SyncFileFilter filter,
 			IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException {
-		provider.synchronize(project, buildScenario, delta, filter, monitor, syncFlags);
+		provider.synchronize(project, syncConfig, delta, filter, monitor, syncFlags);
 	}
 }

@@ -28,8 +28,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.internal.rdt.sync.cdt.core.SyncPolicy;
 import org.eclipse.ptp.internal.rdt.sync.cdt.ui.Activator;
 import org.eclipse.ptp.internal.rdt.sync.cdt.ui.messages.Messages;
-import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
-import org.eclipse.ptp.rdt.sync.core.BuildScenario;
+import org.eclipse.ptp.rdt.sync.core.SyncConfig;
+import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -230,7 +230,6 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 				}
 
 				// Save settings for changed configs. Call modify functions only when necessary.
-				BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
 				PageSettings settings = fConfigToPageSettings.get(config.getId());
 				if (settings != null) {
 					PageSettings systemSettings = this.loadSettings(config);
@@ -240,8 +239,8 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 							if (settings.syncProvider == null) {
 								SyncPolicy.modifyConfigurationAsSyncLocal(config);
 								try {
-									BuildScenario localBuildScenario = bcm.createLocalBuildScenario(project);
-									SyncPolicy.setBuildScenarioForBuildConfiguration(localBuildScenario, config);
+									SyncConfig localConfig = SyncConfigManager.createLocal(project);
+									SyncPolicy.setBuildScenarioForBuildConfiguration(localConfig, config);
 								} catch (CoreException e) {
 									Activator.log(Messages.BuildRemotePropertiesPage_2, e);
 								}
@@ -273,8 +272,8 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 
 		// Register with build configuration manager. This must be done after saving build info with ManagedBuildManager, as
 		// the BuildConfigurationManager relies on the data being up-to-date.
-		BuildScenario buildScenario = new BuildScenario(settings.syncProvider, settings.connection, settings.rootLocation);
-		SyncPolicy.setBuildScenarioForBuildConfiguration(buildScenario, config);
+		SyncConfig syncConfig = new SyncConfig(null, settings.syncProvider, settings.connection, settings.rootLocation);
+		SyncPolicy.setBuildScenarioForBuildConfiguration(syncConfig, config);
 	}
 
 	// Connection button handling
@@ -374,21 +373,21 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	 * @return Configuration settings or null if config not found in BuildConfigurationManager
 	 */
 	private PageSettings loadSettings(IConfiguration config) {
-		BuildScenario buildScenario = SyncPolicy.getBuildScenarioForBuildConfiguration(config);
-		if (buildScenario == null) {
+		SyncConfig syncConfig = SyncPolicy.getBuildScenarioForBuildConfiguration(config);
+		if (syncConfig == null) {
 			IStatus status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Error loading configuration data"); //$NON-NLS-1$
 			StatusManager.getManager().handle(status, StatusManager.SHOW);
 			return null;
 		}
 		PageSettings settings = new PageSettings();
-		settings.syncProvider = buildScenario.getSyncProvider();
+		settings.syncProvider = syncConfig.getSyncProviderId();
 		try {
-			settings.connection = buildScenario.getRemoteConnection();
+			settings.connection = syncConfig.getRemoteConnection();
 		} catch (MissingConnectionException e) {
 			// nothing to do
 		}
 		IProject project = config.getOwner().getProject();
-		settings.rootLocation = buildScenario.getLocation(project);
+		settings.rootLocation = syncConfig.getLocation(project);
 
 		return settings;
 	}
@@ -407,7 +406,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 
 		PageSettings settings = new PageSettings();
 		if (fSyncToggleButton.getSelection()) {
-			settings.syncProvider = BuildConfigurationManager.getInstance().getProjectSyncProvider(project).getName();
+			settings.syncProvider = SyncConfigManager.getActive(project).getSyncService().getName();
 		} else {
 			settings.syncProvider = null;
 		}

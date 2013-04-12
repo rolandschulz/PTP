@@ -50,7 +50,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.ptp.internal.rdt.sync.cdt.core.messages.Messages;
 import org.eclipse.ptp.internal.rdt.sync.cdt.core.remotemake.SyncCommandLauncher;
-import org.eclipse.ptp.rdt.sync.core.BuildScenario;
+import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
@@ -186,8 +186,8 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 			super.setSettingEntries(entries);
 			return;
 		}
-		BuildScenario bs = SyncPolicy.getBuildScenarioForProject(currentProject);
-		if (bs.getSyncProvider() == null) {
+		SyncConfig bs = SyncPolicy.getBuildScenarioForProject(currentProject);
+		if (bs.getSyncProviderId() == null) {
 			// For local configurations, no special processing is needed.
 			super.setSettingEntries(entries);
 			return;
@@ -227,9 +227,9 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 	 */
 	@Override
 	protected String getSpecFile(String languageId) {
-		BuildScenario bs = SyncPolicy.getBuildScenarioForProject(currentProject);
+		SyncConfig bs = SyncPolicy.getBuildScenarioForProject(currentProject);
 		// For local configurations, we can fall back to the original implementation.
-		if (bs.getSyncProvider() == null) {
+		if (bs.getSyncProviderId() == null) {
 			return super.getSpecFile(languageId);
 		}
 

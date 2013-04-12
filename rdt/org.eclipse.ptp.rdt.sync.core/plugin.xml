@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
-   <extension-point id="synchronizePolicy" name="Synchronize Policy" schema="schema/synchronizePolicy.exsd"/>
+   <extension-point id="synchronizeService" name="Synchronize Service" schema="schema/synchronizeService.exsd"/>
    <extension
          id="remoteSyncNature"
          name="%RemoteSyncNature.name"

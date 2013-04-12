@@ -32,7 +32,7 @@ import org.eclipse.ptp.etfw.jaxb.util.ToolAppTypeUtil;
 import org.eclipse.ptp.etfw.messages.Messages;
 import org.eclipse.ptp.etfw.toolopts.ToolApp;
 import org.eclipse.ptp.etfw.toolopts.ToolsOptionsConstants;
-import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
+import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 
 /**
@@ -102,7 +102,7 @@ public abstract class ETFWToolStep extends Job implements IToolLaunchConfigurati
 		isSyncProject = RemoteSyncNature.hasNature(thisProject);// BuildConfigurationManager.getInstance().isInitialized(thisProject);
 
 		if (isSyncProject) {
-			projectLocation = BuildConfigurationManager.getInstance().getActiveBuildScenario(thisProject).getLocation();
+			projectLocation = SyncConfigManager.getActive(thisProject).getLocation();
 		} else {
 			projectLocation = thisCProject.getResource().getLocationURI().getPath();
 		}

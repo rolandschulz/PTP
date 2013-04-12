@@ -17,6 +17,10 @@ public class Messages extends NLS {
 
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.internal.rdt.sync.core.messages.messages"; //$NON-NLS-1$
 
+	public static String AbstractSynchronizeService_Change_remote_connection;
+
+	public static String AbstractSynchronizeService_Change_remote_location;
+
 	public static String BCM_LocalConnectionError;
 
 	public static String BCM_LocalServiceError;
@@ -55,9 +59,13 @@ public class Messages extends NLS {
 
 	public static String SyncBuildServiceProvider_name;
 
+	public static String SyncConfigManager_Unable_to_save;
+
 	public static String SyncFileFilter_1;
 
 	public static String SyncFileFilter_2;
+
+	public static String SynchronizeServiceDescriptor_Invalid_class;
 
 	public static String SyncManager_10;
 

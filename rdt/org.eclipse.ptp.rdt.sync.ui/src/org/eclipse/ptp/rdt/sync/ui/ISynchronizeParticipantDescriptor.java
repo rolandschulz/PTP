@@ -33,4 +33,11 @@ public interface ISynchronizeParticipantDescriptor {
 	 * @return
 	 */
 	public ISynchronizeParticipant getParticipant();
+
+	/**
+	 * Get the service ID that implements the sync service
+	 * 
+	 * @return service ID
+	 */
+	public String getServiceId();
 }

@@ -31,10 +31,10 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.ptp.internal.rdt.sync.git.ui.Activator;
 import org.eclipse.ptp.internal.rdt.sync.git.ui.messages.Messages;
-import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
 import org.eclipse.ptp.rdt.sync.core.CommandRunner;
 import org.eclipse.ptp.rdt.sync.core.CommandRunner.CommandResults;
 import org.eclipse.ptp.rdt.sync.core.RecursiveSubMonitor;
+import org.eclipse.ptp.rdt.sync.core.SyncUtils;
 import org.eclipse.ptp.rdt.sync.core.exceptions.RemoteExecutionException;
 import org.eclipse.ptp.rdt.sync.core.exceptions.RemoteSyncException;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -559,7 +559,7 @@ public class SyncGitPreferencePage extends PreferencePage implements IWorkbenchP
 			}
 		}
 
-		BuildConfigurationManager.flushNode(prefSyncNode);
+		SyncUtils.flushNode(prefSyncNode);
 	}
 
 	/**

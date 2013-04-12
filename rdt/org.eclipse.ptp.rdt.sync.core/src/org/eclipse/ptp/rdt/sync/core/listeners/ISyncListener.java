@@ -8,7 +8,9 @@
  * Contributors:
  *    John Eblen - initial implementation
  *******************************************************************************/
-package org.eclipse.ptp.rdt.sync.core;
+package org.eclipse.ptp.rdt.sync.core.listeners;
+
+import org.eclipse.ptp.rdt.sync.core.SyncEvent;
 
 /**
  * Simple interface for clients wishing to register for sync events 

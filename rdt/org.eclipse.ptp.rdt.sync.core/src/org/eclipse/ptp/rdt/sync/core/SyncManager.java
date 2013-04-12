@@ -21,12 +21,9 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IExtension;
-import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IScopeContext;
@@ -35,24 +32,27 @@ import org.eclipse.ptp.internal.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.internal.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.handlers.IMissingConnectionHandler;
 import org.eclipse.ptp.rdt.sync.core.handlers.ISyncExceptionHandler;
-import org.eclipse.ptp.rdt.sync.core.policy.ISynchronizePolicy;
+import org.eclipse.ptp.rdt.sync.core.listeners.ISyncListener;
+import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
+import org.eclipse.ptp.rdt.sync.core.services.ISynchronizeService;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.osgi.service.prefs.Preferences;
 
 public class SyncManager {
 	private static class SynchronizeJob extends Job {
 		private final IProject fProject;
-		private final BuildScenario fBuildScenario;
+		private final SyncConfig fBuildScenario;
 		private final IResourceDelta fDelta;
 		private final SyncRunner fSyncRunner;
 		private final EnumSet<SyncFlag> fSyncFlags;
 		private final ISyncExceptionHandler fSyncExceptionHandler;
 
-		public SynchronizeJob(IProject project, BuildScenario buildScenario, IResourceDelta delta, SyncRunner runner,
+		public SynchronizeJob(IProject project, SyncConfig syncConfig, IResourceDelta delta, SyncRunner runner,
 				EnumSet<SyncFlag> syncFlags, ISyncExceptionHandler seHandler) {
 			super(Messages.SyncManager_4);
 			fProject = project;
-			fBuildScenario = buildScenario;
+			fBuildScenario = syncConfig;
 			fDelta = delta;
 			fSyncRunner = runner;
 			fSyncFlags = syncFlags;
@@ -118,9 +118,6 @@ public class SyncManager {
 	private static final Map<IProject, Set<ISyncListener>> fProjectToSyncListenersMap = Collections
 			.synchronizedMap(new HashMap<IProject, Set<ISyncListener>>());
 
-	private static final Map<IProject, ISynchronizePolicy> fPolicyMap = Collections
-			.synchronizedMap(new HashMap<IProject, ISynchronizePolicy>());
-
 	// Sync unavailable by default. Wizards should explicitly set the sync mode once the project is ready.
 	private static final SyncMode DEFAULT_SYNC_MODE = SyncMode.UNAVAILABLE;
 	private static final boolean DEFAULT_SYNC_AUTO_SETTING = true;
@@ -139,7 +136,33 @@ public class SyncManager {
 			fProjectToSyncListenersMap.put(project, listenerSet);
 		}
 		listenerSet.add(listener);
-	};
+	}
+
+	/**
+	 * Convert a project into a synchronized project.
+	 * 
+	 * @param project
+	 *            project to convert
+	 * @param provider
+	 *            ISynchronizeService that has been correctly configured
+	 * @param filter
+	 *            synchronize filter, or null if no filter
+	 * @throws CoreException
+	 */
+	public static void makeSyncProject(IProject project, ISynchronizeService provider, SyncFileFilter filter) throws CoreException {
+		RemoteSyncNature.addNature(project, new NullProgressMonitor());
+
+		IRemoteConnection conn = provider.getRemoteConnection();
+		SyncConfig config = new SyncConfig(conn.getName(), provider.getId(), conn, provider.getLocation());
+		SyncConfigManager.addConfig(project, config);
+		SyncConfigManager.setActive(project, config);
+		SyncConfigManager.saveConfigs(project);
+
+		if (filter != null) {
+			SyncManager.saveFileFilter(project, filter);
+		}
+
+	}
 
 	/**
 	 * Return a copy of the default file filter
@@ -161,7 +184,7 @@ public class SyncManager {
 		} else {
 			return filter;
 		}
-	}
+	};
 
 	/**
 	 * Get the current default missing connection handler
@@ -244,57 +267,6 @@ public class SyncManager {
 		return node.getBoolean(SYNC_AUTO_KEY, DEFAULT_SYNC_AUTO_SETTING);
 	}
 
-	public static BuildScenario[] getSynchronizePolicy(IProject project, SyncMode mode) {
-		ISynchronizePolicy policy = fPolicyMap.get(project);
-		if (policy == null) {
-			String[] natures = null;
-			try {
-				natures = project.getDescription().getNatureIds();
-			} catch (CoreException e) {
-				// Ignore
-			}
-			if (natures != null) {
-				for (String nature : natures) {
-					try {
-						if (project.isNatureEnabled(nature)) {
-							policy = getSynchronizePolicy(nature);
-							if (policy != null) {
-								fPolicyMap.put(project, policy);
-								break;
-							}
-						}
-					} catch (CoreException e) {
-						// Ignore
-					}
-				}
-			}
-			if (policy == null) {
-				return null;
-			}
-		}
-		return policy.getSyncronizePolicy(project, mode);
-	}
-
-	private static ISynchronizePolicy getSynchronizePolicy(String nature) {
-		IExtensionPoint point = Platform.getExtensionRegistry().getExtensionPoint(RDTSyncCorePlugin.PLUGIN_ID,
-				SYNCHRONIZE_POLICY_EXTENSION);
-		if (point != null) {
-			for (IExtension extension : point.getExtensions()) {
-				for (IConfigurationElement configElement : extension.getConfigurationElements()) {
-					String natureId = configElement.getAttribute(ATTR_NATURE);
-					if (natureId != null && natureId.equals(nature)) {
-						try {
-							return (ISynchronizePolicy) configElement.createExecutableExtension(ATTR_CLASS);
-						} catch (CoreException e) {
-							RDTSyncCorePlugin.log(e);
-						}
-					}
-				}
-			}
-		}
-		return null;
-	}
-
 	/**
 	 * Get sync mode for a project
 	 * 
@@ -361,7 +333,7 @@ public class SyncManager {
 
 		filter.saveFilter(node);
 
-		BuildConfigurationManager.flushNode(node);
+		SyncUtils.flushNode(node);
 	}
 
 	/**
@@ -387,7 +359,7 @@ public class SyncManager {
 
 		filter.saveFilter(node);
 
-		BuildConfigurationManager.flushNode(node);
+		SyncUtils.flushNode(node);
 	}
 
 	// Note that the monitor is ignored for non-blocking jobs since SynchronizeJob creates its own monitor
@@ -395,41 +367,43 @@ public class SyncManager {
 			boolean isBlocking, boolean useExceptionHandler, ISyncExceptionHandler seHandler, IProgressMonitor monitor)
 			throws CoreException {
 		int jobNum = 0;
-		BuildScenario[] buildScenarios = getSynchronizePolicy(project, mode);
-		if (buildScenarios != null) {
-			Job[] syncJobs = new Job[buildScenarios.length];
-			for (BuildScenario buildScenario : buildScenarios) {
-				SynchronizeJob job = null;
-				SyncRunner syncRunner = new SyncRunner(BuildConfigurationManager.getInstance().getProjectSyncProvider(project));
-				if (syncRunner != null) {
-					if (isBlocking) {
-						try {
-							syncRunner.synchronize(project, buildScenario, delta, getFileFilter(project), monitor, syncFlags);
-						} catch (CoreException e) {
-							if (!useExceptionHandler) {
-								throw e;
-							} else if (seHandler == null) {
-								defaultSyncExceptionHandler.handle(project, e);
-							} else {
-								seHandler.handle(project, e);
-							}
-						} finally {
-							SyncManager.notifySyncListeners(project);
-						}
-					} else {
-						job = new SynchronizeJob(project, buildScenario, delta, syncRunner, syncFlags, seHandler);
-						job.schedule();
-					}
-				}
-
-				// Each build configuration is matched with a job, which may be null if a job could not be created.
-				syncJobs[jobNum] = job;
-				jobNum++;
-			}
-			return syncJobs;
+		SyncConfig[] syncConfigs;
+		if (mode == SyncMode.ACTIVE) {
+			syncConfigs = new SyncConfig[1];
+			syncConfigs[0] = SyncConfigManager.getActive(project);
+		} else {
+			syncConfigs = SyncConfigManager.getConfigs(project);
 		}
+		Job[] syncJobs = new Job[syncConfigs.length];
+		for (SyncConfig config : syncConfigs) {
+			SynchronizeJob job = null;
+			SyncRunner syncRunner = new SyncRunner(config.getSyncService());
+			if (syncRunner != null) {
+				if (isBlocking) {
+					try {
+						syncRunner.synchronize(project, config, delta, getFileFilter(project), monitor, syncFlags);
+					} catch (CoreException e) {
+						if (!useExceptionHandler) {
+							throw e;
+						} else if (seHandler == null) {
+							defaultSyncExceptionHandler.handle(project, e);
+						} else {
+							seHandler.handle(project, e);
+						}
+					} finally {
+						SyncManager.notifySyncListeners(project);
+					}
+				} else {
+					job = new SynchronizeJob(project, config, delta, syncRunner, syncFlags, seHandler);
+					job.schedule();
+				}
+			}
 
-		return null;
+			// Each build configuration is matched with a job, which may be null if a job could not be created.
+			syncJobs[jobNum] = job;
+			jobNum++;
+		}
+		return syncJobs;
 	}
 
 	/**
@@ -474,7 +448,7 @@ public class SyncManager {
 			node.putBoolean(SHOW_ERROR_KEY, shouldBeDisplayed);
 		}
 
-		BuildConfigurationManager.flushNode(node);
+		SyncUtils.flushNode(node);
 	}
 
 	/**
@@ -496,7 +470,7 @@ public class SyncManager {
 			node.putBoolean(SYNC_AUTO_KEY, isSyncAutomatic);
 		}
 
-		BuildConfigurationManager.flushNode(node);
+		SyncUtils.flushNode(node);
 	}
 
 	/**
@@ -523,7 +497,7 @@ public class SyncManager {
 			node.put(SYNC_MODE_KEY, mode.name());
 		}
 
-		BuildConfigurationManager.flushNode(node);
+		SyncUtils.flushNode(node);
 	}
 
 	private static Job sync(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags, boolean isBlocking,

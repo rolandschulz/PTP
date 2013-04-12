@@ -66,7 +66,7 @@ import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.util.FS;
 import org.eclipse.jgit.util.QuotedString;
 import org.eclipse.ptp.internal.rdt.sync.git.core.messages.Messages;
-import org.eclipse.ptp.rdt.sync.core.BuildScenario;
+import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.CommandRunner;
 import org.eclipse.ptp.rdt.sync.core.CommandRunner.CommandResults;
 import org.eclipse.ptp.rdt.sync.core.RecursiveSubMonitor;
@@ -98,7 +98,7 @@ public class GitRemoteSyncConnection {
 	private static final String gitArgs = "--git-dir=" + gitDir + " --work-tree=."; //$NON-NLS-1$ //$NON-NLS-2$
 	private static final String remotePushBranch = "ptp-push"; //$NON-NLS-1$
 	private final String localDirectory;
-	private final BuildScenario buildScenario;
+	private final SyncConfig syncConfig;
 	private SyncFileFilter fileFilter;
 	private Git git;
 	private TransportGitSsh transport;
@@ -124,13 +124,13 @@ public class GitRemoteSyncConnection {
 	 *             when connection missing. In this case, the instance is
 	 *             also invalid.
 	 */
-	public GitRemoteSyncConnection(IProject proj, String localDir, BuildScenario bs, SyncFileFilter filter, IProgressMonitor monitor)
+	public GitRemoteSyncConnection(IProject proj, String localDir, SyncConfig bs, SyncFileFilter filter, IProgressMonitor monitor)
 			throws RemoteSyncException, MissingConnectionException {
 		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
 		try {
 			project = proj;
 			localDirectory = localDir;
-			buildScenario = bs;
+			syncConfig = bs;
 			fileFilter = filter;
 
 			// Build repo, creating it if it is not already present.
@@ -247,7 +247,7 @@ public class GitRemoteSyncConnection {
 			// Create remote directory if necessary.
 			try {
 				subMon.subTask(Messages.GitRemoteSyncConnection_24);
-				CommandRunner.createRemoteDirectory(buildScenario.getRemoteConnection(), buildScenario.getLocation(project),
+				CommandRunner.createRemoteDirectory(syncConfig.getRemoteConnection(), syncConfig.getLocation(project),
 						subMon.newChild(5));
 			} catch (final CoreException e) {
 				throw new RemoteSyncException(e);
@@ -588,7 +588,7 @@ public class GitRemoteSyncConnection {
 			commandList.add(command);
 
 			try {
-				IRemoteConnection connection = buildScenario.getRemoteConnection();
+				IRemoteConnection connection = syncConfig.getRemoteConnection();
 				if (!connection.isOpen()) {
 					connection.open(null);
 				}
@@ -661,7 +661,7 @@ public class GitRemoteSyncConnection {
 				.setHost("none") //$NON-NLS-1$
 				// .setPass("")
 				.setScheme("ssh") //$NON-NLS-1$
-				.setPath(buildScenario.getLocation(project) + "/" + gitDir); //$NON-NLS-1$  // Should use remote path seperator but
+				.setPath(syncConfig.getLocation(project) + "/" + gitDir); //$NON-NLS-1$  // Should use remote path seperator but
 																				// first 315720 has to be fixed
 	}
 
@@ -829,7 +829,7 @@ public class GitRemoteSyncConnection {
 	 * @throws MissingConnectionException
 	 */
 	public IRemoteConnection getConnection() throws MissingConnectionException {
-		return buildScenario.getRemoteConnection();
+		return syncConfig.getRemoteConnection();
 	}
 
 	/**
@@ -843,7 +843,7 @@ public class GitRemoteSyncConnection {
 	 * @return the remoteDirectory
 	 */
 	public String getRemoteDirectory() {
-		return buildScenario.getLocation(project);
+		return syncConfig.getLocation(project);
 	}
 
 	/**
@@ -987,7 +987,7 @@ public class GitRemoteSyncConnection {
 	 * for the actual implementation.)
 	 * 
 	 * Note that the remote is fetched and merged first. This is on purpose so that merge conflicts will occur locally, where
-	 * they can be more easily managed. Previously, "syncLocalToRemote" was called first in "GitServiceProvider", which would
+	 * they can be more easily managed. Previously, "syncLocalToRemote" was called first in "AbstractSynchronizeService", which would
 	 * cause merge conflicts to occur remotely.
 	 * 
 	 * 
@@ -1147,7 +1147,7 @@ public class GitRemoteSyncConnection {
 		try {
 			// Skip class execute function, which attempts to run the command in the remote directory.
 			// (This directory may not yet exist, since reading the Git version is one of the first operations.)
-			IRemoteConnection conn = buildScenario.getRemoteConnection();
+			IRemoteConnection conn = syncConfig.getRemoteConnection();
 			commandResults = CommandRunner.executeRemoteCommand(conn, command, null, monitor);
 		} catch (final InterruptedException e) {
 			throw new RemoteExecutionException(e);
@@ -1234,15 +1234,15 @@ public class GitRemoteSyncConnection {
 
 	private CommandResults executeRemoteCommand(String command, IProgressMonitor monitor) throws RemoteSyncException, IOException,
 			InterruptedException, RemoteConnectionException, MissingConnectionException {
-		IRemoteConnection conn = buildScenario.getRemoteConnection();
-		String remoteDirectory = buildScenario.getLocation(project);
+		IRemoteConnection conn = syncConfig.getRemoteConnection();
+		String remoteDirectory = syncConfig.getLocation(project);
 		return CommandRunner.executeRemoteCommand(conn, command, remoteDirectory, monitor);
 	}
 
 	private CommandResults executeRemoteCommand(List<String> command, IProgressMonitor monitor) throws RemoteSyncException,
 			IOException, InterruptedException, RemoteConnectionException, MissingConnectionException {
-		IRemoteConnection conn = buildScenario.getRemoteConnection();
-		String remoteDirectory = buildScenario.getLocation(project);
+		IRemoteConnection conn = syncConfig.getRemoteConnection();
+		String remoteDirectory = syncConfig.getLocation(project);
 		return CommandRunner.executeRemoteCommand(conn, command, remoteDirectory, monitor);
 	}
 
@@ -1258,7 +1258,7 @@ public class GitRemoteSyncConnection {
 				// Avoid creating node if it doesn't exist
 				if (prefSyncNode.nodeExists(GIT_LOCATION_NODE_NAME)) {
 					Preferences prefGitNode = prefSyncNode.node(GIT_LOCATION_NODE_NAME);
-					gitBinary = prefGitNode.get(buildScenario.getRemoteConnection().getName(), "git"); //$NON-NLS-1$
+					gitBinary = prefGitNode.get(syncConfig.getRemoteConnection().getName(), "git"); //$NON-NLS-1$
 				}
 			} catch (BackingStoreException e) {
 				Activator.log(Messages.GitRemoteSyncConnection_29, e);

@@ -36,15 +36,15 @@ import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.internal.rdt.sync.ui.SyncImages;
 import org.eclipse.ptp.internal.rdt.sync.ui.messages.Messages;
-import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.PathResourceMatcher;
 import org.eclipse.ptp.rdt.sync.core.RegexResourceMatcher;
 import org.eclipse.ptp.rdt.sync.core.RemoteContentProvider;
 import org.eclipse.ptp.rdt.sync.core.ResourceMatcher;
+import org.eclipse.ptp.rdt.sync.core.SyncConfig;
+import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter.PatternType;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
-import org.eclipse.ptp.rdt.sync.core.SyncManager.SyncMode;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -785,14 +785,14 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 		private boolean showRemoteFiles = false;
 
 		public SFTTreeContentProvider() {
-			BuildScenario[] bs = SyncManager.getSynchronizePolicy(project, SyncMode.ACTIVE);
-			if (bs == null || bs.length == 0) {
+			SyncConfig config = SyncConfigManager.getActive(project);
+			if (config == null) {
 				// System error handled by BuildConfigurationManager
 				remoteFiles = null;
 			} else {
 				RemoteContentProvider tmpRCP;
 				try {
-					tmpRCP = new RemoteContentProvider(bs[0].getRemoteConnection(), new Path(bs[0].getLocation(project)), project);
+					tmpRCP = new RemoteContentProvider(config.getRemoteConnection(), new Path(config.getLocation(project)), project);
 				} catch (MissingConnectionException e) {
 					tmpRCP = null;
 				}

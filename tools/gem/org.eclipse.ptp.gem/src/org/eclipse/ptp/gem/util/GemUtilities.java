@@ -58,7 +58,7 @@ import org.eclipse.ptp.gem.views.GemAnalyzer;
 import org.eclipse.ptp.gem.views.GemBrowser;
 import org.eclipse.ptp.gem.views.GemConsole;
 import org.eclipse.ptp.rdt.core.resources.RemoteMakeNature;
-import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
+import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
@@ -222,8 +222,8 @@ public class GemUtilities {
 		if (resource.getFileExtension().equals("gem")) { //$NON-NLS-1$
 			if (isSynchronizedProject(resource)) {
 				try {
-					resourceLocation = BuildConfigurationManager.getInstance().getActiveSyncLocationURI(resource).getPath();
-					logFileLocation = BuildConfigurationManager.getInstance().getActiveSyncLocationURI(gemFolder).getPath();
+					resourceLocation = SyncConfigManager.getActiveSyncLocationURI(resource).getPath();
+					logFileLocation = SyncConfigManager.getActiveSyncLocationURI(gemFolder).getPath();
 				} catch (final CoreException e) {
 					logExceptionDetail(e);
 				}
@@ -587,7 +587,7 @@ public class GemUtilities {
 		URI projectURI = null;
 		if (isSynchronizedProject(gemActiveResource)) {
 			try {
-				projectURI = BuildConfigurationManager.getInstance().getActiveSyncLocationURI(currentProject);
+				projectURI = SyncConfigManager.getActiveSyncLocationURI(currentProject);
 			} catch (final CoreException e) {
 				logExceptionDetail(e);
 			}
@@ -897,7 +897,7 @@ public class GemUtilities {
 		final IConfiguration configuration = ManagedBuildManager.getBuildInfo(project).getDefaultConfiguration();
 		String buildLocation = null;
 		try {
-			buildLocation = BuildConfigurationManager.getInstance().getActiveSyncLocationURI(project).getPath();
+			buildLocation = SyncConfigManager.getActiveSyncLocationURI(project).getPath();
 		} catch (final CoreException e) {
 			GemUtilities.logExceptionDetail(e);
 		}

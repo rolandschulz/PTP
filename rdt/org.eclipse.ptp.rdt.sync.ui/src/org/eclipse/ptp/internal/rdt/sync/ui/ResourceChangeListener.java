@@ -21,7 +21,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.internal.rdt.sync.ui.handlers.CommonSyncExceptionHandler;
 import org.eclipse.ptp.internal.rdt.sync.ui.messages.Messages;
-import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
+import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.SyncManager.SyncMode;
@@ -51,7 +51,7 @@ public class ResourceChangeListener {
 					return;
 				}
 				SyncManager.setSyncMode(project, SyncMode.UNAVAILABLE);
-				BuildConfigurationManager.getInstance().shutdown(project);
+				SyncConfigManager.getActive(project).getSyncService().close(project);
 				return;
 			}
 			for (IResourceDelta delta : event.getDelta().getAffectedChildren()) {

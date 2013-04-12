@@ -18,11 +18,12 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.wizard.IWizardContainer;
-import org.eclipse.ptp.internal.rdt.sync.git.core.GitServiceProvider;
 import org.eclipse.ptp.internal.rdt.sync.git.ui.messages.Messages;
-import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
-import org.eclipse.ptp.rdt.sync.core.services.ISyncServiceProvider;
+import org.eclipse.ptp.rdt.sync.core.services.ISynchronizeService;
+import org.eclipse.ptp.rdt.sync.core.services.SynchronizeServiceRegistry;
+import org.eclipse.ptp.rdt.sync.ui.AbstractSynchronizeParticipant;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
+import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipantDescriptor;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
@@ -31,8 +32,6 @@ import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;
 import org.eclipse.ptp.remote.ui.RemoteUIServices;
 import org.eclipse.ptp.remote.ui.widgets.RemoteConnectionWidget;
-import org.eclipse.ptp.services.core.IService;
-import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -50,20 +49,24 @@ import org.eclipse.swt.widgets.Text;
  * buttons. Also has a text field to allow the name of the configuration to be
  * changed.
  */
-public class GitParticipant implements ISynchronizeParticipant {
+public class GitParticipant extends AbstractSynchronizeParticipant {
 	private static final String FILE_SCHEME = "file"; //$NON-NLS-1$
 
 	private IRemoteConnection fSelectedConnection;
-	private String fProjectName = ""; //$NON-NLS-1$
 
+	private String fProjectName = ""; //$NON-NLS-1$
 	private Button fBrowseButton;
+
 	private Text fLocationText;
 	private RemoteConnectionWidget fRemoteConnectionWidget;
-
 	private IWizardContainer container;
 
 	// If false, automatically select "Remote Tools" provider instead of letting the user select the provider.
 	private final boolean showProviderCombo = false;
+
+	public GitParticipant(ISynchronizeParticipantDescriptor descriptor) {
+		super(descriptor);
+	}
 
 	/**
 	 * Attempt to open a connection.
@@ -214,15 +217,11 @@ public class GitParticipant implements ISynchronizeParticipant {
 	 * org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant#getProvider(org.eclipse.core.resources.IProject)
 	 */
 	@Override
-	public ISyncServiceProvider getProvider(IProject project) {
-		ServiceModelManager smm = ServiceModelManager.getInstance();
-		IService syncService = smm.getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
-		GitServiceProvider provider = (GitServiceProvider) smm.getServiceProvider(syncService
-				.getProviderDescriptor(GitServiceProvider.ID));
-		provider.setLocation(fLocationText.getText());
-		provider.setRemoteConnection(fSelectedConnection);
-		provider.setRemoteServices(fSelectedConnection != null ? fSelectedConnection.getRemoteServices() : null);
-		return provider;
+	public ISynchronizeService getProvider(IProject project) {
+		ISynchronizeService service = SynchronizeServiceRegistry.getSynchronizeServiceDescriptor(getServiceId()).getService();
+		service.setLocation(fLocationText.getText());
+		service.setRemoteConnection(fSelectedConnection);
+		return service;
 	}
 
 	/**
@@ -257,15 +256,6 @@ public class GitParticipant implements ISynchronizeParticipant {
 		return getErrorMessage() == null;
 	}
 
-	private void update() {
-		container.updateMessage();
-		// updateButtons() may fail if current page is null. This can happen if update() is called during wizard/page creation.
-		if (container.getCurrentPage() == null) {
-			return;
-		}
-		container.updateButtons();
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -276,5 +266,14 @@ public class GitParticipant implements ISynchronizeParticipant {
 	public void setProjectName(String projectName) {
 		fProjectName = projectName;
 		fLocationText.setText(getDefaultPathDisplayString());
+	}
+
+	private void update() {
+		container.updateMessage();
+		// updateButtons() may fail if current page is null. This can happen if update() is called during wizard/page creation.
+		if (container.getCurrentPage() == null) {
+			return;
+		}
+		container.updateButtons();
 	}
 }

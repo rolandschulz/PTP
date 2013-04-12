@@ -2,13 +2,12 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
-         point="org.eclipse.ptp.services.core.providers">
-      <provider
-            class="org.eclipse.ptp.internal.rdt.sync.git.core.GitServiceProvider"
-            id="org.eclipse.ptp.rdt.sync.git.core.GitServiceProvider"
-            name="%GitServiceProvider.name"
-            serviceId="org.eclipse.ptp.rdt.sync.core.SyncService">
-      </provider>
+         point="org.eclipse.ptp.rdt.sync.core.synchronizeService">
+      <synchronizeService
+            class="org.eclipse.ptp.internal.rdt.sync.git.core.GitSyncService"
+            id="org.eclipse.ptp.rdt.sync.git.core.synchronizeService"
+            name="GIT">
+      </synchronizeService>
    </extension>
 
 </plugin>

@@ -28,6 +28,11 @@ public class Messages extends NLS {
 	public static String CommonSyncExceptionHandler_3;
 	public static String CommonSyncExceptionHandler_4;
 	public static String ResourceChangeListener_0;
+	public static String SyncConfigDialog_Browse;
+	public static String SyncConfigDialog_Configuration_name;
+	public static String SyncConfigDialog_Project_location;
+	public static String SyncConfigDialog_Sync_Config;
+	public static String SyncConfigDialog_Synchronize_provider;
 	public static String SyncFileFilterPage_Attempt_to_edit_unsupported;
 	public static String SyncFileFilterPage_Cancel;
 	public static String SyncFileFilterPage_Default_Include_exclude_title;
@@ -60,6 +65,17 @@ public class Messages extends NLS {
 	public static String SyncMergeEditor_2;
 	public static String SyncMergeFileTreeViewer_0;
 	public static String SyncPreferencePage_0;
+	public static String SyncPropertyPage_Add;
+	public static String SyncPropertyPage_Cannot_remove_active;
+	public static String SyncPropertyPage_Failed_to_save_properties;
+	public static String SyncPropertyPage_Must_be_at_least_one;
+	public static String SyncPropertyPage_Only_one_configuration_active;
+	public static String SyncPropertyPage_Remove;
+	public static String SyncPropertyPage_Remove_Configuration;
+	public static String SyncPropertyPage_Save_failed;
+	public static String SyncPropertyPage_Set_Active;
+	public static String SyncPropertyPage_Set_Active_Configuration;
+	public static String SyncPropertyPage_Unable_to_save;
 
 	static {
 		// initialize resource bundle

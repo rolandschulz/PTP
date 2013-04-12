@@ -32,7 +32,7 @@ import org.eclipse.ptp.gem.util.GemUtilities;
 import org.eclipse.ptp.gem.views.GemAnalyzer;
 import org.eclipse.ptp.gem.views.GemBrowser;
 import org.eclipse.ptp.gem.views.GemConsole;
-import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
+import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPage;
@@ -107,8 +107,7 @@ public class VerificationPopUpAction implements IObjectActionDelegate {
 					page.showView(GemConsole.ID);
 
 					// if !isValidSourceFile, then its a .gem profiled executable
-					final boolean isValidSourceFile = id
-							.equals("org.eclipse.ptp.gem.verificationPopupC") //$NON-NLS-1$
+					final boolean isValidSourceFile = id.equals("org.eclipse.ptp.gem.verificationPopupC") //$NON-NLS-1$
 							|| id.equals("org.eclipse.ptp.gem.verificationPopupCpp") //$NON-NLS-1$
 							|| id.equals("org.eclipse.ptp.gem.verificationPopupC++") //$NON-NLS-1$
 							|| id.equals("org.eclipse.ptp.gem.verificationPopupCp") //$NON-NLS-1$
@@ -120,7 +119,7 @@ public class VerificationPopUpAction implements IObjectActionDelegate {
 					URI resourceLocation = null;
 					try {
 						if (isSync) {
-							resourceLocation = BuildConfigurationManager.getInstance().getActiveSyncLocationURI(resource);
+							resourceLocation = SyncConfigManager.getActiveSyncLocationURI(resource);
 						} else {
 							resourceLocation = resource.getLocationURI();
 						}

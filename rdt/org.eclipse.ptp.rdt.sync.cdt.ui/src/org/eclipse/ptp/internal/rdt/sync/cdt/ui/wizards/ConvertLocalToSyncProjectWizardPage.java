@@ -50,23 +50,18 @@ import org.eclipse.ptp.internal.rdt.sync.cdt.ui.Activator;
 import org.eclipse.ptp.internal.rdt.sync.cdt.ui.messages.Messages;
 import org.eclipse.ptp.internal.rdt.sync.ui.handlers.CommonSyncExceptionHandler;
 import org.eclipse.ptp.internal.rdt.sync.ui.preferences.SyncFileFilterPage;
-import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
-import org.eclipse.ptp.rdt.sync.core.BuildScenario;
+import org.eclipse.ptp.rdt.sync.core.SyncConfig;
+import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.SyncManager.SyncMode;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
-import org.eclipse.ptp.rdt.sync.core.services.IRemoteSyncServiceConstants;
-import org.eclipse.ptp.rdt.sync.core.services.ISyncServiceProvider;
-import org.eclipse.ptp.rdt.sync.core.services.SyncBuildServiceProvider;
+import org.eclipse.ptp.rdt.sync.core.services.ISynchronizeService;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipantDescriptor;
 import org.eclipse.ptp.rdt.sync.ui.SynchronizeParticipantRegistry;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
-import org.eclipse.ptp.services.core.IServiceProviderDescriptor;
 import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
@@ -305,36 +300,12 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 		try {
 			ISynchronizeParticipant participant = fSelectedProvider.getParticipant();
 
-			// Build the service configuration
-			ServiceModelManager smm = ServiceModelManager.getInstance();
-			IServiceConfiguration serviceConfig = smm.newServiceConfiguration(getConfigName(project.getName()));
-			IService syncService = smm.getService(IRemoteSyncServiceConstants.SERVICE_SYNC);
-			serviceConfig.setServiceProvider(syncService, participant.getProvider(project));
-
-			IService buildService = smm.getService(IRemoteSyncServiceConstants.SERVICE_BUILD);
-			IServiceProviderDescriptor descriptor = buildService.getProviderDescriptor(SyncBuildServiceProvider.ID);
-			SyncBuildServiceProvider rbsp = (SyncBuildServiceProvider) smm.getServiceProvider(descriptor);
-			if (rbsp != null) {
-				IRemoteConnection remoteConnection = participant.getProvider(project).getRemoteConnection();
-				rbsp.setRemoteToolsConnection(remoteConnection);
-				serviceConfig.setServiceProvider(buildService, rbsp);
-			}
-
-			smm.addConfiguration(project, serviceConfig);
-			try {
-				smm.saveModelConfiguration();
-			} catch (IOException e) {
-				Activator.log(e.toString(), e);
-			}
-
-			BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
-
 			// Initialize project with a local build scenario, which is applied to all configurations
-			SyncPolicy.setBuildScenarioForAllBuildConfigurations(project, bcm.createLocalBuildScenario(project));
+			SyncPolicy.setBuildScenarioForAllBuildConfigurations(project, SyncConfigManager.createLocal(project));
 
 			// Create a remote build scenario
-			ISyncServiceProvider provider = participant.getProvider(project);
-			BuildScenario remoteBuildScenario = new BuildScenario(provider.getName(), provider.getRemoteConnection(),
+			ISynchronizeService provider = participant.getProvider(project);
+			SyncConfig remoteBuildScenario = new SyncConfig(null, provider.getId(), provider.getRemoteConnection(),
 					provider.getLocation());
 
 			Object[] selectedConfigs = fConfigTable.getCheckedElements();

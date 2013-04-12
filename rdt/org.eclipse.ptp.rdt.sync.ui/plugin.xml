@@ -3,6 +3,20 @@
 <plugin>
    <extension-point id="synchronizeParticipants" name="Synchronize Participant" schema="schema/synchronizeParticipants.exsd"/>
    <extension
+         point="org.eclipse.ui.newWizards">
+	   <wizard
+	      name="%NewWizards.project"
+	      icon="icons/etool16/newprj_wiz.gif"
+	      category="org.eclipse.ptp.rdt.ui.wizardCategory.Remote"
+	      class="org.eclipse.ptp.internal.rdt.sync.ui.wizards.NewSyncProjectWizard"
+	      project="true"
+	      id="org.eclipse.ptp.rdt.sync.ui.newSyncProjectWizard">
+	      <description>
+	            %NewWizards.project.description
+	      </description>
+	   </wizard>
+   </extension>
+   <extension
        point="org.eclipse.ui.navigator.viewer">
        <viewerContentBinding viewerId="org.eclipse.ui.navigator.ProjectExplorer">
           <includes>
@@ -251,4 +265,38 @@
             restorable="false">
       </view>
    </extension>
+   <extension
+         point="org.eclipse.ui.navigator.navigatorContent">
+      <commonWizard
+            menuGroupId="org.eclipse.ptp.rdt.ui.newProject"
+            type="new"
+            wizardId="org.eclipse.ptp.rdt.sync.ui.newSyncProjectWizard">
+         <enablement/>
+      </commonWizard>
+   </extension>
+   <extension
+       point="org.eclipse.ui.navigator.viewer">
+       <viewerContentBinding viewerId="org.eclipse.ui.navigator.ProjectExplorer">
+          <includes>
+              <contentExtension pattern="org.eclipse.ptp.rdt.sync.ui.navigator.content"/>
+          </includes>
+       </viewerContentBinding>
+   </extension>
+   <extension
+           point="org.eclipse.ui.propertyPages">
+        <page
+              class="org.eclipse.ptp.internal.rdt.sync.ui.properties.SyncPropertyPage"
+              id="org.eclipse.ptp.rdt.sync.ui.properties.SyncConfigPropertiesPage"
+              name="%SyncConfigPropteryPage.name">
+           <enabledWhen>
+              <adapt type="org.eclipse.core.resources.IProject">
+                 <test
+                    property="org.eclipse.core.resources.projectNature"
+                    value="org.eclipse.ptp.rdt.sync.core.remoteSyncNature">
+                 </test>
+              </adapt>
+           </enabledWhen>
+        </page>
+
+     </extension>
 </plugin>

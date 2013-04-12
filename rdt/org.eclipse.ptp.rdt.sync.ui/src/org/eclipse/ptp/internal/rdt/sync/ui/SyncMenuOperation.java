@@ -25,14 +25,15 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.internal.rdt.sync.ui.handlers.CommonSyncExceptionHandler;
 import org.eclipse.ptp.internal.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.internal.rdt.sync.ui.preferences.SyncFileFilterPage;
-import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
-import org.eclipse.ptp.rdt.sync.core.BuildScenario;
 import org.eclipse.ptp.rdt.sync.core.PathResourceMatcher;
+import org.eclipse.ptp.rdt.sync.core.SyncConfig;
+import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.SyncManager.SyncMode;
 import org.eclipse.ptp.rdt.sync.core.handlers.ISyncExceptionHandler;
+import org.eclipse.ptp.rdt.sync.core.services.ISynchronizeService;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -122,8 +123,8 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 				SyncFileFilterPage.open(null, null);
 			} else if (command.equals(checkoutCommand) || command.equals(resolveMergeCommand)
 					|| (command.equals(resolveAsRemoteCommand))) {
-				BuildConfigurationManager bcm = BuildConfigurationManager.getInstance();
-				BuildScenario buildScenario = bcm.getActiveBuildScenario(project);
+				ISynchronizeService syncService = SyncConfigManager.getActive(project).getSyncService();
+				SyncConfig syncConfig = SyncConfigManager.getActive(project);
 				IStructuredSelection sel = this.getSelectedElements();
 
 				ArrayList<IPath> paths = new ArrayList<IPath>();
@@ -142,13 +143,14 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 				}
 
 				if (command.equals(checkoutCommand)) {
-					bcm.checkout(project, buildScenario, paths.toArray(new IPath[paths.size()]));
+					syncService.checkout(project, syncConfig, paths.toArray(new IPath[paths.size()]));
 				}
 				if (command.equals(resolveAsRemoteCommand)) {
-					bcm.checkoutRemoteCopy(project, buildScenario, paths.toArray(new IPath[paths.size()]));
+
+					syncService.checkoutRemoteCopy(project, syncConfig, paths.toArray(new IPath[paths.size()]));
 				}
 				if (command.equals(resolveMergeCommand) || command.equals(resolveAsRemoteCommand)) {
-					bcm.setMergeAsResolved(project, buildScenario, paths.toArray(new IPath[paths.size()]));
+					syncService.setMergeAsResolved(project, syncConfig, paths.toArray(new IPath[paths.size()]));
 					SyncMergeFileTableViewer viewer = SyncMergeFileTableViewer.getActiveInstance();
 					if (viewer != null) {
 						viewer.update(null);

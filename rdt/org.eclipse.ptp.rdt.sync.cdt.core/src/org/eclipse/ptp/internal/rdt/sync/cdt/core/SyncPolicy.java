@@ -38,11 +38,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.internal.rdt.sync.cdt.core.messages.Messages;
-import org.eclipse.ptp.rdt.sync.core.BuildConfigurationManager;
-import org.eclipse.ptp.rdt.sync.core.BuildScenario;
+import org.eclipse.ptp.rdt.sync.core.SyncConfig;
+import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.SyncManager.SyncMode;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
-import org.eclipse.ptp.rdt.sync.core.policy.ISynchronizePolicy;
+import org.eclipse.ptp.rdt.sync.core.listeners.ISynchronizePolicy;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
@@ -148,7 +148,7 @@ public class SyncPolicy implements ISynchronizePolicy {
 	 *            - the build configuration - cannot be null
 	 * @return build scenario or null if there are problems accessing configuration's information
 	 */
-	public static BuildScenario getBuildScenarioForBuildConfiguration(IConfiguration bconf) {
+	public static SyncConfig getBuildScenarioForBuildConfiguration(IConfiguration bconf) {
 		IProject project = bconf.getOwner().getProject();
 		checkProject(project);
 		return getBuildScenarioForBuildConfigurationInternal(bconf);
@@ -156,7 +156,7 @@ public class SyncPolicy implements ISynchronizePolicy {
 
 	// Return the build scenario stored for the passed id or the build scenario of its nearest ancestor.
 	// Return null if not found.
-	private static BuildScenario getBuildScenarioForBuildConfigurationInternal(IConfiguration bconf) {
+	private static SyncConfig getBuildScenarioForBuildConfigurationInternal(IConfiguration bconf) {
 		IProject project = bconf.getOwner().getProject();
 		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
 		if (buildInfo == null) {
@@ -177,7 +177,7 @@ public class SyncPolicy implements ISynchronizePolicy {
 			}
 
 			if (configId != null) {
-				BuildScenario bs = BuildScenario.loadScenario(scenarioData, configId);
+				SyncConfig bs = SyncConfig.loadScenario(scenarioData, configId);
 				if (bs != null) {
 					return bs;
 				}
@@ -249,7 +249,7 @@ public class SyncPolicy implements ISynchronizePolicy {
 	 */
 	public static URI getSyncLocationURI(IConfiguration configuration, IResource resource) throws CoreException {
 		// Project checked inside this function call
-		BuildScenario scenario = getBuildScenarioForBuildConfiguration(configuration);
+		SyncConfig scenario = getBuildScenarioForBuildConfiguration(configuration);
 		if (scenario != null) {
 			IPath path = new Path(scenario.getLocation()).append(resource.getProjectRelativePath());
 			IRemoteConnection conn;
@@ -320,7 +320,7 @@ public class SyncPolicy implements ISynchronizePolicy {
 	 * @param bconf
 	 *            - the build configuration - cannot be null
 	 */
-	public static void setBuildScenarioForBuildConfiguration(BuildScenario bs, IConfiguration bconf) {
+	public static void setBuildScenarioForBuildConfiguration(SyncConfig bs, IConfiguration bconf) {
 		if (bs == null) {
 			throw new NullPointerException();
 		}
@@ -331,7 +331,7 @@ public class SyncPolicy implements ISynchronizePolicy {
 		setBuildScenarioForBuildConfigurationInternal(bs, bconf);
 	}
 
-	private static void setBuildScenarioForBuildConfigurationInternal(BuildScenario bs, IConfiguration bconf) {
+	private static void setBuildScenarioForBuildConfigurationInternal(SyncConfig bs, IConfiguration bconf) {
 		Map<String, String> map = new HashMap<String, String>();
 		bs.saveScenario(map);
 		try {
@@ -441,18 +441,18 @@ public class SyncPolicy implements ISynchronizePolicy {
 
 		IConfiguration[] allConfigs = buildInfo.getManagedProject().getConfigurations();
 		for (IConfiguration config : allConfigs) {
-			BuildScenario bs = getBuildScenarioForBuildConfigurationInternal(config);
-			if (bs.getConfigId() == null) {
+			SyncConfig bs = getBuildScenarioForBuildConfigurationInternal(config);
+			if (bs.getData() == null) {
 				return; // Errors handled by prior function call
 			}
-			if (bs.getConfigId().equals(config.getId())) {
+			if (bs.getData().equals(config.getId())) {
 				continue;
 			}
-			IConfiguration parentConfig = buildInfo.getManagedProject().getConfiguration(bs.getConfigId());
+			IConfiguration parentConfig = buildInfo.getManagedProject().getConfiguration(bs.getData());
 			if (parentConfig != null) {
 				setBuildScenarioForBuildConfigurationInternal(bs, config);
 			} else {
-				Activator.log(Messages.BuildConfigurationManager_10 + bs.getConfigId() + Messages.BuildConfigurationManager_11
+				Activator.log(Messages.BuildConfigurationManager_10 + bs.getData() + Messages.BuildConfigurationManager_11
 						+ project.getName());
 			}
 		}
@@ -463,14 +463,13 @@ public class SyncPolicy implements ISynchronizePolicy {
 	 * default build configuration as parent.
 	 * 
 	 * @param project
-	 * @param buildScenario
+	 * @param syncConfig
 	 * @param configName
 	 * @param configDesc
 	 * @return the new configuration
 	 */
-	public static IConfiguration createConfiguration(IProject project, BuildScenario buildScenario, String configName,
-			String configDesc) {
-		return createConfiguration(project, null, buildScenario, configName, configDesc);
+	public static IConfiguration createConfiguration(IProject project, SyncConfig syncConfig, String configName, String configDesc) {
+		return createConfiguration(project, null, syncConfig, configName, configDesc);
 	}
 
 	/**
@@ -479,12 +478,12 @@ public class SyncPolicy implements ISynchronizePolicy {
 	 * 
 	 * @param project
 	 * @param configParent
-	 * @param buildScenario
+	 * @param syncConfig
 	 * @param configName
 	 * @param configDesc
 	 * @return the new configuration
 	 */
-	public static IConfiguration createConfiguration(IProject project, Configuration configParent, BuildScenario buildScenario,
+	public static IConfiguration createConfiguration(IProject project, Configuration configParent, SyncConfig syncConfig,
 			String configName, String configDesc) {
 		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
 		if (buildInfo == null) {
@@ -519,7 +518,7 @@ public class SyncPolicy implements ISynchronizePolicy {
 			configDes.setName(configName);
 			configDes.setDescription(configDesc);
 			setProjectDescription(project, projectDes);
-			setBuildScenarioForBuildConfigurationInternal(buildScenario, config);
+			setBuildScenarioForBuildConfigurationInternal(syncConfig, config);
 		} else {
 			creationError = Messages.BCM_CreateConfigError;
 		}
@@ -548,10 +547,8 @@ public class SyncPolicy implements ISynchronizePolicy {
 	public static IConfiguration createLocalConfiguration(IProject project, String configName) {
 		checkProject(project);
 		try {
-			BuildScenario localBuildScenario = BuildConfigurationManager.getInstance().createLocalBuildScenario(project);
-			if (localBuildScenario != null) {
-				return createConfiguration(project, localBuildScenario, configName, Messages.BCM_WorkspaceConfigDes);
-			}
+			SyncConfig localConfig = SyncConfigManager.createLocal(project);
+			return createConfiguration(project, localConfig, configName, Messages.BCM_WorkspaceConfigDes);
 		} catch (CoreException e) {
 			Activator.log(Messages.BCM_CreateConfigFailure + e.getMessage(), e);
 		}
@@ -573,7 +570,7 @@ public class SyncPolicy implements ISynchronizePolicy {
 	 *            Configuration's description
 	 * @return the new configuration - can be null on problems during creation
 	 */
-	public static IConfiguration createRemoteConfiguration(IProject project, BuildScenario remoteBuildScenario, String configName,
+	public static IConfiguration createRemoteConfiguration(IProject project, SyncConfig remoteBuildScenario, String configName,
 			String configDesc) {
 		checkProject(project);
 		return createConfiguration(project, remoteBuildScenario, configName, configDesc);
@@ -586,7 +583,7 @@ public class SyncPolicy implements ISynchronizePolicy {
 	 *            - cannot be null
 	 * @return build scenario or null if there are problems accessing configuration's information
 	 */
-	public static BuildScenario getBuildScenarioForProject(IProject project) {
+	public static SyncConfig getBuildScenarioForProject(IProject project) {
 		checkProject(project);
 		IConfiguration bconf = ManagedBuildManager.getBuildInfo(project).getDefaultConfiguration();
 		return getBuildScenarioForBuildConfigurationInternal(bconf);
@@ -600,10 +597,10 @@ public class SyncPolicy implements ISynchronizePolicy {
 	 *         are problems retrieving the sync provider or information.
 	 */
 	@Override
-	public BuildScenario[] getSyncronizePolicy(IProject project, SyncMode mode) {
+	public SyncConfig[] getSyncronizePolicy(IProject project, SyncMode mode) {
 		checkProject(project);
 
-		List<BuildScenario> scenarios = new ArrayList<BuildScenario>();
+		List<SyncConfig> scenarios = new ArrayList<SyncConfig>();
 
 		IConfiguration[] buildConfigurations = null;
 		if (mode == SyncMode.ACTIVE) {
@@ -615,12 +612,12 @@ public class SyncPolicy implements ISynchronizePolicy {
 
 		if (buildConfigurations != null) {
 			for (IConfiguration buildConfig : buildConfigurations) {
-				BuildScenario buildScenario = getBuildScenarioForBuildConfiguration(buildConfig);
-				scenarios.add(buildScenario);
+				SyncConfig syncConfig = getBuildScenarioForBuildConfiguration(buildConfig);
+				scenarios.add(syncConfig);
 			}
 		}
 
-		return scenarios.toArray(new BuildScenario[0]);
+		return scenarios.toArray(new SyncConfig[0]);
 	}
 
 	/**
@@ -631,7 +628,7 @@ public class SyncPolicy implements ISynchronizePolicy {
 	 * @param bs
 	 *            - the build scenario - cannot be null
 	 */
-	public static void setBuildScenarioForAllBuildConfigurations(IProject project, BuildScenario bs) {
+	public static void setBuildScenarioForAllBuildConfigurations(IProject project, SyncConfig bs) {
 		if (bs == null) {
 			throw new NullPointerException();
 		}
