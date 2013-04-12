@@ -157,6 +157,8 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 
 		composite.setLayout(new GridLayout());
 		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		//new/tried composite.setLayoutData(new GridData(SWT.FILL, SWT.LEAD, true, false));
+		
 		setControl(composite);
 
 		createProjectBasicInfoGroup(composite);

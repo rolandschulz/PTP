@@ -47,6 +47,7 @@ import org.eclipse.ptp.rdt.sync.core.RegexResourceMatcher;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter.PatternType;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
+import org.eclipse.ptp.rdt.sync.core.WildcardResourceMatcher;
 import org.eclipse.ptp.rdt.sync.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -82,7 +83,13 @@ import org.eclipse.ui.PlatformUI;
  * 1. Preference Page - to specify default settings<br>
  * 2. Filter page for new sync project - to specify settings for new project<br>
  * 3. Filter page for existing project - to alter existing Sync Filter settings<br>
+ * 
+ * Uses ResourceMatchers (e.g. PathResourceMatcher, RegexResourceMatcher, and WildcardResourceMatcher) to match the
+ * "patterns" entered to actual files in the project.
  */
+// FIXME for case 3. existing project, initial dialog size is too tall and narrow,
+// and not enough room for pattern view
+// FIXME2 make OK/cancel buttons same size
 public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchPreferencePage {
 	private static final int ERROR_DISPLAY_SECONDS = 3;
 	private static final Display display = Display.getCurrent();
@@ -104,6 +111,9 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 	private Text newRegex;
 	private Button excludeButtonForRegex;
 	private Button includeButtonForRegex;
+	private Text newWildcard;
+	private Button excludeButtonForWildcard;
+	private Button includeButtonForWildcard;
 	private Label patternErrorLabel;
 	private Button cancelButton;
 	private Button okButton;
@@ -306,7 +316,7 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 			}
 		}
 
-		// Composite for pattern table and buttons
+		// Composite for pattern view - pattern table and buttons
 		Composite patternTableComposite = new Composite(composite, SWT.BORDER);
 		if (DEBUG) {
 			colorComposite(patternTableComposite, SWT.COLOR_BLUE);
@@ -433,8 +443,10 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 		}
 
 		// Label for entering new path
-		new Label(patternEnterComposite, SWT.NONE).setText(Messages.SyncFileFilterPage_Enter_Path);
-
+		Label pathLabel=new Label(patternEnterComposite, SWT.NONE);
+		pathLabel.setText(Messages.SyncFileFilterPage_Enter_Path);
+		pathLabel.setToolTipText(Messages.SyncFileFilterPage_EnterPathOrFile+Messages.SyncFileFilterPage_toExcludeOrInclude);
+		
 		// Text box to enter new path
 		newPath = new Text(patternEnterComposite, SWT.NONE);
 		newPath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, GRAB_EXCESS, false));
@@ -461,7 +473,9 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 		});
 
 		// Label for entering new regex
-		new Label(patternEnterComposite, SWT.NONE).setText(Messages.SyncFileFilterPage_Enter_Regex);
+		Label regexLabel=new Label(patternEnterComposite, SWT.NONE);
+		regexLabel.setText(Messages.SyncFileFilterPage_Enter_Regex);
+		regexLabel.setToolTipText(Messages.SyncFileFilterPage_EnterRegex+Messages.SyncFileFilterPage_toExcludeOrInclude);
 
 		// Text box to enter new regex
 		newRegex = new Text(patternEnterComposite, SWT.NONE);
@@ -485,6 +499,36 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 		includeButtonForRegex.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				enterNewRegexPattern(PatternType.INCLUDE);
+			}
+		});
+		
+		// Label for entering new wildcard
+		Label wildcardLabel=new Label(patternEnterComposite, SWT.NONE);
+		wildcardLabel.setText(Messages.SyncFileFilterPage_Enter_Wildcard);
+		wildcardLabel.setToolTipText(Messages.SyncFileFilterPage_EnterWildcard+Messages.SyncFileFilterPage_toExcludeOrInclude);
+		
+		// Text box to enter new glob/wildcard
+		newWildcard = new Text(patternEnterComposite, SWT.NONE);
+		newWildcard.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+
+		// Submit buttons (exclude and include)
+		excludeButtonForWildcard = new Button(patternEnterComposite, SWT.PUSH | SWT.FLAT);
+		excludeButtonForWildcard.setImage(SyncImages.get(SyncImages.EXCLUDE));
+		excludeButtonForWildcard.setToolTipText(Messages.SyncFileFilterPage_Exclude);
+		excludeButtonForWildcard.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+		excludeButtonForWildcard.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				enterNewWildcardPattern(PatternType.EXCLUDE);
+			}
+		});
+
+		includeButtonForWildcard = new Button(patternEnterComposite, SWT.PUSH | SWT.FLAT);
+		includeButtonForWildcard.setImage(SyncImages.get(SyncImages.INCLUDE));
+		includeButtonForWildcard.setToolTipText(Messages.SyncFileFilterPage_Include);
+		includeButtonForWildcard.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+		includeButtonForWildcard.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				enterNewWildcardPattern(PatternType.INCLUDE);
 			}
 		});
 
@@ -614,6 +658,19 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 		newRegex.setText(""); //$NON-NLS-1$
 		update();
 	}
+	private void enterNewWildcardPattern(PatternType type) { 
+		String pattern = newWildcard.getText();
+		if (pattern.isEmpty()) {
+			return;
+		}
+
+		WildcardResourceMatcher matcher = null;
+		matcher = new WildcardResourceMatcher(pattern);  
+		filter.addPattern(matcher, type);
+
+		newWildcard.setText(""); //$NON-NLS-1$
+		update();
+	}
 
 	/** Creates a modal dialog to edit the selected pattern and replaces it if user hits "OK" */
 	private void editPattern() {
@@ -730,6 +787,9 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 				patternType = patternType + " " + Messages.SyncFileFilterPage_path; //$NON-NLS-1$
 			} else if (pattern instanceof RegexResourceMatcher) {
 				patternType = patternType + " " + Messages.SyncFileFilterPage_regex; //$NON-NLS-1$
+
+			} else if (pattern instanceof WildcardResourceMatcher) {
+				patternType = patternType + " " + Messages.SyncFileFilterPage_wildcard; //$NON-NLS-1$
 			}
 			patternType += ":  "; //$NON-NLS-1$
 

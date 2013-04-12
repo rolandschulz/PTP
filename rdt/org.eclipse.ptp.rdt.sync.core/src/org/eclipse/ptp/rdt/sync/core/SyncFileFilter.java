@@ -28,8 +28,12 @@ import org.osgi.service.prefs.Preferences;
 /**
  * Class for filtering files during synchronization. Instead of a constructor, the user can create an empty filter or a filter that
  * has decent default behavior, filtering, for example, configuration files like .project and .cproject.
- * 
+ * <p>
  * Facilities are then provided for adding and removing files and directories from filtering.
+ * <p>
+ * Note that a SyncFileFilter can include several patterns which each have a ResourceMatcher.
+ * A pattern has a type (exclude or include) and a ResourceMatcher (e.g. path, regex, or wildcard matcher).
+ * A single SyncFileFilter is used for a project.  SyncFileFilters are saved in preferences.
  */
 public class SyncFileFilter {
 	private static final String PATTERN_NODE_NAME = "pattern"; //$NON-NLS-1$

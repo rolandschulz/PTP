@@ -126,6 +126,8 @@ public class Messages extends NLS {
 
 	public static String ResourceMatcher_3;
 
+	public static String WildcardResourceMatcher_Wildcard_pattern_not_found_in_preference_node;
+
 	public static String WorkspaceConfigName;
 
 	public static String SyncBuildServiceProvider_configDir;

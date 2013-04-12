@@ -49,6 +49,10 @@ public class Messages extends NLS {
 	public static String SyncFileFilterPage_Edit_Pattern;
 	public static String SyncFileFilterPage_Enter_Path;
 	public static String SyncFileFilterPage_Enter_Regex;
+	public static String SyncFileFilterPage_Enter_Wildcard;
+	public static String SyncFileFilterPage_EnterPathOrFile;
+	public static String SyncFileFilterPage_EnterWildcard;
+	public static String SyncFileFilterPage_EnterRegex;
 	public static String SyncFileFilterPage_Exclude;
 	public static String SyncFileFilterPage_File_view;
 	public static String SyncFileFilterPage_Include;
@@ -62,7 +66,9 @@ public class Messages extends NLS {
 	public static String SyncFileFilterPage_Remote_is_disconnected;
 	public static String SyncFileFilterPage_Remove;
 	public static String SyncFileFilterPage_Show_Remote_Files;
+	public static String SyncFileFilterPage_toExcludeOrInclude;
 	public static String SyncFileFilterPage_Up;
+	public static String SyncFileFilterPage_wildcard;
 	public static String SynchronizeParticipantDescriptor_invalidClass;
 	public static String SyncMainWizardPage_0;
 	public static String SyncMainWizardPage_1;
