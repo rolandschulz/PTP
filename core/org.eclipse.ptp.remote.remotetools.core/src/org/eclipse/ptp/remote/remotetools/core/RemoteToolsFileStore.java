@@ -163,7 +163,7 @@ public class RemoteToolsFileStore extends FileStore {
 				}
 			} catch (Exception e) {
 				throw new CoreException(new Status(IStatus.ERROR, RemoteToolsAdapterCorePlugin.getDefault().getBundle()
-						.getSymbolicName(), EFS.ERROR_INTERNAL, Messages.RemoteToolsFileStore_0, e));
+						.getSymbolicName(), EFS.ERROR_INTERNAL, NLS.bind(Messages.RemoteToolsFileStore_0, fRemotePath.toString()), e));
 			}
 		}
 	}
@@ -247,7 +247,7 @@ public class RemoteToolsFileStore extends FileStore {
 				IFileStore parent = getParent();
 				if (parent != null && !parent.fetchInfo(EFS.NONE, monitor).exists()) {
 					throw new CoreException(new Status(IStatus.ERROR, RemoteToolsAdapterCorePlugin.getDefault().getBundle()
-							.getSymbolicName(), EFS.ERROR_WRITE, Messages.RemoteToolsFileStore_1, null));
+							.getSymbolicName(), EFS.ERROR_WRITE, NLS.bind(Messages.RemoteToolsFileStore_1, fRemotePath.toString()), null));
 				}
 			}
 
@@ -256,11 +256,11 @@ public class RemoteToolsFileStore extends FileStore {
 				cacheRemoteItem(null);
 			} catch (Exception e) {
 				throw new CoreException(new Status(IStatus.ERROR, RemoteToolsAdapterCorePlugin.getDefault().getBundle()
-						.getSymbolicName(), EFS.ERROR_INTERNAL, Messages.RemoteToolsFileStore_2, e));
+						.getSymbolicName(), EFS.ERROR_INTERNAL, NLS.bind(Messages.RemoteToolsFileStore_2, fRemotePath.toString()), e));
 			}
 		} else if (!item.isDirectory()) {
 			throw new CoreException(new Status(IStatus.ERROR, RemoteToolsAdapterCorePlugin.getDefault().getBundle()
-					.getSymbolicName(), EFS.ERROR_WRONG_TYPE, Messages.RemoteToolsFileStore_13, null));
+					.getSymbolicName(), EFS.ERROR_WRONG_TYPE, NLS.bind(Messages.RemoteToolsFileStore_13, fRemotePath.toString()), null));
 		}
 
 		return this;
@@ -284,13 +284,13 @@ public class RemoteToolsFileStore extends FileStore {
 		if (!item.exists()) {
 			//			System.out.println("OPENINPUTSTREAM: " + Messages.RemoteToolsFileStore_14); //$NON-NLS-1$
 			throw new CoreException(new Status(IStatus.ERROR, RemoteToolsAdapterCorePlugin.getDefault().getBundle()
-					.getSymbolicName(), EFS.ERROR_READ, Messages.RemoteToolsFileStore_14, null));
+					.getSymbolicName(), EFS.ERROR_READ, NLS.bind(Messages.RemoteToolsFileStore_14, fRemotePath.toString()), null));
 		}
 
 		if (item.isDirectory()) {
 			//			System.out.println("OPENINPUTSTREAM: " + Messages.RemoteToolsFileStore_3); //$NON-NLS-1$
 			throw new CoreException(new Status(IStatus.ERROR, RemoteToolsAdapterCorePlugin.getDefault().getBundle()
-					.getSymbolicName(), EFS.ERROR_WRONG_TYPE, Messages.RemoteToolsFileStore_3, null));
+					.getSymbolicName(), EFS.ERROR_WRONG_TYPE, NLS.bind(Messages.RemoteToolsFileStore_3, fRemotePath.toString()), null));
 		}
 
 		try {
@@ -298,7 +298,7 @@ public class RemoteToolsFileStore extends FileStore {
 		} catch (Exception e) {
 			//			System.out.println("OPENINPUTSTREAM: " + e.getLocalizedMessage()); //$NON-NLS-1$
 			throw new CoreException(new Status(IStatus.ERROR, RemoteToolsAdapterCorePlugin.getDefault().getBundle()
-					.getSymbolicName(), EFS.ERROR_INTERNAL, Messages.RemoteToolsFileStore_4, e));
+					.getSymbolicName(), EFS.ERROR_INTERNAL, NLS.bind(Messages.RemoteToolsFileStore_4, fRemotePath.toString()), e));
 		}
 	}
 

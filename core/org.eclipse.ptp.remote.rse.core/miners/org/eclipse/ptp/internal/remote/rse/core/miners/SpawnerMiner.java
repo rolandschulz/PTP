@@ -156,9 +156,7 @@ public class SpawnerMiner extends Miner {
 			
 			
 			handleSpawnRedirected(subject, cmd, dir, envp, status);
-			status.getDataStore().refresh(status);
-			status.getDataStore().disconnectObject(status.getParent());
-			return status;
+			return statusDone(status);
 		}
 		
 		else if(name.equals(DataStoreSchema.C_CANCEL)) {
@@ -177,11 +175,9 @@ public class SpawnerMiner extends Miner {
 		{
 
 			fSupportsCharConversion = true;
-
+			return statusDone(status);
 		}
 		
-		status.getDataStore().refresh(status);
-		status.getDataStore().disconnectObject(status.getParent());
 		return null;
 	}
 
@@ -194,7 +190,7 @@ public class SpawnerMiner extends Miner {
 				fProcessMap.put(cancelStatus, null);
 			}
 		}
-		
+		statusDone(cancelStatus);		
 	}
 
 	/**
