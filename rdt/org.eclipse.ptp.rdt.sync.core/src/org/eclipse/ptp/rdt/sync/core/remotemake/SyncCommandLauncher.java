@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.ICommandLauncher;
@@ -105,7 +107,9 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		String projectLocalRoot = getProject().getLocation().toPortableString();
 		String projectActualRoot = BuildConfigurationManager.getInstance().getBuildScenarioForBuildConfiguration(configuration)
 				.getLocation(getProject());
-		changeToDirectory = new Path(changeToDirectory.toString().replaceFirst(projectLocalRoot, projectActualRoot));
+		String fixedDirectory = changeToDirectory.toString().replaceFirst(Pattern.quote(projectLocalRoot),
+				Matcher.quoteReplacement(projectActualRoot));
+		changeToDirectory = new Path(fixedDirectory);
 		fCommandArgs = constructCommandArray(commandPath.toPortableString(), args);
 
 		// Get and setup the connection and remote services for this build configuration.
