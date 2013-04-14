@@ -29,17 +29,21 @@ import org.osgi.service.prefs.Preferences;
 /**
  * Class for filtering files during synchronization. Instead of a constructor, the user can create an empty filter or a filter that
  * has decent default behavior, filtering, for example, configuration files like .project and .cproject.
- * 
+ * <p>
  * Facilities are then provided for adding and removing files and directories from filtering.
+ * <p>
+ * Note that a SyncFileFilter can include several patterns which each have a ResourceMatcher. A pattern has a type (exclude or
+ * include) and a ResourceMatcher (e.g. path, regex, or wildcard matcher). A single SyncFileFilter is used for a project.
+ * SyncFileFilters are saved in preferences.
  */
 public class SyncFileFilter {
 	private static final String PATTERN_NODE_NAME = "pattern"; //$NON-NLS-1$
 	private static final String PATTERN_TYPE_KEY = "pattern-type"; //$NON-NLS-1$
 	private static final String NUM_PATTERNS_KEY = "num-patterns"; //$NON-NLS-1$
-	
+
 	private final LinkedList<ResourceMatcher> filteredPaths = new LinkedList<ResourceMatcher>();
 	private final Map<ResourceMatcher, PatternType> patternToTypeMap = new HashMap<ResourceMatcher, PatternType>();
-	
+
 	public enum PatternType {
 		EXCLUDE, INCLUDE
 	}
@@ -47,26 +51,27 @@ public class SyncFileFilter {
 	// Private constructor - create instances with "create" methods.
 	private SyncFileFilter() {
 	}
-	
+
 	// Copy constructor
 	public SyncFileFilter(SyncFileFilter oldFilter) {
 		filteredPaths.addAll(oldFilter.filteredPaths);
 		patternToTypeMap.putAll(oldFilter.patternToTypeMap);
 	}
-	
+
 	/**
 	 * Constructor for an empty filter. Most clients will want to use "createDefaultFilter"
-	 *
+	 * 
 	 * @return the new filter
 	 */
 	public static SyncFileFilter createEmptyFilter() {
 		return new SyncFileFilter();
 	}
-	
+
 	/**
-	 * Constructor for a filter with a standard set of defaults. Note that this is a "default default". It may be overwritten if the user has
+	 * Constructor for a filter with a standard set of defaults. Note that this is a "default default". It may be overwritten if the
+	 * user has
 	 * altered the default global filter.
-	 *
+	 * 
 	 * @return the new filter
 	 */
 	public static SyncFileFilter createBuiltInDefaultFilter() {
@@ -74,24 +79,26 @@ public class SyncFileFilter {
 		sff.addDefaults();
 		return sff;
 	}
-	
+
 	/**
 	 * Get all patterns for this filter
+	 * 
 	 * @return patterns
 	 */
 	public ResourceMatcher[] getPatterns() {
 		return filteredPaths.toArray(new ResourceMatcher[filteredPaths.size()]);
 	}
-	
+
 	/**
 	 * Get the pattern type for the pattern
+	 * 
 	 * @param pattern
 	 * @return the type or null if this pattern is unknown in this filter.
 	 */
 	public PatternType getPatternType(ResourceMatcher pattern) {
 		return patternToTypeMap.get(pattern);
 	}
-	
+
 	/**
 	 * Add the common, default list of paths to be filtered.
 	 */
@@ -107,6 +114,7 @@ public class SyncFileFilter {
 
 	/**
 	 * Add pattern to front of list (calls addPattern with position 0)
+	 * 
 	 * @param pattern
 	 * @param type
 	 */
@@ -118,10 +126,12 @@ public class SyncFileFilter {
 	 * Add a new pattern to the filter of the specified type at the specified position
 	 * This function and others that manipulate the pattern list must enforce the invariant that no pattern appears more than once.
 	 * This invariant is assumed by other functions.
+	 * 
 	 * @param pattern
 	 * @param type
 	 * @param pos
-	 * @throws IndexOutOfBoundsException if position is out of range
+	 * @throws IndexOutOfBoundsException
+	 *             if position is out of range
 	 */
 	public void addPattern(ResourceMatcher pattern, PatternType type, int pos) {
 		if (patternToTypeMap.get(pattern) != null) {
@@ -130,20 +140,22 @@ public class SyncFileFilter {
 		filteredPaths.add(pos, pattern);
 		patternToTypeMap.put(pattern, type);
 	}
-	
+
 	/**
 	 * Remove a pattern from the filter
 	 * Assumes pattern appears no more than once
+	 * 
 	 * @param pattern
 	 */
 	public void removePattern(ResourceMatcher pattern) {
 		filteredPaths.remove(pattern);
 		patternToTypeMap.remove(pattern);
 	}
-	
+
 	/**
 	 * Swap a pattern with its lower-index neighbor
 	 * Assumes pattern only appears once
+	 * 
 	 * @param pattern
 	 * @return whether pattern was actually promoted
 	 */
@@ -151,16 +163,17 @@ public class SyncFileFilter {
 		int oldIndex = filteredPaths.indexOf(pattern);
 		if (oldIndex > 0) {
 			filteredPaths.remove(oldIndex);
-			filteredPaths.add(oldIndex-1, pattern);
+			filteredPaths.add(oldIndex - 1, pattern);
 			return true;
 		}
-		
+
 		return false;
 	}
-	
+
 	/**
 	 * Swap a pattern with its higher-index neighbor
 	 * Assumes pattern appears no more than once
+	 * 
 	 * @param pattern
 	 * @return whether pattern was actually demoted
 	 */
@@ -168,15 +181,16 @@ public class SyncFileFilter {
 		int oldIndex = filteredPaths.indexOf(pattern);
 		if (oldIndex > -1 && oldIndex < filteredPaths.size() - 1) {
 			filteredPaths.remove(oldIndex);
-			filteredPaths.add(oldIndex+1, pattern);
+			filteredPaths.add(oldIndex + 1, pattern);
 			return true;
 		}
-		
+
 		return false;
 	}
 
 	/**
 	 * Replace pattern with another - useful for when existing patterns are edited
+	 * 
 	 * @param oldPattern
 	 * @param newPattern
 	 * @param type
@@ -194,7 +208,9 @@ public class SyncFileFilter {
 
 	/**
 	 * Apply the filter to the given string
-	 * @param s - the string
+	 * 
+	 * @param s
+	 *            - the string
 	 * @return whether the string should be ignored
 	 */
 	public boolean shouldIgnore(IResource r) {
@@ -214,7 +230,7 @@ public class SyncFileFilter {
 		for (ResourceMatcher pm : filteredPaths) {
 			if (pm.match(r)) {
 				PatternType type = patternToTypeMap.get(pm);
-				assert(pm != null);
+				assert (pm != null);
 				if (type == PatternType.EXCLUDE) {
 					return true;
 				} else {
@@ -222,14 +238,15 @@ public class SyncFileFilter {
 				}
 			}
 		}
-		
+
 		return false;
 	}
-	
+
 	/**
 	 * Store filter in the given preference node
-	 *
-	 * @param preference node
+	 * 
+	 * @param preference
+	 *            node
 	 */
 	public void saveFilter(Preferences prefRootNode) {
 		// To clear pattern information, remove node, flush parent, and then recreate the node
@@ -242,7 +259,7 @@ public class SyncFileFilter {
 		}
 		Preferences prefPatternNode = prefRootNode.node(PATTERN_NODE_NAME);
 		prefPatternNode.putInt(NUM_PATTERNS_KEY, filteredPaths.size());
-		int i=0;
+		int i = 0;
 		for (ResourceMatcher pm : filteredPaths) {
 			Preferences prefMatcherNode = prefPatternNode.node(Integer.toString(i));
 			// Whether pattern is exclusive or inclusive
@@ -254,8 +271,9 @@ public class SyncFileFilter {
 
 	/**
 	 * Load filter from the given preference node
-	 *
-	 * @param preference node
+	 * 
+	 * @param preference
+	 *            node
 	 * @return the restored filter or null if the node does not contain a filter or if there are problems reading the filter
 	 */
 	public static SyncFileFilter loadFilter(Preferences prefRootNode) {
@@ -271,7 +289,7 @@ public class SyncFileFilter {
 			}
 
 			SyncFileFilter filter = createEmptyFilter();
-			for (int i=numPatterns-1; i>=0; i--) {
+			for (int i = numPatterns - 1; i >= 0; i--) {
 				if (!prefPatternNode.nodeExists(Integer.toString(i))) {
 					RDTSyncCorePlugin.log(Messages.SyncFileFilter_1);
 					return null;
