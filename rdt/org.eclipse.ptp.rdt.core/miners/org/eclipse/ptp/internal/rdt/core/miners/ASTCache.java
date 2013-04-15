@@ -48,6 +48,7 @@ public class ASTCache {
 
 	private Map<String, SoftReference<IASTTranslationUnit>> cache = new TreeMap<String, SoftReference<IASTTranslationUnit>> ();
 	private Map<String, Long> fPathToLastIndexWriteTimeMap = new TreeMap<String, Long>();
+	private Map<String, Integer> fPathToScannerInfoHashCodeMap = new TreeMap<String, Integer>();
 	
 	private static ASTCache fInstance;
 	
@@ -88,8 +89,15 @@ public class ASTCache {
 		File file = new File(absolutePath);
 		long fileLastModifiedTime = file.lastModified();
 		
+		int currentScannerInfoHashcode = infoProvider.getScannerInformation(absolutePath).hashCode();
 		
-		if(tu == null || fileLastModifiedTime > fPathToLastIndexWriteTimeMap.get(absolutePath).longValue()) {
+		
+		final Long cachedModifiedTime = fPathToLastIndexWriteTimeMap.get(absolutePath);
+		final boolean invalidDueToTimestamp = (cachedModifiedTime) == null ? true : fileLastModifiedTime > cachedModifiedTime.longValue();
+		final Integer cachedHashcode = fPathToScannerInfoHashCodeMap.get(absolutePath);
+		final boolean invalidDueToScannerInfo = (cachedHashcode == null) ? true : cachedHashcode.intValue() != currentScannerInfoHashcode;
+		
+		if(tu == null || invalidDueToTimestamp || invalidDueToScannerInfo) {
 			
 			RemoteLanguageMapper languageMapper = new RemoteLanguageMapper(infoProvider, dataStore);
 			ILanguage language = languageMapper.getLanguage(absolutePath);
@@ -126,6 +134,7 @@ public class ASTCache {
 							fileCreator, index, options, log);
 					cache.put(absolutePath, new SoftReference<IASTTranslationUnit>(tu));
 					fPathToLastIndexWriteTimeMap.put(absolutePath, fileLastModifiedTime);
+					fPathToScannerInfoHashCodeMap.put(absolutePath, new Integer(currentScannerInfoHashcode));
 				} catch (CoreException e) {
 
 					// TODO: handle this properly

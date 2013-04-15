@@ -97,6 +97,43 @@ public class RemoteScannerInfo implements IScannerInfo, Serializable {
 	public String toString() {
 		return includePaths + " " + symbols; //$NON-NLS-1$
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((includePaths == null) ? 0 : includePaths.hashCode());
+		result = prime * result + ((symbols == null) ? 0 : symbols.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		RemoteScannerInfo other = (RemoteScannerInfo) obj;
+		if (includePaths == null) {
+			if (other.includePaths != null)
+				return false;
+		} else if (!includePaths.equals(other.includePaths))
+			return false;
+		if (symbols == null) {
+			if (other.symbols != null)
+				return false;
+		} else if (!symbols.equals(other.symbols))
+			return false;
+		return true;
+	}
 	
 	
 }
