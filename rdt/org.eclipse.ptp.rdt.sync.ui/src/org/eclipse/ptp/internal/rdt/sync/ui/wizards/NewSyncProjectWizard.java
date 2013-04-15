@@ -45,6 +45,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.internal.rdt.sync.ui.RDTSyncUIPlugin;
 import org.eclipse.ptp.internal.rdt.sync.ui.handlers.CommonSyncExceptionHandler;
+import org.eclipse.ptp.internal.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.SyncManager.SyncMode;
@@ -74,7 +75,6 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.ide.StatusUtil;
 import org.eclipse.ui.internal.registry.PerspectiveDescriptor;
 import org.eclipse.ui.internal.util.PrefUtil;
-import org.eclipse.ui.internal.wizards.newresource.ResourceMessages;
 import org.eclipse.ui.statushandlers.StatusAdapter;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
@@ -131,7 +131,7 @@ public class NewSyncProjectWizard extends Wizard implements INewWizard, IExecuta
 	 */
 	private IConfigurationElement configElement;
 
-	private static String WINDOW_PROBLEMS_TITLE = ResourceMessages.NewProject_errorOpeningWindow;
+	private static String WINDOW_PROBLEMS_TITLE = Messages.NewProject_errorOpeningWindow;
 
 	/**
 	 * Extension attribute name for final perspective.
@@ -181,15 +181,15 @@ public class NewSyncProjectWizard extends Wizard implements INewWizard, IExecuta
 		super.addPages();
 
 		mainPage = new SyncMainWizardPage("basicNewProjectPage");//$NON-NLS-1$
-		mainPage.setTitle(ResourceMessages.NewProject_title);
-		mainPage.setDescription(ResourceMessages.NewProject_description);
+		mainPage.setTitle(Messages.NewProject_title);
+		mainPage.setDescription(Messages.NewProject_description);
 		this.addPage(mainPage);
 
 		// only add page if there are already projects in the workspace
 		if (ResourcesPlugin.getWorkspace().getRoot().getProjects().length > 0) {
 			referencePage = new WizardNewProjectReferencePage("basicReferenceProjectPage");//$NON-NLS-1$
-			referencePage.setTitle(ResourceMessages.NewProject_referenceTitle);
-			referencePage.setDescription(ResourceMessages.NewProject_referenceDescription);
+			referencePage.setTitle(Messages.NewProject_referenceTitle);
+			referencePage.setDescription(Messages.NewProject_referenceDescription);
 			this.addPage(referencePage);
 		}
 	}
@@ -238,7 +238,7 @@ public class NewSyncProjectWizard extends Wizard implements INewWizard, IExecuta
 		IRunnableWithProgress op = new IRunnableWithProgress() {
 			@Override
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
-				CreateProjectOperation op = new CreateProjectOperation(description, ResourceMessages.NewProject_windowTitle);
+				CreateProjectOperation op = new CreateProjectOperation(description, Messages.NewProject_windowTitle);
 				try {
 					// see bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=219901
 					// directly execute the operation so that the undo state is
@@ -263,17 +263,17 @@ public class NewSyncProjectWizard extends Wizard implements INewWizard, IExecuta
 				StatusAdapter status;
 				if (cause.getStatus().getCode() == IResourceStatus.CASE_VARIANT_EXISTS) {
 					status = new StatusAdapter(StatusUtil.newStatus(IStatus.WARNING,
-							NLS.bind(ResourceMessages.NewProject_caseVariantExistsError, newProjectHandle.getName()), cause));
+							NLS.bind(Messages.NewProject_caseVariantExistsError, newProjectHandle.getName()), cause));
 				} else {
 					status = new StatusAdapter(StatusUtil.newStatus(cause.getStatus().getSeverity(),
-							ResourceMessages.NewProject_errorMessage, cause));
+							Messages.NewProject_errorMessage, cause));
 				}
-				status.setProperty(StatusAdapter.TITLE_PROPERTY, ResourceMessages.NewProject_errorMessage);
+				status.setProperty(StatusAdapter.TITLE_PROPERTY, Messages.NewProject_errorMessage);
 				StatusManager.getManager().handle(status, StatusManager.BLOCK);
 			} else {
 				StatusAdapter status = new StatusAdapter(new Status(IStatus.WARNING, IDEWorkbenchPlugin.IDE_WORKBENCH, 0, NLS.bind(
-						ResourceMessages.NewProject_internalError, t.getMessage()), t));
-				status.setProperty(StatusAdapter.TITLE_PROPERTY, ResourceMessages.NewProject_errorMessage);
+						Messages.NewProject_internalError, t.getMessage()), t));
+				status.setProperty(StatusAdapter.TITLE_PROPERTY, Messages.NewProject_errorMessage);
 				StatusManager.getManager().handle(status, StatusManager.LOG | StatusManager.BLOCK);
 			}
 			return false;
@@ -313,7 +313,7 @@ public class NewSyncProjectWizard extends Wizard implements INewWizard, IExecuta
 		this.selection = currentSelection;
 		initializeDefaultPageImageDescriptor();
 		setNeedsProgressMonitor(true);
-		setWindowTitle(ResourceMessages.NewProject_windowTitle);
+		setWindowTitle(Messages.NewProject_windowTitle);
 	}
 
 	/*
@@ -360,7 +360,7 @@ public class NewSyncProjectWizard extends Wizard implements INewWizard, IExecuta
 			SyncManager.sync(null, newProject, SyncFlag.FORCE, new CommonSyncExceptionHandler(false, true));
 		} catch (CoreException e) {
 			// This should never happen because only a blocking sync can throw a core exception.
-			RDTSyncUIPlugin.log("Unexpected core exception on non-blocking sync call", e); //$NON-NLS-1$
+			RDTSyncUIPlugin.log(Messages.NewSyncProjectWizard_Unexpected_core_exception, e);
 		}
 
 		return true;
@@ -420,6 +420,7 @@ public class NewSyncProjectWizard extends Wizard implements INewWizard, IExecuta
 	 * @see IPreferenceConstants#OPM_ACTIVE_PAGE
 	 * @see IWorkbenchPreferenceConstants#NO_NEW_PERSPECTIVE
 	 */
+	@SuppressWarnings("unchecked")
 	public static void updatePerspective(IConfigurationElement configElement) {
 		// Do not change perspective if the configuration element is
 		// not specified.
@@ -457,10 +458,10 @@ public class NewSyncProjectWizard extends Wizard implements INewWizard, IExecuta
 				IWorkbenchActivitySupport workbenchActivitySupport = PlatformUI.getWorkbench().getActivitySupport();
 				IActivityManager activityManager = workbenchActivitySupport.getActivityManager();
 				IIdentifier identifier = activityManager.getIdentifier(WorkbenchActivityHelper.createUnifiedId(contribution));
-				Set idActivities = identifier.getActivityIds();
+				Set<String> idActivities = identifier.getActivityIds();
 
 				if (!idActivities.isEmpty()) {
-					Set enabledIds = new HashSet(activityManager.getEnabledActivityIds());
+					Set<String> enabledIds = new HashSet<String>(activityManager.getEnabledActivityIds());
 
 					if (enabledIds.addAll(idActivities)) {
 						workbenchActivitySupport.setEnabledActivityIds(enabledIds);
@@ -468,15 +469,14 @@ public class NewSyncProjectWizard extends Wizard implements INewWizard, IExecuta
 				}
 			}
 		} else {
-			IDEWorkbenchPlugin.log("Unable to find persective " //$NON-NLS-1$
-					+ finalPerspId + " in NewSyncProjectWizard.updatePerspective"); //$NON-NLS-1$
+			IDEWorkbenchPlugin.log(NLS.bind(Messages.NewSyncProjectWizard_Unable_to_find_perspective, finalPerspId));
 			return;
 		}
 
 		// gather the preferred perspectives
 		// always consider the final perspective (and those derived from it)
 		// to be preferred
-		ArrayList preferredPerspIds = new ArrayList();
+		List<String> preferredPerspIds = new ArrayList<String>();
 		addPerspectiveAndDescendants(preferredPerspIds, finalPerspId);
 		String preferred = configElement.getAttribute(PREFERRED_PERSPECTIVES);
 		if (preferred != null) {
@@ -528,7 +528,7 @@ public class NewSyncProjectWizard extends Wizard implements INewWizard, IExecuta
 	 *            the id to query.
 	 * @since 3.0
 	 */
-	private static void addPerspectiveAndDescendants(List perspectiveIds, String id) {
+	private static void addPerspectiveAndDescendants(List<String> perspectiveIds, String id) {
 		IPerspectiveRegistry registry = PlatformUI.getWorkbench().getPerspectiveRegistry();
 		IPerspectiveDescriptor[] perspectives = registry.getPerspectives();
 		for (IPerspectiveDescriptor perspective : perspectives) {
@@ -562,15 +562,18 @@ public class NewSyncProjectWizard extends Wizard implements INewWizard, IExecuta
 		String desc = finalPersp.getDescription();
 		String message;
 		if (desc == null || desc.length() == 0) {
-			message = NLS.bind(ResourceMessages.NewProject_perspSwitchMessage, finalPersp.getLabel());
+			message = NLS.bind(Messages.NewProject_perspSwitchMessage, finalPersp.getLabel());
 		} else {
-			message = NLS
-					.bind(ResourceMessages.NewProject_perspSwitchMessageWithDesc, new String[] { finalPersp.getLabel(), desc });
+			message = NLS.bind(Messages.NewProject_perspSwitchMessageWithDesc, new String[] { finalPersp.getLabel(), desc });
 		}
 
 		MessageDialogWithToggle dialog = MessageDialogWithToggle.openYesNoQuestion(window.getShell(),
-				ResourceMessages.NewProject_perspSwitchTitle, message, null /* use the default message for the toggle */,
-				false /* toggle is initially unchecked */, store, IDEInternalPreferences.PROJECT_SWITCH_PERSP_MODE);
+				Messages.NewProject_perspSwitchTitle, message, null /* use the default message for the toggle */, false /*
+																														 * toggle is
+																														 * initially
+																														 * unchecked
+																														 */, store,
+				IDEInternalPreferences.PROJECT_SWITCH_PERSP_MODE);
 		int result = dialog.getReturnCode();
 
 		// If we are not going to prompt anymore propogate the choice.

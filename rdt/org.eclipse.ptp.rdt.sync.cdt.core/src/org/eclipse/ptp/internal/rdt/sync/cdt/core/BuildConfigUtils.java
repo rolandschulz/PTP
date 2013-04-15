@@ -61,6 +61,11 @@ public class BuildConfigUtils {
 	private static final String SYNC_BUILDER_ID = "org.eclipse.ptp.rdt.sync.cdt.core.SyncBuilder"; //$NON-NLS-1$
 	private static final String SYNC_BUILDER_NAME = "Sync Builder";//$NON-NLS-1$
 
+	private static final String ATTR_SYNC_PROVIDER = "sync-provider"; //$NON-NLS-1$
+	private static final String ATTR_REMOTE_CONNECTION_ID = "remote-connection-id"; //$NON-NLS-1$
+	private static final String ATTR_LOCATION = "location"; //$NON-NLS-1$
+	private static final String ATTR_REMOTE_SERVICES_ID = "remote-services-id"; //$NON-NLS-1$
+
 	// Run standard checks on project and throw the appropriate exception if it is not valid
 	// All public methods should call this for any passed project or any passed configuration's project.
 	// Private methods assume projects have been checked.
@@ -176,7 +181,7 @@ public class BuildConfigUtils {
 			}
 
 			if (configId != null) {
-				SyncConfig bs = SyncConfig.loadScenario(scenarioData, configId);
+				SyncConfig bs = loadSyncConfig(scenarioData, configId);
 				if (bs != null) {
 					return bs;
 				}
@@ -188,6 +193,20 @@ public class BuildConfigUtils {
 			Activator.log(Messages.BuildConfigurationManager_19, e);
 			return null;
 		}
+	}
+
+	/**
+	 * Store config in the given map
+	 * 
+	 * @param map
+	 */
+	public static void saveSyncConfig(SyncConfig config, Map<String, String> map) {
+		if (config.getSyncProviderId() != null) {
+			map.put(ATTR_SYNC_PROVIDER, config.getSyncProviderId());
+		}
+		map.put(ATTR_REMOTE_CONNECTION_ID, config.getConnectionName());
+		map.put(ATTR_LOCATION, config.getLocation());
+		map.put(ATTR_REMOTE_SERVICES_ID, config.getRemoteServicesId());
 	}
 
 	// The below two functions give us an easy mechanism to store build scenario data inside build configurations
@@ -264,6 +283,26 @@ public class BuildConfigUtils {
 	}
 
 	/**
+	 * Load data from a map into a new sync config
+	 * 
+	 * @param map
+	 * @return a new sync config or null if one of the values is not found or if something goes wrong while trying to find the
+	 *         specified IRemoteConnection.
+	 */
+	public static SyncConfig loadSyncConfig(Map<String, String> map, String configId) {
+		String sp = map.get(ATTR_SYNC_PROVIDER);
+		String rc = map.get(ATTR_REMOTE_CONNECTION_ID);
+		String rs = map.get(ATTR_REMOTE_SERVICES_ID);
+		String l = map.get(ATTR_LOCATION);
+		if (rc == null || l == null || rs == null) { // null is okay for sync provider
+			return null;
+		}
+		SyncConfig scenario = new SyncConfig(null, sp, rc, rs, l);
+		scenario.setData(configId);
+		return scenario;
+	}
+
+	/**
 	 * Make the given configuration a local configuration
 	 * 
 	 * @param config
@@ -332,7 +371,7 @@ public class BuildConfigUtils {
 
 	private static void setBuildScenarioForBuildConfigurationInternal(SyncConfig bs, IConfiguration bconf) {
 		Map<String, String> map = new HashMap<String, String>();
-		bs.saveScenario(map);
+		saveSyncConfig(bs, map);
 		try {
 			setConfigData((Configuration) bconf, map, configSyncDataStorageName);
 		} catch (CoreException e) {

@@ -55,6 +55,9 @@ public class SyncConfigManager {
 	private static final String REMOTE_SERVICES_ID_ELEMENT = "remote-services-id"; //$NON-NLS-1$
 	private static final String DATA_ELEMENT = "data"; //$NON-NLS-1$
 	private static final String ACTIVE_ELEMENT = "active"; //$NON-NLS-1$
+	private static final String SYNC_ON_PREBUILD_ELEMENT = "sync-on-prebuild"; //$NON-NLS-1$
+	private static final String SYNC_ON_POSTBUILD_ELEMENT = "sync-on-postbuild"; //$NON-NLS-1$
+	private static final String SYNC_ON_SAVE_ELEMENT = "sync-on-save"; //$NON-NLS-1$
 
 	private static final Map<IProject, ListenerList> fSyncConfigListenerMap = Collections
 			.synchronizedMap(new HashMap<IProject, ListenerList>());
@@ -170,11 +173,23 @@ public class SyncConfigManager {
 					String remoteServicesId = configMemento.getString(REMOTE_SERVICES_ID_ELEMENT);
 					String syncProviderId = configMemento.getString(SYNC_PROVIDER_ID_ELEMENT);
 					Boolean active = configMemento.getBoolean(ACTIVE_ELEMENT);
+					Boolean syncOnPreBuild = configMemento.getBoolean(SYNC_ON_PREBUILD_ELEMENT);
+					Boolean syncOnPostBuild = configMemento.getBoolean(SYNC_ON_POSTBUILD_ELEMENT);
+					Boolean syncOnSave = configMemento.getBoolean(SYNC_ON_SAVE_ELEMENT);
 					SyncConfig config = new SyncConfig(configName, syncProviderId, connectionName, remoteServicesId, location);
 					config.setData(data);
 					if (active != null) {
 						config.setActive(active.booleanValue());
 						fActiveSyncConfigMap.put(project, config);
+					}
+					if (syncOnPreBuild != null) {
+						config.setSyncOnPreBuild(syncOnPreBuild.booleanValue());
+					}
+					if (syncOnPostBuild != null) {
+						config.setSyncOnPostBuild(syncOnPostBuild.booleanValue());
+					}
+					if (syncOnSave != null) {
+						config.setSyncOnSave(syncOnSave.booleanValue());
 					}
 					doAddConfig(project, config);
 				}
@@ -243,6 +258,9 @@ public class SyncConfigManager {
 				configMemento.putString(REMOTE_SERVICES_ID_ELEMENT, config.getRemoteServicesId());
 				configMemento.putString(SYNC_PROVIDER_ID_ELEMENT, config.getSyncProviderId());
 				configMemento.putBoolean(ACTIVE_ELEMENT, config.isActive());
+				configMemento.putBoolean(SYNC_ON_PREBUILD_ELEMENT, config.isSyncOnPreBuild());
+				configMemento.putBoolean(SYNC_ON_POSTBUILD_ELEMENT, config.isSyncOnPostBuild());
+				configMemento.putBoolean(SYNC_ON_SAVE_ELEMENT, config.isSyncOnSave());
 			}
 			StringWriter writer = new StringWriter();
 			try {

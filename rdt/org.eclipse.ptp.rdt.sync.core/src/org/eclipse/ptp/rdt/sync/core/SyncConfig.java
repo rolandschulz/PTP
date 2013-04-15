@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core;
 
-import java.util.Map;
-
 import org.eclipse.core.resources.IPathVariableManager;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
@@ -23,35 +21,9 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.RemoteServices;
 
 /**
- * Class for build information that will be mapped to a specific service configuration. Utility methods for reading and writing
- * the information to a preference node are provided.
+ * Class to encapsulate information about syncing a project
  */
 public class SyncConfig implements Comparable<SyncConfig> {
-	private static final String ATTR_SYNC_PROVIDER = "sync-provider"; //$NON-NLS-1$
-	private static final String ATTR_REMOTE_CONNECTION_ID = "remote-connection-id"; //$NON-NLS-1$
-	private static final String ATTR_LOCATION = "fLocation"; //$NON-NLS-1$
-	private static final String ATTR_REMOTE_SERVICES_ID = "remote-services-id"; //$NON-NLS-1$
-
-	/**
-	 * Load data from a map into a new build scenario.
-	 * 
-	 * @param map
-	 * @return a new build scenario or null if one of the values is not found or if something goes wrong while trying to find the
-	 *         specified IRemoteConnection.
-	 */
-	public static SyncConfig loadScenario(Map<String, String> map, String configId) {
-		String sp = map.get(ATTR_SYNC_PROVIDER);
-		String rc = map.get(ATTR_REMOTE_CONNECTION_ID);
-		String rs = map.get(ATTR_REMOTE_SERVICES_ID);
-		String l = map.get(ATTR_LOCATION);
-		if (rc == null || l == null || rs == null) { // null is okay for sync provider
-			return null;
-		}
-		SyncConfig scenario = new SyncConfig(null, sp, rc, rs, l);
-		scenario.setData(configId);
-		return scenario;
-	}
-
 	/**
 	 * Utility function to resolve a string based on path variables for a certain project. Unless string is in the form:
 	 * ${path_variable:/remainder}, where "path_variable" is a path variable defined for the project, the original string
@@ -95,6 +67,9 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	private String fRemoteServicesId;
 	private String fLocation;
 	private boolean fIsActive;
+	private boolean fSyncOnPreBuild = true;
+	private boolean fSyncOnPostBuild = true;
+	private boolean fSyncOnSave = true;
 
 	private IRemoteServices fRemoteServices;
 	private IRemoteConnection fRemoteConnection;
@@ -121,23 +96,6 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	}
 
 	/**
-	 * @return true if this config is active
-	 */
-	public boolean isActive() {
-		return fIsActive;
-	}
-
-	/**
-	 * Set this config as active for the project. Clients should not call this method directly. Use
-	 * {@link SyncConfigManager#setActive(IProject, SyncConfig)} instead.
-	 * 
-	 * @param active
-	 */
-	public void setActive(boolean active) {
-		fIsActive = active;
-	}
-
-	/**
 	 * Create a new sync configuration
 	 * 
 	 * @param configName
@@ -159,11 +117,21 @@ public class SyncConfig implements Comparable<SyncConfig> {
 		fLocation = location;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
 	@Override
 	public int compareTo(SyncConfig config) {
 		return getConfigName().compareTo(config.getConfigName());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -269,6 +237,27 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	}
 
 	/**
+	 * @return
+	 */
+	public boolean isSyncOnPostBuild() {
+		return fSyncOnPostBuild;
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean isSyncOnPreBuild() {
+		return fSyncOnPreBuild;
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean isSyncOnSave() {
+		return fSyncOnSave;
+	}
+
+	/**
 	 * Get sync provider ID
 	 * 
 	 * @return sync provider ID
@@ -296,17 +285,20 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	}
 
 	/**
-	 * Store scenario in the given map
-	 * 
-	 * @param map
+	 * @return true if this config is active
 	 */
-	public void saveScenario(Map<String, String> map) {
-		if (fSyncProviderId != null) {
-			map.put(ATTR_SYNC_PROVIDER, fSyncProviderId);
-		}
-		map.put(ATTR_REMOTE_CONNECTION_ID, fConnectionName);
-		map.put(ATTR_LOCATION, fLocation);
-		map.put(ATTR_REMOTE_SERVICES_ID, fRemoteServices.getId());
+	public boolean isActive() {
+		return fIsActive;
+	}
+
+	/**
+	 * Set this config as active for the project. Clients should not call this method directly. Use
+	 * {@link SyncConfigManager#setActive(IProject, SyncConfig)} instead.
+	 * 
+	 * @param active
+	 */
+	public void setActive(boolean active) {
+		fIsActive = active;
 	}
 
 	/**
@@ -346,6 +338,27 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	public void setRemoteServicesId(String remoteServicesId) {
 		fRemoteServicesId = remoteServicesId;
 		fRemoteServices = null;
+	}
+
+	/**
+	 * @param syncOnPostBuild
+	 */
+	public void setSyncOnPostBuild(boolean syncOnPostBuild) {
+		fSyncOnPostBuild = syncOnPostBuild;
+	}
+
+	/**
+	 * @param syncOnPreBuild
+	 */
+	public void setSyncOnPreBuild(boolean syncOnPreBuild) {
+		fSyncOnPreBuild = syncOnPreBuild;
+	}
+
+	/**
+	 * @param syncOnSave
+	 */
+	public void setSyncOnSave(boolean syncOnSave) {
+		fSyncOnSave = syncOnSave;
 	}
 
 	/**
