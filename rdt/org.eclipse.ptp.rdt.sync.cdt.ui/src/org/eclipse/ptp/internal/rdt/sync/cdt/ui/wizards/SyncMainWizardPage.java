@@ -778,7 +778,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	private final void createProjectBasicInfoGroup(Composite parent) {
 		Composite projectGroup = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
-		layout.numColumns = 3;
+		layout.numColumns = 1;
 		projectGroup.setLayout(layout);
 		projectGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
