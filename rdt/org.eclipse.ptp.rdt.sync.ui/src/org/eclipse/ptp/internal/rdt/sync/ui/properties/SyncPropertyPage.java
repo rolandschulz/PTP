@@ -10,10 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.sync.ui.properties;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -100,8 +99,8 @@ public class SyncPropertyPage extends PropertyPage {
 			StyledString styledString = new StyledString();
 			if (element instanceof SyncConfig) {
 				SyncConfig config = (SyncConfig) element;
-				styledString.append(config.getConfigName());
-				if (config.isActive()) {
+				styledString.append(config.getName());
+				if (SyncConfigManager.isActive(getProject(), config)) {
 					styledString.setStyle(0, styledString.length(), new FontStyler(Display.getCurrent().getSystemFont()
 							.getFontData()[0].getName()));
 				}
@@ -139,8 +138,8 @@ public class SyncPropertyPage extends PropertyPage {
 	private TreeViewer fTreeViewer;
 
 	private final Set<SyncConfig> fConfigs = new TreeSet<SyncConfig>();
-	private final List<SyncConfig> fAddedConfigs = new ArrayList<SyncConfig>();
-	private final List<SyncConfig> fRemovedConfigs = new ArrayList<SyncConfig>();
+	private final Set<SyncConfig> fAddedConfigs = new HashSet<SyncConfig>();
+	private final Set<SyncConfig> fRemovedConfigs = new HashSet<SyncConfig>();
 
 	/*
 	 * (non-Javadoc)
@@ -197,11 +196,15 @@ public class SyncPropertyPage extends PropertyPage {
 						Object el = iterator.next();
 						if (el instanceof SyncConfig) {
 							SyncConfig config = (SyncConfig) el;
-							if (config.isActive()) {
+							if (SyncConfigManager.isActive(getProject(), config)) {
 								MessageDialog.openError(getShell(), Messages.SyncPropertyPage_Remove_Configuration,
 										Messages.SyncPropertyPage_Cannot_remove_active);
 							} else {
-								fRemovedConfigs.add(config);
+								if (fAddedConfigs.contains(config)) {
+									fAddedConfigs.remove(config);
+								} else {
+									fRemovedConfigs.add(config);
+								}
 								fConfigs.remove(config);
 							}
 						}
@@ -226,7 +229,7 @@ public class SyncPropertyPage extends PropertyPage {
 						Object el = iterator.next();
 						if (el instanceof SyncConfig) {
 							SyncConfig config = (SyncConfig) el;
-							if (!config.isActive()) {
+							if (!SyncConfigManager.isActive(getProject(), config)) {
 								SyncConfigManager.setActive(getProject(), config);
 							}
 						}
@@ -284,11 +287,14 @@ public class SyncPropertyPage extends PropertyPage {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.jface.preference.PreferencePage#performApply()
+	 * @see org.eclipse.jface.preference.PreferencePage#performOk()
 	 */
 	@Override
-	protected void performApply() {
-		SyncConfigManager.updateConfigs(getProject(), fAddedConfigs.toArray(new SyncConfig[0]),
-				fRemovedConfigs.toArray(new SyncConfig[0]));
+	public boolean performOk() {
+		if (!fAddedConfigs.isEmpty() || !fRemovedConfigs.isEmpty()) {
+			SyncConfigManager.updateConfigs(getProject(), fAddedConfigs.toArray(new SyncConfig[0]),
+					fRemovedConfigs.toArray(new SyncConfig[0]));
+		}
+		return true;
 	}
 }

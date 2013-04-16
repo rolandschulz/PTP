@@ -89,7 +89,7 @@ public class SyncConfigManager {
 		for (SyncConfig config : addedConfigs) {
 			doAddConfig(project, config);
 		}
-		for (SyncConfig config : addedConfigs) {
+		for (SyncConfig config : removedConfigs) {
 			doRemoveConfig(project, config);
 		}
 		try {
@@ -187,16 +187,11 @@ public class SyncConfigManager {
 					String connectionName = configMemento.getString(CONNECTION_NAME_ELEMENT);
 					String remoteServicesId = configMemento.getString(REMOTE_SERVICES_ID_ELEMENT);
 					String syncProviderId = configMemento.getString(SYNC_PROVIDER_ID_ELEMENT);
-					Boolean active = configMemento.getBoolean(ACTIVE_ELEMENT);
 					Boolean syncOnPreBuild = configMemento.getBoolean(SYNC_ON_PREBUILD_ELEMENT);
 					Boolean syncOnPostBuild = configMemento.getBoolean(SYNC_ON_POSTBUILD_ELEMENT);
 					Boolean syncOnSave = configMemento.getBoolean(SYNC_ON_SAVE_ELEMENT);
 					SyncConfig config = new SyncConfig(configName, syncProviderId, connectionName, remoteServicesId, location);
 					config.setData(data);
-					if (active != null && active) {
-						config.setActive(active.booleanValue());
-						fActiveSyncConfigMap.put(project, config);
-					}
 					if (syncOnPreBuild != null) {
 						config.setSyncOnPreBuild(syncOnPreBuild.booleanValue());
 					}
@@ -207,6 +202,17 @@ public class SyncConfigManager {
 						config.setSyncOnSave(syncOnSave.booleanValue());
 					}
 					doAddConfig(project, config);
+				}
+				String activeName = rootMemento.getString(ACTIVE_ELEMENT);
+				if (activeName != null) {
+					List<SyncConfig> configs = fSyncConfigMap.get(project);
+					if (configs != null) {
+						for (SyncConfig config : configs) {
+							if (config.getName().equals(activeName)) {
+								fActiveSyncConfigMap.put(project, config);
+							}
+						}
+					}
 				}
 			}
 		}
@@ -272,16 +278,19 @@ public class SyncConfigManager {
 			XMLMemento rootMemento = XMLMemento.createWriteRoot(CONFIGS_ELEMENT);
 			for (SyncConfig config : projConfigs) {
 				IMemento configMemento = rootMemento.createChild(CONFIG_ELEMENT);
-				configMemento.putString(CONFIG_NAME_ELEMENT, config.getConfigName());
+				configMemento.putString(CONFIG_NAME_ELEMENT, config.getName());
 				configMemento.putString(LOCATION_ELEMENT, config.getLocation());
 				configMemento.putString(DATA_ELEMENT, config.getData());
 				configMemento.putString(CONNECTION_NAME_ELEMENT, config.getConnectionName());
 				configMemento.putString(REMOTE_SERVICES_ID_ELEMENT, config.getRemoteServicesId());
 				configMemento.putString(SYNC_PROVIDER_ID_ELEMENT, config.getSyncProviderId());
-				configMemento.putBoolean(ACTIVE_ELEMENT, config.isActive());
 				configMemento.putBoolean(SYNC_ON_PREBUILD_ELEMENT, config.isSyncOnPreBuild());
 				configMemento.putBoolean(SYNC_ON_POSTBUILD_ELEMENT, config.isSyncOnPostBuild());
 				configMemento.putBoolean(SYNC_ON_SAVE_ELEMENT, config.isSyncOnSave());
+			}
+			SyncConfig active = fActiveSyncConfigMap.get(project);
+			if (active != null) {
+				rootMemento.putString(ACTIVE_ELEMENT, active.getName());
 			}
 			StringWriter writer = new StringWriter();
 			try {
@@ -303,11 +312,7 @@ public class SyncConfigManager {
 	public static void setActive(IProject project, SyncConfig config) {
 		try {
 			loadConfigs(project);
-			config.setActive(true);
 			SyncConfig oldConfig = fActiveSyncConfigMap.get(project);
-			if (oldConfig != null) {
-				oldConfig.setActive(false);
-			}
 			fActiveSyncConfigMap.put(project, config);
 			saveConfigs(project);
 			fireSyncConfigSelected(project, config, oldConfig);
@@ -337,6 +342,18 @@ public class SyncConfigManager {
 			// fail
 		}
 		return null;
+	}
+
+	/**
+	 * Check if this config is active for the project.
+	 * 
+	 * @param project
+	 * @param config
+	 * @return true if this config is the active config for the project
+	 */
+	public static boolean isActive(IProject project, SyncConfig config) {
+		SyncConfig active = fActiveSyncConfigMap.get(project);
+		return (active != null && config != null && active.getName().equals(config.getName()));
 	}
 
 	/**

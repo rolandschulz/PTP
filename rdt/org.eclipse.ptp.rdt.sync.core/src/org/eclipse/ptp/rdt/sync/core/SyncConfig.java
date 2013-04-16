@@ -61,12 +61,11 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	}
 
 	private String fData;
-	private String fConfigName;
+	private String fName;
 	private String fSyncProviderId;
 	private String fConnectionName;
 	private String fRemoteServicesId;
 	private String fLocation;
-	private boolean fIsActive;
 	private boolean fSyncOnPreBuild = true;
 	private boolean fSyncOnPostBuild = true;
 	private boolean fSyncOnSave = true;
@@ -78,8 +77,8 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	/**
 	 * Create a new sync configuration
 	 * 
-	 * @param configName
-	 *            Name of this configuration
+	 * @param name
+	 *            Name of this configuration. Must be unique per project.
 	 * @param syncProviderId
 	 *            ID of sync provider
 	 * @param conn
@@ -87,8 +86,8 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	 * @param location
 	 *            Location (directory) on remote host
 	 */
-	public SyncConfig(String configName, String syncProviderId, IRemoteConnection conn, String location) {
-		fConfigName = configName;
+	public SyncConfig(String name, String syncProviderId, IRemoteConnection conn, String location) {
+		fName = name;
 		fSyncProviderId = syncProviderId;
 		fConnectionName = conn.getName();
 		fRemoteServicesId = conn.getRemoteServices().getId();
@@ -98,8 +97,8 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	/**
 	 * Create a new sync configuration
 	 * 
-	 * @param configName
-	 *            Name of this configuration
+	 * @param name
+	 *            Name of this configuration. Must be unique per project.
 	 * @param syncProviderId
 	 *            ID of sync provider
 	 * @param connName
@@ -109,8 +108,8 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	 * @param location
 	 *            Location (directory) on remote host
 	 */
-	public SyncConfig(String configName, String syncProviderId, String connName, String remoteServicesId, String location) {
-		fConfigName = configName;
+	public SyncConfig(String name, String syncProviderId, String connName, String remoteServicesId, String location) {
+		fName = name;
 		fSyncProviderId = syncProviderId;
 		fConnectionName = connName;
 		fRemoteServicesId = remoteServicesId;
@@ -124,7 +123,7 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	 */
 	@Override
 	public int compareTo(SyncConfig config) {
-		return getConfigName().compareTo(config.getConfigName());
+		return getName().compareTo(config.getName());
 	}
 
 	/*
@@ -144,7 +143,7 @@ public class SyncConfig implements Comparable<SyncConfig> {
 			return false;
 		}
 		SyncConfig other = (SyncConfig) obj;
-		if (!fConfigName.equals(other.fConfigName)) {
+		if (!fName.equals(other.fName)) {
 			return false;
 		}
 		return true;
@@ -153,8 +152,8 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	/**
 	 * @return config name
 	 */
-	public String getConfigName() {
-		return fConfigName;
+	public String getName() {
+		return fName;
 	}
 
 	/**
@@ -281,31 +280,14 @@ public class SyncConfig implements Comparable<SyncConfig> {
 
 	@Override
 	public int hashCode() {
-		return fConfigName.hashCode();
-	}
-
-	/**
-	 * @return true if this config is active
-	 */
-	public boolean isActive() {
-		return fIsActive;
-	}
-
-	/**
-	 * Set this config as active for the project. Clients should not call this method directly. Use
-	 * {@link SyncConfigManager#setActive(IProject, SyncConfig)} instead.
-	 * 
-	 * @param active
-	 */
-	public void setActive(boolean active) {
-		fIsActive = active;
+		return fName.hashCode();
 	}
 
 	/**
 	 * @param configName
 	 */
 	public void setConfigName(String configName) {
-		fConfigName = configName;
+		fName = configName;
 	}
 
 	/**
