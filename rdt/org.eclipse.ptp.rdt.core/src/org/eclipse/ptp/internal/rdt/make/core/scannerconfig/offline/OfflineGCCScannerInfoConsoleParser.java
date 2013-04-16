@@ -15,11 +15,13 @@
 package org.eclipse.ptp.internal.rdt.make.core.scannerconfig.offline;
 
 import java.io.File;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.eclipse.cdt.core.IMarkerGenerator;
 import org.eclipse.cdt.make.core.scannerconfig.IScannerInfoCollector;
@@ -86,9 +88,9 @@ public class OfflineGCCScannerInfoConsoleParser implements IScannerInfoConsolePa
 	        }
 
 	        // Recognized gcc or g++ compiler invocation
-	        List<String> includes = new ArrayList<String>();
-	        List<String> symbols = new ArrayList<String>();
-	        List<String> targetSpecificOptions = new ArrayList<String>();
+	        List<String> includes = new CopyOnWriteArrayList<String>();
+	        List<String> symbols = new CopyOnWriteArrayList<String>();
+	        List<String> targetSpecificOptions = new CopyOnWriteArrayList<String>();
 
 	        String fileName = null;
 	        for (int j= compilerInvocationIdx+1; j < tokens.length; j++) {
