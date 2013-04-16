@@ -78,7 +78,22 @@ public class SyncConfigManager {
 		try {
 			loadConfigs(project);
 			doAddConfig(project, config);
+			saveConfigs(project);
 			fireSyncConfigAdded(project, config);
+		} catch (CoreException e) {
+			RDTSyncCorePlugin.log(e);
+		}
+	}
+
+	public static void updateConfigs(IProject project, SyncConfig[] addedConfigs, SyncConfig[] removedConfigs) {
+		for (SyncConfig config : addedConfigs) {
+			doAddConfig(project, config);
+		}
+		for (SyncConfig config : addedConfigs) {
+			doRemoveConfig(project, config);
+		}
+		try {
+			saveConfigs(project);
 		} catch (CoreException e) {
 			RDTSyncCorePlugin.log(e);
 		}
@@ -178,7 +193,7 @@ public class SyncConfigManager {
 					Boolean syncOnSave = configMemento.getBoolean(SYNC_ON_SAVE_ELEMENT);
 					SyncConfig config = new SyncConfig(configName, syncProviderId, connectionName, remoteServicesId, location);
 					config.setData(data);
-					if (active != null) {
+					if (active != null && active) {
 						config.setActive(active.booleanValue());
 						fActiveSyncConfigMap.put(project, config);
 					}
@@ -213,16 +228,22 @@ public class SyncConfigManager {
 	public static void removeConfig(IProject project, SyncConfig config) {
 		try {
 			loadConfigs(project);
-			List<SyncConfig> projConfigs = fSyncConfigMap.get(project);
-			if (projConfigs != null && projConfigs.size() > 1) {
-				boolean removed = projConfigs.remove(config);
-				if (removed) {
-					fireSyncConfigRemoved(project, config);
-				}
+			boolean removed = doRemoveConfig(project, config);
+			if (removed) {
+				saveConfigs(project);
+				fireSyncConfigRemoved(project, config);
 			}
 		} catch (CoreException e) {
 			RDTSyncCorePlugin.log(e);
 		}
+	}
+
+	private static boolean doRemoveConfig(IProject project, SyncConfig config) {
+		List<SyncConfig> projConfigs = fSyncConfigMap.get(project);
+		if (projConfigs != null && projConfigs.size() > 1) {
+			return projConfigs.remove(config);
+		}
+		return false;
 	}
 
 	/**
@@ -245,7 +266,7 @@ public class SyncConfigManager {
 	 * @param project
 	 * @throws CoreException
 	 */
-	public static void saveConfigs(IProject project) throws CoreException {
+	private static void saveConfigs(IProject project) throws CoreException {
 		List<SyncConfig> projConfigs = fSyncConfigMap.get(project);
 		if (projConfigs != null) {
 			XMLMemento rootMemento = XMLMemento.createWriteRoot(CONFIGS_ELEMENT);
@@ -288,6 +309,7 @@ public class SyncConfigManager {
 				oldConfig.setActive(false);
 			}
 			fActiveSyncConfigMap.put(project, config);
+			saveConfigs(project);
 			fireSyncConfigSelected(project, config, oldConfig);
 		} catch (CoreException e) {
 			RDTSyncCorePlugin.log(e);

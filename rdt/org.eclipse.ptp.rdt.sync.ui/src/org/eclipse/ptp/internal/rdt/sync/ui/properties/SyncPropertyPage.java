@@ -19,9 +19,7 @@ import java.util.TreeSet;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.FontRegistry;
@@ -264,6 +262,11 @@ public class SyncPropertyPage extends PropertyPage {
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.PreferencePage#performDefaults()
+	 */
 	@Override
 	protected void performDefaults() {
 		for (SyncConfig config : fAddedConfigs) {
@@ -278,19 +281,14 @@ public class SyncPropertyPage extends PropertyPage {
 		super.performDefaults();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.PreferencePage#performApply()
+	 */
 	@Override
 	protected void performApply() {
-		try {
-			for (SyncConfig config : fAddedConfigs) {
-				SyncConfigManager.addConfig(getProject(), config);
-			}
-			for (SyncConfig config : fRemovedConfigs) {
-				SyncConfigManager.removeConfig(getProject(), config);
-			}
-			SyncConfigManager.saveConfigs(getProject());
-		} catch (CoreException e) {
-			ErrorDialog.openError(getShell(), Messages.SyncPropertyPage_Save_failed,
-					Messages.SyncPropertyPage_Failed_to_save_properties, e.getStatus());
-		}
+		SyncConfigManager.updateConfigs(getProject(), fAddedConfigs.toArray(new SyncConfig[0]),
+				fRemovedConfigs.toArray(new SyncConfig[0]));
 	}
 }

@@ -156,7 +156,6 @@ public class SyncManager {
 		SyncConfig config = new SyncConfig(conn.getName(), provider.getId(), conn, provider.getLocation());
 		SyncConfigManager.addConfig(project, config);
 		SyncConfigManager.setActive(project, config);
-		SyncConfigManager.saveConfigs(project);
 
 		if (filter != null) {
 			SyncManager.saveFileFilter(project, filter);
