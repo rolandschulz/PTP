@@ -21,6 +21,7 @@ import org.eclipse.cdt.managedbuilder.language.settings.providers.GCCBuildComman
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
+import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 
@@ -44,8 +45,8 @@ public class SyncGCCBuildCommandParser extends GCCBuildCommandParser implements 
 			super.setSettingEntries(entries);
 			return;
 		}
-		SyncConfig bs = BuildConfigUtils.getBuildScenarioForProject(currentProject);
-		if (bs.getSyncProviderId() == null) {
+		SyncConfig config = SyncConfigManager.getActive(currentProject);
+		if (config.getSyncProviderId() == null) {
 			// For local configurations, no special processing is needed.
 			super.setSettingEntries(entries);
 			return;
@@ -53,7 +54,7 @@ public class SyncGCCBuildCommandParser extends GCCBuildCommandParser implements 
 
 		IRemoteConnection conn = null;
 		try {
-			conn = bs.getRemoteConnection();
+			conn = config.getRemoteConnection();
 		} catch (MissingConnectionException e1) {
 			// Impossible to build includes properly without connection name
 			super.setSettingEntries(entries);
@@ -67,7 +68,7 @@ public class SyncGCCBuildCommandParser extends GCCBuildCommandParser implements 
 				newEntry = entry;
 			} else {
 				String remotePath = ((CIncludePathEntry) entry).getValue();
-				String workspacePath = this.getWorkspacePath(remotePath, bs.getLocation(currentProject));
+				String workspacePath = this.getWorkspacePath(remotePath, config.getLocation(currentProject));
 				if (workspacePath == null) {
 					// Bug 402350: Sync scanner discovery has corrupt remote paths when using Windows
 					if (remotePath.startsWith("C:")) { //$NON-NLS-1$
@@ -94,13 +95,13 @@ public class SyncGCCBuildCommandParser extends GCCBuildCommandParser implements 
 		if (compilerPath == null) {
 			return compilerPath;
 		}
-		SyncConfig bs = BuildConfigUtils.getBuildScenarioForProject(currentProject);
-		if (bs.getSyncProviderId() == null) {
+		SyncConfig config = SyncConfigManager.getActive(currentProject);
+		if (config.getSyncProviderId() == null) {
 			// For local configurations, no special processing is needed.
 			return compilerPath;
 		}
 
-		String workspacePath = this.getWorkspacePath(compilerPath, bs.getLocation(currentProject));
+		String workspacePath = this.getWorkspacePath(compilerPath, config.getLocation(currentProject));
 		if (workspacePath == null) {
 			return compilerPath;
 		} else {

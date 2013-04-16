@@ -69,7 +69,7 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 			return null;
 		}
 
-		final SyncConfig bs = BuildConfigUtils.getBuildScenarioForBuildConfiguration(getCfg());
+		final SyncConfig bs = BuildConfigUtils.getSyncConfigForBuildConfiguration(getCfg());
 		if (bs == null) {
 			return null;
 		}

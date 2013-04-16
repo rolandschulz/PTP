@@ -60,7 +60,6 @@ public class SyncConfig implements Comparable<SyncConfig> {
 		return newPath.replaceFirst(variable + ":*", value); //$NON-NLS-1$
 	}
 
-	private String fData;
 	private String fName;
 	private String fSyncProviderId;
 	private String fConnectionName;
@@ -161,15 +160,6 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	 */
 	public String getConnectionName() {
 		return fConnectionName;
-	}
-
-	/**
-	 * Get the data associated with this configuration
-	 * 
-	 * @return
-	 */
-	public String getData() {
-		return fData;
 	}
 
 	/**
@@ -296,15 +286,6 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	public void setConnectionName(String connectionName) {
 		fConnectionName = connectionName;
 		fRemoteConnection = null;
-	}
-
-	/**
-	 * Set the data associated with this configuration
-	 * 
-	 * @param data
-	 */
-	public void setData(String data) {
-		fData = data;
 	}
 
 	/**

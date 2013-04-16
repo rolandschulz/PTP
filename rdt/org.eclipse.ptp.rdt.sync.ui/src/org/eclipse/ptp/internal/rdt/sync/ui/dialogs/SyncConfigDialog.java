@@ -10,10 +10,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.sync.ui.dialogs;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.ptp.internal.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
+import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.services.ISynchronizeServiceDescriptor;
 import org.eclipse.ptp.rdt.sync.core.services.SynchronizeServiceRegistry;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -60,6 +62,7 @@ public class SyncConfigDialog extends Dialog {
 	private IRemoteConnection fSelectedConnection;
 	private SyncConfig fSyncConfig;
 	private ISynchronizeServiceDescriptor[] fProviders;
+	private IProject fProject;
 
 	public SyncConfigDialog(Shell parentShell) {
 		super(parentShell);
@@ -243,12 +246,20 @@ public class SyncConfigDialog extends Dialog {
 
 	private void updateControls() {
 		Button okButton = getButton(IDialogConstants.OK_ID);
-		boolean enabled = (fConfigName != null && fProjectLocation != null && fSelectedConnection != null && fSyncProvider != null);
+		boolean enabled = true;
+		if (fConfigName != null && fProject != null) {
+			enabled = SyncConfigManager.getConfig(fProject, fConfigName) == null;
+		}
+		enabled &= (fProjectLocation != null && fSelectedConnection != null && fSyncProvider != null);
 		okButton.setEnabled(enabled);
 	}
 
 	public SyncConfig getSyncConfig() {
 		return fSyncConfig;
+	}
+
+	public void setProject(IProject project) {
+		fProject = project;
 	}
 
 	/*

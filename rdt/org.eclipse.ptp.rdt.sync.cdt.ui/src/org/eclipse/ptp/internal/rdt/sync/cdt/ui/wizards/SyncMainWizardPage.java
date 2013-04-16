@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.sync.cdt.ui.wizards;
 
-import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -33,10 +32,6 @@ import org.eclipse.cdt.ui.wizards.CNewWizard;
 import org.eclipse.cdt.ui.wizards.CWizardHandler;
 import org.eclipse.cdt.ui.wizards.EntryDescriptor;
 import org.eclipse.cdt.ui.wizards.IWizardItemsListListener;
-import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.filesystem.IFileInfo;
-import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
@@ -51,18 +46,14 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
-import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.osgi.util.TextProcessor;
 import org.eclipse.ptp.internal.rdt.sync.cdt.ui.Activator;
 import org.eclipse.ptp.internal.rdt.sync.cdt.ui.messages.Messages;
-import org.eclipse.ptp.internal.rdt.sync.ui.preferences.SyncFileFilterPage;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
-import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
-import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipantDescriptor;
-import org.eclipse.ptp.rdt.sync.ui.SynchronizeParticipantRegistry;
+import org.eclipse.ptp.rdt.sync.ui.widgets.SyncProjectWidget;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.AccessibleAdapter;
 import org.eclipse.swt.accessibility.AccessibleEvent;
@@ -74,9 +65,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
@@ -112,9 +101,6 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 
 	// widgets
 	private Text projectNameField;
-	private Button defaultLocationButton;
-	private Text projectLocationField;
-	private Button browseButton;
 	private Tree projectTypeTree;
 	private Composite allToolChainsHiddenComposite;
 	private Composite remoteToolChain;
@@ -126,10 +112,9 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	private Label projectLocalOptionsLabel;
 	private Label categorySelectedForRemoteLabel;
 	private Label categorySelectedForLocalLabel;
+	private SyncProjectWidget fSyncWidget;
 
 	private SortedMap<String, IToolChain> toolChainMap;
-	private ISynchronizeParticipant fSelectedParticipant = null;
-	private SyncFileFilter customFilter = null;
 	private String message = null;
 	private int messageType = IMessageProvider.NONE;
 	private String errorMessage = null;
@@ -268,26 +253,6 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 			}
 		});
 		showSupportedOnlyButton.setSelection(false);
-
-		// File filter button
-		final Button filterButton = new Button(c, SWT.PUSH);
-		filterButton.setText(Messages.NewRemoteSyncProjectWizardPage_0);
-		filterButton.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false, 2, 1));
-		filterButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent event) {
-				SyncFileFilter tmpFilter;
-				if (customFilter == null) {
-					tmpFilter = SyncManager.getDefaultFileFilter();
-				} else {
-					tmpFilter = new SyncFileFilter(customFilter);
-				}
-				int filterReturnCode = SyncFileFilterPage.openBlocking(tmpFilter, filterButton.getShell());
-				if (filterReturnCode == Window.OK) {
-					customFilter = tmpFilter;
-				}
-			}
-		});
 	}
 
 	@Override
@@ -302,7 +267,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	 */
 	@Override
 	public IPath getLocationPath() {
-		return new Path(projectLocationField.getText());
+		return new Path(fSyncWidget.getProjectLocalLocation());
 	}
 
 	/**
@@ -335,10 +300,19 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 		message = null;
 		messageType = IMessageProvider.NONE;
 		errorMessage = null;
-		return (validateProjectNameAndLocation() && validateProjectTypeSelection() && validateRemoteLocation());
+		if (!validateProjectName() || !validateProjectTypeSelection()) {
+			return false;
+		}
+		if (!fSyncWidget.isPageComplete()) {
+			message = fSyncWidget.getMessage();
+			messageType = fSyncWidget.getMessageType();
+			errorMessage = fSyncWidget.getErrorMessage();
+			return false;
+		}
+		return true;
 	}
 
-	protected boolean validateProjectNameAndLocation() {
+	protected boolean validateProjectName() {
 		// Check if name is empty
 		String projectFieldContents = getProjectNameFieldValue();
 		if (projectFieldContents.equals("")) { //$NON-NLS-1$
@@ -360,42 +334,6 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 			errorMessage = Messages.SyncMainWizardPage_6;
 			return false;
 		}
-
-		IProject handle = ResourcesPlugin.getWorkspace().getRoot().getProject(getProjectName());
-		URI location = URIUtil.toURI(projectLocationField.getText());
-
-		// Check if project exists
-		if (handle.exists()) {
-			errorMessage = Messages.SyncMainWizardPage_7;
-			return false;
-		}
-
-		// Validate location according to built-in rules
-		if (!defaultLocationButton.getSelection()) {
-			IStatus locationStatus = ResourcesPlugin.getWorkspace().validateProjectLocationURI(handle, location);
-			if (!locationStatus.isOK()) {
-				errorMessage = locationStatus.getMessage();
-				return false;
-			}
-		}
-
-		// Check if location is an existing file or directory
-		try {
-			IFileStore fs = EFS.getStore(location);
-			IFileInfo f = fs.fetchInfo();
-			if (f.exists()) {
-				if (f.isDirectory()) {
-					message = Messages.SyncMainWizardPage_8;
-					messageType = IMessageProvider.WARNING;
-				} else {
-					errorMessage = Messages.SyncMainWizardPage_9;
-					return false;
-				}
-			}
-		} catch (CoreException e) {
-			Activator.log(e.getStatus());
-		}
-
 		return true;
 	}
 
@@ -418,11 +356,6 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 		}
 
 		return true;
-	}
-
-	protected boolean validateRemoteLocation() {
-		errorMessage = fSelectedParticipant.getErrorMessage();
-		return fSelectedParticipant.getErrorMessage() == null && fSelectedParticipant.isConfigComplete();
 	}
 
 	/*
@@ -778,7 +711,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	private final void createProjectBasicInfoGroup(Composite parent) {
 		Composite projectGroup = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
-		layout.numColumns = 1;
+		layout.numColumns = 2;
 		projectGroup.setLayout(layout);
 		projectGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
@@ -790,7 +723,6 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 		// new project name entry field
 		projectNameField = new Text(projectGroup, SWT.BORDER);
 		GridData nameData = new GridData(GridData.FILL_HORIZONTAL);
-		nameData.horizontalSpan = 2;
 		nameData.widthHint = SIZING_TEXT_FIELD_WIDTH;
 		projectNameField.setLayoutData(nameData);
 		projectNameField.setFont(parent.getFont());
@@ -798,96 +730,25 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 		projectNameField.addListener(SWT.Modify, new Listener() {
 			@Override
 			public void handleEvent(Event e) {
-				setProjectLocation();
-				if (fSelectedParticipant != null) {
-					fSelectedParticipant.setProjectName(getProjectName());
+				if (fSyncWidget != null) {
+					fSyncWidget.setProjectName(getProjectName());
 				}
 				setPageComplete(validatePage());
 				getWizard().getContainer().updateMessage();
 			}
 		});
+	}
 
-		Group locationGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
-		locationGroup.setText(Messages.SyncMainWizardPage_Local_directory);
-		locationGroup.setLayout(new GridLayout(3, false));
-		locationGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-		// Use default location button
-		defaultLocationButton = new Button(locationGroup, SWT.CHECK);
-		defaultLocationButton.setText(Messages.SyncMainWizardPage_15);
-		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan = 3;
-		defaultLocationButton.setLayoutData(gd);
-		defaultLocationButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				setProjectLocation();
-			}
-		});
-		defaultLocationButton.setSelection(true);
-
-		// new project location label
-		Label projectLocationLabel = new Label(locationGroup, SWT.NONE);
-		projectLocationLabel.setText(Messages.SyncMainWizardPage_16);
-		projectLocationLabel.setFont(parent.getFont());
-
-		// new project location entry field
-		projectLocationField = new Text(locationGroup, SWT.BORDER);
-		GridData locationData = new GridData(GridData.FILL_HORIZONTAL);
-		locationData.widthHint = SIZING_TEXT_FIELD_WIDTH;
-		projectLocationField.setLayoutData(locationData);
-		projectLocationField.setFont(parent.getFont());
-		projectLocationField.addListener(SWT.Modify, new Listener() {
+	private final void createProjectRemoteInfoGroup(Composite parent) {
+		fSyncWidget = new SyncProjectWidget(parent, SWT.NONE, getWizard().getContainer());
+		fSyncWidget.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		fSyncWidget.addListener(SWT.Modify, new Listener() {
 			@Override
 			public void handleEvent(Event e) {
 				setPageComplete(validatePage());
 				getWizard().getContainer().updateMessage();
 			}
 		});
-		projectLocationField.setEnabled(false);
-		this.setProjectLocation();
-
-		// Browse button
-		browseButton = new Button(locationGroup, SWT.PUSH);
-		browseButton.setText(Messages.SyncMainWizardPage_17);
-		browseButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				DirectoryDialog dirDialog = new DirectoryDialog(projectLocationField.getShell());
-				dirDialog.setText(Messages.SyncMainWizardPage_18);
-				String selectedDir = dirDialog.open();
-				projectLocationField.setText(selectedDir);
-			}
-		});
-	}
-
-	private final void createProjectRemoteInfoGroup(Composite parent) {
-		Group locationGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
-		locationGroup.setText(Messages.SyncMainWizardPage_Remote_directory);
-		locationGroup.setLayout(new GridLayout(1, false));
-		locationGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		// For now, assume only one provider, to reduce the number of GUI elements.
-
-		// TODO: Add error handling if there are no providers
-		ISynchronizeParticipantDescriptor[] providers = SynchronizeParticipantRegistry.getDescriptors();
-		fSelectedParticipant = providers[0].getParticipant();
-		fSelectedParticipant.createConfigurationArea(locationGroup, getWizard().getContainer());
-		// Without this, participant uses the old project name from the last time it was invoked.
-		fSelectedParticipant.setProjectName(""); //$NON-NLS-1$
-	}
-
-	// Decides what should appear in project location field and whether or not it should be enabled
-	private void setProjectLocation() {
-		// Build string if default location is indicated.
-		if (defaultLocationButton.getSelection()) {
-			projectLocationField.setText(Platform.getLocation().toOSString() + File.separator + getProjectName());
-			// If user just unchecked default location, erase field contents.
-		} else if (!projectLocationField.isEnabled()) {
-			projectLocationField.setText(""); //$NON-NLS-1$
-		}
-
-		// These two values should never match.
-		projectLocationField.setEnabled(!defaultLocationButton.getSelection());
 	}
 
 	/**
@@ -959,7 +820,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 
 	@Override
 	public boolean useDefaults() {
-		return defaultLocationButton.getSelection();
+		return fSyncWidget.useDafaults();
 	}
 
 	/**
@@ -968,7 +829,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	 * @return participant
 	 */
 	public ISynchronizeParticipant getSynchronizeParticipant() {
-		return fSelectedParticipant;
+		return fSyncWidget.getSynchronizeParticipant();
 	}
 
 	/**
@@ -1059,6 +920,6 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	}
 
 	public SyncFileFilter getCustomFileFilter() {
-		return customFilter;
+		return fSyncWidget.getCustomFileFilter();
 	}
 }

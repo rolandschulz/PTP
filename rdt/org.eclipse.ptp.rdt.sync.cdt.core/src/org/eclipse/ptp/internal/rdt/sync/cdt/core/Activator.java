@@ -40,12 +40,14 @@ public class Activator extends Plugin {
 
 	@Override
 	public void start(BundleContext context) throws Exception {
+		BuildConfigUtils.initializeListeners();
 		super.start(context);
 	}
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		try {
+			BuildConfigUtils.finalizeListeners();
 		} finally {
 			super.stop(context);
 		}

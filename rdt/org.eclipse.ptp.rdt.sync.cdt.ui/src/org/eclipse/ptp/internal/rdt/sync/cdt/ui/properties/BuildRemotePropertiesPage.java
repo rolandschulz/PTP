@@ -240,7 +240,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 								BuildConfigUtils.modifyConfigurationAsSyncLocal(config);
 								try {
 									SyncConfig localConfig = SyncConfigManager.createLocal(project);
-									BuildConfigUtils.setBuildScenarioForBuildConfiguration(localConfig, config);
+									BuildConfigUtils.setSyncConfigForBuildConfiguration(localConfig, config);
 								} catch (CoreException e) {
 									Activator.log(Messages.BuildRemotePropertiesPage_2, e);
 								}
@@ -273,7 +273,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 		// Register with build configuration manager. This must be done after saving build info with ManagedBuildManager, as
 		// the BuildConfigurationManager relies on the data being up-to-date.
 		SyncConfig syncConfig = new SyncConfig(null, settings.syncProvider, settings.connection, settings.rootLocation);
-		BuildConfigUtils.setBuildScenarioForBuildConfiguration(syncConfig, config);
+		BuildConfigUtils.setSyncConfigForBuildConfiguration(syncConfig, config);
 	}
 
 	// Connection button handling
@@ -373,7 +373,7 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 	 * @return Configuration settings or null if config not found in BuildConfigurationManager
 	 */
 	private PageSettings loadSettings(IConfiguration config) {
-		SyncConfig syncConfig = BuildConfigUtils.getBuildScenarioForBuildConfiguration(config);
+		SyncConfig syncConfig = BuildConfigUtils.getSyncConfigForBuildConfiguration(config);
 		if (syncConfig == null) {
 			IStatus status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Error loading configuration data"); //$NON-NLS-1$
 			StatusManager.getManager().handle(status, StatusManager.SHOW);

@@ -10,11 +10,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
  org.eclipse.ptp.remote.core,
  org.eclipse.ptp.remote.ui,
- org.eclipse.ptp.services.core,
- org.eclipse.ptp.rdt.sync.core,
- org.eclipse.ptp.ems.core,
- org.eclipse.ptp.ems.ui,
- org.eclipse.jface
+ org.eclipse.ptp.rdt.sync.core
 Bundle-Localization: plugin
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.eclipse.ptp.internal.rdt.sync.ui.RDTSyncUIPlugin

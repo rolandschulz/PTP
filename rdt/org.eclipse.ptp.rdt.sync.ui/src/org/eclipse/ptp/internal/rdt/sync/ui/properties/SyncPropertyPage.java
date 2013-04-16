@@ -173,6 +173,7 @@ public class SyncPropertyPage extends PropertyPage {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				SyncConfigDialog dialog = new SyncConfigDialog(fAddButton.getShell());
+				dialog.setProject(getProject());
 				if (dialog.open() == Window.OK) {
 					fAddedConfigs.add(dialog.getSyncConfig());
 					fConfigs.add(dialog.getSyncConfig());

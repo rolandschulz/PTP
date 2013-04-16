@@ -51,6 +51,7 @@ import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.ptp.internal.rdt.sync.cdt.core.messages.Messages;
 import org.eclipse.ptp.internal.rdt.sync.cdt.core.remotemake.SyncCommandLauncher;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
+import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
@@ -186,8 +187,8 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 			super.setSettingEntries(entries);
 			return;
 		}
-		SyncConfig bs = BuildConfigUtils.getBuildScenarioForProject(currentProject);
-		if (bs.getSyncProviderId() == null) {
+		SyncConfig config = SyncConfigManager.getActive(currentProject);
+		if (config.getSyncProviderId() == null) {
 			// For local configurations, no special processing is needed.
 			super.setSettingEntries(entries);
 			return;
@@ -195,7 +196,7 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 
 		IRemoteConnection conn = null;
 		try {
-			conn = bs.getRemoteConnection();
+			conn = config.getRemoteConnection();
 		} catch (MissingConnectionException e1) {
 			// Impossible to build includes properly without connection name
 			super.setSettingEntries(entries);
@@ -227,9 +228,9 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 	 */
 	@Override
 	protected String getSpecFile(String languageId) {
-		SyncConfig bs = BuildConfigUtils.getBuildScenarioForProject(currentProject);
+		SyncConfig config = SyncConfigManager.getActive(currentProject);
 		// For local configurations, we can fall back to the original implementation.
-		if (bs.getSyncProviderId() == null) {
+		if (config.getSyncProviderId() == null) {
 			return super.getSpecFile(languageId);
 		}
 
@@ -239,7 +240,7 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 		if (ext != null) {
 			specFileName = specFileName + '.' + ext;
 		}
-		IPath workingLocation = new Path(bs.getLocation(currentProject));
+		IPath workingLocation = new Path(config.getLocation(currentProject));
 		// TODO: Get rid of .ptp-sync string literal.
 		// TODO: What if .ptp-sync does not exist?
 		// TODO: What if remote system does not use '/' path separator? (assumed by IPath.toString())
@@ -248,7 +249,7 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 		// Create spec file if it doesn't exist
 		IRemoteConnection conn = null;
 		try {
-			conn = bs.getRemoteConnection();
+			conn = config.getRemoteConnection();
 		} catch (MissingConnectionException e1) {
 			return fileLocation.toString();
 		}

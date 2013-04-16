@@ -105,20 +105,20 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		// For managed projects and configurations other than workspace, the directory is incorrect and needs to be fixed.
 		IConfiguration configuration = ManagedBuildManager.getBuildInfo(getProject()).getDefaultConfiguration();
 		String projectLocalRoot = getProject().getLocation().toPortableString();
-		String projectActualRoot = BuildConfigUtils.getBuildScenarioForBuildConfiguration(configuration).getLocation(getProject());
+		String projectActualRoot = BuildConfigUtils.getSyncConfigForBuildConfiguration(configuration).getLocation(getProject());
 		String fixedDirectory = changeToDirectory.toString().replaceFirst(Pattern.quote(projectLocalRoot),
 				Matcher.quoteReplacement(projectActualRoot));
 		changeToDirectory = new Path(fixedDirectory);
 		fCommandArgs = constructCommandArray(commandPath.toPortableString(), args);
 
 		// Get and setup the connection and remote services for this build configuration.
-		SyncConfig bs = BuildConfigUtils.getBuildScenarioForBuildConfiguration(configuration);
-		if (bs == null) {
+		SyncConfig config = BuildConfigUtils.getSyncConfigForBuildConfiguration(configuration);
+		if (config == null) {
 			return null;
 		}
 		IRemoteConnection connection;
 		try {
-			connection = bs.getRemoteConnection();
+			connection = config.getRemoteConnection();
 		} catch (MissingConnectionException e2) {
 			throw new CoreException(new Status(IStatus.CANCEL, Activator.PLUGIN_ID,
 					"Build canceled because connection does not exist")); //$NON-NLS-1$ 

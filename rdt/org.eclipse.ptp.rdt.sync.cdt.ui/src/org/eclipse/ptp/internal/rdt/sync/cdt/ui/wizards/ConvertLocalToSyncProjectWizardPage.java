@@ -12,7 +12,6 @@
 
 package org.eclipse.ptp.internal.rdt.sync.cdt.ui.wizards;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -35,7 +34,6 @@ import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -61,8 +59,6 @@ import org.eclipse.ptp.rdt.sync.core.services.ISynchronizeService;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipantDescriptor;
 import org.eclipse.ptp.rdt.sync.ui.SynchronizeParticipantRegistry;
-import org.eclipse.ptp.services.core.IServiceConfiguration;
-import org.eclipse.ptp.services.core.ServiceModelManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -95,7 +91,7 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 	private ISynchronizeParticipantDescriptor fSelectedProvider;
 	private final Map<Integer, ISynchronizeParticipantDescriptor> fComboIndexToDescriptorMap = new HashMap<Integer, ISynchronizeParticipantDescriptor>();
 
-	protected Map<IProject, IServiceConfiguration> projectConfigs = new HashMap<IProject, IServiceConfiguration>();
+	// protected Map<IProject, IServiceConfiguration> projectConfigs = new HashMap<IProject, IServiceConfiguration>();
 
 	private static final String REMOTE_NATURE_ID = "org.eclipse.ptp.rdt.core.remoteNature"; //$NON-NLS-1$
 
@@ -289,19 +285,19 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 	protected void convertProject(final IProject project, IProgressMonitor monitor) throws CoreException {
 		monitor.beginTask(Messages.ConvertToSyncProjectWizardPage_convertingToSyncProject, 3);
 
-		// Add project natures
-		RemoteSyncNature.addNature(project, new NullProgressMonitor());
-		// try {
-		// RemoteMakeNature.updateProjectDescription(project, RemoteMakeBuilder.REMOTE_MAKE_BUILDER_ID, new NullProgressMonitor());
-		// } catch (CoreException e) {
-		// StatusManager.getManager().handle(e, Activator.PLUGIN_ID);
-		// }
+		ISynchronizeParticipant participant = fSelectedProvider.getParticipant();
 
 		try {
-			ISynchronizeParticipant participant = fSelectedProvider.getParticipant();
+			SyncManager.makeSyncProject(project, participant.getProvider(project), null);
+		} catch (CoreException e) {
+			Activator.log(e);
+			return;
+		}
+
+		try {
 
 			// Initialize project with a local build scenario, which is applied to all configurations
-			BuildConfigUtils.setBuildScenarioForAllBuildConfigurations(project, SyncConfigManager.createLocal(project));
+			BuildConfigUtils.setSyncConfigForAllBuildConfigurations(project, SyncConfigManager.createLocal(project));
 
 			// Create a remote build scenario
 			ISynchronizeService provider = participant.getProvider(project);
@@ -383,9 +379,9 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 		try {
 			monitor.beginTask(Messages.ConvertToRemoteWizardPage_0, 2);
 			super.doRun(new SubProgressMonitor(monitor, 1), projectID, bsId);
-			ServiceModelManager.getInstance().saveModelConfiguration();
-		} catch (IOException e) {
-			Activator.log(e);
+			// ServiceModelManager.getInstance().saveModelConfiguration();
+			// } catch (IOException e) {
+			// Activator.log(e);
 		} finally {
 			setAutoBuild(autoBuildWasSet);
 			monitor.done();
@@ -407,38 +403,6 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 			}
 		}
 		return isAutoBuilding;
-	}
-
-	protected IServiceConfiguration getConfig(IProject project) {
-		IServiceConfiguration config = projectConfigs.get(project);
-		if (config == null) {
-			config = ServiceModelManager.getInstance().newServiceConfiguration(project.getName());
-			projectConfigs.put(project, config);
-		}
-		return config;
-	}
-
-	/**
-	 * Creates a name for the service configuration based on the remote
-	 * connection name. If multiple names exist, appends a qualifier to the
-	 * name.
-	 * 
-	 * @return new name guaranteed to be unique
-	 */
-	private String getConfigName(String candidateName) {
-		Set<IServiceConfiguration> configs = ServiceModelManager.getInstance().getConfigurations();
-		Set<String> existingNames = new HashSet<String>();
-		for (IServiceConfiguration config : configs) {
-			existingNames.add(config.getName());
-		}
-
-		int i = 2;
-		String newConfigName = candidateName;
-		while (existingNames.contains(newConfigName)) {
-			newConfigName = candidateName + " (" + (i++) + ")"; //$NON-NLS-1$ //$NON-NLS-2$
-		}
-
-		return newConfigName;
 	}
 
 	/*

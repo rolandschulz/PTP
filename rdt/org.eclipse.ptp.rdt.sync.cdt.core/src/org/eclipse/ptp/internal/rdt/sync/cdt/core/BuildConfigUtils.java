@@ -11,12 +11,9 @@
 package org.eclipse.ptp.internal.rdt.sync.cdt.core;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.eclipse.cdt.core.CProjectNature;
 import org.eclipse.cdt.core.model.CoreModel;
 import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
 import org.eclipse.cdt.core.settings.model.ICProjectDescription;
@@ -32,6 +29,10 @@ import org.eclipse.cdt.managedbuilder.internal.core.Configuration;
 import org.eclipse.cdt.managedbuilder.internal.core.ManagedProject;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -40,8 +41,8 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.internal.rdt.sync.cdt.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
-import org.eclipse.ptp.rdt.sync.core.SyncManager.SyncMode;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
+import org.eclipse.ptp.rdt.sync.core.listeners.ISyncConfigListener;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
@@ -54,17 +55,81 @@ import org.osgi.service.prefs.Preferences;
  * build configurations using the methods provided.
  */
 public class BuildConfigUtils {
-	private static final String configSyncDataStorageName = "org.eclipse.ptp.rdt.sync.cdt.core"; //$NON-NLS-1$
+	private static final String SYNC_CONFIG_ID = "org.eclipse.ptp.rdt.sync.cdt.core"; //$NON-NLS-1$
 	private static final String localConfigAnnotation = "_local"; //$NON-NLS-1$
 	private static final String remoteConfigAnnotation = "_remote"; //$NON-NLS-1$
 
 	private static final String SYNC_BUILDER_ID = "org.eclipse.ptp.rdt.sync.cdt.core.SyncBuilder"; //$NON-NLS-1$
 	private static final String SYNC_BUILDER_NAME = "Sync Builder";//$NON-NLS-1$
 
-	private static final String ATTR_SYNC_PROVIDER = "sync-provider"; //$NON-NLS-1$
-	private static final String ATTR_REMOTE_CONNECTION_ID = "remote-connection-id"; //$NON-NLS-1$
-	private static final String ATTR_LOCATION = "location"; //$NON-NLS-1$
-	private static final String ATTR_REMOTE_SERVICES_ID = "remote-services-id"; //$NON-NLS-1$
+	private static final String ATTR_SYNC_CONFIG_NAME = "sync-config-name"; //$NON-NLS-1$
+
+	private static final ISyncConfigListener fSyncConfigListener = new ISyncConfigListener() {
+
+		@Override
+		public void configAdded(IProject project, SyncConfig config) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void configRemoved(IProject project, SyncConfig config) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void configSelected(IProject project, SyncConfig newConfig, SyncConfig oldConfig) {
+			// TODO Auto-generated method stub
+
+		}
+
+	};
+
+	/**
+	 * Use resource listener to remove sync config listener when project is deleted
+	 */
+	private static IResourceChangeListener fResourceListener = new IResourceChangeListener() {
+		@Override
+		public void resourceChanged(IResourceChangeEvent event) {
+			switch (event.getType()) {
+			case IResourceChangeEvent.PRE_DELETE:
+			case IResourceChangeEvent.PRE_CLOSE:
+				IResource resource = event.getResource();
+				if (resource instanceof IProject) {
+					IProject project = (IProject) resource;
+					SyncConfigManager.removeSyncConfigListener(project, fSyncConfigListener);
+				}
+				break;
+
+			case IResourceChangeEvent.POST_CHANGE:
+				IResourceDelta delta = event.getDelta();
+				if (delta != null) {
+					try {
+						delta.accept(new IResourceDeltaVisitor() {
+							@Override
+							public boolean visit(IResourceDelta delta) throws CoreException {
+								IResource resource = delta.getResource();
+								if (resource instanceof IProject) {
+									IProject project = (IProject) resource;
+									if ((delta.getFlags() & IResourceDelta.OPEN) != 0) {
+										if (project.isOpen()) {
+											SyncConfigManager.addSyncConfigListener(project, fSyncConfigListener);
+										}
+										return false;
+									}
+								}
+								return true;
+							}
+						});
+					} catch (CoreException e) {
+						Activator.log(e);
+					}
+				}
+				break;
+			}
+		}
+	};
 
 	// Run standard checks on project and throw the appropriate exception if it is not valid
 	// All public methods should call this for any passed project or any passed configuration's project.
@@ -77,6 +142,146 @@ public class BuildConfigUtils {
 		} catch (CoreException e) {
 			throw new IllegalArgumentException(Messages.BuildConfigurationManager_8);
 		}
+	}
+
+	/**
+	 * Create a configuration for the given project with the given build scenario, name, and description using the given build
+	 * configuration as parent.
+	 * 
+	 * @param project
+	 * @param configParent
+	 * @param syncConfig
+	 * @param configName
+	 * @param configDesc
+	 * @return the new configuration
+	 */
+	public static IConfiguration createConfiguration(IProject project, Configuration configParent, SyncConfig syncConfig,
+			String configName, String configDesc) {
+		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
+		if (buildInfo == null) {
+			throw new RuntimeException(Messages.BCM_BuildInfoError + project.getName());
+		}
+
+		// For recording of problems during attempt
+		Throwable creationException = null;
+		String creationError = null;
+		boolean configAdded = false;
+
+		ManagedProject managedProject = (ManagedProject) buildInfo.getManagedProject();
+		if (configParent == null) {
+			configParent = (Configuration) buildInfo.getDefaultConfiguration();
+		}
+		String configId = ManagedBuildManager.calculateChildId(configParent.getId(), null);
+		Configuration config = new Configuration(managedProject, configParent, configId, true, false);
+		CConfigurationData configData = config.getConfigurationData();
+		ICProjectDescription projectDes = CoreModel.getDefault().getProjectDescription(project);
+		ICConfigurationDescription configDes = null;
+		try {
+			configDes = projectDes.createConfiguration(ManagedBuildManager.CFG_DATA_PROVIDER_ID, configData);
+		} catch (WriteAccessException e) {
+			creationException = e;
+		} catch (CoreException e) {
+			creationException = e;
+		}
+
+		if (configDes != null) {
+			configAdded = true;
+			config.setConfigurationDescription(configDes);
+			configDes.setName(configName);
+			configDes.setDescription(configDesc);
+			setProjectDescription(project, projectDes);
+			try {
+				setConfigData(config, syncConfig.getName());
+			} catch (CoreException e) {
+				Activator.log(e);
+			}
+		} else {
+			creationError = Messages.BCM_CreateConfigError;
+		}
+
+		if (!configAdded) {
+			if (creationError == null && creationException != null) {
+				creationError = creationException.getMessage();
+			}
+			Activator.log(Messages.BCM_CreateConfigFailure + creationError, creationException);
+			return null;
+		}
+
+		return config;
+	}
+
+	/**
+	 * Create a configuration for the given project with the given build scenario, name, and description using the project's
+	 * default build configuration as parent.
+	 * 
+	 * @param project
+	 * @param syncConfig
+	 * @param configName
+	 * @param configDesc
+	 * @return the new configuration
+	 */
+	public static IConfiguration createConfiguration(IProject project, SyncConfig syncConfig, String configName, String configDesc) {
+		return createConfiguration(project, null, syncConfig, configName, configDesc);
+	}
+
+	/**
+	 * Create a local build configuration. The corresponding build scenario has no sync provider and points to the project's working
+	 * directory. It has a default name and description. This function is normally used as part of the setup when creating a new
+	 * project
+	 * and is of little value to most clients.
+	 * 
+	 * @param project
+	 *            The project needing a local configuration - cannot be null
+	 * @return the new configuration - can be null on problems during creation
+	 */
+	public static IConfiguration createLocalConfiguration(IProject project, String configName) {
+		checkProject(project);
+		try {
+			SyncConfig localConfig = SyncConfigManager.createLocal(project);
+			return createConfiguration(project, localConfig, configName, Messages.BCM_WorkspaceConfigDes);
+		} catch (CoreException e) {
+			Activator.log(Messages.BCM_CreateConfigFailure + e.getMessage(), e);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Create a remote build configuration. This function is mainly used for internal sync purposes and is of little value to most
+	 * clients.
+	 * 
+	 * @param project
+	 *            The project needing a remote configuration - cannot be null
+	 * @param remoteBuildScenario
+	 *            Configuration's build scenario - cannot be null
+	 * @param configName
+	 *            Configuration's name
+	 * @param configDesc
+	 *            Configuration's description
+	 * @return the new configuration - can be null on problems during creation
+	 */
+	public static IConfiguration createRemoteConfiguration(IProject project, SyncConfig remoteBuildScenario, String configName,
+			String configDesc) {
+		checkProject(project);
+		return createConfiguration(project, remoteBuildScenario, configName, configDesc);
+	}
+
+	/**
+	 * Remove sync config listeners on all synchronized CDT projects in the workspace. Should only be called on plugin shutdown.
+	 */
+	public static void finalizeListeners() {
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		for (IProject project : workspace.getRoot().getProjects()) {
+			try {
+				if (project.isOpen() && project.hasNature(CProjectNature.C_NATURE_ID)
+						&& project.hasNature(RemoteSyncNature.NATURE_ID)) {
+					SyncConfigManager.removeSyncConfigListener(project, fSyncConfigListener);
+				}
+			} catch (CoreException e) {
+				// Skip project
+			}
+		}
+		ResourcesPlugin.getWorkspace().removeResourceChangeListener(fResourceListener);
 	}
 
 	/**
@@ -143,101 +348,28 @@ public class BuildConfigUtils {
 		flushThread.start();
 	}
 
-	/**
-	 * Return the build scenario for the passed configuration. Any newly created configurations should be recorded by the call to
-	 * "updateConfigurations." For configurations still unknown (perhaps newly created configurations not yet recorded in CDT),
-	 * return the build scenario for the closest known ancestor.
-	 * 
-	 * @param bconf
-	 *            - the build configuration - cannot be null
-	 * @return build scenario or null if there are problems accessing configuration's information
-	 */
-	public static SyncConfig getBuildScenarioForBuildConfiguration(IConfiguration bconf) {
-		IProject project = bconf.getOwner().getProject();
-		checkProject(project);
-		return getBuildScenarioForBuildConfigurationInternal(bconf);
-	}
-
-	// Return the build scenario stored for the passed id or the build scenario of its nearest ancestor.
-	// Return null if not found.
-	private static SyncConfig getBuildScenarioForBuildConfigurationInternal(IConfiguration bconf) {
-		IProject project = bconf.getOwner().getProject();
-		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
-		if (buildInfo == null) {
-			throw new RuntimeException(Messages.BCM_BuildInfoError + project.getName());
-		}
-
-		try {
-			IConfiguration config = bconf;
-			String configId = config.getId();
-			Map<String, String> scenarioData = getConfigData((Configuration) config, configSyncDataStorageName);
-			while (scenarioData == null) {
-				configId = getParentId(configId);
-				if (configId == null) {
-					break;
-				}
-				config = buildInfo.getManagedProject().getConfiguration(configId);
-				scenarioData = getConfigData((Configuration) config, configSyncDataStorageName);
-			}
-
-			if (configId != null) {
-				SyncConfig bs = loadSyncConfig(scenarioData, configId);
-				if (bs != null) {
-					return bs;
-				}
-				Activator.log(Messages.BuildConfigurationManager_14 + configId + Messages.BuildConfigurationManager_11
-						+ project.getName());
-			}
-			return null;
-		} catch (CoreException e) {
-			Activator.log(Messages.BuildConfigurationManager_19, e);
-			return null;
-		}
-	}
-
-	/**
-	 * Store config in the given map
-	 * 
-	 * @param map
-	 */
-	public static void saveSyncConfig(SyncConfig config, Map<String, String> map) {
-		if (config.getSyncProviderId() != null) {
-			map.put(ATTR_SYNC_PROVIDER, config.getSyncProviderId());
-		}
-		map.put(ATTR_REMOTE_CONNECTION_ID, config.getConnectionName());
-		map.put(ATTR_LOCATION, config.getLocation());
-		map.put(ATTR_REMOTE_SERVICES_ID, config.getRemoteServicesId());
-	}
-
 	// The below two functions give us an easy mechanism to store build scenario data inside build configurations
 	/**
-	 * Get simple java map of configuration data
+	 * Get the sync config name from build configuration data
 	 * 
 	 * @param config
-	 * @param storageName
-	 *            - name of storage module
-	 * 
-	 * @return values in named storage location or null if the storage location does not exist.
+	 *            build config
+	 * @return sync config name
 	 * @throws CoreException
 	 *             on problems retrieving data
 	 */
-	private static Map<String, String> getConfigData(Configuration config, String storageName) throws CoreException {
+	private static String getConfigData(Configuration config) throws CoreException {
 		ICConfigurationDescription configDesc = config.getConfigurationDescription();
 		if (configDesc == null) {
 			// Should never happen
 			throw new RuntimeException(Messages.BuildConfigurationManager_18);
 		}
 
-		Map<String, String> m = new HashMap<String, String>();
-		ICStorageElement storage = configDesc.getStorage(storageName, false);
+		ICStorageElement storage = configDesc.getStorage(SYNC_CONFIG_ID, false);
 		if (storage == null) {
 			return null;
 		}
-		for (String attr : storage.getAttributeNames()) {
-			m.put(attr, storage.getAttribute(attr));
-		}
-
-		return m;
+		return storage.getAttribute(ATTR_SYNC_CONFIG_NAME);
 	}
 
 	// Each new configuration id appends a number to the parent id. So we strip off the last id number to get the parent. We assume
@@ -255,6 +387,58 @@ public class BuildConfigUtils {
 	}
 
 	/**
+	 * Return the sync config for the passed configuration. Any newly created configurations should be recorded by the call to
+	 * "updateConfigurations." For configurations still unknown (perhaps newly created configurations not yet recorded in CDT),
+	 * return the build scenario for the closest known ancestor.
+	 * 
+	 * @param bconf
+	 *            - the build configuration - cannot be null
+	 * @return sync config or null if there are problems accessing configuration's information
+	 */
+	public static SyncConfig getSyncConfigForBuildConfiguration(IConfiguration bconf) {
+		IProject project = bconf.getOwner().getProject();
+		checkProject(project);
+		return getSyncConfigForBuildConfigurationInternal(bconf);
+	}
+
+	// Return the sync config stored for the passed id or the sync config of its nearest ancestor.
+	// Return null if not found.
+	private static SyncConfig getSyncConfigForBuildConfigurationInternal(IConfiguration bconf) {
+		IProject project = bconf.getOwner().getProject();
+		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
+		if (buildInfo == null) {
+			throw new RuntimeException(Messages.BCM_BuildInfoError + project.getName());
+		}
+
+		try {
+			IConfiguration config = bconf;
+			String configId = config.getId();
+			String syncConfigName = getConfigData((Configuration) config);
+			while (syncConfigName == null) {
+				configId = getParentId(configId);
+				if (configId == null) {
+					break;
+				}
+				config = buildInfo.getManagedProject().getConfiguration(configId);
+				syncConfigName = getConfigData((Configuration) config);
+			}
+
+			if (configId != null) {
+				SyncConfig sconf = SyncConfigManager.getConfig(project, syncConfigName);
+				if (sconf != null) {
+					return sconf;
+				}
+				Activator.log(Messages.BuildConfigurationManager_14 + configId + Messages.BuildConfigurationManager_11
+						+ project.getName());
+			}
+			return null;
+		} catch (CoreException e) {
+			Activator.log(Messages.BuildConfigurationManager_19, e);
+			return null;
+		}
+	}
+
+	/**
 	 * Get the synchronize location URI of the resource associated with the build configuration. Returns null if the configuration
 	 * does not contain synchronization information or no connection has been configured.
 	 * 
@@ -267,12 +451,12 @@ public class BuildConfigUtils {
 	 */
 	public static URI getSyncLocationURI(IConfiguration configuration, IResource resource) throws CoreException {
 		// Project checked inside this function call
-		SyncConfig scenario = getBuildScenarioForBuildConfiguration(configuration);
-		if (scenario != null) {
-			IPath path = new Path(scenario.getLocation()).append(resource.getProjectRelativePath());
+		SyncConfig config = getSyncConfigForBuildConfiguration(configuration);
+		if (config != null) {
+			IPath path = new Path(config.getLocation()).append(resource.getProjectRelativePath());
 			IRemoteConnection conn;
 			try {
-				conn = scenario.getRemoteConnection();
+				conn = config.getRemoteConnection();
 			} catch (MissingConnectionException e) {
 				return null;
 			}
@@ -283,23 +467,22 @@ public class BuildConfigUtils {
 	}
 
 	/**
-	 * Load data from a map into a new sync config
-	 * 
-	 * @param map
-	 * @return a new sync config or null if one of the values is not found or if something goes wrong while trying to find the
-	 *         specified IRemoteConnection.
+	 * Initialize sync config listeners on all synchronized CDT projects in the workspace. Should only be called on plugin startup.
 	 */
-	public static SyncConfig loadSyncConfig(Map<String, String> map, String configId) {
-		String sp = map.get(ATTR_SYNC_PROVIDER);
-		String rc = map.get(ATTR_REMOTE_CONNECTION_ID);
-		String rs = map.get(ATTR_REMOTE_SERVICES_ID);
-		String l = map.get(ATTR_LOCATION);
-		if (rc == null || l == null || rs == null) { // null is okay for sync provider
-			return null;
+	public static void initializeListeners() {
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		for (IProject project : workspace.getRoot().getProjects()) {
+			try {
+				if (project.isOpen() && project.hasNature(CProjectNature.C_NATURE_ID)
+						&& project.hasNature(RemoteSyncNature.NATURE_ID)) {
+					SyncConfigManager.addSyncConfigListener(project, fSyncConfigListener);
+				}
+			} catch (CoreException e) {
+				// Skip project
+			}
 		}
-		SyncConfig scenario = new SyncConfig(null, sp, rc, rs, l);
-		scenario.setData(configId);
-		return scenario;
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(fResourceListener,
+				IResourceChangeEvent.PRE_DELETE | IResourceChangeEvent.POST_CHANGE | IResourceChangeEvent.PRE_CLOSE);
 	}
 
 	/**
@@ -351,47 +534,16 @@ public class BuildConfigUtils {
 	}
 
 	/**
-	 * Associate the given configuration with the given build scenario.
-	 * 
-	 * @param buildScenario
-	 *            - cannot be null
-	 * @param bconf
-	 *            - the build configuration - cannot be null
-	 */
-	public static void setBuildScenarioForBuildConfiguration(SyncConfig bs, IConfiguration bconf) {
-		if (bs == null) {
-			throw new NullPointerException();
-		}
-		IProject project = bconf.getOwner().getProject();
-		checkProject(project);
-		// Update so that unknown children of the given configuration are set properly to use the previous build scenario
-		updateConfigurations(project);
-		setBuildScenarioForBuildConfigurationInternal(bs, bconf);
-	}
-
-	private static void setBuildScenarioForBuildConfigurationInternal(SyncConfig bs, IConfiguration bconf) {
-		Map<String, String> map = new HashMap<String, String>();
-		saveSyncConfig(bs, map);
-		try {
-			setConfigData((Configuration) bconf, map, configSyncDataStorageName);
-		} catch (CoreException e) {
-			Activator.log(Messages.BuildConfigurationManager_20, e);
-			return;
-		}
-	}
-
-	/**
-	 * Store a simple java map as data in a configuration.
+	 * Store the sync config name in the build configuration.
 	 * 
 	 * @param config
-	 * @param map
-	 * @param storageName
-	 *            - name of storage module
-	 * 
+	 *            build config
+	 * @param configName
+	 *            sync config name
 	 * @throws CoreException
 	 *             on problems retrieving data
 	 */
-	private static void setConfigData(Configuration config, Map<String, String> map, String storageName) throws CoreException {
+	private static void setConfigData(Configuration config, String configName) throws CoreException {
 		// The commented code gets a read-only description.
 		// ICConfigurationDescription configDesc = config.getConfigurationDescription();
 		ICProjectDescription projectDesc = CoreModel.getDefault().getProjectDescription(config.getOwner().getProject());
@@ -401,11 +553,9 @@ public class BuildConfigUtils {
 			throw new RuntimeException(Messages.BuildConfigurationManager_18);
 		}
 
-		ICStorageElement storage = configDesc.getStorage(storageName, true);
+		ICStorageElement storage = configDesc.getStorage(SYNC_CONFIG_ID, true);
 		storage.clear(); // Certain attributes can be intentionally unmapped, such as the sync provider for non-sync'ed configs.
-		for (Map.Entry<String, String> entry : map.entrySet()) {
-			storage.setAttribute(entry.getKey(), entry.getValue());
-		}
+		storage.setAttribute(ATTR_SYNC_CONFIG_NAME, configName);
 		config.setDirty(true); // Fixes case where "Workspace" configuration does not compile after project rename.
 		setProjectDescription(config.getOwner().getProject(), projectDesc);
 	}
@@ -470,193 +620,6 @@ public class BuildConfigUtils {
 		flushThread.start();
 	}
 
-	// Set all unknown configurations (those without a build scenario) to use the build scenario of their closest ancestor
-	private static void updateConfigurations(IProject project) {
-		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
-		if (buildInfo == null) {
-			throw new RuntimeException(Messages.BCM_BuildInfoError + project.getName());
-		}
-
-		IConfiguration[] allConfigs = buildInfo.getManagedProject().getConfigurations();
-		for (IConfiguration config : allConfigs) {
-			SyncConfig bs = getBuildScenarioForBuildConfigurationInternal(config);
-			if (bs.getData() == null) {
-				return; // Errors handled by prior function call
-			}
-			if (bs.getData().equals(config.getId())) {
-				continue;
-			}
-			IConfiguration parentConfig = buildInfo.getManagedProject().getConfiguration(bs.getData());
-			if (parentConfig != null) {
-				setBuildScenarioForBuildConfigurationInternal(bs, config);
-			} else {
-				Activator.log(Messages.BuildConfigurationManager_10 + bs.getData() + Messages.BuildConfigurationManager_11
-						+ project.getName());
-			}
-		}
-	}
-
-	/**
-	 * Create a configuration for the given project with the given build scenario, name, and description using the project's
-	 * default build configuration as parent.
-	 * 
-	 * @param project
-	 * @param syncConfig
-	 * @param configName
-	 * @param configDesc
-	 * @return the new configuration
-	 */
-	public static IConfiguration createConfiguration(IProject project, SyncConfig syncConfig, String configName, String configDesc) {
-		return createConfiguration(project, null, syncConfig, configName, configDesc);
-	}
-
-	/**
-	 * Create a configuration for the given project with the given build scenario, name, and description using the given build
-	 * configuration as parent.
-	 * 
-	 * @param project
-	 * @param configParent
-	 * @param syncConfig
-	 * @param configName
-	 * @param configDesc
-	 * @return the new configuration
-	 */
-	public static IConfiguration createConfiguration(IProject project, Configuration configParent, SyncConfig syncConfig,
-			String configName, String configDesc) {
-		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
-		if (buildInfo == null) {
-			throw new RuntimeException(Messages.BCM_BuildInfoError + project.getName());
-		}
-
-		// For recording of problems during attempt
-		Throwable creationException = null;
-		String creationError = null;
-		boolean configAdded = false;
-
-		ManagedProject managedProject = (ManagedProject) buildInfo.getManagedProject();
-		if (configParent == null) {
-			configParent = (Configuration) buildInfo.getDefaultConfiguration();
-		}
-		String configId = ManagedBuildManager.calculateChildId(configParent.getId(), null);
-		Configuration config = new Configuration(managedProject, configParent, configId, true, false);
-		CConfigurationData configData = config.getConfigurationData();
-		ICProjectDescription projectDes = CoreModel.getDefault().getProjectDescription(project);
-		ICConfigurationDescription configDes = null;
-		try {
-			configDes = projectDes.createConfiguration(ManagedBuildManager.CFG_DATA_PROVIDER_ID, configData);
-		} catch (WriteAccessException e) {
-			creationException = e;
-		} catch (CoreException e) {
-			creationException = e;
-		}
-
-		if (configDes != null) {
-			configAdded = true;
-			config.setConfigurationDescription(configDes);
-			configDes.setName(configName);
-			configDes.setDescription(configDesc);
-			setProjectDescription(project, projectDes);
-			setBuildScenarioForBuildConfigurationInternal(syncConfig, config);
-		} else {
-			creationError = Messages.BCM_CreateConfigError;
-		}
-
-		if (!configAdded) {
-			if (creationError == null && creationException != null) {
-				creationError = creationException.getMessage();
-			}
-			Activator.log(Messages.BCM_CreateConfigFailure + creationError, creationException);
-			return null;
-		}
-
-		return config;
-	}
-
-	/**
-	 * Create a local build configuration. The corresponding build scenario has no sync provider and points to the project's working
-	 * directory. It has a default name and description. This function is normally used as part of the setup when creating a new
-	 * project
-	 * and is of little value to most clients.
-	 * 
-	 * @param project
-	 *            The project needing a local configuration - cannot be null
-	 * @return the new configuration - can be null on problems during creation
-	 */
-	public static IConfiguration createLocalConfiguration(IProject project, String configName) {
-		checkProject(project);
-		try {
-			SyncConfig localConfig = SyncConfigManager.createLocal(project);
-			return createConfiguration(project, localConfig, configName, Messages.BCM_WorkspaceConfigDes);
-		} catch (CoreException e) {
-			Activator.log(Messages.BCM_CreateConfigFailure + e.getMessage(), e);
-		}
-
-		return null;
-	}
-
-	/**
-	 * Create a remote build configuration. This function is mainly used for internal sync purposes and is of little value to most
-	 * clients.
-	 * 
-	 * @param project
-	 *            The project needing a remote configuration - cannot be null
-	 * @param remoteBuildScenario
-	 *            Configuration's build scenario - cannot be null
-	 * @param configName
-	 *            Configuration's name
-	 * @param configDesc
-	 *            Configuration's description
-	 * @return the new configuration - can be null on problems during creation
-	 */
-	public static IConfiguration createRemoteConfiguration(IProject project, SyncConfig remoteBuildScenario, String configName,
-			String configDesc) {
-		checkProject(project);
-		return createConfiguration(project, remoteBuildScenario, configName, configDesc);
-	}
-
-	/**
-	 * Return the build scenario for the passed project (actually for the project's current active or "default" configuration)
-	 * 
-	 * @param project
-	 *            - cannot be null
-	 * @return build scenario or null if there are problems accessing configuration's information
-	 */
-	public static SyncConfig getBuildScenarioForProject(IProject project) {
-		checkProject(project);
-		IConfiguration bconf = ManagedBuildManager.getBuildInfo(project).getDefaultConfiguration();
-		return getBuildScenarioForBuildConfigurationInternal(bconf);
-	}
-
-	/**
-	 * Get a SyncRunner object that can be used to do sync'ing.
-	 * 
-	 * @param bconf
-	 * @return SyncRunner - can be null if this configuration does not require sync'ing, such as a local configuration, or if there
-	 *         are problems retrieving the sync provider or information.
-	 */
-	public SyncConfig[] getSyncronizePolicy(IProject project, SyncMode mode) {
-		checkProject(project);
-
-		List<SyncConfig> scenarios = new ArrayList<SyncConfig>();
-
-		IConfiguration[] buildConfigurations = null;
-		if (mode == SyncMode.ACTIVE) {
-			buildConfigurations = new IConfiguration[1];
-			buildConfigurations[0] = ManagedBuildManager.getBuildInfo(project).getDefaultConfiguration();
-		} else if (mode == SyncMode.ALL) {
-			buildConfigurations = ManagedBuildManager.getBuildInfo(project).getManagedProject().getConfigurations();
-		}
-
-		if (buildConfigurations != null) {
-			for (IConfiguration buildConfig : buildConfigurations) {
-				SyncConfig syncConfig = getBuildScenarioForBuildConfiguration(buildConfig);
-				scenarios.add(syncConfig);
-			}
-		}
-
-		return scenarios.toArray(new SyncConfig[0]);
-	}
-
 	/**
 	 * Set all build configurations to the passed build scenario. This is usually called as part of project creation.
 	 * 
@@ -665,8 +628,8 @@ public class BuildConfigUtils {
 	 * @param bs
 	 *            - the build scenario - cannot be null
 	 */
-	public static void setBuildScenarioForAllBuildConfigurations(IProject project, SyncConfig bs) {
-		if (bs == null) {
+	public static void setSyncConfigForAllBuildConfigurations(IProject project, SyncConfig sconf) {
+		if (sconf == null) {
 			throw new NullPointerException();
 		}
 		checkProject(project);
@@ -678,7 +641,69 @@ public class BuildConfigUtils {
 
 		IConfiguration[] allConfigs = buildInfo.getManagedProject().getConfigurations();
 		for (IConfiguration config : allConfigs) {
-			setBuildScenarioForBuildConfigurationInternal(bs, config);
+			try {
+				setConfigData((Configuration) config, sconf.getName());
+			} catch (CoreException e) {
+				Activator.log(e);
+			}
+		}
+	}
+
+	/**
+	 * Associate the given build configuration with the given sync config.
+	 * 
+	 * @param sconf
+	 *            - cannot be null
+	 * @param bconf
+	 *            - the build configuration - cannot be null
+	 */
+	public static void setSyncConfigForBuildConfiguration(SyncConfig sconf, IConfiguration bconf) {
+		if (sconf == null) {
+			throw new NullPointerException();
+		}
+		IProject project = bconf.getOwner().getProject();
+		checkProject(project);
+		// Update so that unknown children of the given configuration are set properly to use the previous build scenario
+		updateConfigurations(project);
+		try {
+			setConfigData((Configuration) bconf, sconf.getName());
+		} catch (CoreException e) {
+			Activator.log(Messages.BuildConfigurationManager_20, e);
+		}
+	}
+
+	// Set all unknown configurations (those without a sync config) to use the sync config of their closest ancestor
+	private static void updateConfigurations(IProject project) {
+		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
+		if (buildInfo == null) {
+			throw new RuntimeException(Messages.BCM_BuildInfoError + project.getName());
+		}
+
+		IConfiguration[] allConfigs = buildInfo.getManagedProject().getConfigurations();
+		for (IConfiguration config : allConfigs) {
+			String name = null;
+			try {
+				name = getConfigData((Configuration) config);
+			} catch (CoreException e) {
+				// Ignore
+			}
+			if (name == null) {
+				String parentId = getParentId(config.getId());
+				if (parentId != null) {
+					IConfiguration parentConfig = buildInfo.getManagedProject().getConfiguration(parentId);
+					if (parentConfig != null) {
+						SyncConfig sconf = getSyncConfigForBuildConfigurationInternal(parentConfig);
+						if (sconf == null) {
+							return; // Errors handled by prior function call
+						}
+						try {
+							setConfigData((Configuration) config, sconf.getName());
+						} catch (CoreException e) {
+							Activator.log(e);
+						}
+					}
+				}
+			}
 		}
 	}
 }

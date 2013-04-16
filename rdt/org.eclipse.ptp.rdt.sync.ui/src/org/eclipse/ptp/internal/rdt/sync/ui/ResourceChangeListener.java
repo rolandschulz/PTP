@@ -69,56 +69,65 @@ public class ResourceChangeListener {
 						syncOn = false;
 					}
 					SyncConfig syncConfig = SyncConfigManager.getActive(project);
-					try {
-						// Post-build event
-						// Force a sync in order to download any new remote files but no need to sync if sync'ing is disabled.
-						if (event.getType() == IResourceChangeEvent.POST_BUILD && syncConfig.isSyncOnPostBuild()) {
-							// Ignore auto builds, which are triggered for every resource change.
-							if (event.getBuildKind() == IncrementalProjectBuilder.AUTO_BUILD) {
-								continue;
+					/*
+					 * syncConfig can be null when sync nature is added to the project as this generates a resource change event
+					 */
+					if (syncConfig != null) {
+						try {
+							// Post-build event
+							// Force a sync in order to download any new remote files but no need to sync if sync'ing is disabled.
+							if (event.getType() == IResourceChangeEvent.POST_BUILD && syncConfig.isSyncOnPostBuild()) {
+								// Ignore auto builds, which are triggered for every resource change.
+								if (event.getBuildKind() == IncrementalProjectBuilder.AUTO_BUILD) {
+									continue;
+								}
+								if (!syncOn || syncMode == SyncMode.UNAVAILABLE) {
+									continue;
+								} else if (syncMode == SyncMode.ALL) {
+									SyncManager.syncAll(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(true, true));
+								} else if (syncMode == SyncMode.ACTIVE) {
+									SyncManager.sync(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(true, true));
+								}
 							}
-							if (!syncOn || syncMode == SyncMode.UNAVAILABLE) {
-								continue;
-							} else if (syncMode == SyncMode.ALL) {
-								SyncManager.syncAll(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(true, true));
-							} else if (syncMode == SyncMode.ACTIVE) {
-								SyncManager.sync(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(true, true));
+							// Pre-build event
+							// Force a sync in order to download any new remote files but no need to sync if sync'ing is disabled.
+							else if (event.getType() == IResourceChangeEvent.PRE_BUILD && syncConfig.isSyncOnPreBuild()) {
+								// Ignore auto builds, which are triggered for every resource change.
+								if (event.getBuildKind() == IncrementalProjectBuilder.AUTO_BUILD) {
+									continue;
+								}
+								if (!syncOn || syncMode == SyncMode.UNAVAILABLE) {
+									continue;
+								} else if (syncMode == SyncMode.ALL) {
+									SyncManager.syncAll(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(true, true));
+								} else if (syncMode == SyncMode.ACTIVE) {
+									SyncManager.sync(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(true, true));
+								}
 							}
+							// Post-change event
+							// Sync on all CHANGED events
+							else if (delta.getKind() == IResourceDelta.CHANGED && syncConfig.isSyncOnSave()) {
+								// Do a non-forced sync to update any changes reported in delta. Sync'ing is necessary even if user
+								// has
+								// turned it off. This allows for some bookkeeping but no files are transferred.
+								if (syncMode == SyncMode.UNAVAILABLE) {
+									continue;
+								} else if (!syncOn) {
+									SyncManager.sync(delta, project, SyncFlag.NO_SYNC, null);
+								} else if (syncMode == SyncMode.ALL) {
+									SyncManager.syncAll(delta, project, SyncFlag.NO_FORCE, new CommonSyncExceptionHandler(true,
+											false));
+								} else if (syncMode == SyncMode.ACTIVE) {
+									SyncManager
+											.sync(delta, project, SyncFlag.NO_FORCE, new CommonSyncExceptionHandler(true, false));
+								}
+							}
+						} catch (CoreException e) {
+							// This should never happen because only a blocking sync can throw a core exception, and all syncs here
+							// are
+							// non-blocking.
+							RDTSyncUIPlugin.log(Messages.ResourceChangeListener_0, e);
 						}
-						// Pre-build event
-						// Force a sync in order to download any new remote files but no need to sync if sync'ing is disabled.
-						else if (event.getType() == IResourceChangeEvent.PRE_BUILD && syncConfig.isSyncOnPreBuild()) {
-							// Ignore auto builds, which are triggered for every resource change.
-							if (event.getBuildKind() == IncrementalProjectBuilder.AUTO_BUILD) {
-								continue;
-							}
-							if (!syncOn || syncMode == SyncMode.UNAVAILABLE) {
-								continue;
-							} else if (syncMode == SyncMode.ALL) {
-								SyncManager.syncAll(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(true, true));
-							} else if (syncMode == SyncMode.ACTIVE) {
-								SyncManager.sync(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(true, true));
-							}
-						}
-						// Post-change event
-						// Sync on all CHANGED events
-						else if (delta.getKind() == IResourceDelta.CHANGED && syncConfig.isSyncOnSave()) {
-							// Do a non-forced sync to update any changes reported in delta. Sync'ing is necessary even if user has
-							// turned it off. This allows for some bookkeeping but no files are transferred.
-							if (syncMode == SyncMode.UNAVAILABLE) {
-								continue;
-							} else if (!syncOn) {
-								SyncManager.sync(delta, project, SyncFlag.NO_SYNC, null);
-							} else if (syncMode == SyncMode.ALL) {
-								SyncManager.syncAll(delta, project, SyncFlag.NO_FORCE, new CommonSyncExceptionHandler(true, false));
-							} else if (syncMode == SyncMode.ACTIVE) {
-								SyncManager.sync(delta, project, SyncFlag.NO_FORCE, new CommonSyncExceptionHandler(true, false));
-							}
-						}
-					} catch (CoreException e) {
-						// This should never happen because only a blocking sync can throw a core exception, and all syncs here are
-						// non-blocking.
-						RDTSyncUIPlugin.log(Messages.ResourceChangeListener_0, e);
 					}
 				}
 			}

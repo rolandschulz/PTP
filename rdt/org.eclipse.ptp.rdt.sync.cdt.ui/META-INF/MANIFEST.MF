@@ -14,18 +14,13 @@ Require-Bundle: org.eclipse.cdt.core,
  org.eclipse.cdt.managedbuilder.ui,
  org.eclipse.ptp.remote.core,
  org.eclipse.ptp.remote.ui,
- org.eclipse.ptp.services.core,
+ org.eclipse.ptp.rdt.sync.ui,
  org.eclipse.ptp.rdt.sync.core,
  org.eclipse.ptp.ems.core,
  org.eclipse.ptp.ems.ui,
- org.eclipse.ptp.rdt.sync.ui,
  org.eclipse.ptp.rdt.sync.cdt.core
 Bundle-Localization: plugin
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.eclipse.ptp.internal.rdt.sync.cdt.ui.Activator
 Bundle-Vendor: %providerName
 Export-Package: org.eclipse.ptp.internal.rdt.sync.cdt.ui.wizards;x-friends:="org.eclipse.ptp.rdt.sync.fortran.ui"
-Import-Package: org.eclipse.compare,
- org.eclipse.compare.structuremergeviewer,
- org.eclipse.core.filesystem,
- org.eclipse.team.ui.synchronize
