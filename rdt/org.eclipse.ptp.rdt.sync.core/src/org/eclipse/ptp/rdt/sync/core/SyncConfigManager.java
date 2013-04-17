@@ -56,8 +56,8 @@ public class SyncConfigManager {
 	private static final String SYNC_ON_POSTBUILD_ELEMENT = "sync-on-postbuild"; //$NON-NLS-1$
 	private static final String SYNC_ON_SAVE_ELEMENT = "sync-on-save"; //$NON-NLS-1$
 
-	private static final Map<IProject, ListenerList> fSyncConfigListenerMap = Collections
-			.synchronizedMap(new HashMap<IProject, ListenerList>());
+	private static final Map<String, ListenerList> fSyncConfigListenerMap = Collections
+			.synchronizedMap(new HashMap<String, ListenerList>());
 	private static final Map<IProject, SyncConfig> fActiveSyncConfigMap = Collections
 			.synchronizedMap(new HashMap<IProject, SyncConfig>());
 	private static final Map<IProject, Map<String, SyncConfig>> fSyncConfigMap = Collections
@@ -83,18 +83,18 @@ public class SyncConfigManager {
 	}
 
 	/**
-	 * Register to receive sync configuration events
+	 * Register to receive sync configuration events.
 	 * 
-	 * @param project
-	 *            project on which to monitor changes
+	 * @param natureId
+	 *            project nature ID of projects to notify of changes
 	 * @param listener
 	 *            listener to receive events
 	 */
-	public static void addSyncConfigListener(IProject project, ISyncConfigListener listener) {
-		ListenerList list = fSyncConfigListenerMap.get(project);
+	public static void addSyncConfigListener(String natureId, ISyncConfigListener listener) {
+		ListenerList list = fSyncConfigListenerMap.get(natureId);
 		if (list == null) {
 			list = new ListenerList();
-			fSyncConfigListenerMap.put(project, list);
+			fSyncConfigListenerMap.put(natureId, list);
 		}
 		list.add(listener);
 	}
@@ -143,32 +143,23 @@ public class SyncConfigManager {
 	}
 
 	private static void fireSyncConfigAdded(IProject project, SyncConfig config) {
-		ListenerList list = fSyncConfigListenerMap.get(project);
-		if (list != null) {
-			for (Object obj : list.getListeners()) {
-				ISyncConfigListener listener = (ISyncConfigListener) obj;
-				listener.configAdded(project, config);
-			}
+		for (Object obj : getListenersFor(project).getListeners()) {
+			ISyncConfigListener listener = (ISyncConfigListener) obj;
+			listener.configAdded(project, config);
 		}
 	}
 
 	private static void fireSyncConfigRemoved(IProject project, SyncConfig config) {
-		ListenerList list = fSyncConfigListenerMap.get(project);
-		if (list != null) {
-			for (Object obj : list.getListeners()) {
-				ISyncConfigListener listener = (ISyncConfigListener) obj;
-				listener.configRemoved(project, config);
-			}
+		for (Object obj : getListenersFor(project).getListeners()) {
+			ISyncConfigListener listener = (ISyncConfigListener) obj;
+			listener.configRemoved(project, config);
 		}
 	}
 
 	private static void fireSyncConfigSelected(IProject project, SyncConfig newConfig, SyncConfig oldConfig) {
-		ListenerList list = fSyncConfigListenerMap.get(project);
-		if (list != null) {
-			for (Object obj : list.getListeners()) {
-				ISyncConfigListener listener = (ISyncConfigListener) obj;
-				listener.configSelected(project, newConfig, oldConfig);
-			}
+		for (Object obj : getListenersFor(project).getListeners()) {
+			ISyncConfigListener listener = (ISyncConfigListener) obj;
+			listener.configSelected(project, newConfig, oldConfig);
 		}
 	}
 
@@ -246,6 +237,22 @@ public class SyncConfigManager {
 			RDTSyncCorePlugin.log(e);
 		}
 		return new SyncConfig[0];
+	}
+
+	private static ListenerList getListenersFor(IProject project) {
+		ListenerList listeners = new ListenerList();
+		for (String nature : fSyncConfigListenerMap.keySet()) {
+			try {
+				if (project.hasNature(nature)) {
+					for (Object listener : fSyncConfigListenerMap.get(nature).getListeners()) {
+						listeners.add(listener);
+					}
+				}
+			} catch (CoreException e) {
+				// Ignore
+			}
+		}
+		return listeners;
 	}
 
 	/**
@@ -354,11 +361,11 @@ public class SyncConfigManager {
 	/**
 	 * Remove the listener for sync config events
 	 * 
-	 * @param project
+	 * @param natureId
 	 * @param listener
 	 */
-	public static void removeSyncConfigListener(IProject project, ISyncConfigListener listener) {
-		ListenerList list = fSyncConfigListenerMap.get(project);
+	public static void removeSyncConfigListener(String natureId, ISyncConfigListener listener) {
+		ListenerList list = fSyncConfigListenerMap.get(natureId);
 		if (list != null) {
 			list.remove(listener);
 		}
@@ -441,5 +448,8 @@ public class SyncConfigManager {
 		} catch (CoreException e) {
 			RDTSyncCorePlugin.log(e);
 		}
+	}
+
+	private SyncConfigManager() {
 	}
 }

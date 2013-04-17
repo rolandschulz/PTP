@@ -29,10 +29,6 @@ import org.eclipse.cdt.managedbuilder.internal.core.Configuration;
 import org.eclipse.cdt.managedbuilder.internal.core.ManagedProject;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceChangeEvent;
-import org.eclipse.core.resources.IResourceChangeListener;
-import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -84,51 +80,6 @@ public class BuildConfigUtils {
 
 		}
 
-	};
-
-	/**
-	 * Use resource listener to remove sync config listener when project is deleted
-	 */
-	private static IResourceChangeListener fResourceListener = new IResourceChangeListener() {
-		@Override
-		public void resourceChanged(IResourceChangeEvent event) {
-			switch (event.getType()) {
-			case IResourceChangeEvent.PRE_DELETE:
-			case IResourceChangeEvent.PRE_CLOSE:
-				IResource resource = event.getResource();
-				if (resource instanceof IProject) {
-					IProject project = (IProject) resource;
-					SyncConfigManager.removeSyncConfigListener(project, fSyncConfigListener);
-				}
-				break;
-
-			case IResourceChangeEvent.POST_CHANGE:
-				IResourceDelta delta = event.getDelta();
-				if (delta != null) {
-					try {
-						delta.accept(new IResourceDeltaVisitor() {
-							@Override
-							public boolean visit(IResourceDelta delta) throws CoreException {
-								IResource resource = delta.getResource();
-								if (resource instanceof IProject) {
-									IProject project = (IProject) resource;
-									if ((delta.getFlags() & IResourceDelta.OPEN) != 0) {
-										if (project.isOpen()) {
-											SyncConfigManager.addSyncConfigListener(project, fSyncConfigListener);
-										}
-										return false;
-									}
-								}
-								return true;
-							}
-						});
-					} catch (CoreException e) {
-						Activator.log(e);
-					}
-				}
-				break;
-			}
-		}
 	};
 
 	// Run standard checks on project and throw the appropriate exception if it is not valid
@@ -270,18 +221,7 @@ public class BuildConfigUtils {
 	 * Remove sync config listeners on all synchronized CDT projects in the workspace. Should only be called on plugin shutdown.
 	 */
 	public static void finalizeListeners() {
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		for (IProject project : workspace.getRoot().getProjects()) {
-			try {
-				if (project.isOpen() && project.hasNature(CProjectNature.C_NATURE_ID)
-						&& project.hasNature(RemoteSyncNature.NATURE_ID)) {
-					SyncConfigManager.removeSyncConfigListener(project, fSyncConfigListener);
-				}
-			} catch (CoreException e) {
-				// Skip project
-			}
-		}
-		ResourcesPlugin.getWorkspace().removeResourceChangeListener(fResourceListener);
+		SyncConfigManager.removeSyncConfigListener(CProjectNature.C_NATURE_ID, fSyncConfigListener);
 	}
 
 	/**
@@ -470,19 +410,7 @@ public class BuildConfigUtils {
 	 * Initialize sync config listeners on all synchronized CDT projects in the workspace. Should only be called on plugin startup.
 	 */
 	public static void initializeListeners() {
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		for (IProject project : workspace.getRoot().getProjects()) {
-			try {
-				if (project.isOpen() && project.hasNature(CProjectNature.C_NATURE_ID)
-						&& project.hasNature(RemoteSyncNature.NATURE_ID)) {
-					SyncConfigManager.addSyncConfigListener(project, fSyncConfigListener);
-				}
-			} catch (CoreException e) {
-				// Skip project
-			}
-		}
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(fResourceListener,
-				IResourceChangeEvent.PRE_DELETE | IResourceChangeEvent.POST_CHANGE | IResourceChangeEvent.PRE_CLOSE);
+		SyncConfigManager.addSyncConfigListener(CProjectNature.C_NATURE_ID, fSyncConfigListener);
 	}
 
 	/**
