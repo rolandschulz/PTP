@@ -22,7 +22,10 @@ import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
 import org.eclipse.ptp.core.util.LaunchUtils;
+import org.eclipse.ptp.etfw.Activator;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
+import org.eclipse.ptp.etfw.PreferenceConstants;
+import org.eclipse.ptp.etfw.Preferences;
 import org.eclipse.ptp.etfw.jaxb.JAXBInitializationUtil;
 import org.eclipse.ptp.etfw.jaxb.data.BuildToolType;
 import org.eclipse.ptp.etfw.jaxb.data.EtfwToolProcessType;
@@ -90,14 +93,11 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 	private Composite topComposite;
 	private Composite toolComposite;
 	private Composite bottomComposite;
-	private Combo etfwCombo;
 	private Combo toolCombo;
 	private Label selectToolLbl;
 	private Button buildOnlyCheck;
 	private Button analyzeonlyCheck;
 	private String controlId;
-	private Button addWorkflowButton;
-	private Button removeWorkflowButton;
 	// I believe this should be part of the launchTabParent, but there is RM specifics that must be removed
 	private final LinkedList<IJAXBLaunchConfigurationTab> tabControllers = new LinkedList<IJAXBLaunchConfigurationTab>();
 	private final ContentsChangedListener launchContentsChangedListener = new ContentsChangedListener();
@@ -131,28 +131,6 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 		topComposite.setLayout(new GridLayout(2, false));
 		topComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
-		Label whichETFWLbl = new Label(topComposite, SWT.NONE);
-		whichETFWLbl.setText(IETFWLaunchConfigurationConstants.ETFW_VERSION);
-
-		etfwCombo = new Combo(topComposite, SWT.READ_ONLY);
-		etfwCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		etfwCombo.setItems(new String[] { IETFWLaunchConfigurationConstants.SAX_PARSER,
-				IETFWLaunchConfigurationConstants.JAXB_PARSER });
-		etfwCombo.select(1);
-		etfwCombo.addSelectionListener(new SelectionAdapter() {
-
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				if (etfwCombo.getSelectionIndex() == 0) {
-					buildSAXParserETFW();
-				} else {
-					buildJAXBParserETFW();
-				}
-			}
-		});
-
-		buildNewETFW();
-
 		toolComposite = new Composite(content, SWT.NONE);
 		toolComposite.setLayout(new FillLayout());
 		toolComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -166,64 +144,41 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 
 		analyzeonlyCheck = new Button(bottomComposite, SWT.CHECK);
 		analyzeonlyCheck.setText(Messages.PerformanceAnalysisTab_SelectExistingPerfData);
+
+		String parser = Preferences.getString(Activator.PLUGIN_ID, PreferenceConstants.ETFW_VERSION);
+		if (parser.equals(IToolLaunchConfigurationConstants.USE_SAX_PARSER)) {
+			buildSAXParserUI();
+		} else {
+			buildJAXBParserUI();
+		}
 	}
 
-	private void buildNewETFW() {
-		clearOldWidgets();
+	private void buildSAXParserUI() {
+		bottomComposite.setVisible(false);
 
+		saxETFWTab = new ExternalToolSelectionTab(true);
+		saxETFWTab.createControl(toolComposite);
+		saxETFWTab.setLaunchConfigurationDialog(this.getLaunchConfigurationDialog());
+
+		toolComposite.getParent().layout();
+		toolComposite.layout();
+	}
+
+	private void buildJAXBParserUI() {
 		selectToolLbl = new Label(topComposite, SWT.NONE);
-		selectToolLbl.setText("Select tool: "); //$NON-NLS-1$
+		selectToolLbl.setText(Messages.PerformanceAnalysisTab_SelectTool);
 
 		toolCombo = new Combo(topComposite, SWT.READ_ONLY);
 		toolCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		String[] toolNames = JAXBExtensionUtils.getToolNames();
+		toolCombo.add(Messages.PerformanceAnalysisTab_PleaseSelectWorkflow);
+
 		for (String name : toolNames) {
 			toolCombo.add(name);
 		}
 
 		toolCombo.addSelectionListener(listener);
-
-		addWorkflowButton = new Button(topComposite, SWT.PUSH);
-		addWorkflowButton.setText("Add Workflow"); //$NON-NLS-1$
-
-		removeWorkflowButton = new Button(topComposite, SWT.PUSH);
-		removeWorkflowButton.setText("Remove Workflow"); //$NON-NLS-1$
-	}
-
-	private void buildJAXBParserETFW() {
-		buildNewETFW();
-		bottomComposite.setVisible(true);
-		String toolName;
-		try {
-			toolName = this.launchConfiguration.getAttribute("selected_performance_tool", ""); //$NON-NLS-1$ //$NON-NLS-2$
-			if (!toolName.isEmpty()) {
-				for (int index = 0; index < toolCombo.getItemCount(); index++) {
-					if (toolCombo.getItem(index).equals(toolName)) {
-						toolCombo.select(index);
-						toolCombo.notifyListeners(SWT.Selection, null);
-						break;
-					}
-
-				}
-			}
-		} catch (CoreException e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	private void buildSAXParserETFW() {
-		for (Control child : toolComposite.getChildren()) {
-			child.dispose();
-		}
-
-		clearOldWidgets();
-		bottomComposite.setVisible(false);
-
-		saxETFWTab = new ExternalToolSelectionTab(true);
-		saxETFWTab.createControl(toolComposite);
-		saxETFWTab.initializeFrom(this.launchConfiguration);
-		saxETFWTab.setLaunchConfigurationDialog(this.getLaunchConfigurationDialog());
+		toolCombo.select(0);
 
 		toolComposite.getParent().layout();
 		topComposite.layout();
@@ -269,6 +224,11 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 	}
 
 	private void rebuildTab(String toolName) {
+		if (toolName.equals(Messages.PerformanceAnalysisTab_PleaseSelectWorkflow)) {
+			clearOldWidgets();
+			return;
+		}
+
 		etfwTool = JAXBExtensionUtils.getTool(toolName);
 		vmap = new ETFWVariableMap();
 
@@ -441,8 +401,29 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 	}
 
 	@Override
-	public void initializeFrom(ILaunchConfiguration configuration) {
+	public void activated(ILaunchConfigurationWorkingCopy configuration) {
+		super.activated(configuration);
 
+		if (toolCombo != null) {
+			try {
+				String toolName = configuration.getAttribute(IToolLaunchConfigurationConstants.SELECTED_TOOL,
+						IToolLaunchConfigurationConstants.EMPTY_STRING);
+				for (int index = 0; index < toolCombo.getItemCount(); index++) {
+					if (toolCombo.getItem(index).equals(toolName)) {
+						toolCombo.select(index);
+						toolCombo.notifyListeners(SWT.Selection, null);
+						break;
+					}
+				}
+
+			} catch (CoreException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	@Override
+	public void initializeFrom(ILaunchConfiguration configuration) {
 		launchConfiguration = configuration;
 		final String rmType = LaunchUtils.getTemplateName(configuration);
 		final String remId = LaunchUtils.getRemoteServicesId(configuration);
@@ -452,23 +433,12 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 			if (controller != null) {
 				controlId = controller.getControlId();
 
-				String toolName = configuration.getAttribute(IToolLaunchConfigurationConstants.SELECTED_TOOL,
-						IToolLaunchConfigurationConstants.EMPTY_STRING);
-				if (!toolName.isEmpty()) {
-					if (etfwCombo.getSelectionIndex() == 1) {
-
-						for (int index = 0; index < toolCombo.getItemCount(); index++) {
-							if (toolCombo.getItem(index).equals(toolName)) {
-								toolCombo.select(index);
-								toolCombo.notifyListeners(SWT.Selection, null);
-								break;
-							}
-
-						}
-					}
-
+				String parser = Preferences.getString(Activator.PLUGIN_ID, PreferenceConstants.ETFW_VERSION);
+				if (parser.equals(IToolLaunchConfigurationConstants.USE_SAX_PARSER)) {
+					saxETFWTab.initializeFrom(configuration);
 				}
 			}
+
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
@@ -476,15 +446,12 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 
 	@Override
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-
-		if (etfwCombo.getSelectionIndex() == 0) {
-			configuration.setAttribute(IToolLaunchConfigurationConstants.ETFW_VERSION,
-					IToolLaunchConfigurationConstants.USE_SAX_PARSER);
+		String parser = Preferences.getString(Activator.PLUGIN_ID, PreferenceConstants.ETFW_VERSION);
+		configuration.setAttribute(IToolLaunchConfigurationConstants.ETFW_VERSION, parser);
+		if (parser.equals(IToolLaunchConfigurationConstants.USE_SAX_PARSER)) {
 			saxETFWTab.performApply(configuration);
 		} else {
-			configuration.setAttribute(IToolLaunchConfigurationConstants.ETFW_VERSION,
-					IToolLaunchConfigurationConstants.USE_JAXB_PARSER);
-			if (toolCombo.getSelectionIndex() != -1) {
+			if (toolCombo.getSelectionIndex() > 0) {
 				String selectedtool = toolCombo.getItem(toolCombo.getSelectionIndex());
 				configuration.setAttribute(SELECTED_TOOL, selectedtool);
 
@@ -492,6 +459,10 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 				configuration.setAttribute(ANALYZEONLY, analyzeonlyCheck.getSelection());
 
 				Iterator<String> iterator = launchTabParent.getVariableMap().getAttributes().keySet().iterator();
+
+				launchTabParent.performApply(configuration);
+
+				// TODO the above performApply should update the attribute map, but it doesn't right now so it is handled below
 				while (iterator.hasNext()) {
 					String attribute = iterator.next();
 					String name = attribute;
@@ -501,13 +472,12 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 						// Check to see if the variable is part of ETFw
 						AttributeType temp = vmap.getAttributes().get(name);
 						if (temp != null) {
-							if (isWidgetEnabled(temp.getName())) {
+							if (isWidgetEnabled(temp.getName()) && temp.isVisible()) {
 								String attType = temp.getType();
 
 								// If boolean is translated to a string, insert the string into the launch configuration
 								String translateBoolean = vmap.getAttributes().get(name).getTranslateBooleanAs();
-								Object value = launchTabParent.getVariableMap().getValue(name);// att.getValue();
-
+								Object value = launchTabParent.getVariableMap().getValue(name);
 								if (attType.equals("boolean")) { //$NON-NLS-1$
 									if (translateBoolean != null) {
 										configuration.setAttribute(attribute, value.toString());
@@ -527,16 +497,22 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 						}
 					}
 				}
+
 			}
 		}
 	}
 
 	protected class WidgetListener extends SelectionAdapter {
+		private String prevToolName;
+
 		@Override
 		public void widgetSelected(SelectionEvent e) {
 			int selection = toolCombo.getSelectionIndex();
 			String toolName = toolCombo.getItem(selection);
-			rebuildTab(toolName);
+			if (!toolName.equals(prevToolName)) {
+				prevToolName = toolName;
+				rebuildTab(toolName);
+			}
 
 			updateLaunchConfigurationDialog();
 		}
@@ -544,11 +520,8 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 	}
 
 	private void clearOldWidgets() {
-		if (selectToolLbl != null) {
-			selectToolLbl.dispose();
-			toolCombo.dispose();
-			addWorkflowButton.dispose();
-			removeWorkflowButton.dispose();
+		for (Control child : toolComposite.getChildren()) {
+			child.dispose();
 		}
 	}
 
@@ -557,7 +530,7 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 	 */
 	@Override
 	public String getName() {
-		return "Performance Analysis"; //$NON-NLS-1$
+		return Messages.PerformanceAnalysisTab_Tab_Name;
 	}
 
 	@Override
@@ -576,7 +549,13 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 	@Override
 	public boolean isValid(ILaunchConfiguration configuration) {
 		setErrorMessage(null);
-		if (launchTabParent != null) {
+		if (toolCombo != null) {
+			if (toolCombo.getSelectionIndex() == 0) {
+				setErrorMessage(Messages.PerformanceAnalysisTab_NoWorkflowSelected);
+				return false;
+			}
+		}
+		else if (launchTabParent != null) {
 			String error = launchTabParent.getUpdateHandler().getFirstError();
 			if (error != null) {
 				setErrorMessage(error);

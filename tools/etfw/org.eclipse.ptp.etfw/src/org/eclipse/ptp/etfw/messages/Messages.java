@@ -75,10 +75,12 @@ public class Messages extends NLS {
 	public static String ParametricParameterTab_SelectPerfExScript;
 	public static String ParametricParameterTab_Values;
 	public static String ExternalToolPreferencePage_Add;
+	public static String ExternalToolPreferencePage_ETFW_PARSER;
 	public static String ExternalToolPreferencePage_ExToolConf;
 	public static String ExternalToolPreferencePage_Remove;
 	public static String ExternalToolPreferencePage_SelectToolDefXML;
 	public static String ExternalToolPreferencePage_ToolDefFile;
+	public static String ExternalToolPreferencePage_ToolParser;
 	public static String ToolLocationPreferencePage_BinDir;
 	public static String ToolLocationPreferencePage_BinDirectory;
 	public static String ToolLocationPreferencePage_Browse;

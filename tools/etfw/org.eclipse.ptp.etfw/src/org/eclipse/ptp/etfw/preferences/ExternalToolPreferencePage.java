@@ -34,8 +34,10 @@ import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.etfw.Activator;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
+import org.eclipse.ptp.etfw.PreferenceConstants;
 import org.eclipse.ptp.etfw.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -45,6 +47,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.FileDialog;
@@ -61,13 +64,14 @@ import org.osgi.service.prefs.BackingStoreException;
  * critical of these
  * 
  * @author wspear
- * 
+ * @author "Chris Navarro" - ETFW JAXB Preferences
  */
 public class ExternalToolPreferencePage extends PreferencePage implements IWorkbenchPreferencePage,
 		IToolLaunchConfigurationConstants {
 	protected List XMLLocs = null;
 	protected Button browseXMLButton = null;
 	protected Button removeItemButton = null;
+	protected Combo parser = null;
 
 	// protected Button checkAutoOpts=null;
 	// protected Button checkAixOpts=null;
@@ -111,10 +115,31 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 		composite.setLayout(createGridLayout(1, true, 0, 0));
 		composite.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
 
+		createParserSelection(composite);
 		createTauConf(composite);
 		loadSaved();
 		defaultSetting();
 		return composite;
+	}
+
+	private void createParserSelection(Composite parent) {
+		Group group = new Group(parent, SWT.SHADOW_ETCHED_IN);
+		group.setLayout(createGridLayout(1, true, 10, 10));
+		group.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
+		group.setText(Messages.ExternalToolPreferencePage_ToolParser);
+
+		Composite content = new Composite(group, SWT.NONE);
+		content.setLayout(createGridLayout(2, false, 0, 0));
+		content.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, SWT.WRAP));
+
+		Label parserLbl = new Label(content, SWT.NONE);
+		parserLbl.setText(Messages.ExternalToolPreferencePage_ETFW_PARSER);
+
+		parser = new Combo(content, SWT.READ_ONLY);
+		parser.add(USE_SAX_PARSER);
+		parser.add(USE_JAXB_PARSER);
+		// Text parser = new Text(content, SWT.BORDER);
+		// parser.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 1));
 	}
 
 	/**
@@ -191,10 +216,14 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 				// TODO Auto-generated catch block
 
 				path = EFS.getLocalFileSystem().getStore(new Path(correctPath));
-				//e.printStackTrace();
+				// e.printStackTrace();
 			}
-			if (path!=null&&path.fetchInfo().exists())
-				dialog.setFilterPath(!path.fetchInfo().isDirectory() ? correctPath : path.getParent().toURI().getPath()); //TODO: This may be bad
+			if (path != null && path.fetchInfo().exists())
+				dialog.setFilterPath(!path.fetchInfo().isDirectory() ? correctPath : path.getParent().toURI().getPath()); // TODO:
+																															// This
+																															// may
+																															// be
+																															// bad
 		}
 
 		// String tlpath = correctPath+File.separator+"lib";
@@ -215,7 +244,7 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 		String out = getFieldContent(dialog.open());
 
 		if (out != null) {
-			IFileStore test = EFS.getLocalFileSystem().getStore(new Path(out));//new IFFile(out);
+			IFileStore test = EFS.getLocalFileSystem().getStore(new Path(out));// new IFFile(out);
 			if (test.fetchInfo().exists() && !test.fetchInfo().isDirectory()) {
 				XMLLocs.add(out);
 			} else {
@@ -247,14 +276,22 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 	}
 
 	private void loadSaved() {
-		
-		//Preferences preferences = Activator.getDefault().getPluginPreferences();
+
+		// Preferences preferences = Activator.getDefault().getPluginPreferences();
 		IPreferencesService service = Platform.getPreferencesService();
-		String fiList = service.getString(Activator.PLUGIN_ID, XMLLOCID, "", null);//.getString(XMLLOCID);
+		String fiList = service.getString(Activator.PLUGIN_ID, XMLLOCID, EMPTY_STRING, null);// .getString(XMLLOCID);
 
 		String[] files = fiList.split(",,,"); //$NON-NLS-1$
 		for (String s : files) {
 			XMLLocs.add(s);// setText(preferences.getString(XMLLOCID));
+		}
+
+		String etfwVersion = Preferences.getString(Activator.PLUGIN_ID, PreferenceConstants.ETFW_VERSION);
+		for (int index = 0; index < parser.getItemCount(); index++) {
+			if (parser.getItem(index).equals(etfwVersion)) {
+				parser.select(index);
+				break;
+			}
 		}
 		// TODO: Add checks
 		// checkAutoOpts.setSelection(preferences.getBoolean(ITAULaunchConfigurationConstants.TAU_CHECK_AUTO_OPT));
@@ -262,12 +299,12 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 		// checkAixOpts.setSelection(preferences.getBoolean(ITAULaunchConfigurationConstants.TAU_CHECK_AIX_OPT));
 	}
 
+	@Override
 	public boolean performOk() {
-		 //Activator.getDefault().getPluginPreferences();
+		// Activator.getDefault().getPluginPreferences();
 
-		
 		IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
-		
+
 		String fiList = ""; //$NON-NLS-1$
 
 		for (int i = 0; i < XMLLocs.getItemCount(); i++) {
@@ -284,6 +321,8 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 			e.printStackTrace();
 		}
 		Activator.getDefault().refreshTools();
+
+		Preferences.setString(Activator.PLUGIN_ID, PreferenceConstants.ETFW_VERSION, parser.getItem(parser.getSelectionIndex()));
 		// TODO: Add checks
 		// preferences.setValue(ITAULaunchConfigurationConstants.TAU_CHECK_AUTO_OPT,
 		// checkAutoOpts.getSelection());
@@ -313,10 +352,12 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 	protected void defaultSetting() {
 	}
 
+	@Override
 	public void dispose() {
 		super.dispose();
 	}
 
+	@Override
 	public void performDefaults() {
 		defaultSetting();
 		updateApplyButton();

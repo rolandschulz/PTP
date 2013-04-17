@@ -72,4 +72,10 @@
           type="org.eclipse.cdt.launch.applicationLaunchType">
     </launchDelegate>
  </extension>
+ <extension
+       point="org.eclipse.core.runtime.preferences">
+    <initializer
+          class="org.eclipse.ptp.etfw.internal.PreferenceInitializer">
+    </initializer>
+ </extension>
 </plugin>
