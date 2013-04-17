@@ -80,11 +80,13 @@
 		<module>rdt/org.eclipse.ptp.rdt.managedbuilder.xlc.ui</module>
 		<module>rdt/org.eclipse.ptp.rdt.managedbuilder.xlupc.ui</module>
 		<module>rdt/org.eclipse.ptp.rdt.server.dstore</module>
+		<module>rdt/org.eclipse.ptp.rdt.sync.cdt.core</module>
+		<module>rdt/org.eclipse.ptp.rdt.sync.cdt.ui</module>
 		<module>rdt/org.eclipse.ptp.rdt.sync.core</module>
 		<module>rdt/org.eclipse.ptp.rdt.sync.git.core</module>
 		<module>rdt/org.eclipse.ptp.rdt.sync.git.ui</module>
 		<module>rdt/org.eclipse.ptp.rdt.sync.ui</module>
-		<module>rdt/org.eclipse.ptp.rdt.sync.ui.fortran</module>
+		<module>rdt/org.eclipse.ptp.rdt.sync.fortran.ui</module>
 		<module>rdt/org.eclipse.ptp.rdt.ui</module>
 		<module>rdt/org.eclipse.ptp.rdt.xlc</module>
 		<module>releng/org.eclipse.ptp</module>

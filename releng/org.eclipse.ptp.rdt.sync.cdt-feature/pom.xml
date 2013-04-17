@@ -10,7 +10,7 @@
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
-  <artifactId>org.eclipse.ptp.rdt.sync</artifactId>
+  <artifactId>org.eclipse.ptp.rdt.sync.cdt</artifactId>
   <version>7.0.0-SNAPSHOT</version>
   <packaging>eclipse-feature</packaging>
   <groupId>org.eclipse.ptp.features</groupId>
