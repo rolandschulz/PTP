@@ -36,7 +36,7 @@ public class ToolPaneTypeUtil {
 			Iterator<?> iterator = configuration.getAttributes().keySet().iterator();
 			while (iterator.hasNext()) {
 				String key = iterator.next().toString();
-				if (key.startsWith(attributeKey)) {
+				if (key.startsWith(attributeKey) && !key.endsWith(ETFWCoreConstants.PAIRED_ATTRIBUTE_SAVED)) {
 					String value = JAXBCoreConstants.ZEROSTR;
 					try {
 						// Try string attribute
