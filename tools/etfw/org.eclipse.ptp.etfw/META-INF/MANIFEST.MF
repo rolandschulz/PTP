@@ -29,5 +29,5 @@ Bundle-ActivationPolicy: lazy
 Bundle-Vendor: %pluginProvider
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: org.eclipse.ptp.etfw,
- org.eclipse.ptp.etfw.internal;x-friends:="org.eclipse.ptp.etfw.tau,org.eclipse.ptp.etfw.tau.perfdmf",
+ org.eclipse.ptp.etfw.internal;x-friends:="org.eclipse.ptp.etfw.tau,org.eclipse.ptp.etfw.tau.perfdmf,org.eclipse.ptp.etfw.tau.ui",
  org.eclipse.ptp.etfw.ui;x-friends:="org.eclipse.ptp.etfw.tau,org.eclipse.ptp.etfw.launch"

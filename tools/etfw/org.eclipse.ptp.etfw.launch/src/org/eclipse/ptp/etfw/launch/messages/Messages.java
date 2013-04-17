@@ -7,7 +7,13 @@ public class Messages extends NLS {
 	public static String ETFWToolTabBuilder_ToggleShowHideSelectedAttributes;
 	public static String ETFWVariableResolver_DE_REF_ERROR;
 	public static String PerformanceAnalysisTab_BuildInstrumentedExecutable;
+	public static String PerformanceAnalysisTab_NoWorkflowSelected;
+	public static String PerformanceAnalysisTab_NoWorkflowTypeSelected;
+	public static String PerformanceAnalysisTab_PleaseSelectWorkflow;
+	public static String PerformanceAnalysisTab_PleaseSelectWorkflowType;
 	public static String PerformanceAnalysisTab_SelectExistingPerfData;
+	public static String PerformanceAnalysisTab_SelectTool;
+	public static String PerformanceAnalysisTab_Tab_Name;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
