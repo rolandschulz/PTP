@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.ui.dialogs;
 
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Vector;
 
 import org.eclipse.core.filesystem.IFileStore;
@@ -34,11 +32,11 @@ import org.eclipse.ptp.internal.remote.ui.RemoteResourceComparator;
 import org.eclipse.ptp.internal.remote.ui.RemoteUIImages;
 import org.eclipse.ptp.internal.remote.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.RemoteUIServices;
+import org.eclipse.ptp.remote.ui.widgets.RemoteConnectionWidget;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -49,7 +47,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -79,10 +76,9 @@ public class RemoteResourceBrowser extends Dialog {
 	private TreeViewer treeViewer;
 	private Text remotePathText;
 	private Button okButton;
-	private Combo connectionCombo;
-	private Button newButton;
 	private Button upButton;
 	private Button newFolderButton;
+	private RemoteConnectionWidget fRemoteConnectionWidget;
 
 	private int browserType;
 	private String dialogTitle;
@@ -97,7 +93,6 @@ public class RemoteResourceBrowser extends Dialog {
 	private final IRemoteServices fServices;
 	private IRemoteFileManager fFileMgr;
 	private IRemoteConnection fConnection;
-	private final IRemoteConnectionManager fConnMgr;
 	private final IRemoteUIConnectionManager fUIConnMgr;
 	private int optionFlags = SINGLE;
 
@@ -110,95 +105,9 @@ public class RemoteResourceBrowser extends Dialog {
 		if (conn == null) {
 			showConnections = true;
 		}
-		fConnMgr = services.getConnectionManager();
 		fUIConnMgr = RemoteUIServices.getRemoteUIServices(services).getUIConnectionManager();
 		setTitle(Messages.RemoteResourceBrowser_resourceTitle);
 		setType(FILE_BROWSER | DIRECTORY_BROWSER);
-	}
-
-	/**
-	 * Get the connection that was selected
-	 * 
-	 * @return selected connection
-	 */
-	public IRemoteConnection getConnection() {
-		return fConnection;
-	}
-
-	/**
-	 * Get the path that was selected.
-	 * 
-	 * @return selected path
-	 */
-	public String getPath() {
-		if (remotePath.equals("")) { //$NON-NLS-1$
-			return null;
-		}
-		return remotePath;
-	}
-
-	/**
-	 * Get the paths that were selected.
-	 * 
-	 * @return selected paths
-	 */
-	public String[] getPaths() {
-		return remotePaths;
-	}
-
-	/**
-	 * Set the initial path to start browsing. This will be set in the browser
-	 * text field, and in a future version should expand the browser to this
-	 * location if it exists.
-	 * 
-	 * @param path
-	 */
-	public void setInitialPath(String path) {
-		fInitialPath = path;
-	}
-
-	/**
-	 * Set the dialogTitle of the dialog.
-	 * 
-	 * @param dialogTitle
-	 */
-	public void setTitle(String title) {
-		dialogTitle = title;
-		if (dialogTitle == null) {
-			dialogTitle = ""; //$NON-NLS-1$
-		}
-		Shell shell = getShell();
-		if ((shell != null) && !shell.isDisposed()) {
-			shell.setText(dialogTitle);
-		}
-	}
-
-	/**
-	 * Set the type of browser. Can be either a file browser (allows selection
-	 * of files) or a directory browser (allows selection of directories), or
-	 * both.
-	 */
-	public void setType(int type) {
-		browserType = type;
-		if (type == FILE_BROWSER) {
-			dialogLabel = Messages.RemoteResourceBrowser_fileLabel;
-			setTitle(Messages.RemoteResourceBrowser_fileTitle);
-		} else if (type == DIRECTORY_BROWSER) {
-			dialogLabel = Messages.RemoteResourceBrowser_directoryLabel;
-			setTitle(Messages.RemoteResourceBrowser_directoryTitle);
-		} else {
-			dialogLabel = Messages.RemoteResourceBrowser_resourceLabel;
-			setTitle(Messages.RemoteResourceBrowser_resourceTitle);
-		}
-	}
-
-	/**
-	 * Show available connections on browser if possible.
-	 * 
-	 * @param enable
-	 */
-	public void showConnections(boolean enable) {
-		this.showConnections = enable;
 	}
 
 	/**
@@ -242,173 +151,16 @@ public class RemoteResourceBrowser extends Dialog {
 	 * When a new connection is selected, make sure it is open before using it.
 	 */
 	private void connectionSelected() {
-		int i = connectionCombo.getSelectionIndex();
-		if (i >= 0) {
+		/*
+		 * Make sure the connection is open before we try and read from the
+		 * connection.
+		 */
+		final IRemoteConnection conn = fRemoteConnectionWidget.getConnection();
+		if (!changeInput(conn)) {
 			/*
-			 * Make sure the connection is open before we try and read from the
-			 * connection.
+			 * Reset combo back to the previous selection
 			 */
-			final IRemoteConnection conn = fConnMgr.getConnection(connectionCombo.getItem(i));
-			if (!changeInput(conn)) {
-				/*
-				 * Reset combo back to the previous selection
-				 */
-				if (fConnection == null) {
-					connectionCombo.deselectAll();
-				} else {
-					for (i = 0; i < connectionCombo.getItemCount(); i++) {
-						if (fConnection.equals(connectionCombo.getItem(i))) {
-							connectionCombo.select(i);
-							break;
-						}
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * Create composite to allow connection selection and creation.
-	 * 
-	 * @param comp
-	 */
-	private void createConnectionChooser(Composite comp) {
-		final Composite connComp = new Composite(comp, SWT.NONE);
-		GridLayout layout = new GridLayout();
-		layout.numColumns = 3;
-		layout.marginWidth = 0;
-		connComp.setLayout(layout);
-		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-		gd.horizontalSpan = 2;
-		connComp.setLayoutData(gd);
-
-		Label label = new Label(connComp, SWT.NONE);
-		label.setText(Messages.RemoteResourceBrowser_connectonLabel);
-		gd = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
-		label.setLayoutData(gd);
-
-		connectionCombo = new Combo(connComp, SWT.READ_ONLY);
-		gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		connectionCombo.setLayoutData(gd);
-		connectionCombo.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent event) {
-				if (event.getSource() == connectionCombo) {
-					connectionSelected();
-				}
-			}
-		});
-
-		newButton = new Button(connComp, SWT.PUSH);
-		newButton.setText(Messages.RemoteResourceBrowser_newConnection);
-		gd = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
-		newButton.setLayoutData(gd);
-		newButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent evt) {
-				if (fUIConnMgr != null) {
-					IRemoteConnection conn = fUIConnMgr.newConnection(getShell());
-					if (conn != null) {
-						updateConnectionCombo(conn);
-					}
-				}
-			}
-		});
-	}
-
-	/**
-	 * Determine the initial path for the browser. If the initial path is not
-	 * supplied or does not exist on the remote machine, then the initial path
-	 * will be the cwd.
-	 * 
-	 * @param cwd
-	 * @param initialPath
-	 * @return
-	 */
-	private IPath findInitialPath(String cwd, String initialPath) {
-		if (initialPath != null) {
-			IPath path = new Path(initialPath);
-			if (!path.isAbsolute()) {
-				path = new Path(cwd).append(path);
-			}
-			if (fFileMgr.getResource(path.toString()).fetchInfo().exists()) {
-				return path;
-			}
-		}
-		return new Path(cwd);
-	}
-
-	/**
-	 * Set the root directory for the browser. This will also update the text
-	 * field with the path.
-	 * 
-	 * @param path
-	 *            path of root directory
-	 */
-	private void setRoot(String path) {
-		if (fFileMgr != null) {
-			IFileStore root = fFileMgr.getResource(path);
-			treeViewer.setInput(new DeferredFileStore(root, !showHidden));
-			remotePathText.setText(path);
-			remotePathText.setSelection(remotePathText.getText().length());
-			fRootPath = new Path(path);
-		}
-	}
-
-	/**
-	 * Update connection combo dropdown with current connections. If supplied
-	 * conn will be selected in the list.
-	 * 
-	 * @param conn
-	 *            connection to select in the list
-	 */
-	private void updateConnectionCombo(IRemoteConnection conn) {
-		IRemoteConnectionManager mgr = fServices.getConnectionManager();
-		IRemoteConnection[] conns = mgr.getConnections();
-
-		if (conns.length > 0) {
-			Arrays.sort(conns, new Comparator<IRemoteConnection>() {
-				public int compare(IRemoteConnection c1, IRemoteConnection c2) {
-					return c1.getName().compareToIgnoreCase(c2.getName());
-				}
-			});
-		}
-
-		connectionCombo.removeAll();
-
-		int selected = -1;
-		for (int i = 0; i < conns.length; i++) {
-			connectionCombo.add(conns[i].getName());
-			if (conn != null && conn.equals(conns[i])) {
-				selected = i;
-			}
-		}
-
-		if (selected < 0) {
-			connectionCombo.deselectAll();
-		} else {
-			connectionCombo.select(selected);
-		}
-
-		connectionSelected();
-	}
-
-	private void updateDialog() {
-		if (remotePathText != null && okButton != null) {
-			if (remotePathText.getText().equals(EMPTY_STRING)) {
-				okButton.setEnabled(false);
-			} else {
-				okButton.setEnabled(true);
-			}
-		}
-		if (remotePathText != null && upButton != null) {
-			boolean enabled = false;
-			String pathText = remotePathText.getText();
-			if (!pathText.equals("")) { //$NON-NLS-1$
-				IPath path = new Path(pathText);
-				enabled = !path.isRoot();
-			}
-			upButton.setEnabled(enabled);
+			fRemoteConnectionWidget.setConnection(fConnection);
 		}
 	}
 
@@ -440,9 +192,7 @@ public class RemoteResourceBrowser extends Dialog {
 		Control contents = super.createContents(parent);
 		setTitle(dialogTitle);
 		remotePathText.setText(remotePath);
-		if (showConnections) {
-			updateConnectionCombo(fConnection);
-		} else {
+		if (!showConnections) {
 			changeInput(fConnection);
 		}
 		return contents;
@@ -465,15 +215,23 @@ public class RemoteResourceBrowser extends Dialog {
 		layout.numColumns = 4;
 		dialogComp.setLayout(layout);
 
+		if (showConnections) {
+			fRemoteConnectionWidget = new RemoteConnectionWidget(dialogComp, SWT.NONE, null,
+					RemoteConnectionWidget.FLAG_NO_LOCAL_SELECTION, null);
+			fRemoteConnectionWidget.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 4, 1));
+			fRemoteConnectionWidget.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent event) {
+					connectionSelected();
+				}
+			});
+		}
+
 		Label label = new Label(dialogComp, SWT.NONE);
 		label.setText(dialogLabel);
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 1;
 		label.setLayoutData(gd);
-
-		if (showConnections) {
-			createConnectionChooser(dialogComp);
-		}
 
 		remotePathText = new Text(dialogComp, SWT.BORDER | SWT.SINGLE);
 		remotePathText.addModifyListener(new ModifyListener() {
@@ -600,5 +358,148 @@ public class RemoteResourceBrowser extends Dialog {
 		updateDialog();
 
 		return main;
+	}
+
+	/**
+	 * Determine the initial path for the browser. If the initial path is not
+	 * supplied or does not exist on the remote machine, then the initial path
+	 * will be the cwd.
+	 * 
+	 * @param cwd
+	 * @param initialPath
+	 * @return
+	 */
+	private IPath findInitialPath(String cwd, String initialPath) {
+		if (initialPath != null) {
+			IPath path = new Path(initialPath);
+			if (!path.isAbsolute()) {
+				path = new Path(cwd).append(path);
+			}
+			if (fFileMgr.getResource(path.toString()).fetchInfo().exists()) {
+				return path;
+			}
+		}
+		return new Path(cwd);
+	}
+
+	/**
+	 * Get the connection that was selected
+	 * 
+	 * @return selected connection
+	 */
+	public IRemoteConnection getConnection() {
+		return fConnection;
+	}
+
+	/**
+	 * Get the path that was selected.
+	 * 
+	 * @return selected path
+	 */
+	public String getPath() {
+		if (remotePath.equals("")) { //$NON-NLS-1$
+			return null;
+		}
+		return remotePath;
+	}
+
+	/**
+	 * Get the paths that were selected.
+	 * 
+	 * @return selected paths
+	 */
+	public String[] getPaths() {
+		return remotePaths;
+	}
+
+	/**
+	 * Set the initial path to start browsing. This will be set in the browser
+	 * text field, and in a future version should expand the browser to this
+	 * location if it exists.
+	 * 
+	 * @param path
+	 */
+	public void setInitialPath(String path) {
+		fInitialPath = path;
+	}
+
+	/**
+	 * Set the root directory for the browser. This will also update the text
+	 * field with the path.
+	 * 
+	 * @param path
+	 *            path of root directory
+	 */
+	private void setRoot(String path) {
+		if (fFileMgr != null) {
+			IFileStore root = fFileMgr.getResource(path);
+			treeViewer.setInput(new DeferredFileStore(root, !showHidden));
+			remotePathText.setText(path);
+			remotePathText.setSelection(remotePathText.getText().length());
+			fRootPath = new Path(path);
+		}
+	}
+
+	/**
+	 * Set the dialogTitle of the dialog.
+	 * 
+	 * @param dialogTitle
+	 */
+	public void setTitle(String title) {
+		dialogTitle = title;
+		if (dialogTitle == null) {
+			dialogTitle = ""; //$NON-NLS-1$
+		}
+		Shell shell = getShell();
+		if ((shell != null) && !shell.isDisposed()) {
+			shell.setText(dialogTitle);
+		}
+	}
+
+	/**
+	 * Set the type of browser. Can be either a file browser (allows selection
+	 * of files) or a directory browser (allows selection of directories), or
+	 * both.
+	 */
+	public void setType(int type) {
+		browserType = type;
+		if (type == FILE_BROWSER) {
+			dialogLabel = Messages.RemoteResourceBrowser_fileLabel;
+			setTitle(Messages.RemoteResourceBrowser_fileTitle);
+		} else if (type == DIRECTORY_BROWSER) {
+			dialogLabel = Messages.RemoteResourceBrowser_directoryLabel;
+			setTitle(Messages.RemoteResourceBrowser_directoryTitle);
+		} else {
+			dialogLabel = Messages.RemoteResourceBrowser_resourceLabel;
+			setTitle(Messages.RemoteResourceBrowser_resourceTitle);
+		}
+	}
+
+	/**
+	 * Show available connections on browser if possible.
+	 * 
+	 * @param enable
+	 */
+	public void showConnections(boolean enable) {
+		this.showConnections = enable;
+	}
+
+	private void updateDialog() {
+		if (remotePathText != null && okButton != null) {
+			if (remotePathText.getText().equals(EMPTY_STRING)) {
+				okButton.setEnabled(false);
+			} else {
+				okButton.setEnabled(true);
+			}
+		}
+		if (remotePathText != null && upButton != null) {
+			boolean enabled = false;
+			String pathText = remotePathText.getText();
+			if (!pathText.equals("")) { //$NON-NLS-1$
+				IPath path = new Path(pathText);
+				enabled = !path.isRoot();
+			}
+			upButton.setEnabled(enabled);
+		}
 	}
 }
