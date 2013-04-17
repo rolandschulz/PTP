@@ -109,6 +109,7 @@
 		<module>releng/org.eclipse.ptp.rdt.remotejars-feature</module>
 		<module>releng/org.eclipse.ptp.rdt.remotetools-feature</module>
 		<module>releng/org.eclipse.ptp.rdt.sync-feature</module>
+		<module>releng/org.eclipse.ptp.rdt.sync.cdt-feature</module>
 		<module>releng/org.eclipse.ptp.rdt.sync.fortran-feature</module>
 		<module>releng/org.eclipse.ptp.rdt.xlc-feature</module>
 		<module>releng/org.eclipse.ptp.remote-feature</module>
