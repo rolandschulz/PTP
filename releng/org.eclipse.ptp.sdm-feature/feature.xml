@@ -25,9 +25,8 @@
          fragment="true"/>
 
    <plugin
-         id="org.eclipse.ptp.linux.x86_64"
+         id="org.eclipse.ptp.linux"
          os="linux"
-         arch="x86_64"
          download-size="0"
          install-size="0"
          version="0.0.0"
