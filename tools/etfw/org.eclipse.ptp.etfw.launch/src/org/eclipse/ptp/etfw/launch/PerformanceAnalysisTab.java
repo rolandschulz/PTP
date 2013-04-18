@@ -279,8 +279,7 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 		toolTabs = findTabControllers();
 
 		for (ToolPaneType toolTab : toolTabs) {
-			tabControllers.add(new JAXBDynamicLaunchConfigurationTab(controller, toolTab.getOptionPane(), launchTabParent,
-					new NullProgressMonitor()));
+			tabControllers.add(new JAXBDynamicLaunchConfigurationTab(controller, toolTab.getOptionPane(), launchTabParent));
 		}
 
 		ETFWToolTabBuilder.initialize();
@@ -554,8 +553,7 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 				setErrorMessage(Messages.PerformanceAnalysisTab_NoWorkflowSelected);
 				return false;
 			}
-		}
-		else if (launchTabParent != null) {
+		} else if (launchTabParent != null) {
 			String error = launchTabParent.getUpdateHandler().getFirstError();
 			if (error != null) {
 				setErrorMessage(error);

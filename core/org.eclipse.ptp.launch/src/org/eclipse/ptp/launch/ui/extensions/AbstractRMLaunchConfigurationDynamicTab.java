@@ -17,11 +17,9 @@
 package org.eclipse.ptp.launch.ui.extensions;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 
 /**
@@ -42,8 +40,6 @@ public abstract class AbstractRMLaunchConfigurationDynamicTab implements IRMLaun
 		return new CoreException(status);
 	}
 
-	private IProgressMonitor fMonitor;
-
 	private final ListenerList listenerList = new ListenerList();
 
 	/**
@@ -60,20 +56,6 @@ public abstract class AbstractRMLaunchConfigurationDynamicTab implements IRMLaun
 	 */
 	public void addContentsChangedListener(IRMLaunchConfigurationContentsChangedListener listener) {
 		listenerList.add(listener);
-	}
-
-	/**
-	 * @since 6.0
-	 */
-	public IProgressMonitor getProgressMonitor() {
-		return SubMonitor.convert(fMonitor);
-	}
-
-	/**
-	 * @since 6.0
-	 */
-	public void setProgressMonitor(IProgressMonitor monitor) {
-		fMonitor = monitor;
 	}
 
 	/*

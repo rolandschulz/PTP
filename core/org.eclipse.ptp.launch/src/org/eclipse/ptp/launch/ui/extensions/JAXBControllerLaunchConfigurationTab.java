@@ -16,7 +16,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.ems.ui.LazyEnvManagerDetector;
 import org.eclipse.ptp.internal.rm.jaxb.control.ui.handlers.ValueUpdateHandler;
@@ -25,9 +24,6 @@ import org.eclipse.ptp.internal.rm.jaxb.control.ui.utils.WidgetActionUtils;
 import org.eclipse.ptp.internal.rm.jaxb.control.ui.variables.LCVariableMap;
 import org.eclipse.ptp.launch.internal.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.RemoteServices;
 import org.eclipse.ptp.remote.core.RemoteServicesUtils;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateHandler;
@@ -58,8 +54,6 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	protected final LaunchTabType launchTabData;
 	protected final IUpdateHandler updateHandler;
 	protected final LCVariableMap lcMap;
-	protected String fConnectionName;
-	protected String fRemoteServicesId;
 	protected IRemoteConnection fRemoteConnection;
 	protected ScriptType script;
 
@@ -71,7 +65,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	 * @throws Throwable
 	 */
 	public JAXBControllerLaunchConfigurationTab(ILaunchController control, IProgressMonitor monitor) throws Throwable {
-		setProgressMonitor(monitor);
+		SubMonitor progress = SubMonitor.convert(monitor, 100);
 		fControl = control;
 		LCVariableMap varMap = null;
 
@@ -81,12 +75,19 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 				throw new Throwable(Messages.JAXBControllerLaunchConfigurationTab_unableToObtainConfigurationInfo);
 			}
 			script = data.getControlData().getScript();
-			IRemoteConnection conn = getConnection(fControl);
-			if (conn == null) {
+			fRemoteConnection = RemoteServicesUtils.getConnectionWithProgress(fControl.getRemoteServicesId(),
+					fControl.getConnectionName(), progress.newChild(30));
+			if (fRemoteConnection == null) {
 				throw new Throwable(Messages.JAXBControllerLaunchConfigurationTab_unableToObtainConnectionInfo);
 			}
+			/*
+			 * Connection should be open by now, but just in case...
+			 */
+			if (!fRemoteConnection.isOpen()) {
+				fRemoteConnection.open(progress.newChild(50));
+			}
 			varMap = new LCVariableMap();
-			varMap.setEnvManager(getEnvManager(control, monitor));
+			varMap.setEnvManager(getEnvManager(progress.newChild(10)));
 			voidRMConfig = false;
 		} catch (Throwable t) {
 			script = null;
@@ -101,15 +102,15 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 			if (launchTabData != null) {
 				List<TabControllerType> dynamic = launchTabData.getDynamic();
 				for (TabControllerType controller : dynamic) {
-					addDynamicTab(new JAXBDynamicLaunchConfigurationTab(control, controller, this, monitor));
+					addDynamicTab(new JAXBDynamicLaunchConfigurationTab(control, controller, this));
 				}
 				LaunchTabType.Import importTab = launchTabData.getImport();
 				if (importTab != null) {
-					addDynamicTab(new JAXBImportedScriptLaunchConfigurationTab(control, importTab, this, monitor));
+					addDynamicTab(new JAXBImportedScriptLaunchConfigurationTab(control, importTab, this));
 				}
 			}
 			varMap = new LCVariableMap();
-			varMap.setEnvManager(getEnvManager(control, monitor));
+			varMap.setEnvManager(getEnvManager(progress.newChild(10)));
 		} else {
 			getControllers().clear();
 			launchTabData = null;
@@ -118,24 +119,10 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 		lcMap = varMap;
 	}
 
-	private IEnvManager getEnvManager(ILaunchController control, IProgressMonitor monitor) {
-		SubMonitor progress = SubMonitor.convert(monitor, 10);
-		LazyEnvManagerDetector envMgr = new LazyEnvManagerDetector(getConnection(control));
-		envMgr.setProgressMonitor(progress.newChild(10));
+	private IEnvManager getEnvManager(IProgressMonitor monitor) {
+		LazyEnvManagerDetector envMgr = new LazyEnvManagerDetector(fRemoteConnection);
+		envMgr.setProgressMonitor(monitor);
 		return envMgr;
-	}
-
-	private IRemoteConnection getConnection(final ILaunchController control) {
-		final IRemoteServices remoteServices = RemoteServices
-				.getRemoteServices(control.getRemoteServicesId(), getProgressMonitor());
-
-		if (remoteServices != null) {
-			IRemoteConnectionManager connMgr = remoteServices.getConnectionManager();
-			if (connMgr != null) {
-				return connMgr.getConnection(control.getConnectionName());
-			}
-		}
-		return null;
 	}
 
 	/*
@@ -230,15 +217,6 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 				lcMap.initialize(fControl.getEnvironment(), fControl.getControlId());
 				updateHandler.clear();
 				lcMap.updateFromConfiguration(configuration);
-				SubMonitor monitor = SubMonitor.convert(getProgressMonitor(), 10);
-				fRemoteConnection = RemoteServicesUtils.getConnectionWithProgress(fRemoteServicesId, fConnectionName,
-						monitor.newChild(2));
-				if (fRemoteConnection == null) {
-					return new RMLaunchValidation(false, NLS.bind(Messages.JAXBControllerLaunchConfigurationTab_Unable_to_obtain_remote_connection, fConnectionName));
-				}
-				if (!fRemoteConnection.isOpen()) {
-					fRemoteConnection.open(monitor.newChild(8));
-				}
 			} catch (CoreException e) {
 				return new RMLaunchValidation(false, e.getLocalizedMessage());
 			} catch (Throwable e) {

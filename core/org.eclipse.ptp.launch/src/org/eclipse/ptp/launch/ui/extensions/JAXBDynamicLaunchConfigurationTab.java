@@ -48,8 +48,6 @@ import org.eclipse.ptp.internal.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.internal.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.RemoteServices;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.core.runnable.ScriptHandler;
 import org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel;
@@ -102,19 +100,16 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	protected final Collection<IUpdateModel> sharedModels;
 
 	/**
-	 * @param rm
-	 *            the resource manager
-	 * @param dialog
-	 *            the ancestor main launch dialog
+	 * @param control
+	 *            the launch controller
 	 * @param controller
 	 *            the JAXB data element from which this tab's control will be built
 	 * @param parentTab
 	 *            the parent controller tab
 	 */
 	public JAXBDynamicLaunchConfigurationTab(ILaunchController control, TabControllerType controller,
-			JAXBControllerLaunchConfigurationTab parentTab, IProgressMonitor monitor) {
+			JAXBControllerLaunchConfigurationTab parentTab) {
 		this(control, parentTab);
-		setProgressMonitor(monitor);
 		String title = controller.getTitle();
 		if (title != null) {
 			this.title = title;
@@ -227,17 +222,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 * @see org.eclipse.ptp.rm.jaxb.control.ui.launch.IJAXBLaunchConfigurationTab#getRemoteConnection()
 	 */
 	public IRemoteConnection getRemoteConnection() {
-		final ILaunchController jobControl = getParent().getJobControl();
-		final String remoteServicesID = jobControl.getRemoteServicesId();
-		final String connectionName = jobControl.getConnectionName();
-
-		if (remoteServicesID != null && connectionName != null) {
-			final IRemoteServices services = RemoteServices.getRemoteServices(remoteServicesID, getProgressMonitor());
-			if (services != null) {
-				return services.getConnectionManager().getConnection(connectionName);
-			}
-		}
-		return null;
+		return getParent().getConnection();
 	}
 
 	/**

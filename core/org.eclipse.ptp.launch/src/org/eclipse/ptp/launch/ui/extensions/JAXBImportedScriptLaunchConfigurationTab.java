@@ -16,7 +16,6 @@ import java.io.FileReader;
 import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -70,17 +69,14 @@ public class JAXBImportedScriptLaunchConfigurationTab extends JAXBDynamicLaunchC
 	/**
 	 * @param control
 	 *            the job controller
-	 * @param dialog
-	 *            the ancestor main launch dialog
 	 * @param importTab
 	 *            describing configurable parts
 	 * @param parentTab
 	 *            the parent controller tab
 	 */
 	public JAXBImportedScriptLaunchConfigurationTab(ILaunchController control, LaunchTabType.Import importTab,
-			JAXBControllerLaunchConfigurationTab parentTab, IProgressMonitor monitor) {
+			JAXBControllerLaunchConfigurationTab parentTab) {
 		super(control, parentTab);
-		setProgressMonitor(monitor);
 		this.title = importTab.getTitle();
 		this.viewerType = importTab.getExportForOverride();
 		shared = new String[0];
