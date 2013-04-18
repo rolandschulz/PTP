@@ -65,4 +65,11 @@
          </run>
       </runtime>
    </extension>
+   <extension
+         point="org.eclipse.ptp.remote.core.remoteResources">
+      <remoteResource
+            class="org.eclipse.ptp.internal.rdt.core.RemoteResource"
+            nature="org.eclipse.ptp.rdt.core.remoteNature">
+      </remoteResource>
+   </extension>
 </plugin>
