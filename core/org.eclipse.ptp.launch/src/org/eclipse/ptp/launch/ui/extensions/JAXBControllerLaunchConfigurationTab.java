@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.ems.ui.LazyEnvManagerDetector;
 import org.eclipse.ptp.internal.rm.jaxb.control.ui.handlers.ValueUpdateHandler;
@@ -27,7 +28,7 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.RemoteServices;
-import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
+import org.eclipse.ptp.remote.core.RemoteServicesUtils;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateHandler;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModelEnabled;
@@ -57,7 +58,9 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	protected final LaunchTabType launchTabData;
 	protected final IUpdateHandler updateHandler;
 	protected final LCVariableMap lcMap;
-	protected RemoteServicesDelegate delegate;
+	protected String fConnectionName;
+	protected String fRemoteServicesId;
+	protected IRemoteConnection fRemoteConnection;
 	protected ScriptType script;
 
 	/**
@@ -165,11 +168,8 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 		super.fireContentsChanged();
 	}
 
-	/**
-	 * @return remote services info
-	 */
-	public RemoteServicesDelegate getRemoteServicesDelegate() {
-		return delegate;
+	public IRemoteConnection getConnection() {
+		return fRemoteConnection;
 	}
 
 	/**
@@ -230,15 +230,19 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 				lcMap.initialize(fControl.getEnvironment(), fControl.getControlId());
 				updateHandler.clear();
 				lcMap.updateFromConfiguration(configuration);
-				delegate = RemoteServicesDelegate.getDelegate(fControl.getRemoteServicesId(), fControl.getConnectionName(),
-						getProgressMonitor());
+				SubMonitor monitor = SubMonitor.convert(getProgressMonitor(), 10);
+				fRemoteConnection = RemoteServicesUtils.getConnectionWithProgress(fRemoteServicesId, fConnectionName,
+						monitor.newChild(2));
+				if (fRemoteConnection == null) {
+					return new RMLaunchValidation(false, NLS.bind("Unable to obtain remote connection: {0}", fConnectionName));
+				}
+				if (!fRemoteConnection.isOpen()) {
+					fRemoteConnection.open(monitor.newChild(8));
+				}
 			} catch (CoreException e) {
 				return new RMLaunchValidation(false, e.getLocalizedMessage());
 			} catch (Throwable e) {
 				return new RMLaunchValidation(false, e.getLocalizedMessage());
-			}
-			if (delegate.getRemoteConnection() == null) {
-				return new RMLaunchValidation(false, Messages.UninitializedRemoteServices);
 			}
 		}
 		RMLaunchValidation validation = super.initializeFrom(configuration);

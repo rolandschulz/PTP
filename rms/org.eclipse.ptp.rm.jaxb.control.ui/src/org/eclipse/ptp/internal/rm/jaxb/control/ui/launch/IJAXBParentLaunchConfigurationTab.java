@@ -10,7 +10,7 @@
 package org.eclipse.ptp.internal.rm.jaxb.control.ui.launch;
 
 import org.eclipse.ptp.internal.rm.jaxb.control.ui.variables.LCVariableMap;
-import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
+import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateHandler;
 import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
@@ -20,17 +20,17 @@ import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
  * 
  */
 public interface IJAXBParentLaunchConfigurationTab {
-	public IUpdateHandler getUpdateHandler();
+	public IRemoteConnection getConnection();
 
 	public ILaunchController getJobControl();
 
-	public RemoteServicesDelegate getRemoteServicesDelegate();
+	public ScriptType getScript();
 
-	public boolean isInitialized();
+	public IUpdateHandler getUpdateHandler();
 
 	public LCVariableMap getVariableMap();
 
 	public boolean hasScript();
 
-	public ScriptType getScript();
+	public boolean isInitialized();
 }
