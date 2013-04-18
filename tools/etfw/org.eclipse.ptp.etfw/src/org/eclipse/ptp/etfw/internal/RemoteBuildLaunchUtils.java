@@ -65,6 +65,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
 public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
+	public static final String REMOTE_MAKE_BUILDER_ID = "org.eclipse.ptp.rdt.core.remoteMakeBuilder"; //$NON-NLS-1$
+
 	Shell selshell = null;
 	ILaunchConfiguration config;
 	IRemoteConnection conn = null;

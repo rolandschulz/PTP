@@ -34,7 +34,6 @@ import org.eclipse.ptp.etfw.IBuildLaunchUtils;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.messages.Messages;
 import org.eclipse.ptp.etfw.toolopts.BuildTool;
-import org.eclipse.ptp.rdt.core.remotemake.RemoteMakeBuilder;
 
 @SuppressWarnings("restriction")
 public class BuilderTool extends ToolStep implements IToolLaunchConfigurationConstants {
@@ -208,7 +207,8 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 		}
 		if (select == null) {
 			if (!isSyncProject) {
-				final IMakeBuilderInfo info = MakeCorePlugin.createBuildInfo(thisProject, RemoteMakeBuilder.REMOTE_MAKE_BUILDER_ID);
+				final IMakeBuilderInfo info = MakeCorePlugin.createBuildInfo(thisProject,
+						RemoteBuildLaunchUtils.REMOTE_MAKE_BUILDER_ID);
 
 				if (info == null || !info.isFullBuildEnabled()) {
 					System.out.println(Messages.BuilderTool_NoMakeTargetAll);

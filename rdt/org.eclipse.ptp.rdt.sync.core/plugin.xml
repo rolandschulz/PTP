@@ -36,7 +36,7 @@
    <extension
          point="org.eclipse.ptp.remote.core.remoteResources">
       <remoteResource
-            class="org.eclipse.ptp.rdt.sync.core.SynchronizedResource"
+            class="org.eclipse.ptp.internal.rdt.sync.core.SynchronizedResource"
             nature="org.eclipse.ptp.rdt.sync.core.remoteSyncNature">
       </remoteResource>
    </extension>

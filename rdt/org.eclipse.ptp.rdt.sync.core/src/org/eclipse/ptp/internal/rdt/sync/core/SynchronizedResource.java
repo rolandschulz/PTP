@@ -8,13 +8,16 @@
  * Contributors:
  *    IBM - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.rdt.sync.core;
+package org.eclipse.ptp.internal.rdt.sync.core;
 
 import java.net.URI;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
+import org.eclipse.ptp.rdt.sync.core.SyncFlag;
+import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.remote.core.IRemoteResource;
 
 public class SynchronizedResource implements IRemoteResource {

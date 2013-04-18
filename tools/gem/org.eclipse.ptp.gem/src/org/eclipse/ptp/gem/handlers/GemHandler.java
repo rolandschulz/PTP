@@ -21,14 +21,11 @@ import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.gem.messages.Messages;
 import org.eclipse.ptp.gem.util.GemUtilities;
 import org.eclipse.ptp.gem.views.GemAnalyzer;
 import org.eclipse.ptp.gem.views.GemBrowser;
 import org.eclipse.ptp.gem.views.GemConsole;
-import org.eclipse.ptp.rdt.core.resources.RemoteMakeNature;
-import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IViewReference;
@@ -93,13 +90,8 @@ public class GemHandler extends AbstractHandler {
 		final IFileEditorInput editorInput = (IFileEditorInput) editor.getEditorInput();
 		inputFile = editorInput.getFile();
 
-		try {
-			if (inputFile.getProject().hasNature(RemoteMakeNature.NATURE_ID)
-					|| inputFile.getProject().hasNature(RemoteSyncNature.NATURE_ID)) {
-				return null;
-			}
-		} catch (final CoreException ce) {
-			GemUtilities.logExceptionDetail(ce);
+		if (GemUtilities.isRemoteProject(inputFile)) {
+			return null;
 		}
 
 		final String extension = inputFile.getFileExtension();

@@ -44,7 +44,6 @@ import org.eclipse.ptp.etfw.IBuildLaunchUtils;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.jaxb.data.BuildToolType;
 import org.eclipse.ptp.etfw.messages.Messages;
-import org.eclipse.ptp.rdt.core.remotemake.RemoteMakeBuilder;
 
 /**
  * This class is based on BuilderTool and handles workflow steps that rebuild tools with performance instrumentation.
@@ -105,8 +104,9 @@ public class ETFWBuildTool extends ETFWToolStep implements IToolLaunchConfigurat
 	private void initBuild(ILaunchConfiguration conf) throws CoreException {
 		buildConf = configuration.getAttribute(ATTR_PERFORMANCEBUILD_CONFIGURATION_NAME, (String) null);
 
-		if (tool == null)
+		if (tool == null) {
 			return;
+		}
 
 		buildInfo = ManagedBuildManager.getBuildInfo(thisCProject.getResource());
 		olddefbuildconf = buildInfo.getDefaultConfiguration();// TODO: Make sure
@@ -141,15 +141,16 @@ public class ETFWBuildTool extends ETFWToolStep implements IToolLaunchConfigurat
 		}
 
 		String bextension = buildInfo.getBuildArtifactExtension();
-		if (bextension.length() > 0)
+		if (bextension.length() > 0) {
 			binary = binary + "." + bextension; //$NON-NLS-1$
+		}
 
 		// Make a list of the configurations already within the project
 		IConfiguration[] buildconfigs = buildInfo.getManagedProject().getConfigurations();
 		// IConfiguration selectedconf = null;
-		for (int i = 0; i < buildconfigs.length; i++) {
-			if ((buildconfigs[i].getName()).equals(buildConf)) {
-				selectedconf = buildconfigs[i];
+		for (IConfiguration buildconfig : buildconfigs) {
+			if ((buildconfig.getName()).equals(buildConf)) {
+				selectedconf = buildconfig;
 				break;
 			}
 		}
@@ -193,10 +194,10 @@ public class ETFWBuildTool extends ETFWToolStep implements IToolLaunchConfigurat
 
 		boolean confExists = false;
 		IConfiguration[] confs = managedBuildProj.getConfigurations();
-		for (int i = 0; i < confs.length; i++) {
-			if (confs[i].getName().equals(newname) || confs[i].getName().indexOf(newname) >= 0) {
+		for (IConfiguration conf : confs) {
+			if (conf.getName().equals(newname) || conf.getName().indexOf(newname) >= 0) {
 				confExists = true;
-				newBuildConfig = confs[i];
+				newBuildConfig = conf;
 				break;
 				// managedBuildProj.removeConfiguration(confs[i].getId());
 			}
@@ -224,9 +225,9 @@ public class ETFWBuildTool extends ETFWToolStep implements IToolLaunchConfigurat
 		// Make a list of the configurations already within the project
 		IConfiguration[] buildconfigs = buildInfo.getManagedProject().getConfigurations();
 		// IConfiguration selectedconf = null;
-		for (int i = 0; i < buildconfigs.length; i++) {
-			if ((buildconfigs[i].getName()).equals(buildConf)) {
-				selectedconf = buildconfigs[i];
+		for (IConfiguration buildconfig : buildconfigs) {
+			if ((buildconfig.getName()).equals(buildConf)) {
+				selectedconf = buildconfig;
 				break;
 			}
 		}
@@ -239,14 +240,15 @@ public class ETFWBuildTool extends ETFWToolStep implements IToolLaunchConfigurat
 		// TODO: We have to do this because PTP puts its output in the build
 		// directory
 		if (configuration.getAttribute(EXTOOL_EXECUTABLE_PATH_TAG, (String) null) != null) {
-			if (newname == null)
+			if (newname == null) {
 				outputLocation = "";
-			else {
+			} else {
 				IFileStore newFile = utilBlob.getFile(newname);// thisProject.getFile(newname);
-				if (newFile.fetchInfo().exists())// .isAccessible())
+				if (newFile.fetchInfo().exists()) {
 					outputLocation = newFile.toURI().getPath(); // buildco.getLocationURI().getPath();
-				else
+				} else {
 					outputLocation = "";
+				}
 			}
 		}
 		return true;
@@ -299,16 +301,17 @@ public class ETFWBuildTool extends ETFWToolStep implements IToolLaunchConfigurat
 
 		IMakeTarget[] targs = targetMan.getTargets(thisProject);
 		IMakeTarget select = null;
-		for (int i = 0; i < targs.length; i++) {
-			if (targs[i].getName().equals(Messages.BuilderTool_all)) {
-				select = targs[i];
+		for (IMakeTarget targ : targs) {
+			if (targ.getName().equals(Messages.BuilderTool_all)) {
+				select = targ;
 				break;
 			}
 			// System.out.println(targs[i].getName()+" "+targs[i].getTargetBuilderID());
 		}
 		if (select == null) {
 			if (!isSyncProject) {
-				final IMakeBuilderInfo info = MakeCorePlugin.createBuildInfo(thisProject, RemoteMakeBuilder.REMOTE_MAKE_BUILDER_ID);
+				final IMakeBuilderInfo info = MakeCorePlugin.createBuildInfo(thisProject,
+						RemoteBuildLaunchUtils.REMOTE_MAKE_BUILDER_ID);
 
 				if (info == null || !info.isFullBuildEnabled()) {
 					System.out.println(Messages.BuilderTool_NoMakeTargetAll);
@@ -320,8 +323,7 @@ public class ETFWBuildTool extends ETFWToolStep implements IToolLaunchConfigurat
 			thisProject.build(IncrementalProjectBuilder.CLEAN_BUILD, monitor);
 			thisProject.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
 
-		}
-		else {
+		} else {
 			// System.out.println(select.getBuildLocation());
 
 			select.build(monitor);
@@ -386,13 +388,10 @@ public class ETFWBuildTool extends ETFWToolStep implements IToolLaunchConfigurat
 		IFile programPath = null;
 
 		IFileStore pathStore = null;
-		if (isSyncProject)
-		{
+		if (isSyncProject) {
 			pathStore = utilBlob.getFile(outputLocation);
 			pathStore = pathStore.getChild(progPath);
-		}
-		else
-		{
+		} else {
 			programPath = thisProject.getFile(progPath);
 			pathStore = utilBlob.getFile(programPath.getLocationURI().getPath());
 
@@ -443,8 +442,9 @@ public class ETFWBuildTool extends ETFWToolStep implements IToolLaunchConfigurat
 	}
 
 	private boolean waitForBuild(long lastBuilt, IFile programPath, IFileInfo progInfo) {
-		if ((programPath != null && !programPath.exists()) && !progInfo.exists())
+		if ((programPath != null && !programPath.exists()) && !progInfo.exists()) {
 			return true;
+		}
 
 		// if(progInfo.getLastModified()==lastBuilt)
 		// return true;
@@ -497,12 +497,12 @@ public class ETFWBuildTool extends ETFWToolStep implements IToolLaunchConfigurat
 			allargs = getToolArguments(tool.getAllCompilers(), configuration);
 		}
 		int numChanges = 0;
-		for (int i = 0; i < tools.length; i++) {
+		for (ITool tool2 : tools) {
 
 			if (buildMods != null) {
 				for (String opName : buildMods.keySet()) {
 					// System.out.println(op.getName()+" ID: "+op.getBaseId());
-					for (IOption op : tools[i].getOptions()) {
+					for (IOption op : tool2.getOptions()) {
 						// IOption op=tools[i].getOptionById(opId);
 						if (op.getName().equals(opName))// op.getName().equals("Optimization Level"))
 						{
@@ -516,25 +516,25 @@ public class ETFWBuildTool extends ETFWToolStep implements IToolLaunchConfigurat
 				}
 			}
 
-			String toolid = tools[i].getId();
+			String toolid = tool2.getId();
 			if (toolid.indexOf(".c.") >= 0) //$NON-NLS-1$
 			{
-				numChanges += modifyCommand(tools[i], getToolCommand(tool.getCcCompiler(), configuration), allargs,
+				numChanges += modifyCommand(tool2, getToolCommand(tool.getCcCompiler(), configuration), allargs,
 						tool.isReplaceCompiler());
 			}
 			if (toolid.indexOf(".cpp.") >= 0) //$NON-NLS-1$
 			{
-				numChanges += modifyCommand(tools[i], getToolCommand(tool.getCxxCompiler(), configuration), allargs,
+				numChanges += modifyCommand(tool2, getToolCommand(tool.getCxxCompiler(), configuration), allargs,
 						tool.isReplaceCompiler());
 			}
 			if (toolid.indexOf(".fortran.") >= 0) //$NON-NLS-1$
 			{
-				numChanges += modifyCommand(tools[i], getToolCommand(tool.getF90Compiler(), configuration), allargs,
+				numChanges += modifyCommand(tool2, getToolCommand(tool.getF90Compiler(), configuration), allargs,
 						tool.isReplaceCompiler());
 			}
 			if ((toolid.indexOf(".upc.") >= 0) || (toolid.indexOf(".bupc.") >= 0) || (toolid.indexOf(".xlupc.") >= 0)) //$NON-NLS-1$
 			{
-				numChanges += modifyCommand(tools[i], getToolCommand(tool.getUpcCompiler(), configuration), allargs,
+				numChanges += modifyCommand(tool2, getToolCommand(tool.getUpcCompiler(), configuration), allargs,
 						tool.isReplaceCompiler());
 			}
 		}
@@ -584,23 +584,26 @@ public class ETFWBuildTool extends ETFWToolStep implements IToolLaunchConfigurat
 			throws CoreException {
 		String ops = EMPTY;
 		// String tmp;
-		if (tool.getCcCompiler() != null)
+		if (tool.getCcCompiler() != null) {
 			ops += getStandardMakeOp(CComp, getToolCommand(tool.getCcCompiler(), configuration), allargs, tool.isReplaceCompiler());
-		if (tool.getCxxCompiler() != null)
+		}
+		if (tool.getCxxCompiler() != null) {
 			ops += getStandardMakeOp(CxxComp, getToolCommand(tool.getCxxCompiler(), configuration), allargs,
 					tool.isReplaceCompiler());
-		if (tool.getF90Compiler() != null)
+		}
+		if (tool.getF90Compiler() != null) {
 			ops += getStandardMakeOp(FComp, getToolCommand(tool.getF90Compiler(), configuration), allargs, tool.isReplaceCompiler());
-		if (tool.getUpcCompiler() != null)
+		}
+		if (tool.getUpcCompiler() != null) {
 			ops += getStandardMakeOp(UPCComp, getToolCommand(tool.getUpcCompiler(), configuration), allargs,
 					tool.isReplaceCompiler());
+		}
 		return ops;
 	}
 
 	private String getStandardMakeOp(String var, String command, String args, boolean replace) {
 		String op = EMPTY;
-		if (command != null)
-		{
+		if (command != null) {
 			op = var + EQ + command + SPACE + args;
 			if (!replace) {
 				op += SPACE + "$(" + var + ")";
@@ -619,6 +622,7 @@ public class ETFWBuildTool extends ETFWToolStep implements IToolLaunchConfigurat
 		return outputLocation;
 	}
 
+	@Override
 	public void setSuccessAttribute(String value) {
 		if (tool != null && tool.getSetSuccessAttribute() != null) {
 			try {

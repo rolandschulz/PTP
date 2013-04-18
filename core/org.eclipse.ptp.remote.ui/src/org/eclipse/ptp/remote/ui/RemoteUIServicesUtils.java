@@ -95,7 +95,7 @@ public class RemoteUIServicesUtils {
 		String title = dir ? Messages.RemoteResourceBrowser_directoryTitle : Messages.RemoteResourceBrowser_fileTitle;
 		try {
 			uiFileManager.setConnection(conn);
-			uiFileManager.showConnections(remote);
+			// uiFileManager.showConnections(remote);
 			if (dir) {
 				path = uiFileManager.browseDirectory(shell, title, path, type);
 			} else {

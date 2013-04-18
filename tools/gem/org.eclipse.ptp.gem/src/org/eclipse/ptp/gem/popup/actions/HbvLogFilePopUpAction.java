@@ -77,7 +77,7 @@ public class HbvLogFilePopUpAction implements IObjectActionDelegate {
 			 * 
 			 * Check if the project is local or remote and abort if it is.
 			 */
-			if (logFile.getLocation() == null || GemUtilities.isSynchronizedProject(logFile)) {
+			if (logFile.getLocation() == null || GemUtilities.isRemoteProject(logFile)) {
 				GemUtilities.showInformationDialog(Messages.HbvLogFilePopUpAction_2);
 				return;
 			}
