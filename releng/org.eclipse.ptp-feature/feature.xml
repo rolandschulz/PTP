@@ -58,10 +58,6 @@
          version="0.0.0"/>
 
    <includes
-         id="org.eclipse.ptp.services"
-         version="0.0.0"/>
-
-   <includes
          id="org.eclipse.ptp.utils"
          version="0.0.0"/>
 
