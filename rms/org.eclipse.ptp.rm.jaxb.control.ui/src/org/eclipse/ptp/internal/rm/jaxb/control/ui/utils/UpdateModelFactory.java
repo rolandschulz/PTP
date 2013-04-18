@@ -12,6 +12,7 @@ package org.eclipse.ptp.internal.rm.jaxb.control.ui.utils;
 
 import java.lang.reflect.Constructor;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.JAXBControlConstants;
+import org.eclipse.ptp.internal.rm.jaxb.control.core.RemoteServicesDelegate;
 import org.eclipse.ptp.internal.rm.jaxb.control.ui.JAXBControlUIConstants;
 import org.eclipse.ptp.internal.rm.jaxb.control.ui.JAXBControlUIPlugin;
 import org.eclipse.ptp.internal.rm.jaxb.control.ui.cell.SpinnerCellEditor;
@@ -47,7 +49,11 @@ import org.eclipse.ptp.internal.rm.jaxb.control.ui.model.ValueTreeNodeUpdateMode
 import org.eclipse.ptp.internal.rm.jaxb.control.ui.model.ViewerUpdateModel;
 import org.eclipse.ptp.internal.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.ui.RemoteUIServicesUtils;
+import org.eclipse.ptp.remote.core.IRemoteFileManager;
+import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
+import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
+import org.eclipse.ptp.remote.ui.IRemoteUIServices;
+import org.eclipse.ptp.remote.ui.RemoteUIServices;
 import org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateHandler;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel;
@@ -77,6 +83,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 
@@ -278,6 +285,78 @@ public class UpdateModelFactory {
 			}
 		}
 
+		public Color getBackground() {
+			return background;
+		}
+
+		public String getChoice() {
+			return choice;
+		}
+
+		public String getFixedText() {
+			return fixedText;
+		}
+
+		public Font getFont() {
+			return font;
+		}
+
+		public Color getForeground() {
+			return foreground;
+		}
+
+		public String getItemsFrom() {
+			return itemsFrom;
+		}
+
+		public Object getLayoutData() {
+			return layoutData;
+		}
+
+		public Integer getMax() {
+			return max;
+		}
+
+		public Integer getMin() {
+			return min;
+		}
+
+		public boolean getReadOnly() {
+			return readOnly;
+		}
+
+		public IRemoteConnection getRemoteConnection() {
+			return tab.getRemoteConnection();
+		}
+
+		public int getStyle() {
+			return style;
+		}
+
+		public String getTitle() {
+			return title;
+		}
+
+		public String getToolTipText() {
+			return tooltip;
+		}
+
+		public String getTranslateBooleanAs() {
+			return translateBooleanAs;
+		}
+
+		public String getType() {
+			return widgetType;
+		}
+
+		public String getTypeId() {
+			return typeId;
+		}
+
+		public boolean isReadOnly() {
+			return readOnly;
+		}
+
 		/**
 		 * Configure the fields which do not depend on the underlying data object.
 		 * 
@@ -425,135 +504,398 @@ public class UpdateModelFactory {
 			}
 		}
 
-		public Color getBackground() {
-			return background;
-		}
-
-		public String getChoice() {
-			return choice;
-		}
-
-		public String getFixedText() {
-			return fixedText;
-		}
-
-		public Font getFont() {
-			return font;
-		}
-
-		public Color getForeground() {
-			return foreground;
-		}
-
-		public String getItemsFrom() {
-			return itemsFrom;
-		}
-
-		public Object getLayoutData() {
-			return layoutData;
-		}
-
-		public Integer getMax() {
-			return max;
-		}
-
-		public Integer getMin() {
-			return min;
-		}
-
-		public boolean getReadOnly() {
-			return readOnly;
-		}
-
-		public IRemoteConnection getRemoteConnection() {
-			return tab.getRemoteConnection();
-		}
-
-		public String getTitle() {
-			return title;
-		}
-
-		public String getToolTipText() {
-			return tooltip;
-		}
-
-		public String getTranslateBooleanAs() {
-			return translateBooleanAs;
-		}
-
-		public String getType() {
-			return widgetType;
-		}
-
-		public String getTypeId() {
-			return typeId;
-		}
-
-		public boolean isReadOnly() {
-			return readOnly;
-		}
-
-		public int getStyle() {
-			return style;
-		}
-
 	}
 
 	/**
-	 * Extension-based instantiation for custom control.
+	 * Opens a browse dialog using the indicated remote or local service and
+	 * connection.
 	 * 
-	 * @param type
-	 *            extension name
-	 * @return the control instance
-	 * @throws CoreException
+	 * @param shell
+	 *            for the dialog
+	 * @param current
+	 *            initial uri to display
+	 * @param delegate
+	 *            containing remote services data
+	 * @param remote
+	 *            whether to use the remote or the local connection and service
+	 *            provided by the delegate
+	 * @param readOnly
+	 *            whether to disallow the user to type in a path (default is <code>true</code>)
+	 * @param dir
+	 *            whether to browse/return a directory (default is file)
+	 * @return the selected file path as URI or <code>null</code> if canceled
+	 * @throws URISyntaxException
 	 */
-	private static Control createWidget(IWidgetDescriptor wd, Composite parent) throws CoreException {
-		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(JAXBControlUIPlugin.PLUGIN_ID,
-				JAXBControlUIConstants.WIDGET_EXT_PT);
-		IConfigurationElement[] elements = extensionPoint.getConfigurationElements();
-		for (IConfigurationElement element : elements) {
-			try {
-				if (element.getAttribute(JAXBControlConstants.ID).equals(wd.getTypeId())) {
-					String widgetClass = element.getAttribute(JAXBControlUIConstants.WIDGETCLASS);
-					Class<?> cls = Platform.getBundle(element.getDeclaringExtension().getContributor().getName()).loadClass(
-							widgetClass);
-					Constructor<?> cons = cls.getConstructor(Composite.class, IWidgetDescriptor.class);
-					return (Control) cons.newInstance(parent, wd);
-				}
-			} catch (Throwable t) {
-				throw CoreExceptionUtils.newException(Messages.WidgetInstantiationError + wd.getType(), t);
-			}
+	private static URI browse(Shell shell, URI current, RemoteServicesDelegate delegate, boolean remote, boolean readOnly,
+			boolean dir) throws URISyntaxException {
+		IRemoteUIServices uIServices = null;
+		IRemoteUIFileManager uiFileManager = null;
+		IRemoteConnection conn = null;
+		IRemoteFileManager manager = null;
+
+		URI home = null;
+		String path = null;
+		int type = readOnly ? IRemoteUIConstants.OPEN : IRemoteUIConstants.SAVE;
+
+		if (!remote) {
+			uIServices = RemoteUIServices.getRemoteUIServices(delegate.getLocalServices());
+			uiFileManager = uIServices.getUIFileManager();
+			manager = delegate.getLocalFileManager();
+			conn = delegate.getLocalConnection();
+			home = delegate.getLocalHome();
+		} else {
+			uIServices = RemoteUIServices.getRemoteUIServices(delegate.getRemoteServices());
+			uiFileManager = uIServices.getUIFileManager();
+			manager = delegate.getRemoteFileManager();
+			conn = delegate.getRemoteConnection();
+			home = delegate.getRemoteHome();
 		}
+
+		path = (current == null) ? home.getPath() : current.getPath();
+
+		String title = dir ? Messages.UpdateModelFactory_Browse_directory : Messages.UpdateModelFactory_Browse_file;
+		try {
+			uiFileManager.setConnection(conn);
+			if (dir) {
+				path = uiFileManager.browseDirectory(shell, title, path, type);
+			} else {
+				path = uiFileManager.browseFile(shell, title, path, type);
+			}
+		} catch (Throwable t) {
+			JAXBControlUIPlugin.log(t);
+		}
+
+		if (path == null) {
+			return null;
+		}
+
+		return manager.toURI(path);
+	}
+
+	/**
+	 * Creates a push-button and connects it to the command through a listener.
+	 * 
+	 * @see org.eclipse.swt.widgets.Text
+	 * @see org.eclipse.swt.widgets.Button
+	 * 
+	 * @param parent
+	 * @param cd
+	 * @param tab
+	 * @return
+	 */
+	private static Control createActionButton(Composite parent, final ControlDescriptor cd, final IJAXBLaunchConfigurationTab tab) {
+		Button b = WidgetBuilderUtils.createButton(parent, cd.layoutData, cd.title, SWT.PUSH, new SelectionListener() {
+
+			public void widgetDefaultSelected(SelectionEvent e) {
+				widgetSelected(e);
+			}
+
+			public void widgetSelected(SelectionEvent e) {
+				try {
+					tab.run(cd.action);
+				} catch (Throwable t) {
+					JAXBControlUIPlugin.log(t);
+				}
+			}
+		});
+		SWTUtil.setButtonDimensionHint(b);
 		return null;
 	}
 
 	/**
-	 * Extension-based instantiation for custom control's update model.
+	 * Creates a read-only Text area and adjacent browse button using remote connection information. The update model will be
+	 * attached to the returned text widget, as its text value will trigger updates.
 	 * 
-	 * @param type
-	 *            extension name
-	 * @return the control instance
-	 * @throws CoreException
+	 * @see org.eclipse.swt.widgets.Text
+	 * @see org.eclipse.swt.widgets.Button
+	 * 
+	 * @param parent
+	 *            to which the control belongs
+	 * @param cd
+	 *            internal data object carrying model description info
+	 * @param tab
+	 *            launch tab being built
+	 * @param sources
+	 *            map of widgets to check for state
+	 * @param targets
+	 *            map of widgets on which to set state
+	 * 
+	 * @return the text widget carrying the browse selection
 	 */
-	private static IUpdateModel createModel(IWidgetDescriptor wd, String attr, IUpdateHandler handler, Control control)
-			throws CoreException {
-		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(JAXBControlUIPlugin.PLUGIN_ID,
-				JAXBControlUIConstants.WIDGET_EXT_PT);
-		IConfigurationElement[] elements = extensionPoint.getConfigurationElements();
-		for (IConfigurationElement element : elements) {
-			try {
-				if (element.getAttribute(JAXBControlConstants.ID).equals(wd.getTypeId())) {
-					String updateModelClass = element.getAttribute(JAXBControlUIConstants.UPDATEMODELCLASS);
-					Class<?> cls = Platform.getBundle(element.getDeclaringExtension().getContributor().getName()).loadClass(
-							updateModelClass);
-					Constructor<?> cons = cls.getConstructor(String.class, IUpdateHandler.class, Control.class);
-					return (IUpdateModel) cons.newInstance(attr, handler, control);
+	private static Text createBrowse(final Composite parent, BrowseType d, final ControlDescriptor cd,
+			final IJAXBLaunchConfigurationTab tab, Map<ControlStateType, Control> targets) {
+		final Text t = WidgetBuilderUtils.createText(parent, cd.style, cd.layoutData, cd.readOnly, JAXBControlUIConstants.ZEROSTR);
+
+		Button b = WidgetBuilderUtils.createButton(parent, cd.subLayoutData, cd.title, SWT.NONE, new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+				widgetSelected(e);
+			}
+
+			public void widgetSelected(SelectionEvent e) {
+				try {
+					String initial = t.getText();
+					URI uri = null;
+					IRemoteConnection conn = tab.getParent().getConnection();
+					RemoteServicesDelegate delegate = RemoteServicesDelegate.getDelegate(conn.getRemoteServices().getId(),
+							conn.getName(), null);
+					if (JAXBControlUIConstants.ZEROSTR.equals(initial)) {
+						IRemoteFileManager mgr = conn.getRemoteServices().getFileManager(conn);
+						uri = mgr.toURI(tab.getParent().getConnection().getWorkingDirectory());
+					} else {
+						uri = new URI(initial);
+					}
+					uri = browse(parent.getShell(), uri, delegate, !cd.localOnly, cd.readOnly, cd.directory);
+					if (uri != null) {
+						if (cd.returnUri) {
+							t.setText(uri.toString());
+						} else {
+							t.setText(uri.getPath());
+						}
+					} else {
+						t.setText(JAXBControlUIConstants.ZEROSTR);
+					}
+				} catch (Exception ex) {
+					JAXBControlUIPlugin.log(ex);
 				}
-			} catch (Throwable t) {
-				throw CoreExceptionUtils.newException(Messages.WidgetInstantiationError + wd.getType(), t);
+			}
+		});
+
+		SWTUtil.setButtonDimensionHint(b);
+
+		if (!JAXBControlUIConstants.ZEROSTR.equals(cd.tooltip)) {
+			t.setToolTipText(cd.tooltip);
+		}
+		if (cd.foreground != null) {
+			t.setForeground(cd.foreground);
+		}
+		if (cd.background != null) {
+			t.setBackground(cd.background);
+		}
+		if (cd.font != null) {
+			t.setFont(cd.font);
+		}
+
+		ControlStateType cst = d.getTextControlState();
+		if (cst != null) {
+			targets.put(cst, t);
+		}
+
+		cst = d.getButtonControlState();
+		if (cst != null) {
+			targets.put(cst, b);
+		}
+
+		return t;
+	}
+
+	/**
+	 * @see org.eclipse.swt.widgets.Combo
+	 * 
+	 * @param parent
+	 *            to which the control belongs
+	 * @param cd
+	 *            internal data object carrying model description info
+	 * @return the Combo widget
+	 */
+	private static Combo createCombo(Composite parent, final ControlDescriptor cd) {
+		String[] items = null;
+		if (cd.choice != null) {
+			items = cd.choice.split(JAXBControlUIConstants.CM);
+		}
+		if (items == null) {
+			items = new String[0];
+		} else if (items.length > 0) {
+			items = WidgetBuilderUtils.normalizeComboItems(items);
+		}
+		return WidgetBuilderUtils.createCombo(parent, cd.style, cd.layoutData, items, JAXBControlUIConstants.ZEROSTR, cd.title,
+				cd.tooltip, null);
+	}
+
+	/**
+	 * 
+	 * @param parent
+	 *            to which the control belongs
+	 * @param cd
+	 *            control descriptor for the JAXB data element describing the widget
+	 * @return the resulting control (<code>null</code> if the widget is a Label).
+	 */
+	private static Control createControl(final Composite parent, ControlDescriptor cd) {
+		Control c = null;
+		if (JAXBControlUIConstants.LABEL.equals(cd.getType())) {
+			c = WidgetBuilderUtils.createLabel(parent, cd.fixedText, cd.style, cd.layoutData);
+		} else if (JAXBControlUIConstants.TEXT.equals(cd.getType())) {
+			c = createText(parent, cd);
+		} else if (JAXBControlUIConstants.RADIOBUTTON.equals(cd.getType())) {
+			if (cd.style == SWT.NONE) {
+				cd.style = SWT.RADIO;
+			} else {
+				cd.style |= SWT.RADIO;
+			}
+			c = WidgetBuilderUtils.createButton(parent, cd.layoutData, cd.title, cd.style, null);
+		} else if (JAXBControlUIConstants.CHECKBOX.equals(cd.getType())) {
+			if (cd.style == SWT.NONE) {
+				cd.style = SWT.CHECK;
+			} else {
+				cd.style |= SWT.CHECK;
+			}
+			c = WidgetBuilderUtils.createButton(parent, cd.layoutData, cd.title, cd.style, null);
+		} else if (JAXBControlUIConstants.SPINNER.equals(cd.getType())) {
+			c = WidgetBuilderUtils.createSpinner(parent, cd.style, cd.layoutData, cd.title, cd.min, cd.max, cd.min, null);
+		} else if (JAXBControlUIConstants.COMBO.equals(cd.getType())) {
+			c = createCombo(parent, cd);
+		} else if (JAXBControlUIConstants.CUSTOM.equals(cd.getType())) {
+			try {
+				c = createWidget(cd, parent);
+				if (c != null) {
+					c.setLayoutData(cd.layoutData);
+				}
+			} catch (CoreException e) {
+				// Widget will be missing from UI
 			}
 		}
-		return null;
+
+		if (c != null) {
+			if (!JAXBControlUIConstants.ZEROSTR.equals(cd.tooltip)) {
+				c.setToolTipText(cd.tooltip);
+			}
+			if (cd.foreground != null) {
+				c.setForeground(cd.foreground);
+			}
+			if (cd.background != null) {
+				c.setBackground(cd.background);
+			}
+			if (cd.font != null) {
+				c.setFont(cd.font);
+			}
+		}
+		return c;
+	}
+
+	/**
+	 * Constructs the editor of appropriate type.
+	 * 
+	 * @see org.eclipse.jface.viewers.TextCellEditor
+	 * @see org.eclipse.jface.viewers.CheckboxCellEditor
+	 * @see org.eclipse.jface.viewers.ComboBoxCellEditor
+	 * @see org.eclipse.ptp.internal.rm.jaxb.control.ui.cell.SpinnerCellEditor
+	 * 
+	 * @param cd
+	 *            internal object holding model description
+	 * @param data
+	 *            Property or Attribute
+	 * @param parent
+	 *            Table or Tree to which the editor belongs
+	 * @return the editor of appropriate type
+	 */
+	private static CellEditor createEditor(CellDescriptor cd, Object data, Composite parent) {
+		CellEditor editor = null;
+		if (cd.type == CellEditorType.TEXT) {
+			editor = new TextCellEditor(parent);
+		} else if (cd.type == CellEditorType.CHECK) {
+			editor = new CheckboxCellEditor(parent);
+		} else if (cd.type == CellEditorType.SPINNER) {
+			editor = new SpinnerCellEditor(parent, cd.min, cd.max);
+		} else if (cd.type == CellEditorType.COMBO) {
+			if (data instanceof AttributeType) {
+				if (cd.choice != null) {
+					cd.choice = cd.choice.trim();
+					cd.items = cd.choice.split(JAXBControlUIConstants.CM);
+				} else {
+					cd.items = new String[0];
+				}
+			}
+			editor = new ComboBoxCellEditor(parent, cd.items, SWT.READ_ONLY);
+		}
+		return editor;
+	}
+
+	/**
+	 * Constructs the cell editor and its update model.
+	 * 
+	 * @param attr
+	 *            Attribute for this viewer row.
+	 * @param viewer
+	 *            CheckboxTableViewer or CheckboxTreeViewer
+	 * @param columnData
+	 *            list of JAXB data elements describing the viewer columns
+	 * @param tab
+	 *            launch tab being built
+	 * @return
+	 */
+	public static ICellEditorUpdateModel createModel(AttributeType attr, ColumnViewer viewer, List<ColumnDataType> columnData,
+			IJAXBLaunchConfigurationTab tab) {
+		ICellEditorUpdateModel model = null;
+		if (viewer instanceof TableViewer) {
+			model = createModel(attr, (TableViewer) viewer, columnData, tab);
+		} else {
+			model = createModel(attr, (TreeViewer) viewer, columnData, tab);
+		}
+		maybeAddValidator(model, attr, tab.getParent());
+		return model;
+	}
+
+	/**
+	 * Constructs CellEditor and model for table row.
+	 * 
+	 * @see org.eclipse.jface.viewers.CellEditor
+	 * @see org.eclipse.ptp.internal.rm.jaxb.control.ui.model.TableRowUpdateModel
+	 * 
+	 * @param attr
+	 *            Attribute
+	 * @param viewer
+	 *            to which this row belongs
+	 * @param columnData
+	 *            list of JAXB data elements describing table columns
+	 * @param tab
+	 *            launch tab being built
+	 * @return the cell editor update model, which contains a reference to the CellEditor
+	 */
+	private static ICellEditorUpdateModel createModel(AttributeType attr, TableViewer viewer, List<ColumnDataType> columnData,
+			IJAXBLaunchConfigurationTab tab) {
+		CellDescriptor cd = new CellDescriptor(attr, columnData);
+		CellEditor editor = createEditor(cd, attr, viewer.getTable());
+		IUpdateHandler handler = tab.getParent().getUpdateHandler();
+		ICellEditorUpdateModel model = new TableRowUpdateModel(cd.name, handler, editor, cd.items, cd.itemsFrom,
+				cd.translateBooleanAs, cd.readOnly, attr);
+		if (model != null) {
+			model.setBackground(cd.background);
+			model.setFont(cd.font);
+			model.setForeground(cd.foreground);
+		}
+		return model;
+	}
+
+	/**
+	 * Constructs CellEditor and model for tree node.
+	 * 
+	 * @see org.eclipse.jface.viewers.CellEditor
+	 * @see org.eclipse.ptp.internal.rm.jaxb.control.ui.model.ValueTreeNodeUpdateModel
+	 * 
+	 * @param attr
+	 *            Attribute
+	 * @param viewer
+	 *            to which this row belongs
+	 * @param columnData
+	 *            list of JAXB data elements describing table columns
+	 * @param tab
+	 *            launch tab being built
+	 * @return the cell editor update model, which contains a reference to the CellEditor
+	 */
+	private static ICellEditorUpdateModel createModel(AttributeType attr, TreeViewer viewer, List<ColumnDataType> columnData,
+			IJAXBLaunchConfigurationTab tab) {
+		CellDescriptor cd = new CellDescriptor(attr, columnData);
+		CellEditor editor = createEditor(cd, attr, viewer.getTree());
+		IUpdateHandler handler = tab.getParent().getUpdateHandler();
+		Object[] properties = viewer.getColumnProperties();
+		boolean inValueCol = properties.length == 2;
+		ICellEditorUpdateModel model = new ValueTreeNodeUpdateModel(cd.name, handler, editor, cd.items, cd.itemsFrom,
+				cd.translateBooleanAs, cd.readOnly, inValueCol, attr);
+		if (model != null) {
+			model.setBackground(cd.background);
+			model.setFont(cd.font);
+			model.setForeground(cd.foreground);
+		}
+		return model;
 	}
 
 	/**
@@ -737,28 +1079,32 @@ public class UpdateModelFactory {
 	}
 
 	/**
-	 * Constructs the cell editor and its update model.
+	 * Extension-based instantiation for custom control's update model.
 	 * 
-	 * @param attr
-	 *            Attribute for this viewer row.
-	 * @param viewer
-	 *            CheckboxTableViewer or CheckboxTreeViewer
-	 * @param columnData
-	 *            list of JAXB data elements describing the viewer columns
-	 * @param tab
-	 *            launch tab being built
-	 * @return
+	 * @param type
+	 *            extension name
+	 * @return the control instance
+	 * @throws CoreException
 	 */
-	public static ICellEditorUpdateModel createModel(AttributeType attr, ColumnViewer viewer, List<ColumnDataType> columnData,
-			IJAXBLaunchConfigurationTab tab) {
-		ICellEditorUpdateModel model = null;
-		if (viewer instanceof TableViewer) {
-			model = createModel(attr, (TableViewer) viewer, columnData, tab);
-		} else {
-			model = createModel(attr, (TreeViewer) viewer, columnData, tab);
+	private static IUpdateModel createModel(IWidgetDescriptor wd, String attr, IUpdateHandler handler, Control control)
+			throws CoreException {
+		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(JAXBControlUIPlugin.PLUGIN_ID,
+				JAXBControlUIConstants.WIDGET_EXT_PT);
+		IConfigurationElement[] elements = extensionPoint.getConfigurationElements();
+		for (IConfigurationElement element : elements) {
+			try {
+				if (element.getAttribute(JAXBControlConstants.ID).equals(wd.getTypeId())) {
+					String updateModelClass = element.getAttribute(JAXBControlUIConstants.UPDATEMODELCLASS);
+					Class<?> cls = Platform.getBundle(element.getDeclaringExtension().getContributor().getName()).loadClass(
+							updateModelClass);
+					Constructor<?> cons = cls.getConstructor(String.class, IUpdateHandler.class, Control.class);
+					return (IUpdateModel) cons.newInstance(attr, handler, control);
+				}
+			} catch (Throwable t) {
+				throw CoreExceptionUtils.newException(Messages.WidgetInstantiationError + wd.getType(), t);
+			}
 		}
-		maybeAddValidator(model, attr, tab.getParent());
-		return model;
+		return null;
 	}
 
 	/**
@@ -805,304 +1151,6 @@ public class UpdateModelFactory {
 	}
 
 	/**
-	 * Creates a push-button and connects it to the command through a listener.
-	 * 
-	 * @see org.eclipse.swt.widgets.Text
-	 * @see org.eclipse.swt.widgets.Button
-	 * 
-	 * @param parent
-	 * @param cd
-	 * @param tab
-	 * @return
-	 */
-	private static Control createActionButton(Composite parent, final ControlDescriptor cd, final IJAXBLaunchConfigurationTab tab) {
-		Button b = WidgetBuilderUtils.createButton(parent, cd.layoutData, cd.title, SWT.PUSH, new SelectionListener() {
-
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-
-			public void widgetSelected(SelectionEvent e) {
-				try {
-					tab.run(cd.action);
-				} catch (Throwable t) {
-					JAXBControlUIPlugin.log(t);
-				}
-			}
-		});
-		SWTUtil.setButtonDimensionHint(b);
-		return null;
-	}
-
-	/**
-	 * Creates a read-only Text area and adjacent browse button using remote connection information. The update model will be
-	 * attached to the returned text widget, as its text value will trigger updates.
-	 * 
-	 * @see org.eclipse.swt.widgets.Text
-	 * @see org.eclipse.swt.widgets.Button
-	 * 
-	 * @param parent
-	 *            to which the control belongs
-	 * @param cd
-	 *            internal data object carrying model description info
-	 * @param tab
-	 *            launch tab being built
-	 * @param sources
-	 *            map of widgets to check for state
-	 * @param targets
-	 *            map of widgets on which to set state
-	 * 
-	 * @return the text widget carrying the browse selection
-	 */
-	private static Text createBrowse(final Composite parent, BrowseType d, final ControlDescriptor cd,
-			final IJAXBLaunchConfigurationTab tab, Map<ControlStateType, Control> targets) {
-		final Text t = WidgetBuilderUtils.createText(parent, cd.style, cd.layoutData, cd.readOnly, JAXBControlUIConstants.ZEROSTR);
-
-		Button b = WidgetBuilderUtils.createButton(parent, cd.subLayoutData, cd.title, SWT.NONE, new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-
-			public void widgetSelected(SelectionEvent e) {
-				try {
-					String initial = t.getText();
-					URI uri = null;
-					if (JAXBControlUIConstants.ZEROSTR.equals(initial)) {
-						uri = tab.getParent().getRemoteServicesDelegate().getRemoteHome();
-					} else {
-						uri = new URI(initial);
-					}
-					uri = RemoteUIServicesUtils.browse(parent.getShell(), uri, tab.getParent().getRemoteServicesDelegate(),
-							!cd.localOnly, cd.readOnly, cd.directory);
-					if (uri != null) {
-						if (cd.returnUri) {
-							t.setText(uri.toString());
-						} else {
-							t.setText(uri.getPath());
-						}
-					} else {
-						t.setText(JAXBControlUIConstants.ZEROSTR);
-					}
-				} catch (Throwable t) {
-					JAXBControlUIPlugin.log(t);
-				}
-			}
-		});
-
-		SWTUtil.setButtonDimensionHint(b);
-
-		if (!JAXBControlUIConstants.ZEROSTR.equals(cd.tooltip)) {
-			t.setToolTipText(cd.tooltip);
-		}
-		if (cd.foreground != null) {
-			t.setForeground(cd.foreground);
-		}
-		if (cd.background != null) {
-			t.setBackground(cd.background);
-		}
-		if (cd.font != null) {
-			t.setFont(cd.font);
-		}
-
-		ControlStateType cst = d.getTextControlState();
-		if (cst != null) {
-			targets.put(cst, t);
-		}
-
-		cst = d.getButtonControlState();
-		if (cst != null) {
-			targets.put(cst, b);
-		}
-
-		return t;
-	}
-
-	/**
-	 * @see org.eclipse.swt.widgets.Combo
-	 * 
-	 * @param parent
-	 *            to which the control belongs
-	 * @param cd
-	 *            internal data object carrying model description info
-	 * @return the Combo widget
-	 */
-	private static Combo createCombo(Composite parent, final ControlDescriptor cd) {
-		String[] items = null;
-		if (cd.choice != null) {
-			items = cd.choice.split(JAXBControlUIConstants.CM);
-		}
-		if (items == null) {
-			items = new String[0];
-		} else if (items.length > 0) {
-			items = WidgetBuilderUtils.normalizeComboItems(items);
-		}
-		return WidgetBuilderUtils.createCombo(parent, cd.style, cd.layoutData, items, JAXBControlUIConstants.ZEROSTR, cd.title,
-				cd.tooltip, null);
-	}
-
-	/**
-	 * 
-	 * @param parent
-	 *            to which the control belongs
-	 * @param cd
-	 *            control descriptor for the JAXB data element describing the widget
-	 * @return the resulting control (<code>null</code> if the widget is a Label).
-	 */
-	private static Control createControl(final Composite parent, ControlDescriptor cd) {
-		Control c = null;
-		if (JAXBControlUIConstants.LABEL.equals(cd.getType())) {
-			c = WidgetBuilderUtils.createLabel(parent, cd.fixedText, cd.style, cd.layoutData);
-		} else if (JAXBControlUIConstants.TEXT.equals(cd.getType())) {
-			c = createText(parent, cd);
-		} else if (JAXBControlUIConstants.RADIOBUTTON.equals(cd.getType())) {
-			if (cd.style == SWT.NONE) {
-				cd.style = SWT.RADIO;
-			} else {
-				cd.style |= SWT.RADIO;
-			}
-			c = WidgetBuilderUtils.createButton(parent, cd.layoutData, cd.title, cd.style, null);
-		} else if (JAXBControlUIConstants.CHECKBOX.equals(cd.getType())) {
-			if (cd.style == SWT.NONE) {
-				cd.style = SWT.CHECK;
-			} else {
-				cd.style |= SWT.CHECK;
-			}
-			c = WidgetBuilderUtils.createButton(parent, cd.layoutData, cd.title, cd.style, null);
-		} else if (JAXBControlUIConstants.SPINNER.equals(cd.getType())) {
-			c = WidgetBuilderUtils.createSpinner(parent, cd.style, cd.layoutData, cd.title, cd.min, cd.max, cd.min, null);
-		} else if (JAXBControlUIConstants.COMBO.equals(cd.getType())) {
-			c = createCombo(parent, cd);
-		} else if (JAXBControlUIConstants.CUSTOM.equals(cd.getType())) {
-			try {
-				c = createWidget(cd, parent);
-				if (c != null) {
-					c.setLayoutData(cd.layoutData);
-				}
-			} catch (CoreException e) {
-				// Widget will be missing from UI
-			}
-		}
-
-		if (c != null) {
-			if (!JAXBControlUIConstants.ZEROSTR.equals(cd.tooltip)) {
-				c.setToolTipText(cd.tooltip);
-			}
-			if (cd.foreground != null) {
-				c.setForeground(cd.foreground);
-			}
-			if (cd.background != null) {
-				c.setBackground(cd.background);
-			}
-			if (cd.font != null) {
-				c.setFont(cd.font);
-			}
-		}
-		return c;
-	}
-
-	/**
-	 * Constructs the editor of appropriate type.
-	 * 
-	 * @see org.eclipse.jface.viewers.TextCellEditor
-	 * @see org.eclipse.jface.viewers.CheckboxCellEditor
-	 * @see org.eclipse.jface.viewers.ComboBoxCellEditor
-	 * @see org.eclipse.ptp.internal.rm.jaxb.control.ui.cell.SpinnerCellEditor
-	 * 
-	 * @param cd
-	 *            internal object holding model description
-	 * @param data
-	 *            Property or Attribute
-	 * @param parent
-	 *            Table or Tree to which the editor belongs
-	 * @return the editor of appropriate type
-	 */
-	private static CellEditor createEditor(CellDescriptor cd, Object data, Composite parent) {
-		CellEditor editor = null;
-		if (cd.type == CellEditorType.TEXT) {
-			editor = new TextCellEditor(parent);
-		} else if (cd.type == CellEditorType.CHECK) {
-			editor = new CheckboxCellEditor(parent);
-		} else if (cd.type == CellEditorType.SPINNER) {
-			editor = new SpinnerCellEditor(parent, cd.min, cd.max);
-		} else if (cd.type == CellEditorType.COMBO) {
-			if (data instanceof AttributeType) {
-				if (cd.choice != null) {
-					cd.choice = cd.choice.trim();
-					cd.items = cd.choice.split(JAXBControlUIConstants.CM);
-				} else {
-					cd.items = new String[0];
-				}
-			}
-			editor = new ComboBoxCellEditor(parent, cd.items, SWT.READ_ONLY);
-		}
-		return editor;
-	}
-
-	/**
-	 * Constructs CellEditor and model for table row.
-	 * 
-	 * @see org.eclipse.jface.viewers.CellEditor
-	 * @see org.eclipse.ptp.internal.rm.jaxb.control.ui.model.TableRowUpdateModel
-	 * 
-	 * @param attr
-	 *            Attribute
-	 * @param viewer
-	 *            to which this row belongs
-	 * @param columnData
-	 *            list of JAXB data elements describing table columns
-	 * @param tab
-	 *            launch tab being built
-	 * @return the cell editor update model, which contains a reference to the CellEditor
-	 */
-	private static ICellEditorUpdateModel createModel(AttributeType attr, TableViewer viewer, List<ColumnDataType> columnData,
-			IJAXBLaunchConfigurationTab tab) {
-		CellDescriptor cd = new CellDescriptor(attr, columnData);
-		CellEditor editor = createEditor(cd, attr, viewer.getTable());
-		IUpdateHandler handler = tab.getParent().getUpdateHandler();
-		ICellEditorUpdateModel model = new TableRowUpdateModel(cd.name, handler, editor, cd.items, cd.itemsFrom,
-				cd.translateBooleanAs, cd.readOnly, attr);
-		if (model != null) {
-			model.setBackground(cd.background);
-			model.setFont(cd.font);
-			model.setForeground(cd.foreground);
-		}
-		return model;
-	}
-
-	/**
-	 * Constructs CellEditor and model for tree node.
-	 * 
-	 * @see org.eclipse.jface.viewers.CellEditor
-	 * @see org.eclipse.ptp.internal.rm.jaxb.control.ui.model.ValueTreeNodeUpdateModel
-	 * 
-	 * @param attr
-	 *            Attribute
-	 * @param viewer
-	 *            to which this row belongs
-	 * @param columnData
-	 *            list of JAXB data elements describing table columns
-	 * @param tab
-	 *            launch tab being built
-	 * @return the cell editor update model, which contains a reference to the CellEditor
-	 */
-	private static ICellEditorUpdateModel createModel(AttributeType attr, TreeViewer viewer, List<ColumnDataType> columnData,
-			IJAXBLaunchConfigurationTab tab) {
-		CellDescriptor cd = new CellDescriptor(attr, columnData);
-		CellEditor editor = createEditor(cd, attr, viewer.getTree());
-		IUpdateHandler handler = tab.getParent().getUpdateHandler();
-		Object[] properties = viewer.getColumnProperties();
-		boolean inValueCol = properties.length == 2;
-		ICellEditorUpdateModel model = new ValueTreeNodeUpdateModel(cd.name, handler, editor, cd.items, cd.itemsFrom,
-				cd.translateBooleanAs, cd.readOnly, inValueCol, attr);
-		if (model != null) {
-			model.setBackground(cd.background);
-			model.setFont(cd.font);
-			model.setForeground(cd.foreground);
-		}
-		return model;
-	}
-
-	/**
 	 * @see org.eclipse.swt.widgets.Text
 	 * 
 	 * @param parent
@@ -1113,6 +1161,34 @@ public class UpdateModelFactory {
 	 */
 	private static Text createText(final Composite parent, final ControlDescriptor cd) {
 		return WidgetBuilderUtils.createText(parent, cd.style, cd.layoutData, cd.readOnly, JAXBControlUIConstants.ZEROSTR);
+	}
+
+	/**
+	 * Extension-based instantiation for custom control.
+	 * 
+	 * @param type
+	 *            extension name
+	 * @return the control instance
+	 * @throws CoreException
+	 */
+	private static Control createWidget(IWidgetDescriptor wd, Composite parent) throws CoreException {
+		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(JAXBControlUIPlugin.PLUGIN_ID,
+				JAXBControlUIConstants.WIDGET_EXT_PT);
+		IConfigurationElement[] elements = extensionPoint.getConfigurationElements();
+		for (IConfigurationElement element : elements) {
+			try {
+				if (element.getAttribute(JAXBControlConstants.ID).equals(wd.getTypeId())) {
+					String widgetClass = element.getAttribute(JAXBControlUIConstants.WIDGETCLASS);
+					Class<?> cls = Platform.getBundle(element.getDeclaringExtension().getContributor().getName()).loadClass(
+							widgetClass);
+					Constructor<?> cons = cls.getConstructor(Composite.class, IWidgetDescriptor.class);
+					return (Control) cons.newInstance(parent, wd);
+				}
+			} catch (Throwable t) {
+				throw CoreExceptionUtils.newException(Messages.WidgetInstantiationError + wd.getType(), t);
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -1132,21 +1208,22 @@ public class UpdateModelFactory {
 				/*
 				 * (non-Javadoc)
 				 * 
-				 * @see org.eclipse.ptp.rm.jaxb.control.ui.IValidator#validate(java.lang.Object)
+				 * @see org.eclipse.ptp.rm.jaxb.control.ui.IValidator#getErrorMessage()
 				 */
-				public Object validate(Object value) throws Exception {
-					WidgetActionUtils.validate(String.valueOf(value), attr.getValidator(), tab.getRemoteServicesDelegate()
-							.getRemoteFileManager());
-					return value;
+				public String getErrorMessage() {
+					return attr.getValidator().getErrorMessage();
 				}
 
 				/*
 				 * (non-Javadoc)
 				 * 
-				 * @see org.eclipse.ptp.rm.jaxb.control.ui.IValidator#getErrorMessage()
+				 * @see org.eclipse.ptp.rm.jaxb.control.ui.IValidator#validate(java.lang.Object)
 				 */
-				public String getErrorMessage() {
-					return attr.getValidator().getErrorMessage();
+				public Object validate(Object value) throws Exception {
+					IRemoteConnection conn = tab.getConnection();
+					WidgetActionUtils.validate(String.valueOf(value), attr.getValidator(),
+							conn.getRemoteServices().getFileManager(conn));
+					return value;
 				}
 
 			};

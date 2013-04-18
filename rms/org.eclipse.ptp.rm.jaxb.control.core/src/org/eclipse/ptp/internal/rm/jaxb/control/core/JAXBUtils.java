@@ -17,8 +17,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.messages.Messages;
+import org.eclipse.ptp.internal.rm.jaxb.control.core.RemoteServicesDelegate;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
 public final class JAXBUtils {

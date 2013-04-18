@@ -14,7 +14,6 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.etfw.launch.variables.ETFWVariableMap;
 import org.eclipse.ptp.launch.ui.extensions.JAXBControllerLaunchConfigurationTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
-import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 
 /**
@@ -40,9 +39,6 @@ public class ETFWParentLaunchConfigurationTab extends JAXBControllerLaunchConfig
 			getVariableMap().initialize(variableMap, getJobControl().getControlId());
 			getUpdateHandler().clear();
 			getVariableMap().updateFromConfiguration(configuration);
-			delegate = RemoteServicesDelegate.getDelegate(getJobControl().getRemoteServicesId(), getJobControl()
-					.getConnectionName(),
-					getProgressMonitor());
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}

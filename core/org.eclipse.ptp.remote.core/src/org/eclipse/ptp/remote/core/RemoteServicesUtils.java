@@ -13,7 +13,10 @@ package org.eclipse.ptp.remote.core;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ptp.internal.remote.core.PTPRemoteCorePlugin;
 import org.eclipse.ptp.internal.remote.core.RemoteServicesImpl;
 import org.eclipse.ptp.internal.remote.core.RemoteServicesProxy;
@@ -25,6 +28,62 @@ import org.eclipse.ptp.internal.remote.core.preferences.Preferences;
  * @since 7.0
  */
 public class RemoteServicesUtils {
+	/**
+	 * Utility method to get a remote connection given a remote services ID and a connection name.
+	 * 
+	 * @param remoteServicesId
+	 *            ID of remote services providing the connection
+	 * @param connectionName
+	 *            name of the connection to find
+	 * @param monitor
+	 *            progress monitor
+	 * @return remote connection or null if the ID or connection name are invalid
+	 */
+	public static IRemoteConnection getConnectionWithProgress(String remoteServicesId, String connectionName,
+			IProgressMonitor monitor) {
+		SubMonitor progress = SubMonitor.convert(monitor, 10);
+		IRemoteServices remoteServices = RemoteServices.getRemoteServices(remoteServicesId, progress.newChild(1));
+		if (remoteServices != null) {
+			IRemoteConnectionManager remoteConnectionManager = remoteServices.getConnectionManager();
+			if (remoteConnectionManager != null) {
+				return remoteConnectionManager.getConnection(connectionName);
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Utility method to get a file store corresponding to the given path.
+	 * 
+	 * @param remoteServicesId
+	 *            ID of remote services providing the connection
+	 * @param connectionName
+	 *            name of the remote connection to use
+	 * @param path
+	 *            path of file on remote system
+	 * @param monitor
+	 *            progress monitor
+	 * @return file store corresponding to the remote file or null if the ID or connection name are invalid
+	 */
+	public static IFileStore getRemoteFileWithProgress(String remoteServicesId, String connectionName, String path,
+			IProgressMonitor monitor) {
+		SubMonitor progress = SubMonitor.convert(monitor, 10);
+		IRemoteServices remoteServices = RemoteServices.getRemoteServices(remoteServicesId, progress.newChild(10));
+		if (remoteServices != null) {
+			IRemoteConnectionManager remoteConnectionManager = remoteServices.getConnectionManager();
+			if (remoteConnectionManager != null) {
+				IRemoteConnection remoteConnection = remoteConnectionManager.getConnection(connectionName);
+				if (remoteConnection != null) {
+					IRemoteFileManager remoteFileManager = remoteServices.getFileManager(remoteConnection);
+					if (remoteFileManager != null) {
+						return remoteFileManager.getResource(path);
+					}
+				}
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * Convert a UNC path to a URI
 	 * 

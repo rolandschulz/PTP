@@ -26,11 +26,9 @@ import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.internal.rm.lml.monitor.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.RemoteServices;
-import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
+import org.eclipse.ptp.remote.core.RemoteServicesUtils;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.core.LaunchControllerManager;
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
@@ -85,7 +83,7 @@ public class ActionUtils {
 				console.activate();
 				stream = console.newOutputStream();
 				SubMonitor progress = SubMonitor.convert(monitor, 1000);
-				IFileStore lres = getRemoteFile(fRemoteServicesId, fConnName, getName(), progress);
+				IFileStore lres = RemoteServicesUtils.getRemoteFileWithProgress(fRemoteServicesId, fConnName, getName(), progress);
 				if (lres != null) {
 					BufferedInputStream is = new BufferedInputStream(lres.openInputStream(EFS.NONE, progress.newChild(25)));
 					byte[] buffer = new byte[COPY_BUFFER_SIZE];
@@ -250,8 +248,8 @@ public class ActionUtils {
 						String remotePath = status.getString(JobStatusData.STDOUT_REMOTE_FILE_ATTR);
 						if (remotePath != null) {
 							try {
-								IFileStore lres = getRemoteFile(control.getRemoteServicesId(), control.getConnectionName(),
-										remotePath, progress);
+								IFileStore lres = RemoteServicesUtils.getRemoteFileWithProgress(control.getRemoteServicesId(),
+										control.getConnectionName(), remotePath, progress);
 								if (lres != null) {
 									if (lres.fetchInfo(EFS.NONE, progress.newChild(25)).exists()) {
 										lres.delete(EFS.NONE, progress.newChild(25));
@@ -264,8 +262,8 @@ public class ActionUtils {
 						remotePath = status.getString(JobStatusData.STDERR_REMOTE_FILE_ATTR);
 						if (remotePath != null) {
 							try {
-								IFileStore lres = getRemoteFile(control.getRemoteServicesId(), control.getConnectionName(),
-										remotePath, progress);
+								IFileStore lres = RemoteServicesUtils.getRemoteFileWithProgress(control.getRemoteServicesId(),
+										control.getConnectionName(), remotePath, progress);
 								if (lres != null) {
 									if (lres.fetchInfo(EFS.NONE, progress.newChild(25)).exists()) {
 										lres.delete(EFS.NONE, progress.newChild(25));
@@ -282,31 +280,6 @@ public class ActionUtils {
 		};
 		j.setUser(true);
 		j.schedule();
-	}
-
-	/**
-	 * Similar to {@link RemoteServicesDelegate#initialize(IProgressMonitor)}
-	 * 
-	 * @param path
-	 * @param control
-	 * @param progress
-	 * @return file, if retrieval was successful
-	 */
-	private static IFileStore getRemoteFile(String remoteServicesId, String remoteConnectionName, String path, SubMonitor progress) {
-		IRemoteServices remoteServices = RemoteServices.getRemoteServices(remoteServicesId, progress.newChild(25));
-		if (remoteServices != null) {
-			IRemoteConnectionManager remoteConnectionManager = remoteServices.getConnectionManager();
-			if (remoteConnectionManager != null) {
-				IRemoteConnection remoteConnection = remoteConnectionManager.getConnection(remoteConnectionName);
-				if (remoteConnection != null) {
-					IRemoteFileManager remoteFileManager = remoteServices.getFileManager(remoteConnection);
-					if (remoteFileManager != null) {
-						return remoteFileManager.getResource(path);
-					}
-				}
-			}
-		}
-		return null;
 	}
 
 	/**

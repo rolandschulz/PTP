@@ -54,7 +54,6 @@ import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemotePreferenceConstants;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.RemoteServices;
-import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.core.server.RemoteServerManager;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
@@ -1048,7 +1047,7 @@ public class LaunchController implements ILaunchController {
 				initialize();
 			}
 
-			fRemoteServicesDelegate = RemoteServicesDelegate.getDelegate(servicesId, connectionName, progress.newChild(50));
+			fRemoteServicesDelegate = JAXBUtils.getRemoteServicesDelegate(servicesId, connectionName, progress.newChild(50));
 			IRemoteConnection conn = fRemoteServicesDelegate.getRemoteConnection();
 			if (conn != null) {
 				checkConnection(conn, progress);

@@ -10,7 +10,6 @@
 package org.eclipse.ptp.remote.ui;
 
 import java.lang.reflect.InvocationTargetException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,8 +24,6 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ptp.internal.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.internal.remote.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.remote.core.RemoteServicesDelegate;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.ui.widgets.RemoteConnectionWidget;
 import org.eclipse.swt.widgets.Shell;
@@ -37,81 +34,11 @@ import org.eclipse.swt.widgets.Shell;
  * @see org.eclipse.ptp.remote.ui.IRemoteUIServices
  * @see org.eclipse.ptp.remote.ui.IRemoteUIFileManager
  * @see org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager
- * @see org.eclipse.ptp.remote.core.RemoteServicesDelegate
  * 
- * @author arossi
  * @since 5.0
  * 
  */
 public class RemoteUIServicesUtils {
-
-	/**
-	 * Opens a browse dialog using the indicated remote or local service and
-	 * connection.
-	 * 
-	 * @param shell
-	 *            for the dialog
-	 * @param current
-	 *            initial uri to display
-	 * @param delegate
-	 *            containing remote services data
-	 * @param remote
-	 *            whether to use the remote or the local connection and service
-	 *            provided by the delegate
-	 * @param readOnly
-	 *            whether to disallow the user to type in a path (default is <code>true</code>)
-	 * @param dir
-	 *            whether to browse/return a directory (default is file)
-	 * @return the selected file path as URI or <code>null</code> if canceled
-	 * @throws URISyntaxException
-	 */
-	public static URI browse(Shell shell, URI current, RemoteServicesDelegate delegate, boolean remote, boolean readOnly,
-			boolean dir) throws URISyntaxException {
-		IRemoteUIServices uIServices = null;
-		IRemoteUIFileManager uiFileManager = null;
-		IRemoteConnection conn = null;
-		IRemoteFileManager manager = null;
-
-		URI home = null;
-		String path = null;
-		int type = readOnly ? IRemoteUIConstants.OPEN : IRemoteUIConstants.SAVE;
-
-		if (!remote) {
-			uIServices = RemoteUIServices.getRemoteUIServices(delegate.getLocalServices());
-			uiFileManager = uIServices.getUIFileManager();
-			manager = delegate.getLocalFileManager();
-			conn = delegate.getLocalConnection();
-			home = delegate.getLocalHome();
-		} else {
-			uIServices = RemoteUIServices.getRemoteUIServices(delegate.getRemoteServices());
-			uiFileManager = uIServices.getUIFileManager();
-			manager = delegate.getRemoteFileManager();
-			conn = delegate.getRemoteConnection();
-			home = delegate.getRemoteHome();
-		}
-
-		path = (current == null) ? home.getPath() : current.getPath();
-
-		String title = dir ? Messages.RemoteResourceBrowser_directoryTitle : Messages.RemoteResourceBrowser_fileTitle;
-		try {
-			uiFileManager.setConnection(conn);
-			// uiFileManager.showConnections(remote);
-			if (dir) {
-				path = uiFileManager.browseDirectory(shell, title, path, type);
-			} else {
-				path = uiFileManager.browseFile(shell, title, path, type);
-			}
-		} catch (Throwable t) {
-			PTPRemoteUIPlugin.log(t);
-		}
-
-		if (path == null) {
-			return null;
-		}
-
-		return manager.toURI(path);
-	}
-
 	/**
 	 * @param shell
 	 * @param context

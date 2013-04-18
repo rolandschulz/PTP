@@ -17,7 +17,6 @@ public class Messages extends NLS {
 
 	public static String JAXBUIPlugin_Exception_InternalError;
 	public static String JAXBConnectionWizardPage_Description;
-
 	public static String JAXBRMControlConfigurationWizardPage_Title;
 	public static String StdoutPath;
 	public static String StderrPath;
@@ -38,15 +37,13 @@ public class Messages extends NLS {
 	public static String ControlStateRule_0;
 	public static String ControlStateRule_1;
 	public static String ControlStateRule_2;
-
 	public static String WidgetInstantiationError;
-
 	public static String JAXBRMPreferencesPage_Preferences_options;
 	public static String JAXBRMPreferencesPage_ParserDebug_options;
 	public static String JAXBRMPreferencesPage_CommandDebug_options;
-
+	public static String UpdateModelFactory_Browse_directory;
+	public static String UpdateModelFactory_Browse_file;
 	public static String UpdateModelFactory_Undefined_attribute_in_BrowseType;
-
 	public static String UpdateModelFactory_Undefined_attribute_in_WidgetType;
 
 	static {
