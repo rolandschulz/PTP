@@ -130,14 +130,6 @@ public class Messages extends NLS {
 	public static String AbstractParallelLaunchConfigurationDelegate_Path_not_found;
 	public static String AbstractParallelLaunchConfigurationDelegate_unableToObtainConnectionInfo;
 
-	public static String PTPLaunchPlugin_0;
-	public static String PTPLaunchPlugin_1;
-	public static String PTPLaunchPlugin_2;
-	public static String PTPLaunchPlugin_3;
-	public static String PTPLaunchPlugin_4;
-	public static String PTPLaunchPlugin_5;
-	public static String PTPLaunchPlugin_Operation_cancelled_by_user;
-
 	public static String DownloadBackRule_0;
 
 	public static String DownloadRule_0;
@@ -252,6 +244,8 @@ public class Messages extends NLS {
 	public static String RuntimeProcess_Exit_value_not_available;
 
 	public static String DefaultDynamicTab_title;
+	public static String JAXBControllerLaunchConfigurationTab_Unable_to_obtain_remote_connection;
+
 	public static String JAXBControllerLaunchConfigurationTab_unableToObtainConfigurationInfo;
 	public static String JAXBControllerLaunchConfigurationTab_unableToObtainConnectionInfo;
 	public static String VoidLaunchTabMessage;

@@ -234,7 +234,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 				fRemoteConnection = RemoteServicesUtils.getConnectionWithProgress(fRemoteServicesId, fConnectionName,
 						monitor.newChild(2));
 				if (fRemoteConnection == null) {
-					return new RMLaunchValidation(false, NLS.bind("Unable to obtain remote connection: {0}", fConnectionName));
+					return new RMLaunchValidation(false, NLS.bind(Messages.JAXBControllerLaunchConfigurationTab_Unable_to_obtain_remote_connection, fConnectionName));
 				}
 				if (!fRemoteConnection.isOpen()) {
 					fRemoteConnection.open(monitor.newChild(8));
