@@ -1047,7 +1047,7 @@ public class LaunchController implements ILaunchController {
 				initialize();
 			}
 
-			fRemoteServicesDelegate = JAXBUtils.getRemoteServicesDelegate(servicesId, connectionName, progress.newChild(50));
+			fRemoteServicesDelegate = RemoteServicesDelegate.getDelegate(servicesId, connectionName, progress.newChild(50));
 			IRemoteConnection conn = fRemoteServicesDelegate.getRemoteConnection();
 			if (conn != null) {
 				checkConnection(conn, progress);

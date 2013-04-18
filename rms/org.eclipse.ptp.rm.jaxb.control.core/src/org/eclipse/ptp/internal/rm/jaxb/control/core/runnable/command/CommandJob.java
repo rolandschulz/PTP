@@ -45,7 +45,6 @@ import org.eclipse.ptp.internal.rm.jaxb.control.core.ICommandJobStreamsProxy;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.IStreamParserTokenizer;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.JAXBControlConstants;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.JAXBControlCorePlugin;
-import org.eclipse.ptp.internal.rm.jaxb.control.core.JAXBUtils;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.LaunchController;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.RemoteServicesDelegate;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.data.ArgImpl;
@@ -538,7 +537,7 @@ public class CommandJob extends Job implements ICommandJob {
 			throw CoreExceptionUtils.newException(Messages.MissingArglistFromCommandError, null);
 		}
 		ArgumentParser cmdArgs = new ArgumentParser(ArgImpl.getArgs(uuid, args, rmVarMap));
-		RemoteServicesDelegate delegate = JAXBUtils.getRemoteServicesDelegate(control.getRemoteServicesId(),
+		RemoteServicesDelegate delegate = RemoteServicesDelegate.getDelegate(control.getRemoteServicesId(),
 				control.getConnectionName(), progress.newChild(5));
 		if (progress.isCanceled()) {
 			return null;

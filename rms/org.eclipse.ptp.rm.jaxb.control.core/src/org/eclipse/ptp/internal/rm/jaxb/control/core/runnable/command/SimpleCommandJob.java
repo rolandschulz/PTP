@@ -24,7 +24,6 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.JAXBControlConstants;
-import org.eclipse.ptp.internal.rm.jaxb.control.core.JAXBUtils;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.LaunchController;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.RemoteServicesDelegate;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.messages.Messages;
@@ -251,7 +250,7 @@ public class SimpleCommandJob extends Job {
 	private IRemoteProcessBuilder prepareCommand(IProgressMonitor monitor) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 10);
 		ArgumentParser args = new ArgumentParser(fVarMap.getString(fUuid, fCommand.getExec()));
-		RemoteServicesDelegate delegate = JAXBUtils.getRemoteServicesDelegate(fControl.getRemoteServicesId(),
+		RemoteServicesDelegate delegate = RemoteServicesDelegate.getDelegate(fControl.getRemoteServicesId(),
 				fControl.getConnectionName(), progress.newChild(5));
 		if (delegate.getRemoteConnection() == null) {
 			throw CoreExceptionUtils.newException(Messages.MissingArglistFromCommandError, new Throwable(

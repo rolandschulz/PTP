@@ -33,7 +33,6 @@ import org.eclipse.ptp.internal.rm.jaxb.control.core.ICommandJobStreamMonitor;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.ICommandJobStreamsProxy;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.JAXBControlConstants;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.JAXBControlCorePlugin;
-import org.eclipse.ptp.internal.rm.jaxb.control.core.JAXBUtils;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.RemoteServicesDelegate;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.runnable.JobStatusMap;
 import org.eclipse.ptp.internal.rm.jaxb.core.JAXBCoreConstants;
@@ -83,7 +82,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 			RemoteServicesDelegate d = null;
 			SubMonitor progress = SubMonitor.convert(monitor, 120);
 			try {
-				d = JAXBUtils.getRemoteServicesDelegate(control.getRemoteServicesId(), control.getConnectionName(),
+				d = RemoteServicesDelegate.getDelegate(control.getRemoteServicesId(), control.getConnectionName(),
 						progress.newChild(20));
 				if (d.getRemoteFileManager() == null) {
 					/*

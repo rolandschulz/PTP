@@ -26,8 +26,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.ptp.internal.remote.core.PTPRemoteCorePlugin;
-import org.eclipse.ptp.internal.remote.core.messages.Messages;
+import org.eclipse.ptp.internal.rm.jaxb.control.core.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
@@ -104,9 +103,9 @@ public class RemoteServicesDelegate {
 	 */
 	private static IStatus getErrorStatus(String message, Throwable t) {
 		if (t != null) {
-			PTPRemoteCorePlugin.log(t);
+			JAXBControlCorePlugin.log(t);
 		}
-		return new Status(Status.ERROR, PTPRemoteCorePlugin.getUniqueIdentifier(), Status.ERROR, message, t);
+		return new Status(Status.ERROR, JAXBControlCorePlugin.getUniqueIdentifier(), Status.ERROR, message, t);
 	}
 
 	/**
@@ -215,7 +214,7 @@ public class RemoteServicesDelegate {
 			try {
 				is.close();
 			} catch (IOException ioe) {
-				PTPRemoteCorePlugin.log(ioe);
+				JAXBControlCorePlugin.log(ioe);
 			}
 		}
 		return sb.toString();
@@ -255,7 +254,7 @@ public class RemoteServicesDelegate {
 				try {
 					os.close();
 				} catch (IOException ioe) {
-					PTPRemoteCorePlugin.log(ioe);
+					JAXBControlCorePlugin.log(ioe);
 				}
 			}
 		}
@@ -359,7 +358,7 @@ public class RemoteServicesDelegate {
 		/*
 		 * could happen on shutdown
 		 */
-		if (PTPRemoteCorePlugin.getDefault() == null) {
+		if (JAXBControlCorePlugin.getDefault() == null) {
 			return;
 		}
 		try {

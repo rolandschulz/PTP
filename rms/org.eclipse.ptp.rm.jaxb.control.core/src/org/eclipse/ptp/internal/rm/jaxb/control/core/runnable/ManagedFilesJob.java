@@ -26,7 +26,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.JAXBControlConstants;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.JAXBControlCorePlugin;
-import org.eclipse.ptp.internal.rm.jaxb.control.core.JAXBUtils;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.LaunchController;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.RemoteServicesDelegate;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.data.LineImpl;
@@ -108,7 +107,7 @@ public class ManagedFilesJob extends Job {
 		SubMonitor progress = SubMonitor.convert(monitor, 10);
 		try {
 			try {
-				delegate = JAXBUtils.getRemoteServicesDelegate(control.getRemoteServicesId(), control.getConnectionName(),
+				delegate = RemoteServicesDelegate.getDelegate(control.getRemoteServicesId(), control.getConnectionName(),
 						progress.newChild(2));
 				IRemoteConnection conn = delegate.getRemoteConnection();
 				LaunchController.checkConnection(conn, progress);
