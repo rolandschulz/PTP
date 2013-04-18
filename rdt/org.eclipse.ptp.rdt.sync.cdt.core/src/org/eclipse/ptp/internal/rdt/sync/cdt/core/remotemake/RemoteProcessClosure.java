@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ptp.remote.core;
+package org.eclipse.ptp.internal.rdt.sync.cdt.core.remotemake;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,7 +18,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.text.MessageFormat;
 
-import org.eclipse.ptp.internal.remote.core.messages.Messages;
+import org.eclipse.ptp.internal.rdt.sync.cdt.core.messages.Messages;
+import org.eclipse.ptp.remote.core.IRemoteProcess;
 
 /**
  * @author crecoskie
@@ -31,7 +32,6 @@ import org.eclipse.ptp.internal.remote.core.messages.Messages;
  * @see org.eclipse.cdt.internal.core.ProcessClosure
  * @since 7.0
  */
-@SuppressWarnings("restriction")
 public class RemoteProcessClosure {
 
 	/**

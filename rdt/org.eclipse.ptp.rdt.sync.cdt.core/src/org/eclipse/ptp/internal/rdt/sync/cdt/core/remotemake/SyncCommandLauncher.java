@@ -51,7 +51,6 @@ import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.RemoteProcessAdapter;
-import org.eclipse.ptp.remote.core.RemoteProcessClosure;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
 // TODO (Jeff): Remove/replace NON_ESCAPED_ASCII_CHARS, static initializer, and escape(String) after Bug 371691 is fixed

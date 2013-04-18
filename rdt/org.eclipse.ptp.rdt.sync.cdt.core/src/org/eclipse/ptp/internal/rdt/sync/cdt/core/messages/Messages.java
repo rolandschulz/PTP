@@ -55,6 +55,9 @@ public class Messages extends NLS {
 
 	public static String SyncGCCBuiltinSpecsDetector_4;
 
+	public static String RemoteProcessClosure_exit_code;
+	public static String RemoteProcessClosure_shell_completed;
+
 	static {
 		initializeMessages(BUNDLE_NAME, Messages.class);
 	}
