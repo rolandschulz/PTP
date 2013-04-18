@@ -213,9 +213,14 @@ public class SyncConfigManager {
 	 * @return configuration or null if no configuration with supplied name found
 	 */
 	public static SyncConfig getConfig(IProject project, String name) {
-		Map<String, SyncConfig> map = fSyncConfigMap.get(project);
-		if (map != null) {
-			return map.get(name);
+		try {
+			loadConfigs(project);
+			Map<String, SyncConfig> map = fSyncConfigMap.get(project);
+			if (map != null) {
+				return map.get(name);
+			}
+		} catch (CoreException e) {
+			RDTSyncCorePlugin.log(e);
 		}
 		return null;
 	}
