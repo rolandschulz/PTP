@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Roland Schulz, University of Tennessee
  *******************************************************************************/
-package org.eclipse.ptp.rdt.sync.core.services;
+package org.eclipse.ptp.internal.rdt.sync.core.services;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ptp.internal.rdt.sync.core.RDTSyncCorePlugin;
-import org.eclipse.ptp.internal.rdt.sync.core.SynchronizeServiceDescriptor;
+import org.eclipse.ptp.rdt.sync.core.services.ISynchronizeServiceDescriptor;
 
 public class SynchronizeServiceRegistry {
 	public static final String SYNCHRONIZE_SERVICE_EXTENSION = "synchronizeService"; //$NON-NLS-1$

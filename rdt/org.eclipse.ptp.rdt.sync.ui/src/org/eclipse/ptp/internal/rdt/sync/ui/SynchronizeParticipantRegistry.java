@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Roland Schulz, University of Tennessee
  *******************************************************************************/
-package org.eclipse.ptp.rdt.sync.ui;
+package org.eclipse.ptp.internal.rdt.sync.ui;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,8 +18,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.ptp.internal.rdt.sync.ui.RDTSyncUIPlugin;
-import org.eclipse.ptp.internal.rdt.sync.ui.SynchronizeParticipantDescriptor;
+import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipantDescriptor;
 
 public class SynchronizeParticipantRegistry {
 	private static List<ISynchronizeParticipantDescriptor> fAllDescriptors;

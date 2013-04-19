@@ -12,10 +12,10 @@ package org.eclipse.ptp.rdt.sync.core;
 
 import org.eclipse.core.resources.IPathVariableManager;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.ptp.internal.rdt.sync.core.services.SynchronizeServiceRegistry;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
 import org.eclipse.ptp.rdt.sync.core.handlers.IMissingConnectionHandler;
 import org.eclipse.ptp.rdt.sync.core.services.ISynchronizeService;
-import org.eclipse.ptp.rdt.sync.core.services.SynchronizeServiceRegistry;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.RemoteServices;

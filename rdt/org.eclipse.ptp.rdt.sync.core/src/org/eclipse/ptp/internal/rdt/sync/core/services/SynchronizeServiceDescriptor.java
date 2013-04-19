@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Roland Schulz, University of Tennessee
  *******************************************************************************/
-package org.eclipse.ptp.internal.rdt.sync.core;
+package org.eclipse.ptp.internal.rdt.sync.core.services;
 
 import java.lang.reflect.Constructor;
 
@@ -18,10 +18,10 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.internal.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.internal.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.services.ISynchronizeService;
 import org.eclipse.ptp.rdt.sync.core.services.ISynchronizeServiceDescriptor;
-import org.eclipse.ptp.rdt.sync.core.services.SynchronizeServiceRegistry;
 
 public class SynchronizeServiceDescriptor implements ISynchronizeServiceDescriptor {
 	private final String fName;

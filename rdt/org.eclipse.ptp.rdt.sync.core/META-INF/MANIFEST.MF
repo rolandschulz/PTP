@@ -11,6 +11,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui
 Export-Package: org.eclipse.ptp.internal.rdt.sync.core;x-friends:="org.eclipse.ptp.rdt.sync.ui",
  org.eclipse.ptp.internal.rdt.sync.core.messages;x-internal:=true,
+ org.eclipse.ptp.internal.rdt.sync.core.services;x-friends:="org.eclipse.ptp.rdt.sync.ui",
  org.eclipse.ptp.rdt.sync.core;
   x-friends:="org.eclipse.ptp.rdt.sync.ui,
    org.eclipse.ptp.rdt.sync.git.core,

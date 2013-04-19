@@ -10,6 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.ui;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.ptp.internal.rdt.sync.core.services.SynchronizeServiceRegistry;
+import org.eclipse.ptp.rdt.sync.core.services.ISynchronizeService;
+
 /**
  * Must be extended by extensions to the syncProvider extension point.
  * 
@@ -44,20 +48,30 @@ public abstract class AbstractSynchronizeParticipant implements ISynchronizePart
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipantDescriptor#getServiceId()
-	 */
-	@Override
-	public String getServiceId() {
-		return fDescriptor.getServiceId();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipantDescriptor#getParticipant()
 	 */
 	@Override
 	public ISynchronizeParticipant getParticipant() {
 		return this;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant#getProvider(org.eclipse.core.resources.IProject)
+	 */
+	@Override
+	public ISynchronizeService getProvider(IProject project) {
+		return SynchronizeServiceRegistry.getSynchronizeServiceDescriptor(getServiceId()).getService();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipantDescriptor#getServiceId()
+	 */
+	@Override
+	public String getServiceId() {
+		return fDescriptor.getServiceId();
 	}
 }

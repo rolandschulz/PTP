@@ -38,7 +38,6 @@ import org.eclipse.ptp.internal.rdt.sync.ui.SyncImages;
 import org.eclipse.ptp.internal.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.PathResourceMatcher;
 import org.eclipse.ptp.rdt.sync.core.RegexResourceMatcher;
-import org.eclipse.ptp.rdt.sync.core.RemoteContentProvider;
 import org.eclipse.ptp.rdt.sync.core.ResourceMatcher;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
