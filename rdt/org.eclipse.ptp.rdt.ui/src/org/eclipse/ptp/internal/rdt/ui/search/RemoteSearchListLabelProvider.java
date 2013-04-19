@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2011 QNX Software Systems and others.
+ * Copyright (c) 2006, 2013 QNX Software Systems and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,6 +28,7 @@ import org.eclipse.cdt.internal.ui.util.Messages;
 import org.eclipse.cdt.internal.ui.viewsupport.ColoringLabelProvider;
 import org.eclipse.cdt.ui.CDTSharedImages;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.ptp.internal.rdt.core.search.RemoteLineSearchElement;
 
 
 public class RemoteSearchListLabelProvider extends ColoringLabelProvider {
@@ -46,17 +47,17 @@ public class RemoteSearchListLabelProvider extends ColoringLabelProvider {
 		Object element = cell.getElement();
 		switch (fColumnIndex) {
 		case RemoteSearchViewPage.LOCATION_COLUMN_INDEX:
-			if (element instanceof LineSearchElement) {
-				LineSearchElement lineElement = (LineSearchElement) element;
-				String location = RemoteSearchTreeContentProvider.getAbsolutePath((IIndexFileLocation)element).toString();
+			if (element instanceof RemoteLineSearchElement) {
+				RemoteLineSearchElement lineElement = (RemoteLineSearchElement) element;
+				String location = RemoteSearchTreeContentProvider.getAbsolutePath(lineElement.getLocation()).toString();
 				int lineNumber = lineElement.getLineNumber();
 				cell.setText(Messages.format(CSearchMessages.CSearchResultCollector_location, location, lineNumber));
 				cell.setImage(CDTSharedImages.getImage(CDTSharedImages.IMG_OBJS_SEARCH_LINE));
 			}
 			break;
 		case RemoteSearchViewPage.DEFINITION_COLUMN_INDEX:
-			if (element instanceof LineSearchElement) {
-				LineSearchElement lineElement = (LineSearchElement) element;
+			if (element instanceof RemoteLineSearchElement) {
+				RemoteLineSearchElement lineElement = (RemoteLineSearchElement) element;
 				ICElement enclosingElement = lineElement.getMatches()[0].getEnclosingElement();
 				if (fPage.isShowEnclosingDefinitions() && enclosingElement != null) {
 					cell.setText(enclosingElement.getElementName());
