@@ -4,17 +4,17 @@
    <extension
          point="org.eclipse.ui.importWizards">
       <category
-            id="org.eclipse.ptp.rm.ResourceManagers"
-            name="Resource Managers">
+            id="org.eclipse.ptp.rm.targetConfigurations"
+            name="%ImportCategory.name">
       </category>
       <wizard
-            category="org.eclipse.ptp.rm.ResourceManagers"
+            category="org.eclipse.ptp.rm.targetConfigurations"
             class="org.eclipse.ptp.internal.rm.jaxb.ui.wizards.JAXBRMConfigurationImportWizard"
             icon="icons/rm.gif"
             id="org.eclipse.ptp.rm.jaxb.ui.wizards.JAXBRMConfigurationImportWizard"
-            name="Resource Manager Definition from Plug-in">
+            name="%ImportWizard.name">
          <description>
-            Import XML configurations from the Resource Manager plug-ins to the workspace
+            Import existing target configurations into the workspace
          </description>
       </wizard>
    </extension>

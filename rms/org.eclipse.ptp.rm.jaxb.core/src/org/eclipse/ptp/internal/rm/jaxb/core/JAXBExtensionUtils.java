@@ -97,7 +97,7 @@ public class JAXBExtensionUtils {
 	 *            widget the first time.
 	 */
 	private static void loadExternal() {
-		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(JAXBCoreConstants.RESOURCE_MANAGERS);
+		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(JAXBCoreConstants.TARGET_CONFIGURATIONS);
 		StringBuffer invalid = new StringBuffer();
 		if (project.exists()) {
 			try {

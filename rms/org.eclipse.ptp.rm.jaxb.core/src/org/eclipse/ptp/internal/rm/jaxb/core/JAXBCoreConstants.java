@@ -76,7 +76,7 @@ public class JAXBCoreConstants {
 	public static final String JAXB_CONTEXT = "org.eclipse.ptp.rm.jaxb.core.data";//$NON-NLS-1$
 	public static final String RM_XML = "rm_config_xml";//$NON-NLS-1$
 	public static final String RM_URL = "rm_config_url";//$NON-NLS-1$
-	public static final String RESOURCE_MANAGERS = "resourceManagers";//$NON-NLS-1$
+	public static final String TARGET_CONFIGURATIONS = "targetConfigurations";//$NON-NLS-1$
 	public static final String DOT_XML = ".xml";//$NON-NLS-1$
 	public static final String CONFIGURATION_FILE_ATTRIBUTE = "configurationFile"; //$NON-NLS-1$
 	public static final String RM_CONFIG_EXTENSION_POINT = "org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagerConfigurations"; //$NON-NLS-1$

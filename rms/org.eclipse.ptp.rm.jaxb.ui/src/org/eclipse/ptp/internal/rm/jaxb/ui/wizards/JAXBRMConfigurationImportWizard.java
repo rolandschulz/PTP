@@ -80,7 +80,7 @@ public class JAXBRMConfigurationImportWizard extends Wizard implements IImportWi
 	 */
 	@Override
 	public boolean performFinish() {
-		new UIJob(JAXBUIConstants.RESOURCE_MANAGERS) {
+		new UIJob(JAXBUIConstants.TARGET_CONFIGURATIONS) {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				SubMonitor subMon = SubMonitor.convert(monitor, 20);
@@ -124,7 +124,7 @@ public class JAXBRMConfigurationImportWizard extends Wizard implements IImportWi
 	 */
 	private static IProject checkResourceManagersProject(IProgressMonitor monitor) throws CoreException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 20);
-		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(JAXBUIConstants.RESOURCE_MANAGERS);
+		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(JAXBUIConstants.TARGET_CONFIGURATIONS);
 		if (!project.exists()) {
 			boolean create = MessageDialog
 					.openQuestion(Display.getDefault().getActiveShell(), Messages.ResourceManagersNotExist_title,
