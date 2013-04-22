@@ -19,7 +19,7 @@ fi
 
 cd `dirname $0`
 
-if [ "$(basename `dirname $PWD`)" = "releng" ] ; then # building in GIT with subdirectories
+if [ "$(basename `dirname $PWD`)" = "debug" ] ; then # building in GIT with subdirectories
 
     KNOWN_PLUGINS="\
 	core/org.eclipse.ptp.utils$VERSION\
