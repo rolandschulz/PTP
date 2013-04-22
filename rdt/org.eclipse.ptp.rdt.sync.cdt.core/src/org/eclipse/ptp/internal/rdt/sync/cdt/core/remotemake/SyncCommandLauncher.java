@@ -41,8 +41,9 @@ import org.eclipse.ptp.ems.core.EnvManagerProjectProperties;
 import org.eclipse.ptp.ems.core.EnvManagerRegistry;
 import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.internal.rdt.sync.cdt.core.Activator;
-import org.eclipse.ptp.internal.rdt.sync.cdt.core.BuildConfigUtils;
+import org.eclipse.ptp.internal.rdt.sync.cdt.core.SyncConfigListenerCDT;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
+import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
@@ -100,21 +101,21 @@ public class SyncCommandLauncher implements ICommandLauncher {
 					"RemoteCommandLauncher has not been associated with a project.")); //$NON-NLS-1$
 		}
 
+		SyncConfig config = SyncConfigManager.getActive(getProject());
+		if (config == null) {
+			return null;
+		}
+
 		// Set correct directory
 		// For managed projects and configurations other than workspace, the directory is incorrect and needs to be fixed.
-		IConfiguration configuration = ManagedBuildManager.getBuildInfo(getProject()).getDefaultConfiguration();
 		String projectLocalRoot = getProject().getLocation().toPortableString();
-		String projectActualRoot = BuildConfigUtils.getSyncConfigForBuildConfiguration(configuration).getLocation(getProject());
+		String projectActualRoot = config.getLocation();
 		String fixedDirectory = changeToDirectory.toString().replaceFirst(Pattern.quote(projectLocalRoot),
 				Matcher.quoteReplacement(projectActualRoot));
 		changeToDirectory = new Path(fixedDirectory);
 		fCommandArgs = constructCommandArray(commandPath.toPortableString(), args);
 
-		// Get and setup the connection and remote services for this build configuration.
-		SyncConfig config = BuildConfigUtils.getSyncConfigForBuildConfiguration(configuration);
-		if (config == null) {
-			return null;
-		}
+		// Get and setup the connection and remote services for this sync configuration.
 		IRemoteConnection connection;
 		try {
 			connection = config.getRemoteConnection();

@@ -157,15 +157,18 @@ public class SyncManager {
 	public static void makeSyncProject(IProject project, ISynchronizeService provider, SyncFileFilter filter) throws CoreException {
 		RemoteSyncNature.addNature(project, new NullProgressMonitor());
 
+		// Remote config
 		IRemoteConnection conn = provider.getRemoteConnection();
 		SyncConfig config = SyncConfigManager.newConfig(conn.getName(), provider.getId(), conn, provider.getLocation());
 		SyncConfigManager.addConfig(project, config);
 		SyncConfigManager.setActive(project, config);
 
+		// Local config
+		config = SyncConfigManager.getLocalConfig();
+		SyncConfigManager.addConfig(project, config);
 		if (filter != null) {
 			SyncManager.saveFileFilter(project, filter);
 		}
-
 	}
 
 	/**
