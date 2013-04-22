@@ -29,6 +29,8 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.ptp.internal.rdt.sync.core.RDTSyncCorePlugin;
+import org.eclipse.ptp.internal.rdt.sync.core.SyncRunner;
+import org.eclipse.ptp.internal.rdt.sync.core.SyncUtils;
 import org.eclipse.ptp.internal.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.handlers.IMissingConnectionHandler;
 import org.eclipse.ptp.rdt.sync.core.handlers.ISyncExceptionHandler;

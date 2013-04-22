@@ -25,7 +25,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.internal.rdt.sync.ui.handlers.CommonSyncExceptionHandler;
 import org.eclipse.ptp.internal.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.internal.rdt.sync.ui.preferences.SyncFileFilterPage;
-import org.eclipse.ptp.rdt.sync.core.PathResourceMatcher;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
@@ -114,7 +113,7 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 					}
 
 					IPath path = selection.getProjectRelativePath();
-					sff.addPattern(new PathResourceMatcher(path), type);
+					sff.addPattern(SyncFileFilter.getPathResourceMatcher(path), type);
 				}
 				SyncManager.saveFileFilter(project, sff);
 			} else if (command.equals(syncFileList)) {

@@ -25,19 +25,7 @@ public class Messages extends NLS {
 
 	public static String BCM_LocalServiceError;
 
-	public static String BuildConfigurationManager_17;
-
-	public static String BuildConfigurationManager_25;
-
-	public static String BuildScenario_0;
-
-	public static String CommandRunner_0;
-
-	public static String CommandRunner_1;
-
-	public static String CommandRunner_3;
-
-	public static String CommandRunner_4;
+	public static String SyncUtils_Unable_to_flush;
 
 	public static String PathResourceMatcher_0;
 
@@ -56,10 +44,6 @@ public class Messages extends NLS {
 	public static String ResourceMatcher_3;
 
 	public static String WildcardResourceMatcher_Wildcard_pattern_not_found_in_preference_node;
-
-	public static String SyncBuildServiceProvider_configDir;
-
-	public static String SyncBuildServiceProvider_name;
 
 	public static String SyncConfigManager_Unable_to_save;
 

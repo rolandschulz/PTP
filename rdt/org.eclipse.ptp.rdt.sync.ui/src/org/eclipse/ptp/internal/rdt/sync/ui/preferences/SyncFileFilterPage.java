@@ -36,15 +36,12 @@ import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.internal.rdt.sync.ui.SyncImages;
 import org.eclipse.ptp.internal.rdt.sync.ui.messages.Messages;
-import org.eclipse.ptp.rdt.sync.core.PathResourceMatcher;
-import org.eclipse.ptp.rdt.sync.core.RegexResourceMatcher;
 import org.eclipse.ptp.rdt.sync.core.ResourceMatcher;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter.PatternType;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
-import org.eclipse.ptp.rdt.sync.core.WildcardResourceMatcher;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -289,9 +286,9 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 				public void checkStateChanged(CheckStateChangedEvent event) {
 					IPath path = ((IResource) (event.getElement())).getProjectRelativePath();
 					if (event.getChecked()) {
-						filter.addPattern(new PathResourceMatcher(path), PatternType.INCLUDE);
+						filter.addPattern(SyncFileFilter.getPathResourceMatcher(path), PatternType.INCLUDE);
 					} else {
-						filter.addPattern(new PathResourceMatcher(path), PatternType.EXCLUDE);
+						filter.addPattern(SyncFileFilter.getPathResourceMatcher(path), PatternType.EXCLUDE);
 					}
 
 					update();
@@ -637,8 +634,8 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 			return;
 		}
 
-		PathResourceMatcher matcher = null;
-		matcher = new PathResourceMatcher(new Path(pattern));
+		ResourceMatcher matcher = null;
+		matcher = SyncFileFilter.getPathResourceMatcher(new Path(pattern));
 		filter.addPattern(matcher, type);
 
 		newPath.setText(""); //$NON-NLS-1$
@@ -651,9 +648,9 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 			return;
 		}
 
-		RegexResourceMatcher matcher = null;
+		ResourceMatcher matcher = null;
 		try {
-			matcher = new RegexResourceMatcher(pattern);
+			matcher = SyncFileFilter.getRegexResourceMatcher(pattern);
 		} catch (PatternSyntaxException e) {
 			// Do nothing but display an error message for a few seconds
 			patternErrorLabel.setText(Messages.SyncFileFilterPage_Invalid_Regular_Expression);
@@ -681,8 +678,8 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 			return;
 		}
 
-		WildcardResourceMatcher matcher = null;
-		matcher = new WildcardResourceMatcher(pattern);
+		ResourceMatcher matcher = null;
+		matcher = SyncFileFilter.getWildcardResourceMatcher(pattern);
 		filter.addPattern(matcher, type);
 
 		newWildcard.setText(""); //$NON-NLS-1$
@@ -754,27 +751,21 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 		@Override
 		protected void okPressed() {
 			isInclusive = checkBox.getSelection();
-			if (oldMatcher instanceof PathResourceMatcher) {
-				newMatcher = new PathResourceMatcher(new Path(patternText.getText()));
-			} else if (oldMatcher instanceof RegexResourceMatcher) {
-				try {
-					newMatcher = new RegexResourceMatcher(patternText.getText());
-					// If regex invalid, display error for a few seconds and then return
-				} catch (PatternSyntaxException e) {
-					errorLabel.setText(Messages.SyncFileFilterPage_Invalid_Regular_Expression);
-					display.timerExec(ERROR_DISPLAY_SECONDS * 1000, new Runnable() {
-						@Override
-						public void run() {
-							if (errorLabel.isDisposed()) {
-								return;
-							}
-							errorLabel.setText(""); //$NON-NLS-1$
+			try {
+				newMatcher = oldMatcher.clone(patternText.getText());
+				// If pattern invalid, display error for a few seconds and then return
+			} catch (IllegalArgumentException e) {
+				errorLabel.setText(e.getLocalizedMessage());
+				display.timerExec(ERROR_DISPLAY_SECONDS * 1000, new Runnable() {
+					@Override
+					public void run() {
+						if (errorLabel.isDisposed()) {
+							return;
 						}
-					});
-					return;
-				}
-			} else {
-				assert false : Messages.SyncFileFilterPage_Attempt_to_edit_unsupported;
+						errorLabel.setText(""); //$NON-NLS-1$
+					}
+				});
+				return;
 			}
 			super.okPressed();
 		}
@@ -801,13 +792,7 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 			} else {
 				patternType = Messages.SyncFileFilterPage_Include;
 			}
-			if (pattern instanceof PathResourceMatcher) {
-				patternType = patternType + " " + Messages.SyncFileFilterPage_path; //$NON-NLS-1$
-			} else if (pattern instanceof RegexResourceMatcher) {
-				patternType = patternType + " " + Messages.SyncFileFilterPage_regex; //$NON-NLS-1$
-			} else if (pattern instanceof WildcardResourceMatcher) {
-				patternType = patternType + " " + Messages.SyncFileFilterPage_wildcard; //$NON-NLS-1$
-			}
+			patternType = patternType + " " + pattern.getType(); //$NON-NLS-1$
 			patternType += ":  "; //$NON-NLS-1$
 
 			tableValues[0] = patternType;

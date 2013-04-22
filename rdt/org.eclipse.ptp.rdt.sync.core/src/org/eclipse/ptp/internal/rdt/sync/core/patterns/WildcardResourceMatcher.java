@@ -8,13 +8,14 @@
  * Contributors:
  *    Beth Tibbitts - initial implementation
  *******************************************************************************/
-package org.eclipse.ptp.rdt.sync.core;
+package org.eclipse.ptp.internal.rdt.sync.core.patterns;
 
 import java.util.NoSuchElementException;
 import java.util.regex.PatternSyntaxException;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.ptp.internal.rdt.sync.core.messages.Messages;
+import org.eclipse.ptp.rdt.sync.core.ResourceMatcher;
 import org.osgi.service.prefs.Preferences;
 
 /**
@@ -23,7 +24,26 @@ import org.osgi.service.prefs.Preferences;
  */
 public class WildcardResourceMatcher extends ResourceMatcher {
 	private static final String ATTR_WILDCARD = "wildcard"; //$NON-NLS-1$
+
+	/**
+	 * Recreate instance from preference node
+	 * 
+	 * @param preference
+	 *            node
+	 * @return the recreated instance
+	 * @throws NoSuchElementException
+	 *             if expected data is not in the preference node.
+	 */
+	public static ResourceMatcher loadMatcher(Preferences prefRootNode) throws NoSuchElementException {
+		String r = prefRootNode.get(ATTR_WILDCARD, null);
+		if (r == null) {
+			throw new NoSuchElementException(Messages.WildcardResourceMatcher_Wildcard_pattern_not_found_in_preference_node);
+		}
+		return new WildcardResourceMatcher(r);
+	}
+
 	private final String wildcard;
+
 	private final boolean DEBUG = false;
 
 	/**
@@ -40,6 +60,56 @@ public class WildcardResourceMatcher extends ResourceMatcher {
 		} else {
 			wildcard = r;
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rdt.sync.core.ResourceMatcher#clone(java.lang.String)
+	 */
+	@Override
+	public ResourceMatcher clone(String pattern) {
+		return new WildcardResourceMatcher(pattern);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!(obj instanceof WildcardResourceMatcher)) {
+			return false;
+		}
+		WildcardResourceMatcher other = (WildcardResourceMatcher) obj;
+		if (!wildcard.equals(other.wildcard)) {
+			return false;
+		}
+		return true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rdt.sync.core.ResourceMatcher#getType()
+	 */
+	@Override
+	public String getType() {
+		return ATTR_WILDCARD;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return wildcard.hashCode();
 	}
 
 	/**
@@ -105,46 +175,6 @@ public class WildcardResourceMatcher extends ResourceMatcher {
 	}
 
 	/**
-	 * Represent a wildcard pattern textually as just the wildcard pattern string itself
-	 * 
-	 * @return the string
-	 */
-	@Override
-	public String toString() {
-		return wildcard;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		return wildcard.hashCode();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (!(obj instanceof WildcardResourceMatcher)) {
-			return false;
-		}
-		WildcardResourceMatcher other = (WildcardResourceMatcher) obj;
-		if (!wildcard.equals(other.wildcard)) {
-			return false;
-		}
-		return true;
-	}
-
-	/**
 	 * Place needed data for recreating inside the preference node
 	 */
 	@Override
@@ -154,19 +184,12 @@ public class WildcardResourceMatcher extends ResourceMatcher {
 	}
 
 	/**
-	 * Recreate instance from preference node
+	 * Represent a wildcard pattern textually as just the wildcard pattern string itself
 	 * 
-	 * @param preference
-	 *            node
-	 * @return the recreated instance
-	 * @throws NoSuchElementException
-	 *             if expected data is not in the preference node.
+	 * @return the string
 	 */
-	public static ResourceMatcher loadMatcher(Preferences prefRootNode) throws NoSuchElementException {
-		String r = prefRootNode.get(ATTR_WILDCARD, null);
-		if (r == null) {
-			throw new NoSuchElementException(Messages.WildcardResourceMatcher_Wildcard_pattern_not_found_in_preference_node);
-		}
-		return new WildcardResourceMatcher(r);
+	@Override
+	public String toString() {
+		return wildcard;
 	}
 }

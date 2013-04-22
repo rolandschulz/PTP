@@ -65,11 +65,10 @@ import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.util.FS;
 import org.eclipse.jgit.util.QuotedString;
+import org.eclipse.ptp.internal.rdt.sync.git.core.CommandRunner.CommandResults;
 import org.eclipse.ptp.internal.rdt.sync.git.core.messages.Messages;
-import org.eclipse.ptp.rdt.sync.core.SyncConfig;
-import org.eclipse.ptp.rdt.sync.core.CommandRunner;
-import org.eclipse.ptp.rdt.sync.core.CommandRunner.CommandResults;
 import org.eclipse.ptp.rdt.sync.core.RecursiveSubMonitor;
+import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
 import org.eclipse.ptp.rdt.sync.core.exceptions.RemoteExecutionException;
@@ -662,7 +661,7 @@ public class GitRemoteSyncConnection {
 				// .setPass("")
 				.setScheme("ssh") //$NON-NLS-1$
 				.setPath(syncConfig.getLocation(project) + "/" + gitDir); //$NON-NLS-1$  // Should use remote path seperator but
-																				// first 315720 has to be fixed
+																			// first 315720 has to be fixed
 	}
 
 	public void close() {
@@ -987,7 +986,8 @@ public class GitRemoteSyncConnection {
 	 * for the actual implementation.)
 	 * 
 	 * Note that the remote is fetched and merged first. This is on purpose so that merge conflicts will occur locally, where
-	 * they can be more easily managed. Previously, "syncLocalToRemote" was called first in "AbstractSynchronizeService", which would
+	 * they can be more easily managed. Previously, "syncLocalToRemote" was called first in "AbstractSynchronizeService", which
+	 * would
 	 * cause merge conflicts to occur remotely.
 	 * 
 	 * 

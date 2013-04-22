@@ -8,7 +8,7 @@
  * Contributors:
  *    John Eblen - initial implementation
  *******************************************************************************/
-package org.eclipse.ptp.rdt.sync.core;
+package org.eclipse.ptp.internal.rdt.sync.core.patterns;
 
 import java.util.NoSuchElementException;
 import java.util.regex.Matcher;
@@ -17,6 +17,7 @@ import java.util.regex.PatternSyntaxException;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.ptp.internal.rdt.sync.core.messages.Messages;
+import org.eclipse.ptp.rdt.sync.core.ResourceMatcher;
 import org.osgi.service.prefs.Preferences;
 
 /**
@@ -25,17 +26,37 @@ import org.osgi.service.prefs.Preferences;
  */
 public class RegexResourceMatcher extends ResourceMatcher {
 	private static final String ATTR_REGEX = "regex"; //$NON-NLS-1$
+
+	/**
+	 * Recreate instance from preference node
+	 * 
+	 * @param preference
+	 *            node
+	 * @return the recreated instance
+	 * @throws NoSuchElementException
+	 *             if expected data is not in the preference node.
+	 */
+	public static ResourceMatcher loadMatcher(Preferences prefRootNode) throws NoSuchElementException {
+		String r = prefRootNode.get(ATTR_REGEX, null);
+		if (r == null) {
+			throw new NoSuchElementException(Messages.RegexResourceMatcher_0);
+		}
+		return new RegexResourceMatcher(r);
+	}
+
 	private final String regex;
+
 	private final Pattern pattern;
-	
+
 	/**
 	 * Constructor
 	 * Although PatternSyntaxException is unchecked, callers probably should catch this exception, especially if regular
 	 * expressions are entered by users.
 	 * 
-	 * @param r - the regular expression
+	 * @param r
+	 *            - the regular expression
 	 * @throws PatternSyntaxException
-	 * 				if the pattern is invalid
+	 *             if the pattern is invalid
 	 */
 	public RegexResourceMatcher(String r) throws PatternSyntaxException {
 		if (r == null) {
@@ -45,38 +66,20 @@ public class RegexResourceMatcher extends ResourceMatcher {
 		}
 		pattern = Pattern.compile(regex);
 	}
-	
-	/**
-	 * Return whether the given string matches the regex pattern.
+
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param candidate string
-	 * @return whether the string matches the regex pattern
-	 */
-	public boolean match(IResource candidate) {
-		if (candidate == null) {
-			return false;
-		}
-		Matcher m = pattern.matcher(candidate.getProjectRelativePath().toOSString());
-		return m.matches();
-	}
-	
-	/**
-	 * Represent a regex pattern textually as just the regex string itself
-	 * @return the string
-	 */
-	public String toString() {
-		return regex;
-	}
-	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
+	 * @see org.eclipse.ptp.rdt.sync.core.ResourceMatcher#clone(java.lang.String)
 	 */
 	@Override
-	public int hashCode() {
-		return regex.hashCode();
+	public ResourceMatcher clone(String pattern) {
+		return new RegexResourceMatcher(pattern);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
@@ -94,6 +97,42 @@ public class RegexResourceMatcher extends ResourceMatcher {
 		return true;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rdt.sync.core.ResourceMatcher#getType()
+	 */
+	@Override
+	public String getType() {
+		return ATTR_REGEX;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return regex.hashCode();
+	}
+
+	/**
+	 * Return whether the given string matches the regex pattern.
+	 * 
+	 * @param candidate
+	 *            string
+	 * @return whether the string matches the regex pattern
+	 */
+	@Override
+	public boolean match(IResource candidate) {
+		if (candidate == null) {
+			return false;
+		}
+		Matcher m = pattern.matcher(candidate.getProjectRelativePath().toOSString());
+		return m.matches();
+	}
+
 	/**
 	 * Place needed data for recreating inside the preference node
 	 */
@@ -102,20 +141,14 @@ public class RegexResourceMatcher extends ResourceMatcher {
 		super.saveMatcher(prefRootNode);
 		prefRootNode.put(ATTR_REGEX, regex);
 	}
-	
+
 	/**
-	 * Recreate instance from preference node
+	 * Represent a regex pattern textually as just the regex string itself
 	 * 
-	 * @param preference node
-	 * @return the recreated instance
-	 * @throws NoSuchElementException
-	 * 				if expected data is not in the preference node.
+	 * @return the string
 	 */
-	public static ResourceMatcher loadMatcher(Preferences prefRootNode) throws NoSuchElementException {
-		String r = prefRootNode.get(ATTR_REGEX, null);
-		if (r == null) {
-			throw new NoSuchElementException(Messages.RegexResourceMatcher_0);
-		}
-		return new RegexResourceMatcher(r);
+	@Override
+	public String toString() {
+		return regex;
 	}
 }

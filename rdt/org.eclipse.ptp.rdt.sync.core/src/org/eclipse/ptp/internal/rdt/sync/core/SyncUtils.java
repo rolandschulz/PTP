@@ -8,11 +8,10 @@
  * Contributors:
  *    John Eblen - initial implementation
  *******************************************************************************/
-package org.eclipse.ptp.rdt.sync.core;
+package org.eclipse.ptp.internal.rdt.sync.core;
 
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.ptp.internal.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.internal.rdt.sync.core.messages.Messages;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
@@ -58,9 +57,9 @@ public class SyncUtils {
 						sleepCount++;
 						if (sleepCount > 30) {
 							if (lastException != null) {
-								RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_17, lastException);
+								RDTSyncCorePlugin.log(Messages.SyncUtils_Unable_to_flush, lastException);
 							} else {
-								RDTSyncCorePlugin.log(Messages.BuildConfigurationManager_17);
+								RDTSyncCorePlugin.log(Messages.SyncUtils_Unable_to_flush);
 							}
 							break;
 						}

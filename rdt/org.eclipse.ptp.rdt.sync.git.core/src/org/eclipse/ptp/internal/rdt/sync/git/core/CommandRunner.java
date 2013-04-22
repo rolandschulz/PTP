@@ -8,7 +8,7 @@
  * Contributors:
  *    John Eblen - initial implementation
  *******************************************************************************/
-package org.eclipse.ptp.rdt.sync.core;
+package org.eclipse.ptp.internal.rdt.sync.git.core;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -24,8 +24,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.internal.rdt.sync.core.RDTSyncCorePlugin;
-import org.eclipse.ptp.internal.rdt.sync.core.messages.Messages;
+import org.eclipse.ptp.internal.rdt.sync.git.core.messages.Messages;
+import org.eclipse.ptp.rdt.sync.core.RecursiveSubMonitor;
 import org.eclipse.ptp.rdt.sync.core.exceptions.RemoteSyncException;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
@@ -98,8 +98,7 @@ public class CommandRunner {
 		final File localDir = new File(localDirectory);
 		if (localDir.exists() == false) {
 			return DirectoryStatus.NOT_PRESENT;
-		}
-		else if (localDir.isDirectory()) {
+		} else if (localDir.isDirectory()) {
 			return DirectoryStatus.PRESENT;
 		}
 
@@ -131,7 +130,7 @@ public class CommandRunner {
 	 * This function creates the local directory if it does not exist.
 	 * 
 	 * @return whether the directory was already PRESENT
-	 * TODO: Handle false return from mkdir
+	 *         TODO: Handle false return from mkdir
 	 */
 	public static DirectoryStatus createLocalDirectory(String localDirectory) {
 		final DirectoryStatus directoryStatus = checkLocalDirectory(localDirectory);
@@ -149,12 +148,13 @@ public class CommandRunner {
 	 * 
 	 * @param conn
 	 * @param remoteDir
-	 * @param monitor 
+	 * @param monitor
 	 * @throws CoreException
 	 *             on problem creating the remote directory.
 	 * @return whether the directory was already PRESENT
 	 */
-	public static DirectoryStatus createRemoteDirectory(IRemoteConnection conn, String remoteDir, IProgressMonitor monitor) throws CoreException {
+	public static DirectoryStatus createRemoteDirectory(IRemoteConnection conn, String remoteDir, IProgressMonitor monitor)
+			throws CoreException {
 		final IRemoteFileManager fileManager = conn.getRemoteServices().getFileManager(conn);
 		final IFileStore fileStore = fileManager.getResource(remoteDir);
 		final IFileInfo fileInfo = fileStore.fetchInfo();
@@ -178,7 +178,7 @@ public class CommandRunner {
 	 * @param conn
 	 * @param command
 	 * @param remoteDirectory
-	 * 					Working directory for command
+	 *            Working directory for command
 	 * @param monitor
 	 * @return CommandResults (contains stdout, stderr, and exit code)
 	 * @throws IOException
@@ -186,13 +186,12 @@ public class CommandRunner {
 	 * @throws InterruptedException
 	 *             if execution of remote command is interrupted.
 	 * @throws RemoteConnectionException
-	 * 			   if connection closed and cannot be opened. 
-	 * @throws RemoteSyncException 
-	 * 			   if other error
+	 *             if connection closed and cannot be opened.
+	 * @throws RemoteSyncException
+	 *             if other error
 	 */
 	public static CommandResults executeRemoteCommand(IRemoteConnection conn, String command, String remoteDirectory,
-														IProgressMonitor monitor) throws 
-																IOException, InterruptedException, RemoteConnectionException, RemoteSyncException {
+			IProgressMonitor monitor) throws IOException, InterruptedException, RemoteConnectionException, RemoteSyncException {
 		// Setup a new process
 		final List<String> commandList = new LinkedList<String>();
 		commandList.add("sh"); //$NON-NLS-1$
@@ -200,14 +199,14 @@ public class CommandRunner {
 		commandList.add(command);
 		return executeRemoteCommand(conn, commandList, remoteDirectory, monitor);
 	}
-		
+
 	/**
 	 * Execute command on a remote host and wait for the command to complete.
 	 * 
 	 * @param conn
 	 * @param commandList
 	 * @param remoteDirectory
-	 * 					Working directory for command
+	 *            Working directory for command
 	 * @param monitor
 	 * @return CommandResults (contains stdout, stderr, and exit code)
 	 * @throws IOException
@@ -215,13 +214,12 @@ public class CommandRunner {
 	 * @throws InterruptedException
 	 *             if execution of remote command is interrupted.
 	 * @throws RemoteConnectionException
-	 * 			   if connection closed and cannot be opened. 
-	 * @throws RemoteSyncException 
-	 * 			   if other error
+	 *             if connection closed and cannot be opened.
+	 * @throws RemoteSyncException
+	 *             if other error
 	 */
 	public static CommandResults executeRemoteCommand(IRemoteConnection conn, List<String> commandList, String remoteDirectory,
-															IProgressMonitor monitor) throws 
-																	IOException, InterruptedException, RemoteConnectionException, RemoteSyncException {
+			IProgressMonitor monitor) throws IOException, InterruptedException, RemoteConnectionException, RemoteSyncException {
 		RecursiveSubMonitor progress = RecursiveSubMonitor.convert(monitor, 100);
 		try {
 			progress.subTask(Messages.CommandRunner_4);
@@ -242,15 +240,17 @@ public class CommandRunner {
 			StreamCopyThread getError = new StreamCopyThread(rp.getErrorStream(), error);
 			getOutput.start();
 			getError.start();
-			//wait for EOF with the change for the ProcessMonitor to cancel
+			// wait for EOF with the change for the ProcessMonitor to cancel
 			for (;;) {
 				getOutput.join(250);
-				if (!getOutput.isAlive()) break;
+				if (!getOutput.isAlive()) {
+					break;
+				}
 				if (progress.isCanceled()) {
-					throw new RemoteSyncException(new Status(IStatus.CANCEL, RDTSyncCorePlugin.PLUGIN_ID, Messages.CommandRunner_0));
+					throw new RemoteSyncException(new Status(IStatus.CANCEL, Activator.PLUGIN_ID, Messages.CommandRunner_0));
 				}
 			}
-			//rp and getError should be finished as soon as getOutput is finished
+			// rp and getError should be finished as soon as getOutput is finished
 			int exitCode = rp.waitFor();
 			getError.halt();
 

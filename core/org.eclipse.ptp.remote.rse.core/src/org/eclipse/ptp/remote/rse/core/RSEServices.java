@@ -149,6 +149,7 @@ public class RSEServices extends AbstractRemoteServices {
 	 */
 	public boolean initialize(IProgressMonitor monitor) {
 		if (!fInitialized) {
+			RSEAdapterCorePlugin.log(new Exception("RSE Initialized!")); //$NON-NLS-1$
 			SubMonitor progress = SubMonitor.convert(monitor, 10);
 			progress.setTaskName(Messages.RSEServices_Initializing_RSE_services);
 			while (!fInitialized && !progress.isCanceled()) {

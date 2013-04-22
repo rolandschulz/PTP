@@ -8,7 +8,7 @@
  * Contributors:
  *    John Eblen - initial implementation
  *******************************************************************************/
-package org.eclipse.ptp.rdt.sync.core;
+package org.eclipse.ptp.internal.rdt.sync.core.patterns;
 
 import java.util.NoSuchElementException;
 
@@ -16,6 +16,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.internal.rdt.sync.core.messages.Messages;
+import org.eclipse.ptp.rdt.sync.core.ResourceMatcher;
 import org.osgi.service.prefs.Preferences;
 
 /**
@@ -25,7 +26,25 @@ import org.osgi.service.prefs.Preferences;
  */
 public class PathResourceMatcher extends ResourceMatcher {
 	private static final String ATTR_PATH = "path"; //$NON-NLS-1$
-	IPath path;
+
+	/**
+	 * Recreate instance from preference node
+	 * 
+	 * @param preference
+	 *            node
+	 * @return the recreated instance
+	 * @throws NoSuchElementException
+	 *             if expected data is not in the preference node.
+	 */
+	public static ResourceMatcher loadMatcher(Preferences prefRootNode) throws NoSuchElementException {
+		String p = prefRootNode.get(ATTR_PATH, null);
+		if (p == null) {
+			throw new NoSuchElementException(Messages.PathResourceMatcher_0);
+		}
+		return new PathResourceMatcher(Path.fromPortableString(p));
+	}
+
+	private IPath path;
 
 	public PathResourceMatcher(IPath p) {
 		if (p == null) {
@@ -35,26 +54,26 @@ public class PathResourceMatcher extends ResourceMatcher {
 		}
 	}
 
-	public boolean match(IResource candidate) {
-		if (candidate == null) {
-			return false;
+	public PathResourceMatcher(String p) {
+		if (p == null) {
+			p = ""; //$NON-NLS-1$ 
 		}
-		return path.isPrefixOf(candidate.getProjectRelativePath());
+		path = new Path(p);
 	}
 
-	public String toString() {
-		return path.toOSString();
-	}
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rdt.sync.core.ResourceMatcher#clone(java.lang.String)
 	 */
 	@Override
-	public int hashCode() {
-		return path.toOSString().hashCode();
+	public ResourceMatcher clone(String pattern) {
+		return new PathResourceMatcher(pattern);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
@@ -72,6 +91,39 @@ public class PathResourceMatcher extends ResourceMatcher {
 		return true;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rdt.sync.core.ResourceMatcher#getType()
+	 */
+	@Override
+	public String getType() {
+		return ATTR_PATH;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return path.toOSString().hashCode();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rdt.sync.core.ResourceMatcher#match(org.eclipse.core.resources.IResource)
+	 */
+	@Override
+	public boolean match(IResource candidate) {
+		if (candidate == null) {
+			return false;
+		}
+		return path.isPrefixOf(candidate.getProjectRelativePath());
+	}
+
 	/**
 	 * Place needed data for recreating inside the preference node
 	 */
@@ -80,20 +132,14 @@ public class PathResourceMatcher extends ResourceMatcher {
 		super.saveMatcher(prefRootNode);
 		prefRootNode.put(ATTR_PATH, path.toPortableString());
 	}
-	
-	/**
-	 * Recreate instance from preference node
+
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param preference node
-	 * @return the recreated instance
-	 * @throws NoSuchElementException
-	 * 				if expected data is not in the preference node.
+	 * @see org.eclipse.ptp.rdt.sync.core.ResourceMatcher#toString()
 	 */
-	public static ResourceMatcher loadMatcher(Preferences prefRootNode) throws NoSuchElementException {
-		String p = prefRootNode.get(ATTR_PATH, null);
-		if (p == null) {
-			throw new NoSuchElementException(Messages.PathResourceMatcher_0);
-		}
-		return new PathResourceMatcher(Path.fromPortableString(p));
+	@Override
+	public String toString() {
+		return path.toOSString();
 	}
 }

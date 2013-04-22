@@ -28,21 +28,61 @@ import org.osgi.service.prefs.Preferences;
  */
 public abstract class ResourceMatcher {
 	private static final String ATTR_CLASS_NAME = "class-name"; //$NON-NLS-1$
+
 	public abstract boolean match(IResource candidate);
-	
-	// This method should return a human readable name appropriate for displaying in a UI
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
 	public abstract String toString();
-	
-	// ideally, these two methods should identify two matchers as equal if and only if the set of matching resources is identical.
-	// This is used to remove duplicate matchers from the user's list. Matchers should be considered unequal if it is unknown whether
-	// they match the same set of resources. (This can happen with regular expressions, for example.)
+
+	/**
+	 * Returns a string describing the type of matcher
+	 * 
+	 * @return type string
+	 */
+	public abstract String getType();
+
+	/**
+	 * Create a clone of the matcher using the new pattern
+	 * 
+	 * @param pattern
+	 *            pattern to use for the new matcher
+	 * @return copy of matcher
+	 */
+	public abstract ResourceMatcher clone(String pattern);
+
+	/*
+	 * Ideally, these two methods should identify two matchers as equal if and only if the set of matching resources is identical.
+	 * This is used to remove duplicate matchers from the user's list. Matchers should be considered unequal if it is unknown
+	 * whether they match the same set of resources. (This can happen with regular expressions, for example.)
+	 */
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
 	public abstract boolean equals(Object o);
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
 	public abstract int hashCode();
-	
+
 	/**
 	 * Save pattern to the given Preference node. Subclasses may override, first calling super.savePattern(), if they need to save
 	 * additional data beyond the class type.
-	 * @param preference node
+	 * 
+	 * @param preference
+	 *            node
 	 */
 	public void saveMatcher(Preferences prefRootNode) {
 		prefRootNode.put(ATTR_CLASS_NAME, this.getClass().getName());
@@ -53,15 +93,17 @@ public abstract class ResourceMatcher {
 	 * Supporting the loading of subclasses requires reflection, which makes this code somewhat involved because it must handle
 	 * several possible exceptions.
 	 * 
-	 * @param preference node of pattern matcher to restore
+	 * @param preference
+	 *            node of pattern matcher to restore
 	 * @return new pattern matcher instance
-	 *
+	 * 
 	 * @throws InvocationTargetException
-	 * 					if an exception occurs inside subclass's static "loadMatcher" method.
+	 *             if an exception occurs inside subclass's static "loadMatcher" method.
 	 * @throws ParserConfigurationException
-	 * 					for various problems while parsing and attempting to instantiate the matcher class.
+	 *             for various problems while parsing and attempting to instantiate the matcher class.
 	 */
-	public static ResourceMatcher loadMatcher(Preferences prefRootNode) throws InvocationTargetException, ParserConfigurationException {
+	public static ResourceMatcher loadMatcher(Preferences prefRootNode) throws InvocationTargetException,
+			ParserConfigurationException {
 		String className = prefRootNode.get(ATTR_CLASS_NAME, null);
 		if (className == null) {
 			throw new ParserConfigurationException(Messages.ResourceMatcher_1);
@@ -69,8 +111,8 @@ public abstract class ResourceMatcher {
 
 		try {
 			// Sanity check on the retrieved class
-			if (!ResourceMatcher.class.isAssignableFrom(Class.forName(className)) ||
-					Modifier.isAbstract(Class.forName(className).getModifiers())) {
+			if (!ResourceMatcher.class.isAssignableFrom(Class.forName(className))
+					|| Modifier.isAbstract(Class.forName(className).getModifiers())) {
 				throw new ParserConfigurationException(Messages.ResourceMatcher_2);
 			}
 
@@ -89,7 +131,7 @@ public abstract class ResourceMatcher {
 				try {
 					return (ResourceMatcher) subClassMethod.invoke(Class.forName(className), prefRootNode);
 				} catch (IllegalArgumentException e) {
-					assert(false); // This should never happen
+					assert (false); // This should never happen
 				} catch (IllegalAccessException e) {
 					// Treat as if method does not exist
 				}
@@ -110,7 +152,7 @@ public abstract class ResourceMatcher {
 				try {
 					return (ResourceMatcher) subClassConstructor.newInstance();
 				} catch (IllegalArgumentException e) {
-					assert(false); // This should never happen
+					assert (false); // This should never happen
 				} catch (InstantiationException e) {
 					// Treat as if method does not exist
 				} catch (IllegalAccessException e) {
@@ -120,7 +162,7 @@ public abstract class ResourceMatcher {
 		} catch (ClassNotFoundException e) {
 			throw new ParserConfigurationException(Messages.ResourceMatcher_0 + className);
 		}
-		
+
 		throw new ParserConfigurationException(Messages.ResourceMatcher_3);
 	}
 }

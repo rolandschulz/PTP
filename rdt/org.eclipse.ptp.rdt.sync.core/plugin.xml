@@ -13,27 +13,6 @@
       </runtime>
    </extension>
    <extension
-         point="org.eclipse.ptp.services.core.services">
-      <service
-            id="org.eclipse.ptp.rdt.sync.core.SyncService"
-            name="%SyncService.name">
-      </service>
-      <service
-            id="org.eclipse.ptp.rdt.sync.core.BuildService"
-            name="%SyncBuildService.name">
-      </service>
-   </extension>
-   <extension
-         point="org.eclipse.ptp.services.core.providers">
-      <provider
-            class="org.eclipse.ptp.rdt.sync.core.services.SyncBuildServiceProvider"
-            id="org.eclipse.ptp.rdt.sync.core.BuildServiceProvider"
-            name="%SyncBuildProvider.name"
-            priority="1"
-            serviceId="org.eclipse.ptp.rdt.sync.core.BuildService">
-      </provider>
-   </extension>
-   <extension
          point="org.eclipse.ptp.remote.core.remoteResources">
       <remoteResource
             class="org.eclipse.ptp.internal.rdt.sync.core.SynchronizedResource"

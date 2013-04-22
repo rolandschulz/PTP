@@ -20,9 +20,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.internal.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.internal.rdt.sync.core.messages.Messages;
+import org.eclipse.ptp.internal.rdt.sync.core.patterns.PathResourceMatcher;
+import org.eclipse.ptp.internal.rdt.sync.core.patterns.RegexResourceMatcher;
+import org.eclipse.ptp.internal.rdt.sync.core.patterns.WildcardResourceMatcher;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
@@ -37,35 +41,14 @@ import org.osgi.service.prefs.Preferences;
  * SyncFileFilters are saved in preferences.
  */
 public class SyncFileFilter {
-	private static final String PATTERN_NODE_NAME = "pattern"; //$NON-NLS-1$
-	private static final String PATTERN_TYPE_KEY = "pattern-type"; //$NON-NLS-1$
-	private static final String NUM_PATTERNS_KEY = "num-patterns"; //$NON-NLS-1$
-
-	private final LinkedList<ResourceMatcher> filteredPaths = new LinkedList<ResourceMatcher>();
-	private final Map<ResourceMatcher, PatternType> patternToTypeMap = new HashMap<ResourceMatcher, PatternType>();
-
 	public enum PatternType {
 		EXCLUDE, INCLUDE
 	}
 
-	// Private constructor - create instances with "create" methods.
-	private SyncFileFilter() {
-	}
+	private static final String PATTERN_NODE_NAME = "pattern"; //$NON-NLS-1$
+	private static final String PATTERN_TYPE_KEY = "pattern-type"; //$NON-NLS-1$
 
-	// Copy constructor
-	public SyncFileFilter(SyncFileFilter oldFilter) {
-		filteredPaths.addAll(oldFilter.filteredPaths);
-		patternToTypeMap.putAll(oldFilter.patternToTypeMap);
-	}
-
-	/**
-	 * Constructor for an empty filter. Most clients will want to use "createDefaultFilter"
-	 * 
-	 * @return the new filter
-	 */
-	public static SyncFileFilter createEmptyFilter() {
-		return new SyncFileFilter();
-	}
+	private static final String NUM_PATTERNS_KEY = "num-patterns"; //$NON-NLS-1$
 
 	/**
 	 * Constructor for a filter with a standard set of defaults. Note that this is a "default default". It may be overwritten if the
@@ -81,192 +64,56 @@ public class SyncFileFilter {
 	}
 
 	/**
-	 * Get all patterns for this filter
+	 * Constructor for an empty filter. Most clients will want to use "createDefaultFilter"
 	 * 
-	 * @return patterns
+	 * @return the new filter
 	 */
-	public ResourceMatcher[] getPatterns() {
-		return filteredPaths.toArray(new ResourceMatcher[filteredPaths.size()]);
+	public static SyncFileFilter createEmptyFilter() {
+		return new SyncFileFilter();
 	}
 
 	/**
-	 * Get the pattern type for the pattern
+	 * Obtain a resource matcher that matches a workspace path
 	 * 
-	 * @param pattern
-	 * @return the type or null if this pattern is unknown in this filter.
+	 * @param path
+	 *            path that this matcher will match
+	 * @return resource matcher
 	 */
-	public PatternType getPatternType(ResourceMatcher pattern) {
-		return patternToTypeMap.get(pattern);
+	public static ResourceMatcher getPathResourceMatcher(IPath path) {
+		return new PathResourceMatcher(path);
 	}
 
 	/**
-	 * Add the common, default list of paths to be filtered.
+	 * Obtain a resource matcher that matches a workspace path
+	 * 
+	 * @param path
+	 *            path that this matcher will match
+	 * @return resource matcher
 	 */
-	public void addDefaults() {
-		// In bug 370491, we decided not to filter binaries by default
-		// this.addPattern(new BinaryResourceMatcher(), PatternType.EXCLUDE);
-		this.addPattern(new PathResourceMatcher(new Path(".project")), PatternType.EXCLUDE); //$NON-NLS-1$
-		this.addPattern(new PathResourceMatcher(new Path(".cproject")), PatternType.EXCLUDE); //$NON-NLS-1$
-		this.addPattern(new PathResourceMatcher(new Path(".settings")), PatternType.EXCLUDE); //$NON-NLS-1$
-		// TODO: This Git-specific directory is defined in multiple places - need to refactor.
-		this.addPattern(new PathResourceMatcher(new Path(".ptp-sync")), PatternType.EXCLUDE); //$NON-NLS-1$
+	public static ResourceMatcher getPathResourceMatcher(String path) {
+		return getPathResourceMatcher(new Path(path));
 	}
 
 	/**
-	 * Add pattern to front of list (calls addPattern with position 0)
+	 * Obtain a resource matcher that matches a regular expression
 	 * 
-	 * @param pattern
-	 * @param type
+	 * @param regex
+	 *            regular expression that this matcher will match
+	 * @return resource matcher
 	 */
-	public void addPattern(ResourceMatcher pattern, PatternType type) {
-		this.addPattern(pattern, type, 0);
+	public static ResourceMatcher getRegexResourceMatcher(String regex) {
+		return new RegexResourceMatcher(regex);
 	}
 
 	/**
-	 * Add a new pattern to the filter of the specified type at the specified position
-	 * This function and others that manipulate the pattern list must enforce the invariant that no pattern appears more than once.
-	 * This invariant is assumed by other functions.
+	 * Obtain a resource matcher that matches a path wildcard (globbing)
 	 * 
-	 * @param pattern
-	 * @param type
-	 * @param pos
-	 * @throws IndexOutOfBoundsException
-	 *             if position is out of range
+	 * @param wildcard
+	 *            wildcard path that this matcher will match
+	 * @return resource matcher
 	 */
-	public void addPattern(ResourceMatcher pattern, PatternType type, int pos) {
-		if (patternToTypeMap.get(pattern) != null) {
-			filteredPaths.remove(pattern);
-		}
-		filteredPaths.add(pos, pattern);
-		patternToTypeMap.put(pattern, type);
-	}
-
-	/**
-	 * Remove a pattern from the filter
-	 * Assumes pattern appears no more than once
-	 * 
-	 * @param pattern
-	 */
-	public void removePattern(ResourceMatcher pattern) {
-		filteredPaths.remove(pattern);
-		patternToTypeMap.remove(pattern);
-	}
-
-	/**
-	 * Swap a pattern with its lower-index neighbor
-	 * Assumes pattern only appears once
-	 * 
-	 * @param pattern
-	 * @return whether pattern was actually promoted
-	 */
-	public boolean promote(ResourceMatcher pattern) {
-		int oldIndex = filteredPaths.indexOf(pattern);
-		if (oldIndex > 0) {
-			filteredPaths.remove(oldIndex);
-			filteredPaths.add(oldIndex - 1, pattern);
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * Swap a pattern with its higher-index neighbor
-	 * Assumes pattern appears no more than once
-	 * 
-	 * @param pattern
-	 * @return whether pattern was actually demoted
-	 */
-	public boolean demote(ResourceMatcher pattern) {
-		int oldIndex = filteredPaths.indexOf(pattern);
-		if (oldIndex > -1 && oldIndex < filteredPaths.size() - 1) {
-			filteredPaths.remove(oldIndex);
-			filteredPaths.add(oldIndex + 1, pattern);
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * Replace pattern with another - useful for when existing patterns are edited
-	 * 
-	 * @param oldPattern
-	 * @param newPattern
-	 * @param type
-	 * @return whether replace was successful (old pattern was found)
-	 */
-	public boolean replacePattern(ResourceMatcher oldPattern, ResourceMatcher newPattern, PatternType type) {
-		int index = filteredPaths.indexOf(oldPattern);
-		if (index == -1) {
-			return false;
-		}
-		this.removePattern(oldPattern);
-		this.addPattern(newPattern, type, index);
-		return true;
-	}
-
-	/**
-	 * Apply the filter to the given string
-	 * 
-	 * @param s
-	 *            - the string
-	 * @return whether the string should be ignored
-	 */
-	public boolean shouldIgnore(IResource r) {
-		// Cannot ignore a folder if it contains members that should not be ignored.
-		if (r instanceof IFolder) {
-			try {
-				for (IResource member : ((IFolder) r).members()) {
-					if (!this.shouldIgnore(member)) {
-						return false;
-					}
-				}
-			} catch (CoreException e) {
-				// Could mean folder doesn't exist, which is fine. Continue with testing.
-			}
-		}
-
-		for (ResourceMatcher pm : filteredPaths) {
-			if (pm.match(r)) {
-				PatternType type = patternToTypeMap.get(pm);
-				assert (pm != null);
-				if (type == PatternType.EXCLUDE) {
-					return true;
-				} else {
-					return false;
-				}
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * Store filter in the given preference node
-	 * 
-	 * @param preference
-	 *            node
-	 */
-	public void saveFilter(Preferences prefRootNode) {
-		// To clear pattern information, remove node, flush parent, and then recreate the node
-		try {
-			prefRootNode.node(PATTERN_NODE_NAME).removeNode();
-			prefRootNode.flush();
-		} catch (BackingStoreException e) {
-			RDTSyncCorePlugin.log(Messages.SyncFileFilter_2, e);
-			return;
-		}
-		Preferences prefPatternNode = prefRootNode.node(PATTERN_NODE_NAME);
-		prefPatternNode.putInt(NUM_PATTERNS_KEY, filteredPaths.size());
-		int i = 0;
-		for (ResourceMatcher pm : filteredPaths) {
-			Preferences prefMatcherNode = prefPatternNode.node(Integer.toString(i));
-			// Whether pattern is exclusive or inclusive
-			prefMatcherNode.put(PATTERN_TYPE_KEY, patternToTypeMap.get(pm).name());
-			pm.saveMatcher(prefMatcherNode);
-			i++;
-		}
+	public static ResourceMatcher getWildcardResourceMatcher(String wildcard) {
+		return new WildcardResourceMatcher(wildcard);
 	}
 
 	/**
@@ -321,5 +168,208 @@ public class SyncFileFilter {
 			RDTSyncCorePlugin.log(Messages.SyncFileFilter_1, e);
 			return null;
 		}
+	}
+
+	private final LinkedList<ResourceMatcher> filteredPaths = new LinkedList<ResourceMatcher>();
+
+	private final Map<ResourceMatcher, PatternType> patternToTypeMap = new HashMap<ResourceMatcher, PatternType>();
+
+	// Private constructor - create instances with "create" methods.
+	private SyncFileFilter() {
+	}
+
+	// Copy constructor
+	public SyncFileFilter(SyncFileFilter oldFilter) {
+		filteredPaths.addAll(oldFilter.filteredPaths);
+		patternToTypeMap.putAll(oldFilter.patternToTypeMap);
+	}
+
+	/**
+	 * Add the common, default list of paths to be filtered.
+	 */
+	public void addDefaults() {
+		// In bug 370491, we decided not to filter binaries by default
+		// this.addPattern(new BinaryResourceMatcher(), PatternType.EXCLUDE);
+		addPattern(getPathResourceMatcher(".project"), PatternType.EXCLUDE); //$NON-NLS-1$
+		addPattern(getPathResourceMatcher(".cproject"), PatternType.EXCLUDE); //$NON-NLS-1$
+		addPattern(getPathResourceMatcher(".settings"), PatternType.EXCLUDE); //$NON-NLS-1$
+		// TODO: This Git-specific directory is defined in multiple places - need to refactor.
+		addPattern(getPathResourceMatcher(".ptp-sync"), PatternType.EXCLUDE); //$NON-NLS-1$
+	}
+
+	/**
+	 * Add pattern to front of list (calls addPattern with position 0)
+	 * 
+	 * @param pattern
+	 * @param type
+	 */
+	public void addPattern(ResourceMatcher pattern, PatternType type) {
+		this.addPattern(pattern, type, 0);
+	}
+
+	/**
+	 * Add a new pattern to the filter of the specified type at the specified position
+	 * This function and others that manipulate the pattern list must enforce the invariant that no pattern appears more than once.
+	 * This invariant is assumed by other functions.
+	 * 
+	 * @param pattern
+	 * @param type
+	 * @param pos
+	 * @throws IndexOutOfBoundsException
+	 *             if position is out of range
+	 */
+	public void addPattern(ResourceMatcher pattern, PatternType type, int pos) {
+		if (patternToTypeMap.get(pattern) != null) {
+			filteredPaths.remove(pattern);
+		}
+		filteredPaths.add(pos, pattern);
+		patternToTypeMap.put(pattern, type);
+	}
+
+	/**
+	 * Swap a pattern with its higher-index neighbor
+	 * Assumes pattern appears no more than once
+	 * 
+	 * @param pattern
+	 * @return whether pattern was actually demoted
+	 */
+	public boolean demote(ResourceMatcher pattern) {
+		int oldIndex = filteredPaths.indexOf(pattern);
+		if (oldIndex > -1 && oldIndex < filteredPaths.size() - 1) {
+			filteredPaths.remove(oldIndex);
+			filteredPaths.add(oldIndex + 1, pattern);
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Get all patterns for this filter
+	 * 
+	 * @return patterns
+	 */
+	public ResourceMatcher[] getPatterns() {
+		return filteredPaths.toArray(new ResourceMatcher[filteredPaths.size()]);
+	}
+
+	/**
+	 * Get the pattern type for the pattern
+	 * 
+	 * @param pattern
+	 * @return the type or null if this pattern is unknown in this filter.
+	 */
+	public PatternType getPatternType(ResourceMatcher pattern) {
+		return patternToTypeMap.get(pattern);
+	}
+
+	/**
+	 * Swap a pattern with its lower-index neighbor
+	 * Assumes pattern only appears once
+	 * 
+	 * @param pattern
+	 * @return whether pattern was actually promoted
+	 */
+	public boolean promote(ResourceMatcher pattern) {
+		int oldIndex = filteredPaths.indexOf(pattern);
+		if (oldIndex > 0) {
+			filteredPaths.remove(oldIndex);
+			filteredPaths.add(oldIndex - 1, pattern);
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Remove a pattern from the filter
+	 * Assumes pattern appears no more than once
+	 * 
+	 * @param pattern
+	 */
+	public void removePattern(ResourceMatcher pattern) {
+		filteredPaths.remove(pattern);
+		patternToTypeMap.remove(pattern);
+	}
+
+	/**
+	 * Replace pattern with another - useful for when existing patterns are edited
+	 * 
+	 * @param oldPattern
+	 * @param newPattern
+	 * @param type
+	 * @return whether replace was successful (old pattern was found)
+	 */
+	public boolean replacePattern(ResourceMatcher oldPattern, ResourceMatcher newPattern, PatternType type) {
+		int index = filteredPaths.indexOf(oldPattern);
+		if (index == -1) {
+			return false;
+		}
+		this.removePattern(oldPattern);
+		this.addPattern(newPattern, type, index);
+		return true;
+	}
+
+	/**
+	 * Store filter in the given preference node
+	 * 
+	 * @param preference
+	 *            node
+	 */
+	public void saveFilter(Preferences prefRootNode) {
+		// To clear pattern information, remove node, flush parent, and then recreate the node
+		try {
+			prefRootNode.node(PATTERN_NODE_NAME).removeNode();
+			prefRootNode.flush();
+		} catch (BackingStoreException e) {
+			RDTSyncCorePlugin.log(Messages.SyncFileFilter_2, e);
+			return;
+		}
+		Preferences prefPatternNode = prefRootNode.node(PATTERN_NODE_NAME);
+		prefPatternNode.putInt(NUM_PATTERNS_KEY, filteredPaths.size());
+		int i = 0;
+		for (ResourceMatcher pm : filteredPaths) {
+			Preferences prefMatcherNode = prefPatternNode.node(Integer.toString(i));
+			// Whether pattern is exclusive or inclusive
+			prefMatcherNode.put(PATTERN_TYPE_KEY, patternToTypeMap.get(pm).name());
+			pm.saveMatcher(prefMatcherNode);
+			i++;
+		}
+	}
+
+	/**
+	 * Apply the filter to the given string
+	 * 
+	 * @param s
+	 *            - the string
+	 * @return whether the string should be ignored
+	 */
+	public boolean shouldIgnore(IResource r) {
+		// Cannot ignore a folder if it contains members that should not be ignored.
+		if (r instanceof IFolder) {
+			try {
+				for (IResource member : ((IFolder) r).members()) {
+					if (!this.shouldIgnore(member)) {
+						return false;
+					}
+				}
+			} catch (CoreException e) {
+				// Could mean folder doesn't exist, which is fine. Continue with testing.
+			}
+		}
+
+		for (ResourceMatcher pm : filteredPaths) {
+			if (pm.match(r)) {
+				PatternType type = patternToTypeMap.get(pm);
+				assert (pm != null);
+				if (type == PatternType.EXCLUDE) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+		}
+
+		return false;
 	}
 }
