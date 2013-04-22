@@ -178,7 +178,6 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 		}
 
 		toolCombo.addSelectionListener(listener);
-		toolCombo.select(0);
 
 		toolComposite.getParent().layout();
 		topComposite.layout();
@@ -549,7 +548,10 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 	public boolean isValid(ILaunchConfiguration configuration) {
 		setErrorMessage(null);
 		if (toolCombo != null) {
-			if (toolCombo.getSelectionIndex() == 0) {
+			/* If nothing has ever been selected then its valid so don't report an error */
+			if (toolCombo.getSelectionIndex() == -1) {
+				return true;
+			} else if (toolCombo.getSelectionIndex() == 0) {
 				setErrorMessage(Messages.PerformanceAnalysisTab_NoWorkflowSelected);
 				return false;
 			}
