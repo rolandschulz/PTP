@@ -548,13 +548,19 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 	public boolean isValid(ILaunchConfiguration configuration) {
 		setErrorMessage(null);
 		if (toolCombo != null) {
-			/* If nothing has ever been selected then its valid so don't report an error */
-			if (toolCombo.getSelectionIndex() == -1) {
-				return true;
-			} else if (toolCombo.getSelectionIndex() == 0) {
-				setErrorMessage(Messages.PerformanceAnalysisTab_NoWorkflowSelected);
-				return false;
+			try {
+				String toolName = configuration.getAttribute(IToolLaunchConfigurationConstants.SELECTED_TOOL,
+						IToolLaunchConfigurationConstants.EMPTY_STRING);
+				for (int index = 0; index < toolCombo.getItemCount(); index++) {
+					if (toolCombo.getItem(index).equals(toolName)) {
+						return true;
+					}
+				}
+			} catch (CoreException e) {
+				// Ignore
 			}
+			setErrorMessage(Messages.PerformanceAnalysisTab_NoWorkflowSelected);
+			return false;
 		} else if (launchTabParent != null) {
 			String error = launchTabParent.getUpdateHandler().getFirstError();
 			if (error != null) {
