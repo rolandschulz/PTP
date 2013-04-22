@@ -22,6 +22,8 @@ public class Messages extends NLS {
 	public static String NewRemoteSyncProjectWizard_0;
 	public static String NewRemoteSyncProjectWizard_description;
 	public static String NewRemoteSyncProjectWizard_title;
+	public static String NewRemoteSyncProjectWizardOperation_0;
+	public static String NewRemoteSyncProjectWizardOperation_1;
 	public static String NewRemoteSyncProjectWizardPage_0;
 	public static String NewRemoteSyncProjectWizardPage_syncProvider;
 	public static String WizardProjectConversion_windowLabel;
@@ -32,7 +34,8 @@ public class Messages extends NLS {
 	public static String ConvertToRemoteWizardPage_0;
 	public static String ConvertToSyncProjectWizardPage_0;
 	public static String ConvertToSyncProjectWizardPage_convertingToSyncProject;
-	public static String SynchronizeProperties_Link_configuration;
+	public static String SynchronizeProperties_0;
+	public static String SynchronizeProperties_Default_configuration;
 	public static String SyncMainWizardPage_0;
 	public static String SyncMainWizardPage_1;
 	public static String SyncMainWizardPage_10;

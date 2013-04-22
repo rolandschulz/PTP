@@ -10,9 +10,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.sync.cdt.core;
 
+import org.eclipse.cdt.core.CProjectNature;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -40,17 +42,14 @@ public class Activator extends Plugin {
 
 	@Override
 	public void start(BundleContext context) throws Exception {
-		BuildConfigUtils.initializeListeners();
+		SyncConfigManager.addSyncConfigListener(CProjectNature.C_NATURE_ID, SyncConfigListenerCDT.getInstance());
 		super.start(context);
 	}
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		try {
-			BuildConfigUtils.finalizeListeners();
-		} finally {
-			super.stop(context);
-		}
+		SyncConfigManager.removeSyncConfigListener(CProjectNature.C_NATURE_ID, SyncConfigListenerCDT.getInstance());
+		super.stop(context);
 	}
 
 	public static void log(String e) {

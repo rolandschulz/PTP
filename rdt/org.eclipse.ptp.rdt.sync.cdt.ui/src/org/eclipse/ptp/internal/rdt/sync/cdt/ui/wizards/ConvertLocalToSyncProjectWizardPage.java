@@ -43,7 +43,7 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.Window;
-import org.eclipse.ptp.internal.rdt.sync.cdt.core.BuildConfigUtils;
+import org.eclipse.ptp.internal.rdt.sync.cdt.core.SyncConfigListenerCDT;
 import org.eclipse.ptp.internal.rdt.sync.cdt.ui.Activator;
 import org.eclipse.ptp.internal.rdt.sync.cdt.ui.messages.Messages;
 import org.eclipse.ptp.internal.rdt.sync.ui.SynchronizeParticipantRegistry;
@@ -297,7 +297,7 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 		try {
 
 			// Initialize project with a local build scenario, which is applied to all configurations
-			BuildConfigUtils.setSyncConfigForAllBuildConfigurations(project, SyncConfigManager.createLocal(project));
+			SyncConfigListenerCDT.setSyncConfigForAllBuildConfigurations(project, SyncConfigManager.createLocal(project));
 
 			// Create a remote build scenario
 			ISynchronizeService provider = participant.getProvider(project);
@@ -318,10 +318,10 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 			for (IConfiguration config : allConfigs) {
 				// For selected configs, create a new remote config
 				if (selectedConfigsSet.contains(config)) {
-					IConfiguration remoteConfig = BuildConfigUtils.createConfiguration(project, (Configuration) config,
+					IConfiguration remoteConfig = SyncConfigListenerCDT.createConfiguration(project, (Configuration) config,
 							remoteBuildScenario, config.getName().replace(' ', '_'), null); // Bug 389899 - "remote toolchain name"
 																							// contains spaces
-					BuildConfigUtils.modifyConfigurationAsSyncRemote(remoteConfig);
+					SyncConfigListenerCDT.modifyConfigurationAsSyncRemote(remoteConfig);
 
 					// The first remote found will be the initial default (active) configuration.
 					if (switchToRemoteConfig && !defaultConfigSet) {
@@ -330,7 +330,7 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 					}
 				}
 
-				BuildConfigUtils.modifyConfigurationAsSyncLocal(config);
+				SyncConfigListenerCDT.modifyConfigurationAsSyncLocal(config);
 			}
 			ManagedBuildManager.saveBuildInfo(project, true);
 

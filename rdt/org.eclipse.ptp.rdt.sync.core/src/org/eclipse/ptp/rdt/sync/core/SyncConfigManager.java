@@ -32,6 +32,7 @@ import org.eclipse.ptp.internal.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
 import org.eclipse.ptp.rdt.sync.core.listeners.ISyncConfigListener;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
+import org.eclipse.ptp.rdt.sync.core.services.ISynchronizeService;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
@@ -44,8 +45,6 @@ import org.eclipse.ui.XMLMemento;
  * @since 3.0
  */
 public class SyncConfigManager {
-	private static final String projectLocationPathVariable = "${project_loc}"; //$NON-NLS-1$
-
 	private static final String PREF_SYNCCONFIG = "SYNC_CONFIG"; //$NON-NLS-1$
 	private static final String CONFIGS_ELEMENT = "sync-configs"; //$NON-NLS-1$
 	private static final String CONFIG_ELEMENT = "sync-config"; //$NON-NLS-1$
@@ -58,6 +57,9 @@ public class SyncConfigManager {
 	private static final String SYNC_ON_PREBUILD_ELEMENT = "sync-on-prebuild"; //$NON-NLS-1$
 	private static final String SYNC_ON_POSTBUILD_ELEMENT = "sync-on-postbuild"; //$NON-NLS-1$
 	private static final String SYNC_ON_SAVE_ELEMENT = "sync-on-save"; //$NON-NLS-1$
+	private static final String CONFIG_PROPERTIES_ELEMENT = "config-properties"; //$NON-NLS-1$
+	private static final String LOCAL_SYNC_CONFIG_NAME = "Local"; //$NON-NLS-1$
+    private static final String PROJECT_LOCAL_PATH = "${project_loc}"; //$NON-NLS-1$
 
 	private static final Map<String, ListenerList> fSyncConfigListenerMap = Collections
 			.synchronizedMap(new HashMap<String, ListenerList>());
@@ -100,32 +102,6 @@ public class SyncConfigManager {
 			fSyncConfigListenerMap.put(natureId, list);
 		}
 		list.add(listener);
-	}
-
-	/**
-	 * Create a sync configuration in the local Eclipse workspace.
-	 * This function makes no changes to the internal data structures and is of little value for most clients.
-	 * 
-	 * @param project
-	 *            - cannot be null
-	 * @return the sync configuration - never null
-	 * @throws CoreException
-	 *             on problems getting local resources, either the local connection or local services
-	 */
-	public static SyncConfig createLocal(IProject project) throws CoreException {
-		IRemoteServices localService = RemoteServices.getLocalServices();
-
-		if (localService != null) {
-			IRemoteConnection localConnection = localService.getConnectionManager().getConnection(
-					IRemoteConnectionManager.LOCAL_CONNECTION_NAME);
-			if (localConnection != null) {
-				return newConfig(localConnection.getName(), null, localConnection, projectLocationPathVariable);
-			} else {
-				throw new CoreException(new Status(IStatus.ERROR, RDTSyncCorePlugin.PLUGIN_ID, Messages.BCM_LocalConnectionError));
-			}
-		} else {
-			throw new CoreException(new Status(IStatus.ERROR, RDTSyncCorePlugin.PLUGIN_ID, Messages.BCM_LocalServiceError));
-		}
 	}
 
 	private static void doAddConfig(IProject project, SyncConfig config) {
@@ -265,6 +241,27 @@ public class SyncConfigManager {
 	}
 
 	/**
+	 * Get a local sync config, really a config that does no sync'ing, for when the user wants to just work locally.
+	 * This method must agree with {@link #isLocal(SyncConfig)}.
+	 * @return a local config
+	 * @throws CoreException on problems retrieving local service elements
+	 */
+	public static SyncConfig getLocalConfig(ISynchronizeService syncService) throws CoreException {
+        IRemoteServices localService = RemoteServices.getLocalServices();
+        if (localService == null) {
+        	throw new CoreException(new Status(IStatus.ERROR, RDTSyncCorePlugin.PLUGIN_ID, Messages.SyncConfigManager_0));
+        }
+
+        IRemoteConnection localConnection = localService.getConnectionManager().
+        		getConnection(IRemoteConnectionManager.LOCAL_CONNECTION_NAME);
+        if (localConnection == null) {
+        	throw new CoreException(new Status(IStatus.ERROR, RDTSyncCorePlugin.PLUGIN_ID, Messages.SyncConfigManager_1));
+        }
+
+		return SyncConfigManager.newConfig(LOCAL_SYNC_CONFIG_NAME, syncService.getId(), localConnection, PROJECT_LOCAL_PATH);
+	}
+
+	/**
 	 * Get the synchronize location URI of the resource associated with the sync configuration. Returns null if the sync
 	 * configuration has not been configured correctly.
 	 * 
@@ -302,6 +299,27 @@ public class SyncConfigManager {
 		return (active != null && config != null && active.getName().equals(config.getName()));
 	}
 
+	/**
+	 * Return whether the config is local (no sync'ing is done)
+	 * This definition must agree with how local configs are created in {@link #getLocalConfig()}.
+	 *
+	 * @param config
+	 * @return whether config is local
+	 */
+	public static boolean isLocal(SyncConfig config) {
+		return(config.getName() == LOCAL_SYNC_CONFIG_NAME);
+	}
+
+	/**
+	 * Return whether the config is remote (sync'ing is done)
+	 *
+	 * @param config
+	 * @return whether config is remote
+	 */
+	public static boolean isRemote(SyncConfig config) {
+		return !isLocal(config);
+	}
+
 	private static void loadConfigs(IProject project) throws CoreException {
 		if (!fSyncConfigMap.containsKey(project)) {
 			String prefs = project.getPersistentProperty(new QualifiedName(RDTSyncCorePlugin.PLUGIN_ID, PREF_SYNCCONFIG));
@@ -326,6 +344,13 @@ public class SyncConfigManager {
 					}
 					if (syncOnSave != null) {
 						config.setSyncOnSave(syncOnSave.booleanValue());
+					}
+					IMemento configPropertiesMemento = configMemento.getChild(CONFIG_PROPERTIES_ELEMENT);
+					if (configPropertiesMemento != null) {
+						for (String key : configPropertiesMemento.getAttributeKeys()) {
+							String value = configPropertiesMemento.getString(key);
+							config.setProperty(key, value);
+						}
 					}
 					doAddConfig(project, config);
 				}
@@ -419,7 +444,9 @@ public class SyncConfigManager {
 	 * @param project
 	 * @throws CoreException
 	 */
-	private static void saveConfigs(IProject project) throws CoreException {
+	// TODO: Change method, maybe to use preference nodes, as this will fail once we have more than a few configs.
+	// (project.setPersistentProperty() will only work for strings less than 2k in length)
+	public static void saveConfigs(IProject project) throws CoreException {
 		Map<String, SyncConfig> projConfigs = fSyncConfigMap.get(project);
 		if (projConfigs != null) {
 			XMLMemento rootMemento = XMLMemento.createWriteRoot(CONFIGS_ELEMENT);
@@ -433,6 +460,10 @@ public class SyncConfigManager {
 				configMemento.putBoolean(SYNC_ON_PREBUILD_ELEMENT, config.isSyncOnPreBuild());
 				configMemento.putBoolean(SYNC_ON_POSTBUILD_ELEMENT, config.isSyncOnPostBuild());
 				configMemento.putBoolean(SYNC_ON_SAVE_ELEMENT, config.isSyncOnSave());
+				IMemento configPropertiesMemento = configMemento.createChild(CONFIG_PROPERTIES_ELEMENT);
+				for (Map.Entry<String, String> prop : config.getProperties().entrySet()) {
+					configPropertiesMemento.putString(prop.getKey(), prop.getValue());
+				}
 			}
 			SyncConfig active = fActiveSyncConfigMap.get(project);
 			if (active != null) {

@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.core.resources.IPathVariableManager;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.ptp.internal.rdt.sync.core.services.SynchronizeServiceRegistry;
@@ -71,6 +74,7 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	private boolean fSyncOnPreBuild = true;
 	private boolean fSyncOnPostBuild = true;
 	private boolean fSyncOnSave = true;
+	private Map<String, String> fProperties;
 
 	private IRemoteServices fRemoteServices;
 	private IRemoteConnection fRemoteConnection;
@@ -85,6 +89,7 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	 */
 	public SyncConfig(String name) {
 		fName = name;
+		fProperties = new HashMap<String, String>();
 	}
 
 	/*
@@ -158,6 +163,25 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	 */
 	public IProject getProject() {
 		return fProject;
+	}
+
+    /**
+     * Get an arbitrary property for the configuration
+     *
+     * @param key
+     * @return value
+     */
+	public String getProperty(String key) {
+		return fProperties.get(key);
+	}
+
+	/**
+	 * Get all properties set for this configuration.
+	 * Note that modifying the returned map does not alter the configuration's properties.
+	 * @return copy of configuration's property map
+	 */
+	public Map<String, String> getProperties() {
+		return new HashMap<String, String>(fProperties);
 	}
 
 	/**
@@ -287,6 +311,16 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	public void setProject(IProject project) {
 		fProject = project;
 	}
+
+    /**
+     * Set an arbitrary property for the configuration
+     *
+     * @param key
+     * @param value
+     */
+    public void setProperty(String key, String value) {
+            fProperties.put(key, value);
+    }
 
 	/**
 	 * @param remoteServicesId

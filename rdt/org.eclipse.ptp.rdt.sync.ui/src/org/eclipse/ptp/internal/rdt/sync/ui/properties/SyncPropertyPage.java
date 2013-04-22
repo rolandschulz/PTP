@@ -211,6 +211,10 @@ public class SyncPropertyPage extends PropertyPage {
 					fAddedConfigs.add(config);
 					fConfigs.add(config);
 					fTreeViewer.refresh();
+					ISynchronizeProperties prop = SynchronizePropertiesRegistry.getSynchronizePropertiesForProject(getProject());
+					if (prop != null) {
+						prop.addConfiguration(config);
+					}
 				}
 			}
 		});

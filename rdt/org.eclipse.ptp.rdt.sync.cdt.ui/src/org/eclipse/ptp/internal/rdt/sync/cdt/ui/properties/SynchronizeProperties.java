@@ -11,18 +11,22 @@
 package org.eclipse.ptp.internal.rdt.sync.cdt.ui.properties;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.ptp.internal.rdt.sync.cdt.core.BuildConfigUtils;
+import org.eclipse.ptp.internal.rdt.sync.cdt.core.Activator;
 import org.eclipse.ptp.internal.rdt.sync.cdt.ui.messages.Messages;
 import org.eclipse.ptp.internal.rdt.sync.cdt.ui.wizards.AddSyncConfigWizardPage;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
+import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.ui.AbstractSynchronizeProperties;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizePropertiesDescriptor;
 import org.eclipse.swt.SWT;
@@ -33,11 +37,17 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 
+/**
+ * Synchronize Properties page extension for CDT to specify default build configurations *
+ */
 public class SynchronizeProperties extends AbstractSynchronizeProperties {
+	private static final String DEFAULT_BUILD_CONFIG_ID = "default-build-config-id"; //$NON-NLS-1$
+
 	private Group fUserDefinedContent;
 	private Combo fConfigCombo;
 	private SyncConfig fSyncConfig;
 	private AddSyncConfigWizardPage fWizardPage;
+	private final Map<String, String> fBuildConfigNameToIdMap = new HashMap<String, String>();
 	private final Map<SyncConfig, String> fDirtySyncConfigs = new HashMap<SyncConfig, String>();
 
 	public SynchronizeProperties(ISynchronizePropertiesDescriptor descriptor) {
@@ -46,23 +56,30 @@ public class SynchronizeProperties extends AbstractSynchronizeProperties {
 
 	@Override
 	public void addConfiguration(SyncConfig config) {
-		fDirtySyncConfigs.put(config, fWizardPage.getBuildConfiguration());
+		String buildConfigName = fWizardPage.getBuildConfiguration();
+		if (buildConfigName != null) {
+			fDirtySyncConfigs.put(config, fWizardPage.getBuildConfiguration());
+		}
 	}
 
 	/**
-	 * Check if the selected build configuration has changed. Save the corresponding sync configuration if it has.
+	 * Cache the config if it has changed or remove it from the cache if it has not.
 	 */
-	private void checkConfig() {
-		IConfiguration config = BuildConfigUtils
-				.getBuildConfigurationForSyncConfig(fSyncConfig.getProject(), fSyncConfig.getName());
-		if (config != null) {
-			int index = fConfigCombo.getSelectionIndex();
-			if (index >= 0) {
-				String configName = fConfigCombo.getItem(index);
-				if (!config.getName().equals(configName)) {
-					fDirtySyncConfigs.put(fSyncConfig, configName);
-				}
-			}
+	private void cacheConfig() {
+		String defaultConfigName = this.getDefaultBuildConfig(fSyncConfig);
+
+		String selectedConfigName;
+		int index = fConfigCombo.getSelectionIndex();
+		if (index == -1) {
+			selectedConfigName = null;
+		} else {
+			selectedConfigName = fConfigCombo.getItem(index);
+		}
+		
+		if (defaultConfigName == selectedConfigName) {
+			fDirtySyncConfigs.remove(fSyncConfig);
+		} else {
+			fDirtySyncConfigs.put(fSyncConfig, selectedConfigName);
 		}
 	}
 
@@ -91,11 +108,18 @@ public class SynchronizeProperties extends AbstractSynchronizeProperties {
 		fUserDefinedContent.setLayout(new GridLayout(2, false));
 		fUserDefinedContent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		Label label = new Label(fUserDefinedContent, SWT.NONE);
-		label.setText(Messages.SynchronizeProperties_Link_configuration); 
+		label.setText(Messages.SynchronizeProperties_Default_configuration); 
 		fConfigCombo = new Combo(fUserDefinedContent, SWT.READ_ONLY);
-		fConfigCombo.setItems(getConfigurationNames(config.getProject()));
+		this.readBuildConfigData(config.getProject());
+		fConfigCombo.setItems(fBuildConfigNameToIdMap.keySet().toArray(new String[0]));
 		fConfigCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
-		selectConfiguration(fConfigCombo, config.getProject(), config.getName());
+		String initialBuildConfig;
+		if (fDirtySyncConfigs.containsKey(config)) {
+			initialBuildConfig = fDirtySyncConfigs.get(config);
+		} else {
+			initialBuildConfig = this.getDefaultBuildConfig(config);
+		}
+		selectBuildConfiguration(initialBuildConfig);
 	}
 
 	/*
@@ -105,19 +129,36 @@ public class SynchronizeProperties extends AbstractSynchronizeProperties {
 	 */
 	@Override
 	public void disposePropertiesConfigurationArea() {
-		if (fUserDefinedContent != null) {
-			checkConfig();
-			fUserDefinedContent.dispose();
-			fUserDefinedContent = null;
+		if (fUserDefinedContent == null) {
+			return;
 		}
+
+		if (!fUserDefinedContent.isDisposed()) {
+			cacheConfig();
+			fUserDefinedContent.dispose();
+		}
+		fUserDefinedContent = null;
 	}
 
-	private String[] getConfigurationNames(IProject project) {
-		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
-		if (buildInfo != null) {
-			return buildInfo.getConfigurationNames();
+	/**
+	 * Get name of the default build config for the given sync config
+	 *
+	 * @param syncConfig
+	 * @return build config name or null if either the sync config does not have a default build config or if the build config no longer
+	 *         exists in CDT.
+	 */
+	private String getDefaultBuildConfig(SyncConfig syncConfig) {
+		String buildConfigId = syncConfig.getProperty(DEFAULT_BUILD_CONFIG_ID);
+		if (buildConfigId == null) {
+			return null;
 		}
-		return new String[0];
+		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(syncConfig.getProject());
+		IConfiguration buildConfig = buildInfo.getManagedProject().getConfiguration(buildConfigId);
+		if (buildConfig == null) {
+			return null;
+		} else {
+			return buildConfig.getName();
+		}
 	}
 
 	/*
@@ -127,15 +168,31 @@ public class SynchronizeProperties extends AbstractSynchronizeProperties {
 	 */
 	@Override
 	public void performApply() {
+		// Don't forget to cache changes to the current config
+		if ((fUserDefinedContent != null) && (!fUserDefinedContent.isDisposed())) {
+			cacheConfig();
+		}
+		Set<IProject> projectsToUpdate = new HashSet<IProject>();
 		/*
 		 * Iterate through all the potentially changed configurations and update the build configuration information
 		 */
 		for (Entry<SyncConfig, String> dirty : fDirtySyncConfigs.entrySet()) {
-			IProject project = dirty.getKey().getProject();
-			String syncConfigName = dirty.getKey().getName();
-			String buildConfigName = dirty.getValue();
-			// BuildConfigUtils.updateProject(project, syncConfigName, buildConfigName);
+			// Must store build config Id - not name
+			String configId = fBuildConfigNameToIdMap.get(dirty.getValue());
+			dirty.getKey().setProperty(DEFAULT_BUILD_CONFIG_ID, configId);
+			projectsToUpdate.add(dirty.getKey().getProject());
 		}
+
+		// This should always only iterate once... right?
+		for (IProject p : projectsToUpdate) {
+			try {
+				SyncConfigManager.saveConfigs(p);
+			} catch (CoreException e) {
+				Activator.log(e);
+			}
+		}
+		
+		fDirtySyncConfigs.clear();
 	}
 
 	/*
@@ -145,8 +202,7 @@ public class SynchronizeProperties extends AbstractSynchronizeProperties {
 	 */
 	@Override
 	public void performCancel() {
-		// TODO Auto-generated method stub
-
+		fDirtySyncConfigs.clear();
 	}
 
 	/*
@@ -157,19 +213,45 @@ public class SynchronizeProperties extends AbstractSynchronizeProperties {
 	@Override
 	public void performDefaults() {
 		if (fUserDefinedContent != null) {
-			selectConfiguration(fConfigCombo, fSyncConfig.getProject(), fSyncConfig.getName());
+			String buildConfigName = this.getDefaultBuildConfig(fSyncConfig);
+			selectBuildConfiguration(buildConfigName);
+		}
+		fDirtySyncConfigs.clear();
+	}
+
+	/**
+	 * Read build configuration data and populate data structures
+	 * @param project
+	 */
+	private void readBuildConfigData(IProject project) {
+		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
+		if (buildInfo == null) {
+			throw new RuntimeException(Messages.SynchronizeProperties_0 + project.getName());
+		}
+		IConfiguration[] allBuildConfigs = buildInfo.getManagedProject().getConfigurations();
+		for (IConfiguration config : allBuildConfigs) {
+			fBuildConfigNameToIdMap.put(config.getName(), config.getId());
 		}
 	}
 
-	private void selectConfiguration(Combo combo, IProject project, String name) {
-		IConfiguration config = BuildConfigUtils.getBuildConfigurationForSyncConfig(project, name);
-		if (config != null) {
-			for (int i = 0; i < combo.getItemCount(); i++) {
-				if (combo.getItem(i).equals(config.getName())) {
-					combo.select(i);
-					return;
-				}
+	/**
+	 * Select the build config in the combo with the given name or deselect all if null is given or if the name is not found.
+	 * @param configName
+	 *                build config name or null to select none
+	 */
+	private void selectBuildConfiguration(String configName) {
+		if (configName == null) {
+			fConfigCombo.deselectAll();
+			return;
+		}
+
+		for (int i = 0; i < fConfigCombo.getItemCount(); i++) {
+			if (fConfigCombo.getItem(i).equals(configName)) {
+				fConfigCombo.select(i);
+				return;
 			}
 		}
+		
+		fConfigCombo.deselectAll();
 	}
 }
