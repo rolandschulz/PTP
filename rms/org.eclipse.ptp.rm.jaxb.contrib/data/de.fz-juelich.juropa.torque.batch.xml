@@ -35,7 +35,7 @@
 		</attribute>
 		<attribute name="mpiCommand" type="choice">
 			<description>Which mpi command to use.</description>
-			<choice>,mpiexec</choice>
+			<choice>mpiexec</choice>
 		</attribute>
 		<attribute name="mpiNumberOfProcesses" min="1" type="integer">
 			<description>The '-np' value (Should match with nodes*ppn/tpt)</description>
@@ -727,7 +727,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						</layout-data>
 						<fixed-text>MPI Command: </fixed-text>
 					</widget>
-					<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="mpiCommand">
+					<widget type="combo" style="SWT.BORDER" readOnly="false" attribute="mpiCommand">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false"/>
 						</layout-data>
