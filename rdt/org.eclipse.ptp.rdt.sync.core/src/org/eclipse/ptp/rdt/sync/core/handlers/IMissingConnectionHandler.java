@@ -15,6 +15,8 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
 /**
  * Class for encapsulating logic to handle missing connections. The UI can specify a default handler for the core to execute so
  * that the code does not need to be duplicated or invoked in all places where a connection is not found.
+ * 
+ * @since 3.0
  */
 public interface IMissingConnectionHandler {
 	public void handle(IRemoteServices remoteServices, String connectionName);

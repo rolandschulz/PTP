@@ -24,6 +24,8 @@ import org.eclipse.ptp.internal.rdt.sync.core.RDTSyncCorePlugin;
 
 /**
  * Project nature for remote projects.
+ * 
+ * @since 3.0
  */
 public class RemoteSyncNature implements IProjectNature {
 

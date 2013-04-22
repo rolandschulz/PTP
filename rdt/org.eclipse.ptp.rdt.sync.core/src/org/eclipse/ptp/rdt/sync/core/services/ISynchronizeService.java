@@ -26,6 +26,8 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 
 /**
  * Provides synchronization services.
+ * 
+ * @since 3.0
  */
 public interface ISynchronizeService extends ISynchronizeServiceDescriptor {
 

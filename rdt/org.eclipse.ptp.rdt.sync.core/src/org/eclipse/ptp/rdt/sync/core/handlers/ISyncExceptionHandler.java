@@ -16,6 +16,8 @@ import org.eclipse.core.runtime.CoreException;
 /**
  * Class for encapsulating logic to handle sync exceptions. The intent is to offer a bridge between the sync core and other
  * packages, particularly the ui, so that the caller can specify how to handle errors.
+ * 
+ * @since 3.0
  */
 public interface ISyncExceptionHandler {
 	public void handle(final IProject project, final CoreException e);

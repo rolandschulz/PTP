@@ -13,9 +13,9 @@ package org.eclipse.ptp.rdt.sync.core.listeners;
 import org.eclipse.ptp.rdt.sync.core.SyncEvent;
 
 /**
- * Simple interface for clients wishing to register for sync events 
- *
- *
+ * Simple interface for clients wishing to register for sync events
+ * 
+ * @since 3.0
  */
 public interface ISyncListener {
 	void handleSyncEvent(SyncEvent event);

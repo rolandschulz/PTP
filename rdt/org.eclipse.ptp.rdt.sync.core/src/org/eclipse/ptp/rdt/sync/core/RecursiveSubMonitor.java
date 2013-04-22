@@ -19,6 +19,8 @@ import org.eclipse.core.runtime.SubMonitor;
  * Submonitor capable of recursive task reporting. New subtasks are appended to the parent's subtask.
  * Operates as a thin wrapper around the usual tree of submonitors, which still do most of the work.
  * 
+ * @since 3.0
+ * 
  */
 public class RecursiveSubMonitor implements IProgressMonitorWithBlocking {
 	private SubMonitor subMonitor;

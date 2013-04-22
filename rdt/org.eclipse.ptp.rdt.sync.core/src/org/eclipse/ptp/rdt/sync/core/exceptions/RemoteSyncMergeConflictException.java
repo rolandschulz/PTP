@@ -15,8 +15,10 @@ import org.eclipse.core.runtime.Status;
 /**
  * A RemoteSyncException especially for merge conflicts. Since it is a subclass, clients only need to catch this exception if
  * they want to handle merge conflicts in a different way.
- *
+ * 
  * Later, this exception could add API with information about the merge conflict.
+ * 
+ * @since 3.0
  */
 public class RemoteSyncMergeConflictException extends RemoteSyncException {
 	private static final long serialVersionUID = 1L;

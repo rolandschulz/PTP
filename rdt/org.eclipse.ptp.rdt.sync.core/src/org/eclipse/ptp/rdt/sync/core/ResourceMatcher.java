@@ -25,6 +25,8 @@ import org.osgi.service.prefs.Preferences;
  * Abstract class to be inherited to support various ways of testing strings.
  * Subclasses must implement either a public static "loadMatcher" method that takes a preference node or a default constructor to
  * support persistence. Otherwise, calling PatternMatcher.loadMatcher(Preferences) for a saved instance will throw an exception.
+ * 
+ * @since 3.0
  */
 public abstract class ResourceMatcher {
 	private static final String ATTR_CLASS_NAME = "class-name"; //$NON-NLS-1$

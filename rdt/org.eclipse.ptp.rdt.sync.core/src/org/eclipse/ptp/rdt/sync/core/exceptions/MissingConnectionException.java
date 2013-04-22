@@ -13,6 +13,8 @@ package org.eclipse.ptp.rdt.sync.core.exceptions;
 /**
  * Exception for a missing remote connection. A specific exception is defined as this situation often requires special handling.
  * Normally, it should be expected to happen on occasion, and the client should recover gracefully.
+ * 
+ * @since 3.0
  */
 public class MissingConnectionException extends Exception {
 	private static final long serialVersionUID = 1L;
@@ -27,9 +29,10 @@ public class MissingConnectionException extends Exception {
 		super(message);
 		connectionName = name;
 	}
-	
+
 	/**
 	 * Get connection name
+	 * 
 	 * @return
 	 */
 	public String getConnectionName() {

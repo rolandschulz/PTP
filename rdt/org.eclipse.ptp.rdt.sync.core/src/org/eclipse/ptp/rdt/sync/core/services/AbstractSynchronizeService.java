@@ -13,6 +13,9 @@ package org.eclipse.ptp.rdt.sync.core.services;
 import org.eclipse.ptp.internal.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 
+/**
+ * @since 3.0
+ */
 public abstract class AbstractSynchronizeService implements ISynchronizeService {
 
 	private final ISynchronizeServiceDescriptor fDescriptor;

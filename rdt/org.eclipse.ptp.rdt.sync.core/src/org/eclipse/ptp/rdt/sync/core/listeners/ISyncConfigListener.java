@@ -15,6 +15,8 @@ import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 
 /**
  * Provides sync configuration callbacks.
+ * 
+ * @since 3.0
  */
 public interface ISyncConfigListener {
 

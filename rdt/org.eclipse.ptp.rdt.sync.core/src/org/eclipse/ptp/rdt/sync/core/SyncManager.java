@@ -41,6 +41,9 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.osgi.service.prefs.Preferences;
 
+/**
+ * @since 3.0
+ */
 public class SyncManager {
 	private static class SynchronizeJob extends Job {
 		private final IProject fProject;

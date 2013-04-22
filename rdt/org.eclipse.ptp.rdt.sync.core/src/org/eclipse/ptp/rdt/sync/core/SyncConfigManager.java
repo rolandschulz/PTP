@@ -40,6 +40,9 @@ import org.eclipse.ptp.remote.core.RemoteServices;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 
+/**
+ * @since 3.0
+ */
 public class SyncConfigManager {
 	private static final String projectLocationPathVariable = "${project_loc}"; //$NON-NLS-1$
 

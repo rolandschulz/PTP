@@ -22,6 +22,8 @@ import org.eclipse.ptp.remote.core.RemoteServices;
 
 /**
  * Class to encapsulate information about syncing a project
+ * 
+ * @since 3.0
  */
 public class SyncConfig implements Comparable<SyncConfig> {
 	/**

@@ -14,7 +14,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
-// An exception to wrap exceptions for which the Remote Sync services cannot recover.
+/**
+ * An exception to wrap exceptions for which the Remote Sync services cannot recover.
+ * 
+ * @since 3.0
+ */
 public class RemoteSyncException extends CoreException {
 	private static final String pluginID = "org.eclipse.ptp.rdt.sync.git.core"; //$NON-NLS-1$
 	private static final long serialVersionUID = 1L;
@@ -29,7 +33,7 @@ public class RemoteSyncException extends CoreException {
 	}
 
 	public RemoteSyncException(Throwable arg0) {
-		super(new Status(IStatus.ERROR, pluginID, (arg0==null ? null : arg0.toString()), arg0));
+		super(new Status(IStatus.ERROR, pluginID, (arg0 == null ? null : arg0.toString()), arg0));
 	}
 
 	public RemoteSyncException(Status status) {

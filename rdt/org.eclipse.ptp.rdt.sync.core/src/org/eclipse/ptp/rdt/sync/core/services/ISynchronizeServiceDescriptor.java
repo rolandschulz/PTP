@@ -13,6 +13,7 @@ package org.eclipse.ptp.rdt.sync.core.services;
 /**
  * Must be implemented by extensions to the syncService extension point.
  * 
+ * @since 3.0
  */
 public interface ISynchronizeServiceDescriptor {
 	/**

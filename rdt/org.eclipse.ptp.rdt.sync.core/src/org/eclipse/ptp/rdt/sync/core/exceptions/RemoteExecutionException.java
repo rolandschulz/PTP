@@ -10,8 +10,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core.exceptions;
 
-// Used for cases when a remote command fails. If it fails with an unexpected non-zero exit code, include the error message in the
-// exception. If failure is indicated by another exception, nest the other exception and include its error message.
+/**
+ * Used for cases when a remote command fails. If it fails with an unexpected non-zero exit code, include the error message in the
+ * exception. If failure is indicated by another exception, nest the other exception and include its error message.
+ * 
+ * @since 3.0
+ */
 public class RemoteExecutionException extends Exception {
 	private static final long serialVersionUID = 1L;
 
