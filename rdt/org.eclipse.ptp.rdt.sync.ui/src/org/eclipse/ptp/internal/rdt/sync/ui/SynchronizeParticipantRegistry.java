@@ -21,17 +21,22 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipantDescriptor;
 
 public class SynchronizeParticipantRegistry {
+	public static final String SYNCHRONIZE_EXTENSION = "synchronizeParticipants"; //$NON-NLS-1$
+
 	private static List<ISynchronizeParticipantDescriptor> fAllDescriptors;
 
 	public static ISynchronizeParticipantDescriptor[] getDescriptors() {
 		loadDescriptors();
-		return fAllDescriptors.toArray(new ISynchronizeParticipantDescriptor[fAllDescriptors.size()]);
+		if (fAllDescriptors != null) {
+			return fAllDescriptors.toArray(new ISynchronizeParticipantDescriptor[fAllDescriptors.size()]);
+		}
+		return new ISynchronizeParticipantDescriptor[0];
 	}
 
 	private static void loadDescriptors() {
 		if (fAllDescriptors == null) {
 			IExtensionPoint point = Platform.getExtensionRegistry().getExtensionPoint(RDTSyncUIPlugin.PLUGIN_ID,
-					RDTSyncUIPlugin.SYNCHRONIZE_EXTENSION);
+					SYNCHRONIZE_EXTENSION);
 			if (point != null) {
 				fAllDescriptors = new ArrayList<ISynchronizeParticipantDescriptor>();
 				for (IExtension extension : point.getExtensions()) {

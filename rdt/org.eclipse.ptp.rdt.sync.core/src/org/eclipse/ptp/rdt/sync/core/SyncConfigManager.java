@@ -119,7 +119,7 @@ public class SyncConfigManager {
 			IRemoteConnection localConnection = localService.getConnectionManager().getConnection(
 					IRemoteConnectionManager.LOCAL_CONNECTION_NAME);
 			if (localConnection != null) {
-				return new SyncConfig(localConnection.getName(), null, localConnection, projectLocationPathVariable);
+				return newConfig(localConnection.getName(), null, localConnection, projectLocationPathVariable);
 			} else {
 				throw new CoreException(new Status(IStatus.ERROR, RDTSyncCorePlugin.PLUGIN_ID, Messages.BCM_LocalConnectionError));
 			}
@@ -135,6 +135,7 @@ public class SyncConfigManager {
 			fSyncConfigMap.put(project, projConfigs);
 		}
 		projConfigs.put(config.getName(), config);
+		config.setProject(project);
 	}
 
 	private static boolean doRemoveConfig(IProject project, SyncConfig config) {
@@ -316,7 +317,7 @@ public class SyncConfigManager {
 					Boolean syncOnPreBuild = configMemento.getBoolean(SYNC_ON_PREBUILD_ELEMENT);
 					Boolean syncOnPostBuild = configMemento.getBoolean(SYNC_ON_POSTBUILD_ELEMENT);
 					Boolean syncOnSave = configMemento.getBoolean(SYNC_ON_SAVE_ELEMENT);
-					SyncConfig config = new SyncConfig(configName, syncProviderId, connectionName, remoteServicesId, location);
+					SyncConfig config = newConfig(configName, syncProviderId, remoteServicesId, connectionName, location);
 					if (syncOnPreBuild != null) {
 						config.setSyncOnPreBuild(syncOnPreBuild.booleanValue());
 					}
@@ -338,6 +339,38 @@ public class SyncConfigManager {
 				}
 			}
 		}
+	}
+
+	/**
+	 * @param name
+	 * @param providerId
+	 * @param remoteServicesId
+	 * @param connName
+	 * @param location
+	 * @return
+	 */
+	public static SyncConfig newConfig(String name, String providerId, String remoteServicesId, String connName, String location) {
+		SyncConfig config = new SyncConfig(name);
+		config.setSyncProviderId(providerId);
+		config.setRemoteServicesId(remoteServicesId);
+		config.setConnectionName(connName);
+		config.setLocation(location);
+		return config;
+	}
+
+	/**
+	 * @param name
+	 * @param providerId
+	 * @param conn
+	 * @param location
+	 * @return
+	 */
+	public static SyncConfig newConfig(String name, String providerId, IRemoteConnection conn, String location) {
+		SyncConfig config = new SyncConfig(name);
+		config.setSyncProviderId(providerId);
+		config.setConnection(conn);
+		config.setLocation(location);
+		return config;
 	}
 
 	/**

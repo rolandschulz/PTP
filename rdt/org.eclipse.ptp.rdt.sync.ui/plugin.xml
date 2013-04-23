@@ -2,6 +2,7 @@
 <?eclipse version="3.2"?>
 <plugin>
    <extension-point id="synchronizeParticipants" name="Synchronize Participant" schema="schema/synchronizeParticipants.exsd"/>
+   <extension-point id="synchronizeProperties" name="Synchronize Properies" schema="schema/synchronizeProperties.exsd"/>
    <extension
          point="org.eclipse.ui.newWizards">
 	   <wizard

@@ -129,4 +129,11 @@
         </page>
 
      </extension>
+     <extension
+           point="org.eclipse.ptp.rdt.sync.ui.synchronizeProperties">
+        <synchronizeProperties
+              class="org.eclipse.ptp.internal.rdt.sync.cdt.ui.properties.SynchronizeProperties"
+              nature="org.eclipse.cdt.core.cnature">
+        </synchronizeProperties>
+     </extension>
 </plugin>

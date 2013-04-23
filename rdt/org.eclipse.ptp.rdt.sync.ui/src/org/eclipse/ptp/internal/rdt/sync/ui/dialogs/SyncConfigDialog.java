@@ -14,10 +14,12 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.ptp.internal.rdt.sync.core.services.SynchronizeServiceRegistry;
+import org.eclipse.ptp.internal.rdt.sync.ui.SynchronizePropertiesRegistry;
 import org.eclipse.ptp.internal.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.services.ISynchronizeServiceDescriptor;
+import org.eclipse.ptp.rdt.sync.ui.ISynchronizeProperties;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
@@ -96,8 +98,7 @@ public class SyncConfigDialog extends Dialog {
 		final Composite dialogArea = (Composite) super.createDialogArea(parent);
 
 		final Composite composite = new Composite(dialogArea, SWT.NONE);
-		GridLayout layout = new GridLayout();
-		layout.numColumns = 3;
+		GridLayout layout = new GridLayout(3, false);
 		layout.marginHeight = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_MARGIN);
 		layout.marginWidth = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_MARGIN);
 		layout.verticalSpacing = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_SPACING);
@@ -201,11 +202,26 @@ public class SyncConfigDialog extends Dialog {
 			}
 		});
 
+		Composite userDefinedRegion = new Composite(dialogArea, SWT.NONE);
+		userDefinedRegion.setLayout(new GridLayout(1, false));
+		userDefinedRegion.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));
+
+		createUserDefinedRegion(userDefinedRegion);
+
 		initializeSyncProviders();
 		fSyncProviderCombo.select(0);
 		fSyncProvider = fSyncProviderCombo.getText();
 
 		return dialogArea;
+	}
+
+	private void createUserDefinedRegion(Composite control) {
+		if (fProject != null) {
+			ISynchronizeProperties prop = SynchronizePropertiesRegistry.getSynchronizePropertiesForProject(fProject);
+			if (prop != null) {
+				prop.createConfigurationArea(control, fProject, null);
+			}
+		}
 	}
 
 	private void initializeSyncProviders() {
@@ -271,8 +287,8 @@ public class SyncConfigDialog extends Dialog {
 	protected void okPressed() {
 		IRemoteConnection conn = fRemoteConnectioWidget.getConnection();
 		ISynchronizeServiceDescriptor provider = fProviders[fSyncProviderCombo.getSelectionIndex()];
-		fSyncConfig = new SyncConfig(fConfigNameText.getText().trim(), provider.getId(), conn.getName(), conn.getRemoteServices()
-				.getId(), fProjectLocationText.getText().trim());
+		fSyncConfig = SyncConfigManager.newConfig(fConfigNameText.getText().trim(), provider.getId(), conn.getName(), conn
+				.getRemoteServices().getId(), fProjectLocationText.getText().trim());
 		super.okPressed();
 	}
 

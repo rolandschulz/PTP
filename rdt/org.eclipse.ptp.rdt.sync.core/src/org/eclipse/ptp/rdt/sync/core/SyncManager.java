@@ -158,7 +158,7 @@ public class SyncManager {
 		RemoteSyncNature.addNature(project, new NullProgressMonitor());
 
 		IRemoteConnection conn = provider.getRemoteConnection();
-		SyncConfig config = new SyncConfig(conn.getName(), provider.getId(), conn, provider.getLocation());
+		SyncConfig config = SyncConfigManager.newConfig(conn.getName(), provider.getId(), conn, provider.getLocation());
 		SyncConfigManager.addConfig(project, config);
 		SyncConfigManager.setActive(project, config);
 

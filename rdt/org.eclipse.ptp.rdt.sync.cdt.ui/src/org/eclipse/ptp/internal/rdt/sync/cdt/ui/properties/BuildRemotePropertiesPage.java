@@ -272,7 +272,8 @@ public class BuildRemotePropertiesPage extends AbstractSingleBuildPage {
 
 		// Register with build configuration manager. This must be done after saving build info with ManagedBuildManager, as
 		// the BuildConfigurationManager relies on the data being up-to-date.
-		SyncConfig syncConfig = new SyncConfig(null, settings.syncProvider, settings.connection, settings.rootLocation);
+		SyncConfig syncConfig = SyncConfigManager
+				.newConfig(null, settings.syncProvider, settings.connection, settings.rootLocation);
 		BuildConfigUtils.setSyncConfigForBuildConfiguration(syncConfig, config);
 	}
 

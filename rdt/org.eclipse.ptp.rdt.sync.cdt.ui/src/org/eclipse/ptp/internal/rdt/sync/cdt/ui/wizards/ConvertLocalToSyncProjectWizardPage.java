@@ -301,7 +301,7 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 
 			// Create a remote build scenario
 			ISynchronizeService provider = participant.getProvider(project);
-			SyncConfig remoteBuildScenario = new SyncConfig(null, provider.getId(), provider.getRemoteConnection(),
+			SyncConfig remoteBuildScenario = SyncConfigManager.newConfig(null, provider.getId(), provider.getRemoteConnection(),
 					provider.getLocation());
 
 			Object[] selectedConfigs = fConfigTable.getCheckedElements();

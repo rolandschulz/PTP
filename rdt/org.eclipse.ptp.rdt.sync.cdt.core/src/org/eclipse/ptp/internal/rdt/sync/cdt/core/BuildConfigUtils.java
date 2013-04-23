@@ -378,6 +378,26 @@ public class BuildConfigUtils {
 		}
 	}
 
+	public static IConfiguration getBuildConfigurationForSyncConfig(IProject project, String configName) {
+		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
+		if (buildInfo == null) {
+			return null;
+		}
+		IConfiguration[] allConfigs = buildInfo.getManagedProject().getConfigurations();
+		for (IConfiguration config : allConfigs) {
+			String name = null;
+			try {
+				name = getConfigData((Configuration) config);
+			} catch (CoreException e) {
+				// Ignore
+			}
+			if (configName.equals(name)) {
+				return config;
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * Get the synchronize location URI of the resource associated with the build configuration. Returns null if the configuration
 	 * does not contain synchronization information or no connection has been configured.

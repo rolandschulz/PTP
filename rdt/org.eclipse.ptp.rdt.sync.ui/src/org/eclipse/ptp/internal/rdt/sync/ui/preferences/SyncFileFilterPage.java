@@ -515,7 +515,7 @@ public class SyncFileFilterPage extends ApplicationWindow implements IWorkbenchP
 		wildcardLabel.setToolTipText(Messages.SyncFileFilterPage_EnterWildcard + Messages.SyncFileFilterPage_toExcludeOrInclude);
 
 		// Text box to enter new glob/wildcard
-		newWildcard = new Text(patternEnterComposite, SWT.NONE);
+		newWildcard = new Text(patternEnterComposite, SWT.BORDER);
 		newWildcard.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
 		// Submit buttons (exclude and include)
