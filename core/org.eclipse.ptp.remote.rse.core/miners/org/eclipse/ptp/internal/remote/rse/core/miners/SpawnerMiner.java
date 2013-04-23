@@ -156,7 +156,7 @@ public class SpawnerMiner extends Miner {
 			
 			
 			handleSpawnRedirected(subject, cmd, dir, envp, status);
-			return statusDone(status);
+			return status;
 		}
 		
 		else if(name.equals(DataStoreSchema.C_CANCEL)) {
