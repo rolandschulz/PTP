@@ -55,7 +55,7 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 	private final LinkedList<AbstractJAXBLaunchConfigurationTab> tabControllers = new LinkedList<AbstractJAXBLaunchConfigurationTab>();
 
 	private final Map<String, AbstractJAXBLaunchConfigurationTab> controllerIndex = new HashMap<String, AbstractJAXBLaunchConfigurationTab>();
-	private Composite control;
+	protected Composite control;
 
 	/**
 	 * @param context

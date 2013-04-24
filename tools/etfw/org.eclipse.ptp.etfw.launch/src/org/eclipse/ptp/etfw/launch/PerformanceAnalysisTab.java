@@ -10,7 +10,6 @@
 package org.eclipse.ptp.etfw.launch;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -34,8 +33,6 @@ import org.eclipse.ptp.etfw.jaxb.data.ToolAppType;
 import org.eclipse.ptp.etfw.jaxb.data.ToolPaneType;
 import org.eclipse.ptp.etfw.jaxb.util.JAXBExtensionUtils;
 import org.eclipse.ptp.etfw.launch.messages.Messages;
-import org.eclipse.ptp.etfw.launch.ui.util.ETFWToolTabBuilder;
-import org.eclipse.ptp.etfw.launch.variables.ETFWVariableMap;
 import org.eclipse.ptp.etfw.ui.ExternalToolSelectionTab;
 import org.eclipse.ptp.internal.rm.jaxb.control.ui.launch.IJAXBLaunchConfigurationTab;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationContentsChangedListener;
@@ -48,10 +45,10 @@ import org.eclipse.ptp.remote.core.RemoteServices;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.core.LaunchControllerManager;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel;
+import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.CommandType;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
@@ -62,8 +59,6 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 
 /**
  * Notes: This class is a re-implementation of ParallelToolSelectionTab using JAXB to dynamically build the UI.
@@ -84,7 +79,7 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 	protected boolean noPTP = false;
 	private EtfwToolProcessType etfwTool;
 	private ETFWParentLaunchConfigurationTab launchTabParent;
-	private ETFWVariableMap vmap;
+	private IVariableMap vmap;
 	private ILaunchConfiguration launchConfiguration = null;
 	private ILaunchController controller;
 	private final WidgetListener listener = new WidgetListener();
@@ -97,8 +92,8 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 	private Label selectToolLbl;
 	private Button buildOnlyCheck;
 	private Button analyzeonlyCheck;
-	private String controlId;
-	// I believe this should be part of the launchTabParent, but there is RM specifics that must be removed
+
+	// This should be part of the launchTabParent, but there is RM specifics that must be removed
 	private final LinkedList<IJAXBLaunchConfigurationTab> tabControllers = new LinkedList<IJAXBLaunchConfigurationTab>();
 	private final ContentsChangedListener launchContentsChangedListener = new ContentsChangedListener();
 
@@ -229,7 +224,7 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 		}
 
 		etfwTool = JAXBExtensionUtils.getTool(toolName);
-		vmap = new ETFWVariableMap();
+		vmap = controller.getEnvironment();
 
 		JAXBInitializationUtil.initializeMap(etfwTool, vmap);
 
@@ -269,11 +264,7 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 					}
 				}
 			}
-
-			etfwTool.getControlData().getInitializeCommand();
 		}
-
-		final TabFolder tabParent = new TabFolder(toolComposite, SWT.NONE);
 
 		toolTabs = findTabControllers();
 
@@ -281,62 +272,15 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 			tabControllers.add(new JAXBDynamicLaunchConfigurationTab(controller, toolTab.getOptionPane(), launchTabParent));
 		}
 
-		ETFWToolTabBuilder.initialize();
+		launchTabParent.addDynamicContent(tabControllers);
 
-		for (IJAXBLaunchConfigurationTab tabControl : tabControllers) {
-			ETFWToolTabBuilder builder = new ETFWToolTabBuilder(tabControl, vmap);
-
-			TabItem tabItem = new TabItem(tabParent, SWT.NONE);
-			Control control = null;
-			final ScrolledComposite scroller = new ScrolledComposite(tabParent, SWT.V_SCROLL | SWT.H_SCROLL);
-			try {
-				control = builder.build(scroller);
-				((Composite) control).layout();
-
-				tabItem.setText(tabControl.getController().getTitle());
-				String tooltip = tabControl.getController().getTooltip();
-				if (tooltip != null) {
-					tabItem.setToolTipText(tooltip);
-					scroller.setToolTipText(tooltip);
-				}
-
-				scroller.setContent(control);
-				scroller.setExpandHorizontal(true);
-				scroller.setExpandVertical(true);
-				scroller.setMinSize(control.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-
-				tabItem.setControl(scroller);
-			} catch (Throwable t) {
-				t.printStackTrace();
-			}
-
+		try {
+			launchTabParent.createControl(toolComposite, controller.getControlId());
+		} catch (CoreException e) {
+			e.printStackTrace();
 		}
 
 		handleUpdate();
-	}
-
-	/**
-	 * Determines if the UI widget is enabled and should be included in the launch configuration. It prevents attributes that are
-	 * not enabled from getting included in the launch configuration
-	 * 
-	 * @param attributeName
-	 *            Name of the attribute associated with the widget
-	 * @return enabled state of widget
-	 */
-	public boolean isWidgetEnabled(String attributeName) {
-		for (IJAXBLaunchConfigurationTab tabControl : tabControllers) {
-			for (IUpdateModel m : tabControl.getLocalWidgets().values()) {
-				if (m.getName() != null) {
-					if (m.getName().equals(attributeName)) {
-						return ((Control) m.getControl()).isEnabled();
-					}
-				} else {
-					// Do nothing, the model has no attribute associated with it
-				}
-			}
-		}
-		// Handles the case where attributes are not associated with UI models
-		return true;
 	}
 
 	private void handleUpdate() {
@@ -429,8 +373,6 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 		try {
 			controller = LaunchControllerManager.getInstance().getLaunchController(remId, remName, rmType);
 			if (controller != null) {
-				controlId = controller.getControlId();
-
 				String parser = Preferences.getString(Activator.PLUGIN_ID, PreferenceConstants.ETFW_VERSION);
 				if (parser.equals(IToolLaunchConfigurationConstants.USE_SAX_PARSER)) {
 					saxETFWTab.initializeFrom(configuration);
@@ -456,45 +398,7 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 				configuration.setAttribute(BUILDONLY, buildOnlyCheck.getSelection());
 				configuration.setAttribute(ANALYZEONLY, analyzeonlyCheck.getSelection());
 
-				Iterator<String> iterator = launchTabParent.getVariableMap().getAttributes().keySet().iterator();
-
 				launchTabParent.performApply(configuration);
-
-				// TODO the above performApply should update the attribute map, but it doesn't right now so it is handled below
-				while (iterator.hasNext()) {
-					String attribute = iterator.next();
-					String name = attribute;
-					if (name.startsWith(controlId)) {
-						name = name.substring(controlId.length() + 1, attribute.length());
-
-						// Check to see if the variable is part of ETFw
-						AttributeType temp = vmap.getAttributes().get(name);
-						if (temp != null) {
-							if (isWidgetEnabled(temp.getName()) && temp.isVisible()) {
-								String attType = temp.getType();
-
-								// If boolean is translated to a string, insert the string into the launch configuration
-								String translateBoolean = vmap.getAttributes().get(name).getTranslateBooleanAs();
-								Object value = launchTabParent.getVariableMap().getValue(name);
-								if (attType.equals("boolean")) { //$NON-NLS-1$
-									if (translateBoolean != null) {
-										configuration.setAttribute(attribute, value.toString());
-									} else {
-										boolean val = new Boolean(value.toString());
-										configuration.setAttribute(attribute, val);
-									}
-								} else if (attType.equals("string")) { //$NON-NLS-1$
-									configuration.setAttribute(attribute, value.toString());
-								} else if (attType.equals("integer")) { //$NON-NLS-1$
-									int val = new Integer(value.toString());
-									configuration.setAttribute(attribute, val);
-								} else {
-									configuration.setAttribute(attribute, value.toString());
-								}
-							}
-						}
-					}
-				}
 
 			}
 		}
