@@ -1,25 +1,23 @@
 /*******************************************************************************
- * Copyright (c) 2009 IBM Corporation and others.
+ * Copyright (c) 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *    Mike Kucera (IBM Corporation) - initial API and implementation
+ *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.internal.rdt.sync.ui.dialogs;
+package org.eclipse.ptp.internal.rdt.sync.ui.wizards;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.internal.rdt.sync.core.services.SynchronizeServiceRegistry;
-import org.eclipse.ptp.internal.rdt.sync.ui.SynchronizePropertiesRegistry;
 import org.eclipse.ptp.internal.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.services.ISynchronizeServiceDescriptor;
-import org.eclipse.ptp.rdt.sync.ui.ISynchronizeProperties;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
@@ -32,26 +30,18 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * Launches a dialog that contains the ServiceProviderConfigurationWidget
- * with OK and Cancel buttons. Also has a text field to allow the name
- * of the configuration to be changed.
+ * @noextend This class is not intended to be subclassed by clients.
  */
-public class SyncConfigDialog extends Dialog {
-
-	private Control fDialogControl;
-	private Point fDialogSize;
+public class AddSyncConfigWizardPage extends WizardPage {
 	private Text fProjectLocationText;
 	private Text fConfigNameText;
 
@@ -60,55 +50,39 @@ public class SyncConfigDialog extends Dialog {
 
 	private String fConfigName;
 	private String fProjectLocation;
-	private String fSyncProvider;
 	private IRemoteConnection fSelectedConnection;
-	private SyncConfig fSyncConfig;
 	private ISynchronizeServiceDescriptor[] fProviders;
-	private IProject fProject;
+	private ISynchronizeServiceDescriptor fSyncProvider;
 
-	public SyncConfigDialog(Shell parentShell) {
-		super(parentShell);
-		setShellStyle(getShellStyle() | SWT.RESIZE);
+	private final IProject fProject;
+
+	public AddSyncConfigWizardPage(String pageName, IProject project) {
+		super(pageName);
+		fProject = project;
 	}
 
-	public SyncConfigDialog(Shell parentShell, SyncConfig config) {
-		super(parentShell);
-		setShellStyle(getShellStyle() | SWT.RESIZE);
-		fSyncConfig = config;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets.Shell)
-	 */
-	@Override
-	protected void configureShell(Shell newShell) {
-		super.configureShell(newShell);
-		newShell.setText(Messages.SyncConfigDialog_Sync_Config);
+	private void checkConnection() {
+		IRemoteUIConnectionManager mgr = getUIConnectionManager();
+		if (mgr != null) {
+			mgr.openConnectionWithProgress(fRemoteConnectioWidget.getShell(), null, fSelectedConnection);
+		}
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
+	 * @see org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets.Composite)
 	 */
 	@Override
-	protected Control createDialogArea(Composite parent) {
-		final Composite dialogArea = (Composite) super.createDialogArea(parent);
-
-		final Composite composite = new Composite(dialogArea, SWT.NONE);
+	public void createControl(Composite parent) {
+		final Composite composite = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout(3, false);
-		layout.marginHeight = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_MARGIN);
-		layout.marginWidth = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_MARGIN);
-		layout.verticalSpacing = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_SPACING);
-		layout.horizontalSpacing = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_SPACING);
 		composite.setLayout(layout);
 		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
 		composite.setLayoutData(gd);
 
 		Label nameLabel = new Label(composite, SWT.NONE);
-		nameLabel.setText(Messages.SyncConfigDialog_Configuration_name);
+		nameLabel.setText(Messages.AddSyncConfigWizardPage_Configuration_name);
 
 		fConfigNameText = new Text(composite, SWT.BORDER);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -121,7 +95,7 @@ public class SyncConfigDialog extends Dialog {
 				if (fConfigName.equals("")) { //$NON-NLS-1$
 					fConfigName = null;
 				}
-				updateControls();
+				setPageComplete(validatePage());
 			}
 		});
 
@@ -134,12 +108,12 @@ public class SyncConfigDialog extends Dialog {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				fSelectedConnection = fRemoteConnectioWidget.getConnection();
-				updateControls();
+				setPageComplete(validatePage());
 			}
 		});
 
 		Label projectLocationLabel = new Label(composite, SWT.LEFT);
-		projectLocationLabel.setText(Messages.SyncConfigDialog_Project_location);
+		projectLocationLabel.setText(Messages.AddSyncConfigWizardPage_Project_location);
 
 		fProjectLocationText = new Text(composite, SWT.SINGLE | SWT.BORDER);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -154,13 +128,13 @@ public class SyncConfigDialog extends Dialog {
 				if (fProjectLocation.equals("")) { //$NON-NLS-1$
 					fProjectLocation = null;
 				}
-				updateControls();
+				setPageComplete(validatePage());
 			}
 		});
 
 		// browse button
 		Button fBrowseButton = new Button(composite, SWT.PUSH);
-		fBrowseButton.setText(Messages.SyncConfigDialog_Browse);
+		fBrowseButton.setText(Messages.AddSyncConfigWizardPage_Browse);
 		fBrowseButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -174,9 +148,9 @@ public class SyncConfigDialog extends Dialog {
 							if (fileMgr != null) {
 								fileMgr.setConnection(fSelectedConnection);
 								String correctPath = fProjectLocationText.getText();
-								String selectedPath = fileMgr.browseDirectory(
-										fProjectLocationText.getShell(),
-										"Project Location (" + fSelectedConnection.getName() + ")", correctPath, IRemoteUIConstants.NONE); //$NON-NLS-1$ //$NON-NLS-2$
+								String selectedPath = fileMgr.browseDirectory(fProjectLocationText.getShell(),
+										NLS.bind(Messages.AddSyncConfigWizardPage_browse_message, fSelectedConnection.getName()),
+										correctPath, IRemoteUIConstants.NONE);
 								if (selectedPath != null) {
 									fProjectLocationText.setText(selectedPath);
 								}
@@ -188,7 +162,7 @@ public class SyncConfigDialog extends Dialog {
 		});
 
 		Label syncProviderLabel = new Label(composite, SWT.LEFT);
-		syncProviderLabel.setText(Messages.SyncConfigDialog_Synchronize_provider);
+		syncProviderLabel.setText(Messages.AddSyncConfigWizardPage_Synchronize_provider);
 
 		fSyncProviderCombo = new Combo(composite, SWT.DROP_DOWN | SWT.READ_ONLY);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -197,45 +171,37 @@ public class SyncConfigDialog extends Dialog {
 		fSyncProviderCombo.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				fSyncProvider = fSyncProviderCombo.getText();
-				updateControls();
+				int index = fSyncProviderCombo.getSelectionIndex();
+				if (index >= 0) {
+					fSyncProvider = fProviders[index];
+				} else {
+					fSyncProvider = null;
+				}
+				setPageComplete(validatePage());
 			}
 		});
 
-		Composite userDefinedRegion = new Composite(dialogArea, SWT.NONE);
-		userDefinedRegion.setLayout(new GridLayout(1, false));
-		userDefinedRegion.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));
-
-		createUserDefinedRegion(userDefinedRegion);
-
 		initializeSyncProviders();
 		fSyncProviderCombo.select(0);
-		fSyncProvider = fSyncProviderCombo.getText();
+		fSyncProvider = fProviders[0];
 
-		return dialogArea;
+		setControl(composite);
+		setPageComplete(false);
 	}
 
-	private void createUserDefinedRegion(Composite control) {
-		if (fProject != null) {
-			ISynchronizeProperties prop = SynchronizePropertiesRegistry.getSynchronizePropertiesForProject(fProject);
-			if (prop != null) {
-				prop.createConfigurationArea(control, fProject, null);
-			}
+	/**
+	 * Get the sync config defined by this wizard page. This will only be valid if the page is complete.
+	 * 
+	 * @return sync config
+	 */
+	public SyncConfig getSyncConfig() {
+		if (isPageComplete()) {
+			SyncConfig config = SyncConfigManager.newConfig(fConfigName, fSyncProvider.getId(), fSelectedConnection.getName(),
+					fSelectedConnection.getRemoteServices().getId(), fProjectLocation);
+			config.setProject(fProject);
+			return config;
 		}
-	}
-
-	private void initializeSyncProviders() {
-		fProviders = SynchronizeServiceRegistry.getSynchronizeServiceDescriptors();
-		for (ISynchronizeServiceDescriptor provider : fProviders) {
-			fSyncProviderCombo.add(provider.getName());
-		}
-	}
-
-	private void checkConnection() {
-		IRemoteUIConnectionManager mgr = getUIConnectionManager();
-		if (mgr != null) {
-			mgr.openConnectionWithProgress(fRemoteConnectioWidget.getShell(), null, fSelectedConnection);
-		}
+		return null;
 	}
 
 	private IRemoteUIConnectionManager getUIConnectionManager() {
@@ -247,56 +213,32 @@ public class SyncConfigDialog extends Dialog {
 		return connectionManager;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.dialogs.Dialog#createContents(org.eclipse.swt.widgets.Composite)
-	 */
-	@Override
-	protected Control createContents(Composite parent) {
-		fDialogControl = super.createContents(parent);
-		fDialogSize = fDialogControl.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-		updateControls();
-		return fDialogControl;
-	}
-
-	private void updateControls() {
-		Button okButton = getButton(IDialogConstants.OK_ID);
-		boolean enabled = true;
-		if (fConfigName != null && fProject != null) {
-			enabled = SyncConfigManager.getConfig(fProject, fConfigName) == null;
+	private void initializeSyncProviders() {
+		fProviders = SynchronizeServiceRegistry.getSynchronizeServiceDescriptors();
+		for (ISynchronizeServiceDescriptor provider : fProviders) {
+			fSyncProviderCombo.add(provider.getName());
 		}
-		enabled &= (fProjectLocation != null && fSelectedConnection != null && fSyncProvider != null);
-		okButton.setEnabled(enabled);
 	}
 
-	public SyncConfig getSyncConfig() {
-		return fSyncConfig;
-	}
-
-	public void setProject(IProject project) {
-		fProject = project;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.dialogs.Dialog#okPressed()
-	 */
-	@Override
-	protected void okPressed() {
-		IRemoteConnection conn = fRemoteConnectioWidget.getConnection();
-		ISynchronizeServiceDescriptor provider = fProviders[fSyncProviderCombo.getSelectionIndex()];
-		fSyncConfig = SyncConfigManager.newConfig(fConfigNameText.getText().trim(), provider.getId(), conn.getName(), conn
-				.getRemoteServices().getId(), fProjectLocationText.getText().trim());
-		super.okPressed();
-	}
-
-	private void resizeDialog() {
-		Point p = fDialogControl.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-		if (p.x > fDialogSize.x || p.y > fDialogSize.y) {
-			getShell().setSize(p);
-			fDialogSize = p;
+	private boolean validatePage() {
+		if (fConfigName != null) {
+			if (SyncConfigManager.getConfig(fProject, fConfigName) != null) {
+				setErrorMessage(Messages.AddSyncConfigWizardPage_Name_already_exists);
+				return false;
+			}
+		} else {
+			setErrorMessage(Messages.AddSyncConfigWizardPage_Name_must_be_specified);
+			return false;
 		}
+		if (fProjectLocation == null || fSelectedConnection == null) {
+			setErrorMessage(Messages.AddSyncConfigWizardPage_Connection_and_location_must_be_sepecified);
+			return false;
+		}
+		if (fSyncProvider == null) {
+			setErrorMessage(Messages.AddSyncConfigWizardPage_Provider_must_be_selected);
+			return false;
+		}
+		setErrorMessage(null);
+		return true;
 	}
 }

@@ -15,6 +15,10 @@ import org.eclipse.osgi.util.NLS;
 @SuppressWarnings("javadoc")
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.internal.rdt.sync.cdt.ui.messages.messages"; //$NON-NLS-1$
+	public static String AddSyncConfigWizardPage_A_build_configuration_must_be_selected;
+	public static String AddSyncConfigWizardPage_Configuration;
+	public static String AddSyncConfigWizardPage_description;
+	public static String AddSyncConfigWizardPage_title;
 	public static String NewRemoteSyncProjectWizard_0;
 	public static String NewRemoteSyncProjectWizard_description;
 	public static String NewRemoteSyncProjectWizard_title;
@@ -28,6 +32,7 @@ public class Messages extends NLS {
 	public static String ConvertToRemoteWizardPage_0;
 	public static String ConvertToSyncProjectWizardPage_0;
 	public static String ConvertToSyncProjectWizardPage_convertingToSyncProject;
+	public static String SynchronizeProperties_Link_configuration;
 	public static String SyncMainWizardPage_0;
 	public static String SyncMainWizardPage_1;
 	public static String SyncMainWizardPage_10;

@@ -11,7 +11,7 @@
 package org.eclipse.ptp.rdt.sync.ui;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.jface.operation.IRunnableContext;
+import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.swt.widgets.Composite;
 
@@ -21,18 +21,52 @@ import org.eclipse.swt.widgets.Composite;
  */
 public interface ISynchronizeProperties extends ISynchronizePropertiesDescriptor {
 	/**
+	 * Called when a new configuration is added to the preference page.
+	 * 
+	 * @param config
+	 *            new configuration
+	 */
+	public void addConfiguration(SyncConfig config);
+
+	/**
+	 * Create wizard pages that will be displayed when the add button is pressed.
+	 * 
+	 * @param project
+	 *            project who's properties are being displayed
+	 */
+	public WizardPage[] createAddWizardPages(IProject project);
+
+	/**
+	 * Create a composite that will be displayed in the properties user defined configuration area when a sync configuration is
+	 * selected.
+	 * 
 	 * @param parent
 	 *            parent composite that contains the configuration area
-	 * @param project
+	 * @param config
 	 *            project properties being displayed
 	 * @param context
 	 *            runnable context (can be null)
 	 */
-	public void createConfigurationArea(Composite parent, IProject project, IRunnableContext context);
+	public void createPropertiesConfigurationArea(Composite parent, SyncConfig config);
 
 	/**
-	 * @param config
-	 *            select the sync configuration currently displayed
+	 * Called to dispose of the composite when a sync config selection is changed.
 	 */
-	public void selectConfiguration(SyncConfig config);
+	public void disposePropertiesConfigurationArea();
+
+	/**
+	 * Called when the OK or Apply buttons on the preference page are selected. Apply any changes to the project properties.
+	 */
+	public void performApply();
+
+	/**
+	 * Called when the Cancel button on the preference page is selected. Cancel any changes to the project properties.
+	 */
+	public void performCancel();
+
+	/**
+	 * Called when the Defaults button on the preference page is selected. Revert any changes to the project properties to default
+	 * values.
+	 */
+	public void performDefaults();
 }

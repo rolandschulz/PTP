@@ -15,6 +15,18 @@ import org.eclipse.osgi.util.NLS;
 @SuppressWarnings("javadoc")
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.internal.rdt.sync.ui.messages.messages"; //$NON-NLS-1$
+	public static String AddSyncConfigWizard_description;
+	public static String AddSyncConfigWizard_title;
+	public static String AddSyncConfigWizardPage_Connection_and_location_must_be_sepecified;
+	public static String AddSyncConfigWizardPage_Name_already_exists;
+	public static String AddSyncConfigWizardPage_Name_must_be_specified;
+	public static String AddSyncConfigWizardPage_Project_location;
+	public static String AddSyncConfigWizardPage_Provider_must_be_selected;
+	public static String AddSyncConfigWizardPage_Browse;
+	public static String AddSyncConfigWizardPage_Configuration_name;
+	public static String AddSyncConfigWizardPage_browse_message;
+	public static String AddSyncConfigWizardPage_Sync_Config;
+	public static String AddSyncConfigWizardPage_Synchronize_provider;
 	public static String CommonMissingConnectionHandler_0;
 	public static String CommonMissingConnectionHandler_1;
 	public static String CommonMissingConnectionHandler_2;
@@ -42,11 +54,6 @@ public class Messages extends NLS {
 	public static String NewSyncProjectWizard_Unable_to_find_perspective;
 	public static String NewSyncProjectWizard_Unexpected_core_exception;
 	public static String ResourceChangeListener_0;
-	public static String SyncConfigDialog_Browse;
-	public static String SyncConfigDialog_Configuration_name;
-	public static String SyncConfigDialog_Project_location;
-	public static String SyncConfigDialog_Sync_Config;
-	public static String SyncConfigDialog_Synchronize_provider;
 	public static String SyncFileFilterPage_Attempt_to_edit_unsupported;
 	public static String SyncFileFilterPage_Cancel;
 	public static String SyncFileFilterPage_Default_Include_exclude_title;
