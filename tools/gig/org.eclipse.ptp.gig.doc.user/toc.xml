@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?NLS TYPE="org.eclipse.help.toc"?>
+
+<toc label="Graphical Inquirer of GPU Programs (GIG)" topic="html/toc.html">
+	<topic label="Contents"  href="html/toc.html"/>
+    <topic label="GIG Overview"  href="html/overview.html"/>
+    <topic label="Prerequisites"  href="html/prereqs.html"/>
+    <topic label="GIG View" href="html/GIGView.html" />
+    <topic label="Server View" href="html/ServerView.html" />
+    <topic label="Preferences"  href="html/preferences.html"/>
+    <topic href="html/troubleshooting.html" label="Troubleshooting GIG">
+    </topic>
+</toc>

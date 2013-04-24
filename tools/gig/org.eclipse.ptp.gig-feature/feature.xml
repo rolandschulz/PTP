@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.ptp.gig.feature"
+      label="%featureName"
+      version="1.0.0.qualifier"
+      provider-name="%providerName">
+
+   <description url="http://eclipse.org/ptp">
+      The Graphical Explorer of GPU Programs (GIG) is used to help
+debug CUDA programs. It uses the formal verifier GKLEE, developed
+at the University of Utah, to automatically detect many errors
+and problems such as race conditions, deadlocks, and bank conflicts.
+This is all cleanly integrated into an easy-to use eclipse plug-in.
+GKLEE can be obtained from http://cs.utah.edu/fv/gklee
+   </description>
+
+   <copyright>
+      %copyright
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <url>
+      <discovery label="University of Utah update site" url="http://www.cs.utah.edu/fv/GIG"/>
+   </url>
+
+   <requires>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.ui.ide"/>
+      <import plugin="org.eclipse.core.expressions"/>
+      <import plugin="org.eclipse.cdt.core"/>
+      <import plugin="org.eclipse.ui.console" version="3.5.100" match="greaterOrEqual"/>
+   </requires>
+
+   <plugin
+         id="org.eclipse.ptp.gig"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ptp.gig.doc.user"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+</feature>

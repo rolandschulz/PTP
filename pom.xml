@@ -99,6 +99,7 @@
 		<module>releng/org.eclipse.ptp.fortran-feature</module>
 		<module>releng/org.eclipse.ptp-feature</module>
 		<module>releng/org.eclipse.ptp.gem-feature</module>
+		<module>releng/org.eclipse.ptp.gig-feature</module>
 		<module>releng/org.eclipse.ptp.linux</module>
 		<module>releng/org.eclipse.ptp.macosx</module>
 		<module>releng/org.eclipse.ptp.pldt-feature</module>
@@ -166,6 +167,8 @@
 		<module>tools/etfw/org.eclipse.ptp.etfw.toolopts</module>
 		<module>tools/gem/org.eclipse.ptp.gem</module>
 		<module>tools/gem/org.eclipse.ptp.gem.help</module>
+		<module>tools/gem/org.eclipse.ptp.gig</module>
+		<module>tools/gem/org.eclipse.ptp.gig.doc.user</module>
 		<module>tools/pldt/org.eclipse.ptp.pldt.common</module>
 		<module>tools/pldt/org.eclipse.ptp.pldt.doc.user</module>
 		<module>tools/pldt/org.eclipse.ptp.pldt.mpi.analysis</module>

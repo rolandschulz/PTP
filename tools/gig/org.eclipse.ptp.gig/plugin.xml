@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <!-- Toolbar Commands -->
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            id="org.eclipse.ptp.gig.commands.category"
+            name="GIG Commands Category">
+      </category>
+      <command
+            categoryId="org.eclipse.ptp.gig.commands.category"
+            id="org.eclipse.ptp.gig.commands.sourceToolbar"
+            name="Formally Verify CUDA Program">
+      </command>
+      <command
+            categoryId="org.eclipse.ptp.gig.commands.category"
+            id="org.eclipse.ptp.gig.commands.sourcePopup"
+            name="Formally Verify CUDA Program">
+      </command>
+      <command
+      		categoryId="org.eclipse.ptp.gig.commands.category"
+      		id="org.eclipse.ptp.gig.commands.sendSourceToServer"
+      		name="Send Files and Folders to Server">
+      </command>
+   </extension>
+   
+   <!-- Command Handlers -->
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="org.eclipse.ptp.gig.handlers.ToolbarHandler"
+            commandId="org.eclipse.ptp.gig.commands.sourceToolbar">
+      </handler>
+      <handler
+            class="org.eclipse.ptp.gig.handlers.PopupHandler"
+            commandId="org.eclipse.ptp.gig.commands.sourcePopup">
+      </handler>
+      <handler
+      		class="org.eclipse.ptp.gig.handlers.PopupHandler"
+      		commandId="org.eclipse.ptp.gig.commands.sendSourceToServer">
+      </handler>
+   </extension>
+   
+   <!-- Menus -->
+   <extension
+   		point="org.eclipse.ui.menus">
+      <menuContribution
+      		locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar id="org.eclipse.ptp.gig.toolbar">
+             <command
+                  commandId="org.eclipse.ptp.gig.commands.sourceToolbar"
+                  icon="icons/trident.png"
+                  id="org.eclipse.ptp.gig.toolbar.refCommand"
+                  style="pulldown"
+                  tooltip="Formally Verify CUDA Program">
+                <visibleWhen
+                	checkEnabled="false">
+                  <or>
+                     <with
+                           variable="activeWorkbenchWindow.activePerspective">
+                        <equals
+                              value="org.eclipse.cdt.ui.CPerspective">
+                        </equals>
+                     </with>
+                     <with
+                           variable="activeWorkbenchWindow.activePerspective">
+                        <equals
+                              value="org.eclipse.ptp.rdt.ui.remoteCPerspective">
+                        </equals>
+                     </with>
+                  </or>
+                </visibleWhen>
+             </command>
+         </toolbar>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.ui.popup.any?after=additions">
+         <menu
+               id="org.eclipse.ptp.gig.menus.popupMenu"
+               label="GIG"
+               mnemonic="G">
+            <command
+                  commandId="org.eclipse.ptp.gig.commands.sourcePopup"
+                  icon="icons/trident.png"
+                  id="org.eclipse.ptp.gig.sourcePopupMenu"
+                  mnemonic="F"
+                  style="push">
+            </command>
+            <command
+            		commandId="org.eclipse.ptp.gig.commands.sendSourceToServer"
+            		icon="icons/trident.png"
+            		id="org.eclipse.ptp.gig.sendSourceToServerPopupMenu"
+            		mnemonic="S"
+            		style="push">
+            </command>
+         </menu>
+      </menuContribution>
+    </extension>
+   
+   <!-- Preference Page -->
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage"
+            class="org.eclipse.ptp.gig.preferences.GIGPreferencePage"
+            id="org.eclipse.ptp.gig.preferences.GIGPreferences"
+            name="GIG">
+      </page>
+   </extension>
+   <!-- Preference Initializer -->
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.eclipse.ptp.gig.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
+   
+   <!-- Views -->
+   	<extension
+         point="org.eclipse.ui.views">
+      <category
+            name="GIG"
+            id="org.eclipse.ptp.gig">
+      </category>
+      <view
+            name="GIG"
+            icon="icons/trident.png"
+            category="org.eclipse.ptp.gig"
+            class="org.eclipse.ptp.gig.views.GIGView"
+            id="org.eclipse.ptp.gig.views.GIGView">
+      </view>
+      <view
+      		name="GIGServer"
+      		icon="icons/trident.png"
+      		category="org.eclipse.ptp.gig"
+      		class="org.eclipse.ptp.gig.views.ServerView"
+      		id="org.eclipse.ptp.gig.views.ServerView">
+      </view>
+   </extension>
+   
+   	<!-- Views Perspective -->
+   	<extension
+         	point="org.eclipse.ui.perspectiveExtensions">
+      	<perspectiveExtension
+            	targetID="org.eclipse.cdt.ui.CPerspective">
+         	<view
+               	ratio="0.5"
+               	relative="org.eclipse.ui.console.ConsoleView"
+            	relationship="stack"
+               	id="org.eclipse.ptp.gig.views.GIGView">
+         	</view>
+         	<view
+         		ratio="0.5"
+         		relative="org.eclipse.ui.views.ContentOutline"
+            	relationship="stack"
+            	id="org.eclipse.ptp.gig.views.ServerView">
+            </view>
+      	</perspectiveExtension>
+   	</extension>
+   
+   <!-- Help -->
+   <extension
+         point="org.eclipse.help.contexts">
+      <contexts
+            file="contexts.xml">
+      </contexts>
+   </extension>
+
+</plugin>
