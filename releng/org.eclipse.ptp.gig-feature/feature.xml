@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="org.eclipse.ptp.gig.feature"
+      id="org.eclipse.ptp.gig"
       label="%featureName"
-      version="1.0.0.qualifier"
+      version="7.0.0.qualifier"
       provider-name="%providerName">
 
    <description url="http://eclipse.org/ptp">
