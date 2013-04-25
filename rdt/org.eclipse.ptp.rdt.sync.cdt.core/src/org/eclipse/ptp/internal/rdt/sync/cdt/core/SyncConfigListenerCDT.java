@@ -21,7 +21,7 @@ import org.eclipse.ptp.rdt.sync.core.listeners.ISyncConfigListener;
  * Singleton class responsible for adjusting CDT build configurations in response to changes to the sync configurations.
  */
 public class SyncConfigListenerCDT implements ISyncConfigListener {
-	private static final String DEFAULT_BUILD_CONFIG_NAME = "default-build-config-name"; //$NON-NLS-1$
+	private static final String DEFAULT_BUILD_CONFIG_ID = "default-build-config-id"; //$NON-NLS-1$
 
 	// Setup as a singleton
 	private SyncConfigListenerCDT() {}
@@ -54,12 +54,12 @@ public class SyncConfigListenerCDT implements ISyncConfigListener {
 	 */
 	@Override
 	public void configSelected(IProject project, SyncConfig newConfig, SyncConfig oldConfig) {
-		String newDefaultConfigName = newConfig.getProperty(DEFAULT_BUILD_CONFIG_NAME);
-		if (newDefaultConfigName == null) {
+		String newDefaultConfigId = newConfig.getProperty(DEFAULT_BUILD_CONFIG_ID);
+		if (newDefaultConfigId == null) {
 			return;
 		}
 		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
-		IConfiguration newDefaultConfig = buildInfo.getManagedProject().getConfiguration(newDefaultConfigName);
+		IConfiguration newDefaultConfig = buildInfo.getManagedProject().getConfiguration(newDefaultConfigId);
 		if (newDefaultConfig != null) {
 			ManagedBuildManager.setDefaultConfiguration(project, newDefaultConfig);
 			ManagedBuildManager.saveBuildInfo(project, true);

@@ -152,7 +152,7 @@ public class SyncManager {
 	 *            ISynchronizeService that has been correctly configured
 	 * @param filter
 	 *            synchronize filter, or null if no filter
-	 * @throws CoreException
+	 * @throws CoreException on problems adding sync nature
 	 */
 	public static void makeSyncProject(IProject project, ISynchronizeService provider, SyncFileFilter filter) throws CoreException {
 		RemoteSyncNature.addNature(project, new NullProgressMonitor());
@@ -164,8 +164,13 @@ public class SyncManager {
 		SyncConfigManager.setActive(project, config);
 
 		// Local config
-		config = SyncConfigManager.getLocalConfig();
-		SyncConfigManager.addConfig(project, config);
+		try {
+			config = SyncConfigManager.getLocalConfig(provider);
+			SyncConfigManager.addConfig(project, config);
+		} catch (CoreException e) {
+			RDTSyncCorePlugin.log(Messages.SyncManager_0, e);
+		}
+
 		if (filter != null) {
 			SyncManager.saveFileFilter(project, filter);
 		}

@@ -12,6 +12,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.sync.cdt.ui.wizards;
 
+import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
+import org.eclipse.cdt.internal.core.envvar.EnvironmentVariableManager;
+import org.eclipse.cdt.managedbuilder.core.IBuilder;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
@@ -31,7 +34,8 @@ import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
  * Static class that houses the function ("run") for initializing a new synchronized project.
  */
 public class NewRemoteSyncProjectWizardOperation {
-	private static final String DEFAULT_BUILD_CONFIG_NAME = "default-build-config-name"; //$NON-NLS-1$
+	private static final String DEFAULT_BUILD_CONFIG_ID = "default-build-config-id"; //$NON-NLS-1$
+	private static final String SYNC_BUILDER_CLASS = "org.eclipse.ptp.rdt.sync.cdt.core.SyncBuilder"; //$NON-NLS-1$
 
 	/**
 	 * Does the actual initialization of a new synchronized project.
@@ -49,18 +53,30 @@ public class NewRemoteSyncProjectWizardOperation {
 			return;
 		}
 
-		// Figure out the initial default build configurations
+		// Change build configuration settings and find the initial default configurations
 		IConfiguration defaultLocal = null;
 		IConfiguration defaultRemote = null;
 		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
 		if (buildInfo == null) {
 			throw new RuntimeException("Build information for project not found. Project name: " + project.getName()); //$NON-NLS-1$
 		}
+		IBuilder syncBuilder = ManagedBuildManager.getExtensionBuilder(SYNC_BUILDER_CLASS);
 		IConfiguration[] allBuildConfigs = buildInfo.getManagedProject().getConfigurations();
 		for (IConfiguration config : allBuildConfigs) {
 			boolean isRemote = mainPage.isRemoteConfig(config);
 			boolean isLocal = mainPage.isLocalConfig(config);
 
+			// Set all configs to use the sync builder, which ensures the build always occurs at the active sync config location.
+			config.changeBuilder(syncBuilder, SYNC_BUILDER_CLASS, Messages.NewRemoteSyncProjectWizardOperation_1);
+			// turn off append contributed (local) environment variables for remote configs
+			if (isRemote) {
+				ICConfigurationDescription c_mb_confgDes = ManagedBuildManager.getDescriptionForConfiguration(config);
+				if (c_mb_confgDes != null) {
+					EnvironmentVariableManager.fUserSupplier.setAppendContributedEnvironment(false, c_mb_confgDes);
+				}
+			}
+			
+			// Set default build configurations
 			if (isRemote && defaultRemote == null) {
 				defaultRemote = config;
 			}
@@ -68,6 +84,9 @@ public class NewRemoteSyncProjectWizardOperation {
 			if (isLocal && defaultLocal == null) {
 				defaultLocal = config;
 			}
+
+            // Bug 389899 - Synchronized project: "remote toolchain name" contains spaces
+            config.setName(config.getName().replace(' ', '_'));
 		}
 		
 		assert defaultRemote != null : Messages.NewRemoteSyncProjectWizardOperation_0;
@@ -94,7 +113,7 @@ public class NewRemoteSyncProjectWizardOperation {
 			} else {
 				defaultConfig = defaultRemote;
 			}
-			config.setProperty(DEFAULT_BUILD_CONFIG_NAME, defaultConfig.getName());
+			config.setProperty(DEFAULT_BUILD_CONFIG_ID, defaultConfig.getId());
 			if (SyncConfigManager.isActive(project, config)) {
 				ManagedBuildManager.setDefaultConfiguration(project, defaultConfig);
 			}

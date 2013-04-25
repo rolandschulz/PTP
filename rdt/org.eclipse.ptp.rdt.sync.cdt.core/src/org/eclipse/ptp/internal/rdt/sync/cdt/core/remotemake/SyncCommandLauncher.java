@@ -109,7 +109,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		// Set correct directory
 		// For managed projects and configurations other than workspace, the directory is incorrect and needs to be fixed.
 		String projectLocalRoot = getProject().getLocation().toPortableString();
-		String projectActualRoot = config.getLocation();
+		String projectActualRoot = config.getLocation(getProject());
 		String fixedDirectory = changeToDirectory.toString().replaceFirst(Pattern.quote(projectLocalRoot),
 				Matcher.quoteReplacement(projectActualRoot));
 		changeToDirectory = new Path(fixedDirectory);

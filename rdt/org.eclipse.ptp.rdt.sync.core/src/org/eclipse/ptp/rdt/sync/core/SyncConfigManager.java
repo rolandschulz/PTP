@@ -32,8 +32,12 @@ import org.eclipse.ptp.internal.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
 import org.eclipse.ptp.rdt.sync.core.listeners.ISyncConfigListener;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
+import org.eclipse.ptp.rdt.sync.core.services.ISynchronizeService;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
+import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.RemoteServices;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 
@@ -54,6 +58,7 @@ public class SyncConfigManager {
 	private static final String SYNC_ON_POSTBUILD_ELEMENT = "sync-on-postbuild"; //$NON-NLS-1$
 	private static final String SYNC_ON_SAVE_ELEMENT = "sync-on-save"; //$NON-NLS-1$
 	private static final String LOCAL_SYNC_CONFIG_NAME = "Local"; //$NON-NLS-1$
+    private static final String PROJECT_LOCAL_PATH = "${project_loc}"; //$NON-NLS-1$
 
 	private static final Map<String, ListenerList> fSyncConfigListenerMap = Collections
 			.synchronizedMap(new HashMap<String, ListenerList>());
@@ -238,9 +243,21 @@ public class SyncConfigManager {
 	 * Get a local sync config, really a config that does no sync'ing, for when the user wants to just work locally.
 	 * This method must agree with {@link #isLocal(SyncConfig)}.
 	 * @return a local config
+	 * @throws CoreException on problems retrieving local service elements
 	 */
-	public static SyncConfig getLocalConfig() {
-		return new SyncConfig(LOCAL_SYNC_CONFIG_NAME, null, null, null, null);
+	public static SyncConfig getLocalConfig(ISynchronizeService syncService) throws CoreException {
+        IRemoteServices localService = RemoteServices.getLocalServices();
+        if (localService == null) {
+        	throw new CoreException(new Status(IStatus.ERROR, RDTSyncCorePlugin.PLUGIN_ID, Messages.SyncConfigManager_0));
+        }
+
+        IRemoteConnection localConnection = localService.getConnectionManager().
+        		getConnection(IRemoteConnectionManager.LOCAL_CONNECTION_NAME);
+        if (localConnection == null) {
+        	throw new CoreException(new Status(IStatus.ERROR, RDTSyncCorePlugin.PLUGIN_ID, Messages.SyncConfigManager_1));
+        }
+
+		return new SyncConfig(LOCAL_SYNC_CONFIG_NAME, syncService.getId(), localConnection, PROJECT_LOCAL_PATH);
 	}
 
 	/**
@@ -289,7 +306,7 @@ public class SyncConfigManager {
 	 * @return whether config is local
 	 */
 	public static boolean isLocal(SyncConfig config) {
-		return (config.getSyncProviderId() == null);
+		return(config.getName() == LOCAL_SYNC_CONFIG_NAME);
 	}
 
 	/**

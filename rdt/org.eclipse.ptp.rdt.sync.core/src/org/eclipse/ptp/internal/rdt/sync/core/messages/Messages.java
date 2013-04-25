@@ -45,6 +45,10 @@ public class Messages extends NLS {
 
 	public static String WildcardResourceMatcher_Wildcard_pattern_not_found_in_preference_node;
 
+	public static String SyncConfigManager_0;
+
+	public static String SyncConfigManager_1;
+
 	public static String SyncConfigManager_Unable_to_save;
 
 	public static String SyncFileFilter_1;
@@ -52,6 +56,8 @@ public class Messages extends NLS {
 	public static String SyncFileFilter_2;
 
 	public static String SynchronizeServiceDescriptor_Invalid_class;
+
+	public static String SyncManager_0;
 
 	public static String SyncManager_10;
 

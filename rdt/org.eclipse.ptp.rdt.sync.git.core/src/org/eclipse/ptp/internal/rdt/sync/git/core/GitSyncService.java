@@ -197,7 +197,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 		}
 	}
 
-	// Return appropriate sync connection or null for scenarios with no sync provider or if the connection is missing.
+	// Return appropriate sync connection or null for configs with no sync provider or if the connection is missing.
 	// Creates a new sync connection if necessary. This function must properly maintain the map of connections and also remember
 	// to set the file filter (always, not just for new connections).
 	// TODO: Create progress monitor if passed monitor is null.
