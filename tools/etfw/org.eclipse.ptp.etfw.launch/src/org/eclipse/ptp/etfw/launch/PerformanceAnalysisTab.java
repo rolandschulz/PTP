@@ -343,28 +343,6 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 	}
 
 	@Override
-	public void activated(ILaunchConfigurationWorkingCopy configuration) {
-		super.activated(configuration);
-
-		if (toolCombo != null) {
-			try {
-				String toolName = configuration.getAttribute(IToolLaunchConfigurationConstants.SELECTED_TOOL,
-						IToolLaunchConfigurationConstants.EMPTY_STRING);
-				for (int index = 0; index < toolCombo.getItemCount(); index++) {
-					if (toolCombo.getItem(index).equals(toolName)) {
-						toolCombo.select(index);
-						toolCombo.notifyListeners(SWT.Selection, null);
-						break;
-					}
-				}
-
-			} catch (CoreException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	@Override
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		launchConfiguration = configuration;
 		final String rmType = LaunchUtils.getTemplateName(configuration);
@@ -376,6 +354,22 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 				String parser = Preferences.getString(Activator.PLUGIN_ID, PreferenceConstants.ETFW_VERSION);
 				if (parser.equals(IToolLaunchConfigurationConstants.USE_SAX_PARSER)) {
 					saxETFWTab.initializeFrom(configuration);
+				} else {
+					String toolName = configuration.getAttribute(IToolLaunchConfigurationConstants.SELECTED_TOOL,
+							IToolLaunchConfigurationConstants.EMPTY_STRING);
+					for (int index = 0; index < toolCombo.getItemCount(); index++) {
+						if (toolCombo.getItem(index).equals(toolName)) {
+							toolCombo.select(index);
+							toolCombo.notifyListeners(SWT.Selection, null);
+							break;
+						}
+					}
+
+					if (toolName.equals(IToolLaunchConfigurationConstants.EMPTY_STRING)) {
+						// When switching between launch configurations, clear out old widgets
+						toolCombo.select(0);
+						clearOldWidgets();
+					}
 				}
 			}
 
@@ -398,27 +392,32 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 				configuration.setAttribute(BUILDONLY, buildOnlyCheck.getSelection());
 				configuration.setAttribute(ANALYZEONLY, analyzeonlyCheck.getSelection());
 
-				launchTabParent.performApply(configuration);
-
+				if (launchTabParent != null) {
+					launchTabParent.performApply(configuration);
+				}
 			}
 		}
 	}
 
 	protected class WidgetListener extends SelectionAdapter {
 		private String prevToolName;
+		private String prevLaunchConfig;
 
 		@Override
 		public void widgetSelected(SelectionEvent e) {
-			int selection = toolCombo.getSelectionIndex();
-			String toolName = toolCombo.getItem(selection);
-			if (!toolName.equals(prevToolName)) {
-				prevToolName = toolName;
-				rebuildTab(toolName);
+			if (getLaunchConfigurationDialog().getActiveTab().getName().equals(getName())) {
+				int selection = toolCombo.getSelectionIndex();
+				String toolName = toolCombo.getItem(selection);
+
+				if (!toolName.equals(prevToolName) || !launchConfiguration.getName().equals(prevLaunchConfig)) {
+					prevToolName = toolName;
+					prevLaunchConfig = launchConfiguration.getName();
+					rebuildTab(toolName);
+				}
 			}
 
 			updateLaunchConfigurationDialog();
 		}
-
 	}
 
 	private void clearOldWidgets() {
@@ -455,8 +454,8 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 			try {
 				String toolName = configuration.getAttribute(IToolLaunchConfigurationConstants.SELECTED_TOOL,
 						IToolLaunchConfigurationConstants.EMPTY_STRING);
-				for (int index = 0; index < toolCombo.getItemCount(); index++) {
-					if (toolCombo.getItem(index).equals(toolName)) {
+				if (toolCombo.getSelectionIndex() != -1) {
+					if (toolCombo.getItem(toolCombo.getSelectionIndex()).equals(toolName)) {
 						return true;
 					}
 				}
