@@ -24,7 +24,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.internal.rdt.sync.ui.handlers.CommonSyncExceptionHandler;
 import org.eclipse.ptp.internal.rdt.sync.ui.messages.Messages;
-import org.eclipse.ptp.internal.rdt.sync.ui.preferences.SyncFileFilterPage;
+import org.eclipse.ptp.internal.rdt.sync.ui.preferences.NewSyncFileFilterPage;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
@@ -117,9 +117,9 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 				}
 				SyncManager.saveFileFilter(project, sff);
 			} else if (command.equals(syncFileList)) {
-				SyncFileFilterPage.open(project, null);
+				NewSyncFileFilterPage.open(HandlerUtil.getActiveShell(event), project);
 			} else if (command.equals(syncDefaultFileList)) {
-				SyncFileFilterPage.open(null, null);
+				NewSyncFileFilterPage.open(HandlerUtil.getActiveShell(event), null);
 			} else if (command.equals(checkoutCommand) || command.equals(resolveMergeCommand)
 					|| (command.equals(resolveAsRemoteCommand))) {
 				ISynchronizeService syncService = SyncConfigManager.getActive(project).getSyncService();

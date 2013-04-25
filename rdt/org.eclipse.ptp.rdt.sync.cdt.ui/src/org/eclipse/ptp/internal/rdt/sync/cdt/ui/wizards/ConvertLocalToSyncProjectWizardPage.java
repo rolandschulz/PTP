@@ -270,7 +270,7 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 				} else {
 					tmpFilter = new SyncFileFilter(customFilter);
 				}
-				int filterReturnCode = SyncFileFilterPage.openBlocking(tmpFilter, filterButton.getShell());
+				int filterReturnCode = SyncFileFilterPage.openBlocking(filterButton.getShell(), tmpFilter);
 				if (filterReturnCode == Window.OK) {
 					customFilter = tmpFilter;
 				}

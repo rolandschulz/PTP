@@ -49,7 +49,6 @@ public class SyncFileFilter {
 
 	private static final String PATTERN_NODE_NAME = "pattern"; //$NON-NLS-1$
 	private static final String PATTERN_TYPE_KEY = "pattern-type"; //$NON-NLS-1$
-
 	private static final String NUM_PATTERNS_KEY = "num-patterns"; //$NON-NLS-1$
 
 	/**
