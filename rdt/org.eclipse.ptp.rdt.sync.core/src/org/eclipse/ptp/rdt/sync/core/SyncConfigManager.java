@@ -57,6 +57,7 @@ public class SyncConfigManager {
 	private static final String SYNC_ON_PREBUILD_ELEMENT = "sync-on-prebuild"; //$NON-NLS-1$
 	private static final String SYNC_ON_POSTBUILD_ELEMENT = "sync-on-postbuild"; //$NON-NLS-1$
 	private static final String SYNC_ON_SAVE_ELEMENT = "sync-on-save"; //$NON-NLS-1$
+	private static final String CONFIG_PROPERTIES_ELEMENT = "config-properties"; //$NON-NLS-1$
 	private static final String LOCAL_SYNC_CONFIG_NAME = "Local"; //$NON-NLS-1$
     private static final String PROJECT_LOCAL_PATH = "${project_loc}"; //$NON-NLS-1$
 
@@ -257,7 +258,7 @@ public class SyncConfigManager {
         	throw new CoreException(new Status(IStatus.ERROR, RDTSyncCorePlugin.PLUGIN_ID, Messages.SyncConfigManager_1));
         }
 
-		return new SyncConfig(LOCAL_SYNC_CONFIG_NAME, syncService.getId(), localConnection, PROJECT_LOCAL_PATH);
+		return SyncConfigManager.newConfig(LOCAL_SYNC_CONFIG_NAME, syncService.getId(), localConnection, PROJECT_LOCAL_PATH);
 	}
 
 	/**
@@ -343,6 +344,11 @@ public class SyncConfigManager {
 					}
 					if (syncOnSave != null) {
 						config.setSyncOnSave(syncOnSave.booleanValue());
+					}
+					IMemento configPropertiesMemento = configMemento.getChild(CONFIG_PROPERTIES_ELEMENT);
+					for (String key : configPropertiesMemento.getAttributeKeys()) {
+						String value = configPropertiesMemento.getString(key);
+						config.setProperty(key, value);
 					}
 					doAddConfig(project, config);
 				}
@@ -450,6 +456,10 @@ public class SyncConfigManager {
 				configMemento.putBoolean(SYNC_ON_PREBUILD_ELEMENT, config.isSyncOnPreBuild());
 				configMemento.putBoolean(SYNC_ON_POSTBUILD_ELEMENT, config.isSyncOnPostBuild());
 				configMemento.putBoolean(SYNC_ON_SAVE_ELEMENT, config.isSyncOnSave());
+				IMemento configPropertiesMemento = configMemento.createChild(CONFIG_PROPERTIES_ELEMENT);
+				for (Map.Entry<String, String> prop : config.getProperties().entrySet()) {
+					configPropertiesMemento.putString(prop.getKey(), prop.getValue());
+				}
 			}
 			SyncConfig active = fActiveSyncConfigMap.get(project);
 			if (active != null) {
