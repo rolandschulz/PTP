@@ -108,11 +108,15 @@ public class SynchronizeProperties extends AbstractSynchronizeProperties {
 	 */
 	@Override
 	public void disposePropertiesConfigurationArea() {
-		if (fUserDefinedContent != null) {
+		if (fUserDefinedContent == null) {
+			return;
+		}
+
+		if (!fUserDefinedContent.isDisposed()) {
 			checkConfig();
 			fUserDefinedContent.dispose();
-			fUserDefinedContent = null;
 		}
+		fUserDefinedContent = null;
 	}
 
 	/**
