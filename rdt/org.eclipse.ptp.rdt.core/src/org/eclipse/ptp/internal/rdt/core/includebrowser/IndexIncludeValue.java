@@ -40,6 +40,7 @@ public class IndexIncludeValue implements IIndexIncludeValue, Serializable
 	private boolean isActive;
 	private boolean isResolved;
 	private boolean isSystemInclude;
+	private boolean fIsIncludedFileExported;
 	
 
 	public IndexIncludeValue(IIndexInclude include) throws CoreException
@@ -82,6 +83,7 @@ public class IndexIncludeValue implements IIndexIncludeValue, Serializable
 		isActive = include.isActive();
 		isResolved = include.isResolved();
 		isSystemInclude = include.isSystemInclude();
+		fIsIncludedFileExported = include.isIncludedFileExported();
 		
 	}
 	
@@ -185,6 +187,10 @@ public class IndexIncludeValue implements IIndexIncludeValue, Serializable
 
 	public String getFullName() throws CoreException {
 		return fullName;
+	}
+
+	public boolean isIncludedFileExported() throws CoreException {
+		return fIsIncludedFileExported;
 	}
 
 }
