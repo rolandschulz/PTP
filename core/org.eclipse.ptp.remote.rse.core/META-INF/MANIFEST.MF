@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.remote.rse.core;singleton:=true
 Bundle-Version: 5.0.1.qualifier
-Bundle-Activator: org.eclipse.ptp.remote.rse.core.RSEAdapterCorePlugin
+Bundle-Activator: org.eclipse.ptp.internal.remote.rse.core.RSEAdapterCorePlugin
 Bundle-Vendor: %pluginProvider
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ptp.remote.core,
@@ -23,8 +23,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.rse.services.local
 Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.ptp.internal.remote.rse.core;x-internal:=true,
- org.eclipse.ptp.internal.remote.rse.core.miners;x-internal:=true,
- org.eclipse.ptp.remote.rse.core;x-friends:="org.eclipse.ptp.remote.rse.ui",
- org.eclipse.ptp.remote.rse.core.messages;x-internal:=true
+ org.eclipse.ptp.internal.remote.rse.core.messages;x-internal:=true,
+ org.eclipse.ptp.internal.remote.rse.core.miners;x-internal:=true
 Bundle-Localization: plugin
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

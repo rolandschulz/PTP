@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.remote.rse.ui;singleton:=true
 Bundle-Version: 3.0.0.qualifier
-Bundle-Activator: org.eclipse.ptp.remote.rse.ui.RSEAdapterUIPlugin
+Bundle-Activator: org.eclipse.ptp.internal.remote.rse.ui.RSEAdapterUIPlugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.ptp.remote.rse.core,
@@ -17,3 +17,5 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-Localization: plugin
 Bundle-Vendor: %pluginProvider
+Export-Package: org.eclipse.ptp.internal.remote.rse.ui;x-internal:=true,
+ org.eclipse.ptp.internal.remote.rse.ui.messages;x-internal:=true

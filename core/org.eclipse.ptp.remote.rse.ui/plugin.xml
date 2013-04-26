@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.ptp.remote.ui.remoteUIServices">
       <remoteUIServices
-            class="org.eclipse.ptp.remote.rse.ui.RSEUIServicesFactory"
+            class="org.eclipse.ptp.internal.remote.rse.ui.RSEUIServicesFactory"
             id="org.eclipse.ptp.remote.RSERemoteServices"
             name="RSE">
       </remoteUIServices>

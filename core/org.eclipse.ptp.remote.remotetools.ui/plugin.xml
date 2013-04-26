@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.ptp.remote.ui.remoteUIServices">
       <remoteUIServices
-            class="org.eclipse.ptp.remote.remotetools.ui.RemoteToolsUIServicesFactory"
+            class="org.eclipse.ptp.internal.remote.remotetools.ui.RemoteToolsUIServicesFactory"
             id="org.eclipse.ptp.remote.RemoteTools"
             name="Remote Tools">
       </remoteUIServices>
@@ -12,7 +12,7 @@
    <extension
          point="org.eclipse.ui.ide.filesystemSupport">
       <filesystemContributor
-            class="org.eclipse.ptp.remote.remotetools.ui.RemoteToolsFileSystemContributor"
+            class="org.eclipse.ptp.internal.remote.remotetools.ui.RemoteToolsFileSystemContributor"
             label="Remote Tools"
             scheme="remotetools">
       </filesystemContributor>

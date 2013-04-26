@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.ptp.remote.core.remoteServices">
       <remoteServices
-            class="org.eclipse.ptp.remote.rse.core.RSEServicesFactory"
+            class="org.eclipse.ptp.internal.remote.rse.core.RSEServicesFactory"
             id="org.eclipse.ptp.remote.RSERemoteServices"
             name="%remoteServices.name.0"
             newConnections="true"
