@@ -20,7 +20,7 @@
 		<platform-site>http://download.eclipse.org/eclipse/updates/${platform-version}</platform-site>
 		<tm-version>3.5milestones</tm-version>
 		<tm-site>http://download.eclipse.org/tm/updates/${tm-version}</tm-site>
-		<cdt-version>kepler/milestones</cdt-version>
+		<cdt-version>kepler/nightly</cdt-version>
 		<cdt-site>http://download.eclipse.org/tools/cdt/builds/${cdt-version}</cdt-site>	
 		<egit-version>nightly</egit-version>
 		<egit-site>http://download.eclipse.org/egit/updates-${egit-version}</egit-site>
