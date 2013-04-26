@@ -28,7 +28,7 @@
    <extension
          point="org.eclipse.ui.commands">
       <command
-            defaultHandler="org.eclipse.ptp.internal.rdt.sync.ui.SyncMenuOperation"
+            defaultHandler="org.eclipse.ptp.internal.rdt.sync.ui.menus.SyncMenuOperation"
             id="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
             name="Sync Operations">
          <commandParameter
@@ -44,64 +44,7 @@
             allPopups="true"
             locationURI="popup:org.eclipse.ui.popup.any?after=buildGroup">
          <menu
-               label="Synchronization">
-            <command
-                  commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
-                  label="Auto-Sync"
-                  style="toggle">
-               <parameter
-                     name="org.eclipse.ptp.rdt.sync.ui.syncCommand.syncModeParameter"
-                     value="sync_auto">
-               </parameter>
-            </command>
-            <menu
-                  label="Project Auto-Sync Settings">
-               <command
-                     commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
-                     label="Sync Active"
-                     style="radio">
-                  <parameter
-                        name="org.eclipse.ptp.rdt.sync.ui.syncCommand.syncModeParameter"
-                        value="set_active">
-                  </parameter>
-               </command>
-               <command
-                     commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
-                     label="Sync All"
-                     style="radio">
-                  <parameter
-                        name="org.eclipse.ptp.rdt.sync.ui.syncCommand.syncModeParameter"
-                        value="set_all">
-                  </parameter>
-               </command>
-               <command
-                     commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
-                     label="Sync None"
-                     style="radio">
-                  <parameter
-                        name="org.eclipse.ptp.rdt.sync.ui.syncCommand.syncModeParameter"
-                        value="set_none">
-                  </parameter>
-               </command>
-            </menu>
-            <command
-                  commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
-                  label="Sync Active Now"
-                  style="push">
-               <parameter
-                     name="org.eclipse.ptp.rdt.sync.ui.syncCommand.syncModeParameter"
-                     value="sync_active">
-               </parameter>
-            </command>
-            <command
-                  commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
-                  label="Sync All Now"
-                  style="push">
-               <parameter
-                     name="org.eclipse.ptp.rdt.sync.ui.syncCommand.syncModeParameter"
-                     value="sync_all">
-               </parameter>
-            </command>
+               label="%SynchronizeMenu.name">
             <visibleWhen
                   checkEnabled="false">
                <iterate
@@ -116,57 +59,78 @@
                   </adapt>
                </iterate>
             </visibleWhen>
-            <dynamic
-                  class="org.eclipse.ptp.internal.rdt.sync.ui.InitSyncMenu"
-                  id="org.eclipse.ptp.rdt.sync.ui.InitSyncMenu">
-            </dynamic>
             <command
                   commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
-                  label="Exclude Selection"
+                  label="%SyncActiveNow.name"
                   style="push">
                <parameter
                      name="org.eclipse.ptp.rdt.sync.ui.syncCommand.syncModeParameter"
-                     value="sync_exclude">
+                     value="sync_active">
                </parameter>
-               <visibleWhen
-                     checkEnabled="false">
-                  <iterate
-                        ifEmpty="false"
-                        operator="and">
-                     <adapt
-                           type="org.eclipse.core.resources.IResource">
-                        <not>
-                           <instanceof
-                                 value="org.eclipse.core.resources.IProject">
-                           </instanceof>
-                        </not>
-                     </adapt>
-                  </iterate>
-               </visibleWhen>
             </command>
+            <menu
+                  label="%SetActive.name">
+               <dynamic
+                     class="org.eclipse.ptp.internal.rdt.sync.ui.menus.SetActiveMenu"
+                     id="org.eclipse.ptp.rdt.sync.ui.dynamic">
+               </dynamic>
+            </menu>
             <command
                   commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
-                  label="Include Selection"
+                  label="%SyncAllNow.name"
                   style="push">
                <parameter
                      name="org.eclipse.ptp.rdt.sync.ui.syncCommand.syncModeParameter"
-                     value="sync_include">
+                     value="sync_all">
                </parameter>
-               <visibleWhen
-                     checkEnabled="false">
-                  <iterate
-                        ifEmpty="false"
-                        operator="and">
-                     <adapt
-                           type="org.eclipse.core.resources.IResource">
-                        <not>
-                           <instanceof
-                                 value="org.eclipse.core.resources.IProject">
-                           </instanceof></not>
-                     </adapt>
-                  </iterate>
-               </visibleWhen>
             </command>
+            <separator
+                  name="org.eclipse.ptp.rdt.sync.ui.separator1"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
+                  label="%AutoSync.name"
+                  style="toggle">
+               <parameter
+                     name="org.eclipse.ptp.rdt.sync.ui.syncCommand.syncModeParameter"
+                     value="sync_auto">
+               </parameter>
+            </command>
+            <menu
+                  label="%AutoSyncSettings.name">
+               <command
+                     commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
+                     label="%SyncActive.name"
+                     style="radio">
+                  <parameter
+                        name="org.eclipse.ptp.rdt.sync.ui.syncCommand.syncModeParameter"
+                        value="set_active">
+                  </parameter>
+               </command>
+               <command
+                     commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
+                     label="%SyncAll.name"
+                     style="radio">
+                  <parameter
+                        name="org.eclipse.ptp.rdt.sync.ui.syncCommand.syncModeParameter"
+                        value="set_all">
+                  </parameter>
+               </command>
+               <command
+                     commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
+                     label="%SyncNone.name"
+                     style="radio">
+                  <parameter
+                        name="org.eclipse.ptp.rdt.sync.ui.syncCommand.syncModeParameter"
+                        value="set_none">
+                  </parameter>
+               </command>
+            </menu>
+            <separator
+                  name="org.eclipse.ptp.rdt.sync.ui.separator2"
+                  visible="true">
+            </separator>
             <command
                   commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
                   label="Filter..."
@@ -176,6 +140,10 @@
                      value="sync_file_list">
                </parameter>
             </command>
+            <dynamic
+                  class="org.eclipse.ptp.internal.rdt.sync.ui.menus.InitSyncMenu"
+                  id="org.eclipse.ptp.rdt.sync.ui.InitSyncMenu">
+            </dynamic>
          </menu>
       </menuContribution>
       <menuContribution

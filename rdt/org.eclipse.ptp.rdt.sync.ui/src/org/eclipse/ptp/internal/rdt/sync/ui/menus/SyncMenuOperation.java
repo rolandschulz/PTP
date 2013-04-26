@@ -8,7 +8,7 @@
  * Contributors:
  *    John Eblen - initial implementation
  *******************************************************************************/
-package org.eclipse.ptp.internal.rdt.sync.ui;
+package org.eclipse.ptp.internal.rdt.sync.ui.menus;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -22,6 +22,8 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ptp.internal.rdt.sync.ui.RDTSyncUIPlugin;
+import org.eclipse.ptp.internal.rdt.sync.ui.SyncMergeFileTableViewer;
 import org.eclipse.ptp.internal.rdt.sync.ui.handlers.CommonSyncExceptionHandler;
 import org.eclipse.ptp.internal.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.internal.rdt.sync.ui.preferences.NewSyncFileFilterPage;

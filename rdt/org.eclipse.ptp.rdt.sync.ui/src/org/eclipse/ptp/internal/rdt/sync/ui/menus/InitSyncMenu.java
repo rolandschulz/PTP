@@ -8,7 +8,7 @@
  * Contributors:
  *    John Eblen - initial implementation
  *******************************************************************************/
-package org.eclipse.ptp.internal.rdt.sync.ui;
+package org.eclipse.ptp.internal.rdt.sync.ui.menus;
 
 import org.eclipse.jface.action.ContributionItem;
 
