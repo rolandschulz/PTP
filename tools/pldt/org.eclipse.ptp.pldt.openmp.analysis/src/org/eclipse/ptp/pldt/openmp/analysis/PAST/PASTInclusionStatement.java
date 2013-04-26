@@ -157,4 +157,10 @@ public class PASTInclusionStatement extends PASTNode implements IASTPreprocessor
 		return incl_.getIncludedFileReadTime();
 	}
 
+	@Override
+	public boolean isIncludedFileExported() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }
