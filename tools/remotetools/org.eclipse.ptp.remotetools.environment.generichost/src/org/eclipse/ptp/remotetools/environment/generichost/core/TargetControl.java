@@ -88,15 +88,25 @@ public class TargetControl extends SSHTargetControl implements ITargetControl {
 	 */
 	@Override
 	public boolean create(IProgressMonitor monitor) throws CoreException {
+		return create(fAuthInfo, monitor);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.remotetools.environment.control.ITargetControl#create(org.eclipse.ptp.remotetools.core.IAuthInfo,
+	 * org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	public boolean create(IAuthInfo authInfo, IProgressMonitor monitor) throws CoreException {
 		monitor.beginTask(Messages.TargetControl_create_MonitorConnecting, 1);
 
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-		Debug.setDebug(store.getBoolean("logging"));
+		Debug.setDebug(store.getBoolean("logging")); //$NON-NLS-1$
 
 		/*
 		 * Connect to the remote temote target
 		 */
-		setConnectionParameters(fTargetConfig, fAuthInfo);
+		setConnectionParameters(fTargetConfig, authInfo);
 
 		try {
 			setState(CONNECTING);

@@ -13,6 +13,7 @@ package org.eclipse.ptp.remotetools.environment.control;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.ptp.remotetools.core.IAuthInfo;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 
@@ -36,6 +37,16 @@ public interface ITargetControl {
 	 * @throws CoreException
 	 */
 	public boolean create(IProgressMonitor monitor) throws CoreException;
+
+	/**
+	 * Called to create an instance of the target. Allow client to supply auth info.
+	 * 
+	 * @param authInfo
+	 * @param monitor
+	 * @return
+	 * @throws CoreException
+	 */
+	public boolean create(IAuthInfo authInfo, IProgressMonitor monitor) throws CoreException;
 
 	/**
 	 * Create a new execution manager. This is required for script execution
