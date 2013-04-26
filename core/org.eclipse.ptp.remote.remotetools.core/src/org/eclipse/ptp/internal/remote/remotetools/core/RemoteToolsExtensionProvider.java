@@ -8,7 +8,7 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.remote.remotetools.internal.core;
+package org.eclipse.ptp.internal.remote.remotetools.core;
 
 import java.net.URI;
 import java.net.URISyntaxException;

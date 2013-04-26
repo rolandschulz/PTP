@@ -22,6 +22,8 @@ public class Messages extends NLS {
 	public static String Activator_0;
 	public static String RSEConnection_noPortFwd;
 	public static String RSEConnection_noShellService;
+
+	public static String RSEConnection_Operation_not_supported;
 	public static String RSEProcessBuilder_0;
 	public static String RSEServices_0;
 

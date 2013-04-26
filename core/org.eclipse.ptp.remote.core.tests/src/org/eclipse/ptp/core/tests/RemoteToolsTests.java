@@ -9,7 +9,7 @@ import java.io.OutputStreamWriter;
 import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.ptp.remote.remotetools.core.RemoteToolsServices;
+import org.eclipse.ptp.internal.remote.remotetools.core.RemoteToolsServices;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionTools;
 import org.eclipse.ptp.remotetools.core.IRemoteFileTools;

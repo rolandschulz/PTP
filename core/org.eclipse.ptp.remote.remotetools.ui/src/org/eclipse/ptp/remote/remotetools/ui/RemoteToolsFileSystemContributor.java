@@ -26,11 +26,11 @@ package org.eclipse.ptp.remote.remotetools.ui;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.eclipse.ptp.internal.remote.remotetools.core.RemoteToolsAdapterCorePlugin;
+import org.eclipse.ptp.internal.remote.remotetools.core.RemoteToolsFileSystem;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.RemoteServices;
-import org.eclipse.ptp.remote.remotetools.core.RemoteToolsAdapterCorePlugin;
-import org.eclipse.ptp.remote.remotetools.core.RemoteToolsFileSystem;
 import org.eclipse.ptp.remote.remotetools.ui.messages.Messages;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIServices;

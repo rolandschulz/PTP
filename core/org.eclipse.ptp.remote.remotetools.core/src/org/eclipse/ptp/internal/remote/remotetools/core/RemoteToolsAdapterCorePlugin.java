@@ -1,4 +1,4 @@
-package org.eclipse.ptp.remote.remotetools.core;
+package org.eclipse.ptp.internal.remote.remotetools.core;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;

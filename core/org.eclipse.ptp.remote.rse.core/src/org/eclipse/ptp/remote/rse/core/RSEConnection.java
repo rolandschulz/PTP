@@ -25,6 +25,7 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener;
 import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.IUserAuthenticator;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.core.exception.UnableToForwardPortException;
 import org.eclipse.ptp.remote.rse.core.messages.Messages;
@@ -342,6 +343,16 @@ public class RSEConnection implements IRemoteConnection {
 				throw new RemoteConnectionException(Messages.RSEConnection_noShellService);
 			}
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#open(org.eclipse.ptp.remote.core.IUserAuthenticator,
+	 * org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	public void open(IUserAuthenticator authenticator, IProgressMonitor monitor) throws RemoteConnectionException {
+		throw new RemoteConnectionException(Messages.RSEConnection_Operation_not_supported);
 	}
 
 	/*

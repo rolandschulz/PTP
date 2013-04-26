@@ -21,7 +21,7 @@
  * Martin Oberhuber (Wind River) - [199587] return attributes of RemoteToolsFileSystem
  ********************************************************************************/
 
-package org.eclipse.ptp.remote.remotetools.core;
+package org.eclipse.ptp.internal.remote.remotetools.core;
 
 import java.net.URI;
 import java.net.URISyntaxException;

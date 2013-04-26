@@ -9,7 +9,7 @@
  *     IBM Corporation - Initial Implementation
  *
  */
-package org.eclipse.ptp.remote.remotetools.core.messages;
+package org.eclipse.ptp.internal.remote.remotetools.core.messages;
 
 import org.eclipse.osgi.util.NLS;
 
@@ -19,7 +19,9 @@ import org.eclipse.osgi.util.NLS;
  * @since 3.0
  */
 public class Messages extends NLS {
-	private static final String BUNDLE_ID = "org.eclipse.ptp.remote.remotetools.core.messages.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_ID = "org.eclipse.ptp.internal.remote.remotetools.core.messages.messages"; //$NON-NLS-1$
+
+	public static String AuthInfo_Authentication_message;
 
 	public static String RemoteToolsConnection_connectionNotOpen;
 	public static String RemoteToolsConnection_remotePort;

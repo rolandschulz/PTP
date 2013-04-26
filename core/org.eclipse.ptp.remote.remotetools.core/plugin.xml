@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.ptp.remote.core.remoteServices">
       <remoteServices
-            class="org.eclipse.ptp.remote.remotetools.core.RemoteToolsServicesFactory"
+            class="org.eclipse.ptp.internal.remote.remotetools.core.RemoteToolsServicesFactory"
             id="org.eclipse.ptp.remote.RemoteTools"
             name="Remote Tools"
             newConnections="true"
@@ -17,7 +17,7 @@
       <filesystem
             scheme="remotetools">
          <run
-               class="org.eclipse.ptp.remote.remotetools.core.RemoteToolsFileSystem">
+               class="org.eclipse.ptp.internal.remote.remotetools.core.RemoteToolsFileSystem">
          </run>
       </filesystem>
    </extension>
@@ -25,7 +25,7 @@
 		point="org.eclipse.cdt.core.EFSExtensionProvider">
 		<EFSExtensionProvider
 			scheme="remotetools"
-			class="org.eclipse.ptp.remote.remotetools.internal.core.RemoteToolsExtensionProvider">
+			class="org.eclipse.ptp.internal.remote.remotetools.core.RemoteToolsExtensionProvider">
 		</EFSExtensionProvider>
    </extension>
 </plugin>

@@ -16,10 +16,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.ptp.internal.remote.remotetools.core.RemoteToolsServices;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.remotetools.core.RemoteToolsServices;
 import org.eclipse.ptp.remote.ui.AbstractRemoteUIConnectionManager;
 import org.eclipse.ptp.remotetools.environment.core.TargetElement;
 import org.eclipse.ptp.remotetools.environment.core.TargetTypeElement;

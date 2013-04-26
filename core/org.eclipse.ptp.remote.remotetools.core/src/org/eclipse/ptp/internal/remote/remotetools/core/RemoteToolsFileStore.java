@@ -9,7 +9,7 @@
  *   IBM Corporation - Initial API and implementation
  *   Roland Schulz, University of Tennessee
  *******************************************************************************/
-package org.eclipse.ptp.remote.remotetools.core;
+package org.eclipse.ptp.internal.remote.remotetools.core;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -31,8 +31,8 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.internal.remote.remotetools.core.messages.Messages;
 import org.eclipse.ptp.remote.core.RemoteServices;
-import org.eclipse.ptp.remote.remotetools.core.messages.Messages;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
 import org.eclipse.ptp.remotetools.core.IRemoteFileTools;
 import org.eclipse.ptp.remotetools.core.IRemoteItem;

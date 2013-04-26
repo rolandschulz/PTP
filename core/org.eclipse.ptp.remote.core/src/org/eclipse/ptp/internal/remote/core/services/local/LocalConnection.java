@@ -23,6 +23,7 @@ import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.remote.core.IUserAuthenticator;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.core.exception.UnableToForwardPortException;
 
@@ -48,6 +49,7 @@ public class LocalConnection implements IRemoteConnection {
 	 * org.eclipse.ptp.remote.core.IRemoteConnection#addConnectionChangeListener
 	 * (org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener)
 	 */
+	@Override
 	public void addConnectionChangeListener(IRemoteConnectionChangeListener listener) {
 		fListeners.add(listener);
 	}
@@ -57,6 +59,7 @@ public class LocalConnection implements IRemoteConnection {
 	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#close()
 	 */
+	@Override
 	public void close() {
 		if (fConnected) {
 			fConnected = false;
@@ -70,6 +73,7 @@ public class LocalConnection implements IRemoteConnection {
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#forwardLocalPort(int,
 	 * java.lang.String, int)
 	 */
+	@Override
 	public void forwardLocalPort(int localPort, String fwdAddress, int fwdPort) throws RemoteConnectionException {
 		throw new UnableToForwardPortException(Messages.LocalConnection_2);
 	}
@@ -81,6 +85,7 @@ public class LocalConnection implements IRemoteConnection {
 	 * org.eclipse.ptp.remote.core.IRemoteConnection#forwardLocalPort(java.lang
 	 * .String, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
+	@Override
 	public int forwardLocalPort(String fwdAddress, int fwdPort, IProgressMonitor monitor) throws RemoteConnectionException {
 		throw new UnableToForwardPortException(Messages.LocalConnection_2);
 	}
@@ -91,6 +96,7 @@ public class LocalConnection implements IRemoteConnection {
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#forwardRemotePort(int,
 	 * java.lang.String, int)
 	 */
+	@Override
 	public void forwardRemotePort(int remotePort, String fwdAddress, int fwdPort) throws RemoteConnectionException {
 		throw new UnableToForwardPortException(Messages.LocalConnection_2);
 	}
@@ -102,6 +108,7 @@ public class LocalConnection implements IRemoteConnection {
 	 * org.eclipse.ptp.remote.core.IRemoteConnection#forwardRemotePort(java.
 	 * lang.String, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
+	@Override
 	public int forwardRemotePort(String fwdAddress, int fwdPort, IProgressMonitor monitor) throws RemoteConnectionException {
 		throw new UnableToForwardPortException(Messages.LocalConnection_2);
 	}
@@ -111,6 +118,7 @@ public class LocalConnection implements IRemoteConnection {
 	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getAddress()
 	 */
+	@Override
 	public String getAddress() {
 		return fAddress;
 	}
@@ -120,6 +128,7 @@ public class LocalConnection implements IRemoteConnection {
 	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getAttributes()
 	 */
+	@Override
 	public Map<String, String> getAttributes() {
 		return new HashMap<String, String>();
 	}
@@ -129,6 +138,7 @@ public class LocalConnection implements IRemoteConnection {
 	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getEnv()
 	 */
+	@Override
 	public Map<String, String> getEnv() {
 		return System.getenv();
 	}
@@ -139,6 +149,7 @@ public class LocalConnection implements IRemoteConnection {
 	 * @see
 	 * org.eclipse.ptp.remote.core.IRemoteConnection#getEnv(java.lang.String)
 	 */
+	@Override
 	public String getEnv(String name) {
 		return System.getenv(name);
 	}
@@ -148,6 +159,7 @@ public class LocalConnection implements IRemoteConnection {
 	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getName()
 	 */
+	@Override
 	public String getName() {
 		return fName;
 	}
@@ -157,6 +169,7 @@ public class LocalConnection implements IRemoteConnection {
 	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getPort()
 	 */
+	@Override
 	public int getPort() {
 		return 0;
 	}
@@ -168,6 +181,7 @@ public class LocalConnection implements IRemoteConnection {
 	 * org.eclipse.ptp.remote.core.IRemoteConnection#getProperty(java.lang.String
 	 * )
 	 */
+	@Override
 	public String getProperty(String key) {
 		return System.getProperty(key);
 	}
@@ -177,6 +191,7 @@ public class LocalConnection implements IRemoteConnection {
 	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getRemoteServices()
 	 */
+	@Override
 	public IRemoteServices getRemoteServices() {
 		return fRemoteServices;
 	}
@@ -186,6 +201,7 @@ public class LocalConnection implements IRemoteConnection {
 	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getUsername()
 	 */
+	@Override
 	public String getUsername() {
 		return fUsername;
 	}
@@ -197,6 +213,7 @@ public class LocalConnection implements IRemoteConnection {
 	 * org.eclipse.ptp.remote.core.IRemoteFileManager#getWorkingDirectory(org
 	 * .eclipse.core.runtime.IProgressMonitor)
 	 */
+	@Override
 	public String getWorkingDirectory() {
 		if (fWorkingDir == null) {
 			String cwd = System.getProperty("user.home"); //$NON-NLS-1$
@@ -217,6 +234,7 @@ public class LocalConnection implements IRemoteConnection {
 	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#isOpen()
 	 */
+	@Override
 	public boolean isOpen() {
 		return fConnected;
 	}
@@ -226,6 +244,7 @@ public class LocalConnection implements IRemoteConnection {
 	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#open()
 	 */
+	@Override
 	public void open(IProgressMonitor monitor) throws RemoteConnectionException {
 		if (!fConnected) {
 			fConnected = true;
@@ -236,10 +255,22 @@ public class LocalConnection implements IRemoteConnection {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#open(org.eclipse.ptp.remote.core.IUserAuthenticator,
+	 * org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	@Override
+	public void open(IUserAuthenticator authenticator, IProgressMonitor monitor) throws RemoteConnectionException {
+		open(monitor);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.eclipse.ptp.remote.core.IRemoteConnection#removeConnectionChangeListener
 	 * (org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener)
 	 */
+	@Override
 	public void removeConnectionChangeListener(IRemoteConnectionChangeListener listener) {
 		fListeners.remove(listener);
 	}
@@ -250,6 +281,7 @@ public class LocalConnection implements IRemoteConnection {
 	 * @see
 	 * org.eclipse.ptp.remote.core.IRemoteConnection#removePortForwarding(int)
 	 */
+	@Override
 	public void removePortForwarding(int port) throws RemoteConnectionException {
 		// Do nothing
 	}
@@ -261,6 +293,7 @@ public class LocalConnection implements IRemoteConnection {
 	 * org.eclipse.ptp.remote.core.IRemoteConnection#setAddress(java.lang.String
 	 * )
 	 */
+	@Override
 	public void setAddress(String address) {
 		fAddress = address;
 	}
@@ -272,6 +305,7 @@ public class LocalConnection implements IRemoteConnection {
 	 * org.eclipse.ptp.remote.core.IRemoteConnection#setAttribute(java.lang.
 	 * String, java.lang.String)
 	 */
+	@Override
 	public void setAttribute(String key, String value) {
 		// Not supported
 	}
@@ -282,6 +316,7 @@ public class LocalConnection implements IRemoteConnection {
 	 * @see
 	 * org.eclipse.ptp.remote.core.IRemoteConnection#setName(java.lang.String)
 	 */
+	@Override
 	public void setName(String name) {
 		fName = name;
 		fireConnectionChangeEvent(IRemoteConnectionChangeEvent.CONNECTION_RENAMED);
@@ -294,6 +329,7 @@ public class LocalConnection implements IRemoteConnection {
 	 * org.eclipse.ptp.remote.core.IRemoteConnection#setPassword(java.lang.String
 	 * )
 	 */
+	@Override
 	public void setPassword(String password) {
 		// Not supported
 	}
@@ -303,6 +339,7 @@ public class LocalConnection implements IRemoteConnection {
 	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#setPort(int)
 	 */
+	@Override
 	public void setPort(int port) {
 		// Not supported
 	}
@@ -314,6 +351,7 @@ public class LocalConnection implements IRemoteConnection {
 	 * org.eclipse.ptp.remote.core.IRemoteConnection#setUsername(java.lang.String
 	 * )
 	 */
+	@Override
 	public void setUsername(String username) {
 		fUsername = username;
 	}
@@ -325,6 +363,7 @@ public class LocalConnection implements IRemoteConnection {
 	 * org.eclipse.ptp.remote.core.IRemoteFileManager#setWorkingDirectory(java
 	 * .lang.String)
 	 */
+	@Override
 	public void setWorkingDirectory(String pathStr) {
 		IPath path = new Path(pathStr);
 		if (path.isAbsolute()) {
@@ -338,6 +377,7 @@ public class LocalConnection implements IRemoteConnection {
 	 * @see
 	 * org.eclipse.ptp.remote.core.IRemoteConnection#supportsTCPPortForwarding()
 	 */
+	@Override
 	public boolean supportsTCPPortForwarding() {
 		return false;
 	}
@@ -349,10 +389,12 @@ public class LocalConnection implements IRemoteConnection {
 	 */
 	private void fireConnectionChangeEvent(final int type) {
 		IRemoteConnectionChangeEvent event = new IRemoteConnectionChangeEvent() {
+			@Override
 			public IRemoteConnection getConnection() {
 				return fConnection;
 			}
 
+			@Override
 			public int getType() {
 				return type;
 			}
