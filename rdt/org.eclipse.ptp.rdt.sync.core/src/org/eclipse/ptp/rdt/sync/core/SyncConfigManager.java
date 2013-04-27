@@ -346,9 +346,11 @@ public class SyncConfigManager {
 						config.setSyncOnSave(syncOnSave.booleanValue());
 					}
 					IMemento configPropertiesMemento = configMemento.getChild(CONFIG_PROPERTIES_ELEMENT);
-					for (String key : configPropertiesMemento.getAttributeKeys()) {
-						String value = configPropertiesMemento.getString(key);
-						config.setProperty(key, value);
+					if (configPropertiesMemento != null) {
+						for (String key : configPropertiesMemento.getAttributeKeys()) {
+							String value = configPropertiesMemento.getString(key);
+							config.setProperty(key, value);
+						}
 					}
 					doAddConfig(project, config);
 				}
