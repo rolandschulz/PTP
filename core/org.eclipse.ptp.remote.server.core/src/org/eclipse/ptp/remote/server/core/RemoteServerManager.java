@@ -5,7 +5,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-package org.eclipse.ptp.remote.core.server;
+package org.eclipse.ptp.remote.server.core;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +16,7 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.ptp.internal.remote.core.PTPRemoteCorePlugin;
+import org.eclipse.ptp.internal.remote.server.core.Activator;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 
 /**
@@ -52,8 +52,7 @@ public class RemoteServerManager {
 	private static AbstractRemoteServerRunner createServer(String id) {
 		AbstractRemoteServerRunner server = null;
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
-		IExtensionPoint extensionPoint = registry.getExtensionPoint(PTPRemoteCorePlugin.getUniqueIdentifier(),
-				REMOTE_SERVER_EXTENSION_POINT_ID);
+		IExtensionPoint extensionPoint = registry.getExtensionPoint(Activator.PLUGIN_ID, REMOTE_SERVER_EXTENSION_POINT_ID);
 		if (extensionPoint != null) {
 			final IExtension[] extensions = extensionPoint.getExtensions();
 
@@ -81,7 +80,7 @@ public class RemoteServerManager {
 								return server;
 							}
 						} catch (CoreException e) {
-							PTPRemoteCorePlugin.log(e);
+							Activator.log(e);
 						}
 					}
 				}
@@ -92,8 +91,7 @@ public class RemoteServerManager {
 
 	private static void checkForOverrides(String id, AbstractRemoteServerRunner server) {
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
-		IExtensionPoint extensionPoint = registry.getExtensionPoint(PTPRemoteCorePlugin.getUniqueIdentifier(),
-				REMOTE_SERVER_EXTENSION_POINT_ID);
+		IExtensionPoint extensionPoint = registry.getExtensionPoint(Activator.PLUGIN_ID, REMOTE_SERVER_EXTENSION_POINT_ID);
 		if (extensionPoint != null) {
 			final IExtension[] extensions = extensionPoint.getExtensions();
 

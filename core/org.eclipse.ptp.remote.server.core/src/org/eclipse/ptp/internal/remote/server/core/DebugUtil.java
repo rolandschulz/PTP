@@ -8,17 +8,17 @@
  * Contributors:
  * IBM Corporation - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.internal.remote.core;
+package org.eclipse.ptp.internal.remote.server.core;
 
 import org.eclipse.core.runtime.Platform;
 
 public class DebugUtil {
-	private static final String SERVER_TRACING_OPTION = "org.eclipse.ptp.remote.core/debug/server/tracing"; //$NON-NLS-1$
+	private static final String SERVER_TRACING_OPTION = "org.eclipse.ptp.remote.server.core/debug/server/tracing"; //$NON-NLS-1$
 
 	public static boolean SERVER_TRACING = false;
 
 	public static void configurePluginDebugOptions() {
-		if (PTPRemoteCorePlugin.getDefault().isDebugging()) {
+		if (Activator.getDefault().isDebugging()) {
 			String option = Platform.getDebugOption(SERVER_TRACING_OPTION);
 			if (option != null) {
 				SERVER_TRACING = option.equalsIgnoreCase("true"); //$NON-NLS-1$

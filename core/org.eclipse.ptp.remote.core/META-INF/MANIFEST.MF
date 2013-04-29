@@ -16,7 +16,6 @@ Export-Package: org.eclipse.ptp.internal.remote.core;x-friends:="org.eclipse.ptp
  org.eclipse.ptp.internal.remote.core.preferences;x-friends:="org.eclipse.ptp.remote.ui",
  org.eclipse.ptp.internal.remote.core.services.local;x-internal:=true,
  org.eclipse.ptp.remote.core,
- org.eclipse.ptp.remote.core.exception,
- org.eclipse.ptp.remote.core.server
+ org.eclipse.ptp.remote.core.exception
 Bundle-Localization: plugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

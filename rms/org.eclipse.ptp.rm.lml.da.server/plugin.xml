@@ -2,7 +2,7 @@
 <?eclipse version="3.4"?>
 <plugin>
         <extension
-           point="org.eclipse.ptp.remote.core.remoteServer">
+           point="org.eclipse.ptp.remote.server.core.remoteServer">
         <remoteServer
               class="org.eclipse.ptp.rm.lml.da.server.core.LMLDAServer"
               continuous="false"

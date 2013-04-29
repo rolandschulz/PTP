@@ -53,6 +53,7 @@
 		<module>core/org.eclipse.ptp.remote.remotetools.ui</module>
 		<module>core/org.eclipse.ptp.remote.rse.core</module>
 		<module>core/org.eclipse.ptp.remote.rse.ui</module>
+		<module>core/org.eclipse.ptp.remote.server.core</module>
 		<module>core/org.eclipse.ptp.remote.terminal</module>
 		<module>core/org.eclipse.ptp.remote.ui</module>
 		<module>core/org.eclipse.ptp.services.core</module>

@@ -5,7 +5,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-package org.eclipse.ptp.remote.core.server;
+package org.eclipse.ptp.remote.server.core;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -34,9 +34,9 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.ptp.internal.remote.core.DebugUtil;
-import org.eclipse.ptp.internal.remote.core.PTPRemoteCorePlugin;
-import org.eclipse.ptp.internal.remote.core.messages.Messages;
+import org.eclipse.ptp.internal.remote.server.core.Activator;
+import org.eclipse.ptp.internal.remote.server.core.DebugUtil;
+import org.eclipse.ptp.internal.remote.server.core.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
@@ -697,7 +697,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 				 * For some reason we're sometimes seeing a "write end dead" message here even though the correct result is
 				 * returned. Ignore this exception for now, though the root cause needs to be ascertained.
 				 */
-				PTPRemoteCorePlugin.log(e);
+				Activator.log(e);
 			}
 
 			return false;
@@ -910,11 +910,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 								if (DebugUtil.SERVER_TRACING) {
 									System.out.println("SERVER: " + output); //$NON-NLS-1$
 								}
-								PTPRemoteCorePlugin
-										.getDefault()
-										.getLog()
-										.log(new Status(IStatus.ERROR, PTPRemoteCorePlugin.getUniqueIdentifier(), fServerName
-												+ ": " + output)); //$NON-NLS-1$
+								Activator.log(fServerName + ": " + output); //$NON-NLS-1$
 							}
 						}
 						stderr.close();
@@ -964,12 +960,12 @@ public abstract class AbstractRemoteServerRunner extends Job {
 			 */
 			if (fRemoteProcess.exitValue() != 0) {
 				if (!subMon.isCanceled()) {
-					fStatus = new Status(IStatus.ERROR, PTPRemoteCorePlugin.getUniqueIdentifier(), NLS.bind(
-							Messages.AbstractRemoteServerRunner_3, fRemoteProcess.exitValue()));
+					fStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, NLS.bind(Messages.AbstractRemoteServerRunner_3,
+							fRemoteProcess.exitValue()));
 				}
 			}
 		} catch (IOException e) {
-			fStatus = new Status(IStatus.ERROR, PTPRemoteCorePlugin.getUniqueIdentifier(), e.getMessage(), null);
+			fStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), null);
 		} finally {
 			doServerFinished(subMon.newChild(1));
 			setServerState(ServerState.STOPPED);

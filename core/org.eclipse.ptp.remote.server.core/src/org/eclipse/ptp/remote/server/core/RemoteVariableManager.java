@@ -5,7 +5,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-package org.eclipse.ptp.remote.core.server;
+package org.eclipse.ptp.remote.server.core;
 
 import java.util.Map;
 

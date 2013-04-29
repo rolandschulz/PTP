@@ -81,7 +81,7 @@ import org.eclipse.ptp.rdt.core.serviceproviders.IIndexServiceProvider;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
 import org.eclipse.ptp.rdt.ui.subsystems.ProjectChangeListener;
 import org.eclipse.ptp.rdt.ui.subsystems.StatusMonitor;
-import org.eclipse.ptp.remote.core.server.RemoteServerManager;
+import org.eclipse.ptp.remote.server.core.RemoteServerManager;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceProvider;

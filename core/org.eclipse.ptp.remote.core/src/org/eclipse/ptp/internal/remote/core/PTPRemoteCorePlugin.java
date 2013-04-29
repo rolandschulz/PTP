@@ -93,7 +93,6 @@ public class PTPRemoteCorePlugin extends Plugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-		DebugUtil.configurePluginDebugOptions();
 		ResourcesPlugin.getWorkspace().addSaveParticipant(getUniqueIdentifier(), new ISaveParticipant() {
 			@Override
 			public void saving(ISaveContext saveContext) throws CoreException {

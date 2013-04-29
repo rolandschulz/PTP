@@ -8,7 +8,7 @@
 package org.eclipse.ptp.rm.lml.da.server.core;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.remote.core.server.AbstractRemoteServerRunner;
+import org.eclipse.ptp.remote.server.core.AbstractRemoteServerRunner;
 import org.eclipse.ptp.rm.lml.da.server.messages.Messages;
 
 public class LMLDAServer extends AbstractRemoteServerRunner {
@@ -27,6 +27,7 @@ public class LMLDAServer extends AbstractRemoteServerRunner {
 	 */
 	@Override
 	protected void doServerFinished(IProgressMonitor monitor) {
+		// Nothing to do
 	}
 
 	/*
