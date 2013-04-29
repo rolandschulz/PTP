@@ -28,7 +28,7 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.internal.rdt.sync.ui.RDTSyncUIPlugin;
 import org.eclipse.ptp.internal.rdt.sync.ui.SynchronizeParticipantRegistry;
 import org.eclipse.ptp.internal.rdt.sync.ui.messages.Messages;
-import org.eclipse.ptp.internal.rdt.sync.ui.preferences.NewSyncFileFilterPage;
+import org.eclipse.ptp.internal.rdt.sync.ui.preferences.SyncFileFilterDialog;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
@@ -117,7 +117,7 @@ public class SyncProjectWidget extends Composite {
 				} else {
 					tmpFilter = new SyncFileFilter(fCustomFilter);
 				}
-				int filterReturnCode = NewSyncFileFilterPage.openBlocking(filterButton.getShell(), tmpFilter);
+				int filterReturnCode = SyncFileFilterDialog.openBlocking(filterButton.getShell(), tmpFilter);
 				if (filterReturnCode == Window.OK) {
 					fCustomFilter = tmpFilter;
 				}

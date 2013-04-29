@@ -214,13 +214,13 @@
             category="org.eclipse.ptp.remote.ui.RemoteDevelopmentPreferencePage"
             class="org.eclipse.ptp.internal.rdt.sync.ui.preferences.SyncPreferencePage"
             id="org.eclipse.ptp.rdt.sync.ui.SyncPreferencePage"
-            name="Synchronized Projects">
+            name="%SynchronizedProjectsPreferencePage.name">
       </page>
       <page
             category="org.eclipse.ptp.rdt.sync.ui.SyncPreferencePage"
             class="org.eclipse.ptp.internal.rdt.sync.ui.preferences.SyncFileFilterPage"
             id="org.eclipse.ptp.rdt.sync.ui.SyncPreferencePage.SyncFileFilterPage"
-            name="File Filtering">
+            name="%FileFilteringPreferencePage.name">
       </page>
    </extension>
    <extension

@@ -26,7 +26,7 @@ import org.eclipse.ptp.internal.rdt.sync.ui.RDTSyncUIPlugin;
 import org.eclipse.ptp.internal.rdt.sync.ui.SyncMergeFileTableViewer;
 import org.eclipse.ptp.internal.rdt.sync.ui.handlers.CommonSyncExceptionHandler;
 import org.eclipse.ptp.internal.rdt.sync.ui.messages.Messages;
-import org.eclipse.ptp.internal.rdt.sync.ui.preferences.NewSyncFileFilterPage;
+import org.eclipse.ptp.internal.rdt.sync.ui.preferences.SyncFileFilterDialog;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
@@ -119,9 +119,9 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 				}
 				SyncManager.saveFileFilter(project, sff);
 			} else if (command.equals(syncFileList)) {
-				NewSyncFileFilterPage.open(HandlerUtil.getActiveShell(event), project);
+				SyncFileFilterDialog.open(HandlerUtil.getActiveShell(event), project);
 			} else if (command.equals(syncDefaultFileList)) {
-				NewSyncFileFilterPage.open(HandlerUtil.getActiveShell(event), null);
+				SyncFileFilterDialog.open(HandlerUtil.getActiveShell(event), null);
 			} else if (command.equals(checkoutCommand) || command.equals(resolveMergeCommand)
 					|| (command.equals(resolveAsRemoteCommand))) {
 				ISynchronizeService syncService = SyncConfigManager.getActive(project).getSyncService();

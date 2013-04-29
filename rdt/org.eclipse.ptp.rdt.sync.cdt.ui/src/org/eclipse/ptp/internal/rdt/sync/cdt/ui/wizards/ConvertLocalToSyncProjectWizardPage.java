@@ -48,7 +48,7 @@ import org.eclipse.ptp.internal.rdt.sync.cdt.ui.Activator;
 import org.eclipse.ptp.internal.rdt.sync.cdt.ui.messages.Messages;
 import org.eclipse.ptp.internal.rdt.sync.ui.SynchronizeParticipantRegistry;
 import org.eclipse.ptp.internal.rdt.sync.ui.handlers.CommonSyncExceptionHandler;
-import org.eclipse.ptp.internal.rdt.sync.ui.preferences.NewSyncFileFilterPage;
+import org.eclipse.ptp.internal.rdt.sync.ui.preferences.SyncFileFilterDialog;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
@@ -270,7 +270,7 @@ public class ConvertLocalToSyncProjectWizardPage extends ConvertProjectWizardPag
 				} else {
 					tmpFilter = new SyncFileFilter(customFilter);
 				}
-				int filterReturnCode = NewSyncFileFilterPage.openBlocking(filterButton.getShell(), tmpFilter);
+				int filterReturnCode = SyncFileFilterDialog.openBlocking(filterButton.getShell(), tmpFilter);
 				if (filterReturnCode == Window.OK) {
 					customFilter = tmpFilter;
 				}
