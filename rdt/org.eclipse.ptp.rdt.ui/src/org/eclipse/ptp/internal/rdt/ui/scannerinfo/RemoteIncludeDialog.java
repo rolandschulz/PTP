@@ -16,6 +16,7 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.PTPRemoteUIPlugin;
+import org.eclipse.rse.core.filters.SystemFilterReference;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.files.ui.dialogs.SystemRemoteFolderDialog;
 import org.eclipse.rse.subsystems.files.core.subsystems.IRemoteFile;
@@ -183,9 +184,17 @@ public class RemoteIncludeDialog extends Dialog {
 					folderDialog.setShowNewConnectionPrompt(false);
 					folderDialog.open();
 					Object remoteObject = folderDialog.getSelectedObject();
+					
+					if (folderDialog.wasCancelled()) {
+						return;
+					}
 					if (remoteObject instanceof IRemoteFile) {
 						IRemoteFile folder = (IRemoteFile) remoteObject;
 						text.setText(folder.getCanonicalPath());
+					} else {
+						// the default directory is the home directory which is a type of SystemFilterReference.
+						String homeDir = ((SystemFilterReference) remoteObject).getSubSystem().getConnectorService().getHomeDirectory();
+						text.setText(homeDir);
 					}
 				} else {
 					IRemoteUIConnectionManager connMgr = getUIConnectionManager();
