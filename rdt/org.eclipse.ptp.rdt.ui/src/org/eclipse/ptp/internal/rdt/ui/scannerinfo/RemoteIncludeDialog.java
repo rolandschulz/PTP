@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 IBM Corporation and others.
+ * Copyright (c) 2008, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,7 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
 import org.eclipse.ptp.remote.ui.RemoteUIServices;
+import org.eclipse.rse.core.filters.SystemFilterReference;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.files.ui.dialogs.SystemRemoteFolderDialog;
 import org.eclipse.rse.subsystems.files.core.subsystems.IRemoteFile;
@@ -183,9 +184,17 @@ public class RemoteIncludeDialog extends Dialog {
 					folderDialog.setShowNewConnectionPrompt(false);
 					folderDialog.open();
 					Object remoteObject = folderDialog.getSelectedObject();
+					
+					if (folderDialog.wasCancelled()) {
+						return;
+					}
 					if (remoteObject instanceof IRemoteFile) {
 						IRemoteFile folder = (IRemoteFile) remoteObject;
 						text.setText(folder.getCanonicalPath());
+					} else {
+						// the default directory is the home directory which is a type of SystemFilterReference.
+						String homeDir = ((SystemFilterReference) remoteObject).getSubSystem().getConnectorService().getHomeDirectory();
+						text.setText(homeDir);
 					}
 				} else {
 					IRemoteUIConnectionManager connMgr = getUIConnectionManager();
