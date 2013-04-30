@@ -509,7 +509,7 @@ public class Activator extends AbstractUIPlugin {
 	 * Create log entry from a Throwable
 	 * 
 	 * @param e
-	 * @since 6.0
+	 * @since 7.0
 	 */
 	public static void log(Throwable e) {
 		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, "Internal Error", e)); //$NON-NLS-1$
@@ -519,7 +519,7 @@ public class Activator extends AbstractUIPlugin {
 	 * Create log entry from an IStatus
 	 * 
 	 * @param status
-	 * @since 6.0
+	 * @since 7.0
 	 */
 	public static void log(IStatus status) {
 		getDefault().getLog().log(status);
@@ -529,7 +529,7 @@ public class Activator extends AbstractUIPlugin {
 	 * Generate a unique identifier
 	 * 
 	 * @return unique identifier string
-	 * @since 6.0
+	 * @since 7.0
 	 */
 	public static String getUniqueIdentifier() {
 		if (getDefault() == null) {

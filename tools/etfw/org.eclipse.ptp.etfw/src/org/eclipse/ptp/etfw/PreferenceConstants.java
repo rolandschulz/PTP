@@ -12,7 +12,7 @@ package org.eclipse.ptp.etfw;
 /**
  * Preference constants for the external tools framework
  * 
- * @since 6.0
+ * @since 7.0
  * 
  */
 public interface PreferenceConstants {

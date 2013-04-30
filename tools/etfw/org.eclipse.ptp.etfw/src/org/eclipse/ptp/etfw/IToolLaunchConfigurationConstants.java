@@ -46,17 +46,17 @@ public interface IToolLaunchConfigurationConstants {
 	public static final String PROJECT_DIR = "%%PROJECT_DIR%%";
 
 	/**
-	 * @since 6.0
+	 * @since 7.0
 	 */
 	public static final String ETFW_VERSION = "ETFW_VERSION";
 
 	/**
-	 * @since 6.0
+	 * @since 7.0
 	 */
 	public static final String USE_SAX_PARSER = "sax-parser";
 
 	/**
-	 * @since 6.0
+	 * @since 7.0
 	 */
 	public static final String USE_JAXB_PARSER = "jaxb-parser";
 	/**
