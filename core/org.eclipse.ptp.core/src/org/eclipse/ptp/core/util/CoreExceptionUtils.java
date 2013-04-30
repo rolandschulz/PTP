@@ -12,7 +12,7 @@ package org.eclipse.ptp.core.util;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.internal.core.PTPCorePlugin;
 
 /**
  * Convenience methods for handling CoreExceptions and Status.ERROR.

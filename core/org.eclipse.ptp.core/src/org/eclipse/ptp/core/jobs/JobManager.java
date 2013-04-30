@@ -138,7 +138,7 @@ public class JobManager {
 	 * @since 7.0
 	 */
 	public IJobStatus getJob(String controlId, String jobId) {
-		return fJobs.get(controlId + "+" + jobId);
+		return fJobs.get(controlId + "+" + jobId); //$NON-NLS-1$
 	}
 
 	/**

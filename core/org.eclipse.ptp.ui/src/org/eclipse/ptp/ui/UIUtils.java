@@ -23,7 +23,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.util.SafeRunnable;
-import org.eclipse.ptp.core.PTPCorePlugin;
 import org.eclipse.ptp.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -52,6 +51,7 @@ public class UIUtils {
 
 	protected static void showDialogAsync(final Shell shell, final String title, final String message, final int style) {
 		shell.getDisplay().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				showDialog(shell, title, message, style);
 			}
@@ -59,29 +59,33 @@ public class UIUtils {
 	}
 
 	public static void showWarningDialog(final Shell shell, final String title, final String message, int flag) {
-		if (flag == NORMAL)
+		if (flag == NORMAL) {
 			showDialog(shell, title, message, SWT.ICON_WARNING | SWT.OK);
-		else
+		} else {
 			showDialogAsync(shell, title, message, SWT.ICON_WARNING | SWT.OK);
+		}
 	}
 
 	public static void showInformationDialog(final Shell shell, final String title, final String message, int flag) {
-		if (flag == NORMAL)
+		if (flag == NORMAL) {
 			showDialog(shell, title, message, SWT.ICON_INFORMATION | SWT.OK);
-		else
+		} else {
 			showDialogAsync(shell, title, message, SWT.ICON_INFORMATION | SWT.OK);
+		}
 	}
 
 	public static void showErrorDialog(final Shell shell, final String title, final String message, int flag) {
-		if (flag == NORMAL)
+		if (flag == NORMAL) {
 			showDialog(shell, title, message, SWT.ICON_ERROR | SWT.OK);
-		else
+		} else {
 			showDialogAsync(shell, title, message, SWT.ICON_ERROR | SWT.OK);
+		}
 	}
 
 	// IStatus can be retrieved from CoreException e.getStatus()
 	public static void showDetailErrorDialog(final Shell shell, final String title, final String message, final IStatus status) {
 		shell.getDisplay().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				ErrorDialog.openError(shell, title, message, status);
 			}
@@ -90,12 +94,14 @@ public class UIUtils {
 
 	public static void showErrorDialog(final String title, final String message, final IStatus status) {
 		Display.getDefault().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				final Shell shell = Display.getDefault().getActiveShell();
-				if (status == null)
+				if (status == null) {
 					MessageDialog.openError(shell, title, message);
-				else
+				} else {
 					ErrorDialog.openError(shell, title, message, status);
+				}
 			}
 		});
 	}
@@ -107,8 +113,10 @@ public class UIUtils {
 
 	public static void showView(final String viewID) {
 		BusyIndicator.showWhile(null, new Runnable() {
+			@Override
 			public void run() {
 				Display.getDefault().syncExec(new Runnable() {
+					@Override
 					public void run() {
 						try {
 							displayView(viewID);
@@ -123,10 +131,12 @@ public class UIUtils {
 
 	public static void switchPerspectiveTo(final String perspectiveID) {
 		Display.getDefault().syncExec(new Runnable() {
+			@Override
 			public void run() {
 				IWorkbenchPage page = getActivePage();
-				if (page.getPerspective().getId().equals(perspectiveID))
+				if (page.getPerspective().getId().equals(perspectiveID)) {
 					return;
+				}
 				IWorkbench bench = PTPUIPlugin.getDefault().getWorkbench();
 				try {
 					bench.showPerspective(perspectiveID, PTPUIPlugin.getActiveWorkbenchWindow());
@@ -157,8 +167,9 @@ public class UIUtils {
 
 	public static void closeView(String viewID) {
 		IViewPart viewPart = findView(viewID);
-		if (viewPart == null)
+		if (viewPart == null) {
 			return;
+		}
 		viewPart.dispose();
 	}
 
@@ -167,10 +178,11 @@ public class UIUtils {
 			try {
 				safeRunnable.run();
 			} catch (Exception e) {
-				PTPCorePlugin.log(e);
+				PTPUIPlugin.log(e);
 			}
 		} else {
 			PTPUIPlugin.getDisplay().asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					SafeRunnable.run(safeRunnable);
 				}
@@ -186,10 +198,11 @@ public class UIUtils {
 			try {
 				safeRunnable.run();
 			} catch (Exception e) {
-				PTPCorePlugin.log(e);
+				PTPUIPlugin.log(e);
 			}
 		} else {
 			PTPUIPlugin.getDisplay().syncExec(new Runnable() {
+				@Override
 				public void run() {
 					SafeRunnable.run(safeRunnable);
 				}

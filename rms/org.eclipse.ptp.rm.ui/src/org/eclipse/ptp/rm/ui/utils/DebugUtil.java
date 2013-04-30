@@ -12,7 +12,7 @@ package org.eclipse.ptp.rm.ui.utils;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.rm.ui.RMUIPlugin;
 
 public class DebugUtil {
 	private static final String DATASOURCE_OPTION = "org.eclipse.ptp.rm.ui/debug/dataSource"; //$NON-NLS-1$
@@ -22,7 +22,7 @@ public class DebugUtil {
 	public static boolean LISTENER_TRACING = false;
 
 	public static void configurePluginDebugOptions() {
-		if (PTPCorePlugin.getDefault().isDebugging()) {
+		if (RMUIPlugin.getDefault().isDebugging()) {
 			String option = Platform.getDebugOption(DATASOURCE_OPTION);
 			if (option != null) {
 				DATASOURCE_TRACING = option.equalsIgnoreCase("true"); //$NON-NLS-1$

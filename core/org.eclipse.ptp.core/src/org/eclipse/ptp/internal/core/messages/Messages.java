@@ -8,12 +8,12 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  */
-package org.eclipse.ptp.core.messages;
+package org.eclipse.ptp.internal.core.messages;
 
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-	private static final String BUNDLE_NAME = "org.eclipse.ptp.core.messages.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.internal.core.messages.messages"; //$NON-NLS-1$
 
 	static {
 		// initialize resource bundle

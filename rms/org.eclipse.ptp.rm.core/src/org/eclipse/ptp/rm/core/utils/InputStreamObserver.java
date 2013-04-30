@@ -15,14 +15,12 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.rm.core.RMCorePlugin;
 
 /**
- * A thread that forwards data from an inputstream to a
- * {@link IInputStreamListener}.
+ * A thread that forwards data from an inputstream to a {@link IInputStreamListener}.
  * <p>
- * This is a general facility that allows to forward data received from an
- * inputstream to a listener object.
+ * This is a general facility that allows to forward data received from an inputstream to a listener object.
  * 
  * Copied and adapted from remote tools. Multiple listeners are now supported.
  * 
@@ -90,7 +88,7 @@ public class InputStreamObserver extends Thread {
 	}
 
 	protected void log(Throwable e) {
-		PTPCorePlugin.log(e);
+		RMCorePlugin.log(e);
 	}
 
 	private void streamClosed() {

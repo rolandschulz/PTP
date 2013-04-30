@@ -13,11 +13,11 @@ package org.eclipse.ptp.rm.core.utils;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.eclipse.ptp.core.PTPCorePlugin;
+import org.eclipse.ptp.rm.core.RMCorePlugin;
 
 /**
  * An {@link IInputStreamListener} that forwards output to a piped stream.
- *
+ * 
  * @author Daniel Felix Ferber
  */
 public class InputStreamListenerToOutputStream implements IInputStreamListener {
@@ -55,7 +55,7 @@ public class InputStreamListenerToOutputStream implements IInputStreamListener {
 	}
 
 	protected void log(Exception e) {
-		PTPCorePlugin.log(e);
+		RMCorePlugin.log(e);
 	}
 
 	public synchronized void disable() {
