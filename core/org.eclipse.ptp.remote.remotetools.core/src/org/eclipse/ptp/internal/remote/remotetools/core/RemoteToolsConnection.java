@@ -154,7 +154,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 			throw new RemoteConnectionException(Messages.RemoteToolsConnection_connectionNotOpen);
 		}
 		if (fTunnels.get(Integer.valueOf(localPort)) != null) {
-			throw new RemoteConnectionException("Port {0} is already forwarded");
+			throw new RemoteConnectionException(Messages.RemoteToolsConnection_port_is_already_forwarded);
 		}
 		try {
 			IRemoteTunnel tunnel = fTargetControl.getExecutionManager().createTunnel(localPort, fwdAddress, fwdPort);
