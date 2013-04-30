@@ -57,8 +57,8 @@ public class Activator extends Plugin {
 	@Override
 	public void start(BundleContext bundleContext) throws Exception {
 		super.start(bundleContext);
-		DebugUtil.configurePluginDebugOptions();
 		plugin = this;
+		DebugUtil.configurePluginDebugOptions();
 	}
 
 	/*
