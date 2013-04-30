@@ -278,11 +278,21 @@ public class LocalConnection implements IRemoteConnection {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.remote.core.IRemoteConnection#removePortForwarding(int)
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#removeLocalPortForwarding(int)
 	 */
 	@Override
-	public void removePortForwarding(int port) throws RemoteConnectionException {
+	public void removeLocalPortForwarding(int port) throws RemoteConnectionException {
+		// Do nothing
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.remote.core.IRemoteConnection#removeRemotePortForwarding(int)
+	 */
+	@Override
+	public void removeRemotePortForwarding(int port) throws RemoteConnectionException {
 		// Do nothing
 	}
 

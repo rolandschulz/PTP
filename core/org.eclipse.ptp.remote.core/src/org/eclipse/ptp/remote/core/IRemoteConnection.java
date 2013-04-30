@@ -241,14 +241,24 @@ public interface IRemoteConnection {
 	public void removeConnectionChangeListener(IRemoteConnectionChangeListener listener);
 
 	/**
-	 * Remove the port forwarding associated with the given port.
+	 * Remove the local port forwarding associated with the given port.
 	 * 
 	 * @param port
 	 *            forwarded port
 	 * @throws RemoteConnectionException
-	 * @since 5.0
+	 * @since 7.0
 	 */
-	public void removePortForwarding(int port) throws RemoteConnectionException;
+	public void removeLocalPortForwarding(int port) throws RemoteConnectionException;
+
+	/**
+	 * Remove the remote port forwarding associated with the given port.
+	 * 
+	 * @param port
+	 *            forwarded port
+	 * @throws RemoteConnectionException
+	 * @since 7.0
+	 */
+	public void removeRemotePortForwarding(int port) throws RemoteConnectionException;
 
 	/**
 	 * Set the address for this connection

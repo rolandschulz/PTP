@@ -30,6 +30,7 @@ import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.core.exception.UnableToForwardPortException;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
 import org.eclipse.ptp.remotetools.core.IRemotePortForwarding;
+import org.eclipse.ptp.remotetools.core.IRemoteTunnel;
 import org.eclipse.ptp.remotetools.environment.EnvironmentPlugin;
 import org.eclipse.ptp.remotetools.environment.control.ITargetControl;
 import org.eclipse.ptp.remotetools.environment.control.ITargetStatus;
@@ -45,9 +46,10 @@ import org.eclipse.ptp.remotetools.exception.PortForwardingException;
  * @since 5.0
  */
 public class RemoteToolsConnection implements IRemoteConnection {
-	private String fWorkingDir = null;
-	private Map<String, String> fEnv = null;
-	private Map<String, String> fProperties = null;
+	private String fWorkingDir;
+	private Map<String, String> fEnv;
+	private Map<String, String> fProperties;
+	private Map<Integer, IRemoteTunnel> fTunnels;
 
 	private final String fConnName;
 	private final IRemoteServices fRemoteServices;
@@ -151,8 +153,12 @@ public class RemoteToolsConnection implements IRemoteConnection {
 		if (!isOpen()) {
 			throw new RemoteConnectionException(Messages.RemoteToolsConnection_connectionNotOpen);
 		}
+		if (fTunnels.get(Integer.valueOf(localPort)) != null) {
+			throw new RemoteConnectionException("Port {0} is already forwarded");
+		}
 		try {
-			fTargetControl.getExecutionManager().createTunnel(localPort, fwdAddress, fwdPort);
+			IRemoteTunnel tunnel = fTargetControl.getExecutionManager().createTunnel(localPort, fwdAddress, fwdPort);
+			fTunnels.put(Integer.valueOf(localPort), tunnel);
 		} catch (LocalPortBoundException e) {
 			throw new AddressInUseException(e.getMessage());
 		} catch (org.eclipse.ptp.remotetools.exception.RemoteConnectionException e) {
@@ -439,9 +445,30 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#removePortForwarding(int)
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#removeLocalPortForwarding(int)
 	 */
-	public void removePortForwarding(int port) throws RemoteConnectionException {
+	public void removeLocalPortForwarding(int port) throws RemoteConnectionException {
+		if (!isOpen()) {
+			throw new RemoteConnectionException(Messages.RemoteToolsConnection_connectionNotOpen);
+		}
+		Integer portToRemove = Integer.valueOf(port);
+		IRemoteTunnel tunnel = fTunnels.get(portToRemove);
+		if (tunnel != null) {
+			try {
+				fTargetControl.getExecutionManager().releaseTunnel(tunnel);
+				fTunnels.remove(portToRemove);
+			} catch (Exception e) {
+				throw new RemoteConnectionException(e.getMessage());
+			}
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#removeRemotePortForwarding(int)
+	 */
+	public void removeRemotePortForwarding(int port) throws RemoteConnectionException {
 		if (!isOpen()) {
 			throw new RemoteConnectionException(Messages.RemoteToolsConnection_connectionNotOpen);
 		}

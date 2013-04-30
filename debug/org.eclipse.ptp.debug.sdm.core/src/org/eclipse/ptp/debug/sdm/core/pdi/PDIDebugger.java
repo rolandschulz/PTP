@@ -855,7 +855,7 @@ public class PDIDebugger extends ProxyDebugClient implements IPDIDebugger {
 			 */
 			if (fForwardedPort >= 0 && fRemoteConnection != null) {
 				try {
-					fRemoteConnection.removePortForwarding(fForwardedPort);
+					fRemoteConnection.removeRemotePortForwarding(fForwardedPort);
 				} catch (RemoteConnectionException e) {
 					SDMDebugCorePlugin
 							.getDefault()
