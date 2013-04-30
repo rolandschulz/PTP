@@ -11,6 +11,9 @@
 package org.eclipse.ptp.remote.core;
 
 /**
+ * Abstract base class for remote services. Implementors can use this class to provide a default implementation of a remote
+ * services provider.
+ * 
  * @since 5.0
  */
 public abstract class AbstractRemoteServices implements IRemoteServices {
@@ -28,6 +31,7 @@ public abstract class AbstractRemoteServices implements IRemoteServices {
 	 * org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#canCreateConnections
 	 * ()
 	 */
+	@Override
 	public boolean canCreateConnections() {
 		return fDescriptor.canCreateConnections();
 	}
@@ -37,6 +41,7 @@ public abstract class AbstractRemoteServices implements IRemoteServices {
 	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getId()
 	 */
+	@Override
 	public String getId() {
 		return fDescriptor.getId();
 	}
@@ -46,6 +51,7 @@ public abstract class AbstractRemoteServices implements IRemoteServices {
 	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getName()
 	 */
+	@Override
 	public String getName() {
 		return fDescriptor.getName();
 	}
@@ -55,6 +61,7 @@ public abstract class AbstractRemoteServices implements IRemoteServices {
 	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteServicesDescriptor#getScheme()
 	 */
+	@Override
 	public String getScheme() {
 		return fDescriptor.getScheme();
 	}

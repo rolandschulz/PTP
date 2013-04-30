@@ -14,9 +14,12 @@ import java.net.URI;
 
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
+/**
+ * Interface for managing connections to remote systems.
+ */
 public interface IRemoteConnectionManager {
 	/**
-	 * The name of the connection for the local services
+	 * The name of the connection for local services. There is only one connection for local services.
 	 * 
 	 * @since 7.0
 	 */

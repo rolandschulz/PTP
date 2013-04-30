@@ -13,6 +13,10 @@ package org.eclipse.ptp.remote.ui;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.swt.widgets.Shell;
 
+/**
+ * Interface for providing file management operations in the UI. Clients can call these methods to open generic dialogs for
+ * operations on remote resources.
+ */
 public interface IRemoteUIFileManager {
 	/**
 	 * Browse for a remote directory. The return value is the path of the
@@ -32,8 +36,7 @@ public interface IRemoteUIFileManager {
 	 * @return the path to the directory relative to the remote system or null
 	 *         if the browser was cancelled
 	 */
-	public String browseDirectory(Shell shell, String message,
-			String initialPath, int flags);
+	public String browseDirectory(Shell shell, String message, String initialPath, int flags);
 
 	/**
 	 * Browse for a remote file. The return value is the path of the file <i>on
@@ -54,8 +57,7 @@ public interface IRemoteUIFileManager {
 	 *         browser was cancelled
 	 */
 
-	public String browseFile(Shell shell, String message, String initialPath,
-			int flags);
+	public String browseFile(Shell shell, String message, String initialPath, int flags);
 
 	/**
 	 * Browse for a set of remote files. The return value is an array of paths
@@ -75,8 +77,7 @@ public interface IRemoteUIFileManager {
 	 * @return the path to the file relative to the remote system or null if the
 	 *         browser was cancelled
 	 */
-	public String[] browseFiles(Shell shell, String message,
-			String initialPath, int flags);
+	public String[] browseFiles(Shell shell, String message, String initialPath, int flags);
 
 	/**
 	 * Get the last connection that was selected in the browser.

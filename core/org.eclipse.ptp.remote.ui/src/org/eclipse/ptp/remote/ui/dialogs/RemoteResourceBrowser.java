@@ -367,7 +367,7 @@ public class RemoteResourceBrowser extends Dialog {
 	 * 
 	 * @param cwd
 	 * @param initialPath
-	 * @return
+	 * @return initial path
 	 */
 	private IPath findInitialPath(String cwd, String initialPath) {
 		if (initialPath != null) {
@@ -443,7 +443,7 @@ public class RemoteResourceBrowser extends Dialog {
 	/**
 	 * Set the dialogTitle of the dialog.
 	 * 
-	 * @param dialogTitle
+	 * @param title
 	 */
 	public void setTitle(String title) {
 		dialogTitle = title;

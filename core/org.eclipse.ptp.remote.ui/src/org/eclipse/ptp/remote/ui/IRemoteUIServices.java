@@ -10,6 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.ui;
 
+/**
+ * Abstraction of a UI remote services provider. Clients obtain this interface using one of the static methods in
+ * {@link RemoteUIServices}. The methods on this interface can then be used to access the full range of UI services provided.
+ */
 public interface IRemoteUIServices extends IRemoteUIServicesDescriptor {
 	/**
 	 * Get a UI connection manager for managing connections
@@ -17,7 +21,7 @@ public interface IRemoteUIServices extends IRemoteUIServicesDescriptor {
 	 * @return UI connection manager or null if no connection manager operations are supported
 	 */
 	public IRemoteUIConnectionManager getUIConnectionManager();
-	
+
 	/**
 	 * Get a UI file manager for managing remote files.
 	 * 

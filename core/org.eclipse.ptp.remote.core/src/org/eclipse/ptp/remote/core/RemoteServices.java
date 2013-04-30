@@ -18,7 +18,7 @@ import org.eclipse.ptp.internal.remote.core.RemoteServicesProxy;
 import org.eclipse.ptp.internal.remote.core.services.local.LocalServices;
 
 /**
- * Main entry point for remote services
+ * Main entry point for accessing remote services.
  * 
  * @since 7.0
  */

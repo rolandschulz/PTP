@@ -17,8 +17,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
- * Interface to a remote resource. There are currently two types of remote resources: fully remote and synchronized. This interface
- * provides a common mechanism for accessing resource information from either type.
+ * Abstraction of a remote resource. There are currently two types of remote resources: fully remote and synchronized. This
+ * interface provides a common mechanism for accessing resource information from either type.
  * 
  * Usage:
  * 

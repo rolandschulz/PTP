@@ -13,6 +13,9 @@ package org.eclipse.ptp.remote.core;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+/**
+ * Abstract base class for remote processes. Implementors can use this class to provide a default remote process implementation.
+ */
 public abstract class AbstractRemoteProcess extends Process implements IRemoteProcess {
 	/*
 	 * (non-Javadoc)

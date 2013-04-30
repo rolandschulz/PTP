@@ -10,8 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.ui;
 
-
-
+/**
+ * Interface representing a remote UI services provider extension. Clients can use this to find out information about the extension
+ * without loading it.
+ */
 public interface IRemoteUIServicesDescriptor {
 	/**
 	 * Get unique ID of this service. Can be used as a lookup key.
@@ -19,7 +21,7 @@ public interface IRemoteUIServicesDescriptor {
 	 * @return unique ID
 	 */
 	public String getId();
-	
+
 	/**
 	 * Get display name of this service.
 	 * 

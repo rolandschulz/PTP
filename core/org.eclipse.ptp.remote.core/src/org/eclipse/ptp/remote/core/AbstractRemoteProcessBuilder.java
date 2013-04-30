@@ -18,6 +18,9 @@ import java.util.Map;
 import org.eclipse.core.filesystem.IFileStore;
 
 /**
+ * Abstract base class for remote process builders. Implementors can use this class to provide a default implementation of a remote
+ * process builder.
+ * 
  * @since 5.0
  */
 public abstract class AbstractRemoteProcessBuilder implements IRemoteProcessBuilder {

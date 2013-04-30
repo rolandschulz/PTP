@@ -10,17 +10,20 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.ui;
 
+/**
+ * Constants use by UI operations.
+ */
 public interface IRemoteUIConstants {
 	/**
 	 * A constant indicating that no bits are set.
 	 */
 	public static int NONE = 0;
-	
+
 	/**
 	 * A constant used to indicate a dialog used for opening files.
 	 */
 	public static int OPEN = 1 << 1;
-	
+
 	/**
 	 * A constant used to indicate a dialog should be used for saving files.
 	 */

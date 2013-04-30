@@ -90,7 +90,7 @@ public interface IUserAuthenticator {
 	 *            the destination in the format like username@hostname:port
 	 * @param name
 	 *            a name for this dialog
-	 * @param instruction
+	 * @param message
 	 *            the message to be displayed to the user
 	 * @param prompt
 	 *            labels for each of the text fields.

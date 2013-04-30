@@ -30,7 +30,6 @@ import org.eclipse.dstore.extra.IDomainListener;
 import org.eclipse.ptp.internal.remote.rse.core.messages.Messages;
 import org.eclipse.ptp.internal.remote.rse.core.miners.SpawnerMiner;
 import org.eclipse.ptp.remote.core.AbstractRemoteProcess;
-import org.eclipse.ptp.remote.core.NullInputStream;
 import org.eclipse.rse.internal.services.local.shells.LocalHostShell;
 import org.eclipse.rse.services.shells.HostShellOutputStream;
 import org.eclipse.rse.services.shells.IHostOutput;
@@ -52,28 +51,29 @@ public class RSEProcess extends AbstractRemoteProcess implements IHostShellOutpu
 	private String fSpawnErrorMessage;
 	private boolean fErrorReported = false;
 	private int fIndex = 0;
-	
-	private IDomainListener fDomainListener = new IDomainListener() {
-		
+
+	private final IDomainListener fDomainListener = new IDomainListener() {
 
 		public boolean listeningTo(DomainEvent e) {
 			return e.getParent() == fStatus;
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see org.eclipse.dstore.extra.IDomainListener#domainChanged(org.eclipse.dstore.extra.DomainEvent)
 		 * 
 		 * Listens for events indicating that the data elements hanging off the status object have changed.
 		 * We then look through any new events for elements of our special error type.
 		 * 
 		 * The reason we have the listener in addition to the check when we look for errors to report is that
-		 * this way, we process events as they happen.  Otherwise when you go to report errors, it would have
+		 * this way, we process events as they happen. Otherwise when you go to report errors, it would have
 		 * to loop through all the data elements right then and there, which could be costly if there were a lot
-		 * of them.  This way we keep up to date as time goes on and there is not a big delay in reporting
+		 * of them. This way we keep up to date as time goes on and there is not a big delay in reporting
 		 * errors to the user.
 		 */
 		public synchronized void domainChanged(DomainEvent e) {
-			
+
 			if (!fSpawnErrorFound) {
 
 				// troll through any new nested items, looking for launch errors
@@ -84,7 +84,7 @@ public class RSEProcess extends AbstractRemoteProcess implements IHostShellOutpu
 
 					if (type.equals(SpawnerMiner.SPAWN_ERROR)) {
 						// there was an error launching the command... spit an error message
-						// out to stdout.  We don't output it to stderr as then it might
+						// out to stdout. We don't output it to stderr as then it might
 						// get interleaved with output from the remote side.
 						String command = element.getName();
 						final String message = Messages.bind(Messages.RSEProcess_0, command);
@@ -97,13 +97,23 @@ public class RSEProcess extends AbstractRemoteProcess implements IHostShellOutpu
 					}
 				}
 			}
-			
+
 		}
-			
+
 	};
 
+	public class NullInputStream extends InputStream {
+		@Override
+		public int read() throws IOException {
+			return -1;
+		}
 
-	@SuppressWarnings("restriction")
+		@Override
+		public int available() {
+			return 0;
+		}
+	}
+
 	public RSEProcess(IHostShell hostShell, boolean mergeOutput) throws IOException {
 		this.hostShell = hostShell;
 		this.mergeOutput = mergeOutput;
@@ -118,24 +128,25 @@ public class RSEProcess extends AbstractRemoteProcess implements IHostShellOutpu
 		inputStream = new PipedInputStream(hostShellInput);
 		outputStream = new HostShellOutputStream(hostShell);
 		this.hostShell.getStandardOutputReader().addOutputListener(this);
-		
-		if(this.hostShell.getStandardErrorReader() != null)
+
+		if (this.hostShell.getStandardErrorReader() != null) {
 			this.hostShell.getStandardErrorReader().addOutputListener(this);
-		
-		if(hostShell instanceof DStoreHostShell) {
+		}
+
+		if (hostShell instanceof DStoreHostShell) {
 			fStatus = ((DStoreHostShell) hostShell).getStatus();
 		}
-		
-		else if(hostShell instanceof org.eclipse.rse.internal.services.dstore.shells.DStoreHostShell) {
+
+		else if (hostShell instanceof org.eclipse.rse.internal.services.dstore.shells.DStoreHostShell) {
 			fStatus = ((org.eclipse.rse.internal.services.dstore.shells.DStoreHostShell) hostShell).getStatus();
 		}
-		
+
 		else if (hostShell instanceof LocalHostShell) {
 			fStatus = null;
 		}
-		
-		if(fStatus != null) {
-			fStatus.getDataStore().getDomainNotifier().addDomainListener(fDomainListener );
+
+		if (fStatus != null) {
+			fStatus.getDataStore().getDomainNotifier().addDomainListener(fDomainListener);
 		}
 	}
 
@@ -244,7 +255,7 @@ public class RSEProcess extends AbstractRemoteProcess implements IHostShellOutpu
 
 	private void reportSpawnError() throws IOException {
 		// always look for errors that haven't been found yet, otherwise we might exit
-		// before they are found		
+		// before they are found
 		synchronized (fDomainListener) {
 			if (!fSpawnErrorFound) {
 
@@ -269,7 +280,7 @@ public class RSEProcess extends AbstractRemoteProcess implements IHostShellOutpu
 				}
 			}
 		}
-		
+
 		synchronized (hostShellInput) {
 			if (fSpawnErrorFound && !fErrorReported) {
 				hostShellInput.write(fSpawnErrorMessage.getBytes());
@@ -317,8 +328,8 @@ public class RSEProcess extends AbstractRemoteProcess implements IHostShellOutpu
 			return;
 		}
 		try {
-			for (int i = 0; i < input.length; i++) {
-				outputStream.write(input[i].getString().getBytes());
+			for (IHostOutput element : input) {
+				outputStream.write(element.getString().getBytes());
 				outputStream.write('\n');
 				outputStream.flush();
 			}

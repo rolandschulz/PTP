@@ -11,6 +11,9 @@
 
 package org.eclipse.ptp.remote.core.exception;
 
+/**
+ * Exception thrown when an attempt is made to use a privileged port.
+ */
 public class PrivilegedPortException extends RemoteConnectionException {
 	private static final long serialVersionUID = -7794871221470179956L;
 

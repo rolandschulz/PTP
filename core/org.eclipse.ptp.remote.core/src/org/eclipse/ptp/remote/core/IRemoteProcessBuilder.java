@@ -16,6 +16,10 @@ import java.util.Map;
 
 import org.eclipse.core.filesystem.IFileStore;
 
+/**
+ * Abstraction of a process builder for remote processes. This interface behaves in the same manner as
+ * {@link java.lang.ProcessBuilder}.
+ */
 public interface IRemoteProcessBuilder {
 	/**
 	 * @since 5.0

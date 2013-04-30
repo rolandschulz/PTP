@@ -11,6 +11,9 @@
 
 package org.eclipse.ptp.remote.core.exception;
 
+/**
+ * Exception thrown when a remote connection error occurs.
+ */
 public class RemoteConnectionException extends Exception {
 	private static final long serialVersionUID = -7794871221470179956L;
 

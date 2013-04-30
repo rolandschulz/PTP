@@ -26,6 +26,8 @@ import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.swt.widgets.Shell;
 
 /**
+ * Abstract base class for providing UI connection manager services.
+ * 
  * @since 7.0
  */
 public abstract class AbstractRemoteUIConnectionManager implements IRemoteUIConnectionManager {

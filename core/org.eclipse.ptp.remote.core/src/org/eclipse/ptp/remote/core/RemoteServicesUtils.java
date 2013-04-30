@@ -23,7 +23,7 @@ import org.eclipse.ptp.internal.remote.core.RemoteServicesProxy;
 import org.eclipse.ptp.internal.remote.core.preferences.Preferences;
 
 /**
- * Remote services utility methods
+ * Remote services utility methods.
  * 
  * @since 7.0
  */

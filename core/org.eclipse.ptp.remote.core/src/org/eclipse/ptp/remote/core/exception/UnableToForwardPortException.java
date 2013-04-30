@@ -11,6 +11,9 @@
 
 package org.eclipse.ptp.remote.core.exception;
 
+/**
+ * Exception thrown when a port is unable to be forwarded.
+ */
 public class UnableToForwardPortException extends RemoteConnectionException {
 	/**
 	 * 

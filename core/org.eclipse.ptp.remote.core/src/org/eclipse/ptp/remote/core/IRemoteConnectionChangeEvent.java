@@ -10,17 +10,21 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.core;
 
-public interface IRemoteConnectionChangeEvent {	
+/**
+ * Event representing a change in connection status. The {@link #getType()} method can be used to obtain information about the type
+ * of event that occurred.
+ */
+public interface IRemoteConnectionChangeEvent {
 	/**
 	 * Event indicating that the connection was closed.
 	 */
 	public static final int CONNECTION_CLOSED = 1 << 0;
-	
+
 	/**
 	 * Event indicating that the connection was opened.
 	 */
 	public static final int CONNECTION_OPENED = 1 << 1;
-	
+
 	/**
 	 * Event indicating that the connection was closed abnormally.
 	 */
@@ -37,16 +41,13 @@ public interface IRemoteConnectionChangeEvent {
 	 * @return IRemoteConnection
 	 */
 	public IRemoteConnection getConnection();
-	
+
 	/**
 	 * Returns the type of event being reported. This type
 	 * is obtained by bitwise OR'ing the event types together.
 	 * 
-	 * {@link #CONNECTION_CLOSED}
-	 * {@link #CONNECTION_OPENED}
-	 * {@link #CONNECTION_ABORTED}
-	 * {@link #CONNECTION_RENAMED}
-	 *
+	 * {@link #CONNECTION_CLOSED} {@link #CONNECTION_OPENED} {@link #CONNECTION_ABORTED} {@link #CONNECTION_RENAMED}
+	 * 
 	 * @return a bitwise OR of event type constants
 	 */
 	public int getType();

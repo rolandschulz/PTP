@@ -15,6 +15,11 @@ import java.util.Map;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
+/**
+ * Abstraction of a connection to a remote system. Clients should use the set methods to provide information on the remote system,
+ * then call the {{@link #open(IProgressMonitor)} method. Once the connection is completed, call the {@link #close()} method to
+ * terminate the connection.
+ */
 public interface IRemoteConnection {
 	public final static String OS_NAME_PROPERTY = "os.name"; //$NON-NLS-1$
 	public final static String OS_VERSION_PROPERTY = "os.version"; //$NON-NLS-1$

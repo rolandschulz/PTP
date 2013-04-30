@@ -10,6 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.core;
 
+/**
+ * Interface representing a remote services provider extension. Clients can use this to find out information about the extension
+ * without loading it.
+ */
 public interface IRemoteServicesDescriptor {
 	/**
 	 * Test if this provider can create connections.

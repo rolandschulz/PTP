@@ -14,19 +14,22 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * Adapts an IRemoteProcess to a java.lang.Process
+ * Utility class to adapt an IRemoteProcess to a java.lang.Process
+ * 
  * @author crecoskie
- *
+ * 
  */
 public class RemoteProcessAdapter extends Process {
 
-	private IRemoteProcess fProcess;
-	
+	private final IRemoteProcess fProcess;
+
 	public RemoteProcessAdapter(IRemoteProcess process) {
 		fProcess = process;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Process#destroy()
 	 */
 	@Override
@@ -35,7 +38,9 @@ public class RemoteProcessAdapter extends Process {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Process#exitValue()
 	 */
 	@Override
@@ -43,7 +48,9 @@ public class RemoteProcessAdapter extends Process {
 		return fProcess.exitValue();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Process#getErrorStream()
 	 */
 	@Override
@@ -51,7 +58,9 @@ public class RemoteProcessAdapter extends Process {
 		return fProcess.getErrorStream();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Process#getInputStream()
 	 */
 	@Override
@@ -59,7 +68,9 @@ public class RemoteProcessAdapter extends Process {
 		return fProcess.getInputStream();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Process#getOutputStream()
 	 */
 	@Override
@@ -67,7 +78,9 @@ public class RemoteProcessAdapter extends Process {
 		return fProcess.getOutputStream();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Process#waitFor()
 	 */
 	@Override

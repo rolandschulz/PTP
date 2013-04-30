@@ -15,6 +15,9 @@ import java.net.URI;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IPath;
 
+/**
+ * Interface for managing resources on a remote system.
+ */
 public interface IRemoteFileManager {
 	/**
 	 * Get the resource associated with path. IFileStore can then be used to

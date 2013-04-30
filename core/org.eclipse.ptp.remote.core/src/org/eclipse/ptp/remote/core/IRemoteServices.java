@@ -15,6 +15,10 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
+/**
+ * Abstraction of a remote services provider. Clients obtain this interface using one of the static methods in
+ * {@link RemoteServices}. The methods on this interface can then be used to access the full range of remote services provided.
+ */
 public interface IRemoteServices extends IRemoteServicesDescriptor {
 	/**
 	 * Get a connection manager for managing remote connections.

@@ -17,7 +17,6 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 
 import org.eclipse.ptp.remote.core.AbstractRemoteProcess;
-import org.eclipse.ptp.remote.core.NullInputStream;
 
 public class RemoteToolsProcess extends AbstractRemoteProcess {
 	private static int refCount = 0;
@@ -62,6 +61,18 @@ public class RemoteToolsProcess extends AbstractRemoteProcess {
 					}
 				}
 			}
+		}
+	}
+
+	private class NullInputStream extends InputStream {
+		@Override
+		public int read() throws IOException {
+			return -1;
+		}
+
+		@Override
+		public int available() {
+			return 0;
 		}
 	}
 

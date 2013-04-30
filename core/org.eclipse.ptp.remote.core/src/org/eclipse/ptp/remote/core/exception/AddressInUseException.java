@@ -11,6 +11,10 @@
 
 package org.eclipse.ptp.remote.core.exception;
 
+/**
+ * Exception thrown when a connection address is already in use.
+ * 
+ */
 public class AddressInUseException extends RemoteConnectionException {
 	private static final long serialVersionUID = 1771839754428411610L;
 

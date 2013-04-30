@@ -12,9 +12,14 @@ package org.eclipse.ptp.remote.ui;
 
 import org.eclipse.ptp.remote.core.IRemoteServices;
 
+/**
+ * Factory for creating instances of a remote UI service provider. Implementors must provide a class implementing this interface
+ * when supplying a new remote UI services provider extension.
+ */
 public interface IRemoteUIServicesFactory {
 	/**
-	 * @param services remote services
+	 * @param services
+	 *            remote services
 	 * @return remote services delegate
 	 */
 	public IRemoteUIServices getServices(IRemoteServices services);

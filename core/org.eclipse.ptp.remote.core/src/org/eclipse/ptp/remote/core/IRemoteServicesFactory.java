@@ -10,11 +10,16 @@
  *******************************************************************************/
 package org.eclipse.ptp.remote.core;
 
+/**
+ * Factory for creating instances of a remote service provider. Implementors must provide a class implementing this interface when
+ * supplying a new remote services provider extension.
+ */
 public interface IRemoteServicesFactory {
 	/**
 	 * Return the remote services implementation for the given descriptor
 	 * 
-	 * @param descriptor descriptor for the remote services
+	 * @param descriptor
+	 *            descriptor for the remote services
 	 * @return the remote services implementation, or null if initialization failed
 	 */
 	public IRemoteServices getServices(IRemoteServicesDescriptor descriptor);

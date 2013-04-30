@@ -29,6 +29,8 @@ import org.eclipse.ptp.remote.core.RemoteServices;
 import org.eclipse.ui.PlatformUI;
 
 /**
+ * Main entry point for accessing remote UI services.
+ * 
  * @since 7.0
  */
 public class RemoteUIServices {

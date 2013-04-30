@@ -14,6 +14,10 @@ import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.swt.widgets.Shell;
 
+/**
+ * Interface for providing connection management operations in the UI. Clients can call these methods to open generic dialogs for
+ * operations on connections.
+ */
 public interface IRemoteUIConnectionManager {
 	/**
 	 * @since 5.0
