@@ -5,22 +5,16 @@
 <!-- ============================================================================= -->
 <toc label="Reference">
 	
-	<topic label="API Reference" href="provisional_api.html">
+	<topic label="API Reference" href="reference/api/overview-summary.html">
 		<topic label="org.eclipse.ptp.core" href="reference/api/org/eclipse/ptp/core/package-summary.html" />
-		<topic label="org.eclipse.ptp.ui" href="reference/api/org/eclipse/ptp/ui/package-summary.html" />
-	    <topic label="org.eclipse.ptp.debug.core" href="reference/api/org/eclipse/ptp/debug/core/package-summary.html" />
-	    <topic label="org.eclipse.ptp.debug.core.pdi" href="reference/api/org/eclipse/ptp/debug/core/pdi/package-summary.html" />
-	    <topic label="org.eclipse.ptp.debug.ui" href="reference/api/org/eclipse/ptp/debug/ui/package-summary.html" />
 		<topic label="org.eclipse.ptp.launch" href="reference/api/org/eclipse/ptp/launch/package-summary.html" />
 		<topic label="org.eclipse.ptp.remote.core" href="reference/api/org/eclipse/ptp/remote/core/package-summary.html" />
 		<topic label="org.eclipse.ptp.remote.ui" href="reference/api/org/eclipse/ptp/remote/ui/package-summary.html" />
-	    <topic label="org.eclipse.ptp.rm.core" href="reference/api/org/eclipse/ptp/rm/core/package-summary.html" />
-      	<topic label="org.eclipse.ptp.rm.ui" href="reference/api/org/eclipse/ptp/rm/ui/package-summary.html" />
 		<topic label="org.eclipse.ptp.services.core" href="reference/api/org/eclipse/ptp/services/core/package-summary.html" />
 		<topic label="org.eclipse.ptp.services.ui" href="reference/api/org/eclipse/ptp/services/ui/package-summary.html" />
 	</topic>
 	
-	<topic label="Extension Points Reference" href="provisional_api.html">
+	<topic label="Extension Points Reference" href="reference/extension-points/index.html">
 		<topic label="org_eclipse_ptp_core_resourceManagers.html" href="reference/extension-points/org_eclipse_ptp_core_resourceManagers" />
 		<topic label="org_eclipse_ptp_core_runtimeSystems.html" href="reference/extension-points/org_eclipse_ptp_core_runtimeSystems" />
 		<topic label="org_eclipse_ptp_debug_core_parallelDebuggers.html" href="reference/extension-points/org_eclipse_ptp_debug_core_parallelDebuggers" />

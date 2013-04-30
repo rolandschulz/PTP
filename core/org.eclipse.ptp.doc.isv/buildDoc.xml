@@ -1,23 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="PTP ISV Doc Build" default="all" basedir=".">
-
-	<property name="javadoc.link.location" value="${basedir}/javadoc.link.location"/>
-
 	<target name="init">
-		<available file="${basedir}/index" property="index.present" />
-		<path id="path_bootclasspath">
-			<fileset dir="${java.home}/lib">
-				<include name="*.jar"/>
-			</fileset>
-		</path>
-		<property name="bootclasspath" refid="path_bootclasspath"/>
-		<condition property="safeBaseLocation"
-			value="${baseLocation}"
-			else="${eclipse.home}">
-			<isset property="baseLocation"/>
-		</condition>
-		<delete dir="${javadoc.link.location}" />
+		<available file="${basedir}/index" property="index.present"/>
 	</target>
+
+	<target name="all" depends="init" unless="index.present">
+		<antcall target="convertSchemaToHtml" />
+		<antcall target="generateJavadoc" />
+		<antcall target="build.index" />
+	</target>
+
+
+	<target name="build.index" description="Builds search index for the plug-in: org.eclipse.platform.doc.isv" if="eclipse.running">
+		<help.buildHelpIndex manifest="${basedir}/plugin.xml" destination="${basedir}"/>
+	</target>
+	
+	<property name="javadoc.link.location" value="${basedir}/javadoc.link.location"/>
 
 	<target name="computeClasspath" unless="javadoc.classpath">
 		<!-- Construct the javadoc classpath and store it in a property. -->
@@ -60,7 +58,7 @@
 			
 		<pathconvert property="javadoc.classpath">
 			<path>				
-				<fileset dir="${safeBaseLocation}">
+				<fileset dir="${baseLocation}">
 					<patternset refid="platform.classpath.pattern"/>
 		    	</fileset>
 			</path>
@@ -86,28 +84,15 @@
 		</unzip>
 	</target>
 
-	<target name="all" depends="init" unless="index.present">
-		<antcall target="convertSchemaToHtml" />
-		<antcall target="generateJavadoc" />
-		<antcall target="build.index" />
-	</target>
-
-	<target name="build.index" description="Builds search index for the plug-in: org.eclipse.rse.doc.isv" if="eclipse.running">
-		<help.buildHelpIndex manifest="${basedir}/plugin.xml" destination="${basedir}" />
-	</target>
-
 	<target name="convertSchemaToHtml" if="eclipse.running">
 		<property name="dest" value="reference/extension-points" />
 		<record name="${basedir}/temp.convert.txt" action="start" />
 		<pde.convertSchemaToHTML manifest="../org.eclipse.ptp.core/plugin.xml" destination="${dest}" />
-		<pde.convertSchemaToHTML manifest="../org.eclipse.ptp.debug.core/plugin.xml" destination="${dest}" />
-		<pde.convertSchemaToHTML manifest="../org.eclipse.ptp.debug.ui/plugin.xml" destination="${dest}" />
 		<pde.convertSchemaToHTML manifest="../org.eclipse.ptp.launch/plugin.xml" destination="${dest}" />
 		<pde.convertSchemaToHTML manifest="../org.eclipse.ptp.remote.core/plugin.xml" destination="${dest}" />
 		<pde.convertSchemaToHTML manifest="../org.eclipse.ptp.remote.ui/plugin.xml" destination="${dest}" />
 		<pde.convertSchemaToHTML manifest="../org.eclipse.ptp.services.core/plugin.xml" destination="${dest}" />
 		<pde.convertSchemaToHTML manifest="../org.eclipse.ptp.services.ui/plugin.xml" destination="${dest}" />
-		<pde.convertSchemaToHTML manifest="../org.eclipse.ptp.ui/plugin.xml" destination="${dest}" />
 		<record name="${basedir}/temp.convert.txt" action="stop" />
 	</target>
 
@@ -116,24 +101,16 @@
 		<available file="${java.home}/../bin/javadoc" property="javadoc" value="${java.home}/../bin/javadoc" />
 	</target>
 
-	<target name="generateJavadoc" depends="getJavadocPath,extractLinks,computeClasspath" if="javadoc">
+	<!--target name="generateJavadoc" depends="getJavadocPath,extractLinks,computeClasspath" if="javadoc">
 		<property name="optionsFile" value="temp.options.txt" />
 		<copy file="options.txt" tofile="${optionsFile}" overwrite="true" />
 		
-		<condition property="argsListDelimiter" value=":">
-			<os family="unix" />
-		</condition>
-		<condition property="argsListDelimiter" value=";">
-			<os family="windows" />
-		</condition>
-
 		<replaceregexp file="${basedir}/${optionsFile}" flags="g" match="(\r\n?|\n);" replace="${argsListDelimiter}" />
 		<replace file="${basedir}/${optionsFile}" token="@rt@" value="${bootclasspath}" />
 		<replace file="${basedir}/${optionsFile}" token="@cp@" value="${javadoc.classpath}" />
 		<replace file="${basedir}/${optionsFile}" token="@baseLocation@" value="${safeBaseLocation}" />
 		<replace file="${basedir}/${optionsFile}" token="@javadoc.link.location@" value="${javadoc.link.location}" />
 
-		<!--scrub isv plugin directories of any preexisting api doc content-->
 		<delete dir="reference/api" />
 		<mkdir dir="reference/api" />
 
@@ -143,20 +120,59 @@
 			<arg line="@${basedir}/${optionsFile} -J-Xmx1000M" />
 		</exec>
 		<echo message="javadoc result = ${javadocResult}"/>
+	</target-->
+	
+	<target name="generateJavadoc" depends="getJavadocPath,computeClasspath">
+		<property name="javadoc16" value="${javadoc}" />
+
+		<!-- replace "\n;" with platform-dependent list entry delimiter -->
+		<property name="optionsFile" value="options.tmp.txt" />
+		<copy file="options.txt" tofile="${optionsFile}" overwrite="true">
+			<filterchain>
+				<expandproperties/>
+			</filterchain>
+		</copy>
+		
+		<condition property="argsListDelimiter" value=":">
+			<os family="unix" />
+		</condition>
+		<condition property="argsListDelimiter" value=";">
+			<os family="windows" />
+		</condition>
+		
+		<replaceregexp file="${basedir}/${optionsFile}" flags="g" match="(\r\n?|\n);" replace="${argsListDelimiter}" />
+		<replace file="${basedir}/${optionsFile}" token="@rt@" value="${bootclasspath}" />
+		<replace file="${basedir}/${optionsFile}" token="@cp@" value="${javadoc.classpath}" />
+
+		<!--scrub isv plugin directories of any preexisting api doc content-->
+		<delete dir="reference/api"/>
+		<mkdir dir="reference/api"/>
+
+		<exec dir="." executable="${javadoc16}" output="doc.bin.log">
+			<arg line="@${basedir}/${optionsFile} -J-Xmx1000M" />
+		</exec>
+		
+<!-- Debugging: Add a snapshot of the workspace contents: 
+		<fileset dir="${basedir}/.." id="fileSet">
+			<include name="*"/>
+			<include name="*/*"/>
+		</fileset>
+		<dirset dir="${basedir}/.." id="dirSet">
+			<include name="*"/>
+			<include name="*/*"/>
+		</dirset>
+		<pathconvert property="fileList" refid="fileSet" dirsep="/" pathsep="&#xA;"/>
+		<pathconvert property="dirList" refid="dirSet" dirsep="/" pathsep="&#xA;"/>
+		<echo file="doc.bin.log" append="true">
+Content of ${basedir}/..:
+Files:
+${fileList}
+Directories:
+${dirList}
+</echo>
+-->
 	</target>
-
 </project>
-
-
-
-
-
-
-
-
-
-
-
 
 
 
