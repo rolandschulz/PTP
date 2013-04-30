@@ -140,8 +140,12 @@ public class ETFWParentLaunchConfigurationTab extends JAXBControllerLaunchConfig
 						} else if (attType.equals("string")) { //$NON-NLS-1$
 							configuration.setAttribute(attribute, value.toString());
 						} else if (attType.equals("integer")) { //$NON-NLS-1$
-							int val = new Integer(value.toString());
-							configuration.setAttribute(attribute, val);
+							if (value.toString().length() > 0) {
+								int val = new Integer(value.toString());
+								configuration.setAttribute(attribute, val);
+							} else {
+								configuration.setAttribute(attribute, value.toString());
+							}
 						} else {
 							configuration.setAttribute(attribute, value.toString());
 						}
