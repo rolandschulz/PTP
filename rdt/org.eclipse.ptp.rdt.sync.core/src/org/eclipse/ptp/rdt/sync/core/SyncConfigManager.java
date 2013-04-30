@@ -444,6 +444,8 @@ public class SyncConfigManager {
 	 * @param project
 	 * @throws CoreException
 	 */
+	// TODO: Change method, maybe to use preference nodes, as this will fail once we have more than a few configs.
+	// (project.setPersistentProperty() will only work for strings less than 2k in length)
 	public static void saveConfigs(IProject project) throws CoreException {
 		Map<String, SyncConfig> projConfigs = fSyncConfigMap.get(project);
 		if (projConfigs != null) {

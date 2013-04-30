@@ -6,7 +6,7 @@
       <synchronizeService
             class="org.eclipse.ptp.internal.rdt.sync.git.core.GitSyncService"
             id="org.eclipse.ptp.rdt.sync.git.core.synchronizeService"
-            name="GIT">
+            name="Git">
       </synchronizeService>
    </extension>
 

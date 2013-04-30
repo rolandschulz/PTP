@@ -56,7 +56,10 @@ public class SynchronizeProperties extends AbstractSynchronizeProperties {
 
 	@Override
 	public void addConfiguration(SyncConfig config) {
-		fDirtySyncConfigs.put(config, fWizardPage.getBuildConfiguration());
+		String buildConfigName = fWizardPage.getBuildConfiguration();
+		if (buildConfigName != null) {
+			fDirtySyncConfigs.put(config, fWizardPage.getBuildConfiguration());
+		}
 	}
 
 	/**
@@ -105,7 +108,7 @@ public class SynchronizeProperties extends AbstractSynchronizeProperties {
 		fUserDefinedContent.setLayout(new GridLayout(2, false));
 		fUserDefinedContent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		Label label = new Label(fUserDefinedContent, SWT.NONE);
-		label.setText(Messages.SynchronizeProperties_Link_configuration); 
+		label.setText(Messages.SynchronizeProperties_Default_configuration); 
 		fConfigCombo = new Combo(fUserDefinedContent, SWT.READ_ONLY);
 		this.readBuildConfigData(config.getProject());
 		fConfigCombo.setItems(fBuildConfigNameToIdMap.keySet().toArray(new String[0]));
@@ -166,7 +169,9 @@ public class SynchronizeProperties extends AbstractSynchronizeProperties {
 	@Override
 	public void performApply() {
 		// Don't forget to cache changes to the current config
-		cacheConfig();
+		if ((fUserDefinedContent != null) && (!fUserDefinedContent.isDisposed())) {
+			cacheConfig();
+		}
 		Set<IProject> projectsToUpdate = new HashSet<IProject>();
 		/*
 		 * Iterate through all the potentially changed configurations and update the build configuration information
