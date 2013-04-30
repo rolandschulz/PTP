@@ -3,15 +3,11 @@
 -charset "iso-8859-1"
 -source 1.5
 -sourcepath "../org.eclipse.ptp.core/src
-;../org.eclipse.ptp.debug.core/src
-;../org.eclipse.ptp.debug.core/pdi
-;../org.eclipse.ptp.debug.ui/src
 ;../org.eclipse.ptp.launch/src
 ;../org.eclipse.ptp.remote.core/src
 ;../org.eclipse.ptp.remote.ui/src
 ;../org.eclipse.ptp.services.core/src
-;../org.eclipse.ptp.services.ui/src
-;../org.eclipse.ptp.ui/src"
+;../org.eclipse.ptp.services.ui/src"
 -d reference/api
 -bootclasspath @rt@
 -classpath @cp@
@@ -24,7 +20,7 @@
 -splitIndex
 -windowtitle "PTP API Specification"
 -doctitle "PTP API Specification"
--header "<b>PTP</b><br>Release 5.0"
+-header "<b>PTP</b><br>Release 7.0"
 -bottom "Copyright (c) 2011 IBM Corporation and others. All Rights Reserved."
 -group "PTP Core Plug-in Packages" "org.eclipse.ptp.core;org.eclipse.ptp.core.*"
 -group "PTP UI Plug-in Packages" "org.eclipse.ptp.ui;org.eclipse.ptp.ui.*"
