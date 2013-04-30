@@ -13,7 +13,7 @@
 		<link toc="reference.xml" />
 		<anchor id="reference_additions"/>
 	</topic>
-	<topic label="Configuring the JAXB Resource Manager">
+	<topic label="Target System Configuration">
        		<anchor id="ptpJAXB"/>
      </topic>
       
