@@ -14,7 +14,7 @@
  *    Prof. Ganesh Gopalakrishnan - Project Advisor
  *******************************************************************************/
 
-package org.eclipse.ptp.gem.popup.actions;
+package org.eclipse.ptp.internal.gem.popup.actions;
 
 import java.net.URI;
 
@@ -24,13 +24,13 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ptp.gem.GemPlugin;
-import org.eclipse.ptp.gem.messages.Messages;
-import org.eclipse.ptp.gem.preferences.PreferenceConstants;
-import org.eclipse.ptp.gem.util.GemUtilities;
-import org.eclipse.ptp.gem.views.GemAnalyzer;
-import org.eclipse.ptp.gem.views.GemBrowser;
-import org.eclipse.ptp.gem.views.GemConsole;
+import org.eclipse.ptp.internal.gem.GemPlugin;
+import org.eclipse.ptp.internal.gem.messages.Messages;
+import org.eclipse.ptp.internal.gem.preferences.PreferenceConstants;
+import org.eclipse.ptp.internal.gem.util.GemUtilities;
+import org.eclipse.ptp.internal.gem.views.GemAnalyzer;
+import org.eclipse.ptp.internal.gem.views.GemBrowser;
+import org.eclipse.ptp.internal.gem.views.GemConsole;
 import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPage;
@@ -48,7 +48,6 @@ import org.eclipse.ui.PlatformUI;
  * 
  * @see org.eclipse.ui.IObjectActionDelegate
  */
-@SuppressWarnings("restriction")
 public class VerificationPopUpAction implements IObjectActionDelegate {
 
 	private IStructuredSelection selection;

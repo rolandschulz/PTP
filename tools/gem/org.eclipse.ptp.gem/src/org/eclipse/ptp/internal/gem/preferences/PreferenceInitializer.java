@@ -14,11 +14,11 @@
  *    Prof. Ganesh Gopalakrishnan - Project Advisor
  *******************************************************************************/
 
-package org.eclipse.ptp.gem.preferences;
+package org.eclipse.ptp.internal.gem.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.ptp.gem.GemPlugin;
+import org.eclipse.ptp.internal.gem.GemPlugin;
 
 /**
  * Class used to initialize default preference values for this plug-in.

@@ -14,14 +14,14 @@
  *    Prof. Ganesh Gopalakrishnan - Project Advisor
  *******************************************************************************/
 
-package org.eclipse.ptp.gem.preferences;
+package org.eclipse.ptp.internal.gem.preferences;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
-import org.eclipse.ptp.gem.GemPlugin;
-import org.eclipse.ptp.gem.messages.Messages;
+import org.eclipse.ptp.internal.gem.GemPlugin;
+import org.eclipse.ptp.internal.gem.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -58,11 +58,10 @@ public class GemPreferencePage extends FieldEditorPreferencePage implements IWor
 		addField(new IntegerFieldEditor(PreferenceConstants.GEM_PREF_NUMPROCS, Messages.GemPreferencePage_1, prefGroup));
 		addField(new BooleanFieldEditor(PreferenceConstants.GEM_PREF_CLRCON, Messages.GemPreferencePage_3, prefGroup));
 		addField(new BooleanFieldEditor(PreferenceConstants.GEM_PREF_REQUEST_ARGS, Messages.GemPreferencePage_10, prefGroup));
-		addField(new RadioGroupFieldEditor(PreferenceConstants.GEM_ACTIVE_VIEW, Messages.GemPreferencePage_5, 3,
-				new String[][] { { Messages.GemPreferencePage_7, PreferenceConstants.GEM_ANALYZER },
-						{ Messages.GemPreferencePage_8, PreferenceConstants.GEM_BROWSER },
-						{ Messages.GemPreferencePage_9, PreferenceConstants.GEM_CONSOLE }
-				}, prefGroup, false));
+		addField(new RadioGroupFieldEditor(PreferenceConstants.GEM_ACTIVE_VIEW, Messages.GemPreferencePage_5, 3, new String[][] {
+				{ Messages.GemPreferencePage_7, PreferenceConstants.GEM_ANALYZER },
+				{ Messages.GemPreferencePage_8, PreferenceConstants.GEM_BROWSER },
+				{ Messages.GemPreferencePage_9, PreferenceConstants.GEM_CONSOLE } }, prefGroup, false));
 
 		// Do the grid layout work for each group.
 		doLayoutAndData(prefGroup, 3, 300);

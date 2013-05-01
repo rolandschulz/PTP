@@ -14,13 +14,13 @@
  *    Prof. Ganesh Gopalakrishnan - Project Advisor
  *******************************************************************************/
 
-package org.eclipse.ptp.gem.util;
+package org.eclipse.ptp.internal.gem.util;
 
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.ptp.gem.messages.Messages;
+import org.eclipse.ptp.internal.gem.messages.Messages;
 
 /**
  * This class is a representation of all possible attributes for an MPI function

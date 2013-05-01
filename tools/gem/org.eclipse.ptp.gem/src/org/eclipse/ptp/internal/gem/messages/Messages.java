@@ -1,10 +1,10 @@
-package org.eclipse.ptp.gem.messages;
+package org.eclipse.ptp.internal.gem.messages;
 
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-	private static final String BUNDLE_NAME = "org.eclipse.ptp.gem.messages.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.internal.gem.messages.messages"; //$NON-NLS-1$
 
 	public static String Envelope_0;
 	public static String GemAnalyzer_0;

@@ -14,7 +14,7 @@
  *    Prof. Ganesh Gopalakrishnan - Project Advisor
  *******************************************************************************/
 
-package org.eclipse.ptp.gem.views;
+package org.eclipse.ptp.internal.gem.views;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,15 +47,15 @@ import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.ptp.gem.GemPlugin;
-import org.eclipse.ptp.gem.messages.Messages;
-import org.eclipse.ptp.gem.preferences.PreferenceConstants;
-import org.eclipse.ptp.gem.util.Envelope;
-import org.eclipse.ptp.gem.util.GemUtilities;
-import org.eclipse.ptp.gem.util.InternalIssueOrderSorter;
-import org.eclipse.ptp.gem.util.ListElement;
-import org.eclipse.ptp.gem.util.ProgramOrderSorter;
-import org.eclipse.ptp.gem.util.Transitions;
+import org.eclipse.ptp.internal.gem.GemPlugin;
+import org.eclipse.ptp.internal.gem.messages.Messages;
+import org.eclipse.ptp.internal.gem.preferences.PreferenceConstants;
+import org.eclipse.ptp.internal.gem.util.Envelope;
+import org.eclipse.ptp.internal.gem.util.GemUtilities;
+import org.eclipse.ptp.internal.gem.util.InternalIssueOrderSorter;
+import org.eclipse.ptp.internal.gem.util.ListElement;
+import org.eclipse.ptp.internal.gem.util.ProgramOrderSorter;
+import org.eclipse.ptp.internal.gem.util.Transitions;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.SelectionAdapter;

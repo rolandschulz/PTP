@@ -14,7 +14,7 @@
  *    Prof. Ganesh Gopalakrishnan - Project Advisor
  *******************************************************************************/
 
-package org.eclipse.ptp.gem.preferences;
+package org.eclipse.ptp.internal.gem.preferences;
 
 /**
  * Class used to define preference page constants for this plug-in.

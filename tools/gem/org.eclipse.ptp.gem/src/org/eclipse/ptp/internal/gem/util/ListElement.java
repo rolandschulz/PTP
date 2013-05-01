@@ -14,7 +14,7 @@
  *    Prof. Ganesh Gopalakrishnan - Project Advisor
  *******************************************************************************/
 
-package org.eclipse.ptp.gem.util;
+package org.eclipse.ptp.internal.gem.util;
 
 import org.eclipse.core.resources.IFile;
 

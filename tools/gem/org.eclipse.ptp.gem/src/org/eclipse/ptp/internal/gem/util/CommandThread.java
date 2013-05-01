@@ -14,49 +14,35 @@
  *    Prof. Ganesh Gopalakrishnan - Project Advisor
  *******************************************************************************/
 
-package org.eclipse.ptp.gem.util;
+package org.eclipse.ptp.internal.gem.util;
+
+import java.io.IOException;
 
 /**
- * This class represents a CB (completes before) edge. It simply consists of a
- * rank and an index.
+ * This class serves to execute the specified string as a command via the
+ * java.lang.Runtime instance.
  */
+public class CommandThread implements Runnable {
 
-public class CB {
-
-	private final int rank;
-	private final int index;
+	private final String command;
 
 	/**
-	 * Constructor
+	 * Sets the command to be whatever was passed in. This thread executes the
+	 * specified command via the java.lang.Runtime instance.
 	 * 
-	 * @param rank
-	 *            The rank for this CB.
-	 * @param index
-	 *            The index for this CB.
+	 * @param cmd
+	 *            The new command String.
 	 */
-	public CB(int rank, int index) {
-		this.rank = rank;
-		this.index = index;
+	public CommandThread(String cmd) {
+		this.command = cmd;
 	}
 
-	/**
-	 * Returns the index of the operation.
-	 * 
-	 * @param none
-	 * @return int The index involved with this CB.
-	 */
-	public int getIndex() {
-		return this.index;
-	}
-
-	/**
-	 * Returns the rank of the operation.
-	 * 
-	 * @param none
-	 * @return int The rank involved with this CB.
-	 */
-	public int getRank() {
-		return this.rank;
+	public void run() {
+		try {
+			Runtime.getRuntime().exec(this.command);
+		} catch (final IOException e) {
+			GemUtilities.logExceptionDetail(e);
+		}
 	}
 
 }

@@ -14,7 +14,7 @@
  *    Prof. Ganesh Gopalakrishnan - Project Advisor
  *******************************************************************************/
 
-package org.eclipse.ptp.gem.util;
+package org.eclipse.ptp.internal.gem.util;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -26,8 +26,8 @@ import java.util.StringTokenizer;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.ptp.gem.GemPlugin;
-import org.eclipse.ptp.gem.preferences.PreferenceConstants;
+import org.eclipse.ptp.internal.gem.GemPlugin;
+import org.eclipse.ptp.internal.gem.preferences.PreferenceConstants;
 
 /**
  * This class represents all information for each MPI call (transition) in every

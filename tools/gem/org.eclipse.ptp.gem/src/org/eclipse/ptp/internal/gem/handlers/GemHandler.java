@@ -14,18 +14,18 @@
  *    Prof. Ganesh Gopalakrishnan - Project Advisor
  *******************************************************************************/
 
-package org.eclipse.ptp.gem.handlers;
+package org.eclipse.ptp.internal.gem.handlers;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.ptp.gem.messages.Messages;
-import org.eclipse.ptp.gem.util.GemUtilities;
-import org.eclipse.ptp.gem.views.GemAnalyzer;
-import org.eclipse.ptp.gem.views.GemBrowser;
-import org.eclipse.ptp.gem.views.GemConsole;
+import org.eclipse.ptp.internal.gem.messages.Messages;
+import org.eclipse.ptp.internal.gem.util.GemUtilities;
+import org.eclipse.ptp.internal.gem.views.GemAnalyzer;
+import org.eclipse.ptp.internal.gem.views.GemBrowser;
+import org.eclipse.ptp.internal.gem.views.GemConsole;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IViewReference;

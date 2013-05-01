@@ -14,7 +14,7 @@
  *    Prof. Ganesh Gopalakrishnan - Project Advisor
  *******************************************************************************/
 
-package org.eclipse.ptp.gem.views;
+package org.eclipse.ptp.internal.gem.views;
 
 import java.io.File;
 import java.net.URI;
@@ -38,12 +38,12 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.ptp.gem.GemPlugin;
-import org.eclipse.ptp.gem.messages.Messages;
-import org.eclipse.ptp.gem.preferences.PreferenceConstants;
-import org.eclipse.ptp.gem.util.Envelope;
-import org.eclipse.ptp.gem.util.GemUtilities;
-import org.eclipse.ptp.gem.util.Transitions;
+import org.eclipse.ptp.internal.gem.GemPlugin;
+import org.eclipse.ptp.internal.gem.messages.Messages;
+import org.eclipse.ptp.internal.gem.preferences.PreferenceConstants;
+import org.eclipse.ptp.internal.gem.util.Envelope;
+import org.eclipse.ptp.internal.gem.util.GemUtilities;
+import org.eclipse.ptp.internal.gem.util.Transitions;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.CTabFolder;
@@ -927,9 +927,8 @@ public class GemBrowser extends ViewPart {
 	 */
 	private void openEditor(int lineNumber, IFile sourceFile) {
 		try {
-			final IEditorPart editor = org.eclipse.ui.ide.IDE.openEditor(PlatformUI
-					.getWorkbench().getActiveWorkbenchWindow().getActivePage(),
-					sourceFile, true);
+			final IEditorPart editor = org.eclipse.ui.ide.IDE.openEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+					.getActivePage(), sourceFile, true);
 			final IMarker marker = sourceFile.createMarker(IMarker.MARKER);
 			marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
 			org.eclipse.ui.ide.IDE.gotoMarker(editor, marker);

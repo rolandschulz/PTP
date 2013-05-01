@@ -14,32 +14,49 @@
  *    Prof. Ganesh Gopalakrishnan - Project Advisor
  *******************************************************************************/
 
-package org.eclipse.ptp.gem.util;
-
-import org.eclipse.jface.dialogs.IInputValidator;
-import org.eclipse.ptp.gem.messages.Messages;
+package org.eclipse.ptp.internal.gem.util;
 
 /**
- * A simple validator for the NumProcs InputDialog.
+ * This class represents a CB (completes before) edge. It simply consists of a
+ * rank and an index.
  */
-public class NumProcsValidator implements IInputValidator {
 
-	public String isValid(String newText) {
-		int num = -1;
-		try {
-			num = Integer.parseInt(newText);
+public class CB {
 
-		} catch (final NumberFormatException nfe) {
-			return Messages.NumProcsValidator_0;
-		}
-		if (num < 1) {
-			return Messages.NumProcsValidator_1;
-		}
-		if (num > 32) {
-			return Messages.NumProcsValidator_2;
-		}
+	private final int rank;
+	private final int index;
 
-		return null;
+	/**
+	 * Constructor
+	 * 
+	 * @param rank
+	 *            The rank for this CB.
+	 * @param index
+	 *            The index for this CB.
+	 */
+	public CB(int rank, int index) {
+		this.rank = rank;
+		this.index = index;
+	}
+
+	/**
+	 * Returns the index of the operation.
+	 * 
+	 * @param none
+	 * @return int The index involved with this CB.
+	 */
+	public int getIndex() {
+		return this.index;
+	}
+
+	/**
+	 * Returns the rank of the operation.
+	 * 
+	 * @param none
+	 * @return int The rank involved with this CB.
+	 */
+	public int getRank() {
+		return this.rank;
 	}
 
 }

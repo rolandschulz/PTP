@@ -14,7 +14,7 @@
  *    Prof. Ganesh Gopalakrishnan - Project Advisor
  *******************************************************************************/
 
-package org.eclipse.ptp.gem.views;
+package org.eclipse.ptp.internal.gem.views;
 
 import java.io.File;
 
@@ -25,9 +25,9 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.ptp.gem.GemPlugin;
-import org.eclipse.ptp.gem.messages.Messages;
-import org.eclipse.ptp.gem.util.GemUtilities;
+import org.eclipse.ptp.internal.gem.GemPlugin;
+import org.eclipse.ptp.internal.gem.messages.Messages;
+import org.eclipse.ptp.internal.gem.util.GemUtilities;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
@@ -50,7 +50,7 @@ import org.eclipse.ui.part.ViewPart;
 public class GemConsole extends ViewPart {
 
 	// The ID for this view
-	public static final String ID = "org.eclipse.ptp.gem.views.GemConsole"; //$NON-NLS-1$
+	public static final String ID = ".gem.views.GemConsole"; //$NON-NLS-1$
 
 	private Action clearConsoleAction;
 	private Action writeToLocalFileAction;
@@ -254,7 +254,7 @@ public class GemConsole extends ViewPart {
 		this.getHelpAction = new Action() {
 			@Override
 			public void run() {
-				PlatformUI.getWorkbench().getHelpSystem().displayHelpResource("/org.eclipse.ptp.gem.help/html/consoleView.html"); //$NON-NLS-1$
+				PlatformUI.getWorkbench().getHelpSystem().displayHelpResource("/.gem.help/html/consoleView.html"); //$NON-NLS-1$
 			}
 		};
 		this.getHelpAction.setToolTipText(Messages.GemConsole_10);

@@ -14,7 +14,7 @@
  *    Prof. Ganesh Gopalakrishnan - Project Advisor
  *******************************************************************************/
 
-package org.eclipse.ptp.gem.util;
+package org.eclipse.ptp.internal.gem.util;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -49,12 +49,12 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.window.Window;
-import org.eclipse.ptp.gem.GemPlugin;
-import org.eclipse.ptp.gem.messages.Messages;
-import org.eclipse.ptp.gem.preferences.PreferenceConstants;
-import org.eclipse.ptp.gem.views.GemAnalyzer;
-import org.eclipse.ptp.gem.views.GemBrowser;
-import org.eclipse.ptp.gem.views.GemConsole;
+import org.eclipse.ptp.internal.gem.GemPlugin;
+import org.eclipse.ptp.internal.gem.messages.Messages;
+import org.eclipse.ptp.internal.gem.preferences.PreferenceConstants;
+import org.eclipse.ptp.internal.gem.views.GemAnalyzer;
+import org.eclipse.ptp.internal.gem.views.GemBrowser;
+import org.eclipse.ptp.internal.gem.views.GemConsole;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
@@ -71,7 +71,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
-@SuppressWarnings("restriction")
 public class GemUtilities {
 	public static enum TaskStatus {
 		IDLE, ACTIVE, ABORTED;
@@ -963,7 +962,7 @@ public class GemUtilities {
 
 	/**
 	 * Logs the specified error using the Eclipse error logging mechanism. Log
-	 * entries are placed in the org.eclipse.ptp.gem log file and will show up
+	 * entries are placed in the org.eclipse.ptp.internal.gem log file and will show up
 	 * in the Eclipse Error Log View.
 	 * 
 	 * @param message

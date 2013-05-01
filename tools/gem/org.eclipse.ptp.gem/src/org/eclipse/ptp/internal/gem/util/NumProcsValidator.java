@@ -14,35 +14,32 @@
  *    Prof. Ganesh Gopalakrishnan - Project Advisor
  *******************************************************************************/
 
-package org.eclipse.ptp.gem.util;
+package org.eclipse.ptp.internal.gem.util;
 
-import java.io.IOException;
+import org.eclipse.jface.dialogs.IInputValidator;
+import org.eclipse.ptp.internal.gem.messages.Messages;
 
 /**
- * This class serves to execute the specified string as a command via the
- * java.lang.Runtime instance.
+ * A simple validator for the NumProcs InputDialog.
  */
-public class CommandThread implements Runnable {
+public class NumProcsValidator implements IInputValidator {
 
-	private final String command;
-
-	/**
-	 * Sets the command to be whatever was passed in. This thread executes the
-	 * specified command via the java.lang.Runtime instance.
-	 * 
-	 * @param cmd
-	 *            The new command String.
-	 */
-	public CommandThread(String cmd) {
-		this.command = cmd;
-	}
-
-	public void run() {
+	public String isValid(String newText) {
+		int num = -1;
 		try {
-			Runtime.getRuntime().exec(this.command);
-		} catch (final IOException e) {
-			GemUtilities.logExceptionDetail(e);
+			num = Integer.parseInt(newText);
+
+		} catch (final NumberFormatException nfe) {
+			return Messages.NumProcsValidator_0;
 		}
+		if (num < 1) {
+			return Messages.NumProcsValidator_1;
+		}
+		if (num > 32) {
+			return Messages.NumProcsValidator_2;
+		}
+
+		return null;
 	}
 
 }
