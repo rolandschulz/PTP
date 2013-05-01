@@ -25,7 +25,7 @@ import org.osgi.service.prefs.BackingStoreException;
  * Convenience class to facilitate using the new {@link IEclipsePreferences} story. Adapted from
  * org.eclipse.debug.internal.core.Preferences.
  * 
- * @since 6.0
+ * @since 7.0
  * @noinstantiate This class is not intended to be instantiated by clients.
  */
 public final class Preferences {
