@@ -116,12 +116,12 @@ public interface IBuildLaunchUtils {
 	public byte[] runToolGetOutput(List<String> tool, Map<String, String> env, String directory);
 
 	/**
-	 * @since 6.0
+	 * @since 7.0
 	 */
 	public byte[] runToolGetOutput(List<String> tool, Map<String, String> env, String directory, boolean showErr);
 
 	/**
-	 * @since 6.0
+	 * @since 7.0
 	 */
 	public boolean isRemote();
 

@@ -134,7 +134,7 @@ public class Activator extends AbstractUIPlugin {
 	 * Panes are ordered by tool, and within each tool by compilation, execution and analysis step
 	 * 
 	 * @return
-	 * @since 6.0
+	 * @since 7.0
 	 */
 	public static IToolUITab[] getToolPanes() {
 		ArrayList<IToolUITab> paneList = new ArrayList<IToolUITab>();
@@ -393,7 +393,7 @@ public class Activator extends AbstractUIPlugin {
 	private static ArrayList<IToolUITab> toolUITabs = null;
 
 	/**
-	 * @since 6.0
+	 * @since 7.0
 	 */
 	public static ArrayList<IToolUITab> getToolUITabs() {
 		if (toolUITabs == null) {
