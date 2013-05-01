@@ -7,11 +7,11 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *******************************************************************************/package org.eclipse.ptp.utils.core.tests;
+ *******************************************************************************/package org.eclipse.ptp.core.tests;
 
 import junit.framework.TestCase;
 
-import org.eclipse.ptp.utils.core.ArgumentParser;
+import org.eclipse.ptp.core.util.ArgumentParser;
 
 public class ArgumentParserTests extends TestCase {
 	

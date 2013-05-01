@@ -10,7 +10,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.utils.core.ArgumentParser;
 
 /**
  * @since 6.0

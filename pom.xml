@@ -60,7 +60,6 @@
 		<module>core/org.eclipse.ptp.services.ui</module>
 		<module>core/org.eclipse.ptp.ui</module>
 		<module>core/org.eclipse.ptp.utils</module>
-		<module>core/org.eclipse.ptp.utils.core</module>
 		<module>core/org.eclipse.ptp.utils.extensionpoints.core</module>
 		<module>core/org.eclipse.ptp.utils.file.core</module>
 		<module>core/org.eclipse.ptp.utils.ui</module>

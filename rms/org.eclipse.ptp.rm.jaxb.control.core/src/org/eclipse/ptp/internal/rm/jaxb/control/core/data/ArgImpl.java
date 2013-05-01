@@ -13,11 +13,11 @@ package org.eclipse.ptp.internal.rm.jaxb.control.core.data;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.ptp.core.util.ArgumentParser;
 import org.eclipse.ptp.internal.rm.jaxb.core.JAXBCoreConstants;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
-import org.eclipse.ptp.utils.core.ArgumentParser;
 
 /**
  * Wrapper implementation. An argument is a part of a string sequence which can be resolved in an environment, and then tested to

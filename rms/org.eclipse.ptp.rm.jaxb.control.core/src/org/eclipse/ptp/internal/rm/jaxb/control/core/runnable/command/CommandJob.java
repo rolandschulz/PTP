@@ -38,6 +38,7 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.IStreamListener;
 import org.eclipse.debug.core.model.IStreamMonitor;
 import org.eclipse.ptp.core.jobs.IJobStatus;
+import org.eclipse.ptp.core.util.ArgumentParser;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.ICommandJob;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.ICommandJobStatus;
@@ -63,7 +64,6 @@ import org.eclipse.ptp.rm.jaxb.core.data.CommandType;
 import org.eclipse.ptp.rm.jaxb.core.data.EnvironmentType;
 import org.eclipse.ptp.rm.jaxb.core.data.SimpleCommandType;
 import org.eclipse.ptp.rm.jaxb.core.data.TokenizerType;
-import org.eclipse.ptp.utils.core.ArgumentParser;
 import org.eclipse.ui.progress.IProgressConstants;
 
 /**

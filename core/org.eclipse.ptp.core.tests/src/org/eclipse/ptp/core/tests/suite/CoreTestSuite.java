@@ -13,12 +13,14 @@ package org.eclipse.ptp.core.tests.suite;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import org.eclipse.ptp.core.tests.ArgumentParserTests;
 import org.eclipse.ptp.core.tests.RangeSetTests;
 
 public class CoreTestSuite {
 	public static Test suite() {
 		TestSuite suite = new TestSuite(CoreTestSuite.class.getName());
 
+		suite.addTestSuite(ArgumentParserTests.class);
 		suite.addTestSuite(RangeSetTests.class);
 		return suite;
 	}

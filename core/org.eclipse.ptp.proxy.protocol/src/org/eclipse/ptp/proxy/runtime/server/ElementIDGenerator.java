@@ -13,7 +13,7 @@
 package org.eclipse.ptp.proxy.runtime.server;
 
 import org.eclipse.ptp.proxy.messages.Messages;
-import org.eclipse.ptp.utils.core.RangeSet;
+import org.eclipse.ptp.proxy.util.RangeSet;
 
 /**
  * @since 4.0

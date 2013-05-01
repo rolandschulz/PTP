@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.utils.core;
+package org.eclipse.ptp.core.util;
 
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
@@ -17,6 +17,9 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * @since 7.0
+ */
 public class ArgumentParser {
 	private final List<String> tokens;
 

@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.ptp.core.util.ArgumentParser;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.JAXBControlConstants;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.LaunchController;
@@ -34,7 +35,6 @@ import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.SimpleCommandType;
-import org.eclipse.ptp.utils.core.ArgumentParser;
 
 /**
  * Implementation of runnable Job for the simple execution of external processes. Uses the IRemoteProcessBuilder with the

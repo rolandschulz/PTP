@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ptp.utils.core;
+package org.eclipse.ptp.proxy.util;
 
 import java.util.ArrayList;
 import java.util.BitSet;

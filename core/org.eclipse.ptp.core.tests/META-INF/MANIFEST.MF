@@ -6,6 +6,5 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: %pluginProvider
 Require-Bundle: org.eclipse.core.runtime,
  org.junit,
- org.eclipse.ptp.core,
- org.eclipse.ptp.utils.core
+ org.eclipse.ptp.core
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

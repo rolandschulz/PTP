@@ -10,7 +10,6 @@ Require-Bundle: org.eclipse.core.runtime,
  com.jcraft.jsch,
  org.eclipse.jsch.core,
  org.eclipse.ptp.remotetools.utils,
- org.eclipse.ptp.utils.core;bundle-version="1.0.0",
  org.eclipse.jface,
  org.eclipse.ptp.remotetools.preferences
 Bundle-ActivationPolicy: lazy

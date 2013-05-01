@@ -9,7 +9,7 @@
  * 	LANL - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ptp.utils.core;
+package org.eclipse.ptp.proxy.util;
 
 import java.util.BitSet;
 import java.util.Iterator;
