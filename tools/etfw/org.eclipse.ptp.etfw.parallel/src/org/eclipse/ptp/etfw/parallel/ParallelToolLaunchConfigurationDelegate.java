@@ -30,7 +30,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
-import org.eclipse.ptp.debug.core.launch.PLaunch;
+import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.etfw.Activator;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.internal.ILaunchFactory;
@@ -88,7 +88,7 @@ public class ParallelToolLaunchConfigurationDelegate extends ParallelLaunchConfi
 			wc.setAttribute(EXTOOL_JAXB_ATTR_ARGUMENTS_TAG, rmId + JAXBControlConstants.PROG_ARGS);
 			wc.setAttribute(EXTOOL_JAXB_EXECUTABLE_PATH_TAG, rmId + JAXBControlConstants.EXEC_PATH);
 			wc.setAttribute(EXTOOL_JAXB_EXECUTABLE_DIRECTORY_TAG, rmId + JAXBControlConstants.EXEC_DIR);
-			
+
 			// put(JAXBControlConstants.DIRECTORY, configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR,
 			// dir));
 
@@ -102,7 +102,7 @@ public class ParallelToolLaunchConfigurationDelegate extends ParallelLaunchConfi
 			{
 				// initialized = true;
 				progress.worked(80);
-				if (launchIn instanceof PLaunch) {
+				if (launchIn instanceof IPLaunch) {
 					if (!verifyLaunchAttributes(configuration, mode, progress.newChild(10)) || progress.isCanceled()) {
 						return;
 					}
@@ -153,11 +153,8 @@ public class ParallelToolLaunchConfigurationDelegate extends ParallelLaunchConfi
 				IToolLaunchConfigurationConstants.EMPTY_STRING);
 
 		if (whichParser.isEmpty() || whichTool.isEmpty()) {
-			throw new CoreException(
-					new Status(
-							IStatus.ERROR,
-							Activator.PLUGIN_ID,
-							Messages.ParallelToolLaunchConfigurationDelegate_ProfilingToolNotSpecified));
+			throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+					Messages.ParallelToolLaunchConfigurationDelegate_ProfilingToolNotSpecified));
 		}
 		return true;
 	}
