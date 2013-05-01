@@ -122,6 +122,11 @@ public class NewSyncProjectWizard extends Wizard implements INewWizard, IExecuta
 	private SyncMainWizardPage mainPage;
 
 	private WizardNewProjectReferencePage referencePage;
+	
+	public enum WizardMode {
+		NEW, CONVERT
+	}
+	private WizardMode wizardMode = null;
 
 	// cache of newly-created project
 	private IProject newProject;
@@ -154,6 +159,14 @@ public class NewSyncProjectWizard extends Wizard implements INewWizard, IExecuta
 		}
 		setDialogSettings(section);
 	}
+	
+	/**
+	 * Creates a wizard that operates according to the passed mode
+	 */
+	public NewSyncProjectWizard(WizardMode mode) {
+		this();
+		wizardMode = mode;
+	}
 
 	/**
 	 * Returns the selection which was passed to <code>init</code>.
@@ -180,7 +193,15 @@ public class NewSyncProjectWizard extends Wizard implements INewWizard, IExecuta
 	public void addPages() {
 		super.addPages();
 
-		mainPage = new SyncMainWizardPage("basicNewProjectPage");//$NON-NLS-1$
+		// By default run as a new project wizard
+		if (wizardMode == null) {
+			wizardMode = WizardMode.NEW;
+		}
+		if (wizardMode == WizardMode.NEW) {
+			mainPage = SyncMainWizardPage.newProjectPage("basicNewProjectPage");//$NON-NLS-1$
+		} else if (wizardMode == WizardMode.CONVERT){
+			mainPage = SyncMainWizardPage.convertProjectPage("basicConvertProjectPage"); //$NON-NLS-1$
+		}
 		mainPage.setTitle(Messages.NewProject_title);
 		mainPage.setDescription(Messages.NewProject_description);
 		this.addPage(mainPage);
@@ -281,16 +302,6 @@ public class NewSyncProjectWizard extends Wizard implements INewWizard, IExecuta
 
 		newProject = newProjectHandle;
 
-		try {
-			SyncManager.makeSyncProject(newProject, mainPage.getSynchronizeParticipant().getProvider(newProject),
-					mainPage.getCustomFileFilter());
-		} catch (CoreException e) {
-			return false;
-		}
-
-		// Enable syncing
-		SyncManager.setSyncMode(newProject, SyncMode.ACTIVE);
-
 		return true;
 	}
 
@@ -345,19 +356,39 @@ public class NewSyncProjectWizard extends Wizard implements INewWizard, IExecuta
 	 */
 	@Override
 	public boolean performFinish() {
-		if (!createNewProject()) {
+		// Create project if necessary
+		if (wizardMode == WizardMode.NEW) {
+			if (!createNewProject()) {
+				return false;
+			}
+
+			IWorkingSet[] workingSets = mainPage.getSelectedWorkingSets();
+			getWorkbench().getWorkingSetManager().addToWorkingSets(newProject, workingSets);
+
+			updatePerspective();
+			BasicNewResourceWizard.selectAndReveal(newProject, getWorkbench().getActiveWorkbenchWindow());
+		}
+
+		IProject project;
+		if (wizardMode == WizardMode.NEW) {
+			project = newProject;
+		} else {
+			project = mainPage.getProjectHandle();
+		}
+		// Add sync-specific elements to project
+		try {
+			SyncManager.makeSyncProject(project, mainPage.getSynchronizeParticipant().getProvider(project),
+					mainPage.getCustomFileFilter());
+		} catch (CoreException e) {
 			return false;
 		}
 
-		IWorkingSet[] workingSets = mainPage.getSelectedWorkingSets();
-		getWorkbench().getWorkingSetManager().addToWorkingSets(newProject, workingSets);
-
-		updatePerspective();
-		BasicNewResourceWizard.selectAndReveal(newProject, getWorkbench().getActiveWorkbenchWindow());
+		// Enable syncing
+		SyncManager.setSyncMode(project, SyncMode.ACTIVE);
 
 		// Force an initial sync
 		try {
-			SyncManager.sync(null, newProject, SyncFlag.FORCE, new CommonSyncExceptionHandler(false, true));
+			SyncManager.sync(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(false, true));
 		} catch (CoreException e) {
 			// This should never happen because only a blocking sync can throw a core exception.
 			RDTSyncUIPlugin.log(Messages.NewSyncProjectWizard_Unexpected_core_exception, e);

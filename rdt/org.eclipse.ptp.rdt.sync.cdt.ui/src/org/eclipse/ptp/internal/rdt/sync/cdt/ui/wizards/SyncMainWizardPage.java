@@ -740,7 +740,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	}
 
 	private final void createProjectRemoteInfoGroup(Composite parent) {
-		fSyncWidget = new SyncProjectWidget(parent, SWT.NONE, getWizard().getContainer());
+		fSyncWidget = SyncProjectWidget.newProjectWidget(parent, SWT.NONE, getWizard().getContainer());
 		fSyncWidget.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		fSyncWidget.addListener(SWT.Modify, new Listener() {
 			@Override
@@ -820,7 +820,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 
 	@Override
 	public boolean useDefaults() {
-		return fSyncWidget.useDafaults();
+		return fSyncWidget.useDefaults();
 	}
 
 	/**

@@ -73,6 +73,7 @@ public class Messages extends NLS {
 	public static String NewSyncFileFilterPage_Show_remote_files;
 	public static String NewSyncFileFilterPage_Title;
 	public static String NewSyncFileFilterPage_Type;
+	public static String NewSyncProjectWizard_Set_mode_too_late_error;
 	public static String NewSyncProjectWizard_Unable_to_find_perspective;
 	public static String NewSyncProjectWizard_Unexpected_core_exception;
 	public static String ResourceChangeListener_0;
@@ -117,6 +118,8 @@ public class Messages extends NLS {
 	public static String SyncMergeEditor_2;
 	public static String SyncMergeFileTreeViewer_0;
 	public static String SyncPreferencePage_0;
+	public static String SyncProjectWidget_Project_to_convert;
+	public static String SyncProjectWidget_Project_to_convert_label;
 	public static String SyncProjectWidget_9;
 	public static String SyncProjectWidget_Browse;
 	public static String SyncProjectWidget_Directory_already_exists;
