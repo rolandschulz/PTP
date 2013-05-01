@@ -7,18 +7,33 @@
 	
 	<topic label="API Reference" href="reference/api/overview-summary.html">
 		<topic label="org.eclipse.ptp.core" href="reference/api/org/eclipse/ptp/core/package-summary.html" />
+		<topic label="org.eclipse.ptp.core.jobs" href="reference/api/org/eclipse/ptp/core/jobs/package-summary.html" />
+		<topic label="org.eclipse.ptp.core.util" href="reference/api/org/eclipse/ptp/core/util/package-summary.html" />
+		<topic label="org.eclipse.ptp.debug.core" href="reference/api/org/eclipse/ptp/debug/core/package-summary.html" />
+		<topic label="org.eclipse.ptp.debug.core.event" href="reference/api/org/eclipse/ptp/debug/core/event/package-summary.html" />
+		<topic label="org.eclipse.ptp.debug.core.launch" href="reference/api/org/eclipse/ptp/debug/core/launch/package-summary.html" />
+		<topic label="org.eclipse.ptp.debug.core.model" href="reference/api/org/eclipse/ptp/debug/core/model/package-summary.html" />
+		<topic label="org.eclipse.ptp.debug.core.pdi" href="reference/api/org/eclipse/ptp/debug/core/pdi/package-summary.html" />
+		<topic label="org.eclipse.ptp.debug.core.pdi.event" href="reference/api/org/eclipse/ptp/debug/core/pdi/event/package-summary.html" />
+		<topic label="org.eclipse.ptp.debug.core.pdi.manager" href="reference/api/org/eclipse/ptp/debug/core/pdi/manager/package-summary.html" />
+		<topic label="org.eclipse.ptp.debug.core.pdi.model" href="reference/api/org/eclipse/ptp/debug/core/pdi/modelpackage-summary.html" />
+		<topic label="org.eclipse.ptp.debug.core.pdi.model.aif" href="reference/api/org/eclipse/ptp/debug/core/pdi/model/aifpackage-summary.html" />
+		<topic label="org.eclipse.ptp.debug.core.pdi.request" href="reference/api/org/eclipse/ptp/debug/core/pdi/request/package-summary.html" />
 		<topic label="org.eclipse.ptp.launch" href="reference/api/org/eclipse/ptp/launch/package-summary.html" />
+		<topic label="org.eclipse.ptp.launch.ui" href="reference/api/org/eclipse/ptp/launch/ui/package-summary.html" />
+		<topic label="org.eclipse.ptp.launch.ui.tabs" href="reference/api/org/eclipse/ptp/launch/ui/tabs/package-summary.html" />
 		<topic label="org.eclipse.ptp.remote.core" href="reference/api/org/eclipse/ptp/remote/core/package-summary.html" />
+		<topic label="org.eclipse.ptp.remote.core.exception" href="reference/api/org/eclipse/ptp/remote/core/exception/package-summary.html" />
 		<topic label="org.eclipse.ptp.remote.ui" href="reference/api/org/eclipse/ptp/remote/ui/package-summary.html" />
+		<topic label="org.eclipse.ptp.remote.ui.dialogs" href="reference/api/org/eclipse/ptp/remote/ui/dialogs/package-summary.html" />
+		<topic label="org.eclipse.ptp.remote.ui.widgets" href="reference/api/org/eclipse/ptp/remote/ui/widgets/package-summary.html" />
 		<topic label="org.eclipse.ptp.services.core" href="reference/api/org/eclipse/ptp/services/core/package-summary.html" />
 		<topic label="org.eclipse.ptp.services.ui" href="reference/api/org/eclipse/ptp/services/ui/package-summary.html" />
+		<topic label="org.eclipse.ptp.services.ui.dialogs" href="reference/api/org/eclipse/ptp/services/ui/dialogs/package-summary.html" />
+		<topic label="org.eclipse.ptp.services.ui.widgets" href="reference/api/org/eclipse/ptp/services/ui/widgets/package-summary.html" />
 	</topic>
 	
 	<topic label="Extension Points Reference" href="reference/extension-points/index.html">
-		<topic label="org_eclipse_ptp_core_resourceManagers.html" href="reference/extension-points/org_eclipse_ptp_core_resourceManagers" />
-		<topic label="org_eclipse_ptp_core_runtimeSystems.html" href="reference/extension-points/org_eclipse_ptp_core_runtimeSystems" />
-		<topic label="org_eclipse_ptp_debug_core_parallelDebuggers.html" href="reference/extension-points/org_eclipse_ptp_debug_core_parallelDebuggers" />
-		<topic label="org_eclipse_ptp_debug_ui_debuggerConfigurations.html" href="reference/extension-points/org_eclipse_ptp_debug_ui_debuggerConfigurations" />
 		<topic label="org_eclipse_ptp_launch_rmLaunchConfigurations.html" href="reference/extension-points/org_eclipse_ptp_launch_rmLaunchConfigurations" />
 		<topic label="org_eclipse_ptp_remote_core_remoteServer.html" href="reference/extension-points/org_eclipse_ptp_remote_core_remoteServer" />
 		<topic label="org_eclipse_ptp_remote_core_remoteServices.html" href="reference/extension-points/org_eclipse_ptp_remote_core_remoteServices" />
@@ -29,9 +44,6 @@
 		<topic label="org_eclipse_ptp_services_ui_providerContributors.html" href="reference/extension-points/org_eclipse_ptp_services_ui_providerContributors" />
 		<topic label="org_eclipse_ptp_services_ui_serviceContributors.html" href="reference/extension-points/org_eclipse_ptp_services_ui_serviceContributors" />
 		<topic label="org_eclipse_ptp_services_ui_wizardExtensions.html" href="reference/extension-points/org_eclipse_ptp_services_ui_wizardExtensions" />
-		<topic label="org_eclipse_ptp_ui_rmConfigurationSelections.html" href="reference/extension-points/org_eclipse_ptp_ui_rmConfigurationSelections" />
-		<topic label="org_eclipse_ptp_ui_rmConfigurationWizards.html" href="reference/extension-points/org_eclipse_ptp_ui_rmConfigurationWizards" />
-		<topic label="org_eclipse_ptp_ui_runtimeModelPresentations.html" href="reference/extension-points/org_eclipse_ptp_ui_runtimeModelPresentations" />
 		<anchor id="ptp-extension-points-ref" />
 	</topic>
 
