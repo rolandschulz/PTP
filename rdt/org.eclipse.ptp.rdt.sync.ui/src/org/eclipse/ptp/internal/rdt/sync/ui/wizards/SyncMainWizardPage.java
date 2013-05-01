@@ -13,8 +13,10 @@ package org.eclipse.ptp.internal.rdt.sync.ui.wizards;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
@@ -23,13 +25,18 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.ptp.internal.rdt.sync.ui.RDTSyncUIPlugin;
 import org.eclipse.ptp.internal.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
+import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.rdt.sync.ui.widgets.SyncProjectWidget;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
@@ -56,16 +63,43 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 	private String errorMessage;
 
 	private Text fProjectNameText;
+	private Combo fProjectSelectionCombo;
 	private SyncProjectWidget fSyncWidget;
+	private boolean isNewProject;
 
 	/**
-	 * Creates a new project creation wizard page.
+	 * Creates a new wizard page for creating a new sync project.
 	 * 
 	 * @param pageName
 	 *            the name of this page
+	 * @return the page
 	 */
-	public SyncMainWizardPage(String pageName) {
+	public static SyncMainWizardPage newProjectPage(String pageName) {
+		return new SyncMainWizardPage(pageName, true);
+	}
+
+	/**
+	 * Creates a new wizard page for converting an existing project to a sync project.
+	 * 
+	 * @param pageName
+	 *            the name of this page
+	 * @return the page
+	 */
+	public static SyncMainWizardPage convertProjectPage(String pageName) {
+		return new SyncMainWizardPage(pageName, false);
+	}
+
+	/**
+	 * Private constructor. Clients should use provided static factory methods.
+	 * 
+	 * @param pageName
+	 *            the name of this page
+	 * @param newProjectFlag
+	 *            whether a page for a new project or to convert an existing project
+	 */
+	private SyncMainWizardPage(String pageName, boolean isForNewProject) {
 		super(pageName);
+		isNewProject = isForNewProject;
 		setPageComplete(false);
 	}
 
@@ -83,9 +117,17 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		setControl(composite);
 
-		createProjectBasicInfoGroup(composite);
+		if (isNewProject) {
+			createProjectInfoGroupForNewProject(composite);
+		} else {
+			createProjectInfoGroupForExistingProject(composite);
+		}
 
-		fSyncWidget = new SyncProjectWidget(composite, SWT.NONE, getWizard().getContainer());
+		if (isNewProject) {
+			fSyncWidget = SyncProjectWidget.newProjectWidget(composite, SWT.NONE, getWizard().getContainer());
+		} else {
+			fSyncWidget = SyncProjectWidget.convertProjectWidget(composite, SWT.NONE, getWizard().getContainer());
+		}
 		fSyncWidget.setLayoutData(new GridData(GridData.FILL_BOTH));
 		fSyncWidget.addListener(SWT.Modify, new Listener() {
 			@Override
@@ -103,12 +145,47 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 	}
 
 	/**
-	 * Creates the project name specification controls.
-	 * 
+	 * Creates controls for selecting an existing project
+	 *
 	 * @param parent
 	 *            the parent composite
 	 */
-	private final void createProjectBasicInfoGroup(Composite parent) {
+	private final void createProjectInfoGroupForExistingProject(Composite parent) {
+		Group localGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
+		localGroup.setText(Messages.SyncProjectWidget_Project_to_convert);
+		localGroup.setLayout(new GridLayout(2, false));
+		localGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+
+		Label label = new Label(localGroup, SWT.NONE);
+		label.setText(Messages.SyncProjectWidget_Project_to_convert_label);
+		label.setFont(parent.getFont());
+
+		fProjectSelectionCombo = new Combo(localGroup, SWT.READ_ONLY);
+		this.populateProjectCombo();
+		fProjectSelectionCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		fProjectSelectionCombo.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+				// nothing to do
+			}
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				if (fSyncWidget != null) {
+					fSyncWidget.setProjectName(getProjectName());
+				}
+				setPageComplete(validatePage());
+				getWizard().getContainer().updateMessage();
+			}
+		});
+	}
+
+	/**
+	 * Creates controls for entering a new project name
+	 *
+	 * @param parent
+	 *            the parent composite
+	 */
+	private final void createProjectInfoGroupForNewProject(Composite parent) {
 		Composite projectGroup = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 2;
@@ -139,27 +216,21 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 		});
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.dialogs.WizardNewProjectCreationPage#getProjectName()
-	 */
-	@Override
-	public String getProjectName() {
-		return getProjectNameFieldValue();
-	}
-
 	/**
-	 * Returns the value of the project name field with leading and trailing spaces removed.
+	 * Returns the current project name specified by the user
 	 * 
-	 * @return the project name in the field
+	 * @return the project name
 	 */
-	private String getProjectNameFieldValue() {
-		if (fProjectNameText == null) {
-			return EMPTY_STRING;
+	public String getProjectName() {
+		if (isNewProject) {
+			if (fProjectNameText == null) {
+				return EMPTY_STRING;
+			} else {
+				return fProjectNameText.getText().trim();
+			}
+		} else {
+			return fProjectSelectionCombo.getText();
 		}
-
-		return fProjectNameText.getText().trim();
 	}
 
 	/**
@@ -238,6 +309,16 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 		return fSyncWidget.getSynchronizeParticipant();
 	}
 
+
+	private void populateProjectCombo() {
+		IProject[] allProjects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+		for (IProject p : allProjects) {
+			if ((p.isOpen()) && (!RemoteSyncNature.hasNature(p))) {
+				fProjectSelectionCombo.add(p.getName());
+			}
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -255,7 +336,11 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 	public void setVisible(boolean visible) {
 		this.getControl().setVisible(visible);
 		if (visible) {
-			fProjectNameText.setFocus();
+			if (isNewProject) {
+				fProjectNameText.setFocus();
+			} else {
+				fProjectSelectionCombo.setFocus();
+			}
 		}
 	}
 
@@ -266,7 +351,7 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 	 */
 	@Override
 	public boolean useDefaults() {
-		return fSyncWidget.useDafaults();
+		return fSyncWidget.useDefaults();
 	}
 
 	/*
@@ -296,7 +381,7 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 	 */
 	private boolean validateProjectName() {
 		// Check if name is empty
-		String projectFieldContents = getProjectNameFieldValue();
+		String projectFieldContents = getProjectName();
 		if (projectFieldContents.equals(EMPTY_STRING)) {
 			message = Messages.SyncMainWizardPage_Project_name_must_be_specified; 
 			messageType = IMessageProvider.NONE;

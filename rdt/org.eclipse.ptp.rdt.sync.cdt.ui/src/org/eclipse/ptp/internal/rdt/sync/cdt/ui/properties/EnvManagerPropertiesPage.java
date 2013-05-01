@@ -69,7 +69,8 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 			return null;
 		}
 
-		final SyncConfig bs = SyncConfigListenerCDT.getSyncConfigForBuildConfiguration(getCfg());
+		SyncConfig bs = null;
+		// final SyncConfig bs = SyncConfigListenerCDT.getSyncConfigForBuildConfiguration(getCfg());
 		if (bs == null) {
 			return null;
 		}
@@ -116,13 +117,14 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 	}
 
 	private URI getSyncURI() {
-		try {
-			return SyncConfigListenerCDT.getSyncLocationURI(getCfg(), getCfg().getOwner().getProject());
-		} catch (final CoreException e) {
-			setErrorMessage(e.getClass().getSimpleName() + ": " + e.getLocalizedMessage()); //$NON-NLS-1$
-			Activator.log(e);
-			return null;
-		}
+//		try {
+//			return SyncConfigListenerCDT.getSyncLocationURI(getCfg(), getCfg().getOwner().getProject());
+//		} catch (final CoreException e) {
+//			setErrorMessage(e.getClass().getSimpleName() + ": " + e.getLocalizedMessage()); //$NON-NLS-1$
+//			Activator.log(e);
+//			return null;
+//		}
+		return null;
 	}
 
 	private List<String> computeSelectedItems() {

@@ -12,6 +12,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.sync.cdt.ui.wizards;
 
+import java.util.Set;
+
+import org.eclipse.cdt.core.CCProjectNature;
+import org.eclipse.cdt.core.CProjectNature;
 import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
 import org.eclipse.cdt.internal.core.envvar.EnvironmentVariableManager;
 import org.eclipse.cdt.managedbuilder.core.IBuilder;
@@ -28,6 +32,7 @@ import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.SyncManager.SyncMode;
+import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 
 /**
@@ -43,79 +48,73 @@ public class NewRemoteSyncProjectWizardOperation {
 	 * configurations, and initializes file filtering.
 	 * 
 	 * @param project
-	 * @param mainPage
-	 *            - the main wizard page, which contains the user's entries
+	 * @param ISynchronizeParticipant
+	 *        the participant created by the wizard page
+	 * @param customFileFilter
+	 *        File filter created by user on the wizard page or null if user made no changes
+	 * @param localToolChains
+	 *        Set of local tool chains selected by user
+	 * @param remoteToolChains
+	 *        Set of remote tool chains selected by user
 	 * @param monitor
 	 */
-	public static void run(IProject project, SyncMainWizardPage mainPage, IProgressMonitor monitor) {
-		ISynchronizeParticipant participant = mainPage.getSynchronizeParticipant();
-		if (participant == null) {
-			return;
-		}
-
-		// Change build configuration settings and find the initial default configurations
-		IConfiguration defaultLocal = null;
-		IConfiguration defaultRemote = null;
+	public static void run(IProject project, ISynchronizeParticipant participant, SyncFileFilter customFileFilter,
+			Set<String> localToolChains, Set<String> remoteToolChains, IProgressMonitor monitor) {
+		// Change build configuration settings and find default configs
 		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
 		if (buildInfo == null) {
 			throw new RuntimeException("Build information for project not found. Project name: " + project.getName()); //$NON-NLS-1$
 		}
+		IConfiguration defaultLocalBuildConfig = null;
+		IConfiguration defaultRemoteBuildConfig = null;
 		IBuilder syncBuilder = ManagedBuildManager.getExtensionBuilder(SYNC_BUILDER_CLASS);
 		IConfiguration[] allBuildConfigs = buildInfo.getManagedProject().getConfigurations();
 		for (IConfiguration config : allBuildConfigs) {
-			boolean isRemote = mainPage.isRemoteConfig(config);
-			boolean isLocal = mainPage.isLocalConfig(config);
-
 			// Set all configs to use the sync builder, which ensures the build always occurs at the active sync config location.
 			config.changeBuilder(syncBuilder, SYNC_BUILDER_CLASS, Messages.NewRemoteSyncProjectWizardOperation_1);
 			// turn off append contributed (local) environment variables for remote configs
-			if (isRemote) {
+			String toolChainName = config.getToolChain().getSuperClass().getName();
+			if (isCDTProject(project) || remoteToolChains.contains(toolChainName)) {
 				ICConfigurationDescription c_mb_confgDes = ManagedBuildManager.getDescriptionForConfiguration(config);
 				if (c_mb_confgDes != null) {
 					EnvironmentVariableManager.fUserSupplier.setAppendContributedEnvironment(false, c_mb_confgDes);
 				}
-			}
-			
-			// Set default build configurations
-			if (isRemote && defaultRemote == null) {
-				defaultRemote = config;
-			}
-			
-			if (isLocal && defaultLocal == null) {
-				defaultLocal = config;
+				defaultRemoteBuildConfig = config;
+			} else {
+				defaultLocalBuildConfig = config;
 			}
 
             // Bug 389899 - Synchronized project: "remote toolchain name" contains spaces
             config.setName(config.getName().replace(' ', '_'));
 		}
-		
-		assert defaultRemote != null : Messages.NewRemoteSyncProjectWizardOperation_0;
+		assert defaultRemoteBuildConfig != null : Messages.NewRemoteSyncProjectWizardOperation_0;
 		// If user selects no local toolchain, use the remote default.
-		if (defaultLocal == null) {
-			defaultLocal = defaultRemote;
+		if (defaultLocalBuildConfig == null) {
+			defaultLocalBuildConfig = defaultRemoteBuildConfig;
 		}
-
 
 		// Add elements for a sync project
-		try {
-			SyncManager.makeSyncProject(project, participant.getProvider(project), mainPage.getCustomFileFilter());
-		} catch (CoreException e) {
-			Activator.log(e);
-			return;
+		if (!isSyncProject(project)) {
+			try {
+				SyncManager.makeSyncProject(project, participant.getProvider(project), customFileFilter);
+			} catch (CoreException e) {
+				Activator.log(e);
+				return;
+			}
 		}
 
-		// Set active build config and the default build config for each sync config
-		IConfiguration defaultConfig;
+        // Set active build config and the default build config for each sync config
+		IConfiguration defaultBuildConfig;
 		SyncConfig[] allSyncConfigs = SyncConfigManager.getConfigs(project);
 		for (SyncConfig config : allSyncConfigs) {
 			if (SyncConfigManager.isLocal(config)) {
-				defaultConfig = defaultLocal;
+				defaultBuildConfig = defaultLocalBuildConfig;
 			} else {
-				defaultConfig = defaultRemote;
+				defaultBuildConfig = defaultRemoteBuildConfig;
 			}
-			config.setProperty(DEFAULT_BUILD_CONFIG_ID, defaultConfig.getId());
+			config.setProperty(DEFAULT_BUILD_CONFIG_ID, defaultBuildConfig.getId());
 			if (SyncConfigManager.isActive(project, config)) {
-				ManagedBuildManager.setDefaultConfiguration(project, defaultConfig);
+				ManagedBuildManager.setDefaultConfiguration(project, defaultBuildConfig);
 			}
 		}
 
@@ -127,13 +126,35 @@ public class NewRemoteSyncProjectWizardOperation {
 			Activator.log(e);
 		}
 
-		SyncFileFilter customFilter = mainPage.getCustomFileFilter();
-		if (customFilter != null) {
-			SyncManager.saveFileFilter(project, customFilter);
+		if (customFileFilter != null) {
+			SyncManager.saveFileFilter(project, customFileFilter);
 		}
 		// monitor.done();
 
 		// Enable sync'ing
 		SyncManager.setSyncMode(project, SyncMode.ACTIVE);
+	}
+
+	/**
+	 * Test if given project is a CDT project.
+	 * @param project
+	 * @return whether a CDT project 
+	 */
+	private static boolean isCDTProject(IProject project) {
+		try {
+			return (project.hasNature(CProjectNature.C_NATURE_ID) || project.hasNature(CCProjectNature.CC_NATURE_ID));
+		} catch (CoreException e) {
+			Activator.log(e);
+			return false;
+		}
+	}
+
+	/**
+	 * Test if given project is a synchronized project
+	 * @param project
+	 * @return whether a synchronized project
+	 */
+	private static boolean isSyncProject(IProject project) {
+		return RemoteSyncNature.hasNature(project);
 	}
 }

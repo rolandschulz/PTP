@@ -99,7 +99,9 @@ public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
 				project = this.getProject(true);
 				// Uncomment try/catch statements if run is ever changed to spawn a thread.
 				// try {
-				NewRemoteSyncProjectWizardOperation.run(project, (SyncMainWizardPage) fMainPage, null);
+				SyncMainWizardPage page = (SyncMainWizardPage) fMainPage;
+				NewRemoteSyncProjectWizardOperation.run(project, page.getSynchronizeParticipant(), page.getCustomFileFilter(),
+						page.getLocalToolChains(), page.getRemoteToolChains(), null);
 				// } catch (InvocationTargetException e) {
 				// success = false;
 				// } catch (InterruptedException e) {

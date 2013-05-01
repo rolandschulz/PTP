@@ -9,13 +9,24 @@
 	      name="%NewWizards.project"
 	      icon="icons/etool16/newprj_wiz.gif"
 	      category="org.eclipse.ptp.rdt.ui.wizardCategory.Remote"
-	      class="org.eclipse.ptp.internal.rdt.sync.ui.wizards.NewSyncProjectWizard"
+	      class="org.eclipse.ptp.internal.rdt.sync.ui.wizards.NewSyncProjectWizardProxy"
 	      project="true"
 	      id="org.eclipse.ptp.rdt.sync.ui.newSyncProjectWizard">
 	      <description>
 	            %NewWizards.project.description
 	      </description>
 	   </wizard>
+    <wizard
+          category="org.eclipse.ptp.rdt.ui.wizardCategory.Remote"
+          class="org.eclipse.ptp.internal.rdt.sync.ui.wizards.ConvertToSyncProjectWizardProxy"
+          icon="icons/etool16/newprj_wiz.gif"
+          id="org.eclipse.ptp.rdt.sync.ui.convertToSyncProjectWizard"
+          name="%ConvertWizards.project"
+          project="false">
+       <description>
+          %NewWizards.project.description
+       </description>
+    </wizard>
    </extension>
    <extension
        point="org.eclipse.ui.navigator.viewer">

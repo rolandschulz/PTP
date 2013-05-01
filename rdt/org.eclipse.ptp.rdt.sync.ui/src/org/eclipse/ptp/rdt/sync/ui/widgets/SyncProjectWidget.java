@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     Greg Watson - Initial API and implementation
+ *     John Eblen  - Modified to work also as a widget for conversion wizards
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.ui.widgets;
 
@@ -73,11 +74,12 @@ public class SyncProjectWidget extends Composite {
 	private int fMessageType;
 
 	private boolean fIsComplete;
+	private boolean fHasLocalGroup;
 
 	private String fProjectName;
 
 	/**
-	 * Constructor
+	 * Return a widget for wizards that create new sync projects
 	 * 
 	 * @param parent
 	 *            parent composite
@@ -85,9 +87,42 @@ public class SyncProjectWidget extends Composite {
 	 *            style or SWT.NONE
 	 * @param context
 	 *            runnable context, or null
+	 * @return widget
 	 * @since 7.0
 	 */
-	public SyncProjectWidget(Composite parent, int style, IRunnableContext context) {
+	public static SyncProjectWidget newProjectWidget(Composite parent, int style, IRunnableContext context) {
+		return new SyncProjectWidget(parent, style, context, true);
+	}
+
+	/**
+	 * Return a widget for wizards that convert existing projects to sync projects
+	 * 
+	 * @param parent
+	 *            parent composite
+	 * @param style
+	 *            style or SWT.NONE
+	 * @param context
+	 *            runnable context, or null
+	 * @return widget
+	 * @since 7.0
+	 */
+	public static SyncProjectWidget convertProjectWidget(Composite parent, int style, IRunnableContext context) {
+		return new SyncProjectWidget(parent, style, context, false);
+	}
+
+	/**
+	 * Private constructor. Clients should use provided static factory methods.
+	 * 
+	 * @param parent
+	 *            parent composite
+	 * @param style
+	 *            style or SWT.NONE
+	 * @param context
+	 *            runnable context, or null
+	 * @param isForNewProject
+	 *            whether widget is for creating a new sync project or converting an existing project to a sync project
+	 */
+	private SyncProjectWidget(Composite parent, int style, IRunnableContext context, boolean isForNewProject) {
 		super(parent, style);
 
 		GridLayout layout = new GridLayout(2, false);
@@ -95,7 +130,10 @@ public class SyncProjectWidget extends Composite {
 		layout.marginWidth = 0;
 		setLayout(layout);
 
-		createLocalGroup(this);
+		fHasLocalGroup = isForNewProject;
+		if (isForNewProject) {
+			createLocalGroup(this);
+		}
 		createRemoteGroup(this, context);
 		createFilterGroup(this);
 	}
@@ -232,6 +270,9 @@ public class SyncProjectWidget extends Composite {
 	 * @return
 	 */
 	public String getProjectLocalLocation() {
+		if (!fHasLocalGroup) {
+			return null;
+		}
 		if (fLocalProjectLocationText == null) {
 			return EMPTY_STRING;
 		}
@@ -286,7 +327,9 @@ public class SyncProjectWidget extends Composite {
 
 	public void setProjectName(String name) {
 		fProjectName = name;
-		setLocalProjectLocation();
+		if (fHasLocalGroup) {
+			setLocalProjectLocation();
+		}
 		if (fSelectedParticipant != null) {
 			fSelectedParticipant.setProjectName(name);
 		}
@@ -295,7 +338,10 @@ public class SyncProjectWidget extends Composite {
 	/**
 	 * @return
 	 */
-	public boolean useDafaults() {
+	public boolean useDefaults() {
+		if (!fHasLocalGroup) {
+			return false;
+		}
 		return fUseDefaultLocationButton.getSelection();
 	}
 
@@ -348,7 +394,11 @@ public class SyncProjectWidget extends Composite {
 		fMessage = null;
 		fMessageType = IMessageProvider.NONE;
 		fErrorMessage = null;
-		return (validateLocalLocation() && validateRemoteLocation());
+		if (fHasLocalGroup) {
+			return (validateLocalLocation() && validateRemoteLocation());
+		} else {
+			return validateRemoteLocation();
+		}
 	}
 
 	/**
