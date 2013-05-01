@@ -21,9 +21,8 @@ package org.eclipse.ptp.internal.ui.actions;
 import java.util.BitSet;
 
 import org.eclipse.jface.action.IAction;
-import org.eclipse.ptp.ui.actions.ParallelAction;
-import org.eclipse.ptp.ui.messages.Messages;
-import org.eclipse.ptp.ui.views.AbstractParallelElementView;
+import org.eclipse.ptp.internal.ui.messages.Messages;
+import org.eclipse.ptp.internal.ui.views.AbstractParallelElementView;
 
 /**
  * @author Clement chu

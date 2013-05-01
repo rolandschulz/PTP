@@ -16,7 +16,7 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.debug.core.IPDebugConfiguration;
-import org.eclipse.ptp.debug.ui.PTPDebugUIPlugin;
+import org.eclipse.ptp.internal.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.internal.messages.Messages;
 import org.eclipse.ptp.launch.ui.LaunchImages;
@@ -144,8 +144,8 @@ public abstract class AbstractDebuggerTab extends LaunchConfigurationTab {
 	protected void loadDynamicDebugArea() {
 		// Dispose of any current child widgets in the tab holder area
 		Control[] children = getDynamicTabHolder().getChildren();
-		for (int i = 0; i < children.length; i++) {
-			children[i].dispose();
+		for (Control element : children) {
+			element.dispose();
 		}
 
 		// Retrieve the dynamic UI for the current Debugger

@@ -20,9 +20,10 @@ package org.eclipse.ptp.debug.core.pdi.event;
 
 /**
  * Notifies that the originator has been restarted.
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIRestartedEvent extends IPDIEvent {
-
+	// Empty
 }

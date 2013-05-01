@@ -18,13 +18,12 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.manager;
 
-
 /**
  * TODO
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDITraceManager extends IPDIManager {
-
+	// Empty
 }
-

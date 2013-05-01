@@ -26,12 +26,10 @@ import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.internal.ui.ParallelImages;
-import org.eclipse.ptp.ui.actions.GotoAction;
-import org.eclipse.ptp.ui.actions.GotoDropDownAction;
-import org.eclipse.ptp.ui.messages.Messages;
-import org.eclipse.ptp.ui.model.IElementHandler;
-import org.eclipse.ptp.ui.model.IElementSet;
-import org.eclipse.ptp.ui.views.AbstractParallelElementView;
+import org.eclipse.ptp.internal.ui.messages.Messages;
+import org.eclipse.ptp.internal.ui.model.IElementHandler;
+import org.eclipse.ptp.internal.ui.model.IElementSet;
+import org.eclipse.ptp.internal.ui.views.AbstractParallelElementView;
 
 /**
  * @author clement chu

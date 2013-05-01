@@ -21,7 +21,6 @@ package org.eclipse.ptp.internal.ui;
 import java.net.URL;
 
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ptp.ui.PTPUIPlugin;
 import org.eclipse.ptp.utils.ui.ImageManager;
 import org.eclipse.swt.graphics.Image;
 

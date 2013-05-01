@@ -110,25 +110,25 @@
          point="org.eclipse.debug.core.breakpoints">
       <breakpoint
             markerType="org.eclipse.ptp.debug.core.pLineBreakpointMarker"
-            class="org.eclipse.ptp.debug.internal.core.breakpoint.PLineBreakpoint"
+            class="org.eclipse.ptp.internal.debug.core.breakpoint.PLineBreakpoint"
             name="%PLineBreakpoint.name"
             id="pLineBreakpoint">
       </breakpoint>
       <breakpoint
             markerType="org.eclipse.ptp.debug.core.pAddressBreakpointMarker"
-            class="org.eclipse.ptp.debug.internal.core.breakpoint.PAddressBreakpoint"
+            class="org.eclipse.ptp.internal.debug.core.breakpoint.PAddressBreakpoint"
             name="%PAddressBreakpoint.name"
             id="pAddressBreakpoint">
       </breakpoint>
       <breakpoint
             markerType="org.eclipse.ptp.debug.core.pFunctionBreakpointMarker"
-            class="org.eclipse.ptp.debug.internal.core.breakpoint.PFunctionBreakpoint"
+            class="org.eclipse.ptp.internal.debug.core.breakpoint.PFunctionBreakpoint"
             name="%PFunctionBreakpoint.name"
             id="pFunctionBreakpoint">
       </breakpoint>
       <breakpoint
             markerType="org.eclipse.ptp.debug.core.pWatchpointMarker"
-            class="org.eclipse.ptp.debug.internal.core.breakpoint.PWatchpoint"
+            class="org.eclipse.ptp.internal.debug.core.breakpoint.PWatchpoint"
             name="%PWatchBreakpoint.name"
             id="pWatchpoint">
       </breakpoint>
@@ -136,30 +136,30 @@
    
    <extension
          point="org.eclipse.core.runtime.preferences">
-      <initializer class="org.eclipse.ptp.debug.internal.core.PreferenceInitializer"/>
+      <initializer class="org.eclipse.ptp.internal.debug.core.PreferenceInitializer"/>
    </extension>
 	<extension
 		point="org.eclipse.debug.core.sourcePathComputers">
 		<sourcePathComputer
-			class="org.eclipse.ptp.debug.internal.core.sourcelookup.PSourcePathComputerDelegate"
+			class="org.eclipse.ptp.internal.debug.core.sourcelookup.PSourcePathComputerDelegate"
 			id="org.eclipse.ptp.debug.core.sourcePathComputer"/>
 	</extension>
 	<extension
 		point="org.eclipse.debug.core.sourceLocators">
 		<sourceLocator
-			class="org.eclipse.ptp.debug.core.sourcelookup.PSourceLookupDirector"
+			class="org.eclipse.ptp.internal.debug.core.sourcelookup.PSourceLookupDirector"
 			name="PTP Source Locator"
 			id="org.eclipse.ptp.debug.core.sourceLocator"/>
 	</extension>
 	<extension
 		point="org.eclipse.debug.core.sourceContainerTypes">
 		<sourceContainerType
-			class="org.eclipse.ptp.debug.internal.core.sourcelookup.ResourceMappingSourceContainerType"
+			class="org.eclipse.ptp.internal.debug.core.sourcelookup.ResourceMappingSourceContainerType"
 			description="%containerDescription.mapping"
 			id="org.eclipse.ptp.debug.core.containerType.resourceMapping"
 			name="%containerName.mapping"/>
 		<sourceContainerType
-        class="org.eclipse.ptp.debug.internal.core.sourcelookup.PDirectorySourceContainerType"
+        class="org.eclipse.ptp.internal.debug.core.sourcelookup.PDirectorySourceContainerType"
         description="%containerDescription.directory"
         id="org.eclipse.ptp.debug.core.containerType.directory"
         name="%containerName.directory">

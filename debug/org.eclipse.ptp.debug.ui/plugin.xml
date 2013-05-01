@@ -8,7 +8,7 @@
 	<extension
 		point="org.eclipse.debug.ui.debugModelPresentations">
 		<debugModelPresentation
-			class="org.eclipse.ptp.debug.internal.ui.PDebugModelPresentation"
+			class="org.eclipse.ptp.internal.debug.ui.PDebugModelPresentation"
 			id="org.eclipse.ptp.debug.core">
 		</debugModelPresentation>
 	</extension>
@@ -19,33 +19,33 @@
 			name="%SignalsView.name"
 			icon="icons/view16/signals_view.gif"
 			category="org.eclipse.ptp.ui.views"
-			class="org.eclipse.ptp.debug.internal.ui.views.signals.SignalsView"
+			class="org.eclipse.ptp.internal.debug.ui.views.signals.SignalsView"
 			id="org.eclipse.ptp.debug.ui.views.SignalsView">
 		</view>
 		<view
 			name="%ParallelDebugView.name"
 			icon="icons/view16/parallel_debug.gif"
 			category="org.eclipse.ptp.ui.views"
-			class="org.eclipse.ptp.debug.ui.views.ParallelDebugView"
+			class="org.eclipse.ptp.internal.debug.ui.views.ParallelDebugView"
 			id="org.eclipse.ptp.debug.ui.views.parallelDebugView">
 		</view>
 		<view
 			name="%ArrayView.name"
 			icon="icons/view16/arrays_view.gif"
 			category="org.eclipse.ptp.ui.views"
-			class="org.eclipse.ptp.debug.internal.ui.views.array.ArrayView"
+			class="org.eclipse.ptp.internal.debug.ui.views.array.ArrayView"
 			id="org.eclipse.ptp.debug.ui.views.ArrayView">
 		</view>
 		<view
 			name="%PVariableView.name"
 			icon="icons/view16/variables_view.gif"
 			category="org.eclipse.ptp.ui.views"
-			class="org.eclipse.ptp.debug.internal.ui.views.variable.PVariableView"
+			class="org.eclipse.ptp.internal.debug.ui.views.variable.PVariableView"
 			id="org.eclipse.ptp.debug.ui.views.PVariableView">
 		</view>
 		<view
         category="org.eclipse.ptp.ui.views"
-        class="org.eclipse.ptp.debug.internal.ui.views.locations.PLocationView"
+        class="org.eclipse.ptp.internal.debug.ui.views.locations.PLocationView"
         icon="icons/view16/debug_locations_view.gif"
         id="org.eclipse.ptp.debug.ui.views.PLocationView"
         name="%PLocationView.name">
@@ -94,7 +94,7 @@
 		<page
 			name="%PDebugPreferencePage.name"
 			category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage"
-			class="org.eclipse.ptp.debug.internal.ui.preferences.PDebugPreferencePage"
+			class="org.eclipse.ptp.internal.debug.ui.preferences.PDebugPreferencePage"
 			id="org.eclipse.ptp.debug.ui.PDebugPreferencePage">
 		</page>
 	</extension>
@@ -105,7 +105,7 @@
 		<perspective
 			name="%ParallelDebugPerspective.name"
 			icon="icons/view16/parallel_debug.gif"
-			class="org.eclipse.ptp.debug.internal.ui.PTPDebugPerspectiveFactory"
+			class="org.eclipse.ptp.internal.debug.ui.PTPDebugPerspectiveFactory"
 			id="org.eclipse.ptp.debug.ui.PTPDebugPerspective">
 			<description>
 				%ParallelDebugPerspective.description
@@ -120,7 +120,7 @@
 			othersLabel="%PBreakpointSet.others"
 			label="%PBreakpointSet.label"
 			icon="icons/debug/ptp_bpt_set.gif"
-			class="org.eclipse.ptp.debug.internal.ui.views.breakpoints.PBreakpointSetOrganizer"
+			class="org.eclipse.ptp.internal.debug.ui.views.breakpoints.PBreakpointSetOrganizer"
 			id="org.eclipse.ptp.debug.ui.pBreakpointSetOrganizer"/>
 	</extension>
 
@@ -161,7 +161,7 @@
 			</menu>
 			<action
 				id="org.eclipse.ptp.debug.ui.actions.ResumeAtLine"
-				class="org.eclipse.ptp.debug.internal.ui.actions.RetargetResumeAtLineAction"
+				class="org.eclipse.ptp.internal.debug.ui.actions.RetargetResumeAtLineAction"
 				disabledIcon="icons/tool/jump_co_disable.gif"
 				enablesFor="1"
 				icon="icons/tool/jump_co_normal.gif"
@@ -177,7 +177,7 @@
 			</action>
 			<action
 				id="org.eclipse.ptp.debug.internal.ui.actions.SignalZeroWorkbenchActionDelegate"
-				class="org.eclipse.ptp.debug.internal.ui.actions.SignalZeroWorkbenchActionDelegate"
+				class="org.eclipse.ptp.internal.debug.ui.actions.SignalZeroWorkbenchActionDelegate"
 				disabledIcon="icons/tool/signal0_co_disable.gif"
 				enablesFor="1"
 				icon="icons/tool/signal0_co_normal.gif"
@@ -194,7 +194,7 @@
 			</action>
 			<action
 				id="org.eclipse.ptp.debug.ui.internal.actions.RestartActionDelegate"
-				class="org.eclipse.ptp.debug.internal.ui.actions.RestartActionDelegate"
+				class="org.eclipse.ptp.internal.debug.ui.actions.RestartActionDelegate"
 				disabledIcon="icons/tool/restart_disable.gif"
 				enablesFor="1"
 				icon="icons/tool/restart_normal.gif"
@@ -220,7 +220,7 @@
 			<action
 				label="%GotoSet.label"
 				icon="icons/debug/ptp_bpt_set.gif"
-				class="org.eclipse.ptp.debug.internal.ui.actions.GotoSet"
+				class="org.eclipse.ptp.internal.debug.ui.actions.GotoSet"
 				menubarPath="navigationGroup"
 				enablesFor="1+"
 				id="org.eclipse.ptp.debug.internal.ui.actions.GotoSet">
@@ -231,7 +231,7 @@
 			id="org.eclipse.ptp.debug.ui.PBreakpointActions">
 			<action
 				label="%BreakpointPropertiesAction.label"
-				class="org.eclipse.ptp.debug.internal.ui.actions.PBreakpointPropertiesAction"
+				class="org.eclipse.ptp.internal.debug.ui.actions.PBreakpointPropertiesAction"
 				menubarPath="additions"
 				enablesFor="1"
 				id="org.eclipse.ptp.debug.internal.ui.actions.PBreakpointPropertiesAction">
@@ -242,7 +242,7 @@
 			id="org.eclipse.ptp.debug.ui.SignalActions">
 			<action
 				label="%SignalAction.label"
-				class="org.eclipse.ptp.debug.internal.ui.actions.SignalActionDelegate"
+				class="org.eclipse.ptp.internal.debug.ui.actions.SignalActionDelegate"
 				tooltip="%SignalAction.tooltip"
 				menubarPath="additions"
 				enablesFor="1"
@@ -258,7 +258,7 @@
 				label="%SignalPropertiesAction.label"
 				style="pulldown"
 				helpContextId="signal_properties_action_context"
-				class="org.eclipse.ptp.debug.internal.ui.actions.SignalPropertiesActionDelegate"
+				class="org.eclipse.ptp.internal.debug.ui.actions.SignalPropertiesActionDelegate"
 				tooltip="%SignalPropertiesAction.tooltip"
 				enablesFor="1"
 				id="org.eclipse.ptp.debug.ui.SignalPropertiesAction">
@@ -281,7 +281,7 @@
 				label="%RestartAction.label"
 				icon="icons/tool/restart_normal.gif"
 				helpContextId="restart_action_context"
-				class="org.eclipse.ptp.debug.internal.ui.actions.RestartActionDelegate"
+				class="org.eclipse.ptp.internal.debug.ui.actions.RestartActionDelegate"
 				menubarPath="stepGroup"
 				enablesFor="1"
 				id="org.eclipse.ptp.debug.internal.ui.actions.RestartActionDelegate">
@@ -291,7 +291,7 @@
 				state="false"
 				style="toggle"
 				id="org.eclipse.ptp.debug.internal.ui.actions.ToggleInstructionStepModeActionDelegate"
-				class="org.eclipse.ptp.debug.internal.ui.actions.ToggleInstructionStepModeActionDelegate"
+				class="org.eclipse.ptp.internal.debug.ui.actions.ToggleInstructionStepModeActionDelegate"
 				enablesFor="1"
 				icon="icons/tool/stepinto_group_normal.png"
 				helpContextId="toggle_instruction_step_mode_action_context"
@@ -310,7 +310,7 @@
 				enablesFor="1"
 				label="%SignalZeroAction.label"
 				tooltip="%SignalZeroAction.tooltip"
-				class="org.eclipse.ptp.debug.internal.ui.actions.SignalZeroWorkbenchActionDelegate"
+				class="org.eclipse.ptp.internal.debug.ui.actions.SignalZeroWorkbenchActionDelegate"
 				menubarPath="threadGroup"
 				id="org.eclipse.ptp.debug.internal.ui.actions.SignalZeroWorkbenchActionDelegate">
 				<selection class="org.eclipse.ptp.debug.core.model.IResumeWithoutSignal"/>
@@ -324,7 +324,7 @@
 		<hover
 			label="%DebugTextHover.label"
 			description="%DebugTextHover.description"
-			class="org.eclipse.ptp.debug.internal.ui.editors.PDebugTextHover"
+			class="org.eclipse.ptp.internal.debug.ui.editors.PDebugTextHover"
 			id="org.eclipse.ptp.debug.internal.ui.editors.PDebugTextHover">
 		</hover>
 	</extension>		
@@ -333,7 +333,7 @@
 	<extension
 		point="org.eclipse.ui.propertyPages">
 		<page
-			class="org.eclipse.ptp.debug.internal.ui.propertypages.PBreakpointPropertyPage"
+			class="org.eclipse.ptp.internal.debug.ui.propertypages.PBreakpointPropertyPage"
 			name="%CommonBreakpointPage.label"
 			id="org.eclipse.ptp.debug.ui.propertypages.breakpoint.common">
 			<enabledWhen>
@@ -343,7 +343,7 @@
 			</enabledWhen>
 		</page>
 		<page
-			class="org.eclipse.ptp.debug.internal.ui.propertypages.SignalPropertyPage"
+			class="org.eclipse.ptp.internal.debug.ui.propertypages.SignalPropertyPage"
 			name="%CommonSignalPage.label"
 			id="org.eclipse.ptp.debug.ui.propertypages.signal.common">
 			<enabledWhen>
@@ -359,7 +359,7 @@
 		point="org.eclipse.debug.core.sourceLocators">
 		<sourceLocator
 			name="%DefaultSourceLocator.name"
-			class="org.eclipse.ptp.debug.ui.sourcelookup.DefaultSourceLocator"
+			class="org.eclipse.ptp.internal.debug.ui.sourcelookup.DefaultSourceLocator"
 			id="org.eclipse.ptp.debug.ui.DefaultSourceLocator">
 		</sourceLocator>
 	</extension>
@@ -426,7 +426,7 @@
 	<extension
 		point="org.eclipse.ui.editors.markerAnnotationSpecification">
 		<specification
-        annotationImageProvider="org.eclipse.ptp.debug.internal.ui.BreakpointImageProvider"
+        annotationImageProvider="org.eclipse.ptp.internal.debug.ui.BreakpointImageProvider"
         annotationType="org.eclipse.ptp.debug.core.breakpoint"
         label="%PBreakpointAnnotation.label"
         presentationLayer="4">
@@ -500,18 +500,18 @@
 	<!-- runtime adapters //-->
 	<extension point="org.eclipse.core.runtime.adapters">
 		<factory
-			class="org.eclipse.ptp.debug.internal.ui.PBreakpointWorkbenchAdapterFactory"
+			class="org.eclipse.ptp.internal.debug.ui.PBreakpointWorkbenchAdapterFactory"
 			adaptableType="org.eclipse.ptp.debug.core.model.IPBreakpoint">
 			<adapter type="org.eclipse.ui.model.IWorkbenchAdapter"/>
 		</factory>
 		<factory
-			adaptableType="org.eclipse.ptp.debug.internal.core.sourcelookup.ResourceMappingSourceContainer"
-			class="org.eclipse.ptp.debug.internal.ui.sourcelookup.SourceContainerAdapterFactory">
+			adaptableType="org.eclipse.ptp.internal.debug.core.sourcelookup.ResourceMappingSourceContainer"
+			class="org.eclipse.ptp.internal.debug.ui.sourcelookup.SourceContainerAdapterFactory">
 			<adapter type="org.eclipse.ui.model.IWorkbenchAdapter"/>
 		</factory>
 		<factory
 			adaptableType="org.eclipse.debug.core.sourcelookup.containers.ProjectSourceContainer"
-			class="org.eclipse.ptp.debug.internal.ui.sourcelookup.SourceContainerAdapterFactory">
+			class="org.eclipse.ptp.internal.debug.ui.sourcelookup.SourceContainerAdapterFactory">
 			<adapter type="org.eclipse.ui.model.IWorkbenchAdapter"/>
 		</factory>
 	</extension>
@@ -521,7 +521,7 @@
 		point="org.eclipse.debug.core.watchExpressionDelegates">
 		<watchExpressionDelegate
 			debugModel="org.eclipse.ptp.debug.core"
-			delegateClass="org.eclipse.ptp.debug.internal.ui.PWatchExpressionDelegate"/>
+			delegateClass="org.eclipse.ptp.internal.debug.ui.PWatchExpressionDelegate"/>
 	</extension>
 	<!-- Memory //-->
 	<extension
@@ -531,7 +531,7 @@
 			primaryId="org.eclipse.debug.ui.rendering.raw_memory"
 			renderingIds="org.eclipse.debug.ui.rendering.raw_memory,org.eclipse.debug.ui.rendering.ascii,org.eclipse.debug.ui.rendering.signedint,org.eclipse.debug.ui.rendering.unsignedint">
 			<enablement>
-				<instanceof value="org.eclipse.ptp.debug.internal.core.model.PMemoryBlockExtension"/>
+				<instanceof value="org.eclipse.ptp.internal.debug.core.model.PMemoryBlockExtension"/>
 			</enablement>
 		</renderingBindings>
 	</extension>
@@ -539,7 +539,7 @@
 	<extension
 		point="org.eclipse.debug.ui.sourceContainerPresentations">
 		<sourceContainerPresentation
-			browserClass="org.eclipse.ptp.debug.internal.ui.sourcelookup.ResourceMappingSourceContainerBrowser"
+			browserClass="org.eclipse.ptp.internal.debug.ui.sourcelookup.ResourceMappingSourceContainerBrowser"
 			containerTypeID="org.eclipse.ptp.debug.core.containerType.resourceMapping"
 			icon="icons/obj16/mapping_obj.gif"
 			id="org.eclipse.ptp.debug.ui.sourceContainerPresentation.resourceMapping"/>
@@ -547,7 +547,7 @@
  <extension
        point="org.eclipse.debug.ui.toggleBreakpointsTargetFactories">
     <toggleTargetFactory
-          class="org.eclipse.ptp.debug.internal.ui.views.breakpoints.EditorToggleBreakpointsTargetFactory"
+          class="org.eclipse.ptp.internal.debug.ui.views.breakpoints.EditorToggleBreakpointsTargetFactory"
           id="org.eclipse.ptp.debug.ui.views.breakpoints.toggleBreakpointsTargetFactory">
        <enablement>
           <with

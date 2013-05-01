@@ -19,8 +19,7 @@
 package org.eclipse.ptp.internal.ui.hover;
 
 import org.eclipse.jface.text.TextPresentation;
-import org.eclipse.ptp.ui.hover.IIconInformationControl;
-import org.eclipse.ptp.ui.messages.Messages;
+import org.eclipse.ptp.internal.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.custom.StyledText;

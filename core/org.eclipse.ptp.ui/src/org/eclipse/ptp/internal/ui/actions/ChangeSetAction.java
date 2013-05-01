@@ -24,12 +24,10 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.ptp.internal.ui.ParallelImages;
-import org.eclipse.ptp.ui.actions.GotoAction;
-import org.eclipse.ptp.ui.actions.GotoDropDownAction;
-import org.eclipse.ptp.ui.messages.Messages;
-import org.eclipse.ptp.ui.model.IElementHandler;
-import org.eclipse.ptp.ui.model.IElementSet;
-import org.eclipse.ptp.ui.views.AbstractParallelElementView;
+import org.eclipse.ptp.internal.ui.messages.Messages;
+import org.eclipse.ptp.internal.ui.model.IElementHandler;
+import org.eclipse.ptp.internal.ui.model.IElementSet;
+import org.eclipse.ptp.internal.ui.views.AbstractParallelElementView;
 
 /**
  * @author Clement chu

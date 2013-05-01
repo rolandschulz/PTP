@@ -20,10 +20,10 @@ package org.eclipse.ptp.debug.core.pdi.event;
 
 /**
  * Notifies that the originator has connected
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIConnectedEvent extends IPDIEvent {
-
+	// Empty
 }
-

@@ -20,9 +20,10 @@ package org.eclipse.ptp.debug.core.pdi.event;
 
 /**
  * Notifies that the originator has been started.
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIStartedEvent extends IPDIEvent {
-
+	// Empty
 }

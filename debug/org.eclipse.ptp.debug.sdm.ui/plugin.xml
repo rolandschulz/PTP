@@ -6,14 +6,14 @@
       <page
             name="%SDMPreferencePage.name"
             category="org.eclipse.ptp.debug.ui.PDebugPreferencePage"
-            class="org.eclipse.ptp.debug.sdm.internal.ui.preferences.SDMPreferencePage"
+            class="org.eclipse.ptp.internal.debug.sdm.ui.preferences.SDMPreferencePage"
             id="org.eclipse.ptp.debug.sdm.ui.SDMPreferencePage">
       </page>
    </extension>
    <extension
          point="org.eclipse.ptp.debug.ui.debuggerConfigurations">
       <debuggerConfiguration
-            class="org.eclipse.ptp.debug.sdm.internal.ui.SDMPage"
+            class="org.eclipse.ptp.internal.debug.sdm.ui.SDMPage"
             debuggerID="org.eclipse.ptp.debug.sdm"
             id="org.eclipse.ptp.debug.sdm.SDMPage">
       </debuggerConfiguration>

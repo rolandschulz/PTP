@@ -20,7 +20,7 @@ package org.eclipse.ptp.debug.core.model;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.model.IBreakpoint;
-import org.eclipse.ptp.debug.core.messages.Messages;
+import org.eclipse.ptp.internal.debug.core.messages.Messages;
 
 /**
  * @author Clement chu

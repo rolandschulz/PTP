@@ -28,6 +28,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core;
 
+import org.eclipse.ptp.internal.debug.core.PTPDebugCorePlugin;
+
 /**
  * Constant definitions for PTP debug plug-in.
  */

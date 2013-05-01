@@ -25,7 +25,7 @@ import java.util.Iterator;
 
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.TextPresentation;
-import org.eclipse.ptp.ui.PTPUIPlugin;
+import org.eclipse.ptp.internal.ui.PTPUIPlugin;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Display;

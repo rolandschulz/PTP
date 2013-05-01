@@ -12,7 +12,6 @@ package org.eclipse.ptp.debug.core.tests;
 
 import junit.framework.TestCase;
 
-import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFactory;
 import org.eclipse.ptp.debug.core.pdi.model.aif.AIFFormatException;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFType;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeAddress;
@@ -32,6 +31,7 @@ import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeReference;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeString;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeUnion;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeVoid;
+import org.eclipse.ptp.internal.debug.core.pdi.model.aif.AIFFactory;
 
 public class AIFTests extends TestCase {
 	public void testTypes() {

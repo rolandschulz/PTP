@@ -2,10 +2,10 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.debug.sdm.core;singleton:=true
-Bundle-Version: 6.0.0.qualifier
-Bundle-Activator: org.eclipse.ptp.debug.sdm.core.SDMDebugCorePlugin
+Bundle-Version: 7.0.0.qualifier
+Bundle-Activator: org.eclipse.ptp.internal.debug.sdm.core.SDMDebugCorePlugin
 Bundle-Localization: plugin
-Export-Package: org.eclipse.ptp.debug.sdm.core;
+Export-Package: org.eclipse.ptp.internal.debug.sdm.core;x-friends:="org.eclipse.ptp.debug.sdm.ui";
   uses:="org.eclipse.ptp.core.attributes,
    org.eclipse.ptp.debug.core,
    org.eclipse.ptp.debug.core.pdi.manager,
@@ -19,7 +19,8 @@ Export-Package: org.eclipse.ptp.debug.sdm.core;
    org.eclipse.core.runtime,
    org.eclipse.ptp.debug.core.pdi.model,
    org.eclipse.debug.core",
- org.eclipse.ptp.debug.sdm.core.pdi;
+ org.eclipse.ptp.internal.debug.sdm.core.messages;x-internal:=true,
+ org.eclipse.ptp.internal.debug.sdm.core.pdi;x-friends:="org.eclipse.ptp.debug.sdm.ui";
   uses:="org.eclipse.ptp.proxy.event,
    org.eclipse.ptp.debug.sdm.core.proxy,
    org.eclipse.ptp.debug.core.pdi.model.aif,
@@ -27,7 +28,12 @@ Export-Package: org.eclipse.ptp.debug.sdm.core;
    org.eclipse.ptp.debug.core.pdi,
    org.eclipse.core.runtime,
    org.eclipse.ptp.debug.core.pdi.model",
- org.eclipse.ptp.debug.sdm.core.proxy;uses:="org.eclipse.ptp.core.util,org.eclipse.core.runtime,org.eclipse.ptp.proxy.debug.client"
+ org.eclipse.ptp.internal.debug.sdm.core.pdi.request;x-friends:="org.eclipse.ptp.debug.sdm.ui",
+ org.eclipse.ptp.internal.debug.sdm.core.proxy;x-friends:="org.eclipse.ptp.debug.sdm.ui";
+  uses:="org.eclipse.ptp.core.util,
+   org.eclipse.core.runtime,
+   org.eclipse.ptp.proxy.debug.client",
+ org.eclipse.ptp.internal.debug.sdm.core.utils;x-friends:="org.eclipse.ptp.debug.sdm.ui"
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.debug.core,
  org.eclipse.core.filesystem,

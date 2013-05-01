@@ -21,10 +21,10 @@ package org.eclipse.ptp.debug.core.pdi;
 /**
  * TODO
  * Represents a trace snapshot in the debug session
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDITraceSnapshot extends IPDISessionObject {
-
+	// Empty
 }
-

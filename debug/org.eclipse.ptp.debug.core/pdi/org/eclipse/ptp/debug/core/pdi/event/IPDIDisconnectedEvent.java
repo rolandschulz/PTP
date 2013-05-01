@@ -20,10 +20,10 @@ package org.eclipse.ptp.debug.core.pdi.event;
 
 /**
  * Notifies that the originator has disconnected
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIDisconnectedEvent extends IPDIEvent {
-
+	// Empty
 }
-

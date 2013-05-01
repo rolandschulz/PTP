@@ -18,7 +18,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.ui.hover;
 
-import org.eclipse.ptp.ui.hover.IIconInformationControl;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 

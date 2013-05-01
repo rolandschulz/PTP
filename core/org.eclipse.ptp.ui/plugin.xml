@@ -6,14 +6,14 @@
 		point="org.eclipse.ui.preferencePages">
 		<page
 			name="%preferencePages.name"
-			class="org.eclipse.ptp.ui.preferences.PTPPreferencesPage"
+			class="org.eclipse.ptp.internal.ui.preferences.PTPPreferencesPage"
 			id="org.eclipse.ptp.ui.preferences.ptpPreferencesPage">
 		</page>
 	</extension>
 	<extension
 		point="org.eclipse.core.runtime.preferences">
 		<initializer
-			class="org.eclipse.ptp.ui.preferences.PreferenceInitializer">
+			class="org.eclipse.ptp.internal.ui.preferences.PreferenceInitializer">
 		</initializer>
 	</extension>
    

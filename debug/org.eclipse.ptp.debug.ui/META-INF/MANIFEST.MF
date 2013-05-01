@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.debug.ui; singleton:=true
 Bundle-Version: 5.0.0.qualifier
-Bundle-Activator: org.eclipse.ptp.debug.ui.PTPDebugUIPlugin
+Bundle-Activator: org.eclipse.ptp.internal.debug.ui.PTPDebugUIPlugin
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.jface.text,
  org.eclipse.ui,
@@ -16,19 +16,32 @@ Require-Bundle: org.eclipse.jface.text,
  org.eclipse.cdt.ui,
  org.eclipse.cdt.debug.core,
  org.eclipse.cdt.core,
- org.eclipse.ptp.debug.core,
  org.eclipse.cdt.debug.ui,
  org.eclipse.ptp.core,
  org.eclipse.ptp.proxy.protocol,
  org.eclipse.ptp.ui,
  org.eclipse.ptp.remote.core,
  org.eclipse.ptp.remote.ui,
- org.eclipse.ptp.utils.core
+ org.eclipse.ptp.utils.core,
+ org.eclipse.ptp.debug.core
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: %pluginProvider
-Export-Package: org.eclipse.ptp.debug.ui,
- org.eclipse.ptp.debug.ui.events,
- org.eclipse.ptp.debug.ui.listeners,
- org.eclipse.ptp.debug.ui.views
+Export-Package: org.eclipse.ptp.internal.debug.ui;x-friends:="org.eclipse.ptp.launch,org.eclipse.ptp.debug.sdm.ui",
+ org.eclipse.ptp.internal.debug.ui.actions;x-internal:=true,
+ org.eclipse.ptp.internal.debug.ui.dialogfields;x-internal:=true,
+ org.eclipse.ptp.internal.debug.ui.dialogs;x-internal:=true,
+ org.eclipse.ptp.internal.debug.ui.editors;x-internal:=true,
+ org.eclipse.ptp.internal.debug.ui.events;x-internal:=true,
+ org.eclipse.ptp.internal.debug.ui.listeners;x-internal:=true,
+ org.eclipse.ptp.internal.debug.ui.messages;x-internal:=true,
+ org.eclipse.ptp.internal.debug.ui.preferences;x-internal:=true,
+ org.eclipse.ptp.internal.debug.ui.propertypages;x-internal:=true,
+ org.eclipse.ptp.internal.debug.ui.sourcelookup;x-internal:=true,
+ org.eclipse.ptp.internal.debug.ui.views;x-internal:=true,
+ org.eclipse.ptp.internal.debug.ui.views.array;x-internal:=true,
+ org.eclipse.ptp.internal.debug.ui.views.breakpoints;x-internal:=true,
+ org.eclipse.ptp.internal.debug.ui.views.locations;x-internal:=true,
+ org.eclipse.ptp.internal.debug.ui.views.signals;x-internal:=true,
+ org.eclipse.ptp.internal.debug.ui.views.variable;x-internal:=true
 Import-Package: org.eclipse.core.filesystem
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

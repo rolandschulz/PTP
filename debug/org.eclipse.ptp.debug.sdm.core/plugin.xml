@@ -5,13 +5,13 @@
      <extension
            point="org.eclipse.core.runtime.preferences">
         <initializer
-              class="org.eclipse.ptp.debug.sdm.core.PreferenceInitializer">
+              class="org.eclipse.ptp.internal.debug.sdm.core.PreferenceInitializer">
         </initializer>
      </extension>
      <extension
            point="org.eclipse.ptp.debug.core.parallelDebuggers">
         <debugger
-              class="org.eclipse.ptp.debug.sdm.core.SDMDebugger"
+              class="org.eclipse.ptp.internal.debug.sdm.core.SDMDebugger"
               cpu="*"
               id="org.eclipse.ptp.debug.sdm"
               modes="run"

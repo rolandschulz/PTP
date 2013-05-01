@@ -18,7 +18,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.model;
 
-import org.eclipse.ptp.debug.core.messages.Messages;
+import org.eclipse.ptp.internal.debug.core.messages.Messages;
 
 /**
  * @author clement

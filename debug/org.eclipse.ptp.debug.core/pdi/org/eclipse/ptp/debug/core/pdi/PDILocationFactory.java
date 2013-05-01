@@ -12,11 +12,11 @@ package org.eclipse.ptp.debug.core.pdi;
 
 import java.math.BigInteger;
 
-import org.eclipse.ptp.debug.internal.core.pdi.AddressLocation;
-import org.eclipse.ptp.debug.internal.core.pdi.FileLocation;
-import org.eclipse.ptp.debug.internal.core.pdi.FunctionLocation;
-import org.eclipse.ptp.debug.internal.core.pdi.LineLocation;
-import org.eclipse.ptp.debug.internal.core.pdi.Locator;
+import org.eclipse.ptp.internal.debug.core.pdi.AddressLocation;
+import org.eclipse.ptp.internal.debug.core.pdi.FileLocation;
+import org.eclipse.ptp.internal.debug.core.pdi.FunctionLocation;
+import org.eclipse.ptp.internal.debug.core.pdi.LineLocation;
+import org.eclipse.ptp.internal.debug.core.pdi.Locator;
 
 /**
  * @author greg
