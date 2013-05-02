@@ -45,11 +45,6 @@ public class ElementSet implements IElementSet {
 	/**
 	 * @since 7.0
 	 */
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.ui.model.IElementSet#addElements(org.eclipse.ptp.utils.core.RangeSet)
-	 */
 	@Override
 	public void addElements(BitSet elements) {
 		fElements.or(elements);

@@ -88,20 +88,6 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.utils.core.source"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.ptp.utils.ui.source"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="org.eclipse.ptp.services.core.source"
          download-size="0"
          install-size="0"

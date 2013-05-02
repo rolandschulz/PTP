@@ -30,7 +30,6 @@
       <import plugin="org.eclipse.ui.ide"/>
       <import plugin="org.eclipse.ptp.remote.remotetools.core"/>
       <import plugin="org.eclipse.ptp.remote.ui"/>
-      <import plugin="org.eclipse.ptp.utils.ui"/>
    </requires>
 
    <plugin
