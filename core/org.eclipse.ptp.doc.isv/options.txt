@@ -3,6 +3,11 @@
 -charset "iso-8859-1"
 -sourcepath "
 ;../../core/org.eclipse.ptp.core/src
+;../../core/org.eclipse.ptp.debug.core/src
+;../../core/org.eclipse.ptp.ems.core/src
+;../../core/org.eclipse.ptp.ems.ui/src
+;../../core/org.eclipse.ptp.etfw/src
+;../../core/org.eclipse.ptp.etfw.toolopts/src
 ;../../core/org.eclipse.ptp.launch/src
 ;../../core/org.eclipse.ptp.remote.core/src
 ;../../core/org.eclipse.ptp.remote.ui/src
