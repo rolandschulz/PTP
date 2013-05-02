@@ -7,7 +7,7 @@
  * Contributors: 
  * 		Chris Navarro (Illinois/NCSA) - Design and implementation
  *******************************************************************************/
-package org.eclipse.ptp.etfw.internal;
+package org.eclipse.ptp.internal.etfw;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -26,12 +26,12 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.AbstractToolDataManager;
-import org.eclipse.ptp.etfw.Activator;
+import org.eclipse.ptp.etfw.ETFWUtils;
 import org.eclipse.ptp.etfw.IBuildLaunchUtils;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.jaxb.data.AnalysisToolType;
 import org.eclipse.ptp.etfw.jaxb.data.ToolAppType;
-import org.eclipse.ptp.etfw.messages.Messages;
+import org.eclipse.ptp.internal.etfw.messages.Messages;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -151,7 +151,7 @@ public class ETFWAnalysisTool extends ETFWToolStep implements IToolLaunchConfigu
 				 * Otherwise, if we have an alternative tool defined in a plugin
 				 */
 				else {
-					AbstractToolDataManager manager = Activator.getPerfDataManager(anap.getToolCommand());
+					AbstractToolDataManager manager = ETFWUtils.getPerfDataManager(anap.getToolCommand());
 					if (manager != null) {
 						if (externalTarget) {
 

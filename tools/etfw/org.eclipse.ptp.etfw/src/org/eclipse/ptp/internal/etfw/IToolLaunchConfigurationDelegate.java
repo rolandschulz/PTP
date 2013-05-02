@@ -1,4 +1,4 @@
-package org.eclipse.ptp.etfw.internal;
+package org.eclipse.ptp.internal.etfw;
 
 public interface IToolLaunchConfigurationDelegate {
 	

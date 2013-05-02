@@ -15,7 +15,7 @@
  * Contributors:
  *    Wyatt Spear - initial API and implementation
  ****************************************************************************/
-package org.eclipse.ptp.etfw.internal;
+package org.eclipse.ptp.internal.etfw;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -38,29 +38,27 @@ import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.ptp.etfw.Activator;
 import org.eclipse.ptp.etfw.IBuildLaunchUtils;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
-import org.eclipse.ptp.etfw.messages.Messages;
 import org.eclipse.ptp.etfw.toolopts.ExternalToolProcess;
+import org.eclipse.ptp.internal.etfw.messages.Messages;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
 public class BuildLaunchUtils implements IBuildLaunchUtils {
-	
-	
-	public String getWorkingDirectory(){
+
+	public String getWorkingDirectory() {
 		return null;
 	}
-	
+
 	Shell selshell = null;
-	public BuildLaunchUtils(){
-		try{
-		this.selshell=PlatformUI.getWorkbench().getDisplay().getActiveShell();
-		}
-		catch(Exception e){
-			selshell=null;
+
+	public BuildLaunchUtils() {
+		try {
+			this.selshell = PlatformUI.getWorkbench().getDisplay().getActiveShell();
+		} catch (Exception e) {
+			selshell = null;
 		}
 	}
 
@@ -87,8 +85,9 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 		if (vtbinpath == null || vtbinpath.equals("")) //$NON-NLS-1$
 		{
 			vtbinpath = askToolPath(suggPath, queryText, queryMessage);
-			if (vtbinpath == null)
+			if (vtbinpath == null) {
 				vtbinpath = ""; //$NON-NLS-1$
+			}
 		}
 
 		return vtbinpath;
@@ -111,13 +110,14 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 	 *            The shell in which to launch the directory locator window
 	 * @return
 	 */
-	public  String findToolBinPath(String toolfind, String suggPath, String toolName) {
+	public String findToolBinPath(String toolfind, String suggPath, String toolName) {
 		String vtbinpath = BuildLaunchUtils.checkLocalToolEnvPath(toolfind);
 		if (vtbinpath == null || vtbinpath.equals("")) //$NON-NLS-1$
 		{
 			vtbinpath = askToolPath(suggPath, toolName);
-			if (vtbinpath == null)
+			if (vtbinpath == null) {
 				vtbinpath = ""; //$NON-NLS-1$
+			}
 		}
 
 		return vtbinpath;
@@ -134,8 +134,9 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 		IPreferenceStore pstore = Activator.getDefault().getPreferenceStore();
 		String toolBinID = IToolLaunchConfigurationConstants.TOOL_BIN_ID + "." + toolID; //$NON-NLS-1$
 		String path = pstore.getString(toolBinID);
-		if (path != null)
+		if (path != null) {
 			return path;
+		}
 		return ""; //$NON-NLS-1$
 	}
 
@@ -148,22 +149,23 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 	 * @param force
 	 *            If true existing values will be overridden.
 	 */
-	public  void getAllToolPaths(ExternalToolProcess[] tools, boolean force) {
+	public void getAllToolPaths(ExternalToolProcess[] tools, boolean force) {
 		IPreferenceStore pstore = Activator.getDefault().getPreferenceStore();
 
-		//Shell ourshell = PlatformUI.getWorkbench().getDisplay().getActiveShell();
+		// Shell ourshell = PlatformUI.getWorkbench().getDisplay().getActiveShell();
 		Iterator<Map.Entry<String, String>> eIt = null;
 		Map.Entry<String, String> me = null;
 		String entry = null;
 
-		for (int i = 0; i < tools.length; i++) {
-			eIt = tools[i].groupApp.entrySet().iterator();
+		for (ExternalToolProcess tool : tools) {
+			eIt = tool.groupApp.entrySet().iterator();
 			while (eIt.hasNext()) {
 				me = eIt.next();
 				entry = me.getKey();
 
-				if (entry.equals("internal")) //$NON-NLS-1$
+				if (entry.equals("internal")) {
 					continue;
+				}
 
 				String toolBinID = IToolLaunchConfigurationConstants.TOOL_BIN_ID + "." + entry; //$NON-NLS-1$
 				if (force || pstore.getString(toolBinID).equals("")) //$NON-NLS-1$
@@ -177,7 +179,7 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 	public void verifyRequestToolPath(ExternalToolProcess tool, boolean force) {
 		IPreferenceStore pstore = Activator.getDefault().getPreferenceStore();
 
-		//Shell ourshell = PlatformUI.getWorkbench().getDisplay().getActiveShell();
+		// Shell ourshell = PlatformUI.getWorkbench().getDisplay().getActiveShell();
 		Iterator<Map.Entry<String, String>> eIt = null;
 		Map.Entry<String, String> me = null;
 		String entry = null;
@@ -187,8 +189,9 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 			me = eIt.next();
 			entry = me.getKey();
 
-			if (entry.equals("internal")) //$NON-NLS-1$
+			if (entry.equals("internal")) {
 				continue;
+			}
 
 			String toolBinID = IToolLaunchConfigurationConstants.TOOL_BIN_ID + "." + entry; //$NON-NLS-1$
 			if (force || pstore.getString(toolBinID).equals("")) //$NON-NLS-1$
@@ -212,8 +215,9 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 			me = eIt.next();
 			entry = me.getKey();
 
-			if (entry.equals("internal")) //$NON-NLS-1$
+			if (entry.equals("internal")) {
 				continue;
+			}
 
 			toolBinID = IToolLaunchConfigurationConstants.TOOL_BIN_ID + "." + entry; //$NON-NLS-1$
 			curTool = pstore.getString(toolBinID);
@@ -223,18 +227,17 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 				String gVal = me.getValue();
 				if (gVal != null && gVal.trim().length() > 0) {
 					curTool = BuildLaunchUtils.checkLocalToolEnvPath(gVal);
-					if (curTool != null)
+					if (curTool != null) {
 						pstore.setValue(toolBinID, curTool);// findToolBinPath(tools[i].pathFinder,null,tools[i].queryText,tools[i].queryMessage)
+					}
 				}
 			}
 		}
 	}
-	
-	
-	public String checkToolEnvPath(String toolname){
+
+	public String checkToolEnvPath(String toolname) {
 		return checkLocalToolEnvPath(toolname);
 	}
-	
 
 	/**
 	 * This locates name of the parent of the directory containing the given
@@ -247,8 +250,9 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 	 * 
 	 */
 	public static String checkLocalToolEnvPath(String toolname) {
-		if (org.eclipse.cdt.utils.Platform.getOS().toLowerCase().trim().indexOf("win") >= 0) //$NON-NLS-1$
+		if (org.eclipse.cdt.utils.Platform.getOS().toLowerCase().trim().indexOf("win") >= 0) {
 			return null;
+		}
 		String pPath = null;
 		try {
 			Process p = new ProcessBuilder("which", toolname).start();//Runtime.getRuntime().exec("which "+toolname); //$NON-NLS-1$
@@ -263,18 +267,21 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		if (pPath == null)
+		if (pPath == null) {
 			return null;
+		}
 		File test = new File(pPath);
 		File toolin = new File(toolname);
 
-		if (test.getPath().equals(toolin.getPath()))
+		if (test.getPath().equals(toolin.getPath())) {
 			return null;// TODO: Make sure this is the right behavior when the
-						// full path is provided
+		}
+		// full path is provided
 		if (test.exists()) {
 			return test.getParentFile().getPath();
-		} else
+		} else {
 			return null;
+		}
 	}
 
 	/**
@@ -284,15 +291,16 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 	public String askToolPath(String archpath, String toolText, String toolMessage) {
 		// Shell
 		// ourshell=PlatformUI.getWorkbench().getDisplay().getActiveShell();
-		if (selshell == null)
+		if (selshell == null) {
 			return null;
+		}
 		DirectoryDialog dialog = new DirectoryDialog(selshell);
 		dialog.setText(toolText);
 		dialog.setMessage(toolMessage);
 		if (archpath != null) {
-			//File path = new File(archpath);
+			// File path = new File(archpath);
 			IFileStore path = EFS.getLocalFileSystem().getStore(new Path(archpath));
-			IFileInfo finf=path.fetchInfo();
+			IFileInfo finf = path.fetchInfo();
 			if (finf.exists()) {
 				dialog.setFilterPath(!finf.isDirectory() ? archpath : path.getParent().toURI().getPath());
 			}
@@ -303,7 +311,7 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 	/**
 	 * Given a tool's name, ask the user for the location of the tool
 	 * */
-	public  String askToolPath(String archpath, String toolName) {
+	public String askToolPath(String archpath, String toolName) {
 
 		return askToolPath(archpath, Messages.BuildLaunchUtils_Select + toolName + Messages.BuildLaunchUtils_BinDir,
 				Messages.BuildLaunchUtils_PleaseSelectDir + toolName + ""); //$NON-NLS-1$
@@ -314,7 +322,7 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 	 * 
 	 * @return A formatted representation of the current time
 	 */
-	public static  String getNow() {
+	public static String getNow() {
 		Calendar cal = Calendar.getInstance(TimeZone.getDefault());
 		String DATE_FORMAT = "yyyy-MM-dd_HH-mm-ss"; //$NON-NLS-1$
 		java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(DATE_FORMAT);
@@ -332,11 +340,11 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 	 * @param directory
 	 *            The directory where the tool is invoked
 	 */
-	public  boolean runTool(List<String> tool, Map<String, String> env, String directory) {
+	public boolean runTool(List<String> tool, Map<String, String> env, String directory) {
 		return runTool(tool, env, directory, null);
 	}
 
-	public  boolean runTool(List<String> tool, Map<String, String> env, String directory, String output) {
+	public boolean runTool(List<String> tool, Map<String, String> env, String directory, String output) {
 		int eval = -1;
 		try {
 
@@ -351,8 +359,9 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 			}
 
 			ProcessBuilder pb = new ProcessBuilder(tool);
-			if(directory!=null)
+			if (directory != null) {
 				pb.directory(new File(directory));
+			}
 			if (env != null) {
 				pb.environment().putAll(env);
 			}
@@ -377,8 +386,8 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 		return (eval == 0);// true;
 	}
 
-	public  void runVis(List<String> tool, Map<String, String> env, String directory) {
-		//int eval = -1;
+	public void runVis(List<String> tool, Map<String, String> env, String directory) {
+		// int eval = -1;
 		try {
 
 			ProcessBuilder pb = new ProcessBuilder(tool);
@@ -387,14 +396,14 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 				pb.environment().putAll(env);
 			}
 
-			//Process p = 
-				pb.start();
+			// Process p =
+			pb.start();
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			//return false;
+			// return false;
 		}
-		//return (eval == 0);// true;
+		// return (eval == 0);// true;
 	}
 
 	static class StreamRunner extends Thread {
@@ -436,21 +445,21 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 	}
 
 	public IFileStore getFile(String path) {
-		
+
 		return EFS.getLocalFileSystem().getStore(URI.create(path));
 	}
 
-	public byte[] runToolGetOutput(List<String> tool, Map<String, String> env,
-			String directory, boolean showErr) {
+	public byte[] runToolGetOutput(List<String> tool, Map<String, String> env, String directory, boolean showErr) {
 		int eval = -1;
 		byte[] out = null;
 		try {
 
 			ByteArrayOutputStream fos = new ByteArrayOutputStream();
-			
+
 			ProcessBuilder pb = new ProcessBuilder(tool);
-			if(directory!=null)
+			if (directory != null) {
 				pb.directory(new File(directory));
+			}
 			if (env != null) {
 				pb.environment().putAll(env);
 			}
@@ -465,26 +474,26 @@ public class BuildLaunchUtils implements IBuildLaunchUtils {
 			eval = p.waitFor();
 			if (fos != null) {
 				fos.flush();
-				out=fos.toByteArray();
+				out = fos.toByteArray();
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
-		if(eval!=0)
+		if (eval != 0) {
 			return null;
+		}
 		return out;// true;
 	}
 
 	public boolean isRemote() {
-		
+
 		return false;
 	}
 
-	public byte[] runToolGetOutput(List<String> tool, Map<String, String> env,
-			String directory) {
-		return runToolGetOutput(tool,env,directory,false);
+	public byte[] runToolGetOutput(List<String> tool, Map<String, String> env, String directory) {
+		return runToolGetOutput(tool, env, directory, false);
 	}
 
 }

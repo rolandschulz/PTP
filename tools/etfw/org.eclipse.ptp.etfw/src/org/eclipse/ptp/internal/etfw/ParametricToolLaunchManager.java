@@ -15,7 +15,7 @@
  * Contributors:
  *    Wyatt Spear - initial API and implementation
  ****************************************************************************/
-package org.eclipse.ptp.etfw.internal;
+package org.eclipse.ptp.internal.etfw;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,14 +37,14 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
-import org.eclipse.ptp.etfw.Activator;
+import org.eclipse.ptp.etfw.ETFWUtils;
 import org.eclipse.ptp.etfw.IBuildLaunchUtils;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
-import org.eclipse.ptp.etfw.messages.Messages;
 import org.eclipse.ptp.etfw.toolopts.BuildTool;
 import org.eclipse.ptp.etfw.toolopts.ExecTool;
 import org.eclipse.ptp.etfw.toolopts.ExternalToolProcess;
 import org.eclipse.ptp.etfw.toolopts.PostProcTool;
+import org.eclipse.ptp.internal.etfw.messages.Messages;
 
 public class ParametricToolLaunchManager {
 
@@ -59,7 +59,7 @@ public class ParametricToolLaunchManager {
 	// * @param delegate
 	// * @param appNameAtt
 	// * @param projNameAtt
-	// * @see org.eclipse.ptp.etfw.internal.ToolLaunchManager
+	// * @see org.eclipse.ptp.internal.etfw.ToolLaunchManager
 	// */
 	// public ParametricToolLaunchManager(LaunchConfigurationDelegate delegate,
 	// LaunchFactory lf) {
@@ -75,7 +75,7 @@ public class ParametricToolLaunchManager {
 	// * @param appNameAtt
 	// * @param projNameAtt
 	// * @param appPathAtt
-	// * @see org.eclipse.ptp.etfw.internal.ToolLaunchManager
+	// * @see org.eclipse.ptp.internal.etfw.ToolLaunchManager
 	// */
 	// public ParametricToolLaunchManager(
 	// LaunchConfigurationDelegate delegate, String appNameAtt,
@@ -565,7 +565,7 @@ public class ParametricToolLaunchManager {
 			}
 		};
 
-		ExternalToolProcess pproc = Activator.getTool(configuration.getAttribute(IToolLaunchConfigurationConstants.SELECTED_TOOL,
+		ExternalToolProcess pproc = ETFWUtils.getTool(configuration.getAttribute(IToolLaunchConfigurationConstants.SELECTED_TOOL,
 				(String) null));
 		// paraDel=lcd;
 		// this.lf=lf;

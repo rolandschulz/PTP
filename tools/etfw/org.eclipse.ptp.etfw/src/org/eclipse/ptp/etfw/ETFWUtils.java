@@ -33,12 +33,9 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.etfw.internal.BuildLaunchUtils;
-import org.eclipse.ptp.etfw.messages.Messages;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ptp.etfw.toolopts.BuildTool;
 import org.eclipse.ptp.etfw.toolopts.ExecTool;
 import org.eclipse.ptp.etfw.toolopts.ExternalTool;
@@ -48,19 +45,15 @@ import org.eclipse.ptp.etfw.toolopts.PostProcTool;
 import org.eclipse.ptp.etfw.toolopts.ToolApp;
 import org.eclipse.ptp.etfw.toolopts.ToolMaker;
 import org.eclipse.ptp.etfw.ui.AbstractToolConfigurationTab;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.osgi.framework.BundleContext;
+import org.eclipse.ptp.internal.etfw.BuildLaunchUtils;
+import org.eclipse.ptp.internal.etfw.messages.Messages;
 
 /**
- * The activator class controls the plug-in life cycle
+ * Utilities for accessing ETFW tools
+ * 
+ * @since 7.0
  */
-public class Activator extends AbstractUIPlugin {
-
-	// The plug-in ID
-	public static final String PLUGIN_ID = "org.eclipse.ptp.etfw"; //$NON-NLS-1$
-
-	// The shared instance
-	private static Activator plugin;
+public class ETFWUtils {
 
 	private static ExternalToolProcess[] tools = null;
 
@@ -149,31 +142,6 @@ public class Activator extends AbstractUIPlugin {
 				ExternalTool t = tool.externalTools.get(j);
 				if (t instanceof BuildTool) {
 					BuildTool bt = (BuildTool) t;
-					// ToolApp lastApp=null;
-					// ToolApp compApp = bt.getCcCompiler();
-					// if(compApp!=null)
-					// {
-					// insertPanes(compApp.toolPanes,paneList);
-					// }
-					// compApp=null;
-					// compApp=bt.getCxxCompiler();
-					// if(compApp!=null)
-					// {
-					// insertPanes(compApp.toolPanes,paneList);
-					// }
-					// compApp=null;
-					// compApp=bt.getF90Compiler();
-					// if(compApp!=null)
-					// {
-					// insertPanes(compApp.toolPanes,paneList);
-					// }
-					// compApp=null;
-					// compApp=bt.getGlobalCompiler();
-					// if(compApp!=null)
-					// {
-					// insertPanes(compApp.toolPanes,paneList);
-					// }
-
 					insertPanes(bt.getAllCompilerPanes(), paneList);
 
 				} else if (t instanceof ExecTool) {
@@ -208,7 +176,7 @@ public class Activator extends AbstractUIPlugin {
 
 	private static ArrayList<IFileStore> workflowList = null;
 
-	private ArrayList<IFileStore> getInternalXMLWorkflows() {
+	private static ArrayList<IFileStore> getInternalXMLWorkflows() {
 		if (workflowList != null) {
 			return workflowList;
 		}
@@ -229,24 +197,15 @@ public class Activator extends AbstractUIPlugin {
 					String plugspace = ext.getNamespaceIdentifier();
 					String aGetter = ce.getAttribute("XMLFile"); //$NON-NLS-1$
 
-					// elements[i].
-					// aGetter.setId(ce.getAttribute("id"));
-					// System.out.println(plugspace+" "+aGetter);
 					URI iuri = new URI(FileLocator.toFileURL((Platform.getBundle(plugspace).getEntry(aGetter))).toString()
-							.replaceAll(" ", "%20"));
-					// (Platform.getBundle(plugspace).getEntry(aGetter)).toURI();
+							.replaceAll(" ", "%20")); //$NON-NLS-1$ //$NON-NLS-2$
 					ifs = EFS.getLocalFileSystem().getStore(iuri);
-					workflowList.add(ifs);//EFS.getLocalFileSystem().getStore((Platform.getBundle(plugspace).getEntry(aGetter)).toURI())  //new File(new URI(FileLocator.toFileURL((Platform.getBundle(plugspace).getEntry(aGetter))).toString().replaceAll(" ", "%20")))); //$NON-NLS-1$ //$NON-NLS-2$
+					workflowList.add(ifs);
 				} catch (Exception e) {
 					e.printStackTrace();
-					// PTPCorePlugin.log(e);
 				}
 			}
 		}
-		// xmlWorkflows =
-		// (File[]) getterList.toArray(
-		// new File[getterList.size()]);
-		//
 		return workflowList;
 	}
 
@@ -254,29 +213,13 @@ public class Activator extends AbstractUIPlugin {
 	 * Reinitializes the performance tool data structures from the given XML definition file(s).
 	 * 
 	 */
-	public void refreshTools() {
+	public static void refreshTools(IPreferenceStore store) {
 		getInternalXMLWorkflows();
-		// File tauToolXML=null;
-		// URL testURL=Activator.getDefault().getBundle().getEntry("toolxml"+File.separator+"tau_tool.xml");
-		// try {
-		// tauToolXML = new File(new URI(FileLocator.toFileURL(testURL).toString().replaceAll(" ", "%20")));
-		// } catch (URISyntaxException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// } catch (IOException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
-		// ExternalToolProcess[] tauTool=null;
 		ArrayList<ExternalToolProcess> theTools = new ArrayList<ExternalToolProcess>();// null;
-		// if(tauToolXML!=null&&tauToolXML.canRead())
-		// {
-		// tauTool=ToolMaker.makeTools(tauToolXML);
-		// }
 
 		IFileSystem loc = EFS.getLocalFileSystem();
 
-		String fiList = getPreferenceStore().getString(IToolLaunchConfigurationConstants.XMLLOCID);
+		String fiList = store.getString(IToolLaunchConfigurationConstants.XMLLOCID);
 		String[] fiLocs = fiList.split(",,,"); //$NON-NLS-1$
 
 		List<IFileStore> files = new ArrayList<IFileStore>();
@@ -288,36 +231,29 @@ public class Activator extends AbstractUIPlugin {
 				// TODO Auto-generated catch block
 
 				fi = EFS.getLocalFileSystem().getStore(new Path(fiLoc));
-
-				// e.printStackTrace();
-			}// new IFileStore(fiLocs[i]);
+			}
 			IFileInfo finf = fi.fetchInfo();
 
-			if (finf.exists() && !finf.isDirectory()) {// (fi.canRead()&&fi.isFile()){
+			if (finf.exists() && !finf.isDirectory()) {
 				files.add(fi);
 			}
 		}
 
 		if (files.size() == 0) {
-			// File toolxml= new File();
 			String epath = BuildLaunchUtils.checkLocalToolEnvPath("eclipse"); //$NON-NLS-1$
 			if (epath != null) {
 				IFileStore toolxml = loc.getStore(new Path(epath));
 				IFileInfo finf = toolxml.fetchInfo();
 				if (finf.exists()) {
-					toolxml = toolxml.getChild("tool.xml");
+					toolxml = toolxml.getChild("tool.xml"); //$NON-NLS-1$
 					finf = toolxml.fetchInfo();
-					//toolxml=new File(toolxml.getPath()+File.separator+"tool.xml"); //$NON-NLS-1$
 					if (finf.exists()) {
 						files.add(toolxml);
-						// tools=ToolMaker.makeTools(toolxml);
-						this.getPreferenceStore().setValue(IToolLaunchConfigurationConstants.XMLLOCID, toolxml.toURI().toString());
+						store.setValue(IToolLaunchConfigurationConstants.XMLLOCID, toolxml.toURI().toString());
 					}
 				}
 			}
 		}
-		// int numOTools=0;
-
 		for (int i = 0; i < workflowList.size(); i++) {
 			tools = ToolMaker.makeTools(workflowList.get(i));
 			if (tools != null) {
@@ -335,7 +271,6 @@ public class Activator extends AbstractUIPlugin {
 				e.printStackTrace();
 				System.out.println(Messages.Activator_ProblemReading + files.get(i).toString());
 			}
-			// numOTools=otherTools.length;
 			if (tools != null) {
 				for (ExternalToolProcess tool : tools) {
 					theTools.add(tool);
@@ -345,13 +280,6 @@ public class Activator extends AbstractUIPlugin {
 		}
 
 		tools = theTools.toArray(new ExternalToolProcess[theTools.size()]);
-
-		// tools=new ExternalToolProcess[numOTools];
-		// //tools[0]=tauTool[0];
-		// for(int i=0;i<numOTools;i++)
-		// {
-		// tools[i]=otherTools[i];
-		// }
 
 		for (ExternalToolProcess tool : tools) {
 			BuildLaunchUtils.verifyLocalEnvToolPath(tool);
@@ -421,7 +349,7 @@ public class Activator extends AbstractUIPlugin {
 
 	private static ArrayList<AbstractToolDataManager> perfConfManagers = null;
 
-	private ArrayList<AbstractToolDataManager> getPerfConfManagers() {
+	public static ArrayList<AbstractToolDataManager> getPerfConfManagers() {
 		if (perfConfManagers != null) {
 			return perfConfManagers;
 		}
@@ -464,78 +392,4 @@ public class Activator extends AbstractUIPlugin {
 		}
 		return null;
 	}
-
-	/**
-	 * The constructor
-	 */
-	public Activator() {
-		plugin = this;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
-	 */
-	@Override
-	public void start(BundleContext context) throws Exception {
-		super.start(context);
-		refreshTools();
-		getPerfTabs();
-		getPerfConfManagers();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
-	 */
-	@Override
-	public void stop(BundleContext context) throws Exception {
-		plugin = null;
-		super.stop(context);
-	}
-
-	/**
-	 * Returns the shared instance
-	 * 
-	 * @return the shared instance
-	 */
-	public static Activator getDefault() {
-		return plugin;
-	}
-
-	/**
-	 * Create log entry from a Throwable
-	 * 
-	 * @param e
-	 * @since 7.0
-	 */
-	public static void log(Throwable e) {
-		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, "Internal Error", e)); //$NON-NLS-1$
-	}
-
-	/**
-	 * Create log entry from an IStatus
-	 * 
-	 * @param status
-	 * @since 7.0
-	 */
-	public static void log(IStatus status) {
-		getDefault().getLog().log(status);
-	}
-
-	/**
-	 * Generate a unique identifier
-	 * 
-	 * @return unique identifier string
-	 * @since 7.0
-	 */
-	public static String getUniqueIdentifier() {
-		if (getDefault() == null) {
-			return PLUGIN_ID;
-		}
-		return getDefault().getBundle().getSymbolicName();
-	}
-
 }

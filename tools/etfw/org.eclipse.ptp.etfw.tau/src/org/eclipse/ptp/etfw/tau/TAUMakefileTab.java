@@ -29,13 +29,13 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.core.util.LaunchUtils;
 import org.eclipse.ptp.etfw.IBuildLaunchUtils;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
-import org.eclipse.ptp.etfw.internal.BuildLaunchUtils;
-import org.eclipse.ptp.etfw.internal.RemoteBuildLaunchUtils;
 import org.eclipse.ptp.etfw.tau.messages.Messages;
 import org.eclipse.ptp.etfw.tau.papiselect.PapiListSelectionDialog;
 import org.eclipse.ptp.etfw.tau.papiselect.papic.EventTreeDialog;
 import org.eclipse.ptp.etfw.toolopts.IToolUITab;
 import org.eclipse.ptp.etfw.toolopts.ToolPaneListener;
+import org.eclipse.ptp.internal.etfw.BuildLaunchUtils;
+import org.eclipse.ptp.internal.etfw.RemoteBuildLaunchUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -245,8 +245,8 @@ public class TAUMakefileTab implements IToolUITab  {
 	protected Map<String, Object> varmap = null;
 
 	// TODO: This isn't generic. We need to get this pane explicitly  Fixing: Moving individual panes into standard UI
-	//protected final ToolPane tauOpts = Activator.getTool("TAU").getFirstBuilder(null).getGlobalCompiler().toolPanes[0];// toolPanes[0];//ToolMaker.makeTools(tauToolXML)[0].toolPanes[0]; //$NON-NLS-1$
-	//protected final ToolPane tauEnv = Activator.getTool("TAU").getNthRunner(null, 2).global.toolPanes[0]; //$NON-NLS-1$
+	//protected final ToolPane tauOpts = ETFWUtils.getTool("TAU").getFirstBuilder(null).getGlobalCompiler().toolPanes[0];// toolPanes[0];//ToolMaker.makeTools(tauToolXML)[0].toolPanes[0]; //$NON-NLS-1$
+	//protected final ToolPane tauEnv = ETFWUtils.getTool("TAU").getNthRunner(null, 2).global.toolPanes[0]; //$NON-NLS-1$
 	
 	// protected ToolPane custOpts=null;
 
@@ -257,7 +257,7 @@ public class TAUMakefileTab implements IToolUITab  {
 	// static{
 	// try {
 
-	// URL testURL=Activator.getDefault().getBundle().getEntry("toolxml"+File.separator+"tau_tool.xml");
+	// URL testURL=ETFWUtils.getDefault().getBundle().getEntry("toolxml"+File.separator+"tau_tool.xml");
 	// tauToolXML = new File(new URI(FileLocator.toFileURL(testURL).toString().replaceAll(" ", "%20")));
 
 	// } catch (Exception e) {
@@ -462,7 +462,7 @@ public class TAUMakefileTab implements IToolUITab  {
 	 * 
 	 */
 	private void initMakefiles() {
-		// IPreferenceStore pstore = Activator.getDefault().getPreferenceStore();
+		// IPreferenceStore pstore = ETFWUtils.getDefault().getPreferenceStore();
 
 		String binpath = blt.getToolPath("tau");//pstore.getString(ITAULaunchConfigurationConstants.TAU_ARCH_PATH); //$NON-NLS-1$
 		IFileStore bindir = null;
@@ -1329,7 +1329,7 @@ public class TAUMakefileTab implements IToolUITab  {
 
 			varmap = archvarmap = configuration.getAttribute(ITAULaunchConfigurationConstants.ENVVARS, (Map<String, Object>) null);
 
-			//Activator.getDefault().getPluginPreferences().setDefault(ITAULaunchConfigurationConstants.TAU_CHECK_AUTO_OPT,true); //$NON-NLS-1$
+			//ETFWUtils.getDefault().getPluginPreferences().setDefault(ITAULaunchConfigurationConstants.TAU_CHECK_AUTO_OPT,true); //$NON-NLS-1$
 
 		} catch (CoreException e) {
 			//setErrorMessage(Messages.TAUAnalysisTab_CoreExceptionInitAnalysisTab + e.getMessage());  //TODO: May need to handle setting errors higher

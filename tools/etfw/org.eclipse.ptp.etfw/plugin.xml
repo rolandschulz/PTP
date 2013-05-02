@@ -8,7 +8,7 @@
    <extension
          point="org.eclipse.debug.ui.launchConfigurationTabGroups">
       <launchConfigurationTabGroup
-            class="org.eclipse.ptp.etfw.ui.ToolLaunchConfigurationTabGroup"
+            class="org.eclipse.ptp.internal.etfw.ui.ToolLaunchConfigurationTabGroup"
             id="org.eclipse.ptp.etfw.tau.performance.launchConfigurationTabGroup"
             type="org.eclipse.cdt.launch.applicationLaunchType">
          <launchMode
@@ -20,12 +20,12 @@
          point="org.eclipse.ui.preferencePages">
       <page
             category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage"
-            class="org.eclipse.ptp.etfw.preferences.ExternalToolPreferencePage"
+            class="org.eclipse.ptp.internal.etfw.preferences.ExternalToolPreferencePage"
             id="org.eclipse.ptp.etfw.preferences.ExternalToolsMainPage"
             name="External Tools"/>
       <page
             category="org.eclipse.ptp.etfw.preferences.ExternalToolsMainPage"
-            class="org.eclipse.ptp.etfw.preferences.ToolLocationPreferencePage"
+            class="org.eclipse.ptp.internal.etfw.preferences.ToolLocationPreferencePage"
             id="org.eclipse.ptp.etfw.preferences.ExternalToolLocationPreferencePage"
             name="Tool Location Configuration"/> 
    </extension>
@@ -35,9 +35,6 @@
        <actionSet id="org.eclipse.debug.ui.profileActionSet"/>
     </perspectiveExtension>
     <perspectiveExtension targetID="org.eclipse.photran.ui.FortranPerspective">
-       <actionSet id="org.eclipse.debug.ui.profileActionSet"/>
-    </perspectiveExtension>
-    <perspectiveExtension targetID="org.eclipse.ptp.ui.PTPRunPerspective">
        <actionSet id="org.eclipse.debug.ui.profileActionSet"/>
     </perspectiveExtension>
     <perspectiveExtension targetID="org.eclipse.debug.ui.DebugPerspective">
@@ -65,7 +62,7 @@
  <extension
        point="org.eclipse.debug.core.launchDelegates">
     <launchDelegate
-          delegate="org.eclipse.ptp.etfw.internal.ToolLaunchConfigurationDelegate"
+          delegate="org.eclipse.ptp.internal.etfw.ToolLaunchConfigurationDelegate"
           id="org.eclipse.ptp.etfw.tau.performance.performancelaunch"
           modes="profile"
           name="Performance Analysis"
@@ -75,7 +72,7 @@
  <extension
        point="org.eclipse.core.runtime.preferences">
     <initializer
-          class="org.eclipse.ptp.etfw.internal.PreferenceInitializer">
+          class="org.eclipse.ptp.internal.etfw.PreferenceInitializer">
     </initializer>
  </extension>
 </plugin>

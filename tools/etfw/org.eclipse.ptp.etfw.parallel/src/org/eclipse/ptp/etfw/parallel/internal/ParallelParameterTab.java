@@ -17,7 +17,7 @@
  ****************************************************************************/
 package org.eclipse.ptp.etfw.parallel.internal;
 
-import org.eclipse.ptp.etfw.ui.ParametricParameterTab;
+import org.eclipse.ptp.internal.etfw.ui.ParametricParameterTab;
 
 public class ParallelParameterTab extends ParametricParameterTab {
 

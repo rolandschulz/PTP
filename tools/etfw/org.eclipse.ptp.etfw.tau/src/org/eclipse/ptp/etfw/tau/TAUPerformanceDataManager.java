@@ -37,19 +37,19 @@ import org.eclipse.ptp.core.util.LaunchUtils;
 import org.eclipse.ptp.etfw.AbstractToolDataManager;
 import org.eclipse.ptp.etfw.IBuildLaunchUtils;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
-import org.eclipse.ptp.etfw.internal.BuildLaunchUtils;
-import org.eclipse.ptp.etfw.internal.PostlaunchTool;
-import org.eclipse.ptp.etfw.internal.RemoteBuildLaunchUtils;
 import org.eclipse.ptp.etfw.tau.messages.Messages;
 import org.eclipse.ptp.etfw.tau.perfdmf.PerfDMFUIPlugin;
 import org.eclipse.ptp.etfw.tau.perfdmf.views.PerfDMFView;
+import org.eclipse.ptp.internal.etfw.BuildLaunchUtils;
+import org.eclipse.ptp.internal.etfw.PostlaunchTool;
+import org.eclipse.ptp.internal.etfw.RemoteBuildLaunchUtils;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.console.MessageConsole;
 
 public class TAUPerformanceDataManager extends AbstractToolDataManager {
-	// private static final IPreferenceStore pstore = Activator.getDefault().getPreferenceStore();
+	// private static final IPreferenceStore pstore = ETFWUtils.getDefault().getPreferenceStore();
 
 	private static String tbpath = null;
 

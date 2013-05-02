@@ -17,7 +17,7 @@
  ****************************************************************************/
 package org.eclipse.ptp.etfw.parallel.internal;
 
-import org.eclipse.ptp.etfw.ui.ExternalToolSelectionTab;
+import org.eclipse.ptp.internal.etfw.ui.ExternalToolSelectionTab;
 
 public class ParallelToolSelectionTab extends ExternalToolSelectionTab {
 	private static final String TAB_ID = "org.eclipse.ptp.etfw.parallelToolSelectionTab"; //$NON-NLS-1$

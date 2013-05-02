@@ -3,8 +3,8 @@ package org.eclipse.ptp.etfw.parallel;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.ISourceLocator;
-import org.eclipse.ptp.etfw.internal.ILaunchFactory;
 import org.eclipse.ptp.internal.debug.core.launch.PLaunch;
+import org.eclipse.ptp.internal.etfw.ILaunchFactory;
 
 public class ParallelLaunchFactory implements ILaunchFactory {
 

@@ -15,7 +15,7 @@
  * Contributors:
  *    Wyatt Spear - initial API and implementation
  ****************************************************************************/
-package org.eclipse.ptp.etfw.ui;
+package org.eclipse.ptp.internal.etfw.ui;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -27,8 +27,9 @@ import org.eclipse.debug.ui.EnvironmentTab;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
 import org.eclipse.debug.ui.sourcelookup.SourceLookupTab;
-import org.eclipse.ptp.etfw.Activator;
+import org.eclipse.ptp.etfw.ETFWUtils;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
+import org.eclipse.ptp.etfw.ui.AbstractToolConfigurationTab;
 
 /**
  * Defines the tab group in the performance analysis launch configuration system using the CDT launcher
@@ -40,7 +41,7 @@ public class ToolLaunchConfigurationTabGroup extends
 	 */
 	public void createTabs(ILaunchConfigurationDialog dialog, String mode) {
 		
-		ArrayList<AbstractToolConfigurationTab> perfTabs=Activator.getPerfTabs();
+		ArrayList<AbstractToolConfigurationTab> perfTabs=ETFWUtils.getPerfTabs();
 		ILaunchConfigurationTab tabs[]=new ILaunchConfigurationTab[7+perfTabs.size()];
 		tabs[0]=new ToolRecompMainTab(true);
 		//tabs[1]=new CDebuggerTab(false);

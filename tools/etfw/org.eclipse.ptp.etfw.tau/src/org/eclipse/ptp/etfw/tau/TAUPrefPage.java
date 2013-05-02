@@ -25,9 +25,9 @@ import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.ptp.etfw.Activator;
 import org.eclipse.ptp.etfw.tau.messages.Messages;
 import org.eclipse.ptp.etfw.tau.papitest.TestPAPI;
+import org.eclipse.ptp.internal.etfw.Activator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -104,7 +104,7 @@ public class TAUPrefPage extends PreferencePage implements IWorkbenchPreferenceP
 	/*This may be unused...*/
 	protected void loadSaved()
 	{
-		//Preferences preferences = Activator.getDefault().getPluginPreferences();
+		//Preferences preferences = ETFWUtils.getDefault().getPluginPreferences();
 		IPreferencesService service = Platform.getPreferencesService();
 		
 		//TODO: Add checks
@@ -117,7 +117,7 @@ public class TAUPrefPage extends PreferencePage implements IWorkbenchPreferenceP
 	{
 		
 		IEclipsePreferences preferences = new InstanceScope().getNode(Activator.PLUGIN_ID);
-		//Preferences preferences = Activator.getDefault().getPluginPreferences();
+		//Preferences preferences = ETFWUtils.getDefault().getPluginPreferences();
 
 		//TODO: Add checks
 		preferences.putBoolean(ITAULaunchConfigurationConstants.TAU_CHECK_AUTO_OPT, checkAutoOpts.getSelection()); //$NON-NLS-1$

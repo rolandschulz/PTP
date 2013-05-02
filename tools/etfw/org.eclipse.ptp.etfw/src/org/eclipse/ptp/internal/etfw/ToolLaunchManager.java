@@ -15,14 +15,14 @@
  * Contributors:
  *    Wyatt Spear - initial API and implementation
  ****************************************************************************/
-package org.eclipse.ptp.etfw.internal;
+package org.eclipse.ptp.internal.etfw;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
-import org.eclipse.ptp.etfw.Activator;
+import org.eclipse.ptp.etfw.ETFWUtils;
 import org.eclipse.ptp.etfw.IBuildLaunchUtils;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.jaxb.data.BuildToolType;
@@ -31,12 +31,12 @@ import org.eclipse.ptp.etfw.jaxb.data.ExecToolType;
 import org.eclipse.ptp.etfw.jaxb.data.AnalysisToolType;
 import org.eclipse.ptp.etfw.jaxb.util.ExternalToolProcessUtil;
 import org.eclipse.ptp.etfw.jaxb.util.JAXBExtensionUtils;
-import org.eclipse.ptp.etfw.messages.Messages;
 import org.eclipse.ptp.etfw.toolopts.BuildTool;
 import org.eclipse.ptp.etfw.toolopts.ExecTool;
 import org.eclipse.ptp.etfw.toolopts.ExternalTool;
 import org.eclipse.ptp.etfw.toolopts.ExternalToolProcess;
 import org.eclipse.ptp.etfw.toolopts.PostProcTool;
+import org.eclipse.ptp.internal.etfw.messages.Messages;
 
 public class ToolLaunchManager {
 
@@ -248,7 +248,7 @@ public class ToolLaunchManager {
 		final ILaunch launch = launchIn;
 
 		// This is the main chunk of data for the workflow being launched
-		ExternalToolProcess pproc = Activator.getTool(configuration.getAttribute(IToolLaunchConfigurationConstants.SELECTED_TOOL,
+		ExternalToolProcess pproc = ETFWUtils.getTool(configuration.getAttribute(IToolLaunchConfigurationConstants.SELECTED_TOOL,
 				(String) null));
 
 		// Are we using parametric launching? Then go do that instead.

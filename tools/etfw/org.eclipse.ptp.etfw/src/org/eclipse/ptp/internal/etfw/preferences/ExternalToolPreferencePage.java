@@ -15,7 +15,7 @@
  * Contributors:
  *    Wyatt Spear - initial API and implementation
  ****************************************************************************/
-package org.eclipse.ptp.etfw.preferences;
+package org.eclipse.ptp.internal.etfw.preferences;
 
 //import java.io.File;
 
@@ -35,10 +35,11 @@ import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.core.Preferences;
-import org.eclipse.ptp.etfw.Activator;
+import org.eclipse.ptp.etfw.ETFWUtils;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.PreferenceConstants;
-import org.eclipse.ptp.etfw.messages.Messages;
+import org.eclipse.ptp.internal.etfw.Activator;
+import org.eclipse.ptp.internal.etfw.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -102,8 +103,9 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 		}
 
 		public void propertyChange(PropertyChangeEvent event) {
-			if (event.getProperty().equals(FieldEditor.IS_VALID))
+			if (event.getProperty().equals(FieldEditor.IS_VALID)) {
 				updatePreferencePage();
+			}
 		}
 	}
 
@@ -218,12 +220,13 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 				path = EFS.getLocalFileSystem().getStore(new Path(correctPath));
 				// e.printStackTrace();
 			}
-			if (path != null && path.fetchInfo().exists())
+			if (path != null && path.fetchInfo().exists()) {
 				dialog.setFilterPath(!path.fetchInfo().isDirectory() ? correctPath : path.getParent().toURI().getPath()); // TODO:
 																															// This
 																															// may
 																															// be
 																															// bad
+			}
 		}
 
 		// String tlpath = correctPath+File.separator+"lib";
@@ -320,7 +323,7 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		Activator.getDefault().refreshTools();
+		ETFWUtils.refreshTools(Activator.getDefault().getPreferenceStore());
 
 		Preferences.setString(Activator.PLUGIN_ID, PreferenceConstants.ETFW_VERSION, parser.getItem(parser.getSelectionIndex()));
 		// TODO: Add checks
@@ -371,10 +374,12 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 	}
 
 	protected String getFieldContent(String text) {
-		if (text == null)
+		if (text == null) {
 			return null;
-		if (text.trim().length() == 0 || text.equals(EMPTY_STRING))
+		}
+		if (text.trim().length() == 0 || text.equals(EMPTY_STRING)) {
 			return null;
+		}
 
 		return text;
 	}
@@ -390,10 +395,11 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 
 	protected GridData spanGridData(int style, int space) {
 		GridData gd = null;
-		if (style == -1)
+		if (style == -1) {
 			gd = new GridData();
-		else
+		} else {
 			gd = new GridData(style);
+		}
 		gd.horizontalSpan = space;
 		return gd;
 	}

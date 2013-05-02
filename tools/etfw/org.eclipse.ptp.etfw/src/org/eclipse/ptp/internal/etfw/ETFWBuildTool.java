@@ -7,7 +7,7 @@
  * Contributors: 
  * 		Chris Navarro (Illinois/NCSA) - Design and implementation
  *******************************************************************************/
-package org.eclipse.ptp.etfw.internal;
+package org.eclipse.ptp.internal.etfw;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -43,7 +43,7 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.ptp.etfw.IBuildLaunchUtils;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.jaxb.data.BuildToolType;
-import org.eclipse.ptp.etfw.messages.Messages;
+import org.eclipse.ptp.internal.etfw.messages.Messages;
 
 /**
  * This class is based on BuilderTool and handles workflow steps that rebuild tools with performance instrumentation.

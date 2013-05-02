@@ -31,13 +31,13 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
-import org.eclipse.ptp.etfw.Activator;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
-import org.eclipse.ptp.etfw.internal.ILaunchFactory;
-import org.eclipse.ptp.etfw.internal.IToolLaunchConfigurationDelegate;
-import org.eclipse.ptp.etfw.internal.RemoteBuildLaunchUtils;
-import org.eclipse.ptp.etfw.internal.ToolLaunchManager;
 import org.eclipse.ptp.etfw.parallel.messages.Messages;
+import org.eclipse.ptp.internal.etfw.Activator;
+import org.eclipse.ptp.internal.etfw.ILaunchFactory;
+import org.eclipse.ptp.internal.etfw.IToolLaunchConfigurationDelegate;
+import org.eclipse.ptp.internal.etfw.RemoteBuildLaunchUtils;
+import org.eclipse.ptp.internal.etfw.ToolLaunchManager;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.JAXBControlConstants;
 import org.eclipse.ptp.launch.ParallelLaunchConfigurationDelegate;
 

@@ -23,8 +23,8 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.ptp.etfw.Activator;
 import org.eclipse.ptp.etfw.tau.messages.Messages;
+import org.eclipse.ptp.internal.etfw.Activator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -82,7 +82,7 @@ public class OptionSplash extends Dialog{
 			Messages.OptionSplash_AutoEclipseInternal
 			);
 			fixAix.setToolTipText(Messages.OptionSplash_TauSuggestsOnDesc);
-			//Preferences preferences = Activator.getDefault().getPluginPreferences();
+			//Preferences preferences = ETFWUtils.getDefault().getPluginPreferences();
 			fixAix.setSelection(service.getBoolean(Activator.PLUGIN_ID,ITAULaunchConfigurationConstants.TAU_CHECK_AIX_OPT,false,null)); //$NON-NLS-1$
 			
 		}

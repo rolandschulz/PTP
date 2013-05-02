@@ -15,7 +15,7 @@
  * Contributors:
  *    Wyatt Spear - initial API and implementation
  ****************************************************************************/
-package org.eclipse.ptp.etfw.ui;
+package org.eclipse.ptp.internal.etfw.ui;
 
 //import java.io.File;
 import java.io.File;
@@ -41,12 +41,13 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.ptp.etfw.Activator;
+import org.eclipse.ptp.etfw.ETFWUtils;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
-import org.eclipse.ptp.etfw.messages.Messages;
 import org.eclipse.ptp.etfw.toolopts.ExternalToolProcess;
 import org.eclipse.ptp.etfw.toolopts.IToolUITab;
 import org.eclipse.ptp.etfw.toolopts.ToolPaneListener;
+import org.eclipse.ptp.internal.etfw.Activator;
+import org.eclipse.ptp.internal.etfw.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ModifyEvent;
@@ -75,14 +76,14 @@ import org.eclipse.ui.dialogs.ListDialog;
  */
 public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab implements IToolLaunchConfigurationConstants {
 	// private static final IPreferenceStore pstore =
-	// Activator.getDefault().getPreferenceStore();
+	// ETFWUtils.getDefault().getPreferenceStore();
 	/**
 	 * Determines if the launch configuration associated with this tab has
 	 * access to the PTP
 	 */
 	protected boolean noPTP = false;
 
-	protected final ExternalToolProcess[] tools = Activator.getTools();// null;
+	protected final ExternalToolProcess[] tools = ETFWUtils.getTools();// null;
 
 	protected Combo toolTypes;
 
@@ -99,7 +100,7 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 
 	protected Button keepprofsCheck;
 
-	protected final IToolUITab[] panes = Activator.getToolPanes();
+	protected final IToolUITab[] panes = ETFWUtils.getToolPanes();
 
 	// protected Button relocateTools;
 
@@ -199,8 +200,9 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 
 		String out = getFieldContent(dialog.open());
 
-		if (out == null)
+		if (out == null) {
 			return;
+		}
 
 		IFileStore test = null;
 		// try {
@@ -215,7 +217,7 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 			return;
 		}
 
-		// Preferences preferences = Activator.getDefault().getPluginPreferences();
+		// Preferences preferences = ETFWUtils.getDefault().getPluginPreferences();
 		IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
 
 		IPreferencesService service = Platform.getPreferencesService();
@@ -225,8 +227,8 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 
 		String[] x = fiList.split(",,,"); //$NON-NLS-1$
 		LinkedHashSet<String> files = new LinkedHashSet<String>();
-		for (int i = 0; i < x.length; i++) {
-			files.add(x[i]);
+		for (String element : x) {
+			files.add(element);
 		}
 		files.add(out);
 
@@ -241,7 +243,7 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 			}
 		}
 		preferences.put(XMLLOCID, fiList);// XMLLoc.getText());
-		Activator.getDefault().refreshTools();
+		ETFWUtils.refreshTools(Activator.getDefault().getPreferenceStore());
 		warnXMLChange();
 
 	}
@@ -255,8 +257,8 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 
 		String[] x = fiList.split(",,,"); //$NON-NLS-1$
 		LinkedHashSet<String> files = new LinkedHashSet<String>();
-		for (int i = 0; i < x.length; i++) {
-			files.add(x[i]);
+		for (String element : x) {
+			files.add(element);
 		}
 
 		ArrayContentProvider acp = new ArrayContentProvider();
@@ -275,8 +277,8 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 			return;
 		}
 		Object[] y = ld.getResult();
-		for (int i = 0; i < y.length; i++) {
-			files.remove(y[i]);
+		for (Object element : y) {
+			files.remove(element);
 		}
 
 		fiList = ""; //$NON-NLS-1$
@@ -290,7 +292,7 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 			}
 		}
 		preferences.put(XMLLOCID, fiList);// XMLLoc.getText());
-		Activator.getDefault().refreshTools();
+		ETFWUtils.refreshTools(Activator.getDefault().getPreferenceStore());
 		warnXMLChange();
 	}
 
@@ -379,17 +381,20 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 		if (panes != null) {
 
 			TabItem[] tabs = null;
-			if (tabParent != null)
+			if (tabParent != null) {
 				tabs = tabParent.getItems();
+			}
 			for (int i = 0; i < tabs.length; i++) {
-				if (!tabs[i].getText().equals(Messages.ExternalToolSelectionTab_ToolSelection))
+				if (!tabs[i].getText().equals(Messages.ExternalToolSelectionTab_ToolSelection)) {
 					tabs[i].dispose();
+				}
 			}
 
 			for (int i = 0; i < panes.length; i++) {
 				if (panes[i] == null || panes[i].isVirtual() || panes[i].isEmbedded() || panes[i].getToolName() == null
-						|| !panes[i].getToolName().equals(tool))
+						|| !panes[i].getToolName().equals(tool)) {
 					continue;
+				}
 				optionTab = new TabItem(tabParent, SWT.NULL);
 				optionTab.setText(panes[i].getName());
 
@@ -427,10 +432,11 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 	}
 
 	private void initializePanesForTool(String tool, ILaunchConfiguration configuration) {
-		if (panes != null)
+		if (panes != null) {
 			for (int i = 0; i < panes.length; i++) {
-				if (panes[i].getToolName() == null || !panes[i].getToolName().equals(tool))
+				if (panes[i].getToolName() == null || !panes[i].getToolName().equals(tool)) {
 					continue;
+				}
 				panes[i].OptUpdate();
 				try {
 					panes[i].initializePane(configuration);
@@ -438,6 +444,7 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 					e.printStackTrace();
 				}
 			}
+		}
 	}
 
 	public void updateComboFromSelection() {
@@ -450,10 +457,11 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 	 * @see ILaunchConfigurationTab#setDefaults(ILaunchConfigurationWorkingCopy)
 	 */
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
-		if (panes != null)
-			for (int i = 0; i < panes.length; i++) {
-				panes[i].setDefaults(configuration);
+		if (panes != null) {
+			for (IToolUITab pane : panes) {
+				pane.setDefaults(configuration);
 			}
+		}
 	}
 
 	ILaunchConfiguration localConfig = null;
@@ -474,8 +482,8 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 			}
 		}
 
-		for (int i = 0; i < tools.length; i++) {
-			toolTypes.add(tools[i].toolName);
+		for (ExternalToolProcess tool : tools) {
+			toolTypes.add(tool.toolName);
 		}
 		toolTypes.select(0);
 
@@ -534,18 +542,21 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 
 		configuration.setAttribute(ANALYZEONLY, analyzeonlyCheck.getSelection());
 		// System.out.println("Performing Apply in ETSTab!");
-		if (panes != null)
+		if (panes != null) {
 			for (int i = 0; i < panes.length; i++) {
-				if (panes[i].getToolName() == null || !panes[i].getToolName().equals(selectedtool))
+				if (panes[i].getToolName() == null || !panes[i].getToolName().equals(selectedtool)) {
 					continue;
+				}
 				panes[i].performApply(configuration);
 
 				String paneOpts = panes[i].getOptionString();
-				if (paneOpts == null)
+				if (paneOpts == null) {
 					paneOpts = "";
+				}
 				configuration.setAttribute(panes[i].getConfigID(), paneOpts);
 				configuration.setAttribute(panes[i].getConfigVarID(), panes[i].getVarMap());
 			}
+		}
 
 		localConfig = configuration;
 	}

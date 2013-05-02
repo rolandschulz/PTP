@@ -15,7 +15,7 @@
  * Contributors:
  *    Wyatt Spear - initial API and implementation
  ****************************************************************************/
-package org.eclipse.ptp.etfw.preferences;
+package org.eclipse.ptp.internal.etfw.preferences;
 
 //import java.io.File;
 import java.util.Iterator;
@@ -35,10 +35,11 @@ import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.ptp.etfw.Activator;
+import org.eclipse.ptp.etfw.ETFWUtils;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
-import org.eclipse.ptp.etfw.messages.Messages;
 import org.eclipse.ptp.etfw.toolopts.ExternalToolProcess;
+import org.eclipse.ptp.internal.etfw.Activator;
+import org.eclipse.ptp.internal.etfw.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -91,8 +92,9 @@ public class ToolLocationPreferencePage extends PreferencePage implements IWorkb
 			}
 
 			public void propertyChange(PropertyChangeEvent event) {
-				if (event.getProperty().equals(FieldEditor.IS_VALID))
+				if (event.getProperty().equals(FieldEditor.IS_VALID)) {
 					updatePreferencePage();
+				}
 			}
 		}
 
@@ -128,14 +130,15 @@ public class ToolLocationPreferencePage extends PreferencePage implements IWorkb
 		setPreferenceStore(Activator.getDefault().getPreferenceStore());
 		Iterator<Map.Entry<String, String>> eIt = null;
 		String me = null;
-		ExternalToolProcess[] tools = Activator.getTools();
+		ExternalToolProcess[] tools = ETFWUtils.getTools();
 		Set<String> groups = new LinkedHashSet<String>();
-		for (int i = 0; i < tools.length; i++) {
-			eIt = tools[i].groupApp.entrySet().iterator();
+		for (ExternalToolProcess tool : tools) {
+			eIt = tool.groupApp.entrySet().iterator();
 			while (eIt.hasNext()) {
 				me = (eIt.next()).getKey().toString();
-				if (!me.equals("internal")) //$NON-NLS-1$
+				if (!me.equals("internal")) {
 					groups.add(me);
+				}
 			}
 		}
 
@@ -167,8 +170,9 @@ public class ToolLocationPreferencePage extends PreferencePage implements IWorkb
 		}
 
 		public void propertyChange(PropertyChangeEvent event) {
-			if (event.getProperty().equals(FieldEditor.IS_VALID))
+			if (event.getProperty().equals(FieldEditor.IS_VALID)) {
 				updatePreferencePage();
+			}
 		}
 	}
 
@@ -197,9 +201,11 @@ public class ToolLocationPreferencePage extends PreferencePage implements IWorkb
 		aGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
 		aGroup.setText(Messages.ToolLocationPreferencePage_ToolLocationConf);
 
-		if (toolGroups != null)
-			for (int i = 0; i < toolGroups.length; i++)
-				toolGroups[i].makeToolBinPane(aGroup);
+		if (toolGroups != null) {
+			for (BinDirPanel toolGroup : toolGroups) {
+				toolGroup.makeToolBinPane(aGroup);
+			}
+		}
 
 	}
 
@@ -212,9 +218,10 @@ public class ToolLocationPreferencePage extends PreferencePage implements IWorkb
 		IFileStore path = null;
 		String correctPath = getFieldContent(field.getText());
 		if (correctPath != null) {
-			path = EFS.getLocalFileSystem().getStore(new Path(correctPath));//new File(correctPath);
-			if (path.fetchInfo().exists())
+			path = EFS.getLocalFileSystem().getStore(new Path(correctPath));// new File(correctPath);
+			if (path.fetchInfo().exists()) {
 				dialog.setFilterPath(!path.fetchInfo().isDirectory() ? correctPath : path.getParent().toURI().getPath());
+			}
 		}
 		// The specified directory previously had to contain at least one
 		// recognizable TAU makefile in its lib sub-directory to be accepted.
@@ -235,54 +242,56 @@ public class ToolLocationPreferencePage extends PreferencePage implements IWorkb
 		// dialog.setMessage("You must select a valid TAU bin directory.  Such a directory should be created when you configure and install TAU.  It should contain least one valid stub makefile configured with the Program Database Toolkit (pdt)");
 
 		String selectedPath = dialog.open();// null;
-		if (selectedPath != null)
+		if (selectedPath != null) {
 			field.setText(selectedPath);
-		// while(true)
-		// {
-		// selectedPath = dialog.open();
-		// if(selectedPath==null)
-		// break;
-		//
-		// tlpath=selectedPath+File.separator+"lib";
-		// test = new File(tlpath);
-		// if(test.exists()){
-		// mfiles = test.listFiles(mfilter);
-		// }
-		// if (mfiles!=null&&mfiles.length>0)
-		// {
-		// if (selectedPath != null)
-		// tauBin.setText(selectedPath);
-		// break;
-		// }
-		// }
+			// while(true)
+			// {
+			// selectedPath = dialog.open();
+			// if(selectedPath==null)
+			// break;
+			//
+			// tlpath=selectedPath+File.separator+"lib";
+			// test = new File(tlpath);
+			// if(test.exists()){
+			// mfiles = test.listFiles(mfilter);
+			// }
+			// if (mfiles!=null&&mfiles.length>0)
+			// {
+			// if (selectedPath != null)
+			// tauBin.setText(selectedPath);
+			// break;
+			// }
+			// }
+		}
 
 	}
 
 	private void loadSaved() {
-		//Preferences preferences = Activator.getDefault().getPluginPreferences();
+		// Preferences preferences = Activator.getDefault().getPluginPreferences();
 		IPreferencesService service = Platform.getPreferencesService();
 
-		if (toolGroups != null)
-			for (int i = 0; i < toolGroups.length; i++) {
-				toolGroups[i].binDir.setText(service.getString(Activator.PLUGIN_ID,IToolLaunchConfigurationConstants.TOOL_BIN_ID
-						+ "." + toolGroups[i].group,"",null));// ITAULaunchConfigurationConstants.TAU_BIN_PATH)); //$NON-NLS-1$
+		if (toolGroups != null) {
+			for (BinDirPanel toolGroup : toolGroups) {
+				toolGroup.binDir.setText(service.getString(Activator.PLUGIN_ID, IToolLaunchConfigurationConstants.TOOL_BIN_ID
+						+ "." + toolGroup.group, "", null));// ITAULaunchConfigurationConstants.TAU_BIN_PATH)); //$NON-NLS-1$
 			}
+		}
 
 	}
 
 	@Override
 	public boolean performOk() {
-		//Preferences preferences = Activator.getDefault().getPluginPreferences();
+		// Preferences preferences = Activator.getDefault().getPluginPreferences();
 
-		//InstanceScope is = new InstanceScope();
-		
+		// InstanceScope is = new InstanceScope();
+
 		IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
-		
-		if (toolGroups != null)
-			for (int i = 0; i < toolGroups.length; i++) {
-				preferences.put(
-						IToolLaunchConfigurationConstants.TOOL_BIN_ID + "." + toolGroups[i].group, toolGroups[i].binDir.getText()); //$NON-NLS-1$
+
+		if (toolGroups != null) {
+			for (BinDirPanel toolGroup : toolGroups) {
+				preferences.put(IToolLaunchConfigurationConstants.TOOL_BIN_ID + "." + toolGroup.group, toolGroup.binDir.getText()); //$NON-NLS-1$
 			}
+		}
 
 		try {
 			preferences.flush();
@@ -290,7 +299,7 @@ public class ToolLocationPreferencePage extends PreferencePage implements IWorkb
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		//Activator.getDefault().savePluginPreferences();
+		// Activator.getDefault().savePluginPreferences();
 		return true;
 	}
 
@@ -331,8 +340,9 @@ public class ToolLocationPreferencePage extends PreferencePage implements IWorkb
 	}
 
 	protected String getFieldContent(String text) {
-		if (text.trim().length() == 0 || text.equals(EMPTY_STRING))
+		if (text.trim().length() == 0 || text.equals(EMPTY_STRING)) {
 			return null;
+		}
 
 		return text;
 	}
@@ -348,10 +358,11 @@ public class ToolLocationPreferencePage extends PreferencePage implements IWorkb
 
 	protected GridData spanGridData(int style, int space) {
 		GridData gd = null;
-		if (style == -1)
+		if (style == -1) {
 			gd = new GridData();
-		else
+		} else {
 			gd = new GridData(style);
+		}
 		gd.horizontalSpan = space;
 		return gd;
 	}

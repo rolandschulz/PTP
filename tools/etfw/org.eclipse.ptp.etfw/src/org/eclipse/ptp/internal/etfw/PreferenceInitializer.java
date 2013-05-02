@@ -7,10 +7,9 @@
  * Contributors: 
  *     Chris Navarro (Illinois/NCSA) - Design and implementation
  ******************************************************************************/
-package org.eclipse.ptp.etfw.internal;
+package org.eclipse.ptp.internal.etfw;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.ptp.etfw.Activator;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.PreferenceConstants;
 import org.eclipse.ptp.etfw.Preferences;

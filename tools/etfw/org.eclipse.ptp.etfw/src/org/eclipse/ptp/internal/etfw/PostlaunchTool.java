@@ -1,4 +1,4 @@
-package org.eclipse.ptp.etfw.internal;
+package org.eclipse.ptp.internal.etfw;
 
 //import java.io.File;
 //import java.io.FileFilter;
@@ -19,12 +19,12 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.AbstractToolDataManager;
-import org.eclipse.ptp.etfw.Activator;
+import org.eclipse.ptp.etfw.ETFWUtils;
 import org.eclipse.ptp.etfw.IBuildLaunchUtils;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
-import org.eclipse.ptp.etfw.messages.Messages;
 import org.eclipse.ptp.etfw.toolopts.PostProcTool;
 import org.eclipse.ptp.etfw.toolopts.ToolApp;
+import org.eclipse.ptp.internal.etfw.messages.Messages;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -137,7 +137,7 @@ public class PostlaunchTool extends ToolStep implements IToolLaunchConfiguration
 					 * Otherwise, if we have an alternative tool defined in a plugin
 					 */
 					else {
-						AbstractToolDataManager manager = Activator.getPerfDataManager(anap.toolCommand);
+						AbstractToolDataManager manager = ETFWUtils.getPerfDataManager(anap.toolCommand);
 						if (manager != null) {
 							if (externalTarget) {
 								manager.setExternalTarget(true);

@@ -7,7 +7,7 @@
  * Contributors: 
  * 		Chris Navarro (Illinois/NCSA) - Design and implementation
  *******************************************************************************/
-package org.eclipse.ptp.etfw.internal;
+package org.eclipse.ptp.internal.etfw;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -33,7 +33,7 @@ import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.jaxb.data.ExecToolType;
 import org.eclipse.ptp.etfw.jaxb.data.ToolAppType;
 import org.eclipse.ptp.etfw.jaxb.util.ToolAppTypeUtil;
-import org.eclipse.ptp.etfw.messages.Messages;
+import org.eclipse.ptp.internal.etfw.messages.Messages;
 
 /**
  * This class is based on LauncherTool and handles workflow steps that run tools rebuilt with performance instrumentation.

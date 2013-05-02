@@ -4,21 +4,24 @@ import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 
+/**
+ * @since 7.0
+ */
 public abstract class AbstractToolConfigurationTab extends AbstractLaunchConfigurationTab {
 	public String getName() {
 		return null;
 	}
-	
+
 	/**
 	 * Produces a new GridLayout based on provided arguments
+	 * 
 	 * @param columns
 	 * @param isEqual
 	 * @param mh
 	 * @param mw
 	 * @return
 	 */
-	protected static GridLayout createGridLayout(int columns, boolean isEqual, int mh,
-			int mw) {
+	protected static GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) {
 		GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = columns;
 		gridLayout.makeColumnsEqualWidth = isEqual;
@@ -29,6 +32,7 @@ public abstract class AbstractToolConfigurationTab extends AbstractLaunchConfigu
 
 	/**
 	 * Creates a new GridData based on provided style and space arguments
+	 * 
 	 * @param style
 	 * @param space
 	 * @return
@@ -46,6 +50,7 @@ public abstract class AbstractToolConfigurationTab extends AbstractLaunchConfigu
 
 	/**
 	 * Treats empty strings as null
+	 * 
 	 * @param text
 	 * @return Contents of text, or null if text is the empty string
 	 */

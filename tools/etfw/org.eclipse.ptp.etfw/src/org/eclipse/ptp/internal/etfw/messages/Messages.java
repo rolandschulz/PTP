@@ -1,9 +1,9 @@
-package org.eclipse.ptp.etfw.messages;
+package org.eclipse.ptp.internal.etfw.messages;
 
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-	private static final String BUNDLE_NAME = "org.eclipse.ptp.etfw.messages.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.internal.etfw.messages.messages"; //$NON-NLS-1$
 	public static String Activator_ProblemReading;
 	public static String BuilderTool_all;
 	public static String BuilderTool_BuildIncomplete;
