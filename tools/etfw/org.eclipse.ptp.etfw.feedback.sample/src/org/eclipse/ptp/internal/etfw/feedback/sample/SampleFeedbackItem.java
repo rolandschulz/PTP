@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ptp.etfw.feedback.sample;
+package org.eclipse.ptp.internal.etfw.feedback.sample;
 
 import java.util.HashMap;
 import java.util.List;
@@ -17,8 +17,7 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.ptp.etfw.feedback.AbstractFeedbackItem;
-import org.eclipse.ptp.etfw.feedback.obj.IFeedbackItem;
-import org.eclipse.ptp.etfw.feedback.sample.internal.FeedbackIDs;
+import org.eclipse.ptp.etfw.feedback.IFeedbackItem;
 
 /**
  * @author Beth Tibbitts

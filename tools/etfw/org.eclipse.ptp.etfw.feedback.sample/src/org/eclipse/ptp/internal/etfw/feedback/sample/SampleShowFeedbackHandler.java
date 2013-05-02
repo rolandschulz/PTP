@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ptp.etfw.feedback.sample;
+package org.eclipse.ptp.internal.etfw.feedback.sample;
 
 import org.eclipse.ptp.etfw.feedback.actions.handlers.ShowFeedbackHandler;
 

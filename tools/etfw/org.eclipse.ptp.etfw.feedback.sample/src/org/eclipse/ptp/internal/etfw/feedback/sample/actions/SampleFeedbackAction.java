@@ -8,14 +8,14 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.etfw.feedback.sample.actions;
+package org.eclipse.ptp.internal.etfw.feedback.sample.actions;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.etfw.feedback.AbstractFeedbackAction;
-import org.eclipse.ptp.etfw.feedback.obj.IFeedbackItem;
-import org.eclipse.ptp.etfw.feedback.sample.Activator;
+import org.eclipse.ptp.etfw.feedback.IFeedbackItem;
+import org.eclipse.ptp.internal.etfw.feedback.sample.Activator;
 
 /**
  * A sample action that can be added to the ETFw Feedback view

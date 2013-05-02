@@ -3,10 +3,12 @@ Bundle-ManifestVersion: 2
 Bundle-Name: ETFW Feedback Sample
 Bundle-SymbolicName: org.eclipse.ptp.etfw.feedback.sample; singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: org.eclipse.ptp.etfw.feedback.sample.Activator
+Bundle-Activator: org.eclipse.ptp.internal.etfw.feedback.sample.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.eclipse.ptp.etfw.feedback;bundle-version="1.0.0",
- org.eclipse.core.resources;bundle-version="3.5.1"
+ org.eclipse.ptp.etfw.feedback,
+ org.eclipse.core.resources
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Export-Package: org.eclipse.ptp.internal.etfw.feedback.sample;x-internal:=true,
+ org.eclipse.ptp.internal.etfw.feedback.sample.actions;x-internal:=true

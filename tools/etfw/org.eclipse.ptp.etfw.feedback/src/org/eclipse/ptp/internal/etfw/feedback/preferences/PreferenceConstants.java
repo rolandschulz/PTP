@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.etfw.feedback.preferences;
+package org.eclipse.ptp.internal.etfw.feedback.preferences;
 
 /**
  * Constant definitions for plug-in preferences

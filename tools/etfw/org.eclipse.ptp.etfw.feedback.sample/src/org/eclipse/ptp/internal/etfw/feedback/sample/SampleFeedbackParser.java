@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ptp.etfw.feedback.sample;
+package org.eclipse.ptp.internal.etfw.feedback.sample;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +32,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.etfw.feedback.AbstractFeedbackParser;
-import org.eclipse.ptp.etfw.feedback.obj.IFeedbackItem;
+import org.eclipse.ptp.etfw.feedback.IFeedbackItem;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;

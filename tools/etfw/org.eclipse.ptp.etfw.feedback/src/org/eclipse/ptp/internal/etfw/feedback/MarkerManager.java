@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ptp.etfw.feedback;
+package org.eclipse.ptp.internal.etfw.feedback;
 
 import java.io.File;
 import java.net.URI;
@@ -32,9 +32,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.ptp.etfw.feedback.messages.Messages;
-import org.eclipse.ptp.etfw.feedback.obj.IFeedbackItem;
-import org.eclipse.ptp.etfw.feedback.preferences.PreferenceConstants;
+import org.eclipse.ptp.etfw.feedback.IFeedbackItem;
+import org.eclipse.ptp.internal.etfw.feedback.messages.Messages;
+import org.eclipse.ptp.internal.etfw.feedback.preferences.PreferenceConstants;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;

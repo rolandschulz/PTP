@@ -8,12 +8,12 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.etfw.feedback.preferences;
+package org.eclipse.ptp.internal.etfw.feedback.preferences;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
-import org.eclipse.ptp.etfw.feedback.Activator;
-import org.eclipse.ptp.etfw.feedback.messages.Messages;
+import org.eclipse.ptp.internal.etfw.feedback.Activator;
+import org.eclipse.ptp.internal.etfw.feedback.messages.Messages;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 

@@ -8,9 +8,9 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.etfw.feedback;
+package org.eclipse.ptp.internal.etfw.feedback;
 
-import org.eclipse.ptp.etfw.feedback.messages.Messages;
+import org.eclipse.ptp.internal.etfw.feedback.messages.Messages;
 
 /**
  * Feedback view Plugin constants

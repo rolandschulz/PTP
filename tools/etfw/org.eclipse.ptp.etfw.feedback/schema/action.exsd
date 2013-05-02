@@ -65,7 +65,7 @@
                   An action to be performed on the selected item in the Feedback view
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn=":org.eclipse.ptp.etfw.feedback.IFeedbackAction"/>
+                  <meta.attribute kind="java" basedOn="org.eclipse.ptp.etfw.feedback.AbstractFeedbackAction:"/>
                </appInfo>
             </annotation>
          </attribute>

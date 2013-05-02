@@ -10,7 +10,6 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.ptp.etfw.feedback.obj.IFeedbackItem;
 
 /**
  * Code to be shared amongst implementors of IFeedbackItem - generic stuff

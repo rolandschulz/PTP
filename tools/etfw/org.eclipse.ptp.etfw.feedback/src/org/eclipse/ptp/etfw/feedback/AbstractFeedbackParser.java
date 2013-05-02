@@ -25,8 +25,7 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.ptp.etfw.feedback.obj.IFeedbackItem;
-import org.eclipse.ptp.etfw.feedback.obj.IFeedbackParser;
+import org.eclipse.ptp.internal.etfw.feedback.MarkerManager;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 

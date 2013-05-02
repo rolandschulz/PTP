@@ -9,14 +9,13 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ptp.etfw.feedback.sample;
+package org.eclipse.ptp.internal.etfw.feedback.sample;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.ptp.etfw.feedback.preferences.PreferenceConstants;
-import org.eclipse.ptp.etfw.feedback.sample.internal.FeedbackIDs;
 import org.eclipse.ptp.etfw.feedback.views.SimpleTreeTableMarkerView;
+import org.eclipse.ptp.internal.etfw.feedback.preferences.PreferenceConstants;
 
 /**
  * Expose xlC compiler transformation information in an eclipse view

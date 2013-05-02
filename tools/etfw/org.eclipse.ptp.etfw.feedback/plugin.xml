@@ -5,12 +5,6 @@
    <extension-point id="action" name="%extension-point.name.0" schema="schema/action.exsd"/>
 
    <extension
-         point="org.eclipse.help.contexts">
-      <contexts
-            file="contexts.xml">
-      </contexts>
-   </extension>
-   <extension
          id="feedbackMarker"
          name="%extension.name"
          point="org.eclipse.core.resources.markers">
@@ -33,7 +27,7 @@
          point="org.eclipse.ui.preferencePages">
       <page
             category="org.eclipse.ptp.etfw.preferences.ExternalToolsMainPage"
-            class="org.eclipse.ptp.etfw.feedback.preferences.FeedbackPreferencePage"
+            class="org.eclipse.ptp.internal.etfw.feedback.preferences.FeedbackPreferencePage"
             id="org.eclipse.ptp.etfw.feedback.preferences.SamplePreferencePage"
             name="%page.name">
       </page>
@@ -41,7 +35,7 @@
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
-            class="org.eclipse.ptp.etfw.feedback.preferences.PreferenceInitializer">
+            class="org.eclipse.ptp.internal.etfw.feedback.preferences.PreferenceInitializer">
       </initializer>
    </extension>
     

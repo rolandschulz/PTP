@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.etfw.feedback.sample.internal;
+package org.eclipse.ptp.internal.etfw.feedback.sample;
 
 /**
  * Feedback view Plugin constants

@@ -9,14 +9,14 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ptp.etfw.feedback.views;
+package org.eclipse.ptp.internal.etfw.feedback.views;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ptp.etfw.feedback.AbstractFeedbackAction;
-import org.eclipse.ptp.etfw.feedback.Activator;
+import org.eclipse.ptp.internal.etfw.feedback.Activator;
 
 /**
  * 

@@ -22,6 +22,7 @@
 		<topic label="org.eclipse.ptp.ems.core" href="reference/api/org/eclipse/ptp/ems/core/package-summary.html" />
 		<topic label="org.eclipse.ptp.ems.ui" href="reference/api/org/eclipse/ptp/ems/ui/package-summary.html" />
 		<topic label="org.eclipse.ptp.etfw.core" href="reference/api/org/eclipse/ptp/etfw/core/package-summary.html" />
+		<topic label="org.eclipse.ptp.etfw.feedback" href="reference/api/org/eclipse/ptp/etfw/feedback/package-summary.html" />
 		<topic label="org.eclipse.ptp.etfw.ui" href="reference/api/org/eclipse/ptp/etfw/ui/package-summary.html" />
 		<topic label="org.eclipse.ptp.launch" href="reference/api/org/eclipse/ptp/launch/package-summary.html" />
 		<topic label="org.eclipse.ptp.launch.ui" href="reference/api/org/eclipse/ptp/launch/ui/package-summary.html" />

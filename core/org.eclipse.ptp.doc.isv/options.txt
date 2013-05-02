@@ -7,6 +7,7 @@
 ;../../core/org.eclipse.ptp.ems.core/src
 ;../../core/org.eclipse.ptp.ems.ui/src
 ;../../core/org.eclipse.ptp.etfw/src
+;../../core/org.eclipse.ptp.etfw.feedback/src
 ;../../core/org.eclipse.ptp.etfw.toolopts/src
 ;../../core/org.eclipse.ptp.launch/src
 ;../../core/org.eclipse.ptp.remote.core/src

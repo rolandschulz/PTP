@@ -66,7 +66,7 @@
          name="Sample PTP Feedback view report items"
          point="org.eclipse.ptp.etfw.feedback.parser">
       <feedtype
-            class="org.eclipse.ptp.etfw.feedback.sample.SampleFeedbackParser"
+            class="org.eclipse.ptp.internal.etfw.feedback.sample.SampleFeedbackParser"
             id="org.eclipse.ptp.etfw.feedback.sample.parser"
             name="Sample feedback parser"
             nodeName="SampleXMLRoot">
@@ -83,7 +83,7 @@
             name="Sample Feedback items"
             icon="icons/feedback_view.gif"
             category="org.eclipse.ptp.etfw.feedback"
-            class="org.eclipse.ptp.etfw.feedback.sample.SampleFeedbackView"
+            class="org.eclipse.ptp.internal.etfw.feedback.sample.SampleFeedbackView"
             id="org.eclipse.ptp.etfw.feedback.sample.view">
       </view>
    </extension>
@@ -92,7 +92,7 @@
          name="Sample Added Action"
          point="org.eclipse.ptp.etfw.feedback.action">
       <action
-            class="org.eclipse.ptp.etfw.feedback.sample.actions.SampleFeedbackAction"
+            class="org.eclipse.ptp.internal.etfw.feedback.sample.actions.SampleFeedbackAction"
             icon="icons/feedback_action.gif"
             id="sampleFeedbackAction1"
             name="Sample Feedback Action"

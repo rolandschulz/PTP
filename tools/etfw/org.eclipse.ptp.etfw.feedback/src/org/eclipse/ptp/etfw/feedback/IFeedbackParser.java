@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ptp.etfw.feedback.obj;
+package org.eclipse.ptp.etfw.feedback;
 
 import java.util.List;
 
@@ -23,6 +23,7 @@ import org.eclipse.core.resources.IFile;
  * etfw.feedback team.
  * 
  * @author beth tibbitts
+ * @since 6.0
  * 
  */
 public interface IFeedbackParser {

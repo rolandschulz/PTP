@@ -8,24 +8,32 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
+package org.eclipse.ptp.internal.etfw.feedback;
 
-package org.eclipse.ptp.etfw.feedback.sample;
-
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
  * The activator class controls the plug-in life cycle
+ * <p>
+ * <strong>EXPERIMENTAL</strong>. This package, and subpackages and classes, have been added as part of a work in progress. There is
+ * no guarantee that the included API will work or that it will remain the same. We do not recommending using these APIs without
+ * consulting with the etfw.feedback team.
+ * 
+ * @author Beth Tibbitts
  */
 public class Activator extends AbstractUIPlugin {
 
-	// The plug-in ID
-	public static final String PLUGIN_ID = "org.eclipse.ptp.etfw.feedback.sample";
-	public static final String MARKER_ID = "org.eclipse.ptp.etfw.feedback.sample.marker";
-	public static final String VIEW_ID = "org.eclipse.ptp.etfw.feedback.sample.view";
+	/** The plug-in ID */
+	public static final String PLUGIN_ID = "org.eclipse.ptp.etfw.feedback"; //$NON-NLS-1$
 
-	// The shared instance
+	public static final String FEEDBACK_EXTENSION_ID = "parser"; //$NON-NLS-1$
+	/**
+	 * @since 2.0
+	 */
+	public static final String FEEDBACK_ACTION_EXTENSION_ID = "action"; //$NON-NLS-1$
+
+	/** The shared instance */
 	private static Activator plugin;
 
 	/**
@@ -37,8 +45,11 @@ public class Activator extends AbstractUIPlugin {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
+	 * @see
+	 * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
+	 * )
 	 */
+	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
@@ -47,8 +58,11 @@ public class Activator extends AbstractUIPlugin {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
+	 * @see
+	 * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
+	 * )
 	 */
+	@Override
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
 		super.stop(context);
@@ -63,15 +77,4 @@ public class Activator extends AbstractUIPlugin {
 		return plugin;
 	}
 
-	/**
-	 * Returns an image descriptor for the image file at the given
-	 * plug-in relative path
-	 * 
-	 * @param path
-	 *            the path
-	 * @return the image descriptor
-	 */
-	public static ImageDescriptor getImageDescriptor(String path) {
-		return imageDescriptorFromPlugin(PLUGIN_ID, path);
-	}
 }

@@ -12,7 +12,7 @@ package org.eclipse.ptp.etfw.feedback;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ptp.etfw.feedback.obj.IFeedbackItem;
+import org.eclipse.ptp.internal.etfw.feedback.Activator;
 
 /**
  * Extend this class to add an action to the toolbar, an action that can be
@@ -37,11 +37,14 @@ public abstract class AbstractFeedbackAction {
 	 * 
 	 * @param item
 	 */
-	abstract public void run(IMarker marker);
+	public abstract void run(IMarker marker);
 
-	abstract public void run(IFeedbackItem item);
+	/**
+	 * @since 6.0
+	 */
+	public abstract void run(IFeedbackItem item);
 
-	abstract public String getPluginId();
+	public abstract String getPluginId();
 
 	public void addIcon(String iconName) {
 		this.iconName = iconName;

@@ -8,12 +8,12 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ptp.etfw.feedback.messages;
+package org.eclipse.ptp.internal.etfw.feedback.messages;
 
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-	private static final String BUNDLE_NAME = "org.eclipse.ptp.etfw.feedback.messages.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "org.eclipse.ptp.internal.etfw.feedback.messages.messages"; //$NON-NLS-1$
 	public static String FeedbackIDs_feedback;
 	public static String FeedbackPreferencePage_maintainExpandCollapseState;
 	public static String FeedbackPreferencePage_showNoItemsFoundDialog;

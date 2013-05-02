@@ -2,8 +2,8 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %bundle_name
 Bundle-SymbolicName: org.eclipse.ptp.etfw.feedback;singleton:=true
-Bundle-Version: 5.0.0.qualifier
-Bundle-Activator: org.eclipse.ptp.etfw.feedback.Activator
+Bundle-Version: 6.0.0.qualifier
+Bundle-Activator: org.eclipse.ptp.internal.etfw.feedback.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
@@ -13,10 +13,11 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: org.eclipse.ptp.etfw.feedback,
  org.eclipse.ptp.etfw.feedback.actions.handlers,
- org.eclipse.ptp.etfw.feedback.messages;x-internal:=true,
- org.eclipse.ptp.etfw.feedback.obj,
- org.eclipse.ptp.etfw.feedback.preferences,
- org.eclipse.ptp.etfw.feedback.util;x-internal:=true,
- org.eclipse.ptp.etfw.feedback.views
+ org.eclipse.ptp.etfw.feedback.views,
+ org.eclipse.ptp.internal.etfw.feedback;x-internal:=true,
+ org.eclipse.ptp.internal.etfw.feedback.messages;x-internal:=true,
+ org.eclipse.ptp.internal.etfw.feedback.preferences;x-internal:=true,
+ org.eclipse.ptp.internal.etfw.feedback.util;x-internal:=true,
+ org.eclipse.ptp.internal.etfw.feedback.views;x-internal:=true
 Bundle-Vendor: %bundle_provider
 Bundle-Localization: plugin

@@ -9,17 +9,18 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ptp.etfw.feedback.views;
+package org.eclipse.ptp.internal.etfw.feedback.views;
 
 import java.util.StringTokenizer;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.ptp.etfw.feedback.Activator;
-import org.eclipse.ptp.etfw.feedback.FeedbackIDs;
-import org.eclipse.ptp.etfw.feedback.messages.Messages;
-import org.eclipse.ptp.etfw.feedback.preferences.PreferenceConstants;
+import org.eclipse.ptp.etfw.feedback.views.SimpleTreeTableMarkerView;
+import org.eclipse.ptp.internal.etfw.feedback.Activator;
+import org.eclipse.ptp.internal.etfw.feedback.FeedbackIDs;
+import org.eclipse.ptp.internal.etfw.feedback.messages.Messages;
+import org.eclipse.ptp.internal.etfw.feedback.preferences.PreferenceConstants;
 
 /**
  * Expose information (e.g. from an XML file) in an eclipse view
@@ -45,14 +46,10 @@ public class FeedbackTreeTableMarkerView extends SimpleTreeTableMarkerView {
 	 * These are the default values if we don't get one in the constructor, but I'm not sure
 	 * this works to use these.
 	 */
-	private static String[] attrNames = new String[] {
-			FeedbackIDs.FEEDBACK_ATTR_NAME,
-			FeedbackIDs.FEEDBACK_ATTR_FILENAME,
+	private static String[] attrNames = new String[] { FeedbackIDs.FEEDBACK_ATTR_NAME, FeedbackIDs.FEEDBACK_ATTR_FILENAME,
 			FeedbackIDs.FEEDBACK_ATTR_FUNCTION, // aka Caller
-			FeedbackIDs.FEEDBACK_ATTR_FUNCTION_CALLEE,
-			IMarker.LINE_NUMBER, /* IMarker.CHAR_START,IMarker.CHAR_END */
-			FeedbackIDs.FEEDBACK_ATTR_DESC,
-			FeedbackIDs.FEEDBACK_ATTR_LOOP_ID };
+			FeedbackIDs.FEEDBACK_ATTR_FUNCTION_CALLEE, IMarker.LINE_NUMBER, /* IMarker.CHAR_START,IMarker.CHAR_END */
+			FeedbackIDs.FEEDBACK_ATTR_DESC, FeedbackIDs.FEEDBACK_ATTR_LOOP_ID };
 	private static String[] colNames;// =new String[] {"Type/Name","File","Caller(Target)","Callee(Src)", "Caller Line",;
 	// /*"Char start","Char end"*/ "Description", "Loop ID"};
 	private static int[] widths = new int[] { 160, 100, 100, 100, 80, 200, 60 };
@@ -62,6 +59,8 @@ public class FeedbackTreeTableMarkerView extends SimpleTreeTableMarkerView {
 
 	/**
 	 * Use the ctor that allows an arbitrary number of extra columns.
+	 * 
+	 * @since 6.0
 	 */
 	public FeedbackTreeTableMarkerView(Activator plugin, String markerID) {
 		super(plugin, "XForm", "XForms", attrNames, colNames, widths, //$NON-NLS-1$ //$NON-NLS-2$
@@ -104,11 +103,13 @@ public class FeedbackTreeTableMarkerView extends SimpleTreeTableMarkerView {
 
 	}
 
+	@Override
 	public String removeSpaces(String s) {
 		StringTokenizer st = new StringTokenizer(s, " ", false); //$NON-NLS-1$
 		String t = ""; //$NON-NLS-1$
-		while (st.hasMoreElements())
+		while (st.hasMoreElements()) {
 			t += st.nextElement();
+		}
 		return t;
 	}
 
