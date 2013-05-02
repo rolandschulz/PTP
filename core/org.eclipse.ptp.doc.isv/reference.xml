@@ -19,6 +19,8 @@
 		<topic label="org.eclipse.ptp.debug.core.pdi.model" href="reference/api/org/eclipse/ptp/debug/core/pdi/modelpackage-summary.html" />
 		<topic label="org.eclipse.ptp.debug.core.pdi.model.aif" href="reference/api/org/eclipse/ptp/debug/core/pdi/model/aifpackage-summary.html" />
 		<topic label="org.eclipse.ptp.debug.core.pdi.request" href="reference/api/org/eclipse/ptp/debug/core/pdi/request/package-summary.html" />
+		<topic label="org.eclipse.ptp.ems.core" href="reference/api/org/eclipse/ptp/ems/core/package-summary.html" />
+		<topic label="org.eclipse.ptp.ems.ui" href="reference/api/org/eclipse/ptp/ems/ui/package-summary.html" />
 		<topic label="org.eclipse.ptp.launch" href="reference/api/org/eclipse/ptp/launch/package-summary.html" />
 		<topic label="org.eclipse.ptp.launch.ui" href="reference/api/org/eclipse/ptp/launch/ui/package-summary.html" />
 		<topic label="org.eclipse.ptp.launch.ui.tabs" href="reference/api/org/eclipse/ptp/launch/ui/tabs/package-summary.html" />

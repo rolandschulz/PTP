@@ -9,12 +9,18 @@
  ******************************************************************************/
 package org.eclipse.ptp.etfw;
 
+import org.eclipse.ptp.internal.etfw.Activator;
+
 /**
  * Preference constants for the external tools framework
  * 
  * @since 7.0
  * 
  */
-public interface PreferenceConstants {
+public class PreferenceConstants {
 	public static final String ETFW_VERSION = "ETFW_VERSION"; //$NON-NLS-1$
+
+	public static String getVersion() {
+		return Preferences.getString(Activator.PLUGIN_ID, ETFW_VERSION);
+	}
 }

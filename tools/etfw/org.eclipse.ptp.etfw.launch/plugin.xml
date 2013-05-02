@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.debug.ui.launchConfigurationTabs">
       <tab
-            class="org.eclipse.ptp.etfw.launch.PerformanceAnalysisTab"
+            class="org.eclipse.ptp.internal.etfw.launch.PerformanceAnalysisTab"
             group="org.eclipse.ptp.etfw.launchConfigurationTabGroup"
             id="org.eclipse.ptp.etfw.launch.PerformanceAnalysisTab"
             name="Performance Analysis">

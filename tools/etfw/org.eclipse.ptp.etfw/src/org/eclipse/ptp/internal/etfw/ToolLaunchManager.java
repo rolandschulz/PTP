@@ -25,17 +25,17 @@ import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.ptp.etfw.ETFWUtils;
 import org.eclipse.ptp.etfw.IBuildLaunchUtils;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
-import org.eclipse.ptp.etfw.jaxb.data.BuildToolType;
-import org.eclipse.ptp.etfw.jaxb.data.EtfwToolProcessType;
-import org.eclipse.ptp.etfw.jaxb.data.ExecToolType;
-import org.eclipse.ptp.etfw.jaxb.data.AnalysisToolType;
-import org.eclipse.ptp.etfw.jaxb.util.ExternalToolProcessUtil;
-import org.eclipse.ptp.etfw.jaxb.util.JAXBExtensionUtils;
 import org.eclipse.ptp.etfw.toolopts.BuildTool;
 import org.eclipse.ptp.etfw.toolopts.ExecTool;
 import org.eclipse.ptp.etfw.toolopts.ExternalTool;
 import org.eclipse.ptp.etfw.toolopts.ExternalToolProcess;
 import org.eclipse.ptp.etfw.toolopts.PostProcTool;
+import org.eclipse.ptp.internal.etfw.jaxb.data.AnalysisToolType;
+import org.eclipse.ptp.internal.etfw.jaxb.data.BuildToolType;
+import org.eclipse.ptp.internal.etfw.jaxb.data.EtfwToolProcessType;
+import org.eclipse.ptp.internal.etfw.jaxb.data.ExecToolType;
+import org.eclipse.ptp.internal.etfw.jaxb.util.ExternalToolProcessUtil;
+import org.eclipse.ptp.internal.etfw.jaxb.util.JAXBExtensionUtils;
 import org.eclipse.ptp.internal.etfw.messages.Messages;
 
 public class ToolLaunchManager {

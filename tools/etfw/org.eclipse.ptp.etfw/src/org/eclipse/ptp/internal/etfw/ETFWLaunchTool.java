@@ -30,9 +30,9 @@ import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.IBuildLaunchUtils;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
-import org.eclipse.ptp.etfw.jaxb.data.ExecToolType;
-import org.eclipse.ptp.etfw.jaxb.data.ToolAppType;
-import org.eclipse.ptp.etfw.jaxb.util.ToolAppTypeUtil;
+import org.eclipse.ptp.internal.etfw.jaxb.data.ExecToolType;
+import org.eclipse.ptp.internal.etfw.jaxb.data.ToolAppType;
+import org.eclipse.ptp.internal.etfw.jaxb.util.ToolAppTypeUtil;
 import org.eclipse.ptp.internal.etfw.messages.Messages;
 
 /**

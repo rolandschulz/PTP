@@ -1,11 +1,11 @@
 ###################################################################################
 #
-# The classes in the org.eclipse.ptp.etfw.jaxb.data package are 
+# The classes in the org.eclipse.ptp.internal.etfw.jaxb.data package are 
 # generated from the schema definitions. Do not edit.
 #
 # To generate the classes, run the following command from the plugin directory.
 #
 ###################################################################################
 
-xjc -target 2.1 -b schema/import-bindings.xml -d src -p org.eclipse.ptp.etfw.jaxb.data schema/etfw_tool_type.xsd
+xjc -target 2.1 -b schema/import-bindings.xml -d src -p org.eclipse.ptp.internal.etfw.jaxb.data schema/etfw_tool_type.xsd
 	

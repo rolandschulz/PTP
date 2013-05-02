@@ -43,29 +43,37 @@ public class ToolOption {
 	/**
 	 * List of items availabel in the combo widget
 	 * 
-	 * @since 4.0
+	 * @since 5.0
 	 */
-	protected String[] items;
+	public String[] items;
 
 	/**
 	 * The check button to activate/deactivate this option if it is optional
+	 * 
+	 * @since 5.0
 	 */
-	protected Button unitCheck;
+	public Button unitCheck;
 
 	/**
 	 * The label used if this option is required
+	 * 
+	 * @since 5.0
 	 */
-	protected Label reqLabel;
+	public Label reqLabel;
 
 	/**
 	 * Holds/displays text arguments if any
+	 * 
+	 * @since 5.0
 	 */
-	protected Text argbox;
+	public Text argbox;
 
 	/**
 	 * Launches file/directory browser for argbox
+	 * 
+	 * @since 5.0
 	 */
-	protected Button browser;
+	public Button browser;
 
 	/*
 	 * The following should be defined in the factory
@@ -73,61 +81,78 @@ public class ToolOption {
 
 	/**
 	 * Sets the default state of the check button
+	 * 
+	 * @since 5.0
 	 */
-	protected boolean defState;
+	public boolean defState;
 
 	/**
 	 * Specifies the type of option(bool,text,dir,file or combo)
+	 * 
+	 * @since 5.0
 	 */
-	protected int type;
+	public int type;
 
 	/**
 	 * The name, or prefix of the option
+	 * 
+	 * @since 5.0
 	 */
-	protected String optName;
+	public String optName;
 
-	protected String optID;
+	/**
+	 * @since 5.0
+	 */
+	public String optID;
 
 	/**
 	 * The default value for the argument, if any
+	 * 
+	 * @since 5.0
 	 */
-	protected String defText;
+	public String defText;
 
 	/**
 	 * The default numerical value for numerical arguments, if any
 	 * 
-	 * @since 4.0
+	 * @since 5.0
 	 */
-	protected int defNum;
+	public int defNum;
 
 	/**
 	 * The minimum numerical value for numerical arguments, if any
 	 * 
-	 * @since 4.0
+	 * @since 5.0
 	 */
-	protected int minNum;
+	public int minNum;
 
 	/**
 	 * The maximum numerical value for numerical arguments, if any
 	 * 
-	 * @since 4.0
+	 * @since 5.0
 	 */
-	protected int maxNum;
+	public int maxNum;
 
 	/**
 	 * Text for the option button
+	 * 
+	 * @since 5.0
 	 */
-	protected String optLabel;
+	public String optLabel;
 
 	/**
 	 * Context sensitive help info
+	 * 
+	 * @since 5.0
 	 */
-	protected String toolTip;
+	public String toolTip;
 
 	/**
 	 * Context sensitive help info for entry widget
+	 * 
+	 * @since 5.0
 	 */
-	protected String valueToolTip;
+	public String valueToolTip;
 
 	/**
 	 * Connect the option name and value with an equals if true otherwise use
@@ -146,30 +171,46 @@ public class ToolOption {
 	 */
 	public boolean visible = true;
 
-	protected Combo combopt;
+	/**
+	 * @since 5.0
+	 */
+	public Combo combopt;
 
 	/**
-	 * @since 4.0
+	 * @since 5.0
 	 */
-	protected Spinner numopt;
+	public Spinner numopt;
 
 	/**
 	 * If true this option is for an argument, if false it is for an environment
 	 * variable
+	 * 
+	 * @since 5.0
 	 */
-	protected boolean isArgument = true;
+	public boolean isArgument = true;
 
-	protected String setOn = "";
-	protected String setOff = null;
-	protected boolean fieldrequired = false;
+	/**
+	 * @since 5.0
+	 */
+	public String setOn = ""; //$NON-NLS-1$
+	/**
+	 * @since 5.0
+	 */
+	public String setOff = null;
+	/**
+	 * @since 5.0
+	 */
+	public boolean fieldrequired = false;
 
 	/*
 	 * These values should be defined internally
 	 */
 	/**
 	 * The whole option as sent to the system, up to the argument component
+	 * 
+	 * @since 5.0
 	 */
-	protected StringBuffer optionLine;
+	public StringBuffer optionLine;
 
 	// This will eventually be used to hold subordinate options.
 	// protected ArrayList subopts;
@@ -177,31 +218,39 @@ public class ToolOption {
 	/**
 	 * Name of the configuration value associated with the toggle button state
 	 * for this option
+	 * 
+	 * @since 5.0
 	 */
-	protected String confStateString;
+	public String confStateString;
 
 	/**
 	 * Name of the configuration value associated with the argument of this
 	 * option, if any
+	 * 
+	 * @since 5.0
 	 */
-	protected String confArgString;
+	public String confArgString;
 
 	/**
 	 * Name of the configuration value associated with the default argument of
 	 * this option, if any
+	 * 
+	 * @since 5.0
 	 */
-	protected String confDefString;
+	public String confDefString;
 
 	public String fileLike = null;
 
 	/**
 	 * Creates a new ToolOption
 	 * 
+	 * @since 5.0
+	 * 
 	 */
-	protected ToolOption() {
+	public ToolOption() {
 		type = 0;
 		defState = false;
-		defText = "";
+		defText = ""; //$NON-NLS-1$
 		// useEquals=true;
 	}
 
@@ -243,7 +292,7 @@ public class ToolOption {
 			numopt.setSelection(arg);
 			numopt.setEnabled(isOn);
 		} else if (argbox != null) {
-			setArg("" + arg);
+			setArg("" + arg); //$NON-NLS-1$
 		} else if (combopt != null) {
 			combopt.select(arg);
 		}
@@ -289,7 +338,7 @@ public class ToolOption {
 	 * Sets if this is an argument or an env variable.
 	 * 
 	 * @param isarg
-	 * @since 4.1
+	 * @since 5.0
 	 */
 	public void setIsArgument(boolean isarg) {
 		isArgument = isarg;

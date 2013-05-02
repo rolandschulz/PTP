@@ -19,20 +19,22 @@ package org.eclipse.ptp.etfw.toolopts;
 
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 
 /**
  * A reference implementation for the type of listener that can be associated with a ToolPane's tools
+ * 
  * @author wspear
- *
+ * 
+ * @since 5.0
  */
-public class ToolPaneListener implements ModifyListener, SelectionListener {
+public class ToolPaneListener extends SelectionAdapter implements ModifyListener {
 
 	IToolUITab thisTool;
 
 	/**
-	 * @since 4.1
+	 * @since 5.0
 	 */
 	public ToolPaneListener(IToolUITab tool) {
 		thisTool = tool;
@@ -40,14 +42,14 @@ public class ToolPaneListener implements ModifyListener, SelectionListener {
 
 	@SuppressWarnings("unused")
 	private ToolPaneListener() {
-		
+
 	}
 
-	protected void localAction()
-	{
-		//updateLaunchConfigurationDialog();
+	protected void localAction() {
+		// updateLaunchConfigurationDialog();
 	}
-	
+
+	@Override
 	public void widgetSelected(SelectionEvent e) {
 		thisTool.OptUpdate();
 		thisTool.updateOptDisplay();
@@ -55,12 +57,10 @@ public class ToolPaneListener implements ModifyListener, SelectionListener {
 	}
 
 	public void modifyText(ModifyEvent evt) {
-		//Object source = evt.getSource();
-		//if (thisTool.updateOptField(source))
-			//localAction();
-		//TODO: This should only be set off once per reload.  For now, don't use it at all.
+		// Object source = evt.getSource();
+		// if (thisTool.updateOptField(source))
+		// localAction();
+		// TODO: This should only be set off once per reload. For now, don't use it at all.
 	}
-
-	public void widgetDefaultSelected(SelectionEvent e) {}
 
 }

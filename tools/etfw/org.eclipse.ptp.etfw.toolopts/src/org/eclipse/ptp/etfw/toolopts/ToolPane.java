@@ -24,6 +24,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.ptp.internal.etfw.toolopts.ToolMaker;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -52,10 +53,10 @@ public class ToolPane implements IAppInput, IToolUITab {
 		public void widgetSelected(SelectionEvent e) {
 
 			Object source = e.getSource();
-			for (int i = 0; i < options.length; i++) {
-				if (source == options[i].browser) {
+			for (ToolOption option : options) {
+				if (source == option.browser) {
 
-					ToolMaker.optBrowse(options[i]);
+					ToolMaker.optBrowse(option);
 					break;
 				}
 			}
@@ -87,8 +88,10 @@ public class ToolPane implements IAppInput, IToolUITab {
 
 	/**
 	 * The listener for browse buttons in this pane
+	 * 
+	 * @since 5.0
 	 */
-	protected SelectionListener browseListener;
+	public SelectionListener browseListener;
 
 	/**
 	 * The listener for check boxes and value entry fields in this pane
@@ -107,15 +110,18 @@ public class ToolPane implements IAppInput, IToolUITab {
 
 	/**
 	 * The individual tool options defined in this pane
+	 * 
+	 * @since 5.0
 	 */
-	protected ToolOption[] options;
+	public ToolOption[] options;
 
 	/**
 	 * The name associated with this tool pane
-	 * @since 4.1
+	 * 
+	 * @since 5.0
 	 */
 	public String paneName;
-	
+
 	/**
 	 * The name of the top-level tool workflow associated with this pane
 	 */
@@ -124,35 +130,35 @@ public class ToolPane implements IAppInput, IToolUITab {
 	/**
 	 * Added to the beginning of the opt string Default: empty
 	 */
-	public String prependOpts = "";
+	public String prependOpts = ""; //$NON-NLS-1$
 
 	/**
 	 * String/character put before the first and after the last option in the
 	 * option string Default: empty
 	 */
-	public String encloseOpts = "";
+	public String encloseOpts = "";//$NON-NLS-1$
 
 	/**
 	 * String/Character placed between individual options Default: newline
 	 */
-	public String separateOpts = "\n";
+	public String separateOpts = "\n";//$NON-NLS-1$
 
 	/**
 	 * String/character placed around values Default: "
 	 */
-	public String encloseValues = "\"";
+	public String encloseValues = "\"";//$NON-NLS-1$
 
 	/**
 	 * String/character placed between option names and values Default: =
 	 */
-	public String separateNameValue = "=";
+	public String separateNameValue = "=";//$NON-NLS-1$
 	/**
 	 * This unique, generated ID is used to store the output of this pane in a
 	 * launch configuration
 	 */
-	public String configID = "";
+	public String configID = "";//$NON-NLS-1$
 
-	public String configVarID = "";
+	public String configVarID = "";//$NON-NLS-1$
 
 	/**
 	 * The type of tool the parameter defined by this pane goes to
@@ -167,7 +173,10 @@ public class ToolPane implements IAppInput, IToolUITab {
 	 */
 	public boolean embedded = false;
 
-	protected ToolPane(boolean virtual) {
+	/**
+	 * @since 5.0
+	 */
+	public ToolPane(boolean virtual) {
 		this.virtual = virtual;
 		if (!virtual) {
 			browseListener = new MakeBrowseListener();
@@ -184,11 +193,11 @@ public class ToolPane implements IAppInput, IToolUITab {
 
 	public String getArgument(ILaunchConfiguration configuration) {
 		try {
-			return configuration.getAttribute(configID, "");
+			return configuration.getAttribute(configID, "");//$NON-NLS-1$
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
-		return "";
+		return "";//$NON-NLS-1$
 	}
 
 	@SuppressWarnings("unchecked")
@@ -203,9 +212,9 @@ public class ToolPane implements IAppInput, IToolUITab {
 	}
 
 	public ToolOption getOption(String optID) {
-		for (int i = 0; i < options.length; i++) {
-			if (options[i].getID().equals(optID)) {
-				return options[i];
+		for (ToolOption option : options) {
+			if (option.getID().equals(optID)) {
+				return option;
 			}
 		}
 		return null;
@@ -222,7 +231,7 @@ public class ToolPane implements IAppInput, IToolUITab {
 		String out = optString.toString();
 
 		if (out.equals(prependOpts + encloseOpts + encloseOpts)) {
-			return "";
+			return "";//$NON-NLS-1$
 		}
 
 		return optString.toString();
@@ -242,29 +251,29 @@ public class ToolPane implements IAppInput, IToolUITab {
 	 * @throws CoreException
 	 */
 	public void initializePane(ILaunchConfiguration configuration) throws CoreException {
-		String arg = "";
-		for (int i = 0; i < options.length; i++) {
-			if (options[i].unitCheck != null) {
-				options[i].unitCheck.setSelection(configuration.getAttribute(options[i].confDefString, options[i].defState));
+		String arg = "";//$NON-NLS-1$
+		for (ToolOption option : options) {
+			if (option.unitCheck != null) {
+				option.unitCheck.setSelection(configuration.getAttribute(option.confDefString, option.defState));
 			}
 
-			if (options[i].usesTextBox()) {
-				arg = configuration.getAttribute(options[i].confArgString, options[i].defText);
+			if (option.usesTextBox()) {
+				arg = configuration.getAttribute(option.confArgString, option.defText);
 				if (arg != null) {
-					options[i].argbox.setText(arg);
+					option.argbox.setText(arg);
 				}
 			}
 
-			if (options[i].numopt != null) {
-				options[i].numopt.setSelection(configuration.getAttribute(options[i].confArgString, options[i].defNum));
+			if (option.numopt != null) {
+				option.numopt.setSelection(configuration.getAttribute(option.confArgString, option.defNum));
 			}
 
-			if (options[i].combopt != null) {
-				arg = configuration.getAttribute(options[i].confArgString, options[i].defText);
+			if (option.combopt != null) {
+				arg = configuration.getAttribute(option.confArgString, option.defText);
 				if (arg != null) {
-					int dex = options[i].combopt.indexOf(arg);
+					int dex = option.combopt.indexOf(arg);
 					if (dex > -1) {
-						options[i].combopt.select(dex);
+						option.combopt.select(dex);
 					}
 				}
 			}
@@ -311,7 +320,7 @@ public class ToolPane implements IAppInput, IToolUITab {
 
 				String text = options[i].getArg();
 				if (options[i].getArg() == null) {
-					text = "";
+					text = "";//$NON-NLS-1$
 				}
 
 				boolean useField = !options[i].fieldrequired || text.trim().length() > 0;
@@ -358,12 +367,12 @@ public class ToolPane implements IAppInput, IToolUITab {
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 		for (int i = 0; i < options.length; i++) {
 			boolean set = true;
-			if (options[i].unitCheck != null&&!options[i].unitCheck.isDisposed()) {
+			if (options[i].unitCheck != null && !options[i].unitCheck.isDisposed()) {
 				set = options[i].unitCheck.getSelection();
 				configuration.setAttribute(options[i].confDefString, set);
 				updateOptField(options[i].unitCheck);
 			}
-			if (options[i].usesTextBox()&&options[i].argbox!=null) {
+			if (options[i].usesTextBox() && options[i].argbox != null) {
 				configuration.setAttribute(options[i].confArgString, options[i].argbox.getText());
 				updateOptField(options[i].argbox);
 			}
@@ -387,7 +396,7 @@ public class ToolPane implements IAppInput, IToolUITab {
 			// configuration.setAttribute(options[i].confArgString,argVal);
 			// }
 		}
-		
+
 	}
 
 	/**
@@ -423,9 +432,9 @@ public class ToolPane implements IAppInput, IToolUITab {
 	 * @return True if the object is found, otherwise false
 	 */
 	public boolean updateOptField(Object source) {
-		for (int i = 0; i < options.length; i++) {
-			if (source.equals(options[i].argbox) || source.equals(options[i].numopt) || source.equals(options[i].combopt)) {
-				OptArgUpdate(options[i]);
+		for (ToolOption option : options) {
+			if (source.equals(option.argbox) || source.equals(option.numopt) || source.equals(option.combopt)) {
+				OptArgUpdate(option);
 				updateOptDisplay();
 				return true;
 			}
@@ -443,7 +452,7 @@ public class ToolPane implements IAppInput, IToolUITab {
 	protected void OptArgUpdate(ToolOption opt) {
 		String val = opt.getArg();
 		if (val == null) {
-			val = "";
+			val = "";//$NON-NLS-1$
 		}
 		// if (opt.type ==1||opt.type ==2||opt.type ==3) {
 		// val = opt.argbox.getText();
@@ -457,26 +466,19 @@ public class ToolPane implements IAppInput, IToolUITab {
 
 	}
 
-	protected void setName(String name) {
+	/**
+	 * @since 5.0
+	 */
+	public void setName(String name) {
 		paneName = name;
 		configID = name + ToolsOptionsConstants.TOOL_PANE_ID_SUFFIX;
 		configVarID = name + ToolsOptionsConstants.TOOL_PANE_VAR_ID_SUFFIX;
 	}
 
-	// /**
-	// * Creates a new tool pane with the given name and list of tool options
-	// * @param name The name associated with the new pane
-	// * @param toptions A list of ToolOptions to be contained and displayed by
-	// this pane
-	// */
-	// protected ToolPane(String name, List toptions) {
-	// toolName = name;
-	// configID=name+".performance.options.configuration_id";
-	// options = new ToolOption[toptions.size()];
-	// toptions.toArray(options);
-	// }
-
-	protected void setOptions(List<ToolOption> toptions) {
+	/**
+	 * @since 5.0
+	 */
+	public void setOptions(List<ToolOption> toptions) {
 		options = new ToolOption[toptions.size()];
 		toptions.toArray(options);
 	}
@@ -484,7 +486,8 @@ public class ToolPane implements IAppInput, IToolUITab {
 	/**
 	 * Places the current string of name/value pairs in the option-display text
 	 * box
-	 * @since 4.1
+	 * 
+	 * @since 5.0
 	 * 
 	 */
 	public void updateOptDisplay() {
@@ -494,45 +497,44 @@ public class ToolPane implements IAppInput, IToolUITab {
 	}
 
 	/**
-	 * @since 4.1
+	 * @since 5.0
 	 */
 	public String getName() {
 		return paneName;
 	}
 
 	/**
-	 * @since 4.1
+	 * @since 5.0
 	 */
 	public String getToolName() {
 		return toolName;
 	}
 
 	/**
-	 * @since 4.1
+	 * @since 5.0
 	 */
 	public String getConfigID() {
 		return configID;
 	}
 
 	/**
-	 * @since 4.1
+	 * @since 5.0
 	 */
 	public String getConfigVarID() {
 		return configVarID;
 	}
 
 	/**
-	 * @since 4.1
+	 * @since 5.0
 	 */
 	public boolean isVirtual() {
 		return virtual;
 	}
 
 	/**
-	 * @since 4.1
+	 * @since 5.0
 	 */
 	public boolean isEmbedded() {
 		return embedded;
 	}
-
 }

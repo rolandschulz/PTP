@@ -43,10 +43,10 @@ import org.eclipse.ptp.etfw.toolopts.ExternalToolProcess;
 import org.eclipse.ptp.etfw.toolopts.IToolUITab;
 import org.eclipse.ptp.etfw.toolopts.PostProcTool;
 import org.eclipse.ptp.etfw.toolopts.ToolApp;
-import org.eclipse.ptp.etfw.toolopts.ToolMaker;
 import org.eclipse.ptp.etfw.ui.AbstractToolConfigurationTab;
 import org.eclipse.ptp.internal.etfw.BuildLaunchUtils;
 import org.eclipse.ptp.internal.etfw.messages.Messages;
+import org.eclipse.ptp.internal.etfw.toolopts.ToolMaker;
 
 /**
  * Utilities for accessing ETFW tools

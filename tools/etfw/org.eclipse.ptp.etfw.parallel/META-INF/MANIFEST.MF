@@ -14,3 +14,6 @@ Require-Bundle: org.eclipse.ptp.core,
  org.eclipse.ptp.launch
 Bundle-Vendor: %pluginProvider
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Export-Package: org.eclipse.ptp.internal.etfw.parallel;x-internal:=true,
+ org.eclipse.ptp.internal.etfw.parallel.internal;x-internal:=true,
+ org.eclipse.ptp.internal.etfw.parallel.messages;x-internal:=true

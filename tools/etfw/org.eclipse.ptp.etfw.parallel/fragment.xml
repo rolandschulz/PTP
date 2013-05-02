@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.debug.ui.launchConfigurationTabGroups">
       <launchConfigurationTabGroup
-            class="org.eclipse.ptp.etfw.parallel.ParallelToolLaunchConfigurationTabGroup"
+            class="org.eclipse.ptp.internal.etfw.parallel.ParallelToolLaunchConfigurationTabGroup"
             id="org.eclipse.ptp.etfw.launchConfigurationTabGroup"
             type="org.eclipse.ptp.launch.parallelLaunch">
          <launchMode
@@ -15,7 +15,7 @@
    <extension
          point="org.eclipse.debug.core.launchDelegates">
       <launchDelegate
-            delegate="org.eclipse.ptp.etfw.parallel.ParallelToolLaunchConfigurationDelegate"
+            delegate="org.eclipse.ptp.internal.etfw.parallel.ParallelToolLaunchConfigurationDelegate"
             id="org.eclipse.ptp.etfw.parallelLaunch"
             modes="profile"
             name="Profile Parallel Application"
@@ -34,7 +34,7 @@
          </associatedDelegate>
       </tab>
       <tab
-            class="org.eclipse.ptp.etfw.parallel.ParallelToolRecompMainTab"
+            class="org.eclipse.ptp.internal.etfw.parallel.ParallelToolRecompMainTab"
             group="org.eclipse.ptp.etfw.launchConfigurationTabGroup"
             id="org.eclipse.ptp.etfw.applicationTab"
             name="%ApplicationLaunchTab.name">
@@ -70,7 +70,7 @@
          </associatedDelegate>
       </tab>
       <tab
-    		class="org.eclipse.ptp.etfw.parallel.internal.ParallelParameterTab"
+    		class="org.eclipse.ptp.internal.etfw.parallel.internal.ParallelParameterTab"
             group="org.eclipse.ptp.etfw.launchConfigurationTabGroup"
             id="org.eclipse.ptp.etfw.parametricParameterTab"
           	name="%ParametricLaunchTab.name">

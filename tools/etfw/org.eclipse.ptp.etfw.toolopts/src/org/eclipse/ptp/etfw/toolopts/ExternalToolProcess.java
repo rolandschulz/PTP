@@ -30,14 +30,13 @@ import org.eclipse.debug.core.ILaunchConfiguration;
  * settings
  * 
  * @author wspear
- * 
  */
 public class ExternalToolProcess {
 
 	public static class Parametric {
 		public boolean runParametric = false;
 		public boolean weakScaling = false;
-		public String mpiProcs = "1";
+		public String mpiProcs = "1"; //$NON-NLS-1$
 		public List<String> argWeakBools = new ArrayList<String>();
 		public List<String> argNames = new ArrayList<String>();
 		public List<String> argValues = new ArrayList<String>();
@@ -91,6 +90,9 @@ public class ExternalToolProcess {
 		groupApp = new HashMap<String, String>();
 	}
 
+	/**
+	 * @since 5.0
+	 */
 	public PostProcTool getFirstAnalyzer(ILaunchConfiguration configuration) {
 		for (int i = 0; i < externalTools.size(); i++) {
 			ExternalTool pt = externalTools.get(i);
@@ -101,6 +103,9 @@ public class ExternalToolProcess {
 		return null;
 	}
 
+	/**
+	 * @since 5.0
+	 */
 	public BuildTool getFirstBuilder(ILaunchConfiguration configuration) {
 		for (int i = 0; i < externalTools.size(); i++) {
 			ExternalTool pt = externalTools.get(i);
@@ -111,6 +116,9 @@ public class ExternalToolProcess {
 		return null;
 	}
 
+	/**
+	 * @since 5.0
+	 */
 	public ExecTool getFirstRunner(ILaunchConfiguration configuration) {
 		for (int i = 0; i < externalTools.size(); i++) {
 			ExternalTool pt = externalTools.get(i);
@@ -127,7 +135,7 @@ public class ExternalToolProcess {
 	 * @param configuration
 	 * @param n
 	 * @return
-	 * @since 4.0
+	 * @since 5.0
 	 */
 	public ExecTool getNthRunner(ILaunchConfiguration configuration, int n) {
 		if (n < 1) {
