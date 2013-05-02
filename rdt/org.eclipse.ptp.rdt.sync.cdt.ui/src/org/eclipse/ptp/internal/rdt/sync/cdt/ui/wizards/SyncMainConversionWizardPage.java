@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.sync.cdt.ui.wizards;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -26,11 +24,11 @@ import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 import org.eclipse.cdt.ui.CDTSharedImages;
 import org.eclipse.cdt.ui.newui.PageLayout;
-import org.eclipse.cdt.ui.wizards.CDTMainWizardPage;
 import org.eclipse.cdt.ui.wizards.CNewWizard;
 import org.eclipse.cdt.ui.wizards.CWizardHandler;
 import org.eclipse.cdt.ui.wizards.EntryDescriptor;
 import org.eclipse.cdt.ui.wizards.IWizardItemsListListener;
+import org.eclipse.cdt.ui.wizards.conversion.ConvertProjectWizardPage;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
@@ -39,18 +37,16 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.osgi.util.TextProcessor;
-import org.eclipse.ptp.internal.rdt.sync.cdt.ui.Activator;
 import org.eclipse.ptp.internal.rdt.sync.cdt.ui.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
+import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.rdt.sync.ui.widgets.SyncProjectWidget;
 import org.eclipse.swt.SWT;
@@ -63,16 +59,16 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
-import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.ide.IIDEHelpContextIds;
@@ -86,7 +82,7 @@ import org.eclipse.ui.internal.ide.IIDEHelpContextIds;
  * functionality in the two immediate superclasses (CDTMainWizardPage and WizardNewProjectCreationPage) but borrows much of the code
  * from those two classes. Thus, except for very basic functionality, such as jface methods, this class is self-contained.
  */
-public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItemsListListener {
+public class SyncMainConversionWizardPage extends ConvertProjectWizardPage implements IWizardItemsListListener {
 	public static final String REMOTE_SYNC_WIZARD_PAGE_ID = "org.eclipse.ptp.rdt.sync.cdt.ui.remoteSyncWizardPage"; //$NON-NLS-1$
 	public static final String SERVICE_PROVIDER_PROPERTY = "org.eclipse.ptp.rdt.sync.cdt.ui.remoteSyncWizardPage.serviceProvider"; //$NON-NLS-1$
 	private static final String RDT_PROJECT_TYPE = "org.eclipse.ptp.rdt"; //$NON-NLS-1$
@@ -96,10 +92,9 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	private static final String ELEMENT_NAME = "wizard"; //$NON-NLS-1$
 	private static final String CLASS_NAME = "class"; //$NON-NLS-1$
 	public static final String DESC = "EntryDescriptor"; //$NON-NLS-1$
-	private static final int SIZING_TEXT_FIELD_WIDTH = 250;
 
 	// widgets
-	private Text projectNameField;
+	private Combo projectSelectionCombo;
 	private Tree projectTypeTree;
 	private Composite allToolChainsHiddenComposite;
 	private Composite remoteToolChain;
@@ -117,9 +112,11 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	private String message = null;
 	private int messageType = IMessageProvider.NONE;
 	private String errorMessage = null;
-	
-	private Set<String> localToolChainsSet;
-	private Set<String> remoteToolChainsSet;
+
+	private CWizardHandler h_selected = null;
+
+	private Set<String> localToolChainsSet = null;
+	private Set<String> remoteToolChainsSet = null;
 
 	/**
 	 * Creates a new project creation wizard page.
@@ -127,13 +124,14 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	 * @param pageName
 	 *            the name of this page
 	 */
-	public SyncMainWizardPage(String pageName) {
+	public SyncMainConversionWizardPage(String pageName) {
 		super(pageName);
 		setPageComplete(false);
 	}
 
-	/**
-	 * (non-Javadoc) Method declared on IDialogPage.
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.cdt.ui.wizards.conversion.ConvertProjectWizardPage#createControl(org.eclipse.swt.widgets.Composite)
 	 */
 	@Override
 	public void createControl(Composite parent) {
@@ -149,7 +147,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 		createProjectBasicInfoGroup(composite);
 		createProjectRemoteInfoGroup(composite);
 		createProjectDetailedInfoGroup(composite);
-		this.switchTo(this.updateData(projectTypeTree, allToolChainsHiddenComposite, false, SyncMainWizardPage.this, getWizard()),
+		this.switchTo(this.updateData(projectTypeTree, allToolChainsHiddenComposite, false, SyncMainConversionWizardPage.this, getWizard()),
 				getDescriptor(projectTypeTree));
 
 		setPageComplete(false);
@@ -250,7 +248,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 		showSupportedOnlyButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				switchTo(updateData(projectTypeTree, allToolChainsHiddenComposite, false, SyncMainWizardPage.this, getWizard()),
+				switchTo(updateData(projectTypeTree, allToolChainsHiddenComposite, false, SyncMainConversionWizardPage.this, getWizard()),
 						getDescriptor(projectTypeTree));
 			}
 		});
@@ -262,41 +260,10 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 		return (h_selected == null) ? null : h_selected.getSpecificPage();
 	}
 
-	/**
-	 * Returns the current project location path as entered by the user
-	 * 
-	 * @return the project location path or its anticipated initial value.
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.cdt.ui.wizards.conversion.ConvertProjectWizardPage#validatePage()
 	 */
-	@Override
-	public IPath getLocationPath() {
-		return new Path(fSyncWidget.getProjectLocalLocation());
-	}
-
-	/**
-	 * Get workspace URI
-	 * 
-	 * @return URI or null if location path is not a valid URI
-	 */
-	@Override
-	public URI getLocationURI() {
-		try {
-			return new URI("file://" + getLocationPath().toString()); //$NON-NLS-1$
-		} catch (URISyntaxException e) {
-			Activator.log(e);
-			return null;
-		}
-	}
-
-	/**
-	 * Get project location URI
-	 * 
-	 * @return URI (may be null if location path is not a valid URI)
-	 */
-	@Override
-	public URI getProjectLocation() {
-		return useDefaults() ? null : getLocationURI();
-	}
-
 	@Override
 	protected boolean validatePage() {
 		message = null;
@@ -316,7 +283,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 
 	protected boolean validateProjectName() {
 		// Check if name is empty
-		String projectFieldContents = getProjectNameFieldValue();
+		String projectFieldContents = getProjectName();
 		if (projectFieldContents.equals("")) { //$NON-NLS-1$
 			message = Messages.SyncMainWizardPage_5;
 			messageType = IMessageProvider.NONE;
@@ -711,38 +678,45 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	 *            the parent composite
 	 */
 	private final void createProjectBasicInfoGroup(Composite parent) {
-		Composite projectGroup = new Composite(parent, SWT.NONE);
-		GridLayout layout = new GridLayout();
-		layout.numColumns = 2;
-		projectGroup.setLayout(layout);
-		projectGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        Group localGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
+        localGroup.setText(Messages.SyncMainConversionWizardPage_Project_to_convert_);
+        localGroup.setLayout(new GridLayout(2, false));
+        localGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 
-		// new project name label
-		Label projectNameLabel = new Label(projectGroup, SWT.NONE);
-		projectNameLabel.setText(Messages.SyncMainWizardPage_14);
-		projectNameLabel.setFont(parent.getFont());
+        Label label = new Label(localGroup, SWT.NONE);
+        label.setText(Messages.SyncMainConversionWizardPage_Project_to_convert_label);
+        label.setFont(parent.getFont());
 
-		// new project name entry field
-		projectNameField = new Text(projectGroup, SWT.BORDER);
-		GridData nameData = new GridData(GridData.FILL_HORIZONTAL);
-		nameData.widthHint = SIZING_TEXT_FIELD_WIDTH;
-		projectNameField.setLayoutData(nameData);
-		projectNameField.setFont(parent.getFont());
-
-		projectNameField.addListener(SWT.Modify, new Listener() {
-			@Override
-			public void handleEvent(Event e) {
-				if (fSyncWidget != null) {
-					fSyncWidget.setProjectName(getProjectName());
-				}
-				setPageComplete(validatePage());
-				getWizard().getContainer().updateMessage();
-			}
-		});
+        projectSelectionCombo = new Combo(localGroup, SWT.READ_ONLY);
+        this.populateProjectCombo();
+        projectSelectionCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+        projectSelectionCombo.addSelectionListener(new SelectionListener() {
+            @Override
+            public void widgetDefaultSelected(SelectionEvent arg0) {
+                // nothing to do
+            }
+            @Override
+            public void widgetSelected(SelectionEvent arg0) {
+                if (fSyncWidget != null) {
+                    fSyncWidget.setProjectName(getProjectName());
+                }
+                setPageComplete(validatePage());
+                getWizard().getContainer().updateMessage();
+            }
+        });
 	}
+	
+    private void populateProjectCombo() {
+        IProject[] allProjects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+        for (IProject p : allProjects) {
+            if ((p.isOpen()) && (!RemoteSyncNature.hasNature(p))) {
+                projectSelectionCombo.add(p.getName());
+            }
+        }
+    }
 
 	private final void createProjectRemoteInfoGroup(Composite parent) {
-		fSyncWidget = SyncProjectWidget.newProjectWidget(parent, SWT.NONE, getWizard().getContainer());
+		fSyncWidget = SyncProjectWidget.convertProjectWidget(parent, SWT.NONE, getWizard().getContainer());
 		fSyncWidget.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		fSyncWidget.addListener(SWT.Modify, new Listener() {
 			@Override
@@ -754,59 +728,12 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	}
 
 	/**
-	 * Creates a project resource handle for the current project name field value. The project handle is created relative to the
-	 * workspace root.
-	 * <p>
-	 * This method does not create the project resource; this is the responsibility of <code>IProject::create</code> invoked by the
-	 * new project resource wizard.
-	 * </p>
-	 * 
-	 * @return the new project resource handle
-	 */
-	@Override
-	public IProject getProjectHandle() {
-		return ResourcesPlugin.getWorkspace().getRoot().getProject(getProjectName());
-	}
-
-	/**
 	 * Returns the current project name as entered by the user, or its anticipated initial value.
 	 * 
 	 * @return the project name, its anticipated initial value, or <code>null</code> if no project name is known
 	 */
-	@Override
 	public String getProjectName() {
-		return getProjectNameFieldValue();
-	}
-
-	/**
-	 * Returns the value of the project name field with leading and trailing spaces removed.
-	 * 
-	 * @return the project name in the field
-	 */
-	private String getProjectNameFieldValue() {
-		if (projectNameField == null) {
-			return ""; //$NON-NLS-1$
-		}
-
-		return projectNameField.getText().trim();
-	}
-
-	/**
-	 * Sets the initial project name that this page will use when created. The name is ignored if the createControl(Composite)
-	 * method has already been called. Leading and trailing spaces in the name are ignored. Providing the name of an existing
-	 * project will not necessarily cause the wizard to warn the user. Callers of this method should first check if the project name
-	 * passed already exists in the workspace.
-	 * 
-	 * @param name
-	 *            initial project name for this page
-	 * 
-	 * @see IWorkspace#validateName(String, int)
-	 * 
-	 *      TODO: Calls to this function can be ignored probably, but I'm not certain.
-	 */
-	@Override
-	public void setInitialProjectName(String name) {
-		// Ignore
+		return projectSelectionCombo.getText();
 	}
 
 	/*
@@ -816,13 +743,8 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	public void setVisible(boolean visible) {
 		this.getControl().setVisible(visible);
 		if (visible) {
-			projectNameField.setFocus();
+			projectSelectionCombo.setFocus();
 		}
-	}
-
-	@Override
-	public boolean useDefaults() {
-		return fSyncWidget.useDefaults();
 	}
 
 	/**
@@ -847,16 +769,6 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 			String toolChainName = selectedToolChains[0].getText();
 			return toolChainMap.get(toolChainName);
 		}
-	}
-
-	/**
-	 * No working sets for this wizard
-	 * 
-	 * @return null
-	 */
-	@Override
-	public IWorkingSet[] getSelectedWorkingSets() {
-		return null;
 	}
 
 	// Select toolchains in the hidden table that are selected in the visible remote and local tables
@@ -926,7 +838,45 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 			remoteToolChainsSet.add(ti.getText());
 		}
 	}
+
+	/**
+	 * Return the file filter created by the user or null if no changes were made.
+	 * @return
+	 */
 	public SyncFileFilter getCustomFileFilter() {
 		return fSyncWidget.getCustomFileFilter();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.cdt.ui.wizards.conversion.ConvertProjectWizardPage#getCheckedElements()
+	 */
+	@Override
+	protected Object[] getCheckedElements() {
+        IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(getProjectName());
+        return new Object[]{project};
+	}
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.cdt.ui.wizards.conversion.ConvertProjectWizardPage#getWzDescriptionResource()
+	 */
+    @Override
+    protected String getWzDescriptionResource() {
+        return "Converts a project to a synchronized C/C++ or Fortran project"; //$NON-NLS-1$
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.cdt.ui.wizards.conversion.ConvertProjectWizardPage#getWzTitleResource()
+     */
+    @Override
+    protected String getWzTitleResource() {
+        return "Convert to a synchronized project"; //$NON-NLS-1$
+    }
+
+    // This function must be defined but is not used for this wizard (part of the original UI)
+	@Override
+	public boolean isCandidate(IProject project) {
+		return false;
 	}
 }
