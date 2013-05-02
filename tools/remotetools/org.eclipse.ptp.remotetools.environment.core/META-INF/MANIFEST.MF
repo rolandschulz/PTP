@@ -20,6 +20,7 @@ Export-Package: org.eclipse.ptp.remotetools.environment;x-friends:="org.eclipse.
    org.eclipse.ptp.remotetools.environment.ui,
    org.eclipse.ptp.remote.remotetools.ui,
    org.eclipse.ptp.remote.remotetools.core",
+ org.eclipse.ptp.remotetools.environment.core.messages;x-internal:=true,
  org.eclipse.ptp.remotetools.environment.extension;x-friends:="org.eclipse.ptp.remotetools.environment.generichost,org.eclipse.ptp.remotetools.environment.ui",
  org.eclipse.ptp.remotetools.environment.wizard;x-friends:="org.eclipse.ptp.remotetools.environment.generichost,org.eclipse.ptp.remotetools.environment.ui,org.eclipse.ptp.remote.remotetools.ui",
  org.eclipse.ptp.remotetools.utils.verification;x-friends:="org.eclipse.ptp.remotetools.environment.generichost,org.eclipse.ptp.remote.remotetools.core"

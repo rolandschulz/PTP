@@ -14,4 +14,9 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ptp.remotetools.preferences
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Export-Package: org.eclipse.ptp.remotetools.environment.generichost.core;x-friends:="org.eclipse.ptp.remote.remotetools.ui"
+Export-Package: org.eclipse.ptp.remotetools.environment.generichost;x-internal:=true,
+ org.eclipse.ptp.remotetools.environment.generichost.conf;x-internal:=true,
+ org.eclipse.ptp.remotetools.environment.generichost.core;x-friends:="org.eclipse.ptp.remote.remotetools.ui",
+ org.eclipse.ptp.remotetools.environment.generichost.messages;x-internal:=true,
+ org.eclipse.ptp.remotetools.environment.generichost.preferences.ui;x-internal:=true,
+ org.eclipse.ptp.remotetools.environment.generichost.ui;x-internal:=true

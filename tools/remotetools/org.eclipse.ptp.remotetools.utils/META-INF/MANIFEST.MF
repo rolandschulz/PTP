@@ -9,4 +9,7 @@ Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: org.eclipse.ptp.remotetools.utils.stream;x-friends:="org.eclipse.ptp.remotetools.core"
+Export-Package: org.eclipse.ptp.remotetools.utils;x-internal:=true,
+ org.eclipse.ptp.remotetools.utils.messages;x-internal:=true,
+ org.eclipse.ptp.remotetools.utils.network;x-internal:=true,
+ org.eclipse.ptp.remotetools.utils.stream;x-friends:="org.eclipse.ptp.remotetools.core"

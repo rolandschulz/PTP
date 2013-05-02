@@ -11,3 +11,7 @@ Require-Bundle: org.eclipse.ptp.remotetools.environment.core,
  org.eclipse.ui
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Export-Package: org.eclipse.ptp.remotetools.environment.ui;x-internal:=true,
+ org.eclipse.ptp.remotetools.environment.ui.extension;x-internal:=true,
+ org.eclipse.ptp.remotetools.environment.ui.messages;x-internal:=true,
+ org.eclipse.ptp.remotetools.environment.ui.views;x-internal:=true

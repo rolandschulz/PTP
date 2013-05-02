@@ -13,9 +13,12 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jface,
  org.eclipse.ptp.remotetools.preferences
 Bundle-ActivationPolicy: lazy
-Export-Package: org.eclipse.ptp.remotetools,
- org.eclipse.ptp.remotetools.core,
- org.eclipse.ptp.remotetools.exception,
- org.eclipse.ptp.remotetools.internal.common;x-friends:="org.eclipse.ptp.remotetools.environment.generichost"
+Export-Package: org.eclipse.ptp.remotetools;x-friends:="org.eclipse.ptp.remotetools.environment.generichost,org.eclipse.ptp.remotetools.environment.core",
+ org.eclipse.ptp.remotetools.core;x-friends:="org.eclipse.ptp.remotetools.environment.generichost,org.eclipse.ptp.remotetools.environment.core",
+ org.eclipse.ptp.remotetools.core.messages;x-internal:=true,
+ org.eclipse.ptp.remotetools.exception;x-friends:="org.eclipse.ptp.remotetools.environment.core,org.eclipse.ptp.remotetools.environment.generichost",
+ org.eclipse.ptp.remotetools.internal.common;x-friends:="org.eclipse.ptp.remotetools.environment.generichost",
+ org.eclipse.ptp.remotetools.internal.core;x-internal:=true,
+ org.eclipse.ptp.remotetools.internal.ssh;x-internal:=true
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Import-Package: com.ibm.icu.text
