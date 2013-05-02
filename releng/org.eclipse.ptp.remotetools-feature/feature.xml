@@ -22,12 +22,10 @@
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="com.jcraft.jsch"/>
       <import plugin="org.eclipse.jsch.core"/>
-      <import plugin="org.eclipse.ptp.utils.core"/>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.core.resources"/>
       <import plugin="org.eclipse.core.filesystem"/>
       <import plugin="org.eclipse.equinox.security"/>
-      <import plugin="org.eclipse.ptp.utils.ui"/>
       <import plugin="org.eclipse.debug.core"/>
       <import plugin="org.eclipse.debug.ui"/>
       <import plugin="org.eclipse.cdt.core"/>
@@ -59,13 +57,6 @@
 
    <plugin
          id="org.eclipse.ptp.remotetools.environment.generichost"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.ptp.remotetools.environment.launcher"
          download-size="0"
          install-size="0"
          version="0.0.0"

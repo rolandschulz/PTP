@@ -21,8 +21,8 @@ package org.eclipse.ptp.internal.ui.adapters;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ptp.core.jobs.IJobStatus;
+import org.eclipse.ptp.internal.ui.ImageImageDescriptor;
 import org.eclipse.ptp.internal.ui.ParallelImages;
-import org.eclipse.ptp.utils.ui.ImageImageDescriptor;
 import org.eclipse.ui.model.WorkbenchAdapter;
 
 public class PJobWorkbenchAdapter extends WorkbenchAdapter {

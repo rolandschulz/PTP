@@ -29,7 +29,6 @@ import org.eclipse.ptp.launch.internal.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeViewerType;
 import org.eclipse.ptp.rm.jaxb.core.data.LaunchTabType;
-import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
@@ -124,9 +123,9 @@ public class JAXBImportedScriptLaunchConfigurationTab extends JAXBDynamicLaunchC
 		String s = selected == null ? JAXBControlUIConstants.ZEROSTR : selected.toString();
 		choice = WidgetBuilderUtils.createText(group, SWT.BORDER, gd, true, s);
 		browseWorkspace = WidgetBuilderUtils.createPushButton(group, Messages.JAXBRMConfigurationSelectionWizardPage_1, this);
-		SWTUtil.setButtonDimensionHint(browseWorkspace);
+		WidgetBuilderUtils.setButtonDimensionHint(browseWorkspace);
 		clear = WidgetBuilderUtils.createPushButton(group, Messages.ClearScript, this);
-		SWTUtil.setButtonDimensionHint(clear);
+		WidgetBuilderUtils.setButtonDimensionHint(clear);
 
 		/*
 		 * attribute viewer
@@ -305,7 +304,7 @@ public class JAXBImportedScriptLaunchConfigurationTab extends JAXBDynamicLaunchC
 		Group grp = WidgetBuilderUtils.createGroup(control, SWT.NONE, layout, gd);
 
 		Button b = WidgetBuilderUtils.createPushButton(grp, Messages.ViewConfig, this);
-		SWTUtil.setButtonDimensionHint(b);
+		WidgetBuilderUtils.setButtonDimensionHint(b);
 		b.setToolTipText(Messages.ViewConfigTooltip);
 
 		b = WidgetBuilderUtils.createPushButton(grp, Messages.DefaultValues, new SelectionListener() {
@@ -317,7 +316,7 @@ public class JAXBImportedScriptLaunchConfigurationTab extends JAXBDynamicLaunchC
 				resetDefaults();
 			}
 		});
-		SWTUtil.setButtonDimensionHint(b);
+		WidgetBuilderUtils.setButtonDimensionHint(b);
 	}
 
 	/**

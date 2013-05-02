@@ -56,7 +56,6 @@ import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.ButtonActionType;
 import org.eclipse.ptp.rm.jaxb.core.data.TabControllerType;
-import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -459,18 +458,18 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 
 		if (parentTab.hasScript()) {
 			Button b = WidgetBuilderUtils.createPushButton(grp, Messages.ViewScript, this);
-			SWTUtil.setButtonDimensionHint(b);
+			WidgetBuilderUtils.setButtonDimensionHint(b);
 		}
 
 		if (controller.isShowViewConfig()) {
 			Button b = WidgetBuilderUtils.createPushButton(grp, Messages.ViewConfig, this);
-			SWTUtil.setButtonDimensionHint(b);
+			WidgetBuilderUtils.setButtonDimensionHint(b);
 			b.setToolTipText(Messages.ViewConfigTooltip);
 		}
 
 		if (controller.isShowViewExcluded()) {
 			Button b = WidgetBuilderUtils.createPushButton(grp, Messages.ViewExcluded, this);
-			SWTUtil.setButtonDimensionHint(b);
+			WidgetBuilderUtils.setButtonDimensionHint(b);
 			b.setToolTipText(Messages.ViewExcludedTooltip);
 		}
 
@@ -483,7 +482,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 				resetDefaults();
 			}
 		});
-		SWTUtil.setButtonDimensionHint(b);
+		WidgetBuilderUtils.setButtonDimensionHint(b);
 	}
 
 	/**

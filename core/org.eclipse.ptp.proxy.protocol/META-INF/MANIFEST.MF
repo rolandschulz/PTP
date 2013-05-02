@@ -4,19 +4,28 @@ Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.proxy.protocol
 Bundle-Version: 6.0.0.qualifier
 Bundle-Localization: plugin
-Export-Package: org.eclipse.ptp.proxy.client;x-internal:=true,
+Export-Package: org.eclipse.ptp.internal.proxy.command;x-internal:=true,
+ org.eclipse.ptp.internal.proxy.debug.event;x-internal:=true,
+ org.eclipse.ptp.internal.proxy.event;x-internal:=true,
+ org.eclipse.ptp.internal.proxy.runtime.command;x-internal:=true,
+ org.eclipse.ptp.internal.proxy.runtime.event;x-internal:=true,
+ org.eclipse.ptp.proxy.client;x-internal:=true,
  org.eclipse.ptp.proxy.command;x-internal:=true,
- org.eclipse.ptp.proxy.debug.client;x-internal:=true,
- org.eclipse.ptp.proxy.debug.command;x-internal:=true,
- org.eclipse.ptp.proxy.debug.event;x-internal:=true,
+ org.eclipse.ptp.proxy.debug.client;x-friends:="org.eclipse.ptp.debug.sdm.core",
+ org.eclipse.ptp.proxy.debug.command;x-friends:="org.eclipse.ptp.debug.sdm.core",
+ org.eclipse.ptp.proxy.debug.event;x-friends:="org.eclipse.ptp.debug.sdm.core",
  org.eclipse.ptp.proxy.event;x-internal:=true,
+ org.eclipse.ptp.proxy.messages;x-internal:=true,
  org.eclipse.ptp.proxy.packet;x-internal:=true,
  org.eclipse.ptp.proxy.runtime.client;x-internal:=true,
  org.eclipse.ptp.proxy.runtime.command;x-internal:=true,
  org.eclipse.ptp.proxy.runtime.event;x-internal:=true,
  org.eclipse.ptp.proxy.runtime.server;x-internal:=true,
  org.eclipse.ptp.proxy.server;x-internal:=true,
- org.eclipse.ptp.proxy.util;x-internal:=true
+ org.eclipse.ptp.proxy.util;x-internal:=true,
+ org.eclipse.ptp.proxy.util.compression;x-internal:=true,
+ org.eclipse.ptp.proxy.util.compression.huffmancoder;x-internal:=true,
+ org.eclipse.ptp.proxy.util.messages;x-internal:=true
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: %pluginProvider
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

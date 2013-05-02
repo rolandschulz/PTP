@@ -24,9 +24,9 @@ import org.eclipse.ptp.remotetools.environment.core.ChildrenProviderManager;
 import org.eclipse.ptp.remotetools.environment.core.ITargetElement;
 import org.eclipse.ptp.remotetools.environment.core.TargetEnvironmentManager;
 import org.eclipse.ptp.remotetools.environment.core.TargetTypeElement;
+import org.eclipse.ptp.remotetools.environment.extension.IProcessMemberVisitor;
 import org.eclipse.ptp.remotetools.environment.extension.ITargetTypeExtension;
-import org.eclipse.ptp.utils.extensionpoints.core.IProcessMemberVisitor;
-import org.eclipse.ptp.utils.extensionpoints.core.ProcessExtensions;
+import org.eclipse.ptp.remotetools.environment.extension.ProcessExtensions;
 import org.osgi.framework.BundleContext;
 
 /**

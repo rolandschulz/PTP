@@ -60,9 +60,6 @@
 		<module>core/org.eclipse.ptp.services.ui</module>
 		<module>core/org.eclipse.ptp.ui</module>
 		<module>core/org.eclipse.ptp.utils</module>
-		<module>core/org.eclipse.ptp.utils.extensionpoints.core</module>
-		<module>core/org.eclipse.ptp.utils.file.core</module>
-		<module>core/org.eclipse.ptp.utils.ui</module>
 		<module>core/org.eclipse.ptp.doc.user</module>
 		<module>core/org.eclipse.ptp.doc.isv</module>
 		<module>debug/org.eclipse.ptp.debug.core</module>
@@ -127,7 +124,6 @@
 		<module>releng/org.eclipse.ptp.sdk-feature</module>
 		<module>releng/org.eclipse.ptp.sdm-feature</module>
 		<module>releng/org.eclipse.ptp.services-feature</module>
-		<module>releng/org.eclipse.ptp.utils-feature</module>
 		<module>rms/org.eclipse.ptp.rm.core</module>
 		<module>rms/org.eclipse.ptp.rm.ibm.ll.doc.user</module>
 		<module>rms/org.eclipse.ptp.rm.ibm.ll.ui</module>
@@ -187,7 +183,6 @@
 		<module>tools/remotetools/org.eclipse.ptp.remotetools.core</module>
 		<module>tools/remotetools/org.eclipse.ptp.remotetools.environment.core</module>
 		<module>tools/remotetools/org.eclipse.ptp.remotetools.environment.generichost</module>
-		<module>tools/remotetools/org.eclipse.ptp.remotetools.environment.launcher</module>
 		<module>tools/remotetools/org.eclipse.ptp.remotetools.environment.ui</module>
 		<module>tools/remotetools/org.eclipse.ptp.remotetools.preferences</module>
 		<module>tools/remotetools/org.eclipse.ptp.remotetools.utils</module>

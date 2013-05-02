@@ -11,7 +11,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.debug.ui,
  org.eclipse.jface.text,
  org.eclipse.ui.forms,
- org.eclipse.ptp.utils.ui,
  org.eclipse.ptp.core
 Bundle-ActivationPolicy: lazy
 Export-Package: 
@@ -24,6 +23,7 @@ Export-Package:
  org.eclipse.ptp.internal.ui.messages;x-internal:=true,
  org.eclipse.ptp.internal.ui.model;x-friends:="org.eclipse.ptp.launch,org.eclipse.ptp.debug.ui",
  org.eclipse.ptp.internal.ui.preferences;x-friends:="org.eclipse.ptp.debug.ui,org.eclipse.ptp.debug.sdm.ui",
- org.eclipse.ptp.internal.ui.views;x-friends:="org.eclipse.ptp.debug.ui"
+ org.eclipse.ptp.internal.ui.views;x-friends:="org.eclipse.ptp.debug.ui",
+ org.eclipse.ptp.internal.ui.widgets;x-friends:="org.eclipse.ptp.remotetools.environment.generichost"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: com.ibm.icu.text

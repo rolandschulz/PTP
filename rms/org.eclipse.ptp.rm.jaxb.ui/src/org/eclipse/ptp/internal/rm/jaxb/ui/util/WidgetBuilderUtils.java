@@ -15,11 +15,13 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.resource.FontRegistry;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.ptp.internal.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ptp.rm.jaxb.core.data.FontType;
-import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
@@ -563,6 +565,27 @@ public class WidgetBuilderUtils {
 	}
 
 	/**
+	 * Creates and returns a new push button with the given label and/or image.
+	 * 
+	 * @param parent
+	 *            parent control
+	 * @param label
+	 *            button label or <code>null</code>
+	 * @return a new push button
+	 */
+	private static Button createPushButton(Composite parent, String label) {
+		Button button = new Button(parent, SWT.PUSH);
+		button.setFont(parent.getFont());
+		if (label != null) {
+			button.setText(label);
+		}
+		GridData gd = new GridData();
+		button.setLayoutData(gd);
+		setButtonDimensionHint(button);
+		return button;
+	}
+
+	/**
 	 * Sets the layout data to grid with style GridData.FILL_HORIZONTAL.
 	 * 
 	 * @param parent
@@ -571,7 +594,7 @@ public class WidgetBuilderUtils {
 	 * @return push button
 	 */
 	public static Button createPushButton(Composite parent, String label, SelectionListener listener) {
-		Button button = SWTUtil.createPushButton(parent, label, null);
+		Button button = createPushButton(parent, label);
 		GridData gd = new GridData();
 		gd.horizontalAlignment = SWT.FILL;
 		button.setLayoutData(gd);
@@ -798,6 +821,16 @@ public class WidgetBuilderUtils {
 	}
 
 	/**
+	 * Returns a width hint for a button control.
+	 */
+	private static int getButtonWidthHint(Button button) {
+		button.setFont(JFaceResources.getDialogFont());
+		PixelConverter converter = new PixelConverter(button);
+		int widthHint = converter.convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH);
+		return Math.max(widthHint, button.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x);
+	}
+
+	/**
 	 * Translates string representation of SWT color into int code.
 	 * 
 	 * @param color
@@ -919,62 +952,6 @@ public class WidgetBuilderUtils {
 			return SWT.NONE;
 		}
 		return getStyle(style.split(JAXBUIConstants.REGPIP));
-	}
-
-	/**
-	 * For consistency in treating <code>null</code> or undefined defaults on loading, this method ensures the first element of the
-	 * combo is a JAXBRMUIConstants.ZEROSTR. It also removes blank items.
-	 * 
-	 * @param items
-	 * @return adjusted array of combo items
-	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static String[] normalizeComboItems(String[] items) {
-		List<String> list = new ArrayList(Arrays.asList(items));
-		for (Iterator<String> s = list.iterator(); s.hasNext();) {
-			String item = s.next().trim();
-			if (JAXBUIConstants.ZEROSTR.equals(item) || JAXBUIConstants.LINE_SEP.equals(item)) {
-				s.remove();
-			}
-		}
-		list.add(0, JAXBUIConstants.ZEROSTR);
-		return list.toArray(new String[0]);
-	}
-
-	/**
-	 * For preprocessing tooltip text from messed up XML text elements.
-	 * 
-	 * @param text
-	 *            to be adjusted
-	 * @return text without internal tabs or line breaks.
-	 */
-	public static String removeTabOrLineBreak(String text) {
-		if (text == null) {
-			return null;
-		}
-		if (JAXBUIConstants.ZEROSTR.equals(text)) {
-			return JAXBUIConstants.ZEROSTR;
-		}
-		StringBuffer newLine = new StringBuffer();
-		int strln = text.length();
-		char lastChar = 0;
-		for (int i = 0; i < strln; i++) {
-			char c = text.charAt(i);
-			switch (c) {
-			case '\t':
-			case '\n':
-			case '\r':
-				if (lastChar != JAXBUIConstants.SP.charAt(0)) {
-					newLine.append(JAXBUIConstants.SP);
-					lastChar = JAXBUIConstants.SP.charAt(0);
-				}
-				break;
-			default:
-				newLine.append(c);
-				lastChar = c;
-			}
-		}
-		return newLine.toString();
 	}
 
 	/**
@@ -1225,6 +1202,78 @@ public class WidgetBuilderUtils {
 			}
 		}
 		return swt;
+	}
+
+	/**
+	 * For consistency in treating <code>null</code> or undefined defaults on loading, this method ensures the first element of the
+	 * combo is a JAXBRMUIConstants.ZEROSTR. It also removes blank items.
+	 * 
+	 * @param items
+	 * @return adjusted array of combo items
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static String[] normalizeComboItems(String[] items) {
+		List<String> list = new ArrayList(Arrays.asList(items));
+		for (Iterator<String> s = list.iterator(); s.hasNext();) {
+			String item = s.next().trim();
+			if (JAXBUIConstants.ZEROSTR.equals(item) || JAXBUIConstants.LINE_SEP.equals(item)) {
+				s.remove();
+			}
+		}
+		list.add(0, JAXBUIConstants.ZEROSTR);
+		return list.toArray(new String[0]);
+	}
+
+	/**
+	 * For preprocessing tooltip text from messed up XML text elements.
+	 * 
+	 * @param text
+	 *            to be adjusted
+	 * @return text without internal tabs or line breaks.
+	 */
+	public static String removeTabOrLineBreak(String text) {
+		if (text == null) {
+			return null;
+		}
+		if (JAXBUIConstants.ZEROSTR.equals(text)) {
+			return JAXBUIConstants.ZEROSTR;
+		}
+		StringBuffer newLine = new StringBuffer();
+		int strln = text.length();
+		char lastChar = 0;
+		for (int i = 0; i < strln; i++) {
+			char c = text.charAt(i);
+			switch (c) {
+			case '\t':
+			case '\n':
+			case '\r':
+				if (lastChar != JAXBUIConstants.SP.charAt(0)) {
+					newLine.append(JAXBUIConstants.SP);
+					lastChar = JAXBUIConstants.SP.charAt(0);
+				}
+				break;
+			default:
+				newLine.append(c);
+				lastChar = c;
+			}
+		}
+		return newLine.toString();
+	}
+
+	/**
+	 * Sets width and height hint for the button control. <b>Note:</b> This is
+	 * a NOP if the button's layout data is not an instance of <code>GridData</code>.
+	 * 
+	 * @param the
+	 *            button for which to set the dimension hint
+	 */
+	public static void setButtonDimensionHint(Button button) {
+		Assert.isNotNull(button);
+		Object gd = button.getLayoutData();
+		if (gd instanceof GridData) {
+			((GridData) gd).widthHint = getButtonWidthHint(button);
+			((GridData) gd).horizontalAlignment = GridData.FILL;
+		}
 	}
 
 	private WidgetBuilderUtils() {

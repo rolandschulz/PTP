@@ -15,7 +15,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ptp.remote.core,
  org.eclipse.ptp.remote.ui,
  org.eclipse.ptp.rm.core,
- org.eclipse.ptp.utils.ui,
  org.eclipse.ptp.launch,
  org.eclipse.debug.ui
 Bundle-ActivationPolicy: lazy

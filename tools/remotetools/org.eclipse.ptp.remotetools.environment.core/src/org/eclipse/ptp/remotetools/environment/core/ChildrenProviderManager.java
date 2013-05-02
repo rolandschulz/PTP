@@ -19,8 +19,8 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.ptp.remotetools.environment.extension.IChildrenProvider;
 import org.eclipse.ptp.remotetools.environment.extension.INode;
-import org.eclipse.ptp.utils.extensionpoints.core.IProcessMemberVisitor;
-import org.eclipse.ptp.utils.extensionpoints.core.ProcessExtensions;
+import org.eclipse.ptp.remotetools.environment.extension.IProcessMemberVisitor;
+import org.eclipse.ptp.remotetools.environment.extension.ProcessExtensions;
 
 /**
  * Manage a list of <code>IChildrenProvider</code> contributed by extensions

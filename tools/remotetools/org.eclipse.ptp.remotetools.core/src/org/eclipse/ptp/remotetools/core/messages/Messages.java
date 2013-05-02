@@ -51,6 +51,7 @@ public class Messages extends NLS {
 	public static String ExecutionManager_CreateTunnel_AllLocalPortsBusy;
 	public static String ExecutionObserver_ExecutionObserver_RemoteCommandObserver;
 	public static String ExecutionTools_ExecuteBashCommand_FailedRunBashCommand;
+	public static String FileEnumeration_0;
 	public static String FileTools_10;
 	public static String FileTools_12;
 	public static String FileTools_13;

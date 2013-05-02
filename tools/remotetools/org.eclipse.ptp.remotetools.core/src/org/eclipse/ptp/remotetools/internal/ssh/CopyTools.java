@@ -27,8 +27,8 @@ import org.eclipse.ptp.remotetools.exception.CancelException;
 import org.eclipse.ptp.remotetools.exception.RemoteConnectionException;
 import org.eclipse.ptp.remotetools.exception.RemoteOperationException;
 import org.eclipse.ptp.remotetools.internal.common.Debug;
-import org.eclipse.ptp.utils.file.core.FileEnumeration;
-import org.eclipse.ptp.utils.file.core.FileRecursiveEnumeration;
+import org.eclipse.ptp.remotetools.internal.common.FileEnumeration;
+import org.eclipse.ptp.remotetools.internal.common.FileRecursiveEnumeration;
 
 
 public class CopyTools implements IRemoteCopyTools {

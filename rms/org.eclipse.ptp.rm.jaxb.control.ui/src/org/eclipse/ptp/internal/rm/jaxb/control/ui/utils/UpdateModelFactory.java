@@ -72,7 +72,6 @@ import org.eclipse.ptp.rm.jaxb.core.data.FontType;
 import org.eclipse.ptp.rm.jaxb.core.data.LayoutDataType;
 import org.eclipse.ptp.rm.jaxb.core.data.PushButtonType;
 import org.eclipse.ptp.rm.jaxb.core.data.WidgetType;
-import org.eclipse.ptp.utils.ui.swt.SWTUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -598,7 +597,7 @@ public class UpdateModelFactory {
 				}
 			}
 		});
-		SWTUtil.setButtonDimensionHint(b);
+		WidgetBuilderUtils.setButtonDimensionHint(b);
 		return null;
 	}
 
@@ -660,7 +659,7 @@ public class UpdateModelFactory {
 			}
 		});
 
-		SWTUtil.setButtonDimensionHint(b);
+		WidgetBuilderUtils.setButtonDimensionHint(b);
 
 		if (!JAXBControlUIConstants.ZEROSTR.equals(cd.tooltip)) {
 			t.setToolTipText(cd.tooltip);
