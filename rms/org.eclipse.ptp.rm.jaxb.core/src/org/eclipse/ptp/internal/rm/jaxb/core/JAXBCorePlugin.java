@@ -23,7 +23,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.Preferences;
-import org.eclipse.ptp.rm.core.RMCorePlugin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
@@ -98,7 +97,7 @@ public class JAXBCorePlugin extends Plugin {
 	 * @return exception
 	 */
 	public static CoreException coreErrorException(String message) {
-		return new CoreException(new Status(IStatus.ERROR, RMCorePlugin.getDefault().getBundle().getSymbolicName(), message));
+		return new CoreException(new Status(IStatus.ERROR, getDefault().getBundle().getSymbolicName(), message));
 	}
 
 	/**
@@ -109,7 +108,7 @@ public class JAXBCorePlugin extends Plugin {
 	 * @return exception
 	 */
 	public static CoreException coreErrorException(String message, Throwable t) {
-		return new CoreException(new Status(IStatus.ERROR, RMCorePlugin.getDefault().getBundle().getSymbolicName(), message, t));
+		return new CoreException(new Status(IStatus.ERROR, getDefault().getBundle().getSymbolicName(), message, t));
 	}
 
 	/**

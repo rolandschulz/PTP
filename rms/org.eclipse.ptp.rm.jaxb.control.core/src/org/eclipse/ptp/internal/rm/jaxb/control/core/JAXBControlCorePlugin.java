@@ -23,7 +23,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.messages.Messages;
-import org.eclipse.ptp.rm.core.RMCorePlugin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
@@ -93,7 +92,8 @@ public class JAXBControlCorePlugin extends Plugin {
 	 * @return exception
 	 */
 	public static CoreException coreErrorException(String message) {
-		return new CoreException(new Status(IStatus.ERROR, RMCorePlugin.getDefault().getBundle().getSymbolicName(), message));
+		return new CoreException(new Status(IStatus.ERROR, JAXBControlCorePlugin.getDefault().getBundle().getSymbolicName(),
+				message));
 	}
 
 	/**
@@ -104,7 +104,8 @@ public class JAXBControlCorePlugin extends Plugin {
 	 * @return exception
 	 */
 	public static CoreException coreErrorException(String message, Throwable t) {
-		return new CoreException(new Status(IStatus.ERROR, RMCorePlugin.getDefault().getBundle().getSymbolicName(), message, t));
+		return new CoreException(new Status(IStatus.ERROR, JAXBControlCorePlugin.getDefault().getBundle().getSymbolicName(),
+				message, t));
 	}
 
 	/**

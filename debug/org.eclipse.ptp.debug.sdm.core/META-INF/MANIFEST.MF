@@ -41,8 +41,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ptp.core,
  org.eclipse.ptp.debug.core,
  org.eclipse.ptp.launch,
- org.eclipse.ptp.remote.core,
- org.eclipse.ptp.rm.core
+ org.eclipse.ptp.remote.core
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: %pluginProvider
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

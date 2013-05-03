@@ -28,7 +28,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.internal.rm.jaxb.core.JAXBCoreConstants;
 import org.eclipse.ptp.internal.rm.jaxb.core.JAXBInitializationUtils;
-import org.eclipse.ptp.rm.core.RMCorePlugin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.xml.sax.SAXException;
@@ -56,18 +55,22 @@ public class JAXBTestsPlugin extends Plugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		ResourcesPlugin.getWorkspace().addSaveParticipant(getUniqueIdentifier(), new ISaveParticipant() {
+			@Override
 			public void doneSaving(ISaveContext saveContext) {
 				// Nothing
 			}
 
+			@Override
 			public void prepareToSave(ISaveContext saveContext) throws CoreException {
 				// Nothing
 			}
 
+			@Override
 			public void rollback(ISaveContext saveContext) {
 				// Nothing
 			}
 
+			@Override
 			public void saving(ISaveContext saveContext) throws CoreException {
 				Preferences.savePreferences(getUniqueIdentifier());
 			}
@@ -97,7 +100,7 @@ public class JAXBTestsPlugin extends Plugin {
 	 * @return
 	 */
 	public static CoreException coreErrorException(String message) {
-		return new CoreException(new Status(IStatus.ERROR, RMCorePlugin.getDefault().getBundle().getSymbolicName(), message));
+		return new CoreException(new Status(IStatus.ERROR, getDefault().getBundle().getSymbolicName(), message));
 	}
 
 	/**
@@ -108,7 +111,7 @@ public class JAXBTestsPlugin extends Plugin {
 	 * @return
 	 */
 	public static CoreException coreErrorException(String message, Throwable t) {
-		return new CoreException(new Status(IStatus.ERROR, RMCorePlugin.getDefault().getBundle().getSymbolicName(), message, t));
+		return new CoreException(new Status(IStatus.ERROR, getDefault().getBundle().getSymbolicName(), message, t));
 	}
 
 	/**

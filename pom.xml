@@ -124,7 +124,6 @@
 		<module>releng/org.eclipse.ptp.sdk-feature</module>
 		<module>releng/org.eclipse.ptp.sdm-feature</module>
 		<module>releng/org.eclipse.ptp.services-feature</module>
-		<module>rms/org.eclipse.ptp.rm.core</module>
 		<module>rms/org.eclipse.ptp.rm.ibm.ll.doc.user</module>
 		<module>rms/org.eclipse.ptp.rm.ibm.ll.ui</module>
 		<module>rms/org.eclipse.ptp.rm.ibm.pe.doc.user</module>
@@ -146,7 +145,6 @@
 		<module>rms/org.eclipse.ptp.rm.lml.monitor.ui</module>
 		<module>rms/org.eclipse.ptp.rm.lml.ui</module>
 		<module>rms/org.eclipse.ptp.rm.slurm.help</module>
-		<module>rms/org.eclipse.ptp.rm.ui</module>
 		<module>tools/cdt/org.eclipse.ptp.cdt.compilers.core</module>
 		<module>tools/etfw/org.eclipse.ptp.etfw</module>
 		<module>tools/etfw/org.eclipse.ptp.etfw.doc.user</module>

@@ -7,8 +7,7 @@ Bundle-Activator: org.eclipse.ptp.internal.rm.jaxb.core.JAXBCorePlugin
 Bundle-Vendor: %pluginProvider
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.debug.core,
- org.eclipse.ptp.core,
- org.eclipse.ptp.rm.core
+ org.eclipse.ptp.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin

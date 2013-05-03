@@ -13,7 +13,6 @@ package org.eclipse.ptp.internal.rm.lml.monitor.ui;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ptp.rm.core.RMCorePlugin;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -64,7 +63,7 @@ public class LMLMonitorUIPlugin extends AbstractUIPlugin {
 	 * @return
 	 */
 	public static CoreException coreErrorException(String message) {
-		return new CoreException(new Status(IStatus.ERROR, RMCorePlugin.getDefault().getBundle().getSymbolicName(), message));
+		return new CoreException(new Status(IStatus.ERROR, getDefault().getBundle().getSymbolicName(), message));
 	}
 
 	/**
@@ -75,7 +74,7 @@ public class LMLMonitorUIPlugin extends AbstractUIPlugin {
 	 * @return
 	 */
 	public static CoreException coreErrorException(String message, Throwable t) {
-		return new CoreException(new Status(IStatus.ERROR, RMCorePlugin.getDefault().getBundle().getSymbolicName(), message, t));
+		return new CoreException(new Status(IStatus.ERROR, getDefault().getBundle().getSymbolicName(), message, t));
 	}
 
 	/**

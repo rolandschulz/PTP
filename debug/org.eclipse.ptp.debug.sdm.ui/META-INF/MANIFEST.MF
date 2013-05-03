@@ -16,9 +16,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ptp.core,
  org.eclipse.ptp.remote.core,
  org.eclipse.ptp.remote.ui,
- org.eclipse.ptp.debug.sdm.core,
- org.eclipse.ptp.rm.core;bundle-version="1.0.1",
- org.eclipse.ptp.rm.ui;bundle-version="1.0.1"
+ org.eclipse.ptp.debug.sdm.core
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: org.eclipse.ptp.internal.debug.sdm.ui;x-internal:=true,
