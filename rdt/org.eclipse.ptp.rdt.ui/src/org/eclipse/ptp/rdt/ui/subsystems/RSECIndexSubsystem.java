@@ -1215,6 +1215,7 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 			DStoreConnectorService dstoreConnectorService = (DStoreConnectorService) connectorService;
 			if(!fIsInitializing && !dstoreConnectorService.isConnected()) {
 				try {
+					dstoreConnectorService.acquireCredentials(false);
 					dstoreConnectorService.connect(monitor);
 				} catch (Exception e) {
 					UIPlugin.log(e);
@@ -1264,6 +1265,7 @@ public class RSECIndexSubsystem extends SubSystem implements ICIndexSubsystem {
 		IConnectorService connectorService = getConnectorService();
 		if(!connectorService.isConnected()) {
 			try {
+				connectorService.acquireCredentials(false);
 				connectorService.connect(monitor);
 			} catch (Exception e) {
 				UIPlugin.log(e);
