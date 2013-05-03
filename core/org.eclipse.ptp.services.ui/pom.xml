@@ -11,6 +11,6 @@
   </parent>
 
   <artifactId>org.eclipse.ptp.services.ui</artifactId>
-  <version>2.0.0-SNAPSHOT</version>
+  <version>3.0.0-SNAPSHOT</version>
   <packaging>eclipse-plugin</packaging>
 </project>
