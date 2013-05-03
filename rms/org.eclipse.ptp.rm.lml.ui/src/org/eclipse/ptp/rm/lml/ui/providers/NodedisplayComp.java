@@ -19,26 +19,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.ptp.internal.rm.lml.core.events.NodedisplayZoomEvent;
+import org.eclipse.ptp.internal.rm.lml.core.model.LMLCheck;
+import org.eclipse.ptp.internal.rm.lml.core.model.Node;
+import org.eclipse.ptp.internal.rm.lml.core.model.RowColumnSorter;
+import org.eclipse.ptp.internal.rm.lml.core.model.TreeExpansion;
+import org.eclipse.ptp.rm.lml.core.elements.AlignType;
+import org.eclipse.ptp.rm.lml.core.elements.Nodedisplay;
+import org.eclipse.ptp.rm.lml.core.elements.Nodedisplayelement;
+import org.eclipse.ptp.rm.lml.core.elements.ObjectType;
+import org.eclipse.ptp.rm.lml.core.elements.PictureType;
+import org.eclipse.ptp.rm.lml.core.elements.UsageType;
 import org.eclipse.ptp.rm.lml.core.events.INodedisplayZoomEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.INodedisplayZoomListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
-import org.eclipse.ptp.rm.lml.internal.core.elements.AlignType;
-import org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplay;
-import org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplayelement;
-import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectType;
-import org.eclipse.ptp.rm.lml.internal.core.elements.PictureType;
-import org.eclipse.ptp.rm.lml.internal.core.elements.UsageType;
-import org.eclipse.ptp.rm.lml.internal.core.events.NodedisplayZoomEvent;
-import org.eclipse.ptp.rm.lml.internal.core.model.LMLCheck;
-import org.eclipse.ptp.rm.lml.internal.core.model.LMLColor;
-import org.eclipse.ptp.rm.lml.internal.core.model.LMLNodeData;
-import org.eclipse.ptp.rm.lml.internal.core.model.Node;
-import org.eclipse.ptp.rm.lml.internal.core.model.NodedisplayAccess;
-import org.eclipse.ptp.rm.lml.internal.core.model.OIDToObject;
-import org.eclipse.ptp.rm.lml.internal.core.model.ObjectStatus.Updatable;
-import org.eclipse.ptp.rm.lml.internal.core.model.RowColumnSorter;
-import org.eclipse.ptp.rm.lml.internal.core.model.TreeExpansion;
-import org.eclipse.ptp.rm.lml.ui.LMLUIPlugin;
+import org.eclipse.ptp.rm.lml.core.model.LMLColor;
+import org.eclipse.ptp.rm.lml.core.model.LMLNodeData;
+import org.eclipse.ptp.rm.lml.core.model.NodedisplayAccess;
+import org.eclipse.ptp.rm.lml.core.model.OIDToObject;
+import org.eclipse.ptp.rm.lml.core.model.ObjectStatus.Updatable;
+import org.eclipse.ptp.rm.lml.internal.ui.LMLUIPlugin;
 import org.eclipse.ptp.rm.lml.ui.providers.support.BorderLayout;
 import org.eclipse.ptp.rm.lml.ui.providers.support.BorderLayout.BorderData;
 import org.eclipse.ptp.rm.lml.ui.providers.support.ColorConversion;
@@ -640,8 +640,8 @@ public class NodedisplayComp extends LguiWidget implements Updatable, JobDetecto
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.lml.internal.core.model.ObjectStatus.Updatable#
-	 * updateStatus(org.eclipse.ptp.rm.lml.internal.core.elements .ObjectType, boolean, boolean)
+	 * @see org.eclipse.ptp.internal.rm.lml.core.model.ObjectStatus.Updatable#
+	 * updateStatus(org.eclipse.ptp.rm.lml.core.elements .ObjectType, boolean, boolean)
 	 */
 	@Override
 	public void updateStatus(ObjectType object, boolean mouseOver, boolean mouseDown) {

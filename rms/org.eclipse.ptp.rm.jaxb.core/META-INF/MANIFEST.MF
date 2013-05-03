@@ -22,5 +22,6 @@ Export-Package: org.eclipse.ptp.internal.rm.jaxb.core;
    org.eclipse.ptp.etfw.launch,
    org.eclipse.ptp.etfw.jaxb,
    org.eclipse.ptp.etfw.tau.ui",
+ org.eclipse.ptp.internal.rm.jaxb.core.messages;x-internal:=true,
  org.eclipse.ptp.rm.jaxb.core,
  org.eclipse.ptp.rm.jaxb.core.data

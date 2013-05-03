@@ -18,6 +18,17 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.ptp.internal.rm.lml.core.events.LguiAddedEvent;
+import org.eclipse.ptp.internal.rm.lml.core.events.LguiRemovedEvent;
+import org.eclipse.ptp.internal.rm.lml.core.events.MarkObjectEvent;
+import org.eclipse.ptp.internal.rm.lml.core.events.SelectObjectEvent;
+import org.eclipse.ptp.internal.rm.lml.core.events.TableFilterEvent;
+import org.eclipse.ptp.internal.rm.lml.core.events.TableSortedEvent;
+import org.eclipse.ptp.internal.rm.lml.core.events.UnmarkObjectEvent;
+import org.eclipse.ptp.internal.rm.lml.core.events.UnselectObjectEvent;
+import org.eclipse.ptp.internal.rm.lml.core.events.ViewUpdateEvent;
+import org.eclipse.ptp.internal.rm.lml.core.model.LguiItem;
+import org.eclipse.ptp.rm.lml.core.elements.RequestType;
 import org.eclipse.ptp.rm.lml.core.events.ILguiAddedEvent;
 import org.eclipse.ptp.rm.lml.core.events.ILguiRemovedEvent;
 import org.eclipse.ptp.rm.lml.core.events.IMarkObjectEvent;
@@ -30,17 +41,6 @@ import org.eclipse.ptp.rm.lml.core.events.IViewUpdateEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.ILMLListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
 import org.eclipse.ptp.rm.lml.core.model.IPattern;
-import org.eclipse.ptp.rm.lml.internal.core.elements.RequestType;
-import org.eclipse.ptp.rm.lml.internal.core.events.LguiAddedEvent;
-import org.eclipse.ptp.rm.lml.internal.core.events.LguiRemovedEvent;
-import org.eclipse.ptp.rm.lml.internal.core.events.MarkObjectEvent;
-import org.eclipse.ptp.rm.lml.internal.core.events.SelectObjectEvent;
-import org.eclipse.ptp.rm.lml.internal.core.events.TableFilterEvent;
-import org.eclipse.ptp.rm.lml.internal.core.events.TableSortedEvent;
-import org.eclipse.ptp.rm.lml.internal.core.events.UnmarkObjectEvent;
-import org.eclipse.ptp.rm.lml.internal.core.events.UnselectObjectEvent;
-import org.eclipse.ptp.rm.lml.internal.core.events.ViewUpdateEvent;
-import org.eclipse.ptp.rm.lml.internal.core.model.LguiItem;
 
 /**
  * 

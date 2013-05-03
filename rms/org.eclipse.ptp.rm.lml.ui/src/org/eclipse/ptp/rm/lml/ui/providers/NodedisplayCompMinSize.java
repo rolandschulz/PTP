@@ -10,11 +10,11 @@
  */
 package org.eclipse.ptp.rm.lml.ui.providers;
 
+import org.eclipse.ptp.internal.rm.lml.core.model.Node;
+import org.eclipse.ptp.rm.lml.core.elements.Nodedisplay;
+import org.eclipse.ptp.rm.lml.core.elements.Nodedisplayelement;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
-import org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplay;
-import org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplayelement;
-import org.eclipse.ptp.rm.lml.internal.core.model.LMLNodeData;
-import org.eclipse.ptp.rm.lml.internal.core.model.Node;
+import org.eclipse.ptp.rm.lml.core.model.LMLNodeData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;

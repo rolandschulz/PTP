@@ -12,11 +12,11 @@ package org.eclipse.ptp.rm.lml.ui.providers;
 
 import java.util.List;
 
+import org.eclipse.ptp.rm.lml.core.elements.ObjectType;
+import org.eclipse.ptp.rm.lml.core.elements.UsageType;
+import org.eclipse.ptp.rm.lml.core.elements.UsagebarType;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
-import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectType;
-import org.eclipse.ptp.rm.lml.internal.core.elements.UsageType;
-import org.eclipse.ptp.rm.lml.internal.core.elements.UsagebarType;
-import org.eclipse.ptp.rm.lml.internal.core.model.ObjectStatus.Updatable;
+import org.eclipse.ptp.rm.lml.core.model.ObjectStatus.Updatable;
 import org.eclipse.ptp.rm.lml.ui.providers.support.MouseInteraction;
 import org.eclipse.ptp.rm.lml.ui.providers.support.UsagebarPainter;
 import org.eclipse.ptp.rm.lml.ui.providers.support.UsagebarPainter.JobInterval;
@@ -242,7 +242,7 @@ public class Usagebar extends LguiWidget implements Updatable {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.rm.lml.internal.core.model.ObjectStatus.Updatable#updateStatus(org.eclipse.ptp.rm.lml.internal.core.elements
+	 * org.eclipse.ptp.internal.rm.lml.core.model.ObjectStatus.Updatable#updateStatus(org.eclipse.ptp.rm.lml.core.elements
 	 * .ObjectType, boolean, boolean)
 	 */
 	@Override

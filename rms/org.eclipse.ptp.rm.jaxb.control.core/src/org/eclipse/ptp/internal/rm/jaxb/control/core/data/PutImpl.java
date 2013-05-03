@@ -14,8 +14,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.internal.rm.jaxb.control.core.exceptions.StreamParserException;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.messages.Messages;
-import org.eclipse.ptp.rm.jaxb.control.core.exceptions.StreamParserException;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.EntryType;
 import org.eclipse.ptp.rm.jaxb.core.data.PutType;

@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.ptp.internal.rm.lml.core.LMLCorePlugin;
 import org.osgi.service.prefs.BackingStoreException;
 
 /**

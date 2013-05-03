@@ -9,8 +9,8 @@
  ******************************************************************************/
 package org.eclipse.ptp.internal.rm.jaxb.control.core.data;
 
-import org.eclipse.ptp.rm.jaxb.control.core.exceptions.StreamParserException;
-import org.eclipse.ptp.rm.jaxb.control.core.exceptions.UserThrownException;
+import org.eclipse.ptp.internal.rm.jaxb.control.core.exceptions.StreamParserException;
+import org.eclipse.ptp.internal.rm.jaxb.control.core.exceptions.UserThrownException;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.EntryType;
 import org.eclipse.ptp.rm.jaxb.core.data.ThrowType;

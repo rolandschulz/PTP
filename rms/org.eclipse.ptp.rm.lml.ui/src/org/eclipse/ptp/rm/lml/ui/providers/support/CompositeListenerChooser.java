@@ -11,8 +11,8 @@
 
 package org.eclipse.ptp.rm.lml.ui.providers.support;
 
-import org.eclipse.ptp.rm.lml.internal.core.model.LMLNodeData;
-import org.eclipse.ptp.rm.lml.internal.core.model.Node;
+import org.eclipse.ptp.internal.rm.lml.core.model.Node;
+import org.eclipse.ptp.rm.lml.core.model.LMLNodeData;
 
 /**
  * This is a helper class for the nodedisplay.

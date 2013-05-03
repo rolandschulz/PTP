@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.rm.lml.monitor.core;singleton:=true
 Bundle-Version: 2.0.0.qualifier
-Bundle-Activator: org.eclipse.ptp.rm.lml.monitor.LMLMonitorCorePlugin
+Bundle-Activator: org.eclipse.ptp.internal.rm.lml.monitor.core.LMLMonitorCorePlugin
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
  org.eclipse.debug.core,
@@ -18,7 +18,9 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: %pluginProvider
 Bundle-Localization: plugin
-Export-Package: org.eclipse.ptp.rm.lml.monitor.core;
+Export-Package: org.eclipse.ptp.internal.rm.lml.monitor.core;x-internal:=true,
+ org.eclipse.ptp.internal.rm.lml.monitor.core.messages;x-internal:=true,
+ org.eclipse.ptp.rm.lml.monitor.core;
   x-friends:="org.eclipse.ptp.rm.jaxb.tests,
    org.eclipse.ptp.rm.lml.monitor.ui,
    org.eclipse.ptp.launch,

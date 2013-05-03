@@ -13,14 +13,14 @@ package org.eclipse.ptp.rm.lml.ui.providers;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.ptp.internal.rm.lml.core.events.NodedisplayZoomEvent;
+import org.eclipse.ptp.internal.rm.lml.core.events.RectangleSizeChangeEvent;
+import org.eclipse.ptp.rm.lml.core.elements.Nodedisplay;
 import org.eclipse.ptp.rm.lml.core.events.INodedisplayZoomEvent;
 import org.eclipse.ptp.rm.lml.core.events.IRectangleSizeChangeEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.INodedisplayZoomListener;
 import org.eclipse.ptp.rm.lml.core.listeners.IRectangleSizeChangeListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
-import org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplay;
-import org.eclipse.ptp.rm.lml.internal.core.events.NodedisplayZoomEvent;
-import org.eclipse.ptp.rm.lml.internal.core.events.RectangleSizeChangeEvent;
 import org.eclipse.swt.widgets.Composite;
 
 /**

@@ -22,7 +22,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.internal.rm.lml.monitor.ui.messages.Messages;
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
 import org.eclipse.ptp.rm.lml.core.LMLManager;
-import org.eclipse.ptp.rm.lml.internal.core.model.Row;
+import org.eclipse.ptp.rm.lml.core.model.Row;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 public class RemoveJobHandler extends AbstractHandler {

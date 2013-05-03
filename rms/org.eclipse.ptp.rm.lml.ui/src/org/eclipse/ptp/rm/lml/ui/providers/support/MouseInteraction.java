@@ -11,11 +11,11 @@
 package org.eclipse.ptp.rm.lml.ui.providers.support;
 
 import org.eclipse.jface.window.DefaultToolTip;
+import org.eclipse.ptp.internal.rm.lml.core.model.Node;
+import org.eclipse.ptp.internal.rm.lml.ui.messages.Messages;
+import org.eclipse.ptp.rm.lml.core.elements.ObjectType;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
-import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectType;
-import org.eclipse.ptp.rm.lml.internal.core.model.LMLNodeData;
-import org.eclipse.ptp.rm.lml.internal.core.model.Node;
-import org.eclipse.ptp.rm.lml.ui.messages.Messages;
+import org.eclipse.ptp.rm.lml.core.model.LMLNodeData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
 

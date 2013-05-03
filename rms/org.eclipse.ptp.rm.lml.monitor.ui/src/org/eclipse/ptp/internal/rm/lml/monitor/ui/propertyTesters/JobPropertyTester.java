@@ -18,7 +18,7 @@ import org.eclipse.ptp.rm.jaxb.control.core.LaunchControllerManager;
 import org.eclipse.ptp.rm.jaxb.core.data.ControlType;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
-import org.eclipse.ptp.rm.lml.internal.core.model.Row;
+import org.eclipse.ptp.rm.lml.core.model.Row;
 
 public class JobPropertyTester extends PropertyTester {
 	private static final String OUTPUT_READY = "outputReady"; //$NON-NLS-1$

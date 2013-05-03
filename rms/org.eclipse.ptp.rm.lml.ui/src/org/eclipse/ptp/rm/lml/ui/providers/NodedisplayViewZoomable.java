@@ -10,12 +10,12 @@
  */
 package org.eclipse.ptp.rm.lml.ui.providers;
 
+import org.eclipse.ptp.rm.lml.core.elements.Nodedisplay;
 import org.eclipse.ptp.rm.lml.core.events.INodedisplayZoomEvent;
 import org.eclipse.ptp.rm.lml.core.events.IRectangleSizeChangeEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.INodedisplayZoomListener;
 import org.eclipse.ptp.rm.lml.core.listeners.IRectangleSizeChangeListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
-import org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplay;
 import org.eclipse.swt.widgets.Composite;
 
 /**
@@ -81,7 +81,7 @@ public abstract class NodedisplayViewZoomable extends NodedisplayViewDecorator {
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.lml.ui.providers.NodedisplayViewDecorator#update(org.eclipse.ptp.rm.lml.core.model.ILguiItem,
-	 * org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplay)
+	 * org.eclipse.ptp.rm.lml.core.elements.Nodedisplay)
 	 */
 	@Override
 	public void update(ILguiItem lguiItem, Nodedisplay nodedislay) {

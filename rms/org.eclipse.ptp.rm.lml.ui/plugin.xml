@@ -6,7 +6,7 @@
       <view
             allowMultiple="true"
             category="org.eclipse.ptp.ui.views"
-            class="org.eclipse.ptp.rm.lml.ui.views.NodesView"
+            class="org.eclipse.ptp.internal.rm.lml.ui.views.NodesView"
             icon="icons/nodes_view.gif"
             id="org.eclipse.ptp.rm.lml.ui.SystemMonitorView"
             name="%NodediesplayView.name">
@@ -14,7 +14,7 @@
       <view
             allowMultiple="true"
             category="org.eclipse.ptp.ui.views"
-            class="org.eclipse.ptp.rm.lml.ui.views.TableView"
+            class="org.eclipse.ptp.internal.rm.lml.ui.views.TableView"
             icon="icons/active_jobs_view.gif"
             id="org.eclipse.ptp.rm.lml.ui.ActiveJobsView"
             name="%TableView1.name">
@@ -22,7 +22,7 @@
       <view
             allowMultiple="true"
             category="org.eclipse.ptp.ui.views"
-            class="org.eclipse.ptp.rm.lml.ui.views.TableView"
+            class="org.eclipse.ptp.internal.rm.lml.ui.views.TableView"
             icon="icons/inactive_jobs_view.gif"
             id="org.eclipse.ptp.rm.lml.ui.InactiveJobsView"
             name="%TableView2.name">
@@ -30,7 +30,7 @@
       <view
             allowMultiple="false"
             category="org.eclipse.ptp.ui.views"
-            class="org.eclipse.ptp.rm.lml.ui.views.InfoView"
+            class="org.eclipse.ptp.internal.rm.lml.ui.views.InfoView"
             id="org.eclipse.ptp.rm.lml.ui.InfoView"
             name="%InfoView.name">
       </view>

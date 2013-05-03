@@ -12,7 +12,7 @@ package org.eclipse.ptp.internal.rm.jaxb.control.core.data;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.ptp.rm.jaxb.control.core.exceptions.StreamParserException;
+import org.eclipse.ptp.internal.rm.jaxb.control.core.exceptions.StreamParserException;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.AddType;
 import org.eclipse.ptp.rm.jaxb.core.data.EntryType;

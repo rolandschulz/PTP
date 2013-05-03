@@ -68,7 +68,7 @@ public class EnvironmentVariableUtils {
 	 * @param buffer
 	 *            running contents of the script being generated
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.core.runnable.ScriptHandler#composeScript(IProgressMonitor)
+	 * @see org.eclipse.ptp.internal.rm.jaxb.control.core.runnable.ScriptHandler#composeScript(IProgressMonitor)
 	 */
 	public static void addVariable(String name, String value, String directive, StringBuffer buffer) {
 		if (value != null && !JAXBControlConstants.ZEROSTR.equals(value)) {

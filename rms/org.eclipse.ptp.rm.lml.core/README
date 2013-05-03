@@ -1,6 +1,6 @@
 ###################################################################################
 #
-# The classes in the org.eclipse.ptp.rm.lml.internal.core.elements package are 
+# The classes in the org.eclipse.ptp.rm.lml.core.elements package are 
 # generated from the schema definitions. Do not edit.
 #
 # To generate the classes, run the following command from the plugin directory.
@@ -10,5 +10,5 @@
 #
 ###################################################################################
 
-xjc -target 2.1 -d src -p org.eclipse.ptp.rm.lml.internal.core.elements schema/lgui.xsd
+xjc -target 2.1 -d src -p org.eclipse.ptp.rm.lml.core.elements schema/lgui.xsd
 	

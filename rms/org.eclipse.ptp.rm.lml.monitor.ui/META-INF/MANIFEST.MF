@@ -22,4 +22,9 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: %pluginProvider
 Bundle-Localization: plugin
-Export-Package: org.eclipse.ptp.rm.lml.monitor.ui
+Export-Package: org.eclipse.ptp.internal.rm.lml.monitor.ui;x-internal:=true,
+ org.eclipse.ptp.internal.rm.lml.monitor.ui.dialogs;x-internal:=true,
+ org.eclipse.ptp.internal.rm.lml.monitor.ui.handlers;x-internal:=true,
+ org.eclipse.ptp.internal.rm.lml.monitor.ui.messages;x-internal:=true,
+ org.eclipse.ptp.internal.rm.lml.monitor.ui.propertyTesters;x-internal:=true,
+ org.eclipse.ptp.internal.rm.lml.monitor.ui.views;x-internal:=true

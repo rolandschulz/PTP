@@ -11,8 +11,8 @@
 package org.eclipse.ptp.rm.lml.ui.providers.support;
 
 import org.eclipse.ptp.rm.lml.core.LMLManager;
-import org.eclipse.ptp.rm.lml.internal.core.elements.ObjectType;
-import org.eclipse.ptp.rm.lml.internal.core.model.ObjectStatus.Updatable;
+import org.eclipse.ptp.rm.lml.core.elements.ObjectType;
+import org.eclipse.ptp.rm.lml.core.model.ObjectStatus.Updatable;
 
 /**
  * This class forwards events created in ObjectStatus to
@@ -47,7 +47,7 @@ public class EventForwarder implements Updatable {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.rm.lml.internal.core.model.ObjectStatus.Updatable#updateStatus(org.eclipse.ptp.rm.lml.internal.core.elements
+	 * org.eclipse.ptp.internal.rm.lml.core.model.ObjectStatus.Updatable#updateStatus(org.eclipse.ptp.rm.lml.core.elements
 	 * .ObjectType, boolean, boolean)
 	 */
 	public void updateStatus(ObjectType object, boolean mouseOver, boolean mouseDown) {

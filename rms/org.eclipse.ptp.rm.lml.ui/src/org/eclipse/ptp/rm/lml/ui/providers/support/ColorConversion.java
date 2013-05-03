@@ -12,7 +12,7 @@ package org.eclipse.ptp.rm.lml.ui.providers.support;
 
 import java.util.HashMap;
 
-import org.eclipse.ptp.rm.lml.internal.core.model.LMLColor;
+import org.eclipse.ptp.rm.lml.core.model.LMLColor;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
 

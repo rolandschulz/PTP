@@ -16,15 +16,8 @@ import java.io.OutputStream;
 import javax.xml.bind.JAXBException;
 
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
+import org.eclipse.ptp.rm.lml.core.elements.RequestType;
 import org.eclipse.ptp.rm.lml.core.listeners.ILguiListener;
-import org.eclipse.ptp.rm.lml.internal.core.elements.RequestType;
-import org.eclipse.ptp.rm.lml.internal.core.model.LayoutAccess;
-import org.eclipse.ptp.rm.lml.internal.core.model.NodedisplayAccess;
-import org.eclipse.ptp.rm.lml.internal.core.model.OIDToInformation;
-import org.eclipse.ptp.rm.lml.internal.core.model.OIDToObject;
-import org.eclipse.ptp.rm.lml.internal.core.model.ObjectStatus;
-import org.eclipse.ptp.rm.lml.internal.core.model.OverviewAccess;
-import org.eclipse.ptp.rm.lml.internal.core.model.TableHandler;
 
 /**
  * Interface to manage the handling of an LguiType. It helps to work with LguiType without knowing the exact build of LguiType.

@@ -10,10 +10,10 @@
  */
 package org.eclipse.ptp.rm.lml.ui.providers;
 
+import org.eclipse.ptp.rm.lml.core.elements.Nodedisplay;
 import org.eclipse.ptp.rm.lml.core.events.INodedisplayZoomEvent;
 import org.eclipse.ptp.rm.lml.core.listeners.INodedisplayZoomListener;
 import org.eclipse.ptp.rm.lml.core.model.ILguiItem;
-import org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplay;
 import org.eclipse.ptp.rm.lml.ui.providers.support.BorderLayout;
 import org.eclipse.ptp.rm.lml.ui.providers.support.BorderLayout.BorderData;
 import org.eclipse.swt.SWT;
@@ -224,7 +224,7 @@ public class NodedisplayViewDecorator extends AbstractNodedisplayView {
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.lml.ui.providers.AbstractNodedisplayView#update(org.eclipse.ptp.rm.lml.core.model.ILguiItem,
-	 * org.eclipse.ptp.rm.lml.internal.core.elements.Nodedisplay)
+	 * org.eclipse.ptp.rm.lml.core.elements.Nodedisplay)
 	 */
 	@Override
 	public void update(ILguiItem lguiItem, Nodedisplay nodedisplay) {

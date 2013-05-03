@@ -12,7 +12,6 @@ package org.eclipse.ptp.internal.rm.lml.monitor.ui.propertyTesters;
 
 import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl;
-import org.eclipse.ptp.rm.lml.monitor.core.MonitorControl;
 import org.eclipse.ptp.rm.lml.monitor.core.MonitorControlManager;
 import org.eclipse.ptp.rm.lml.monitor.core.listeners.IMonitorChangedListener;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -56,8 +55,8 @@ public class MonitorPropertyTester extends PropertyTester {
 	 */
 	@Override
 	public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
-		if (receiver instanceof MonitorControl) {
-			MonitorControl monitor = (MonitorControl) receiver;
+		if (receiver instanceof IMonitorControl) {
+			IMonitorControl monitor = (IMonitorControl) receiver;
 			if (IS_ACTIVE.equals(property)) {
 				return monitor.isActive() == toBoolean(expectedValue);
 			}

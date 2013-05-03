@@ -21,8 +21,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.eclipse.ptp.rm.lml.core.LMLCorePlugin;
-import org.eclipse.ptp.rm.lml.ui.LMLUIPlugin;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.XMLMemento;
@@ -72,7 +70,7 @@ public class LguiSelectionPersistence {
 					reader.close();
 				}
 			} catch (IOException e) {
-				LMLCorePlugin.log(e);
+				LMLUIPlugin.log(e);
 			}
 		}
 		return rmId;
@@ -96,14 +94,14 @@ public class LguiSelectionPersistence {
 			writer = new FileWriter(file);
 			memento.save(writer);
 		} catch (IOException e) {
-			LMLCorePlugin.log(e);
+			LMLUIPlugin.log(e);
 		} finally {
 			try {
 				if (writer != null) {
 					writer.close();
 				}
 			} catch (IOException e) {
-				LMLCorePlugin.log(e);
+				LMLUIPlugin.log(e);
 			}
 		}
 	}

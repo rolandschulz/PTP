@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.eclipse.ptp.internal.rm.jaxb.control.core;
 
-import org.eclipse.ptp.rm.jaxb.control.core.exceptions.StreamParserException;
+import org.eclipse.ptp.internal.rm.jaxb.control.core.exceptions.StreamParserException;
 
 /**
  * Defines object for tokenizer to call to process matches against.

@@ -12,8 +12,8 @@ package org.eclipse.ptp.rm.lml.ui.providers.support;
 
 import java.text.DecimalFormat;
 
+import org.eclipse.ptp.internal.rm.lml.ui.messages.Messages;
 import org.eclipse.ptp.rm.lml.core.model.IUsagebarInterpreter;
-import org.eclipse.ptp.rm.lml.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;

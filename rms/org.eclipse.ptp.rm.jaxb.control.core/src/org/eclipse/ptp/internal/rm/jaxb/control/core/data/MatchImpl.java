@@ -15,9 +15,9 @@ import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.IAssign;
+import org.eclipse.ptp.internal.rm.jaxb.control.core.exceptions.StreamParserException;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.messages.Messages;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.utils.DebuggingLogger;
-import org.eclipse.ptp.rm.jaxb.control.core.exceptions.StreamParserException;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.MatchType;
