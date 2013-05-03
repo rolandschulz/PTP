@@ -28,6 +28,11 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: org.eclipse.ptp.launch;x-friends:="org.eclipse.ptp.etfw.parallel,org.eclipse.ptp.rcp.sysmon",
+ org.eclipse.ptp.launch.internal;x-internal:=true,
+ org.eclipse.ptp.launch.internal.messages;x-internal:=true,
+ org.eclipse.ptp.launch.internal.rulesengine;x-internal:=true,
+ org.eclipse.ptp.launch.internal.ui;x-internal:=true,
+ org.eclipse.ptp.launch.rulesengine;x-internal:=true,
  org.eclipse.ptp.launch.ui;x-friends:="org.eclipse.ptp.rcp.sysmon",
  org.eclipse.ptp.launch.ui.extensions;x-friends:="org.eclipse.ptp.etfw.launch",
  org.eclipse.ptp.launch.ui.tabs;x-friends:="org.eclipse.ptp.etfw.parallel,org.eclipse.ptp.rcp.sysmon"

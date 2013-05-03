@@ -17,3 +17,6 @@ Bundle-Localization: plugin
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.eclipse.ptp.internal.rdt.sync.fortran.ui.Activator
 Bundle-Vendor: %providerName
+Export-Package: org.eclipse.ptp.internal.rdt.sync.fortran.ui;x-internal:=true,
+ org.eclipse.ptp.internal.rdt.sync.fortran.ui.messages;x-internal:=true,
+ org.eclipse.ptp.internal.rdt.sync.fortran.ui.wizards;x-internal:=true

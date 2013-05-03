@@ -13,3 +13,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ptp.pldt.mpi.analysis.cdt
 Eclipse-LazyStart: true
 Bundle-Vendor: IBM Research
+Export-Package: org.eclipse.ptp.pldt.sampleCDTstaticAnalysis;x-internal:=true,
+ org.eclipse.ptp.pldt.sampleCDTstaticAnalysis.actions;x-internal:=true,
+ org.eclipse.ptp.pldt.sampleCDTstaticAnalysis.handlers;x-internal:=true

@@ -23,5 +23,6 @@ Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: org.eclipse.ptp.pldt.openacc.internal.fortran;x-internal:=true,
+ org.eclipse.ptp.pldt.openacc.internal.fortran.analysis;x-internal:=true,
  org.eclipse.ptp.pldt.openacc.internal.fortran.editorHelp;x-internal:=true,
  org.eclipse.ptp.pldt.openacc.internal.fortran.messages;x-internal:=true

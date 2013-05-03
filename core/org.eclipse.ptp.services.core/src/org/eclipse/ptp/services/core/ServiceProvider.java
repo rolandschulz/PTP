@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.PlatformObject;
-import org.eclipse.ptp.services.core.messages.Messages;
+import org.eclipse.ptp.internal.services.core.messages.Messages;
 import org.eclipse.ptp.services.internal.core.ServiceModelEvent;
 import org.eclipse.ui.IMemento;
 

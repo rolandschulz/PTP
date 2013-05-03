@@ -24,6 +24,7 @@ Export-Package: org.eclipse.ptp.pldt.openmp.core;x-friends:="org.eclipse.ptp.pld
  org.eclipse.ptp.pldt.openmp.core.analysis;x-friends:="org.eclipse.ptp.pldt.wizards",
  org.eclipse.ptp.pldt.openmp.core.editorHelp;x-internal:=true,
  org.eclipse.ptp.pldt.openmp.core.internal;x-friends:="org.eclipse.ptp.pldt.wizards,org.eclipse.ptp.pldt.tests",
+ org.eclipse.ptp.pldt.openmp.core.messages;x-internal:=true,
  org.eclipse.ptp.pldt.openmp.core.prefs;x-internal:=true,
  org.eclipse.ptp.pldt.openmp.core.views;x-internal:=true
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

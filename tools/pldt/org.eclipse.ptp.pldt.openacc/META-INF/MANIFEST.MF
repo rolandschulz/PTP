@@ -22,4 +22,8 @@ Export-Package: org.eclipse.ptp.pldt.openacc.internal;x-internal:=true;
    org.eclipse.ui.plugin,
    org.eclipse.osgi.util,
    org.eclipse.jface.resource",
- org.eclipse.ptp.pldt.openacc.internal.actions;x-internal:=true
+ org.eclipse.ptp.pldt.openacc.internal.actions;x-internal:=true,
+ org.eclipse.ptp.pldt.openacc.internal.editorHelp;x-internal:=true,
+ org.eclipse.ptp.pldt.openacc.internal.messages;x-internal:=true,
+ org.eclipse.ptp.pldt.openacc.internal.prefs;x-internal:=true,
+ org.eclipse.ptp.pldt.openacc.internal.views;x-internal:=true

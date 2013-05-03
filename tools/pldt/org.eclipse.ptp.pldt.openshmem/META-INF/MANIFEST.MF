@@ -16,3 +16,10 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.cdt.doc.user
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: org.eclipse.ptp.pldt.openshmem;x-internal:=true,
+ org.eclipse.ptp.pldt.openshmem.actions;x-internal:=true,
+ org.eclipse.ptp.pldt.openshmem.analysis;x-internal:=true,
+ org.eclipse.ptp.pldt.openshmem.editorHelp;x-internal:=true,
+ org.eclipse.ptp.pldt.openshmem.messages;x-internal:=true,
+ org.eclipse.ptp.pldt.openshmem.prefs;x-internal:=true,
+ org.eclipse.ptp.pldt.openshmem.views;x-internal:=true

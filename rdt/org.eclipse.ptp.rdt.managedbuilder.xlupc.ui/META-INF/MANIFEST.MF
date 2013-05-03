@@ -31,3 +31,4 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Bundle-Vendor: %Bundle-Vendor
+Export-Package: org.eclipse.ptp.rdt.managedbuilder.xlupc.ui;x-internal:=true

@@ -13,8 +13,8 @@ package org.eclipse.ptp.services.ui.dialogs;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.window.IShellProvider;
+import org.eclipse.ptp.internal.services.ui.messages.Messages;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
-import org.eclipse.ptp.services.ui.messages.Messages;
 import org.eclipse.ptp.services.ui.widgets.ServiceProviderConfigurationWidget;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;

@@ -13,6 +13,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.editors,
  org.eclipse.ui.workbench.texteditor
 Export-Package: org.eclipse.ptp.etfw.tau.selinst,
+ org.eclipse.ptp.etfw.tau.selinst.messages;x-internal:=true,
  org.eclipse.ptp.etfw.tau.selinst.popup.actions
 Bundle-Vendor: %pluginProvider
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

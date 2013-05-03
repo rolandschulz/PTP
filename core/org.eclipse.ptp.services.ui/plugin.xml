@@ -12,7 +12,7 @@
 	</category>
   	 <view
           category="org.eclipse.ptp.services.ui.views"
-          class="org.eclipse.ptp.services.ui.views.ServiceConfigurationView"
+          class="org.eclipse.ptp.internal.services.ui.views.ServiceConfigurationView"
           icon="icons/etool16/service.gif"
           id="org.eclipse.ptp.services.ui.views.serviceConfigurationView"
           name="%ServiceConfigurationView.name">
@@ -35,7 +35,7 @@
          point="org.eclipse.ui.preferencePages">
       <page
             category="org.eclipse.ptp.remote.ui.RemoteDevelopmentPreferencePage"
-            class="org.eclipse.ptp.services.ui.preferences.ServiceConfigurationPreferencePage"
+            class="org.eclipse.ptp.internal.services.ui.preferences.ServiceConfigurationPreferencePage"
             id="org.eclipse.ptp.services.ui.ServiceConfigurationPreference"
             name="%ServiceConfigurationsPreferencePage.name">
       </page>
@@ -44,7 +44,7 @@
          point="org.eclipse.core.runtime.adapters">
       <factory
             adaptableType="org.eclipse.ptp.services.core.IServiceConfiguration"
-            class="org.eclipse.ptp.services.internal.ui.adapters.ServiceModelWorkbenchAdapterFactory">
+            class="org.eclipse.ptp.internal.services.ui.adapters.ServiceModelWorkbenchAdapterFactory">
          <adapter
                type="org.eclipse.ui.model.IWorkbenchAdapter">
          </adapter>
@@ -54,7 +54,7 @@
       </factory>
       <factory
             adaptableType="org.eclipse.ptp.services.core.IServiceProvider"
-            class="org.eclipse.ptp.services.internal.ui.adapters.ServiceModelWorkbenchAdapterFactory">
+            class="org.eclipse.ptp.internal.services.ui.adapters.ServiceModelWorkbenchAdapterFactory">
          <adapter
                type="org.eclipse.ui.model.IWorkbenchAdapter">
          </adapter>
@@ -64,7 +64,7 @@
       </factory>
       <factory
             adaptableType="org.eclipse.ptp.services.core.IServiceModelManager"
-            class="org.eclipse.ptp.services.internal.ui.adapters.ServiceModelWorkbenchAdapterFactory">
+            class="org.eclipse.ptp.internal.services.ui.adapters.ServiceModelWorkbenchAdapterFactory">
          <adapter
                type="org.eclipse.ui.model.IWorkbenchAdapter">
          </adapter>
@@ -74,7 +74,7 @@
       </factory>
       <factory
             adaptableType="org.eclipse.ptp.services.core.IService"
-            class="org.eclipse.ptp.services.internal.ui.adapters.ServiceModelWorkbenchAdapterFactory">
+            class="org.eclipse.ptp.internal.services.ui.adapters.ServiceModelWorkbenchAdapterFactory">
          <adapter
                type="org.eclipse.ui.model.IWorkbenchAdapter">
          </adapter>
@@ -90,19 +90,19 @@
             id="org.eclipse.ptp.services.ui.serviceConfiguration.popupMenu"
             objectClass="org.eclipse.ptp.services.core.IServiceConfiguration">
          <action
-               class="org.eclipse.ptp.services.internal.ui.actions.EditServiceConfigurationAction"
+               class="org.eclipse.ptp.internal.services.ui.actions.EditServiceConfigurationAction"
                enablesFor="1"
                id="org.eclipse.ptp.services.ui.actions.editServiceConfiguration"
                label="%EditServiceConfiguration.label">
          </action>
          <action
-               class="org.eclipse.ptp.services.internal.ui.actions.RemoveServiceConfigurationAction"
+               class="org.eclipse.ptp.internal.services.ui.actions.RemoveServiceConfigurationAction"
                enablesFor="+"
                id="org.eclipse.ptp.services.ui.actions.removeServiceConfiguration"
                label="%RemoveServiceConfiguration.label">
          </action>
          <action
-               class="org.eclipse.ptp.services.internal.ui.actions.SelectActiveServiceConfigurationAction"
+               class="org.eclipse.ptp.internal.services.ui.actions.SelectActiveServiceConfigurationAction"
                enablesFor="1"
                id="org.eclipse.ptp.services.ui.actions.selectActiveServiceConfiguration"
                label="%SetActiveServiceConfiguration.label">
@@ -112,7 +112,7 @@
             id="org.eclipse.ptp.services.ui.serviceConfiguration.popupMenu2"
             targetID="org.eclipse.ptp.services.ui.views.serviceConfigurationView">
          <action
-               class="org.eclipse.ptp.services.internal.ui.actions.AddServiceConfigurationAction"
+               class="org.eclipse.ptp.internal.services.ui.actions.AddServiceConfigurationAction"
                enablesFor="*"
                id="org.eclipse.ptp.services.ui.actions.addServiceConfiguration"
                label="%AddServiceConfiguration.label">

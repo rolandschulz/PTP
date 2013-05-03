@@ -21,6 +21,7 @@ Export-Package: org.eclipse.ptp.pldt.upc;x-internal:=true,
  org.eclipse.ptp.pldt.upc.analysis;x-internal:=true,
  org.eclipse.ptp.pldt.upc.editorHelp;x-internal:=true,
  org.eclipse.ptp.pldt.upc.internal;x-friends:="org.eclipse.ptp.pldt.tests,org.eclipse.ptp.pldt.wizards",
+ org.eclipse.ptp.pldt.upc.messages;x-internal:=true,
  org.eclipse.ptp.pldt.upc.prefs;x-internal:=true,
  org.eclipse.ptp.pldt.upc.views;x-internal:=true
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

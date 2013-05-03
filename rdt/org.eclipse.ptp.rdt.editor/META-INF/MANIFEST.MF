@@ -28,6 +28,8 @@ Require-Bundle: org.eclipse.cdt.core;bundle-version="5.0.2",
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.ptp.internal.rdt.editor;x-internal:=true,
+ org.eclipse.ptp.internal.rdt.editor.actions;x-internal:=true,
+ org.eclipse.ptp.internal.rdt.editor.preferences;x-internal:=true,
  org.eclipse.ptp.rdt.editor,
  org.eclipse.ptp.rdt.editor.info
 Bundle-Localization: plugin

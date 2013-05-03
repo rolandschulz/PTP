@@ -18,6 +18,7 @@ Export-Package: org.eclipse.ptp.internal.rdt.sync.cdt.core;
    org.eclipse.ptp.etfw,
    org.eclipse.ptp.rdt.sync.git.ui,
    org.eclipse.ptp.rdt.sync.cdt.ui",
+ org.eclipse.ptp.internal.rdt.sync.cdt.core.messages;x-internal:=true,
  org.eclipse.ptp.internal.rdt.sync.cdt.core.remotemake;x-friends:="org.eclipse.ptp.rdt.sync.ui"
 Bundle-Localization: plugin
 Bundle-ActivationPolicy: lazy

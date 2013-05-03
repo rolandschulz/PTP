@@ -16,3 +16,10 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: %pluginVendor
 Bundle-Localization: plugin
+Export-Package: org.eclipse.ptp.internal.gig;x-internal:=true,
+ org.eclipse.ptp.internal.gig.handlers;x-internal:=true,
+ org.eclipse.ptp.internal.gig.log;x-internal:=true,
+ org.eclipse.ptp.internal.gig.messages;x-internal:=true,
+ org.eclipse.ptp.internal.gig.preferences;x-internal:=true,
+ org.eclipse.ptp.internal.gig.util;x-internal:=true,
+ org.eclipse.ptp.internal.gig.views;x-internal:=true

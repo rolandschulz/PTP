@@ -20,6 +20,7 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.ptp.services.internal.core.ServicesCorePlugin;
 
 import static org.eclipse.core.resources.IResourceDelta.*;
 

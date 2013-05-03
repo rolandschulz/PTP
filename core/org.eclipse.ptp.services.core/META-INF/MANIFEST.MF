@@ -3,13 +3,14 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name.0
 Bundle-SymbolicName: org.eclipse.ptp.services.core;singleton:=true
 Bundle-Version: 3.0.0.qualifier
-Bundle-Activator: org.eclipse.ptp.services.core.ServicesCorePlugin
+Bundle-Activator: org.eclipse.ptp.services.internal.core.ServicesCorePlugin
 Bundle-Vendor: %Bundle-Vendor.0
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources
 Bundle-ActivationPolicy: lazy
-Export-Package: org.eclipse.ptp.services.core,
+Export-Package: org.eclipse.ptp.internal.services.core.messages;x-internal:=true,
+ org.eclipse.ptp.services.core,
  org.eclipse.ptp.services.internal.core;x-internal:=true
 Bundle-Localization: plugin
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

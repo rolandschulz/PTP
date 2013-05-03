@@ -11,8 +11,8 @@
 package org.eclipse.ptp.services.ui.dialogs;
 
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.ptp.internal.services.ui.messages.Messages;
 import org.eclipse.ptp.services.core.IService;
-import org.eclipse.ptp.services.ui.messages.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;

@@ -18,3 +18,10 @@ Import-Package: org.eclipse.cdt.core.model,
  org.eclipse.jface.text,
  org.eclipse.ptp.remote.core,
  org.eclipse.ptp.remote.core.exception
+Export-Package: org.eclipse.ptp.internal.gem;x-internal:=true,
+ org.eclipse.ptp.internal.gem.handlers;x-internal:=true,
+ org.eclipse.ptp.internal.gem.messages;x-internal:=true,
+ org.eclipse.ptp.internal.gem.popup.actions;x-internal:=true,
+ org.eclipse.ptp.internal.gem.preferences;x-internal:=true,
+ org.eclipse.ptp.internal.gem.util;x-internal:=true,
+ org.eclipse.ptp.internal.gem.views;x-internal:=true

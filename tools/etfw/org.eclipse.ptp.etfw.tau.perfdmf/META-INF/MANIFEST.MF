@@ -17,5 +17,6 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Export-Package: org.eclipse.ptp.etfw.tau.perfdmf,
+ org.eclipse.ptp.etfw.tau.perfdmf.messages;x-internal:=true,
  org.eclipse.ptp.etfw.tau.perfdmf.views
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

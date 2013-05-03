@@ -5,6 +5,7 @@ Bundle-SymbolicName: org.eclipse.ptp.etfw.tau.papiselect;singleton:=true
 Bundle-Version: 4.0.0.qualifier
 Bundle-Localization: plugin
 Export-Package: org.eclipse.ptp.etfw.tau.papiselect,
+ org.eclipse.ptp.etfw.tau.papiselect.messages;x-internal:=true,
  org.eclipse.ptp.etfw.tau.papiselect.papic
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jface,

@@ -10,6 +10,7 @@ Export-Package: org.eclipse.ptp.pldt.mpi.analysis;x-friends:="org.eclipse.ptp.pl
  org.eclipse.ptp.pldt.mpi.analysis.actions;x-friends:="org.eclipse.ptp.pldt.mpi.analysis.cdt,org.eclipse.cdt.core.tests",
  org.eclipse.ptp.pldt.mpi.analysis.analysis;x-friends:="org.eclipse.ptp.pldt.mpi.analysis.cdt",
  org.eclipse.ptp.pldt.mpi.analysis.internal;x-friends:="org.eclipse.ptp.pldt.tests",
+ org.eclipse.ptp.pldt.mpi.analysis.messages;x-internal:=true,
  org.eclipse.ptp.pldt.mpi.analysis.popup.actions;x-internal:=true,
  org.eclipse.ptp.pldt.mpi.analysis.view;x-friends:="org.eclipse.ptp.pldt.mpi.analysis.cdt"
 Require-Bundle: org.eclipse.ui,

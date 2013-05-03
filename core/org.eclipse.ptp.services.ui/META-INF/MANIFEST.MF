@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name.0
 Bundle-SymbolicName: org.eclipse.ptp.services.ui;singleton:=true
 Bundle-Version: 2.0.0.qualifier
-Bundle-Activator: org.eclipse.ptp.services.ui.ServicesUIPlugin
+Bundle-Activator: org.eclipse.ptp.internal.services.ui.ServicesUIPlugin
 Bundle-Vendor: %Bundle-Vendor.0
 Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.ide,
@@ -14,8 +14,13 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Export-Package: org.eclipse.ptp.services.ui,
+Export-Package: org.eclipse.ptp.internal.services.ui;x-internal:=true,
+ org.eclipse.ptp.internal.services.ui.actions;x-internal:=true,
+ org.eclipse.ptp.internal.services.ui.adapters;x-internal:=true,
+ org.eclipse.ptp.internal.services.ui.messages;x-internal:=true,
+ org.eclipse.ptp.internal.services.ui.preferences;x-internal:=true,
+ org.eclipse.ptp.internal.services.ui.views;x-internal:=true,
+ org.eclipse.ptp.services.ui,
  org.eclipse.ptp.services.ui.dialogs,
- org.eclipse.ptp.services.ui.messages,
  org.eclipse.ptp.services.ui.widgets,
  org.eclipse.ptp.services.ui.wizards

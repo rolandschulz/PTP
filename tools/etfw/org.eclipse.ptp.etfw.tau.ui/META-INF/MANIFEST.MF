@@ -20,6 +20,7 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: org.eclipse.ptp.etfw.tau.ui,
+ org.eclipse.ptp.etfw.tau.ui.messages;x-internal:=true,
  org.eclipse.ptp.etfw.tau.ui.model
 Bundle-Vendor: %pluginProvider
 Bundle-Localization: plugin

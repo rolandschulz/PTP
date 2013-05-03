@@ -16,3 +16,6 @@ Bundle-ActivationPolicy: lazy
 Bundle-Vendor: %pluginProvider
 Import-Package: org.eclipse.ui
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Export-Package: org.eclipse.ptp.etfw.tau.selinstfort;x-internal:=true,
+ org.eclipse.ptp.etfw.tau.selinstfort.messages;x-internal:=true,
+ org.eclipse.ptp.etfw.tau.selinstfort.popup.actions;x-internal:=true

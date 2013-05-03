@@ -18,6 +18,7 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.ptp.pldt.openmp.ui.pv;x-internal:=true,
  org.eclipse.ptp.pldt.openmp.ui.pv.internal;x-friends:="org.eclipse.ptp.pldt.tests,org.eclipse.ptp.pldt.openmp.core",
+ org.eclipse.ptp.pldt.openmp.ui.pv.messages;x-internal:=true,
  org.eclipse.ptp.pldt.openmp.ui.pv.views;x-internal:=true
 Bundle-ClassPath: .
 Bundle-Vendor: %pluginProvider

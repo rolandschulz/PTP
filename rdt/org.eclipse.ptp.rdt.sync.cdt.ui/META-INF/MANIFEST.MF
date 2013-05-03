@@ -23,4 +23,8 @@ Bundle-Localization: plugin
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.eclipse.ptp.internal.rdt.sync.cdt.ui.Activator
 Bundle-Vendor: %providerName
-Export-Package: org.eclipse.ptp.internal.rdt.sync.cdt.ui.wizards;x-friends:="org.eclipse.ptp.rdt.sync.fortran.ui"
+Export-Package: org.eclipse.ptp.internal.rdt.sync.cdt.ui;x-internal:=true,
+ org.eclipse.ptp.internal.rdt.sync.cdt.ui.messages;x-internal:=true,
+ org.eclipse.ptp.internal.rdt.sync.cdt.ui.preferences;x-internal:=true,
+ org.eclipse.ptp.internal.rdt.sync.cdt.ui.properties;x-internal:=true,
+ org.eclipse.ptp.internal.rdt.sync.cdt.ui.wizards;x-friends:="org.eclipse.ptp.rdt.sync.fortran.ui"
