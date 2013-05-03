@@ -23,7 +23,7 @@ use strict;
 
 my $patint="([\\+\\-\\d]+)";   # Pattern for Integer number
 my $patfp ="([\\+\\-\\d.E]+)"; # Pattern for Floating Point number
-my $patwrd="([\^\\s]+)";       # Pattern for Work (all noblank characters)
+my $patwrd="([\^\\s]+)";       # Pattern for Work (all nonblank characters)
 my $patbl ="\\s+";             # Pattern for blank space (variable length)
 
 my $version="1.18";
@@ -40,15 +40,15 @@ my ($tstart,$tdiff,$rc);
 # 
 # 1. running from scratch
 #    - designed to run on remote system in user mode
-#    - determine system and select corrensponding query scripts
+#    - determine system and select corresponding query scripts
 #
 # 2. running on a LML raw file
 #    - designed to run on a web server as backend to 
 #      web server scripts 
-#    - raw file must be speciied by rawfile parameter
+#    - raw file must be specified by rawfile parameter
 # 
 # Common steps
-#    - check comand line option
+#    - check command line option
 #    - extract options from request
 #    - step 1 or 2
 #    - extract layout from request, if not given
