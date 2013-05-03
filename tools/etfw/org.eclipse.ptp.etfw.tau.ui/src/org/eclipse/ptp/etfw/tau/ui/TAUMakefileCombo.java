@@ -114,7 +114,8 @@ public class TAUMakefileCombo extends AbstractWidget {
 						public void run() {
 							// TODO handle case where user closes dialog before this finishes, leads to widget disposed error
 							updateMakefileCombo();
-							combo.getParent().layout();
+							if(combo!=null&&!combo.isDisposed())
+								combo.getParent().layout();
 							refreshing = false;
 						}
 					});
@@ -150,6 +151,9 @@ public class TAUMakefileCombo extends AbstractWidget {
 	}
 
 	private void updateMakefileCombo() {
+		if(combo==null||combo.isDisposed()){
+			return;
+		}
 		List<String> options = populateOptions();
 
 		List<String> makefiles = new ArrayList<String>();

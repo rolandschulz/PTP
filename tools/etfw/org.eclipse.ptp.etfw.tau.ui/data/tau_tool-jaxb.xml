@@ -1450,7 +1450,7 @@
 							<rm:button type="radiobutton" title="User Defined" buttonId="UserDefinedButton" style="SWT.LEFT">
 							</rm:button>
 						</rm:button-group>
-						<rm:browse title="Browse..." localOnly="true" directory="true" textStyle="SWT.BORDER">
+						<rm:browse title="Browse..." localOnly="false" directory="false" textStyle="SWT.BORDER">
 							<rm:text-layout-data>
 								<rm:grid-data horizontalSpan="2" horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="true" />
 							</rm:text-layout-data>
