@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 IBM Corporation and others.
+ * Copyright (c) 2009,2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -78,6 +78,11 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	private Bundle fBundle;
 	private boolean fContinuous = true;
 	private IStatus fStatus;
+	
+	/**
+	 * Save stderr output so if there is a nonzero exit code we can expose message to the user - Bug 395517
+	 */
+	private String stdErrOutput;
 
 	public AbstractRemoteServerRunner(String name) {
 		super(name);
@@ -849,6 +854,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 */
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
+		stdErrOutput="";//reset output string //$NON-NLS-1$
 		assert getLaunchCommand() != null;
 
 		final SubMonitor subMon = SubMonitor.convert(monitor, 100);
@@ -910,9 +916,11 @@ public abstract class AbstractRemoteServerRunner extends Job {
 								if (DebugUtil.SERVER_TRACING) {
 									System.out.println("SERVER: " + output); //$NON-NLS-1$
 								}
-								Activator.log(fServerName + ": " + output); //$NON-NLS-1$
+								// this log item is possibly unnecessary but we include it to make sure something
+								// reaches the log if problems occur later
 								Activator.log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, fServerName
 												+ ": " + output)); //$NON-NLS-1$
+								stdErrOutput+=output;
 							}
 						}
 						stderr.close();
@@ -962,8 +970,10 @@ public abstract class AbstractRemoteServerRunner extends Job {
 			 */
 			if (fRemoteProcess.exitValue() != 0) {
 				if (!subMon.isCanceled()) {
-					fStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, NLS.bind(Messages.AbstractRemoteServerRunner_serverFinishedWithExitCode,
-							fRemoteProcess.exitValue()));
+					// Create exception object so the details of the problem can be shown in the ErrorDialog's Details section
+					RemoteServerException exc=new RemoteServerException(stdErrOutput);
+					String msg=NLS.bind(Messages.AbstractRemoteServerRunner_serverFinishedWithExitCode, fRemoteProcess.exitValue());
+					fStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, msg, exc);			
 				}
 			}
 		} catch (IOException e) {
@@ -976,6 +986,18 @@ public abstract class AbstractRemoteServerRunner extends Job {
 			}
 		}
 		return fStatus;
+	}
+
+	/**
+	 * Exception to be attached to errors running commands on remote server - since the Exception class type
+	 * is shown in the Error Log View, we make our own name here so as to not be a "java.lang.Exception"
+	 */
+	@SuppressWarnings("serial")
+	private class RemoteServerException extends 
+			Exception {
+		public RemoteServerException(String message) {
+			super(message);
+		}
 	}
 
 	/**
