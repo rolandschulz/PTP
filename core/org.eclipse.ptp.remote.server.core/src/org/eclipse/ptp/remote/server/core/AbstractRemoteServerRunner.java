@@ -421,7 +421,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 		try {
 			if (fRemoteConnection != null && fServerState != ServerState.RUNNING) {
 				if (!doServerStarting(subMon.newChild(10))) {
-					throw new IOException(Messages.AbstractRemoteServerRunner_6);
+					throw new IOException(Messages.AbstractRemoteServerRunner_serverRestartAborted);
 				}
 				setServerState(ServerState.STARTING);
 				if (!fRemoteConnection.isOpen()) {
@@ -434,7 +434,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 						return;
 					}
 					if (!fRemoteConnection.isOpen()) {
-						throw new IOException(Messages.AbstractRemoteServerRunner_7);
+						throw new IOException(Messages.AbstractRemoteServerRunner_unableToOpenConnection);
 					}
 				}
 
@@ -449,7 +449,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 								new Object[] { fServerName, fRemoteConnection.getName() }));
 					}
 					setServerState(ServerState.STOPPED);
-					throw new IOException(Messages.AbstractRemoteServerRunner_12);
+					throw new IOException(Messages.AbstractRemoteServerRunner_cannotRunServerMissingRequirements);
 				}
 
 				/*
@@ -500,7 +500,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 						return;
 					}
 					if (!fRemoteConnection.isOpen()) {
-						throw new IOException(Messages.AbstractRemoteServerRunner_7);
+						throw new IOException(Messages.AbstractRemoteServerRunner_unableToOpenConnection);
 					}
 				}
 
@@ -614,7 +614,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 				local = EFS.getStore(URIUtil.toURI(jarURL));
 			}
 			if (local == null) {
-				throw new IOException(NLS.bind(Messages.AbstractRemoteServerRunner_11,
+				throw new IOException(NLS.bind(Messages.AbstractRemoteServerRunner_unableToLocatePayload,
 						new Object[] { getPayload(), fBundle.getSymbolicName() }));
 			}
 			IFileInfo localInfo = local.fetchInfo(EFS.NONE, subMon.newChild(10));
@@ -726,7 +726,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 			 * Now launch the server.
 			 */
 			if (!subMon.isCanceled()) {
-				return runCommand(getLaunchCommand(), Messages.AbstractRemoteServerRunner_5, directory, false, subMon.newChild(50));
+				return runCommand(getLaunchCommand(), Messages.AbstractRemoteServerRunner_launching, directory, false, subMon.newChild(50));
 			}
 
 			return null;
@@ -911,6 +911,8 @@ public abstract class AbstractRemoteServerRunner extends Job {
 									System.out.println("SERVER: " + output); //$NON-NLS-1$
 								}
 								Activator.log(fServerName + ": " + output); //$NON-NLS-1$
+								Activator.log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, fServerName
+												+ ": " + output)); //$NON-NLS-1$
 							}
 						}
 						stderr.close();
@@ -925,7 +927,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 			}
 
 			subMon.worked(40);
-			subMon.subTask(Messages.AbstractRemoteServerRunner_1);
+			subMon.subTask(Messages.AbstractRemoteServerRunner_serverRunningCancelToTerminate);
 
 			/*
 			 * Wait while running but not canceled.
@@ -960,7 +962,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 			 */
 			if (fRemoteProcess.exitValue() != 0) {
 				if (!subMon.isCanceled()) {
-					fStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, NLS.bind(Messages.AbstractRemoteServerRunner_3,
+					fStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, NLS.bind(Messages.AbstractRemoteServerRunner_serverFinishedWithExitCode,
 							fRemoteProcess.exitValue()));
 				}
 			}
