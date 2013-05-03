@@ -114,6 +114,15 @@ public class RemoteConnectionTests extends TestCase {
 		// }
 	}
 
+	public void testWd() {
+		String oldWd = fRemoteConnection.getWorkingDirectory();
+		assertFalse(oldWd.equals("/"));
+		String newWd = "/tmp";
+		fRemoteConnection.setWorkingDirectory(newWd);
+		String wd = fRemoteConnection.getWorkingDirectory();
+		assertEquals(newWd, wd);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
