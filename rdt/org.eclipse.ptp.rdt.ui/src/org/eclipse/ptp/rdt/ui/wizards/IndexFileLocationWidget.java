@@ -16,6 +16,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.ptp.internal.rdt.ui.RSEUtils;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
 import org.eclipse.rse.core.model.IHost;
@@ -36,6 +37,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 public class IndexFileLocationWidget extends Composite {
@@ -181,8 +183,19 @@ public class IndexFileLocationWidget extends Composite {
 				remoteFileSubSystem.getRemoteFileObject(path, new NullProgressMonitor());
 						
 			if (!currentRemoteFolder.canWrite()){	
-				MessageDialog.openWarning(getShell(), 
-						Messages.getString("InvalidIndexLocationTitle"), Messages.getString("InvalidIndexLocationLabel")); //$NON-NLS-1$ //$NON-NLS-2$
+				// display the message in the property dialog if possible
+				Composite parent = text.getParent();
+				while (parent!=null && !(parent instanceof Shell)) 
+					parent=parent.getParent();
+				if (parent instanceof Shell) {
+					if (parent.getData() instanceof PreferenceDialog) {
+						PreferenceDialog dialog = (PreferenceDialog)parent.getData();
+						dialog.setErrorMessage(Messages.getString("InvalidIndexLocationLabel")); //$NON-NLS-1$
+					}					
+				} else
+					// just display a dialog
+					MessageDialog.openWarning(getShell(), 
+							Messages.getString("InvalidIndexLocationTitle"), Messages.getString("InvalidIndexLocationLabel")); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			
 		} catch (SystemMessageException e1) {

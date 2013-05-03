@@ -439,6 +439,12 @@ public class ServiceProviderConfigurationWidget extends Composite {
 			providerLabel.setEnabled(!disabled);
 			enabledCheckbox.setSelection(!disabled);
 			enabledCheckbox.setEnabled(true);
+		} else {
+			providerCombo.removeAll();
+			enabledCheckbox.setEnabled(false);
+			providerLabel.setEnabled(false);
+			stackLayout.topControl = null;
+			configurationComposite.layout();
 		}
 	}
 

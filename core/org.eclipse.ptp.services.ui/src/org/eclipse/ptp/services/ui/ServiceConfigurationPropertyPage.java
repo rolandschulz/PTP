@@ -128,6 +128,7 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 	
 	private IServiceConfiguration currentConfig;
 	private Vector<IServiceConfiguration> deletedServiceConfigurations;
+	private Vector<IServiceConfiguration> addedServiceConfigurations;
 	private final EventHandler eventHandler = new EventHandler();
 	private Composite propertiesPane;
 	private Button removeButton;
@@ -151,6 +152,7 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 	 */
 	public boolean performOk() {
 		deleteServiceConfigurations();
+		addServiceConfigurations();
 		serviceModelWidget.applyChangesToConfiguration();
 		try {
 			ServiceModelManager.getInstance().saveModelConfiguration();
@@ -158,6 +160,17 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 			ServicesUIPlugin.getDefault().log(e);
 		}
 		return super.performOk();
+	}
+
+	/**
+	 * Add selected service configurations to the set of service
+	 * configurations known to the service model manager
+	 */
+	private void addServiceConfigurations() {
+		if (addedServiceConfigurations != null)
+			for (IServiceConfiguration configuration : addedServiceConfigurations)
+				ServiceModelManager.getInstance().addConfiguration(
+						getProject(), configuration);
 	}
 
 	/**
@@ -188,8 +201,11 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 				item = new TableItem(serviceConfigurationList, 0);
 				item.setData(config);
 				item.setText(config.getName());
-				ServiceModelManager.getInstance().addConfiguration(
-						getProject(), config);
+				// ServiceModelManager.getInstance().addConfiguration(
+				// getProject(), config);
+				if (addedServiceConfigurations == null)
+					addedServiceConfigurations = new Vector<IServiceConfiguration>();
+				addedServiceConfigurations.add(config);
 			}
 		}
 	}
@@ -264,7 +280,8 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 			// Selected service model is added to vector to be deleted during Ok
 			// or Apply button processing
 			deletedServiceConfigurations.add(selectedConfig);
-			serviceConfigurationList.remove(serviceConfigurationList.getSelectionIndex());
+			serviceConfigurationList.remove(serviceConfigurationList
+					.getSelectionIndex());
 			serviceModelWidget.setServiceConfiguration(null);
 		}
 	}
@@ -368,4 +385,24 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 		getProjectConfigurations();
 		return propertiesPane;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.preference.PreferencePage#performDefaults()
+	 */
+	@Override
+	protected void performDefaults() {
+		// clean up pending deletes
+		if (deletedServiceConfigurations != null)
+			deletedServiceConfigurations.removeAllElements();
+		// remove any pending additions
+		if (addedServiceConfigurations != null)
+			addedServiceConfigurations.removeAllElements();
+		currentConfig = null;
+		serviceConfigurationList.removeAll(); // cleanup table
+		getProjectConfigurations(); // reload table
+		serviceModelWidget.setServiceConfiguration(null);
+		super.performDefaults();
+		setErrorMessage(null);
+	}
+
 }
