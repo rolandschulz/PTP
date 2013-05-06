@@ -5,7 +5,12 @@
 <!-- are made available under the terms of the Eclipse Public License v1.0   -->
 <!-- which accompanies this distribution, and is available at                -->
 <!-- http://www.eclipse.org/legal/epl-v10.html                               -->
-<toc label="Running IBM Platform LSF Jobs">
+
+<!-- Removing  <extension point="org.eclipse.help.toc"> from plugin.xml - and thus plugin.xml as well -
+since this is now included in toc.xml of org.eclipse.ptp.doc.user under list of TSCs.  No other TSCs
+have toc at top level. -->
+<toc label="Running IBM Platform LSF Jobs" link_to="../org.eclipse.ptp.doc.user/toc.xml#ptpRun">
+
 <topic label="Running IBM Platform LSF Jobs" href="html/lsf.html#top">
 	<topic label="Initial Setup"  href="html/lsf.html#config"> 	</topic>
 	<topic label="Submitting a Batch Job" href="html/lsf.html#submit"></topic>
