@@ -107,7 +107,7 @@ public class OpenIncludeAction extends
 			String fullFileName= include.getFullFileName(); //the full path, if there is one
 			IProject project = include.getCProject().getProject();
 			
-			if (fullFileName != null) {
+			if (fullFileName != null && fullFileName.length()>0) {
 				// Bug 379298 - Open include file from Outline view throws errors for remote project
 				if (!isLocalServiceConfiguration(project)) { //files are on remote server
 					//get remote location information
