@@ -13,7 +13,6 @@
       <topic label="Configuring Environment Modules" href="html/modules.html"/>
       <topic label="Recognizing Compiler Errors: Cray, PGI, and Open64" href="html/errorParsers.html"/>
       <topic label="Running Parallel Programs"  href="html/03pRunConfig.html"> 
-          <anchor id="ptpRun"/>
           <!-- FIXME make order consistent with toc.xml -->
           <topic label="Running Open MPI Jobs" href="html/rms/openMPI.html"/>
           <topic label="Running SLURM Jobs" href="html/rms/slurm.html"/>
@@ -22,9 +21,13 @@
           <topic label="Running IBM PE Jobs" href="html/rms/ibm-pe.html"/>
           <topic label="Running PBS Jobs" href="html/rms/pbs.html"/>
           <topic label="Running IBM LoadLeveler Jobs" href="html/rms/ibm-ll.html"/>
+          <!-- anchor point for general TSC help docs -->
+          <anchor id="ptpRun"/>
           <topic label="Running Jobs on JSC JUDGE" href="html/rms/de.fz-juelich.judge.html"/>
           <topic label="Running Jobs on JSC JUROPA" href="html/rms/de.fz-juelich.juropa.html"/>
           <topic label="Running Jobs on JSC JUQUEEN" href="html/rms/de.fz-juelich.juqueen.html"/>
+           <!-- anchor point for specific TSC help docs for specific machines -->
+          <anchor id="ptpRunSpec"/>
           </topic>
       <topic label="Monitoring Jobs and Systems" href="html/05monitoring.html"/>
       <topic label="Parallel Debugging"  href="html/06parDebugging.html"/>
@@ -38,6 +41,9 @@
       </topic>
       <topic label="Graphical Explorer of MPI Programs (GEM)">
       	<anchor id="ptpGEM"/>
+      	</topic>
+      	<topic label="Graphical Inquirer of GPU Programs (GIG)">
+      	<anchor id="ptpGIG"/>
       </topic>
    
 </toc>
