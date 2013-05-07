@@ -24,7 +24,7 @@ public class ETFWCoreConstants {
 	public static final String JAXB_CONTEXT = "org.eclipse.ptp.internal.etfw.jaxb.data";//$NON-NLS-1$
 
 	/* ETFW Workflow Extension */
-	public static final String WORKFLOW_EXT_PT = "org.eclipse.ptp.internal.etfw.jaxb.workflows"; //$NON-NLS-1$
+	public static final String WORKFLOW_EXT_PT = "org.eclipse.ptp.etfw.jaxb.workflows"; //$NON-NLS-1$
 
 	/* Other Constants */
 	public static final String PAIRED_ATTRIBUTE_SAVED = "_SAVED"; //$NON-NLS-1$
