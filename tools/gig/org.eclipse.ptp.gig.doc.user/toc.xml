@@ -5,8 +5,9 @@
 	<topic label="Contents"  href="html/toc.html"/>
     <topic label="GIG Overview"  href="html/overview.html"/>
     <topic label="Prerequisites"  href="html/prereqs.html"/>
+    <topic label="Getting Started" href="html/gettingStarted.html" />
     <topic label="GIG View" href="html/GIGView.html" />
     <topic label="Server View" href="html/ServerView.html" />
     <topic label="Preferences"  href="html/preferences.html"/>
-    <topic href="html/troubleshooting.html" label="Troubleshooting GIG"/>
+    <topic label="Troubleshooting GIG" href="html/troubleshooting.html" />
 </toc>
