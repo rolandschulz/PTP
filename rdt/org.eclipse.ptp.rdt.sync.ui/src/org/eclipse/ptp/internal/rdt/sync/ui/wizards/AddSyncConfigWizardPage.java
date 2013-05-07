@@ -196,8 +196,8 @@ public class AddSyncConfigWizardPage extends WizardPage {
 	 */
 	public SyncConfig getSyncConfig() {
 		if (isPageComplete()) {
-			SyncConfig config = SyncConfigManager.newConfig(fConfigName, fSyncProvider.getId(), fSelectedConnection.getName(),
-					fSelectedConnection.getRemoteServices().getId(), fProjectLocation);
+			SyncConfig config = SyncConfigManager.newConfig(fConfigName, fSyncProvider.getId(),
+					fSelectedConnection.getRemoteServices().getId(), fSelectedConnection.getName(), fProjectLocation);
 			config.setProject(fProject);
 			return config;
 		}
