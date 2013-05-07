@@ -18,6 +18,7 @@
 
 package org.eclipse.ptp.internal.rdt.ui.callhierarchy;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -39,9 +40,12 @@ import org.eclipse.cdt.internal.ui.callhierarchy.CHMultiDefNode;
 import org.eclipse.cdt.internal.ui.callhierarchy.CHNode;
 import org.eclipse.cdt.internal.ui.callhierarchy.CHReferenceInfo;
 import org.eclipse.cdt.internal.ui.editor.ICEditorActionDefinitionIds;
+import org.eclipse.cdt.internal.ui.search.CSearchMessages;
 import org.eclipse.cdt.internal.ui.util.CoreUtility;
 import org.eclipse.cdt.internal.ui.util.EditorUtility;
+import org.eclipse.cdt.internal.ui.util.ExternalEditorInput;
 import org.eclipse.cdt.internal.ui.util.Messages;
+import org.eclipse.cdt.internal.ui.util.StatusLineHandler;
 import org.eclipse.cdt.internal.ui.viewsupport.AdaptingSelectionProvider;
 import org.eclipse.cdt.internal.ui.viewsupport.CElementLabels;
 import org.eclipse.cdt.internal.ui.viewsupport.DecoratingCLabelProvider;
@@ -52,7 +56,10 @@ import org.eclipse.cdt.internal.ui.viewsupport.TreeNavigator;
 import org.eclipse.cdt.internal.ui.viewsupport.WorkingSetFilterUI;
 import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.cdt.ui.actions.CdtActionConstants;
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuListener;
@@ -88,6 +95,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
@@ -607,7 +615,23 @@ public class RemoteCHViewPart extends ViewPart {
 			try {
 				CModel model = CModelManager.getDefault().getCModel();
 				ICProject cproject = model.findCProject(elem.getCProject().getProject());
-				IEditorPart editor = EditorUtility.openInEditor(elem.getLocationURI(), cproject);
+				IEditorInput input = EditorUtility.getEditorInputForLocation(elem.getLocationURI(), cproject);
+				if (input instanceof ExternalEditorInput) {
+					try {
+						IFileStore f = EFS.getStore(elem.getLocationURI());
+						if (!f.fetchInfo().exists()) {
+							StatusLineHandler.showStatusLineMessage(this.getSite(), MessageFormat.format(
+					    			CSearchMessages.SelectionParseAction_FileOpenFailure_format, 
+					    			new Object[] { elem.getLocationURI().getRawSchemeSpecificPart()}));
+							setMessage(CHMessages.CHViewPart_emptyPageMessage);
+				            fTreeViewer.setInput(null);
+							return;
+						}
+					} catch (CoreException e) {
+						CUIPlugin.log(e);
+					}
+				}
+				IEditorPart editor = EditorUtility.openInEditor(input);
 				if(editor instanceof ITextEditor && elem instanceof ISourceReference) {
 					ISourceReference sr = (ISourceReference) elem;
 					int offset = sr.getSourceRange().getIdStartPos();
