@@ -38,7 +38,7 @@ import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 /**
  * Static class that houses the function ("run") for initializing a new synchronized project.
  */
-public class NewRemoteSyncProjectWizardOperation {
+public class NewRemoteSyncProjectWizardOperation implements Runnable {
 	private static final String DEFAULT_BUILD_CONFIG_ID = "default-build-config-id"; //$NON-NLS-1$
 	private static final String SYNC_BUILDER_CLASS = "org.eclipse.ptp.rdt.sync.cdt.core.SyncBuilder"; //$NON-NLS-1$
 
@@ -156,5 +156,11 @@ public class NewRemoteSyncProjectWizardOperation {
 	 */
 	private static boolean isSyncProject(IProject project) {
 		return RemoteSyncNature.hasNature(project);
+	}
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		
 	}
 }

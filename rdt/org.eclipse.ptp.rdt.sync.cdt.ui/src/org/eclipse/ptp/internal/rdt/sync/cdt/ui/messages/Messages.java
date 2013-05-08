@@ -35,6 +35,14 @@ public class Messages extends NLS {
 	public static String ConvertToRemoteWizardPage_0;
 	public static String ConvertToSyncProjectWizardPage_0;
 	public static String ConvertToSyncProjectWizardPage_convertingToSyncProject;
+	public static String SyncConfigToBuildConfigWizardPage_0;
+	public static String SyncConfigToBuildConfigWizardPage_1;
+	public static String SyncConfigToBuildConfigWizardPage_2;
+	public static String SyncConfigToBuildConfigWizardPage_3;
+	public static String SyncConfigToBuildConfigWizardPage_4;
+	public static String SyncConfigToBuildConfigWizardPage_5;
+	public static String SyncConfigToBuildConfigWizardPage_6;
+	public static String SyncConfigToBuildConfigWizardPage_7;
 	public static String SynchronizeProperties_0;
 	public static String SynchronizeProperties_Default_configuration;
 	public static String SyncMainConversionWizardPage_Project_to_convert_;
