@@ -96,6 +96,8 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 				addServiceConfiguration();
 			} else if (source == removeButton) {
 				removeServiceConfiguration();
+			} else if (source == setActiveConfigButton) {
+				setActiveServiceConfiguration();
 			} else if (source == serviceModelWidget) {
 				serviceModelPane.reflow(true);
 			}
@@ -131,10 +133,12 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 	private final EventHandler eventHandler = new EventHandler();
 	private Composite propertiesPane;
 	private Button removeButton;
+	private Button setActiveConfigButton;
 	private ServiceConfigurationComparator serviceConfigurationComparator;
 	private Table serviceConfigurationList;
 	private ServiceScrolledComposite serviceModelPane;
 	private ServiceProviderConfigurationWidget serviceModelWidget;
+	private IServiceConfiguration activeConfig;
 
 	/**
 	 * Create the service configuration properties page
@@ -153,6 +157,9 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 		deleteServiceConfigurations();
 		addServiceConfigurations();
 		serviceModelWidget.applyChangesToConfiguration();
+		if(activeConfig != null) {
+			ServiceModelManager.getInstance().setActiveConfiguration(getProject(), activeConfig);
+		}
 		try {
 			ServiceModelManager.getInstance().saveModelConfiguration();
 		} catch (IOException e) {
@@ -222,6 +229,37 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 			deletedServiceConfigurations.clear();
 		}
 	}
+	
+	/**
+	 * User is able to set active service configuration from a set of configurations.
+	 */
+	private void setActiveServiceConfiguration() {
+		TableItem selection[];
+		selection = serviceConfigurationList.getSelection();
+		if (selection.length > 0) {
+			activeConfig = (IServiceConfiguration) selection[0].getData();
+			addOrRemoveActiveConfigLabel();
+		}
+	}
+	
+	private void addOrRemoveActiveConfigLabel() {
+		if (serviceConfigurationList == null) {
+			return;
+		}
+		String activeLabel = "(Active)";
+		for (TableItem item: serviceConfigurationList.getItems()) {
+			String text = item.getText();
+			if(!item.getData().equals(activeConfig) && text.endsWith(activeLabel)) {
+				int index = text.indexOf(activeLabel);
+				item.setText(text.substring(0, index));
+			}
+			if(item.getData().equals(activeConfig) && !text.endsWith(activeLabel)) {
+				item.setText(text + " " + activeLabel);
+				setActiveConfigButton.setEnabled(false);
+			}
+		}
+		
+	}
 
 	/**
 	 * Get the project Object
@@ -249,6 +287,7 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 		IServiceConfiguration serviceConfigurations[];
 
 		try {
+			activeConfig = ServiceModelManager.getInstance().getActiveConfiguration(getProject());
 			serviceConfigurations = ServiceModelManager.getInstance()
 					.getConfigurations(getProject()).toArray(new IServiceConfiguration[0]);
 			Arrays.sort(serviceConfigurations, serviceConfigurationComparator);
@@ -310,6 +349,11 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 				serviceModelWidget.setServiceConfiguration(selectedConfig, natures);
 				serviceModelWidget.setEnabled(true);
 				serviceModelPane.reflow(true);
+				if (selectedConfig.equals(activeConfig)) {
+					setActiveConfigButton.setEnabled(false);
+				} else {
+					setActiveConfigButton.setEnabled(true);
+				}
 			}
 		} else {
 			currentConfig = null;
@@ -362,6 +406,12 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 		data = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
 		data.widthHint = BUTTON_WIDTH;
 		removeButton.setLayoutData(data);
+		setActiveConfigButton = new Button(buttonPane, SWT.PUSH);
+		setActiveConfigButton.setText(Messages.ServiceConfigurationPropertyPage_3);
+		setActiveConfigButton.addSelectionListener(eventHandler);
+		data = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
+		data.widthHint = BUTTON_WIDTH;
+		setActiveConfigButton.setLayoutData(data);
 
 		// Create the pane which will contain the current service model
 		serviceModelPane = new ServiceScrolledComposite(propertiesPane, SWT.V_SCROLL|SWT.H_SCROLL);
@@ -382,6 +432,7 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 		// Fill in the list of service configurations currently used by this
 		// project
 		getProjectConfigurations();
+		addOrRemoveActiveConfigLabel();
 		return propertiesPane;
 	}
 
