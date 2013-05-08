@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ******************************************************************************* -->
+<!-- * Copyright (c) 2011 IBM Corporation. All rights reserved. This program -->
+<!-- * and the accompanying materials are made available under the terms of the -->
+<!-- * Eclipse Public License v1.0 which accompanies this distribution, and is -->
+<!-- * available at http://www.eclipse.org/legal/epl-v10.html -->
+<!-- * -->
+<!-- ****************************************************************************** -->
+<resource-manager-builder 
+	xmlns="org.eclipse.ptp" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="org.eclipse.ptp http://eclipse.org/ptp/schemas/rm.xsd" 
+	name="IBM Platform MPI">
+	<control-data>
+		<!-- this is a necessary attribute for the functioning of LML; link it to the batch-specific variable name -->
+		<attribute name="control.queue.name" visible="false">
+			<link-value-to>destination</link-value-to>
+		</attribute>
+		<attribute name="pmpi_minor_version" visible="false" type="integer"/>
+		<attribute name="local_prefix" visible="false" type="string">
+			<default></default>
+		</attribute>
+		<attribute name="mpiNumberOfProcesses" min="1" type="integer"/>
+		<attribute name="byNodeOption" type="boolean"/>
+		<attribute name="bySlotOption" type="boolean"/>
+		<attribute name="noOversubscribeOption" type="boolean"/>
+		<attribute name="noLocalOption" type="boolean"/>
+		<attribute name="prefixOption" type="boolean"/>
+		<attribute name="prefix" type="string"/>
+		<attribute name="hostFileOption" type="boolean"/>
+		<attribute name="hostFile" type="string"/>
+		<attribute name="hostListOption" type="boolean"/>
+		<attribute name="hostList" type="string"/>
+		<attribute name="useDefaultArguments" visible="false" type="boolean">
+			<default>true</default>
+		</attribute>
+		
+		<!--start-up-command name="ompi_info">
+			<arg>${ptp_rm:local_prefix#value}ompi_info</arg>
+			<arg>-a</arg>
+			<arg>\-\-parseable</arg>
+			<stdout-parser delim="\n">
+				<target allowOverwrites="true">
+					<match>
+						<expression>mca:.*:param:([^:]*):value:(.*)</expression>
+						<set field="name">
+							<entry valueGroup="1"/>
+						</set>
+						<set field="visible">
+							<entry value="true"/>
+						</set>
+						<set field="value">
+							<entry valueGroup="2"/>
+						</set>
+					</match>
+					<match>
+						<expression>mca:.*:param:([^:]*):status:(.*)</expression>
+						<set field="name">
+							<entry valueGroup="1"/>
+						</set>
+						<set field="status">
+							<entry valueGroup="2"/>
+						</set>
+					</match>
+					<match>
+						<expression>mca:.*:param:([^:]*):help:(.*)</expression>
+						<set field="name">
+							<entry valueGroup="1"/>
+						</set>
+						<set field="tooltip">
+							<entry valueGroup="2"/>
+						</set>
+					</match>
+					<test op="EQ">
+						<value>#status</value>
+						<value>read-only</value>
+						<set field="readOnly">
+							<entry value="true"/>
+						</set>
+						<else>
+							<set field="readOnly">
+								<entry value="false"/>
+							</set>
+						</else>
+					</test>
+				</target>
+				<target>
+					<match>
+						<expression>ompi:version:full:[\d]+\.([\d]+).*</expression>
+						<set field="name">
+							<entry value="ompi_minor_version"/>
+						</set>
+						<set field="value">
+							<entry valueGroup="1"/>
+						</set>
+					</match>
+					<test op="LT">
+						<value>#value</value>
+						<value>3</value>
+						<throw message="Only supports Open MPI 1.3 and later"/>
+					</test>
+				</target>
+			</stdout-parser>
+		</start-up-command-->
+		<submit-interactive name="submit-interactive" directory="${ptp_rm:directory#value}" waitForId="true" keepOpen="true">
+			<arg>perl ${ptp_rm:ptpDirectory#value}/rms/PLATFORM_MPI/start_job.pl</arg>
+			<arg>${ptp_rm:local_prefix#value}mpirun</arg>
+			<arg>-np ${ptp_rm:mpiNumberOfProcesses#value}</arg>
+			<arg attribute="byNodeOption" isUndefinedIfMatches="false">-bynode</arg>
+			<arg attribute="bySlotOption" isUndefinedIfMatches="false">-byslot</arg>
+			<arg attribute="noOversubscribeOption" isUndefinedIfMatches="false">-nooversubscribe</arg>
+			<arg attribute="noLocalOption" isUndefinedIfMatches="false">-nolocal</arg>
+			<arg attribute="prefixOption" isUndefinedIfMatches="false">--prefix ${ptp_rm:prefix#value}</arg>
+			<arg attribute="hostListOption" isUndefinedIfMatches="false">--host ${ptp_rm:hostList#value}</arg>
+			<arg attribute="hostFileOption" isUndefinedIfMatches="false">--hostfile ${ptp_rm:hostFile#value}</arg>
+			<arg>${ptp_rm:executablePath#value}</arg>
+			<arg>${ptp_rm:progArgs#value}</arg>
+			<environment name="PTP_JOBID" value="@jobId"/>
+			<environment name="PTP_LAUNCH_MODE" value="${ptp_rm:launchMode#value}" />
+			<stdout-parser delim="\n">
+				<target ref="@jobId">
+					<match>
+						<expression>#PTP job_id=([0-9]+)</expression>
+						<set field="name">
+							<entry valueGroup="1" />
+						</set>
+						<set field="value">
+							<entry value="RUNNING" />
+						</set>
+					</match>
+				</target>
+			</stdout-parser>
+			<stderr-parser delim="\n">
+				<target>
+					<match>
+						<expression>-+</expression>
+						<throw message="Unable to launch job"/>
+					</match>
+				</target>
+			</stderr-parser>
+		</submit-interactive>
+		<submit-interactive-debug name="submit-interactive-debug" directory="${ptp_rm:executableDirectory#value}" waitForId="true" keepOpen="true">
+			<arg>perl ${ptp_rm:ptpDirectory#value}/rms/PLATFORM_MPI/start_job.pl</arg>
+			<arg>${ptp_rm:local_prefix#value}mpirun</arg>
+			<arg>-np ${ptp_rm:mpiNumberOfProcesses#value}</arg>
+			<arg attribute="byNodeOption" isUndefinedIfMatches="false">-bynode</arg>
+			<arg attribute="bySlotOption" isUndefinedIfMatches="false">-byslot</arg>
+			<arg attribute="noOversubscribeOption" isUndefinedIfMatches="false">-nooversubscribe</arg>
+			<arg attribute="noLocalOption" isUndefinedIfMatches="false">-nolocal</arg>
+			<arg attribute="prefixOption" isUndefinedIfMatches="false">--prefix ${ptp_rm:prefix#value}</arg>
+			<arg attribute="hostListOption" isUndefinedIfMatches="false">--host ${ptp_rm:hostList#value}</arg>
+			<arg attribute="hostFileOption" isUndefinedIfMatches="false">--hostfile ${ptp_rm:hostFile#value}</arg>
+			<environment name="PTP_JOBID" value="@jobId"/>
+			<environment name="PTP_LAUNCH_MODE" value="${ptp_rm:launchMode#value}" />
+			<environment name="PTP_DEBUGGER_EXECUTABLE_PATH" value="${ptp_rm:debuggerExecutablePath#value}"/>
+			<environment name="PTP_DEBUGGER_ARGS" value="${ptp_rm:debuggerArgs#value}"/>
+			<stdout-parser delim="\n">
+				<target ref="@jobId">
+					<match>
+						<expression>#PTP job_id=([0-9]+)</expression>
+						<set field="name">
+							<entry valueGroup="1" />
+						</set>
+						<set field="value">
+							<entry value="RUNNING" />
+						</set>
+					</match>
+				</target>
+			</stdout-parser>
+			<stderr-parser delim="\n">
+				<target>
+					<match>
+						<expression>-+</expression>
+						<throw message="Unable to launch job"/>
+					</match>
+				</target>
+			</stderr-parser>
+			<pre-launch-cmd name="SDM Master" exec="${ptp_rm:debuggerExecutablePath#value} --master --routing_file=routes_@jobId ${ptp_rm:debuggerArgs#value}" wait="false"/>
+		</submit-interactive-debug>		
+		<launch-tab>
+			<dynamic includeWidgetValuesFrom="Advanced Options">
+				<title>Basic Options</title>
+				<layout>
+					<grid-layout numColumns="1"/>
+				</layout>
+				<composite>
+					<layout>
+						<grid-layout numColumns="2"/>
+					</layout>
+					<widget type="label" style="SWT.LEFT">
+						<fixed-text>Number of processes:</fixed-text>
+					</widget>
+					<widget type="spinner" style="SWT.BORDER" readOnly="false" attribute="mpiNumberOfProcesses">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.LEFT" verticalAlign="SWT.CENTER"
+								grabExcessHorizontal="false" grabExcessVertical="false"/>
+						</layout-data>
+					</widget>
+				</composite>
+				<!-- Options group -->
+				<composite group="true">
+					<layout>
+						<grid-layout numColumns="4"/>
+					</layout>
+					<layout-data>
+						<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true"/>
+					</layout-data>
+					<title>Options</title>
+					<widget type="checkbox" title="By node" attribute="byNodeOption"/>
+					<widget type="checkbox" title="By slot" attribute="bySlotOption"/>
+					<widget type="checkbox" title="No oversubscribe" attribute="noOversubscribeOption"/>
+					<widget type="checkbox" title="No local" attribute="noLocalOption"/>
+					<widget type="checkbox" title="Prefix:" buttonId="prefixButton" attribute="prefixOption"/>
+					<widget type="text" style="SWT.BORDER" attribute="prefix">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="3" grabExcessHorizontal="true"/>
+						</layout-data>
+						<control-state>
+							<enable-if button="prefixButton" selected="true"/>
+						</control-state>
+					</widget>
+				</composite>
+				<composite group="true">
+					<layout>
+						<grid-layout numColumns="3" makeColumnsEqualWidth="false"/>
+					</layout>
+					<layout-data>
+						<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL"  grabExcessHorizontal="true" grabExcessVertical="true"/>
+					</layout-data>
+					<title>Hosts</title>
+					<widget type="checkbox" title="Host file:" buttonId="hostFileButton" attribute="hostFileOption"/>
+					<browse textStyle="SWT.BORDER" title="Browse" attribute="hostFile">
+						<text-layout-data>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true"/>
+						</text-layout-data>
+						<button-layout-data>
+							<grid-data horizontalAlign="SWT.RIGHT" verticalAlign="SWT.CENTER"/>
+						</button-layout-data>
+						<text-control-state>
+							<enable-if button="hostFileButton" selected="true"/>
+						</text-control-state>
+						<button-control-state>
+							<enable-if button="hostFileButton" selected="true"/>
+						</button-control-state>
+					</browse>					
+					<widget type="checkbox" title="Host list:" buttonId="hostListButton" attribute="hostListOption">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.LEFT" verticalAlign="SWT.TOP"/>
+						</layout-data>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="hostList">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" horizontalSpan="2" 
+								grabExcessHorizontal="true" grabExcessVertical="false" heightHint="400"/>
+						</layout-data>
+						<control-state>
+							<enable-if button="hostListButton" selected="true"/>
+						</control-state>
+					</widget>
+				</composite>
+			</dynamic>
+			<dynamic includeWidgetValuesFrom="Basic Options">
+				<title>Advanced Options</title>
+				<layout>
+					<grid-layout numColumns="1"/>
+				</layout>
+				<composite>
+					<layout>
+						<grid-layout numColumns="1"/>
+					</layout>
+					<layout-data>
+						<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true"/>
+					</layout-data>
+					<!-- Launch group -->
+					<composite group="true">
+						<layout>
+							<grid-layout numColumns="2" makeColumnsEqualWidth="false"/>
+						</layout>
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" grabExcessVertical="false"/>
+						</layout-data>
+						<title>Launch Arguments</title>
+						<widget type="checkbox" title="Use default arguments" buttonId="defaultArguments" attribute="useDefaultArguments">
+							<layout-data>
+								<grid-data horizontalSpan="2"/>
+							</layout-data>
+						</widget>
+						<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+							<fixed-text>Arguments:</fixed-text>
+						</widget>
+						<widget type="text" style="SWT.LEFT | SWT.BORDER">
+							<layout-data>
+								<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" grabExcessVertical="false" widthHint="400"/>
+							</layout-data>
+							<dynamic-text>
+								<arg attribute="byNodeOption" isUndefinedIfMatches="false">-bynode</arg>
+								<arg attribute="bySlotOption" isUndefinedIfMatches="false">-byslot</arg>
+								<arg attribute="noOversubscribeOption" isUndefinedIfMatches="false">-nooversubscribe</arg>
+								<arg attribute="noLocalOption" isUndefinedIfMatches="false">-nolocal</arg>
+								<arg attribute="prefixOption" isUndefinedIfMatches="false">--prefix ${ptp_rm:prefix#value}</arg>
+								<arg attribute="hostListOption" isUndefinedIfMatches="false">--host ${ptp_rm:hostList#value}</arg>
+								<arg attribute="hostFileOption" isUndefinedIfMatches="false">--hostfile ${ptp_rm:hostFile#value}</arg>
+								<arg>${ptp_rm:allAttributes#value}</arg>
+							</dynamic-text>
+							<control-state>
+								<enable-if button="defaultArguments" selected="false"/>
+							</control-state>
+						</widget>
+					</composite>
+					<!-- MCA group -->
+					<composite group="true">
+						<layout>
+							<grid-layout numColumns="1"/>
+						</layout>
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true"/>
+						</layout-data>
+						<title>MCA Parameters</title>
+						<viewer name="allAttributes" style="SWT.BORDER | SWT.MULTI" sort="true" type="table" initialAllChecked="false">
+							<layout-data>
+								<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true"/>
+							</layout-data>
+							<column-data name="Name" width="175">
+								<tooltip>Double-click on selected rows toggles their checked value.</tooltip>
+							</column-data>
+							<column-data name="Value" width="200">
+								<tooltip>Click to activate value widget.</tooltip>
+							</column-data>
+							<items allDiscovered="true">
+							</items>
+							<value pattern="-mca @name &quot;@value&quot;"/>
+						</viewer>
+					</composite>
+				</composite>
+			</dynamic>
+		</launch-tab>
+	</control-data>
+</resource-manager-builder>
