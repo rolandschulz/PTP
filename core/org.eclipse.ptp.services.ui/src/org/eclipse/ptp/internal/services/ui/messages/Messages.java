@@ -75,7 +75,12 @@ public class Messages extends NLS {
 	public static String ServiceConfigurationPropertyPage_0;
 	public static String ServiceConfigurationPropertyPage_1;
 	public static String ServiceConfigurationPropertyPage_2;
+	public static String ServiceConfigurationPropertyPage_3;
 
+	public static String ServiceConfigurationPropertyPage_ActiveLabel;
+
+	public static String ServiceConfigurationPropertyPage_ActiveLabelPattern;
+	
 	public static String ServiceConfigurationSelectionDialog_0;
 	public static String ServiceConfigurationSelectionDialog_1;
 
