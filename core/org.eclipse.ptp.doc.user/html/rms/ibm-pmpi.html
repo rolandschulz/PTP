@@ -7,7 +7,8 @@
 <body>
 
 <h1 id="top">IBM Platform MPI</h1>
-<p>This section describes how to set up run configuration using IBM Platform MPI as a target system configuration
+<p>This section describes how to set up a run configuration using IBM Platform MPI 
+as a target system configuration for the <a href="../toc.html">Parallel Tools Platform (PTP)</a>.
 
 <p>When running an IBM Platform MPI program from PTP, first create a C/C++/Fortran project, and build it.
 For more information, see
@@ -22,13 +23,13 @@ via Run > Run Configurations ... and create a new <b>Parallel Application</b>.
 <p>The specifics for running an IBM Platform MPI program with PTP are specified on
 the <b>Resources</b> tab of the run configuration.
 For <b>Target System Configuration</b>, select <b>IBM Platform MPI</b>
-<p><img src="../images/ibm-pmpi-rm.png">
+<p><img src="../images/rms-ibm-pmpi-rm.png">
 <p>Then specify a connection.  If you have already specified a connection, e.g.
 for a <a href="../sync.html">Synchronized Project</a> or a remote project,
 it will be selected already.
 If you are launching a local application, which we are doing in this example,
-you must specify a connection back to the local machine.
-<p><img src="../images/ibm-pmpi-conn.png">
+select the radio button for "Local."
+<p><img src="../images/rms-ibm-pmpi-conn.png">
 <blockquote>
 <p>See <a href="../remoteTools.html#create">Creating Remote Connections</a> and 
 <a href="../remoteTools.html#local">Local Connections</a>
@@ -38,10 +39,10 @@ you must specify a connection back to the local machine.
 </blockquote>
 <p>Fill in the IBM Platform MPI options you need. 
 On the <b>Basic Options</b> tab here we specify 4 processes.
-<p><img src="../images/ibm-pmpi-basic.png">
+<p><img src="../images/rms-ibm-pmpi-basic.png">
 <p>On the <b>Advanced Options</b> tab, other arguments can be specified;
 using a checkbox will fill in the checked argument.
-<p><img src="../images/ibm-pmpi-advanced.png">
+<p><img src="../images/rms-ibm-pmpi-advanced.png">
 
 <p>Now continue with the 
 <a href="../03pRunConfig.html#application">run configuration setup for running your parallel application</a> by specifying the Application program
