@@ -65,6 +65,7 @@ public class TAUMakefileCombo extends AbstractWidget {
 	private final Combo combo;
 	private final RemoteBuildLaunchUtils blt;
 	private IVariableMap map;
+	private String selectedMakefile;
 
 	/**
 	 * The list of all available options found among all available TAU makefiles
@@ -150,15 +151,22 @@ public class TAUMakefileCombo extends AbstractWidget {
 		}
 	}
 
+	public void setSelectedMakefile(String makefile){
+		this.selectedMakefile=makefile;
+	}
+	public String getSelectedMakefile(){
+		return selectedMakefile;
+	}
+	
 	private void updateMakefileCombo() {
 		if(combo==null||combo.isDisposed()){
 			return;
 		}
 		List<String> options = populateOptions();
-
+		int preDex=-1;
 		List<String> makefiles = new ArrayList<String>();
 		makefiles.add(JAXBCoreConstants.ZEROSTR);
-
+		int i = 1;
 		for (String name : allmakefiles) {
 			int optionTypes = 0;
 			for (String option : options) {
@@ -169,6 +177,10 @@ public class TAUMakefileCombo extends AbstractWidget {
 
 			if (optionTypes == options.size()) {
 				makefiles.add(name);
+				if(selectedMakefile!=null&&selectedMakefile.endsWith(name)){
+					preDex=i;
+				}
+				i++;
 			}
 		}
 
@@ -176,7 +188,10 @@ public class TAUMakefileCombo extends AbstractWidget {
 		combo.setItems(items);
 		combo.setEnabled(true);
 		if (items.length > 1) {
-			combo.select(1);
+			if(preDex>0)
+				combo.select(preDex);
+			else
+				combo.select(1);
 			combo.notifyListeners(SWT.Selection, null);
 		}
 		getParent().layout(true);

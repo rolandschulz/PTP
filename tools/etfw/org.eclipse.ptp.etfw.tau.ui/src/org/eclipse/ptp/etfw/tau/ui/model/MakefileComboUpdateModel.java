@@ -9,9 +9,15 @@
  *******************************************************************************/
 package org.eclipse.ptp.etfw.tau.ui.model;
 
+import java.util.Iterator;
+
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.etfw.tau.ui.TAUMakefileCombo;
+import org.eclipse.ptp.internal.rm.jaxb.control.ui.utils.WidgetActionUtils;
 import org.eclipse.ptp.rm.jaxb.control.ui.AbstractUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateHandler;
+import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -33,6 +39,9 @@ public class MakefileComboUpdateModel extends AbstractUpdateModel implements Sel
 				try {
 					Object value = storeValue();
 					handleUpdate(value);
+					if(value!=null&&value instanceof String){
+						makefileCombo.setSelectedMakefile((String)value);
+					}
 				} catch (Exception ignored) {
 				}
 			}
@@ -59,10 +68,31 @@ public class MakefileComboUpdateModel extends AbstractUpdateModel implements Sel
 		try {
 			Object value = storeValue();
 			handleUpdate(value);
+			if(value!=null&&value instanceof String){
+				makefileCombo.setSelectedMakefile((String)value);
+			}
 		} catch (Exception ignored) {
 			ignored.printStackTrace();
 		}
 
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.internal.rm.jaxb.control.ui.model.AbstractUpdateModel#initialize(org.eclipse.ptp.rm.jaxb.core.IVariableMap,
+	 * org.eclipse.ptp.rm.jaxb.core.IVariableMap)
+	 */
+	@Override
+	public void initialize(ILaunchConfiguration configuration, IVariableMap rmMap, IVariableMap lcMap) {
+		
+		String val = (String)lcMap.getValue(name);
+		if(val!=null&&val.length()>0&&val.contains("Makefile.tau")){
+			makefileCombo.setSelectedMakefile(val);
+		}
+		
+		super.initialize(configuration, rmMap, lcMap);
 	}
 
 	@Override
