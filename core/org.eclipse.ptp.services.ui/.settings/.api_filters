@@ -13,6 +13,16 @@
                 <message_argument value="ServiceConfigurationPropertyPage_3"/>
             </message_arguments>
         </filter>
+        <filter id="1143996420">
+            <message_arguments>
+                <message_argument value="ServiceConfigurationPropertyPage_ActiveLabel"/>
+            </message_arguments>
+        </filter>
+        <filter id="1143996420">
+            <message_arguments>
+                <message_argument value="ServiceConfigurationPropertyPage_ActiveLabelPattern"/>
+            </message_arguments>
+        </filter>
     </resource>
     <resource path="src/org/eclipse/ptp/services/ui/preferences/ServiceConfigurationPreferencePage.java" type="org.eclipse.ptp.services.ui.preferences.ServiceConfigurationPreferencePage">
         <filter id="1108344834">

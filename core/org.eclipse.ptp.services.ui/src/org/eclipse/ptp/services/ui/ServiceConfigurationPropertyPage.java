@@ -11,12 +11,14 @@
 package org.eclipse.ptp.services.ui;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -246,15 +248,14 @@ public class ServiceConfigurationPropertyPage extends PropertyPage implements
 		if (serviceConfigurationList == null) {
 			return;
 		}
-		String activeLabel = "(Active)";
+		String activeLabel = Messages.ServiceConfigurationPropertyPage_ActiveLabel;
 		for (TableItem item: serviceConfigurationList.getItems()) {
 			String text = item.getText();
-			if(!item.getData().equals(activeConfig) && text.endsWith(activeLabel)) {
-				int index = text.indexOf(activeLabel);
-				item.setText(text.substring(0, index));
+			if(!item.getData().equals(activeConfig) && text.contains(activeLabel)) {
+				item.setText(text.replaceAll(Pattern.quote(activeLabel), "")); //$NON-NLS-1$
 			}
-			if(item.getData().equals(activeConfig) && !text.endsWith(activeLabel)) {
-				item.setText(text + " " + activeLabel);
+			if(item.getData().equals(activeConfig) && !text.contains(activeLabel)) {
+				item.setText(MessageFormat.format(Messages.ServiceConfigurationPropertyPage_ActiveLabelPattern, text, activeLabel));			
 				setActiveConfigButton.setEnabled(false);
 			}
 		}
