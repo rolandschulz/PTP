@@ -7,12 +7,12 @@ import org.eclipse.debug.core.model.ISourceLocator;
 
 public class ToolLaunchFactory implements ILaunchFactory {
 
-	public ILaunch makeLaunch(ILaunchConfiguration config, String mode,ISourceLocator isl) {
-		return new Launch(config,mode,isl);
-	}
-	
-	public String getType(){
+	public String getType() {
 		return SEQUENTIAL;
+	}
+
+	public ILaunch makeLaunch(ILaunchConfiguration config, String mode, ISourceLocator isl) {
+		return new Launch(config, mode, isl);
 	}
 
 }

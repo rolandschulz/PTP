@@ -70,30 +70,109 @@ public class PapiSelect {
 	}
 
 	/**
-	 * Given a list of already selected and already rejected counters, returns all available remaining counters
+	 * Returns all (native) counters available on the system
 	 * */
-	public LinkedHashSet<Object> getGrey(Object[] checked, Object[] greyed) {
-		LinkedHashSet<Object> active = new LinkedHashSet<Object>();
-		LinkedHashSet<Object> greyset = new LinkedHashSet<Object>();
-		LinkedHashSet<String> notgrey = new LinkedHashSet<String>(avCounters);
+	private void findNativeAvail() {
+		final IFileStore papi_avail = location.getChild("papi_native_avail");
+		final List<String> commands = new ArrayList<String>();
+		commands.add(papi_avail.toURI().getPath());
+		String s = null;
 
-		if (checked.length > 0) {
-			active.addAll(Arrays.asList(checked));
-		}
-		if (greyed != null && greyed.length > 0) {
-			active.removeAll(Arrays.asList(greyed));
-		}
-		notgrey.removeAll(active);
-		if (greyed != null && greyed.length > 0) {
-			notgrey.removeAll(Arrays.asList(greyed));
-		}
+		final LinkedHashSet<String> avail = new LinkedHashSet<String>();
+		String holdcounter = null;
+		try {
+			// Process p = Runtime.getRuntime().exec(papi_avail, null, null);
 
-		greyset.addAll(getRejects(active));
+			final byte[] xbytes = blt.runToolGetOutput(commands, null, null);
+			if (xbytes == null) {
+				return;
+			}
 
-		if (greyed != null && greyed.length > 0) {
-			greyset.add(Arrays.asList(greyed));
+			// BufferedReader stdErr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+
+			final BufferedReader stdInput = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(xbytes)));
+			while ((s = stdInput.readLine()) != null) {
+				if (s.indexOf("   0x") > 0) {
+					holdcounter = s.substring(0, s.indexOf(" "));
+					avail.add(holdcounter);
+					counterNames.add(holdcounter);
+					String defCounter = s.substring(s.lastIndexOf("   ") + 3);
+					int lendex = 55;
+					int freespace = 0;
+					while (lendex < defCounter.length()) {
+						freespace = defCounter.lastIndexOf(' ', lendex - 1);
+						defCounter = defCounter.substring(0, freespace + 1) + '\n' + defCounter.substring(freespace + 1);
+						lendex += 55;
+					}
+					counterDefs.add(defCounter);
+				}
+			}
+			// boolean fault=false;
+			// while ((s = stdErr.readLine()) != null)
+			// {
+			// fault=true;
+			// }
+			// if(fault){p.destroy(); avCounters = null;}
+			//
+			// p.destroy();
+		} catch (final Exception e) {
+			System.out.println(e);
 		}
-		return greyset;
+		avCounters = avail;
+	}
+
+	/**
+	 * Returns all (preset) counters available on the system
+	 * */
+	private void findPresetAvail() {
+		final IFileStore papi_avail = location.getChild("papi_avail");// +File.separator+"papi_avail";
+		String s = null;
+
+		final LinkedHashSet<String> avail = new LinkedHashSet<String>();
+		final List<String> commands = new ArrayList<String>();
+		commands.add(papi_avail.toURI().getPath());
+		String holdcounter = null;
+
+		try {
+
+			final byte[] xbytes = blt.runToolGetOutput(commands, null, null);
+			if (xbytes == null) {
+				return;
+			}
+			// Process p = Runtime.getRuntime().exec(papi_avail, null, null);
+
+			// BufferedReader stdErr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+
+			final BufferedReader stdInput = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(xbytes)));
+			// read the output from the command
+			while ((s = stdInput.readLine()) != null) {
+				if (s.indexOf("PAPI_") == 0 && s.indexOf("\tYes\t") > 0) {
+					holdcounter = s.substring(0, s.indexOf("\t"));
+					avail.add(holdcounter);
+					counterNames.add(holdcounter);
+					String defCounter = s.substring(s.lastIndexOf("\t") + 1);
+					int lendex = 55;
+					int freespace = 0;
+					while (lendex < defCounter.length()) {
+						freespace = defCounter.lastIndexOf(' ', lendex - 1);
+						defCounter = defCounter.substring(0, freespace + 1) + '\n' + defCounter.substring(freespace + 1);
+						lendex += 55;
+					}
+					counterDefs.add(defCounter);
+				}
+			}
+			// boolean fault=false;
+			// while ((s = stdErr.readLine()) != null)
+			// {
+			// fault=true;
+			// }
+			// if(fault){p.destroy(); avCounters= null;}
+			//
+			// p.destroy();
+		} catch (final Exception e) {
+			System.out.println(e);
+		}
+		avCounters = avail;
 	}
 
 	/**
@@ -124,109 +203,30 @@ public class PapiSelect {
 	}
 
 	/**
-	 * Returns all (preset) counters available on the system
+	 * Given a list of already selected and already rejected counters, returns all available remaining counters
 	 * */
-	private void findPresetAvail() {
-		IFileStore papi_avail = location.getChild("papi_avail");// +File.separator+"papi_avail";
-		String s = null;
+	public LinkedHashSet<Object> getGrey(Object[] checked, Object[] greyed) {
+		final LinkedHashSet<Object> active = new LinkedHashSet<Object>();
+		final LinkedHashSet<Object> greyset = new LinkedHashSet<Object>();
+		final LinkedHashSet<String> notgrey = new LinkedHashSet<String>(avCounters);
 
-		LinkedHashSet<String> avail = new LinkedHashSet<String>();
-		List<String> commands = new ArrayList<String>();
-		commands.add(papi_avail.toURI().getPath());
-		String holdcounter = null;
-
-		try {
-
-			byte[] xbytes = blt.runToolGetOutput(commands, null, null);
-			if (xbytes == null) {
-				return;
-			}
-			// Process p = Runtime.getRuntime().exec(papi_avail, null, null);
-
-			// BufferedReader stdErr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-
-			BufferedReader stdInput = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(xbytes)));
-			// read the output from the command
-			while ((s = stdInput.readLine()) != null) {
-				if (s.indexOf("PAPI_") == 0 && s.indexOf("\tYes\t") > 0) {
-					holdcounter = s.substring(0, s.indexOf("\t"));
-					avail.add(holdcounter);
-					counterNames.add(holdcounter);
-					String defCounter = s.substring(s.lastIndexOf("\t") + 1);
-					int lendex = 55;
-					int freespace = 0;
-					while (lendex < defCounter.length()) {
-						freespace = defCounter.lastIndexOf(' ', lendex - 1);
-						defCounter = defCounter.substring(0, freespace + 1) + '\n' + defCounter.substring(freespace + 1);
-						lendex += 55;
-					}
-					counterDefs.add(defCounter);
-				}
-			}
-			// boolean fault=false;
-			// while ((s = stdErr.readLine()) != null)
-			// {
-			// fault=true;
-			// }
-			// if(fault){p.destroy(); avCounters= null;}
-			//
-			// p.destroy();
-		} catch (Exception e) {
-			System.out.println(e);
+		if (checked.length > 0) {
+			active.addAll(Arrays.asList(checked));
 		}
-		avCounters = avail;
-	}
-
-	/**
-	 * Returns all (native) counters available on the system
-	 * */
-	private void findNativeAvail() {
-		IFileStore papi_avail = location.getChild("papi_native_avail");
-		List<String> commands = new ArrayList<String>();
-		commands.add(papi_avail.toURI().getPath());
-		String s = null;
-
-		LinkedHashSet<String> avail = new LinkedHashSet<String>();
-		String holdcounter = null;
-		try {
-			// Process p = Runtime.getRuntime().exec(papi_avail, null, null);
-
-			byte[] xbytes = blt.runToolGetOutput(commands, null, null);
-			if (xbytes == null) {
-				return;
-			}
-
-			// BufferedReader stdErr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-
-			BufferedReader stdInput = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(xbytes)));
-			while ((s = stdInput.readLine()) != null) {
-				if (s.indexOf("   0x") > 0) {
-					holdcounter = s.substring(0, s.indexOf(" "));
-					avail.add(holdcounter);
-					counterNames.add(holdcounter);
-					String defCounter = s.substring(s.lastIndexOf("   ") + 3);
-					int lendex = 55;
-					int freespace = 0;
-					while (lendex < defCounter.length()) {
-						freespace = defCounter.lastIndexOf(' ', lendex - 1);
-						defCounter = defCounter.substring(0, freespace + 1) + '\n' + defCounter.substring(freespace + 1);
-						lendex += 55;
-					}
-					counterDefs.add(defCounter);
-				}
-			}
-			// boolean fault=false;
-			// while ((s = stdErr.readLine()) != null)
-			// {
-			// fault=true;
-			// }
-			// if(fault){p.destroy(); avCounters = null;}
-			//
-			// p.destroy();
-		} catch (Exception e) {
-			System.out.println(e);
+		if (greyed != null && greyed.length > 0) {
+			active.removeAll(Arrays.asList(greyed));
 		}
-		avCounters = avail;
+		notgrey.removeAll(active);
+		if (greyed != null && greyed.length > 0) {
+			notgrey.removeAll(Arrays.asList(greyed));
+		}
+
+		greyset.addAll(getRejects(active));
+
+		if (greyed != null && greyed.length > 0) {
+			greyset.add(Arrays.asList(greyed));
+		}
+		return greyset;
 	}
 
 	/**
@@ -246,12 +246,12 @@ public class PapiSelect {
 			counterString = "NATIVE";
 		}
 
-		IFileStore papi_event_chooser = location.getChild("papi_event_chooser");// +counterString;
-		List<String> pec_command = new ArrayList<String>();
+		final IFileStore papi_event_chooser = location.getChild("papi_event_chooser");// +counterString;
+		final List<String> pec_command = new ArrayList<String>();
 		pec_command.add(papi_event_chooser.toURI().getPath());
 		pec_command.add(counterString);
 		if (selected != null && selected.size() > 0) {
-			Iterator<Object> itsel = selected.iterator();
+			final Iterator<Object> itsel = selected.iterator();
 			while (itsel.hasNext()) {
 				pec_command.add((String) itsel.next());
 			}
@@ -260,10 +260,10 @@ public class PapiSelect {
 		}
 
 		String s = null;
-		LinkedHashSet<String> result = new LinkedHashSet<String>(avCounters);
+		final LinkedHashSet<String> result = new LinkedHashSet<String>(avCounters);
 		result.removeAll(selected);
 
-		byte[] xbytes = blt.runToolGetOutput(pec_command, null, null);
+		final byte[] xbytes = blt.runToolGetOutput(pec_command, null, null);
 		if (xbytes == null) {
 			return null;
 		}
@@ -276,7 +276,7 @@ public class PapiSelect {
 			// Process p = Runtime.getRuntime().exec(pec_command, null, null);
 			// BufferedReader stdErr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 
-			BufferedReader stdInput = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(xbytes)));
+			final BufferedReader stdInput = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(xbytes)));
 			int countLines = 0;
 			int tabDex = 0;
 			while ((s = stdInput.readLine()) != null) {
@@ -298,7 +298,7 @@ public class PapiSelect {
 			// {
 			// }
 			// p.destroy();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			System.out.println(e);
 		}
 

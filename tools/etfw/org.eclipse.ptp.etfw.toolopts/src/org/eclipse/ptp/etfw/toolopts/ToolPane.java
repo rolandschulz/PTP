@@ -52,8 +52,8 @@ public class ToolPane implements IAppInput, IToolUITab {
 		@Override
 		public void widgetSelected(SelectionEvent e) {
 
-			Object source = e.getSource();
-			for (ToolOption option : options) {
+			final Object source = e.getSource();
+			for (final ToolOption option : options) {
 				if (source == option.browser) {
 
 					ToolMaker.optBrowse(option);
@@ -173,6 +173,11 @@ public class ToolPane implements IAppInput, IToolUITab {
 	 */
 	public boolean embedded = false;
 
+	@SuppressWarnings("unused")
+	private ToolPane() {
+		this.virtual = false;
+	}
+
 	/**
 	 * @since 5.0
 	 */
@@ -186,33 +191,49 @@ public class ToolPane implements IAppInput, IToolUITab {
 		}
 	}
 
-	@SuppressWarnings("unused")
-	private ToolPane() {
-		this.virtual = false;
-	}
-
 	public String getArgument(ILaunchConfiguration configuration) {
 		try {
 			return configuration.getAttribute(configID, "");//$NON-NLS-1$
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			e.printStackTrace();
 		}
 		return "";//$NON-NLS-1$
 	}
 
+	/**
+	 * @since 5.0
+	 */
+	public String getConfigID() {
+		return configID;
+	}
+
+	/**
+	 * @since 5.0
+	 */
+	public String getConfigVarID() {
+		return configVarID;
+	}
+
 	@SuppressWarnings("unchecked")
 	public Map<String, String> getEnvVars(ILaunchConfiguration configuration) {
-		Map<String, String> nullmap = null;
+		final Map<String, String> nullmap = null;
 		try {
 			return configuration.getAttribute(configVarID, nullmap);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			e.printStackTrace();
 		}
 		return nullmap;
 	}
 
+	/**
+	 * @since 5.0
+	 */
+	public String getName() {
+		return paneName;
+	}
+
 	public ToolOption getOption(String optID) {
-		for (ToolOption option : options) {
+		for (final ToolOption option : options) {
 			if (option.getID().equals(optID)) {
 				return option;
 			}
@@ -228,13 +249,20 @@ public class ToolPane implements IAppInput, IToolUITab {
 	 */
 	// TODO: Make the empty-string output optional
 	public String getOptionString() {
-		String out = optString.toString();
+		final String out = optString.toString();
 
 		if (out.equals(prependOpts + encloseOpts + encloseOpts)) {
 			return "";//$NON-NLS-1$
 		}
 
 		return optString.toString();
+	}
+
+	/**
+	 * @since 5.0
+	 */
+	public String getToolName() {
+		return toolName;
 	}
 
 	public Map<String, String> getVarMap() {
@@ -252,7 +280,7 @@ public class ToolPane implements IAppInput, IToolUITab {
 	 */
 	public void initializePane(ILaunchConfiguration configuration) throws CoreException {
 		String arg = "";//$NON-NLS-1$
-		for (ToolOption option : options) {
+		for (final ToolOption option : options) {
 			if (option.unitCheck != null) {
 				option.unitCheck.setSelection(configuration.getAttribute(option.confDefString, option.defState));
 			}
@@ -271,7 +299,7 @@ public class ToolPane implements IAppInput, IToolUITab {
 			if (option.combopt != null) {
 				arg = configuration.getAttribute(option.confArgString, option.defText);
 				if (arg != null) {
-					int dex = option.combopt.indexOf(arg);
+					final int dex = option.combopt.indexOf(arg);
 					if (dex > -1) {
 						option.combopt.select(dex);
 					}
@@ -280,6 +308,20 @@ public class ToolPane implements IAppInput, IToolUITab {
 
 		}
 		updateOptDisplay();
+	}
+
+	/**
+	 * @since 5.0
+	 */
+	public boolean isEmbedded() {
+		return embedded;
+	}
+
+	/**
+	 * @since 5.0
+	 */
+	public boolean isVirtual() {
+		return virtual;
 	}
 
 	/**
@@ -306,6 +348,30 @@ public class ToolPane implements IAppInput, IToolUITab {
 	}
 
 	/**
+	 * If the given ToolOption has an assoicated value field, the name/value
+	 * string is updated accordingly.
+	 * 
+	 * @param opt
+	 *            The ToolOption being updated
+	 */
+	protected void OptArgUpdate(ToolOption opt) {
+		String val = opt.getArg();
+		if (val == null) {
+			val = "";//$NON-NLS-1$
+		}
+		// if (opt.type ==1||opt.type ==2||opt.type ==3) {
+		// val = opt.argbox.getText();
+		// }else if (opt.type==4){
+		// val=opt.numopt.getText();
+		// }
+		opt.optionLine = new StringBuffer(opt.optName).append(this.separateNameValue).append(this.encloseValues).append(val)
+				.append(this.encloseValues);
+
+		OptUpdate();
+
+	}
+
+	/**
 	 * For every option in this pane, if it is active/selected add its
 	 * name/value string to the collection of active values for the whole pane
 	 * 
@@ -323,7 +389,7 @@ public class ToolPane implements IAppInput, IToolUITab {
 					text = "";//$NON-NLS-1$
 				}
 
-				boolean useField = !options[i].fieldrequired || text.trim().length() > 0;
+				final boolean useField = !options[i].fieldrequired || text.trim().length() > 0;
 
 				if (options[i].isArgument) {
 					if (useField) {
@@ -424,49 +490,6 @@ public class ToolPane implements IAppInput, IToolUITab {
 	}
 
 	/**
-	 * If the object is a tool in this pane update the associated strings and
-	 * displays for the object
-	 * 
-	 * @param source
-	 *            The object being searched for and updated if found
-	 * @return True if the object is found, otherwise false
-	 */
-	public boolean updateOptField(Object source) {
-		for (ToolOption option : options) {
-			if (source.equals(option.argbox) || source.equals(option.numopt) || source.equals(option.combopt)) {
-				OptArgUpdate(option);
-				updateOptDisplay();
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * If the given ToolOption has an assoicated value field, the name/value
-	 * string is updated accordingly.
-	 * 
-	 * @param opt
-	 *            The ToolOption being updated
-	 */
-	protected void OptArgUpdate(ToolOption opt) {
-		String val = opt.getArg();
-		if (val == null) {
-			val = "";//$NON-NLS-1$
-		}
-		// if (opt.type ==1||opt.type ==2||opt.type ==3) {
-		// val = opt.argbox.getText();
-		// }else if (opt.type==4){
-		// val=opt.numopt.getText();
-		// }
-		opt.optionLine = new StringBuffer(opt.optName).append(this.separateNameValue).append(this.encloseValues).append(val)
-				.append(this.encloseValues);
-
-		OptUpdate();
-
-	}
-
-	/**
 	 * @since 5.0
 	 */
 	public void setName(String name) {
@@ -497,44 +520,21 @@ public class ToolPane implements IAppInput, IToolUITab {
 	}
 
 	/**
-	 * @since 5.0
+	 * If the object is a tool in this pane update the associated strings and
+	 * displays for the object
+	 * 
+	 * @param source
+	 *            The object being searched for and updated if found
+	 * @return True if the object is found, otherwise false
 	 */
-	public String getName() {
-		return paneName;
-	}
-
-	/**
-	 * @since 5.0
-	 */
-	public String getToolName() {
-		return toolName;
-	}
-
-	/**
-	 * @since 5.0
-	 */
-	public String getConfigID() {
-		return configID;
-	}
-
-	/**
-	 * @since 5.0
-	 */
-	public String getConfigVarID() {
-		return configVarID;
-	}
-
-	/**
-	 * @since 5.0
-	 */
-	public boolean isVirtual() {
-		return virtual;
-	}
-
-	/**
-	 * @since 5.0
-	 */
-	public boolean isEmbedded() {
-		return embedded;
+	public boolean updateOptField(Object source) {
+		for (final ToolOption option : options) {
+			if (source.equals(option.argbox) || source.equals(option.numopt) || source.equals(option.combopt)) {
+				OptArgUpdate(option);
+				updateOptDisplay();
+				return true;
+			}
+		}
+		return false;
 	}
 }

@@ -38,6 +38,30 @@ import org.eclipse.ptp.internal.etfw.messages.Messages;
 @SuppressWarnings("restriction")
 public class BuilderTool extends ToolStep implements IToolLaunchConfigurationConstants {
 
+	private static int modifyCommand(ITool tool, String command, String args, boolean replace) {
+		int didChange = 0;
+		final String toolCommand = tool.getToolCommand();
+		if (replace) {
+			final String newcom = command + " " + args; //$NON-NLS-1$
+			if (!newcom.equals(toolCommand)) {
+				tool.setToolCommand(command + " " + args); //$NON-NLS-1$
+				didChange = 1;
+			}
+		} else {
+			String oldcom = toolCommand.trim();
+			final int lastspc = oldcom.lastIndexOf(' ');
+			if (lastspc >= 0) {
+				oldcom = toolCommand.substring(lastspc).trim();
+			}
+			final String newcom = command + SPACE + args + SPACE + oldcom;
+			if (!newcom.equals(toolCommand)) {
+				tool.setToolCommand(newcom);
+				didChange = 1;
+			}
+		}
+		return didChange;
+	}
+
 	/**
 	 * The location of the binary rebuilt with performance instrumentation
 	 */
@@ -48,29 +72,48 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 	 * error, or user request)
 	 * */
 	private boolean runbuilt = false;
-
 	/** Executable (application) path attribute name */
 	// private String apppathattrib=null;
 	// private IManagedProject managedBuildProj=null;
 	private IConfiguration newBuildConfig = null;
 	private String buildConf = null;
-	// private String projectLocation=null;
-	private IConfiguration olddefbuildconf = null;
 
 	// private IConfiguration standardbuildconf=null;
 	// private ICProject thisCProject=null;
 	// private IProject thisProject = null;
 
+	// private String projectLocation=null;
+	private IConfiguration olddefbuildconf = null;
+
 	private IManagedBuildInfo buildInfo = null;
 
 	// private String outputLocation=null;
 	private Map<String, String> buildMods = null;
-
 	private String newname = null;
 	private String binary = null;
 	private BuildTool tool = null;
 	private IBuildLaunchUtils utilBlob = null;
+
 	private boolean isManaged;
+
+	public IConfiguration selectedconf = null;
+
+	private static final String CComp = "CC";
+
+	private static final String CxxComp = "CXX";
+
+	private static final String FComp = "F90";
+
+	private static final String UPCComp = "UPCC";
+
+	private static final String EQ = ":=";
+
+	public BuilderTool(ILaunchConfiguration conf, BuildTool btool, IBuildLaunchUtils utilBlob) throws CoreException {
+		super(conf, Messages.BuilderTool_InstrumentingBuilding, utilBlob);
+		this.utilBlob = utilBlob;
+		tool = btool;
+		initBuild(conf);
+	}
 
 	public BuilderTool(ILaunchConfiguration conf, BuildTool btool, Map<String, String> buildMods, IBuildLaunchUtils utilBlob)
 			throws CoreException {
@@ -81,11 +124,72 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 		initBuild(conf);
 	}
 
-	public BuilderTool(ILaunchConfiguration conf, BuildTool btool, IBuildLaunchUtils utilBlob) throws CoreException {
-		super(conf, Messages.BuilderTool_InstrumentingBuilding, utilBlob);
-		this.utilBlob = utilBlob;
-		tool = btool;
-		initBuild(conf);
+	/**
+	 * Builds the project with managed make if supported, otherwise with
+	 * standard make
+	 * 
+	 * @param monitor
+	 * @throws Exception
+	 */
+	public void buildIndstrumented(IProgressMonitor monitor) throws Exception {
+		// if(tool==null)
+		// throw new Exception("No valid tool configuration found");
+		// runbuilt = true;
+		if (tool != null) {
+			if (!isManaged) {
+				standardMakeBuild(monitor);
+			} else {
+				if (runbuilt) {
+					runbuilt = initMMBuildConf();
+					if (runbuilt) {
+						runbuilt = managedMakeBuild(monitor);
+					}
+				}
+			}
+		}
+	}
+
+	public boolean getBuildSuccessful() {
+		return runbuilt;
+	}
+
+	public String getOutputLocation() {
+		return outputLocation;
+	}
+
+	public String getProgramPath() {
+		return progPath;
+	}
+
+	private String getStandardMakeBuildOps(BuildTool tool, ILaunchConfiguration configuration, String allargs) throws CoreException {
+		String ops = EMPTY;
+		// String tmp;
+		if (tool.getCcCompiler() != null) {
+			ops += getStandardMakeOp(CComp, getToolCommand(tool.getCcCompiler(), configuration), allargs, tool.replaceCompiler);
+		}
+		if (tool.getCxxCompiler() != null) {
+			ops += getStandardMakeOp(CxxComp, getToolCommand(tool.getCxxCompiler(), configuration), allargs, tool.replaceCompiler);
+		}
+		if (tool.getF90Compiler() != null) {
+			ops += getStandardMakeOp(FComp, getToolCommand(tool.getF90Compiler(), configuration), allargs, tool.replaceCompiler);
+		}
+		if (tool.getUPCCompiler() != null) {
+			ops += getStandardMakeOp(UPCComp, getToolCommand(tool.getUPCCompiler(), configuration), allargs, tool.replaceCompiler);
+		}
+		return ops;
+	}
+
+	private String getStandardMakeOp(String var, String command, String args, boolean replace) {
+		String op = EMPTY;
+		if (command != null) {
+			op = var + EQ + command + SPACE + args;
+			if (!replace) {
+				op += SPACE + "$(" + var + ")";
+			}
+			op += NEWLINE;
+		}
+
+		return op;
 	}
 
 	// private String rootLocation=null;
@@ -114,193 +218,13 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 		}
 	}
 
-	public boolean getBuildSuccessful() {
-		return runbuilt;
-	}
-
-	public String getOutputLocation() {
-		return outputLocation;
-	}
-
-	public String getProgramPath() {
-		return progPath;
-	}
-
-	/**
-	 * Builds the project with managed make if supported, otherwise with
-	 * standard make
-	 * 
-	 * @param monitor
-	 * @throws Exception
-	 */
-	public void buildIndstrumented(IProgressMonitor monitor) throws Exception {
-		// if(tool==null)
-		// throw new Exception("No valid tool configuration found");
-		// runbuilt = true;
-		if (tool != null) {
-			if (!isManaged) {
-				standardMakeBuild(monitor);
-			} else {
-				if (runbuilt) {
-					runbuilt = initMMBuildConf();
-					if (runbuilt) {
-						runbuilt = managedMakeBuild(monitor);
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * Runs the standard make build system using the tool-supplied compiler and
-	 * compiler options. This is accomplished by temporarily replacing the
-	 * default compiler names in a pre-defined makefile inclusion with the names
-	 * and arguments of the compilers
-	 * 
-	 * @param monitor
-	 * @throws CoreException
-	 */
-	public void standardMakeBuild(IProgressMonitor monitor) throws CoreException {
-
-		IFileStore projectFileStore = utilBlob.getFile(projectLocation);
-		IFileStore compilerInclude = projectFileStore.getChild("eclipse.inc");//new File(projectLocation + File.separator + "eclipse.inc"); //$NON-NLS-1$
-		//IFileStore compilerDef = projectFileStore.getChild("eclipse.inc.default");// new File(projectLocation + File.separator + "eclipse.inc.default"); //$NON-NLS-1$
-		try {
-			// if (compilerInclude.fetchInfo().exists()) {
-
-			// compilerInclude.copy(compilerDef, EFS.OVERWRITE, null);
-
-			// InputStream in = compilerInclude.openInputStream(EFS.NONE, null);// new FileInputStream(compilerInclude);
-			// OutputStream out = compilerDef.openOutputStream(EFS.NONE, null);//new FileOutputStream(compilerDef);
-			//
-			// byte[] buf = new byte[1024];
-			// int len;
-			// while ((len = in.read(buf)) > 0) {
-			// out.write(buf, 0, len);
-			// }
-			// in.close();
-			// out.close();
-			// }
-			BufferedOutputStream makeOut = new BufferedOutputStream(compilerInclude.openOutputStream(EFS.NONE, null));
-			String allargs = getToolArguments(tool.getGlobalCompiler(), configuration);
-			String ops = getStandardMakeBuildOps(tool, configuration, allargs);
-
-			makeOut.write(ops.getBytes());
-			makeOut.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		MakeTargetManager targetMan = new MakeTargetManager();
-		targetMan.startup();
-
-		IMakeTarget[] targs = targetMan.getTargets(thisProject);
-		IMakeTarget select = null;
-		for (IMakeTarget targ : targs) {
-			if (targ.getName().equals(Messages.BuilderTool_all)) {
-				select = targ;
-				break;
-			}
-			// System.out.println(targs[i].getName()+" "+targs[i].getTargetBuilderID());
-		}
-		if (select == null) {
-			if (!isSyncProject) {
-				final IMakeBuilderInfo info = MakeCorePlugin.createBuildInfo(thisProject,
-						RemoteBuildLaunchUtils.REMOTE_MAKE_BUILDER_ID);
-
-				if (info == null || !info.isFullBuildEnabled()) {
-					System.out.println(Messages.BuilderTool_NoMakeTargetAll);
-					runbuilt = false;
-					return;
-				}
-			}
-
-			thisProject.build(IncrementalProjectBuilder.CLEAN_BUILD, monitor);
-			thisProject.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
-
-		} else {
-			// System.out.println(select.getBuildLocation());
-
-			select.build(monitor);
-		}
-
-		targetMan.shutdown();
-
-		// if (compilerDef.fetchInfo().exists()) {
-		// InputStream in;
-		try {
-			// in = compilerDef.openInputStream(EFS.NONE, null);//new FileInputStream(compilerDef);
-
-			OutputStream out = new BufferedOutputStream(compilerInclude.openOutputStream(EFS.NONE, null));// new
-																											// FileOutputStream(compilerInclude);
-
-			// Transfer bytes from in to out
-			byte[] buf = new byte[1024];
-			// int len;
-			// while ((len = in.read(buf)) > 0) {
-			out.write(buf, 0, 0);
-			// }
-			// in.close();
-			out.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		// }
-		runbuilt = true;
-		return;
-	}
-
-	private boolean initSMBuild() throws CoreException {
-		if (buildInfo == null || !buildInfo.isValid()) {
-			System.out.println(Messages.BuilderTool_NoInfo);
-			return false;
-		}
-
-		// Make a list of the configurations already within the project
-		IConfiguration[] buildconfigs = buildInfo.getManagedProject().getConfigurations();
-		// IConfiguration selectedconf = null;
-		for (IConfiguration buildconfig : buildconfigs) {
-			if ((buildconfig.getName()).equals(buildConf)) {
-				selectedconf = buildconfig;
-				break;
-			}
-		}
-
-		progPath = olddefbuildconf.getEditableBuilder().getBuildLocation().toOSString();// + "?"; //$NON-NLS-1$
-		newname = progPath;
-		// progPath = newname + File.separator + binary;
-		// System.out.println(progPath);
-
-		// TODO: We have to do this because PTP puts its output in the build
-		// directory
-		if (configuration.getAttribute(EXTOOL_EXECUTABLE_PATH_TAG, (String) null) != null) {
-			if (newname == null) {
-				outputLocation = "";
-			} else {
-				IFileStore newFile = utilBlob.getFile(newname);// thisProject.getFile(newname);
-				if (newFile.fetchInfo().exists()) {
-					outputLocation = newFile.toURI().getPath(); // buildco.getLocationURI().getPath();
-				} else {
-					outputLocation = "";
-				}
-			}
-		}
-		return true;
-	}
-
-	public IConfiguration selectedconf = null;
-
 	private boolean initMMBuild() throws CoreException {
 		if (buildInfo == null || !buildInfo.isValid()) {
 			System.out.println(Messages.BuilderTool_NoInfo);
 			return false;
 		}
 
-		IManagedProject managedBuildProj = buildInfo.getManagedProject();
+		final IManagedProject managedBuildProj = buildInfo.getManagedProject();
 		if (managedBuildProj == null) {
 			System.out.println(Messages.BuilderTool_NoManagedProject);
 			return false;
@@ -311,15 +235,15 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 			binary = thisProject.getName();
 		}
 
-		String bextension = buildInfo.getBuildArtifactExtension();
+		final String bextension = buildInfo.getBuildArtifactExtension();
 		if (bextension.length() > 0) {
 			binary = binary + "." + bextension; //$NON-NLS-1$
 		}
 
 		// Make a list of the configurations already within the project
-		IConfiguration[] buildconfigs = buildInfo.getManagedProject().getConfigurations();
+		final IConfiguration[] buildconfigs = buildInfo.getManagedProject().getConfigurations();
 		// IConfiguration selectedconf = null;
-		for (IConfiguration buildconfig : buildconfigs) {
+		for (final IConfiguration buildconfig : buildconfigs) {
 			if ((buildconfig.getName()).equals(buildConf)) {
 				selectedconf = buildconfig;
 				break;
@@ -337,11 +261,11 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 
 		// Make the new configuration name, and if there is already a
 		// configuration with that name, remove it.
-		String basename = selectedconf.getName();
+		final String basename = selectedconf.getName();
 		newname = null;// =basename+"_PerformanceAnalysis"; //TODO: FIX RECOVERY
 						// OF TOOLID!!!
 
-		String addname = configuration.getAttribute(TOOLCONFNAME + tool.toolID, DEFAULT_TOOLCONFNAME);
+		final String addname = configuration.getAttribute(TOOLCONFNAME + tool.toolID, DEFAULT_TOOLCONFNAME);
 		// if(basename.indexOf(addname)<0)
 		newname = basename + "_" + addname; //$NON-NLS-1$
 
@@ -364,8 +288,8 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 		}
 
 		boolean confExists = false;
-		IConfiguration[] confs = managedBuildProj.getConfigurations();
-		for (IConfiguration conf : confs) {
+		final IConfiguration[] confs = managedBuildProj.getConfigurations();
+		for (final IConfiguration conf : confs) {
 			if (conf.getName().equals(newname) || conf.getName().indexOf(newname) >= 0) {
 				confExists = true;
 				newBuildConfig = conf;
@@ -421,11 +345,11 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 			newBuildConfig.setName(newname);
 		}
 
-		IToolChain chain = newBuildConfig.getToolChain();
-		ITool[] tools = chain.getTools();
+		final IToolChain chain = newBuildConfig.getToolChain();
+		final ITool[] tools = chain.getTools();
 
-		for (ITool it : tools) {
-			for (IOption op : it.getOptions()) {
+		for (final ITool it : tools) {
+			for (final IOption op : it.getOptions()) {
 				if (op == null) {
 					continue;
 				}
@@ -448,18 +372,18 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 			allargs = getToolArguments(tool.getGlobalCompiler(), configuration);
 		}
 		int numChanges = 0;
-		for (ITool tool2 : tools) {
+		for (final ITool tool2 : tools) {
 
 			if (buildMods != null) {
-				for (String opName : buildMods.keySet()) {
+				for (final String opName : buildMods.keySet()) {
 					// System.out.println(op.getName()+" ID: "+op.getBaseId());
-					for (IOption op : tool2.getOptions()) {
+					for (final IOption op : tool2.getOptions()) {
 						// IOption op=tools[i].getOptionById(opId);
 						if (op.getName().equals(opName))// op.getName().equals("Optimization Level"))
 						{
 							try {
 								op.setValue(buildMods.get(opName));
-							} catch (BuildException e) {
+							} catch (final BuildException e) {
 								e.printStackTrace();
 							}
 						}
@@ -467,7 +391,7 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 				}
 			}
 
-			String toolid = tool2.getId();
+			final String toolid = tool2.getId();
 			if (toolid.indexOf(".c.") >= 0) //$NON-NLS-1$
 			{
 				numChanges += modifyCommand(tool2, getToolCommand(tool.getCcCompiler(), configuration), allargs,
@@ -497,6 +421,44 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 		return true;
 	}
 
+	private boolean initSMBuild() throws CoreException {
+		if (buildInfo == null || !buildInfo.isValid()) {
+			System.out.println(Messages.BuilderTool_NoInfo);
+			return false;
+		}
+
+		// Make a list of the configurations already within the project
+		final IConfiguration[] buildconfigs = buildInfo.getManagedProject().getConfigurations();
+		// IConfiguration selectedconf = null;
+		for (final IConfiguration buildconfig : buildconfigs) {
+			if ((buildconfig.getName()).equals(buildConf)) {
+				selectedconf = buildconfig;
+				break;
+			}
+		}
+
+		progPath = olddefbuildconf.getEditableBuilder().getBuildLocation().toOSString();// + "?";
+		newname = progPath;
+		// progPath = newname + File.separator + binary;
+		// System.out.println(progPath);
+
+		// TODO: We have to do this because PTP puts its output in the build
+		// directory
+		if (configuration.getAttribute(EXTOOL_EXECUTABLE_PATH_TAG, (String) null) != null) {
+			if (newname == null) {
+				outputLocation = "";
+			} else {
+				final IFileStore newFile = utilBlob.getFile(newname);// thisProject.getFile(newname);
+				if (newFile.fetchInfo().exists()) {
+					outputLocation = newFile.toURI().getPath(); // buildco.getLocationURI().getPath();
+				} else {
+					outputLocation = "";
+				}
+			}
+		}
+		return true;
+	}
+
 	private boolean managedMakeBuild(IProgressMonitor monitor) {
 		// Build set the new configuration to default so we can build it.
 
@@ -522,7 +484,7 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 			thisProject.build(IncrementalProjectBuilder.FULL_BUILD, monitor);// .FULL_BUILD
 																				// //.INCREMENTAL_BUILD
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			return false;
 		}
 
@@ -533,10 +495,10 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 				runbuilt = false;
 				throw new OperationCanceledException();
 			}
-			long numMillisecondsToSleep = 1000;
+			final long numMillisecondsToSleep = 1000;
 			try {
 				Thread.sleep(numMillisecondsToSleep);
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 			}
 			if (!isSyncProject) {
 				programPath = thisProject.getFile(progPath);
@@ -545,78 +507,6 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 
 		restoreBuild();
 		return true;
-	}
-
-	private boolean waitForBuild(long lastBuilt, IFile programPath, IFileInfo progInfo) {
-		if ((programPath != null && !programPath.exists()) && !progInfo.exists()) {
-			return true;
-		}
-
-		// if(progInfo.getLastModified()==lastBuilt)
-		// return true;
-
-		return false;
-	}
-
-	private static int modifyCommand(ITool tool, String command, String args, boolean replace) {
-		int didChange = 0;
-		String toolCommand = tool.getToolCommand();
-		if (replace) {
-			String newcom = command + " " + args; //$NON-NLS-1$
-			if (!newcom.equals(toolCommand)) {
-				tool.setToolCommand(command + " " + args); //$NON-NLS-1$
-				didChange = 1;
-			}
-		} else {
-			String oldcom = toolCommand.trim();
-			int lastspc = oldcom.lastIndexOf(' ');
-			if (lastspc >= 0) {
-				oldcom = toolCommand.substring(lastspc).trim();
-			}
-			String newcom = command + SPACE + args + SPACE + oldcom;
-			if (!newcom.equals(toolCommand)) {
-				tool.setToolCommand(newcom);
-				didChange = 1;
-			}
-		}
-		return didChange;
-	}
-
-	private static final String CComp = "CC";
-	private static final String CxxComp = "CXX";
-	private static final String FComp = "F90";
-	private static final String UPCComp = "UPCC";
-	private static final String EQ = ":=";
-
-	private String getStandardMakeBuildOps(BuildTool tool, ILaunchConfiguration configuration, String allargs) throws CoreException {
-		String ops = EMPTY;
-		// String tmp;
-		if (tool.getCcCompiler() != null) {
-			ops += getStandardMakeOp(CComp, getToolCommand(tool.getCcCompiler(), configuration), allargs, tool.replaceCompiler);
-		}
-		if (tool.getCxxCompiler() != null) {
-			ops += getStandardMakeOp(CxxComp, getToolCommand(tool.getCxxCompiler(), configuration), allargs, tool.replaceCompiler);
-		}
-		if (tool.getF90Compiler() != null) {
-			ops += getStandardMakeOp(FComp, getToolCommand(tool.getF90Compiler(), configuration), allargs, tool.replaceCompiler);
-		}
-		if (tool.getUPCCompiler() != null) {
-			ops += getStandardMakeOp(UPCComp, getToolCommand(tool.getUPCCompiler(), configuration), allargs, tool.replaceCompiler);
-		}
-		return ops;
-	}
-
-	private String getStandardMakeOp(String var, String command, String args, boolean replace) {
-		String op = EMPTY;
-		if (command != null) {
-			op = var + EQ + command + SPACE + args;
-			if (!replace) {
-				op += SPACE + "$(" + var + ")";
-			}
-			op += NEWLINE;
-		}
-
-		return op;
 	}
 
 	public void restoreBuild() {
@@ -632,9 +522,123 @@ public class BuilderTool extends ToolStep implements IToolLaunchConfigurationCon
 	protected IStatus run(IProgressMonitor monitor) {
 		try {
 			buildIndstrumented(monitor);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			return new Status(IStatus.ERROR, "com.ibm.jdg2e.concurrency", IStatus.ERROR, Messages.BuilderTool_BuildIncomplete, e); //$NON-NLS-1$
 		}
 		return new Status(IStatus.OK, "com.ibm.jdg2e.concurrency", IStatus.OK, Messages.BuilderTool_BuildSuccessful, null); //$NON-NLS-1$
+	}
+
+	/**
+	 * Runs the standard make build system using the tool-supplied compiler and
+	 * compiler options. This is accomplished by temporarily replacing the
+	 * default compiler names in a pre-defined makefile inclusion with the names
+	 * and arguments of the compilers
+	 * 
+	 * @param monitor
+	 * @throws CoreException
+	 */
+	public void standardMakeBuild(IProgressMonitor monitor) throws CoreException {
+
+		final IFileStore projectFileStore = utilBlob.getFile(projectLocation);
+		final IFileStore compilerInclude = projectFileStore.getChild("eclipse.inc");//new File(projectLocation + File.separator + "eclipse.inc"); //$NON-NLS-1$
+		//IFileStore compilerDef = projectFileStore.getChild("eclipse.inc.default");// new File(projectLocation + File.separator + "eclipse.inc.default"); //$NON-NLS-1$
+		try {
+			// if (compilerInclude.fetchInfo().exists()) {
+
+			// compilerInclude.copy(compilerDef, EFS.OVERWRITE, null);
+
+			// InputStream in = compilerInclude.openInputStream(EFS.NONE, null);// new FileInputStream(compilerInclude);
+			// OutputStream out = compilerDef.openOutputStream(EFS.NONE, null);//new FileOutputStream(compilerDef);
+			//
+			// byte[] buf = new byte[1024];
+			// int len;
+			// while ((len = in.read(buf)) > 0) {
+			// out.write(buf, 0, len);
+			// }
+			// in.close();
+			// out.close();
+			// }
+			final BufferedOutputStream makeOut = new BufferedOutputStream(compilerInclude.openOutputStream(EFS.NONE, null));
+			final String allargs = getToolArguments(tool.getGlobalCompiler(), configuration);
+			final String ops = getStandardMakeBuildOps(tool, configuration, allargs);
+
+			makeOut.write(ops.getBytes());
+			makeOut.close();
+		} catch (final FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (final IOException e) {
+			e.printStackTrace();
+		}
+
+		final MakeTargetManager targetMan = new MakeTargetManager();
+		targetMan.startup();
+
+		final IMakeTarget[] targs = targetMan.getTargets(thisProject);
+		IMakeTarget select = null;
+		for (final IMakeTarget targ : targs) {
+			if (targ.getName().equals(Messages.BuilderTool_all)) {
+				select = targ;
+				break;
+			}
+			// System.out.println(targs[i].getName()+" "+targs[i].getTargetBuilderID());
+		}
+		if (select == null) {
+			if (!isSyncProject) {
+				final IMakeBuilderInfo info = MakeCorePlugin.createBuildInfo(thisProject,
+						RemoteBuildLaunchUtils.REMOTE_MAKE_BUILDER_ID);
+
+				if (info == null || !info.isFullBuildEnabled()) {
+					System.out.println(Messages.BuilderTool_NoMakeTargetAll);
+					runbuilt = false;
+					return;
+				}
+			}
+
+			thisProject.build(IncrementalProjectBuilder.CLEAN_BUILD, monitor);
+			thisProject.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
+
+		} else {
+			// System.out.println(select.getBuildLocation());
+
+			select.build(monitor);
+		}
+
+		targetMan.shutdown();
+
+		// if (compilerDef.fetchInfo().exists()) {
+		// InputStream in;
+		try {
+			// in = compilerDef.openInputStream(EFS.NONE, null);//new FileInputStream(compilerDef);
+
+			final OutputStream out = new BufferedOutputStream(compilerInclude.openOutputStream(EFS.NONE, null));// new
+			// FileOutputStream(compilerInclude);
+
+			// Transfer bytes from in to out
+			final byte[] buf = new byte[1024];
+			// int len;
+			// while ((len = in.read(buf)) > 0) {
+			out.write(buf, 0, 0);
+			// }
+			// in.close();
+			out.close();
+		} catch (final FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (final IOException e) {
+			e.printStackTrace();
+		}
+		// }
+		runbuilt = true;
+		return;
+	}
+
+	private boolean waitForBuild(long lastBuilt, IFile programPath, IFileInfo progInfo) {
+		if ((programPath != null && !programPath.exists()) && !progInfo.exists()) {
+			return true;
+		}
+
+		// if(progInfo.getLastModified()==lastBuilt)
+		// return true;
+
+		return false;
 	}
 }

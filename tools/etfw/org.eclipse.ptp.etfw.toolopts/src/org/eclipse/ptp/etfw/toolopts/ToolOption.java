@@ -288,7 +288,7 @@ public class ToolOption {
 	 */
 	public void setArg(int arg) {
 		if (numopt != null) {
-			boolean isOn = numopt.getEnabled();
+			final boolean isOn = numopt.getEnabled();
 			numopt.setSelection(arg);
 			numopt.setEnabled(isOn);
 		} else if (argbox != null) {
@@ -300,11 +300,11 @@ public class ToolOption {
 
 	public void setArg(String arg) {
 		if (argbox != null) {
-			boolean isOn = argbox.getEnabled();
+			final boolean isOn = argbox.getEnabled();
 			argbox.setText(arg);
 			argbox.setEnabled(isOn);
 		} else if (numopt != null) {
-			int argnum = Integer.parseInt(arg);
+			final int argnum = Integer.parseInt(arg);
 			setArg(argnum);
 		} else if (combopt != null) {
 			combopt.select(Integer.parseInt(arg));

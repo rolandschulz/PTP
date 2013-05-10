@@ -69,33 +69,9 @@ import org.osgi.service.prefs.BackingStoreException;
  */
 public class ExternalToolPreferencePage extends PreferencePage implements IWorkbenchPreferencePage,
 		IToolLaunchConfigurationConstants {
-	protected List XMLLocs = null;
-	protected Button browseXMLButton = null;
-	protected Button removeItemButton = null;
-	protected Combo parser = null;
-
-	// protected Button checkAutoOpts=null;
-	// protected Button checkAixOpts=null;
-
-	public ExternalToolPreferencePage() {
-		setPreferenceStore(Activator.getDefault().getPreferenceStore());
-	}
-
 	protected class WidgetListener extends SelectionAdapter implements ModifyListener, IPropertyChangeListener {
-		@Override
-		public void widgetSelected(SelectionEvent e) {
-			Object source = e.getSource();
-			if (source == browseXMLButton) {
-				handleXMLBrowseButtonSelected();
-			}
-			if (source == removeItemButton) {
-				handleRemoveItem();
-			}
-			updatePreferencePage();
-		}
-
 		public void modifyText(ModifyEvent evt) {
-			Object source = evt.getSource();
+			final Object source = evt.getSource();
 			if (source == XMLLocs) {
 			}
 
@@ -107,13 +83,50 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 				updatePreferencePage();
 			}
 		}
+
+		@Override
+		public void widgetSelected(SelectionEvent e) {
+			final Object source = e.getSource();
+			if (source == browseXMLButton) {
+				handleXMLBrowseButtonSelected();
+			}
+			if (source == removeItemButton) {
+				handleRemoveItem();
+			}
+			updatePreferencePage();
+		}
 	}
+
+	protected List XMLLocs = null;
+	protected Button browseXMLButton = null;
+	protected Button removeItemButton = null;
+
+	// protected Button checkAutoOpts=null;
+	// protected Button checkAixOpts=null;
+
+	protected Combo parser = null;
 
 	protected WidgetListener listener = new WidgetListener();
 
+	public ExternalToolPreferencePage() {
+		setPreferenceStore(Activator.getDefault().getPreferenceStore());
+	}
+
+	protected Button createButton(Composite parent, String label, int type) {
+		final Button button = new Button(parent, type);
+		button.setText(label);
+		final GridData data = new GridData();
+		button.setLayoutData(data);
+		return button;
+	}
+
+	protected Button createCheckButton(Composite parent, String label) {
+		return createButton(parent, label, SWT.CHECK | SWT.LEFT);
+	}
+
 	@Override
 	protected Control createContents(Composite parent) {
-		Composite composite = new Composite(parent, SWT.NONE);
+		final Composite composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(createGridLayout(1, true, 0, 0));
 		composite.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
 
@@ -124,17 +137,26 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 		return composite;
 	}
 
+	protected GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) {
+		final GridLayout gridLayout = new GridLayout();
+		gridLayout.numColumns = columns;
+		gridLayout.makeColumnsEqualWidth = isEqual;
+		gridLayout.marginHeight = mh;
+		gridLayout.marginWidth = mw;
+		return gridLayout;
+	}
+
 	private void createParserSelection(Composite parent) {
-		Group group = new Group(parent, SWT.SHADOW_ETCHED_IN);
+		final Group group = new Group(parent, SWT.SHADOW_ETCHED_IN);
 		group.setLayout(createGridLayout(1, true, 10, 10));
 		group.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
 		group.setText(Messages.ExternalToolPreferencePage_ToolParser);
 
-		Composite content = new Composite(group, SWT.NONE);
+		final Composite content = new Composite(group, SWT.NONE);
 		content.setLayout(createGridLayout(2, false, 0, 0));
 		content.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, SWT.WRAP));
 
-		Label parserLbl = new Label(content, SWT.NONE);
+		final Label parserLbl = new Label(content, SWT.NONE);
 		parserLbl.setText(Messages.ExternalToolPreferencePage_ETFW_PARSER);
 
 		parser = new Combo(content, SWT.READ_ONLY);
@@ -150,16 +172,16 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 	 * @param parent
 	 */
 	private void createTauConf(Composite parent) {
-		Group aGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
+		final Group aGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
 		aGroup.setLayout(createGridLayout(1, true, 10, 10));
 		aGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
 		aGroup.setText(Messages.ExternalToolPreferencePage_ExToolConf);
 
-		Composite xmlcom = new Composite(aGroup, SWT.NONE);
+		final Composite xmlcom = new Composite(aGroup, SWT.NONE);
 		xmlcom.setLayout(createGridLayout(2, false, 0, 0));
 		xmlcom.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
 
-		Label tauarchComment = new Label(xmlcom, SWT.WRAP);
+		final Label tauarchComment = new Label(xmlcom, SWT.WRAP);
 		tauarchComment.setText(Messages.ExternalToolPreferencePage_ToolDefFile);
 		XMLLocs = new List(xmlcom, SWT.BORDER | SWT.V_SCROLL);
 		XMLLocs.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -190,6 +212,25 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 		// checkAutoOpts.addSelectionListener(listener);
 	}
 
+	protected void defaultSetting() {
+	}
+
+	@Override
+	public void dispose() {
+		super.dispose();
+	}
+
+	protected String getFieldContent(String text) {
+		if (text == null) {
+			return null;
+		}
+		if (text.trim().length() == 0 || text.equals(EMPTY_STRING)) {
+			return null;
+		}
+
+		return text;
+	}
+
 	protected void handleRemoveItem() {
 		XMLLocs.remove(XMLLocs.getSelectionIndices());
 	}
@@ -201,20 +242,20 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 	 * 
 	 */
 	protected void handleXMLBrowseButtonSelected() {
-		FileDialog dialog = new FileDialog(getShell());
+		final FileDialog dialog = new FileDialog(getShell());
 		IFileStore path = null;
 		String correctPath = null;
-		int maxXDex = XMLLocs.getItemCount() - 1;
+		final int maxXDex = XMLLocs.getItemCount() - 1;
 		if (maxXDex >= 0) {
 			correctPath = getFieldContent(XMLLocs.getItem(maxXDex));
 		}
 		if (correctPath != null) {
 			try {
 				path = EFS.getStore(new URI(correctPath));
-			} catch (CoreException e) {
+			} catch (final CoreException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			} catch (URISyntaxException e) {
+			} catch (final URISyntaxException e) {
 				// TODO Auto-generated catch block
 
 				path = EFS.getLocalFileSystem().getStore(new Path(correctPath));
@@ -244,10 +285,10 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 
 		dialog.setText(Messages.ExternalToolPreferencePage_SelectToolDefXML);
 
-		String out = getFieldContent(dialog.open());
+		final String out = getFieldContent(dialog.open());
 
 		if (out != null) {
-			IFileStore test = EFS.getLocalFileSystem().getStore(new Path(out));// new IFFile(out);
+			final IFileStore test = EFS.getLocalFileSystem().getStore(new Path(out));// new IFFile(out);
 			if (test.fetchInfo().exists() && !test.fetchInfo().isDirectory()) {
 				XMLLocs.add(out);
 			} else {
@@ -278,18 +319,21 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 
 	}
 
+	public void init(IWorkbench workbench) {
+	}
+
 	private void loadSaved() {
 
 		// Preferences preferences = Activator.getDefault().getPluginPreferences();
-		IPreferencesService service = Platform.getPreferencesService();
-		String fiList = service.getString(Activator.PLUGIN_ID, XMLLOCID, EMPTY_STRING, null);// .getString(XMLLOCID);
+		final IPreferencesService service = Platform.getPreferencesService();
+		final String fiList = service.getString(Activator.PLUGIN_ID, XMLLOCID, EMPTY_STRING, null);// .getString(XMLLOCID);
 
-		String[] files = fiList.split(",,,"); //$NON-NLS-1$
-		for (String s : files) {
+		final String[] files = fiList.split(",,,"); //$NON-NLS-1$
+		for (final String s : files) {
 			XMLLocs.add(s);// setText(preferences.getString(XMLLOCID));
 		}
 
-		String etfwVersion = Preferences.getString(Activator.PLUGIN_ID, PreferenceConstants.ETFW_VERSION);
+		final String etfwVersion = Preferences.getString(Activator.PLUGIN_ID, PreferenceConstants.ETFW_VERSION);
 		for (int index = 0; index < parser.getItemCount(); index++) {
 			if (parser.getItem(index).equals(etfwVersion)) {
 				parser.select(index);
@@ -303,10 +347,16 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 	}
 
 	@Override
+	public void performDefaults() {
+		defaultSetting();
+		updateApplyButton();
+	}
+
+	@Override
 	public boolean performOk() {
 		// Activator.getDefault().getPluginPreferences();
 
-		IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
+		final IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
 
 		String fiList = ""; //$NON-NLS-1$
 
@@ -319,7 +369,7 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 		preferences.put(XMLLOCID, fiList);// XMLLoc.getText());
 		try {
 			preferences.flush();
-		} catch (BackingStoreException e) {
+		} catch (final BackingStoreException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -337,62 +387,6 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 		return true;
 	}
 
-	protected Button createCheckButton(Composite parent, String label) {
-		return createButton(parent, label, SWT.CHECK | SWT.LEFT);
-	}
-
-	protected Button createButton(Composite parent, String label, int type) {
-		Button button = new Button(parent, type);
-		button.setText(label);
-		GridData data = new GridData();
-		button.setLayoutData(data);
-		return button;
-	}
-
-	public void init(IWorkbench workbench) {
-	}
-
-	protected void defaultSetting() {
-	}
-
-	@Override
-	public void dispose() {
-		super.dispose();
-	}
-
-	@Override
-	public void performDefaults() {
-		defaultSetting();
-		updateApplyButton();
-	}
-
-	protected void updatePreferencePage() {
-		setErrorMessage(null);
-		setMessage(null);
-
-		setValid(true);
-	}
-
-	protected String getFieldContent(String text) {
-		if (text == null) {
-			return null;
-		}
-		if (text.trim().length() == 0 || text.equals(EMPTY_STRING)) {
-			return null;
-		}
-
-		return text;
-	}
-
-	protected GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) {
-		GridLayout gridLayout = new GridLayout();
-		gridLayout.numColumns = columns;
-		gridLayout.makeColumnsEqualWidth = isEqual;
-		gridLayout.marginHeight = mh;
-		gridLayout.marginWidth = mw;
-		return gridLayout;
-	}
-
 	protected GridData spanGridData(int style, int space) {
 		GridData gd = null;
 		if (style == -1) {
@@ -402,5 +396,12 @@ public class ExternalToolPreferencePage extends PreferencePage implements IWorkb
 		}
 		gd.horizontalSpan = space;
 		return gd;
+	}
+
+	protected void updatePreferencePage() {
+		setErrorMessage(null);
+		setMessage(null);
+
+		setValid(true);
 	}
 }

@@ -48,7 +48,35 @@ import org.eclipse.ptp.internal.etfw.messages.Messages;
 
 public class ParametricToolLaunchManager {
 
-	private static final String NUMBER_MPI_PROCS = "org.eclipse.ptp.rm.mpi.openmpi.ui.launchAttributes.numProcs";//"org.eclipse.ptp.rm.orte.ui.launchAttributes.numProcs"; //$NON-NLS-1$
+	/**
+	 * Contains the values for the parameters to be appended in a single
+	 * execution of a parametric multi-execution
+	 * 
+	 * @author wspear
+	 * 
+	 */
+	static class RunParams {
+		/**
+		 * The number of processors to use
+		 */
+		int numProcs;
+
+		/**
+		 * The string of arguments to append to the application
+		 */
+		String args;
+		/**
+		 * The map of environment variables to append to the environment
+		 */
+		Map<String, String> vars;
+
+		public RunParams(int numProcs, String args, Map<String, String> vars) {
+			super();
+			this.args = args;
+			this.numProcs = numProcs;
+			this.vars = vars;
+		}
+	}
 
 	// LaunchFactory lf = null;
 	// LaunchConfigurationDelegate paraDel = null;
@@ -90,21 +118,9 @@ public class ParametricToolLaunchManager {
 	 * 
 	 */
 	static class StringPair {
-		public String getFirst() {
-			return first;
-		}
+		private String first;
 
-		public void setFirst(String first) {
-			this.first = first;
-		}
-
-		public String getSecond() {
-			return second;
-		}
-
-		public void setSecond(String second) {
-			this.second = second;
-		}
+		private String second;
 
 		public StringPair(String first, String second) {
 			super();
@@ -112,119 +128,64 @@ public class ParametricToolLaunchManager {
 			this.second = second;
 		}
 
-		private String first;
-		private String second;
-	}
-
-	/**
-	 * Contains the values for the parameters to be appended in a single
-	 * execution of a parametric multi-execution
-	 * 
-	 * @author wspear
-	 * 
-	 */
-	static class RunParams {
-		public RunParams(int numProcs, String args, Map<String, String> vars) {
-			super();
-			this.args = args;
-			this.numProcs = numProcs;
-			this.vars = vars;
+		public String getFirst() {
+			return first;
 		}
 
-		/**
-		 * The number of processors to use
-		 */
-		int numProcs;
-		/**
-		 * The string of arguments to append to the application
-		 */
-		String args;
-		/**
-		 * The map of environment variables to append to the environment
-		 */
-		Map<String, String> vars;
+		public String getSecond() {
+			return second;
+		}
+
+		public void setFirst(String first) {
+			this.first = first;
+		}
+
+		public void setSecond(String second) {
+			this.second = second;
+		}
 	}
 
+	private static final String NUMBER_MPI_PROCS = "org.eclipse.ptp.rm.mpi.openmpi.ui.launchAttributes.numProcs";//"org.eclipse.ptp.rm.orte.ui.launchAttributes.numProcs"; //$NON-NLS-1$
+
 	/**
-	 * Given two strings of comma-separated substrings returns a list of string
-	 * pairs for every possible combination of one substring from the first
-	 * string and one substring from the second.
+	 * Given a string of comma separated strings, returns an array of the
+	 * strings
 	 * 
-	 * @param a
-	 * @param b
+	 * @param combined
+	 *            The string to be tokenized by commas
 	 * @return
 	 */
-	static List<StringPair> getStringCombinations(String a, String b) {
-		List<StringPair> combos = new ArrayList<StringPair>();
-
-		List<String> aList = getComArgs(a);
-		List<String> bList = getComArgs(b);
-
-		for (String first : aList) {
-			for (String second : bList) {
-				combos.add(new StringPair(first, second));
-			}
+	static List<String> getComArgs(String combined) {
+		final List<String> numProcesses = new ArrayList<String>();
+		if (combined == null) {
+			return numProcesses;
 		}
 
-		return combos;
+		final StringTokenizer st = new StringTokenizer(combined, ","); //$NON-NLS-1$
+
+		while (st.hasMoreTokens()) {
+			numProcesses.add(st.nextToken());
+		}
+		return numProcesses;
 	}
 
 	/**
-	 * Creates a list of lists of stringpairs. Each list of stringpairs contains
-	 * each combination of substrings of the same-indexed strings from lists a
-	 * and b.
+	 * Given a list of lists of string pairs, converts it into a list of maps,
+	 * where each map contains the mapped values of the first string in a pair
+	 * to the second for each StringPair in one of the lists.
 	 * 
-	 * @param a
-	 * @param b
+	 * @param combos
 	 * @return
 	 */
-	static List<List<StringPair>> getListCombinations(List<String> a, List<String> b) {
+	static List<Map<String, String>> getComboMaps(List<List<StringPair>> combos) {
+		final List<Map<String, String>> allCom = new ArrayList<Map<String, String>>();
 
-		List<List<StringPair>> comCom = new ArrayList<List<StringPair>>();
-
-		if (a.size() != b.size()) {
-			return comCom;
-		}
-
-		for (int i = 0; i < a.size(); i++) {
-			comCom.add(getStringCombinations(a.get(i), b.get(i)));
-		}
-
-		return comCom;
-	}
-
-	static List<List<StringPair>> unifyCombos(final List<List<StringPair>> combos, int curDex) {
-
-		List<List<StringPair>> allCom = new ArrayList<List<StringPair>>();
-
-		if (combos.size() == 0) {
-			return allCom;
-		}
-
-		/**
-		 * The real base-case. When we hit the final index we just want to
-		 * return with the last sets of combinations
-		 */
-		if (curDex == combos.size() - 1) {
-
-			for (int i = 0; i < combos.get(curDex).size(); i++) {
-				ArrayList<StringPair> jList = new ArrayList<StringPair>();
-				jList.add(0, combos.get(curDex).get(i));
-				allCom.add(jList);
+		for (final List<StringPair> sl : combos) {
+			final Map<String, String> agg = new LinkedHashMap<String, String>();
+			for (final StringPair sp : sl) {
+				agg.put(sp.first, sp.second);
 			}
-
-			return allCom;// new ArrayList<List<StringPair>>();// allCom=new
-							// ArrayList<StringPair>();
-		}
-
-		List<List<StringPair>> someCom = unifyCombos(combos, curDex + 1);
-
-		for (int i = 0; i < combos.get(curDex).size(); i++) {
-			for (int j = 0; j < someCom.size(); j++) {
-				ArrayList<StringPair> jList = new ArrayList<StringPair>(someCom.get(j));
-				jList.add(0, combos.get(curDex).get(i));
-				allCom.add(jList);
-			}
+			allCom.add(agg);
 		}
 
 		return allCom;
@@ -239,11 +200,11 @@ public class ParametricToolLaunchManager {
 	 * @return
 	 */
 	static List<String> getComboStrings(List<List<StringPair>> combos) {
-		List<String> allCom = new ArrayList<String>();
+		final List<String> allCom = new ArrayList<String>();
 
-		for (List<StringPair> sl : combos) {
+		for (final List<StringPair> sl : combos) {
 			String agg = ""; //$NON-NLS-1$
-			for (StringPair sp : sl) {
+			for (final StringPair sp : sl) {
 				agg += sp.first + sp.second + " "; //$NON-NLS-1$
 			}
 			allCom.add(agg);
@@ -253,84 +214,27 @@ public class ParametricToolLaunchManager {
 	}
 
 	/**
-	 * Given a list of lists of string pairs, converts it into a list of maps,
-	 * where each map contains the mapped values of the first string in a pair
-	 * to the second for each StringPair in one of the lists.
+	 * Creates a list of lists of stringpairs. Each list of stringpairs contains
+	 * each combination of substrings of the same-indexed strings from lists a
+	 * and b.
 	 * 
-	 * @param combos
+	 * @param a
+	 * @param b
 	 * @return
 	 */
-	static List<Map<String, String>> getComboMaps(List<List<StringPair>> combos) {
-		List<Map<String, String>> allCom = new ArrayList<Map<String, String>>();
+	static List<List<StringPair>> getListCombinations(List<String> a, List<String> b) {
 
-		for (List<StringPair> sl : combos) {
-			Map<String, String> agg = new LinkedHashMap<String, String>();
-			for (StringPair sp : sl) {
-				agg.put(sp.first, sp.second);
-			}
-			allCom.add(agg);
+		final List<List<StringPair>> comCom = new ArrayList<List<StringPair>>();
+
+		if (a.size() != b.size()) {
+			return comCom;
 		}
 
-		return allCom;
-	}
-
-	/**
-	 * Given a string representing all desired values for the number of
-	 * processors, and 4 arrays of strings representing the desired values for
-	 * program argument names and values and environment variable names and
-	 * values, returns an array of RunParams containing one RunParams for each
-	 * unique combination of the presented values.
-	 * 
-	 * @param procs
-	 * @param argNames
-	 * @param argVars
-	 * @param envNames
-	 * @param envVars
-	 * @return
-	 */
-	static List<RunParams> getWeakParams(String procs, List<String> argNames, List<String> argVars, List<String> envNames,
-			List<String> envVars) {
-		List<RunParams> params = new ArrayList<RunParams>();
-
-		List<String> numProcs = getComArgs(procs);
-
-		// int i=0;
-
-		/*
-		 * Get list combinations returns a list of one list of string pairs per
-		 * argument, unify combos transforms that
-		 */
-
-		// List<String> args = new ArrayList<String>();
-
-		// ArrayList<HashMap<String, String>> vars = new
-		// ArrayList<HashMap<String,String>>();
-
-		for (int i = 0; i < numProcs.size(); i++) {
-			String num = numProcs.get(i);
-			String arg = null;
-			Map<String, String> var = null;
-
-			for (int j = 0; j < argNames.size(); j++) {
-				if (arg == null) {
-					arg = ""; //$NON-NLS-1$
-				}
-				List<String> av = getComArgs(argVars.get(j));
-				arg += " " + argNames.get(j) + av.get(i); //$NON-NLS-1$
-
-			}
-
-			for (int j = 0; j < envNames.size(); j++) {
-				if (var == null) {
-					var = new HashMap<String, String>();
-				}
-				List<String> ev = getComArgs(envVars.get(j));
-				var.put(envNames.get(j), ev.get(i));
-			}
-			params.add(new RunParams(Integer.parseInt(num), arg, var));
+		for (int i = 0; i < a.size(); i++) {
+			comCom.add(getStringCombinations(a.get(i), b.get(i)));
 		}
 
-		return params;
+		return comCom;
 	}
 
 	/**
@@ -349,11 +253,11 @@ public class ParametricToolLaunchManager {
 	 */
 	static List<RunParams> getRunParams(String procs, List<String> argNames, List<String> argVars, List<String> argBools,
 			List<String> envNames, List<String> envVars, List<String> envBools) {
-		List<RunParams> params = new ArrayList<RunParams>();
+		final List<RunParams> params = new ArrayList<RunParams>();
 
-		List<String> numProcs = getComArgs(procs);
+		final List<String> numProcs = getComArgs(procs);
 
-		List<StringPair> checkedArgs = new ArrayList<StringPair>();
+		final List<StringPair> checkedArgs = new ArrayList<StringPair>();
 
 		int i = 0;
 
@@ -366,7 +270,7 @@ public class ParametricToolLaunchManager {
 			}
 		}
 
-		List<StringPair> checkedVars = new ArrayList<StringPair>();
+		final List<StringPair> checkedVars = new ArrayList<StringPair>();
 
 		i = 0;
 
@@ -384,9 +288,9 @@ public class ParametricToolLaunchManager {
 		 * argument, unify combos transforms that
 		 */
 
-		List<String> args = getComboStrings(unifyCombos(getListCombinations(argNames, argVars), 0));
+		final List<String> args = getComboStrings(unifyCombos(getListCombinations(argNames, argVars), 0));
 
-		List<Map<String, String>> vars = getComboMaps(unifyCombos(getListCombinations(envNames, envVars), 0));
+		final List<Map<String, String>> vars = getComboMaps(unifyCombos(getListCombinations(envNames, envVars), 0));
 
 		if (args.size() == 0) {
 			args.add(null);
@@ -396,7 +300,7 @@ public class ParametricToolLaunchManager {
 		}
 
 		for (i = 0; i < numProcs.size(); i++) {
-			String num = numProcs.get(i);
+			final String num = numProcs.get(i);
 			for (String arg : args) {
 				for (Map<String, String> var : vars) {
 
@@ -404,7 +308,7 @@ public class ParametricToolLaunchManager {
 						if (arg == null) {
 							arg = ""; //$NON-NLS-1$
 						}
-						for (StringPair sp : checkedArgs) {
+						for (final StringPair sp : checkedArgs) {
 							arg += " " + sp.getFirst() + getComArgs(sp.getSecond()).get(i); //$NON-NLS-1$
 						}
 					}
@@ -413,7 +317,7 @@ public class ParametricToolLaunchManager {
 						if (var == null) {
 							var = new HashMap<String, String>();
 						}
-						for (StringPair sp : checkedVars) {
+						for (final StringPair sp : checkedVars) {
 							var.put(sp.getFirst(), getComArgs(sp.getSecond()).get(i));
 						}
 					}
@@ -427,86 +331,110 @@ public class ParametricToolLaunchManager {
 	}
 
 	/**
-	 * Given a string of comma separated strings, returns an array of the
-	 * strings
+	 * Given two strings of comma-separated substrings returns a list of string
+	 * pairs for every possible combination of one substring from the first
+	 * string and one substring from the second.
 	 * 
-	 * @param combined
-	 *            The string to be tokenized by commas
+	 * @param a
+	 * @param b
 	 * @return
 	 */
-	static List<String> getComArgs(String combined) {
-		List<String> numProcesses = new ArrayList<String>();
-		if (combined == null) {
-			return numProcesses;
-		}
+	static List<StringPair> getStringCombinations(String a, String b) {
+		final List<StringPair> combos = new ArrayList<StringPair>();
 
-		StringTokenizer st = new StringTokenizer(combined, ","); //$NON-NLS-1$
+		final List<String> aList = getComArgs(a);
+		final List<String> bList = getComArgs(b);
 
-		while (st.hasMoreTokens()) {
-			numProcesses.add(st.nextToken());
-		}
-		return numProcesses;
-	}
-
-	public static String makeTauAtt(String name, String value) {
-		String att = "\n<tau:attribute>\n<tau:name>" + name + "</tau:name>\n<tau:value>" + value + "</tau:value>\n</tau:attribute>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		return att;
-	}
-
-	public static String mapToString(Map<String, String> map) {
-		String out = ""; //$NON-NLS-1$
-
-		Iterator<Entry<String, String>> it = map.entrySet().iterator();
-		Entry<String, String> e;
-		while (it.hasNext()) {
-			e = it.next();
-			out += e.getKey() + "=" + e.getValue(); //$NON-NLS-1$
-			if (it.hasNext()) {
-				out += ", "; //$NON-NLS-1$
+		for (final String first : aList) {
+			for (final String second : bList) {
+				combos.add(new StringPair(first, second));
 			}
 		}
 
-		return out;
-	}
-
-	public static String makeTauAtts(Map<String, String> map, String prefix) {
-		String atts = ""; //$NON-NLS-1$
-
-		Iterator<Entry<String, String>> it = map.entrySet().iterator();
-		Entry<String, String> e;
-		while (it.hasNext()) {
-			e = it.next();
-			atts += makeTauAtt(prefix + e.getKey(), e.getValue());
-		}
-
-		return atts;
+		return combos;
 	}
 
 	public static String getTauMetadata(Map<String, String> build, RunParams par) {
 		String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<tau:metadata xmlns:tau=\"http://www.cs.uoregon.edu/research/tau\">\n<tau:CommonProfileAttributes>"; //$NON-NLS-1$
 
 		if (build != null)
+		{
 			xml += makeTauAtts(build, "BUILD:"); //$NON-NLS-1$
+		}
 
 		if (par.args != null)
+		{
 			xml += makeTauAtt("ApplicationArguments", par.args); //$NON-NLS-1$
+		}
 
 		if (par.vars != null)
+		{
 			xml += makeTauAtts(par.vars, "ENV:"); //$NON-NLS-1$
+		}
 
 		xml += "\n</tau:CommonProfileAttributes>\n</tau:metadata>"; //$NON-NLS-1$
 
 		return xml;
 	}
 
-	// private boolean finalRun=false;
-
 	/**
-	 * The number of runs that must complete before the last set
+	 * Given a string representing all desired values for the number of
+	 * processors, and 4 arrays of strings representing the desired values for
+	 * program argument names and values and environment variable names and
+	 * values, returns an array of RunParams containing one RunParams for each
+	 * unique combination of the presented values.
+	 * 
+	 * @param procs
+	 * @param argNames
+	 * @param argVars
+	 * @param envNames
+	 * @param envVars
+	 * @return
 	 */
-	// private int firstRuns=0;
-	// private int curRuns=0;
-	// private int topRun=-1;
+	static List<RunParams> getWeakParams(String procs, List<String> argNames, List<String> argVars, List<String> envNames,
+			List<String> envVars) {
+		final List<RunParams> params = new ArrayList<RunParams>();
+
+		final List<String> numProcs = getComArgs(procs);
+
+		// int i=0;
+
+		/*
+		 * Get list combinations returns a list of one list of string pairs per
+		 * argument, unify combos transforms that
+		 */
+
+		// List<String> args = new ArrayList<String>();
+
+		// ArrayList<HashMap<String, String>> vars = new
+		// ArrayList<HashMap<String,String>>();
+
+		for (int i = 0; i < numProcs.size(); i++) {
+			final String num = numProcs.get(i);
+			String arg = null;
+			Map<String, String> var = null;
+
+			for (int j = 0; j < argNames.size(); j++) {
+				if (arg == null) {
+					arg = ""; //$NON-NLS-1$
+				}
+				final List<String> av = getComArgs(argVars.get(j));
+				arg += " " + argNames.get(j) + av.get(i); //$NON-NLS-1$
+
+			}
+
+			for (int j = 0; j < envNames.size(); j++) {
+				if (var == null) {
+					var = new HashMap<String, String>();
+				}
+				final List<String> ev = getComArgs(envVars.get(j));
+				var.put(envNames.get(j), ev.get(i));
+			}
+			params.add(new RunParams(Integer.parseInt(num), arg, var));
+		}
+
+		return params;
+	}
 
 	/**
 	 * The primary launch command of this launch configuration delegate. The
@@ -516,8 +444,8 @@ public class ParametricToolLaunchManager {
 	@SuppressWarnings("unchecked")
 	public static void launch(ILaunchConfiguration configuration, LaunchConfigurationDelegate paraDel, ILaunchFactory lf,
 			String mode, ILaunch launchIn, IProgressMonitor monitor, IBuildLaunchUtils utilBlob) throws CoreException // ,
-																							// TAULaunch
-																							// bLTool
+	// TAULaunch
+	// bLTool
 	{
 
 		/**
@@ -535,7 +463,7 @@ public class ParametricToolLaunchManager {
 		/**
 		 * Manages job execution order
 		 */
-		JobChangeAdapter tauChange = new JobChangeAdapter() {
+		final JobChangeAdapter tauChange = new JobChangeAdapter() {
 			@Override
 			public void done(IJobChangeEvent event) {
 
@@ -551,7 +479,7 @@ public class ParametricToolLaunchManager {
 																// {
 					try {
 						configs.poll().delete();
-					} catch (CoreException e) {
+					} catch (final CoreException e) {
 						e.printStackTrace();
 					}
 				}
@@ -565,7 +493,8 @@ public class ParametricToolLaunchManager {
 			}
 		};
 
-		ExternalToolProcess pproc = ETFWUtils.getTool(configuration.getAttribute(IToolLaunchConfigurationConstants.SELECTED_TOOL,
+		final ExternalToolProcess pproc = ETFWUtils.getTool(configuration.getAttribute(
+				IToolLaunchConfigurationConstants.SELECTED_TOOL,
 				(String) null));
 		// paraDel=lcd;
 		// this.lf=lf;
@@ -580,7 +509,7 @@ public class ParametricToolLaunchManager {
 		List<String> varBools = null;
 		String optLevStr = null;
 		boolean allCom = false;
-		boolean parallel = lf != null && lf.getType().equals(ILaunchFactory.PARALLEL);
+		final boolean parallel = lf != null && lf.getType().equals(ILaunchFactory.PARALLEL);
 
 		if (pproc.para != null && pproc.para.runParametric) {
 			processorOptionString = pproc.para.mpiProcs;
@@ -608,7 +537,7 @@ public class ParametricToolLaunchManager {
 			allCom = configuration.getAttribute(IToolLaunchConfigurationConstants.PARA_ALL_COMBO, false);
 		}
 
-		String timestamp = BuildLaunchUtils.getNow();
+		final String timestamp = BuildLaunchUtils.getNow();
 
 		List<RunParams> params = null;
 		if (!parallel) {
@@ -619,16 +548,18 @@ public class ParametricToolLaunchManager {
 
 				if (argVars != null) {
 					for (int i = 0; i < argVars.size(); i++) {
-						int count = getComArgs(argVars.get(i)).size();
-						if (min == -1 || min > count)
+						final int count = getComArgs(argVars.get(i)).size();
+						if (min == -1 || min > count) {
 							min = count;
+						}
 					}
 				}
 				if (varVars != null) {
 					for (int i = 0; i < varVars.size(); i++) {
-						int count = getComArgs(varVars.get(i)).size();
-						if (min == -1 || min > count)
+						final int count = getComArgs(varVars.get(i)).size();
+						if (min == -1 || min > count) {
 							min = count;
+						}
 					}
 				}
 
@@ -656,24 +587,27 @@ public class ParametricToolLaunchManager {
 		}
 
 		System.out.println(params.size());
-		for (RunParams param : params) {
+		for (final RunParams param : params) {
 			System.out.println("Num Processors: " + param.numProcs); //$NON-NLS-1$
 			if (param.args != null)
+			{
 				System.out.println("Program args: " + param.args); //$NON-NLS-1$
+			}
 			System.out.println("Env args: "); //$NON-NLS-1$
-			if (param.vars != null)
-				for (Map.Entry<String, String> env : param.vars.entrySet()) {
+			if (param.vars != null) {
+				for (final Map.Entry<String, String> env : param.vars.entrySet()) {
 					System.out.println(env);
 				}
+			}
 		}
 
-		List<String> optLevs = getComArgs(optLevStr);
+		final List<String> optLevs = getComArgs(optLevStr);
 
-		List<Map<String, String>> buildopts = new ArrayList<Map<String, String>>();
+		final List<Map<String, String>> buildopts = new ArrayList<Map<String, String>>();
 		if (optLevs.size() == 0) {
 			buildopts.add(null);
 		} else {
-			for (String s : optLevs) {
+			for (final String s : optLevs) {
 				String lev = null;
 				Map<String, String> hm = null;
 				switch (Integer.parseInt(s)) {
@@ -708,17 +642,17 @@ public class ParametricToolLaunchManager {
 		 * TODO: Make this robust! (Allow for or explicitly prohibit advanced
 		 * tool combinations)
 		 */
-		BuildTool bTool = pproc.getFirstBuilder(configuration);// .perfTools.get(0);
-		ExecTool eTool = pproc.getFirstRunner(configuration);
-		PostProcTool pTool = pproc.getFirstAnalyzer(configuration);
+		final BuildTool bTool = pproc.getFirstBuilder(configuration);// .perfTools.get(0);
+		final ExecTool eTool = pproc.getFirstRunner(configuration);
+		final PostProcTool pTool = pproc.getFirstAnalyzer(configuration);
 
 		int numruns = 0;
 		// here is where the outer loop for the parametric study should go - for
 		// build parameters, like optimization.
 		for (int bDex = 0; bDex < buildopts.size(); bDex++) {
 
-			Map<String, String> optM = buildopts.get(bDex);
-			BuilderTool builder = new BuilderTool(configuration, bTool, optM, utilBlob);
+			final Map<String, String> optM = buildopts.get(bDex);
+			final BuilderTool builder = new BuilderTool(configuration, bTool, optM, utilBlob);
 
 			// if(optM!=null)
 			// builder.setBuildMods(optM);
@@ -731,7 +665,7 @@ public class ParametricToolLaunchManager {
 
 			try {
 				builder.join();
-			} catch (InterruptedException ie) {
+			} catch (final InterruptedException ie) {
 				ie.printStackTrace();
 			}
 
@@ -747,20 +681,20 @@ public class ParametricToolLaunchManager {
 				// topRun=numruns;
 				// }
 
-				RunParams param = params.get(lDex);
+				final RunParams param = params.get(lDex);
 
 				// get a working copy
-				ILaunchConfigurationWorkingCopy wc = configuration.copy(configuration.getName() + " ParameterSet_" + numruns); //$NON-NLS-1$
+				final ILaunchConfigurationWorkingCopy wc = configuration.copy(configuration.getName() + " ParameterSet_" + numruns); //$NON-NLS-1$
 				// TODO: need this constant!
 				if (parallel) {
-					int numProcs = param.numProcs;
+					final int numProcs = param.numProcs;
 
 					// System.out.println("doing " + numProcs +
 					// " processors...");
 					wc.setAttribute(NUMBER_MPI_PROCS, numProcs);
 				}
 
-				String argConfigTag = wc.getAttribute(IToolLaunchConfigurationConstants.EXTOOL_ATTR_ARGUMENTS_TAG, ""); //$NON-NLS-1$
+				final String argConfigTag = wc.getAttribute(IToolLaunchConfigurationConstants.EXTOOL_ATTR_ARGUMENTS_TAG, ""); //$NON-NLS-1$
 
 				/* Set up application arguments for this run */
 				if (param.args != null) {
@@ -795,7 +729,7 @@ public class ParametricToolLaunchManager {
 					wc.setAttribute(IToolLaunchConfigurationConstants.EXTOOL_LAUNCH_PERFEX, true);
 				}
 
-				ILaunchConfiguration tmpConfig = wc.doSave();
+				final ILaunchConfiguration tmpConfig = wc.doSave();
 				configs.add(tmpConfig);
 
 				/**
@@ -809,7 +743,8 @@ public class ParametricToolLaunchManager {
 
 				// ;
 
-				final LauncherTool launcher = new LauncherTool(tmpConfig, eTool, builder.getProgramPath(), paraDel, launch,utilBlob);
+				final LauncherTool launcher = new LauncherTool(tmpConfig, eTool, builder.getProgramPath(), paraDel, launch,
+						utilBlob);
 				steps.add(launcher);
 				launcher.addJobChangeListener(tauChange);
 
@@ -819,7 +754,7 @@ public class ParametricToolLaunchManager {
 				 */
 
 				// if(pTool!=null){
-				PostlaunchTool analyzer = new PostlaunchTool(tmpConfig, pTool, builder.getOutputLocation(),utilBlob);
+				final PostlaunchTool analyzer = new PostlaunchTool(tmpConfig, pTool, builder.getOutputLocation(), utilBlob);
 				steps.add(analyzer);
 				analyzer.addJobChangeListener(tauChange);
 				// }
@@ -837,5 +772,85 @@ public class ParametricToolLaunchManager {
 		/**
 		 * Need something to launch PerfExplorer and run a script.
 		 */
+	}
+
+	public static String makeTauAtt(String name, String value) {
+		final String att = "\n<tau:attribute>\n<tau:name>" + name + "</tau:name>\n<tau:value>" + value + "</tau:value>\n</tau:attribute>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return att;
+	}
+
+	public static String makeTauAtts(Map<String, String> map, String prefix) {
+		String atts = ""; //$NON-NLS-1$
+
+		final Iterator<Entry<String, String>> it = map.entrySet().iterator();
+		Entry<String, String> e;
+		while (it.hasNext()) {
+			e = it.next();
+			atts += makeTauAtt(prefix + e.getKey(), e.getValue());
+		}
+
+		return atts;
+	}
+
+	public static String mapToString(Map<String, String> map) {
+		String out = ""; //$NON-NLS-1$
+
+		final Iterator<Entry<String, String>> it = map.entrySet().iterator();
+		Entry<String, String> e;
+		while (it.hasNext()) {
+			e = it.next();
+			out += e.getKey() + "=" + e.getValue(); //$NON-NLS-1$
+			if (it.hasNext()) {
+				out += ", "; //$NON-NLS-1$
+			}
+		}
+
+		return out;
+	}
+
+	// private boolean finalRun=false;
+
+	/**
+	 * The number of runs that must complete before the last set
+	 */
+	// private int firstRuns=0;
+	// private int curRuns=0;
+	// private int topRun=-1;
+
+	static List<List<StringPair>> unifyCombos(final List<List<StringPair>> combos, int curDex) {
+
+		final List<List<StringPair>> allCom = new ArrayList<List<StringPair>>();
+
+		if (combos.size() == 0) {
+			return allCom;
+		}
+
+		/**
+		 * The real base-case. When we hit the final index we just want to
+		 * return with the last sets of combinations
+		 */
+		if (curDex == combos.size() - 1) {
+
+			for (int i = 0; i < combos.get(curDex).size(); i++) {
+				final ArrayList<StringPair> jList = new ArrayList<StringPair>();
+				jList.add(0, combos.get(curDex).get(i));
+				allCom.add(jList);
+			}
+
+			return allCom;// new ArrayList<List<StringPair>>();// allCom=new
+							// ArrayList<StringPair>();
+		}
+
+		final List<List<StringPair>> someCom = unifyCombos(combos, curDex + 1);
+
+		for (int i = 0; i < combos.get(curDex).size(); i++) {
+			for (int j = 0; j < someCom.size(); j++) {
+				final ArrayList<StringPair> jList = new ArrayList<StringPair>(someCom.get(j));
+				jList.add(0, combos.get(curDex).get(i));
+				allCom.add(jList);
+			}
+		}
+
+		return allCom;
 	}
 }

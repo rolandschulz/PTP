@@ -62,106 +62,358 @@ import org.eclipse.swt.widgets.Text;
 
 /**
  * Manages uploading TAU profile data to the TAUPortal online performance data storage system
+ * 
  * @author wspear
- *
+ * 
  */
 public class TAUPortalUploadDialog extends Dialog {
 
 	private static final int RESET_ID = IDialogConstants.NO_TO_ALL_ID + 1;
 
+	/**
+	 * Converts the login and profile data for remote trasfer
+	 * 
+	 * @param data
+	 * @return
+	 */
+	private static String convertToHex(byte[] data) {
+		final StringBuffer buf = new StringBuffer();
+		for (final byte element : data) {
+			int halfbyte = (element >>> 4) & 0x0F;
+			int two_halfs = 0;
+			do {
+				if ((0 <= halfbyte) && (halfbyte <= 9)) {
+					buf.append((char) ('0' + halfbyte));
+				} else {
+					buf.append((char) ('a' + (halfbyte - 10)));
+				}
+				halfbyte = element & 0x0F;
+			} while (two_halfs++ < 1);
+		}
+		return buf.toString();
+	}
+
+	/**
+	 * Obtain the names of the users available workspaces
+	 * 
+	 * @param uname
+	 *            Username
+	 * @param pwd
+	 *            Password
+	 * @return
+	 */
+	private static String getWorkspaces(String url, String uname, String pwd)
+	{
+		String pwd2;
+		try {
+			pwd2 = SHA1(pwd);
+
+			final String portalURL = url + "/trial/list_workspaces"; //$NON-NLS-1$
+			String data = URLEncoder.encode("username", "UTF-8") + "=" + URLEncoder.encode(uname, "UTF-8"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			data += "&" + URLEncoder.encode("password", "UTF-8") + "=" + URLEncoder.encode(pwd2, "UTF-8"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+
+			final String workspaces = portalAccess(portalURL, data);
+
+			return workspaces;
+
+		} catch (final NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (final UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} catch (final Exception e) {
+			e.printStackTrace();
+		}
+
+		return "NO_VALID_WORKSPACES"; //$NON-NLS-1$
+	}
+
+	/**
+	 * Uploads data to the given URL
+	 * 
+	 * @param portalURL
+	 *            The web address of the portal
+	 * @param data
+	 *            The string-representation of the data being sent
+	 * @return The portal's response
+	 * @throws Exception
+	 */
+	private static String portalAccess(String portalURL, String data) throws Exception {
+		final URL url = new URL(portalURL);
+
+		trustHttpsCertificates();
+
+		final URLConnection conn = url.openConnection();
+
+		((javax.net.ssl.HttpsURLConnection) conn).setHostnameVerifier(new javax.net.ssl.HostnameVerifier() {
+			public boolean verify(String hostname, javax.net.ssl.SSLSession session) {
+				return true;
+			}
+		});
+
+		conn.setDoOutput(true);
+		final OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+
+		wr.write(data);
+		wr.flush();
+		String line = ""; //$NON-NLS-1$
+		final BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+		String result = ""; //$NON-NLS-1$
+		while ((line = rd.readLine()) != null) {
+			result += line;
+		}
+		wr.close();
+		return result;
+	}
+
+	/**
+	 * Handhes hash conversion for security
+	 * 
+	 * @param text
+	 * @return
+	 * @throws NoSuchAlgorithmException
+	 * @throws UnsupportedEncodingException
+	 */
+	private static String SHA1(String text)
+			throws NoSuchAlgorithmException, UnsupportedEncodingException {
+		MessageDigest md;
+		md = MessageDigest.getInstance("SHA-1"); //$NON-NLS-1$
+		byte[] sha1hash = new byte[40];
+		md.update(text.getBytes("iso-8859-1"), 0, text.length()); //$NON-NLS-1$
+		sha1hash = md.digest();
+		return convertToHex(sha1hash);
+	}
+
+	/**
+	 * Bypass certificate checking
+	 * 
+	 * @throws Exception
+	 */
+	static private void trustHttpsCertificates() throws Exception {
+
+		Class<?> sslProvider = null;
+		boolean goodProvider = true;
+		try {
+			sslProvider = Class.forName("com.sun.net.ssl.internal.ssl.Provider"); //$NON-NLS-1$
+		} catch (final ClassNotFoundException e) {
+			goodProvider = false;
+		}
+
+		if (!goodProvider)
+		{
+			sslProvider = Class.forName("com.ibm.jsse.IBMJSSEProvider"); //$NON-NLS-1$
+		}
+
+		Security.addProvider((Provider) sslProvider.newInstance());// new
+																	// com.ibm.jsse.IBMJSSEProvider());//com.sun.net.ssl.internal.ssl.Provider());
+		// Create a trust manager that does not validate certificate chains:
+		final TrustManager[] trustAllCerts = new TrustManager[] {
+				new X509TrustManager() {
+					public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType)
+							throws java.security.cert.CertificateException {
+					}
+
+					public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType)
+							throws java.security.cert.CertificateException {
+					}
+
+					public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+						return null;
+					}
+				}
+		};
+
+		// Install the all-trusting trust manager:
+		final SSLContext sc = SSLContext.getInstance("SSL"); //$NON-NLS-1$
+		sc.init(null, trustAllCerts, new SecureRandom());
+		HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+
+		// avoid "HTTPS hostname wrong: should be <myhostname>" exception:
+		final HostnameVerifier hv = new HostnameVerifier() {
+			public boolean verify(String urlHostName, SSLSession session) {
+				if (!urlHostName.equalsIgnoreCase(session.getPeerHost())) {
+					System.out.println(Messages.TAUPortalUploadDialog_WarningURLHost + urlHostName
+							+ Messages.TAUPortalUploadDialog_IsDifferent + session.getPeerHost() + "'.");
+				}
+				return true; // also accept different hostname (e.g. domain name instead of IP address)
+			}
+		};
+		HttpsURLConnection.setDefaultHostnameVerifier(hv);
+	}
+
+	/**
+	 * Uploads ppkFile to the specified workspace of the asccount associated with the given username and password
+	 * 
+	 * @param usr
+	 *            Username
+	 * @param pwd
+	 *            Password
+	 * @param workspace
+	 *            Selected workspace
+	 * @param ppkFile
+	 *            Packed profile file
+	 * @return
+	 * @throws Exception
+	 */
+	private static String uploadPPK(String url, String usr, String pwd, String workspace, IFileStore ppkFile) throws Exception {
+
+		final String pwd2 = SHA1(pwd);
+
+		final String portalURL = url + "/trial/batch_upload"; //$NON-NLS-1$
+		String ppkName = ppkFile.getName();
+		ppkName = ppkName.substring(0, ppkName.lastIndexOf('.'));
+
+		//RandomAccessFile rfile = new RandomAccessFile(ppkFile.openOutputStream(EFS.NONE, null), "r"); //$NON-NLS-1$
+		final InputStream rfile = (new BufferedInputStream(ppkFile.openInputStream(EFS.NONE, null)));
+		ppkFile.fetchInfo().getLength();
+		final byte barr[] = new byte[(int) ppkFile.fetchInfo().getLength()];// TODO: This needs testing.
+		rfile.read(barr);
+		String ppkString = new String(barr, "ISO-8859-1"); //$NON-NLS-1$
+		ppkString = URLEncoder.encode(ppkString, "ISO-8859-1"); //$NON-NLS-1$
+
+		String data = URLEncoder.encode("username", "UTF-8") + "=" + URLEncoder.encode(usr, "UTF-8"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		data += "&" + URLEncoder.encode("password", "UTF-8") + "=" + URLEncoder.encode(pwd2, "UTF-8"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+		data += "&" + URLEncoder.encode(ppkName, "UTF-8") + "=" + ppkString; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		data += "&" + URLEncoder.encode("workspace", "UTF-8") + "=" + URLEncoder.encode(workspace, "UTF-8"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+
+		return portalAccess(portalURL, data);
+
+	}
+
 	private Text urlField;
-	
-	  private Text usernameField;
+	private Text usernameField;
+	private Text passwordField;
 
-	  private Text passwordField;
-	  
-	  private Label portalStatus;
-	  
-	  private Combo workspaceCombo;
-	  
-	  private String url=""; //$NON-NLS-1$
-	  private String uname=""; //$NON-NLS-1$
-	  private String pwd=""; //$NON-NLS-1$
-	  private IFileStore ppk=null;
-	  
-	  public TAUPortalUploadDialog(Shell parentShell, IFileStore ppk) {
-	    super(parentShell);
-	    this.ppk=ppk;
-	  }
+	private Label portalStatus;
 
-	  /**
-	   * Creates the primary interface for the upload dialog
-	   */
-	  protected Control createDialogArea(Composite parent) {
-		  
-	    Composite comp = (Composite) super.createDialogArea(parent);
+	private Combo workspaceCombo;
 
-	    GridLayout layout = (GridLayout) comp.getLayout();
-	    layout.numColumns = 2;
+	private String url = ""; //$NON-NLS-1$
 
-	    Label pwdLabel=new Label(comp,SWT.RIGHT);
-	    pwdLabel.setText(Messages.TAUPortalUploadDialog_TauPortURL);
-	    
-	    urlField=new Text(comp,SWT.SINGLE|SWT.BORDER);
-	    GridData data = new GridData(GridData.FILL_HORIZONTAL);
-	    urlField.setLayoutData(data);
-	    urlField.setText("https://tau.nic.uoregon.edu"); //$NON-NLS-1$
-	    
-	    Label usernameLabel = new Label(comp, SWT.RIGHT);
-	    usernameLabel.setText(Messages.TAUPortalUploadDialog_TauPortUname);
+	private String uname = ""; //$NON-NLS-1$
 
-	    usernameField = new Text(comp, SWT.SINGLE | SWT.BORDER);
-	    data = new GridData(GridData.FILL_HORIZONTAL);
-	    usernameField.setLayoutData(data);
-	    
+	private String pwd = ""; //$NON-NLS-1$
 
-	    Label passwordLabel = new Label(comp, SWT.RIGHT);
-	    passwordLabel.setText(Messages.TAUPortalUploadDialog_TauPortPwd);
+	private IFileStore ppk = null;
 
-	    passwordField = new Text(comp, SWT.SINGLE | SWT.PASSWORD | SWT.BORDER);
-	    data = new GridData(GridData.FILL_HORIZONTAL);
-	    passwordField.setLayoutData(data);
-	    
-	    
-	    SelectionListener subListen = new SelectionAdapter() {
+	public TAUPortalUploadDialog(Shell parentShell, IFileStore ppk) {
+		super(parentShell);
+		this.ppk = ppk;
+	}
+
+	@Override
+	protected void buttonPressed(int buttonId) {
+		if (buttonId == RESET_ID) {
+			usernameField.setText(""); //$NON-NLS-1$
+			passwordField.setText(""); //$NON-NLS-1$
+		} else {
+			if (buttonId == Window.OK) {
+				if (!workspaceCombo.getEnabled()) {
+					portalStatus.setText(Messages.TAUPortalUploadDialog_ErrorNoWorkspace);
+					return;
+				}
+				if (workspaceCombo.getSelectionIndex() == -1)
+				{
+					portalStatus.setText(Messages.TAUPortalUploadDialog_ErrorNoWorkspace);
+					return;
+				}
+
+				try {
+					final String success = uploadPPK(url, uname, pwd, workspaceCombo.getItem(workspaceCombo.getSelectionIndex()),
+							ppk);
+					if (success.indexOf(Messages.TAUPortalUploadDialog_Error) >= 0)
+					{
+						portalStatus.setText(success);
+						return;
+					}
+				} catch (final Exception e) {
+					e.printStackTrace();
+					portalStatus.setText(Messages.TAUPortalUploadDialog_UploadError);
+					return;
+				}
+			}
+			super.buttonPressed(buttonId);
+		}
+	}
+
+	@Override
+	protected void createButtonsForButtonBar(Composite parent) {
+		super.createButtonsForButtonBar(parent);
+		createButton(parent, RESET_ID, Messages.TAUPortalUploadDialog_ResetAll, false);
+	}
+
+	/**
+	 * Creates the primary interface for the upload dialog
+	 */
+	@Override
+	protected Control createDialogArea(Composite parent) {
+
+		final Composite comp = (Composite) super.createDialogArea(parent);
+
+		final GridLayout layout = (GridLayout) comp.getLayout();
+		layout.numColumns = 2;
+
+		final Label pwdLabel = new Label(comp, SWT.RIGHT);
+		pwdLabel.setText(Messages.TAUPortalUploadDialog_TauPortURL);
+
+		urlField = new Text(comp, SWT.SINGLE | SWT.BORDER);
+		GridData data = new GridData(GridData.FILL_HORIZONTAL);
+		urlField.setLayoutData(data);
+		urlField.setText("https://tau.nic.uoregon.edu"); //$NON-NLS-1$
+
+		final Label usernameLabel = new Label(comp, SWT.RIGHT);
+		usernameLabel.setText(Messages.TAUPortalUploadDialog_TauPortUname);
+
+		usernameField = new Text(comp, SWT.SINGLE | SWT.BORDER);
+		data = new GridData(GridData.FILL_HORIZONTAL);
+		usernameField.setLayoutData(data);
+
+		final Label passwordLabel = new Label(comp, SWT.RIGHT);
+		passwordLabel.setText(Messages.TAUPortalUploadDialog_TauPortPwd);
+
+		passwordField = new Text(comp, SWT.SINGLE | SWT.PASSWORD | SWT.BORDER);
+		data = new GridData(GridData.FILL_HORIZONTAL);
+		passwordField.setLayoutData(data);
+
+		final SelectionListener subListen = new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
-				url=urlField.getText();
-				uname=usernameField.getText();
-				pwd=passwordField.getText();
-				if(uname.length()==0||pwd.length()==0)
+				url = urlField.getText();
+				uname = usernameField.getText();
+				pwd = passwordField.getText();
+				if (uname.length() == 0 || pwd.length() == 0)
 				{
 					portalStatus.setText(Messages.TAUPortalUploadDialog_SubmitValidUnamePass);
 					workspaceCombo.clearSelection();
-				    workspaceCombo.setEnabled(false);
+					workspaceCombo.setEnabled(false);
 					return;
 				}
-				
-				String workspaces = getWorkspaces(url,uname,pwd);
 
-				if(workspaces.equals("NO_VALID_WORKSPACES")) //$NON-NLS-1$
+				String workspaces = getWorkspaces(url, uname, pwd);
+
+				if (workspaces.equals("NO_VALID_WORKSPACES")) //$NON-NLS-1$
 				{
 					portalStatus.setText(Messages.TAUPortalUploadDialog_LoginError);
 					workspaceCombo.clearSelection();
-				    workspaceCombo.setEnabled(false);
+					workspaceCombo.setEnabled(false);
 					return;
 				}
-				
-				if(workspaces.indexOf(',')==-1)//
+
+				if (workspaces.indexOf(',') == -1)//
 				{
 					portalStatus.setText(workspaces);
 					workspaceCombo.clearSelection();
-				    workspaceCombo.setEnabled(false);
+					workspaceCombo.setEnabled(false);
 					return;
 				}
-				
-				workspaces=workspaces.trim();
-				
-				StringTokenizer tz = new StringTokenizer(workspaces, ",", false); //$NON-NLS-1$
-				
-				String wSArray[] = new String[tz.countTokens()];
-				int i=0;
-				while(tz.hasMoreTokens()){
-					wSArray[i++]=tz.nextToken().trim();
+
+				workspaces = workspaces.trim();
+
+				final StringTokenizer tz = new StringTokenizer(workspaces, ",", false); //$NON-NLS-1$
+
+				final String wSArray[] = new String[tz.countTokens()];
+				int i = 0;
+				while (tz.hasMoreTokens()) {
+					wSArray[i++] = tz.nextToken().trim();
 				}
 				workspaceCombo.setItems(wSArray);
 				workspaceCombo.setEnabled(true);
@@ -169,252 +421,23 @@ public class TAUPortalUploadDialog extends Dialog {
 				portalStatus.setText(Messages.TAUPortalUploadDialog_SelectWorkspace);
 			}
 		};
-	    
-	    
-	    Button login = new Button(comp, SWT.PUSH|SWT.CENTER);
-	    login.setText(Messages.TAUPortalUploadDialog_SubmitLogin);
-	    login.addSelectionListener(subListen);
-	    
-	    portalStatus=new Label(comp,SWT.LEFT);
-	    portalStatus.setText(Messages.TAUPortalUploadDialog_SubmitValidEtcSpace);
 
-	    Label workspaceLabel = new Label(comp, SWT.RIGHT);
-	    workspaceLabel.setText(Messages.TAUPortalUploadDialog_SelectWorkspaceTab);
-	    
-	    workspaceCombo = new Combo(comp, SWT.READ_ONLY);
-	    data = new GridData(GridData.FILL_HORIZONTAL);
-	    workspaceCombo.setLayoutData(data);
-	    workspaceCombo.setEnabled(false);
+		final Button login = new Button(comp, SWT.PUSH | SWT.CENTER);
+		login.setText(Messages.TAUPortalUploadDialog_SubmitLogin);
+		login.addSelectionListener(subListen);
 
-	    return comp;
-	  }
+		portalStatus = new Label(comp, SWT.LEFT);
+		portalStatus.setText(Messages.TAUPortalUploadDialog_SubmitValidEtcSpace);
 
-	  protected void createButtonsForButtonBar(Composite parent) {
-	    super.createButtonsForButtonBar(parent);
-	    createButton(parent, RESET_ID, Messages.TAUPortalUploadDialog_ResetAll, false);
-	  }
+		final Label workspaceLabel = new Label(comp, SWT.RIGHT);
+		workspaceLabel.setText(Messages.TAUPortalUploadDialog_SelectWorkspaceTab);
 
-	  protected void buttonPressed(int buttonId) {
-	    if (buttonId == RESET_ID) {
-	      usernameField.setText(""); //$NON-NLS-1$
-	      passwordField.setText(""); //$NON-NLS-1$
-	    } else {
-	    	if(buttonId==Window.OK){
-	    		if(!workspaceCombo.getEnabled()){
-	    			portalStatus.setText(Messages.TAUPortalUploadDialog_ErrorNoWorkspace);
-	    			return;
-	    		}
-	    		if(workspaceCombo.getSelectionIndex()==-1)
-	    		{
-	    			portalStatus.setText(Messages.TAUPortalUploadDialog_ErrorNoWorkspace);
-	    			return;
-	    		}
-	    		
-	    		try {
-					String success = uploadPPK(url,uname, pwd, workspaceCombo.getItem(workspaceCombo.getSelectionIndex()), ppk);
-					if(success.indexOf(Messages.TAUPortalUploadDialog_Error)>=0)
-					{
-						portalStatus.setText(success);
-						return;
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-					portalStatus.setText(Messages.TAUPortalUploadDialog_UploadError);
-					return;
-				}
-	    	}
-	    	super.buttonPressed(buttonId);
-	    }
-	  }
-	
+		workspaceCombo = new Combo(comp, SWT.READ_ONLY);
+		data = new GridData(GridData.FILL_HORIZONTAL);
+		workspaceCombo.setLayoutData(data);
+		workspaceCombo.setEnabled(false);
 
-	/**
-	 * Converts the login and profile data for remote trasfer
-	 * @param data
-	 * @return
-	 */
-    private static String convertToHex(byte[] data) {
-        StringBuffer buf = new StringBuffer();
-        for (int i = 0; i < data.length; i++) {
-            int halfbyte = (data[i] >>> 4) & 0x0F;
-            int two_halfs = 0;
-            do {
-                if ((0 <= halfbyte) && (halfbyte <= 9))
-                buf.append((char) ('0' + halfbyte));
-                else
-                buf.append((char) ('a' + (halfbyte - 10)));
-                halfbyte = data[i] & 0x0F;
-            } while(two_halfs++ < 1);
-        }
-        return buf.toString();
-    }
-
-    /**
-     * Handhes hash conversion for security
-     * @param text
-     * @return
-     * @throws NoSuchAlgorithmException
-     * @throws UnsupportedEncodingException
-     */
-    private static String SHA1(String text)
-    throws NoSuchAlgorithmException, UnsupportedEncodingException  {
-        MessageDigest md;
-        md = MessageDigest.getInstance("SHA-1"); //$NON-NLS-1$
-        byte[] sha1hash = new byte[40];
-        md.update(text.getBytes("iso-8859-1"), 0, text.length()); //$NON-NLS-1$
-        sha1hash = md.digest();
-        return convertToHex(sha1hash);
-    }
-	
-    /**
-     * Bypass certificate checking
-     * @throws Exception
-     */
-    static private void trustHttpsCertificates() throws Exception {
-    	
-    	Class<?> sslProvider=null;
-    	boolean goodProvider=true;
-    	try{
-    	sslProvider=Class.forName("com.sun.net.ssl.internal.ssl.Provider"); //$NON-NLS-1$
-    	}catch(ClassNotFoundException e){goodProvider=false;}
-    	
-    	if(!goodProvider)
-    	{
-    		sslProvider=Class.forName("com.ibm.jsse.IBMJSSEProvider"); //$NON-NLS-1$
-    	}
-    	
-        Security.addProvider((Provider)sslProvider.newInstance());//new com.ibm.jsse.IBMJSSEProvider());//com.sun.net.ssl.internal.ssl.Provider());
-        //Create a trust manager that does not validate certificate chains:
-        TrustManager[] trustAllCerts = new TrustManager[] {
-            new X509TrustManager() {
-                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                    return null;
-                }
-
-				public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) throws java.security.cert.CertificateException {
-				}
-				public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws java.security.cert.CertificateException {
-				}
-            }
-        };
- 
-        //Install the all-trusting trust manager:
-        SSLContext sc = SSLContext.getInstance("SSL"); //$NON-NLS-1$
-      sc.init(null, trustAllCerts, new SecureRandom());
-       HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-       
-       //avoid "HTTPS hostname wrong: should be <myhostname>" exception:
-       HostnameVerifier hv = new HostnameVerifier() {
-           public boolean verify(String urlHostName, SSLSession session) {
-               if (!urlHostName.equalsIgnoreCase(session.getPeerHost())) {
-                   System.out.println(Messages.TAUPortalUploadDialog_WarningURLHost+urlHostName+Messages.TAUPortalUploadDialog_IsDifferent+session.getPeerHost()+"'."); //$NON-NLS-3$
-               }
-               return true; //also accept different hostname (e.g. domain name instead of IP address)
-           }
-       };
-       HttpsURLConnection.setDefaultHostnameVerifier(hv);
-    }
-    
-    /**
-     * Obtain the names of the users available workspaces
-     * @param uname Username
-     * @param pwd Password
-     * @return
-     */
-    private static String getWorkspaces(String url,String uname, String pwd)
-    {
-    	String pwd2;
-		try {
-			pwd2 = SHA1(pwd);
-		
-		
-		String portalURL=url+"/trial/list_workspaces"; //$NON-NLS-1$
-		String data = URLEncoder.encode("username","UTF-8")+"="+URLEncoder.encode(uname,"UTF-8"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		data += "&"+URLEncoder.encode("password", "UTF-8")+"="+URLEncoder.encode(pwd2, "UTF-8"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-		
-		String workspaces = portalAccess(portalURL,data);
-		
-		return workspaces;
-		
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		return "NO_VALID_WORKSPACES"; //$NON-NLS-1$
+		return comp;
 	}
-    
-    /**
-     * Uploads ppkFile to the specified workspace of the asccount associated with the given username and password
-     * @param usr Username
-     * @param pwd Password
-     * @param workspace Selected workspace
-     * @param ppkFile Packed profile file
-     * @return
-     * @throws Exception
-     */
-	private static String uploadPPK(String url, String usr, String pwd, String workspace, IFileStore ppkFile) throws Exception {
-		
-		String pwd2 = SHA1(pwd);
-		
-		String portalURL=url+"/trial/batch_upload"; //$NON-NLS-1$
-		String ppkName = ppkFile.getName();
-		ppkName=ppkName.substring(0, ppkName.lastIndexOf('.'));
-		
-		//RandomAccessFile rfile = new RandomAccessFile(ppkFile.openOutputStream(EFS.NONE, null), "r"); //$NON-NLS-1$
-		InputStream rfile = (new BufferedInputStream(ppkFile.openInputStream(EFS.NONE, null)));
-		ppkFile.fetchInfo().getLength();
-		byte barr[]=new byte[(int)ppkFile.fetchInfo().getLength()];//TODO: This needs testing.
-		rfile.read(barr);
-		String ppkString=new String(barr,"ISO-8859-1"); //$NON-NLS-1$
-		ppkString=URLEncoder.encode(ppkString,"ISO-8859-1"); //$NON-NLS-1$
-		
 
-		String data = URLEncoder.encode("username","UTF-8")+"="+URLEncoder.encode(usr,"UTF-8"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		data += "&"+URLEncoder.encode("password", "UTF-8")+"="+URLEncoder.encode(pwd2, "UTF-8"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-		data += "&"+URLEncoder.encode(ppkName, "UTF-8")+"="+ppkString; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		data += "&"+URLEncoder.encode("workspace", "UTF-8")+"="+URLEncoder.encode(workspace, "UTF-8"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-		
-		return portalAccess(portalURL,data);
-		
-	}
-	
-	/**
-	 * Uploads data to the given URL
-	 * @param portalURL The web address of the portal
-	 * @param data The string-representation of the data being sent
-	 * @return The portal's response
-	 * @throws Exception
-	 */
-	private static String portalAccess(String portalURL, String data) throws Exception{
-		URL url = new URL(portalURL);
-
-		trustHttpsCertificates();
-		
-		URLConnection conn = url.openConnection();
-		
-	    ((javax.net.ssl.HttpsURLConnection) conn).setHostnameVerifier(new javax.net.ssl.HostnameVerifier() {
-	    	public boolean verify(String hostname, javax.net.ssl.SSLSession session) {
-	     	return true;
-	     	}
-	     });
-		
-		conn.setDoOutput(true);
-		OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-		
-		wr.write(data);
-		wr.flush();
-		String line=""; //$NON-NLS-1$
-		BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-		String result = ""; //$NON-NLS-1$
-		while ((line = rd.readLine()) != null) {
-			result+=line;
-		}
-		wr.close();
-		return result;
-	}
-	
 }

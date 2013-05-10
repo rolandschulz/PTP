@@ -35,42 +35,42 @@ import org.eclipse.ptp.etfw.ui.AbstractToolConfigurationTab;
  * Defines the tab group in the performance analysis launch configuration system using the CDT launcher
  */
 public class ToolLaunchConfigurationTabGroup extends
-		AbstractLaunchConfigurationTabGroup implements IToolLaunchConfigurationConstants{
+		AbstractLaunchConfigurationTabGroup implements IToolLaunchConfigurationConstants {
 	/**
 	 * Creates the tabs used by the performance launch configuration system
 	 */
 	public void createTabs(ILaunchConfigurationDialog dialog, String mode) {
-		
-		ArrayList<AbstractToolConfigurationTab> perfTabs=ETFWUtils.getPerfTabs();
-		ILaunchConfigurationTab tabs[]=new ILaunchConfigurationTab[7+perfTabs.size()];
-		tabs[0]=new ToolRecompMainTab(true);
-		//tabs[1]=new CDebuggerTab(false);
-		tabs[1]=new CArgumentsTab();
-		tabs[2]=new EnvironmentTab();
-		tabs[3]=new SourceLookupTab();
-		tabs[4]=new CommonTab();
-		tabs[5]=new ExternalToolSelectionTab(true);
-		tabs[6]=new ParametricParameterTab(false);
-		Iterator<AbstractToolConfigurationTab> perfIt=perfTabs.iterator();
-		int tabDex=7;
-		while(perfIt.hasNext())
+
+		final ArrayList<AbstractToolConfigurationTab> perfTabs = ETFWUtils.getPerfTabs();
+		final ILaunchConfigurationTab tabs[] = new ILaunchConfigurationTab[7 + perfTabs.size()];
+		tabs[0] = new ToolRecompMainTab(true);
+		// tabs[1]=new CDebuggerTab(false);
+		tabs[1] = new CArgumentsTab();
+		tabs[2] = new EnvironmentTab();
+		tabs[3] = new SourceLookupTab();
+		tabs[4] = new CommonTab();
+		tabs[5] = new ExternalToolSelectionTab(true);
+		tabs[6] = new ParametricParameterTab(false);
+		final Iterator<AbstractToolConfigurationTab> perfIt = perfTabs.iterator();
+		int tabDex = 7;
+		while (perfIt.hasNext())
 		{
-			tabs[tabDex]=perfIt.next();
+			tabs[tabDex] = perfIt.next();
 			tabDex++;
 		}
-		
-//		ILaunchConfigurationTab tabs[] = {
-//				new ToolRecompMainTab(true), 
-//				new CArgumentsTab(), 
-//				new EnvironmentTab(),
-//				new ExternalToolSelectionTab(true), 
-//				//new TAUAnalysisTab(true),
-//				
-//				
-//				new CDebuggerTab(false),
-//				new SourceLookupTab(), 
-//				new CommonTab() 
-//		};
+
+		// ILaunchConfigurationTab tabs[] = {
+		// new ToolRecompMainTab(true),
+		// new CArgumentsTab(),
+		// new EnvironmentTab(),
+		// new ExternalToolSelectionTab(true),
+		// //new TAUAnalysisTab(true),
+		//
+		//
+		// new CDebuggerTab(false),
+		// new SourceLookupTab(),
+		// new CommonTab()
+		// };
 		setTabs(tabs);
 	}
 }

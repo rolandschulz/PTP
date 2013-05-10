@@ -18,7 +18,7 @@ public class BuildTool extends ExternalTool {
 
 	public ArrayList<IToolUITab> getAllCompilerPanes() {
 
-		ArrayList<IToolUITab> allPanes = new ArrayList<IToolUITab>();
+		final ArrayList<IToolUITab> allPanes = new ArrayList<IToolUITab>();
 
 		if (ccCompiler != null && ccCompiler.toolPanes != null) {
 			allPanes.addAll(Arrays.asList(ccCompiler.toolPanes));
@@ -60,6 +60,10 @@ public class BuildTool extends ExternalTool {
 		return allCompilers;
 	}
 
+	public ToolApp getGlobalCompiler() {
+		return allCompilers;
+	}
+
 	public ToolApp getUPCCompiler() {
 		if (upcCompiler != null) {
 			return upcCompiler;
@@ -67,8 +71,11 @@ public class BuildTool extends ExternalTool {
 		return allCompilers;
 	}
 
-	public ToolApp getGlobalCompiler() {
-		return allCompilers;
+	/**
+	 * @since 5.0
+	 */
+	public void setAllCompilers(ToolApp allCompilers) {
+		this.allCompilers = allCompilers;
 	}
 
 	/**
@@ -97,13 +104,6 @@ public class BuildTool extends ExternalTool {
 	 */
 	public void setUpcCompiler(ToolApp upcCompiler) {
 		this.upcCompiler = upcCompiler;
-	}
-
-	/**
-	 * @since 5.0
-	 */
-	public void setAllCompilers(ToolApp allCompilers) {
-		this.allCompilers = allCompilers;
 	}
 
 }

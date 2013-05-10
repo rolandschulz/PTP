@@ -40,21 +40,12 @@ import org.eclipse.ui.IEditorActionDelegate;
 import org.eclipse.ui.IEditorPart;
 
 /**
- * Action for adding selective instrumentation of user defined events to a CDT source file via selection of source code in the editor 
+ * Action for adding selective instrumentation of user defined events to a CDT source file via selection of source code in the
+ * editor
  */
 @SuppressWarnings("restriction")
 public class AtomicInstrument implements IEditorActionDelegate {
 	CEditor textEditor;
-
-	/**
-	 * Saves a reference to the current active editor
-	 * 
-	 * @see org.eclipse.ui.IEditorActionDelegate#setActiveEditor(IAction,
-	 *      IEditorPart)
-	 */
-	public void setActiveEditor(IAction action, IEditorPart targetEditor) {
-		textEditor = (CEditor) targetEditor;
-	}
 
 	/**
 	 * Takes the position of the selected text and creates a user-defined selective instrumentation entry
@@ -62,58 +53,69 @@ public class AtomicInstrument implements IEditorActionDelegate {
 	 * @see org.eclipse.ui.IActionDelegate#run(IAction)
 	 */
 	public void run(IAction action) {
-		ICElement cele = textEditor.getInputCElement();
-		ICProject cproject = cele.getCProject();
-		String location = cproject.getResource().getLocation().toOSString();
-		int insertregs=0;
-		ITextSelection ts = (ITextSelection) textEditor.getSelectionProvider().getSelection();
-		insertregs = ts.getStartLine()+1;
-		class validateName implements IInputValidator{
+		final ICElement cele = textEditor.getInputCElement();
+		final ICProject cproject = cele.getCProject();
+		final String location = cproject.getResource().getLocation().toOSString();
+		int insertregs = 0;
+		final ITextSelection ts = (ITextSelection) textEditor.getSelectionProvider().getSelection();
+		insertregs = ts.getStartLine() + 1;
+		class validateName implements IInputValidator {
 
 			public String isValid(String newText) {
-				if(newText.equals("")) //$NON-NLS-1$
+				if (newText.equals("")) {
 					return Messages.AtomicInstrument_EnterValidText;
+				}
 				return null;
 			}
 		}
-		
-		class validateValue implements IInputValidator{
+
+		class validateValue implements IInputValidator {
 
 			public String isValid(String newText) {
-				String err=Messages.AtomicInstrument_EnterValidDoubOrVar;
-				if(newText.equals("")) //$NON-NLS-1$
+				final String err = Messages.AtomicInstrument_EnterValidDoubOrVar;
+				if (newText.equals("")) {
 					return err;
-				
-				String fixed = newText.replaceAll("\\W", ""); //$NON-NLS-1$ //$NON-NLS-2$
-				if(!newText.equals(fixed))
+				}
+
+				final String fixed = newText.replaceAll("\\W", ""); //$NON-NLS-1$ //$NON-NLS-2$
+				if (!newText.equals(fixed))
 				{
-					if(newText.length()-fixed.length()==1)
-						if(newText.indexOf(".")>=0) //$NON-NLS-1$
-							if(fixed.replaceAll("\\d", "").equals("")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					if (newText.length() - fixed.length() == 1) {
+						if (newText.indexOf(".") >= 0) {
+							if (fixed.replaceAll("\\d", "").equals("")) {
 								return null;
+							}
+						}
+					}
 					return err;
 				}
 				return null;
 			}
 		}
-		InputDialog namedialog = new InputDialog(CUIPlugin.getActiveWorkbenchShell(), Messages.AtomicInstrument_UserDefinedEventName, Messages.AtomicInstrument_EnterUniqueName, "", new validateName()); //$NON-NLS-3$
+		final InputDialog namedialog = new InputDialog(CUIPlugin.getActiveWorkbenchShell(),
+				Messages.AtomicInstrument_UserDefinedEventName, Messages.AtomicInstrument_EnterUniqueName, "", new validateName());
 
-		if(namedialog.open() == Window.CANCEL)return;
-		String testline = namedialog.getValue();
-		
-		
-		InputDialog incdialog = new InputDialog(CUIPlugin.getActiveWorkbenchShell(), Messages.AtomicInstrument_UserDefinedEventValue, Messages.AtomicInstrument_EnterStaticValueOrVariable, "", new validateValue()); //$NON-NLS-3$
-		if(incdialog.open() == Window.CANCEL)return;
-		String testinc = incdialog.getValue();
-		
-		String fixline = testline.replaceAll("\\W", ""); //$NON-NLS-1$ //$NON-NLS-2$
-		LinkedHashSet<String> instlines = new LinkedHashSet<String>();
-		String regline = "TAU_REGISTER_EVENT(TAU__"+fixline+", \\\""+testline+"\\\");"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		String evtline = "TAU_EVENT(TAU__"+fixline+", "+testinc+");"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		String nosselregline = "file =\""+cele.getElementName()+"\" line="+insertregs+" code=\""+regline+" "+evtline+"\""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+		if (namedialog.open() == Window.CANCEL) {
+			return;
+		}
+		final String testline = namedialog.getValue();
+
+		final InputDialog incdialog = new InputDialog(CUIPlugin.getActiveWorkbenchShell(),
+				Messages.AtomicInstrument_UserDefinedEventValue, Messages.AtomicInstrument_EnterStaticValueOrVariable, "",
+				new validateValue());
+		if (incdialog.open() == Window.CANCEL) {
+			return;
+		}
+		final String testinc = incdialog.getValue();
+
+		final String fixline = testline.replaceAll("\\W", ""); //$NON-NLS-1$ //$NON-NLS-2$
+		final LinkedHashSet<String> instlines = new LinkedHashSet<String>();
+		final String regline = "TAU_REGISTER_EVENT(TAU__" + fixline + ", \\\"" + testline + "\\\");"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		final String evtline = "TAU_EVENT(TAU__" + fixline + ", " + testinc + ");"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		final String nosselregline = "file =\"" + cele.getElementName() + "\" line=" + insertregs + " code=\"" + regline + " " + evtline + "\""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 		instlines.add(nosselregline);
-		
-		Selector selectinst = new Selector(location);
+
+		final Selector selectinst = new Selector(location);
 		selectinst.addInst(instlines);
 	}
 
@@ -126,5 +128,14 @@ public class AtomicInstrument implements IEditorActionDelegate {
 	public void selectionChanged(IAction action, ISelection selection) {
 
 		action.setEnabled(true);
+	}
+
+	/**
+	 * Saves a reference to the current active editor
+	 * 
+	 * @see org.eclipse.ui.IEditorActionDelegate#setActiveEditor(IAction, IEditorPart)
+	 */
+	public void setActiveEditor(IAction action, IEditorPart targetEditor) {
+		textEditor = (CEditor) targetEditor;
 	}
 }

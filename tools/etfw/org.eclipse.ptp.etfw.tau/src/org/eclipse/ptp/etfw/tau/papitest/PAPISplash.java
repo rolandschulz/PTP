@@ -49,39 +49,7 @@ import org.eclipse.swt.widgets.Text;
  */
 public class PAPISplash extends Dialog {
 
-	Text papiPath;
-	Button browsePapi;
-	Button[] papiCountRadios;
-
-	protected PAPISplash(Shell parentShell) {
-		super(parentShell);
-
-	}
-
-	protected void handleXMLBrowseButtonSelected() {
-		DirectoryDialog dialog = new DirectoryDialog(getShell());
-		File path = null;
-		String correctPath = papiPath.getText();
-		if (correctPath != null) {
-			path = new File(correctPath);
-			if (path.exists())
-				dialog.setFilterPath(correctPath);
-		}
-
-		dialog.setText(Messages.PAPISplash_SelectPapiBin);
-		papiPath.setText(dialog.open());
-
-	}
-
 	protected class WidgetListener extends SelectionAdapter implements ModifyListener, IPropertyChangeListener {
-		@Override
-		public void widgetSelected(SelectionEvent e) {
-			Object source = e.getSource();
-			if (source == browsePapi) {
-				handleXMLBrowseButtonSelected();
-			}
-		}
-
 		public void modifyText(ModifyEvent e) {
 			// TODO Auto-generated method stub
 
@@ -91,9 +59,27 @@ public class PAPISplash extends Dialog {
 			// TODO Auto-generated method stub
 
 		}
+
+		@Override
+		public void widgetSelected(SelectionEvent e) {
+			final Object source = e.getSource();
+			if (source == browsePapi) {
+				handleXMLBrowseButtonSelected();
+			}
+		}
 	}
 
+	Text papiPath;
+	Button browsePapi;
+
+	Button[] papiCountRadios;
+
 	protected WidgetListener listener = new WidgetListener();
+
+	protected PAPISplash(Shell parentShell) {
+		super(parentShell);
+
+	}
 
 	/**
 	 * Defines the UI of the dialog, including options for enabling autorefresh,
@@ -101,15 +87,15 @@ public class PAPISplash extends Dialog {
 	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
-		Composite composite = (Composite) super.createDialogArea(parent);
+		final Composite composite = (Composite) super.createDialogArea(parent);
 
 		// Label introlabel = new Label(composite, SWT.NONE);
 		// introlabel.setText("Sp");
-		Composite papiCom = new Composite(parent, SWT.NONE);
+		final Composite papiCom = new Composite(parent, SWT.NONE);
 		papiCom.setLayout(createGridLayout(1, false, 0, 0));
 		papiCom.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
 
-		Label tauarchComment = new Label(papiCom, SWT.WRAP);
+		final Label tauarchComment = new Label(papiCom, SWT.WRAP);
 		tauarchComment.setText(Messages.PAPISplash_PapiBin);
 		papiPath = new Text(papiCom, SWT.BORDER | SWT.SINGLE);
 		papiPath.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -126,10 +112,36 @@ public class PAPISplash extends Dialog {
 		papiCountRadios[1].setText(Messages.PAPISplash_NativeCounters);
 		// papiCountRadios[2] = new Button(parent,SWT.RADIO);
 		// papiCountRadios[2].setText("PAPI-C Selector");
-		int pType = Activator.getDefault().getPreferenceStore().getInt(TestPAPI.papiCounterTypeVar);
-		if (pType < papiCountRadios.length)
+		final int pType = Activator.getDefault().getPreferenceStore().getInt(TestPAPI.papiCounterTypeVar);
+		if (pType < papiCountRadios.length) {
 			papiCountRadios[pType].setSelection(true);
+		}
 		return composite;
+	}
+
+	protected GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) {
+		final GridLayout gridLayout = new GridLayout();
+		gridLayout.numColumns = columns;
+		gridLayout.makeColumnsEqualWidth = isEqual;
+		gridLayout.marginHeight = mh;
+		gridLayout.marginWidth = mw;
+		return gridLayout;
+	}
+
+	protected void handleXMLBrowseButtonSelected() {
+		final DirectoryDialog dialog = new DirectoryDialog(getShell());
+		File path = null;
+		final String correctPath = papiPath.getText();
+		if (correctPath != null) {
+			path = new File(correctPath);
+			if (path.exists()) {
+				dialog.setFilterPath(correctPath);
+			}
+		}
+
+		dialog.setText(Messages.PAPISplash_SelectPapiBin);
+		papiPath.setText(dialog.open());
+
 	}
 
 	/**
@@ -140,8 +152,9 @@ public class PAPISplash extends Dialog {
 
 		Activator.getDefault().getPreferenceStore().setValue(TestPAPI.papiLocationSelectionVar, papiPath.getText());
 		int papiType = 0;
-		if (papiCountRadios[1].getSelection())
+		if (papiCountRadios[1].getSelection()) {
 			papiType = 1;
+		}
 		// else if(papiCountRadios[2].getSelection())
 		// papiType=2;
 		Activator.getDefault().getPreferenceStore().setValue(TestPAPI.papiCounterTypeVar, papiType);
@@ -149,21 +162,13 @@ public class PAPISplash extends Dialog {
 		super.okPressed();
 	}
 
-	protected GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) {
-		GridLayout gridLayout = new GridLayout();
-		gridLayout.numColumns = columns;
-		gridLayout.makeColumnsEqualWidth = isEqual;
-		gridLayout.marginHeight = mh;
-		gridLayout.marginWidth = mw;
-		return gridLayout;
-	}
-
 	protected GridData spanGridData(int style, int space) {
 		GridData gd = null;
-		if (style == -1)
+		if (style == -1) {
 			gd = new GridData();
-		else
+		} else {
 			gd = new GridData(style);
+		}
 		gd.horizontalSpan = space;
 		return gd;
 	}

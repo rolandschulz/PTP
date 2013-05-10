@@ -57,23 +57,119 @@ public class ETFWUtils {
 
 	private static ExternalToolProcess[] tools = null;
 
-	public static ExternalToolProcess[] getTools() {
-		return tools;
+	private static ArrayList<IFileStore> workflowList = null;
+
+	private static ArrayList<AbstractToolConfigurationTab> perfConfTabs = null;
+
+	private static ArrayList<IToolUITab> toolUITabs = null;
+
+	private static ArrayList<AbstractToolDataManager> perfConfManagers = null;
+
+	private static ArrayList<IFileStore> getInternalXMLWorkflows() {
+		if (workflowList != null) {
+			return workflowList;
+		}
+
+		workflowList = new ArrayList<IFileStore>();
+
+		final IExtensionRegistry registry = Platform.getExtensionRegistry();
+		final IExtensionPoint extensionPoint = registry.getExtensionPoint("org.eclipse.ptp.etfw.workflows"); //$NON-NLS-1$
+		final IExtension[] extensions = extensionPoint.getExtensions();
+
+		for (final IExtension ext : extensions) {
+			final IConfigurationElement[] elements = ext.getConfigurationElements();
+
+			IFileStore ifs = null;
+
+			for (final IConfigurationElement ce : elements) {
+				try {
+					final String plugspace = ext.getNamespaceIdentifier();
+					final String aGetter = ce.getAttribute("XMLFile"); //$NON-NLS-1$
+
+					final URI iuri = new URI(FileLocator.toFileURL((Platform.getBundle(plugspace).getEntry(aGetter))).toString()
+							.replaceAll(" ", "%20")); //$NON-NLS-1$ //$NON-NLS-2$
+					ifs = EFS.getLocalFileSystem().getStore(iuri);
+					workflowList.add(ifs);
+				} catch (final Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return workflowList;
 	}
 
-	/**
-	 * Returns the performance tool with the given name from the performance tools array, or null if not found
-	 * 
-	 * @param toolName
-	 * @return
-	 */
-	public static ExternalToolProcess getTool(String toolName) {
-		for (ExternalToolProcess tool : tools) {
-			if (tool.toolName.equals(toolName)) {
-				return tool;
+	public static ArrayList<AbstractToolDataManager> getPerfConfManagers() {
+		if (perfConfManagers != null) {
+			return perfConfManagers;
+		}
+
+		perfConfManagers = new ArrayList<AbstractToolDataManager>();
+
+		final IExtensionRegistry registry = Platform.getExtensionRegistry();
+		final IExtensionPoint extensionPoint = registry.getExtensionPoint("org.eclipse.ptp.etfw.dataManagers"); //$NON-NLS-1$
+		final IExtension[] extensions = extensionPoint.getExtensions();
+
+		for (final IExtension ext : extensions) {
+			final IConfigurationElement[] elements = ext.getConfigurationElements();
+
+			for (final IConfigurationElement ce : elements) {
+				try {
+					final AbstractToolDataManager aGetter = (AbstractToolDataManager) ce.createExecutableExtension("class"); //$NON-NLS-1$
+					// aGetter.setId(ce.getAttribute("id"));
+					perfConfManagers.add(aGetter);
+				} catch (final CoreException e) {
+					e.printStackTrace();
+					// PTPCorePlugin.log(e);
+				}
+			}
+		}
+
+		return perfConfManagers;
+	}
+
+	public static AbstractToolDataManager getPerfDataManager(String name) {
+		if (name == null) {
+			return null;
+		}
+		AbstractToolDataManager check = null;
+		final Iterator<AbstractToolDataManager> perfit = perfConfManagers.iterator();
+		while (perfit.hasNext()) {
+			check = perfit.next();
+			if (check.getName().equals(name)) {
+				return (check);
 			}
 		}
 		return null;
+	}
+
+	public static ArrayList<AbstractToolConfigurationTab> getPerfTabs() {
+		if (perfConfTabs != null) {
+			return perfConfTabs;
+		}
+
+		perfConfTabs = new ArrayList<AbstractToolConfigurationTab>();
+
+		final IExtensionRegistry registry = Platform.getExtensionRegistry();
+		final IExtensionPoint extensionPoint = registry.getExtensionPoint("org.eclipse.ptp.etfw.configurationTabs"); //$NON-NLS-1$
+		final IExtension[] extensions = extensionPoint.getExtensions();
+
+		for (final IExtension ext : extensions) {
+			final IConfigurationElement[] elements = ext.getConfigurationElements();
+
+			for (final IConfigurationElement ce : elements) {
+				try {
+					final AbstractToolConfigurationTab aGetter = (AbstractToolConfigurationTab) ce
+							.createExecutableExtension("class"); //$NON-NLS-1$
+					// aGetter.setId(ce.getAttribute("id"));
+					perfConfTabs.add(aGetter);
+				} catch (final CoreException e) {
+					e.printStackTrace();
+					// PTPCorePlugin.log(e);
+				}
+			}
+		}
+
+		return perfConfTabs;
 	}
 
 	/**
@@ -88,6 +184,104 @@ public class ETFWUtils {
 		} else {
 			return null;
 		}
+	}
+
+	/**
+	 * Returns the performance tool with the given name from the performance tools array, or null if not found
+	 * 
+	 * @param toolName
+	 * @return
+	 */
+	public static ExternalToolProcess getTool(String toolName) {
+		for (final ExternalToolProcess tool : tools) {
+			if (tool.toolName.equals(toolName)) {
+				return tool;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Returns an array of all of the non-virtual tool panes defined in available tool definition xml files
+	 * Panes are ordered by tool, and within each tool by compilation, execution and analysis step
+	 * 
+	 * @return
+	 * @since 7.0
+	 */
+	public static IToolUITab[] getToolPanes() {
+		final ArrayList<IToolUITab> paneList = new ArrayList<IToolUITab>();
+		IToolUITab[] panes = null;
+
+		if (tools.length <= 0) {
+			return null;
+		}
+
+		for (final ExternalToolProcess tool : tools) {
+			for (int j = 0; j < tool.externalTools.size(); j++) {
+				final ExternalTool t = tool.externalTools.get(j);
+				if (t instanceof BuildTool) {
+					final BuildTool bt = (BuildTool) t;
+					insertPanes(bt.getAllCompilerPanes(), paneList);
+
+				} else if (t instanceof ExecTool) {
+					final ExecTool et = (ExecTool) t;
+					for (final ToolApp execUtil : et.execUtils) {
+						insertPanes(execUtil.toolPanes, paneList);
+					}
+				} else if (t instanceof PostProcTool) {
+					final PostProcTool pt = (PostProcTool) t;
+					for (final ToolApp analysisCommand : pt.analysisCommands) {
+						insertPanes(analysisCommand.toolPanes, paneList);
+					}
+				}
+				if (t.global != null) {
+					insertPanes(t.global.toolPanes, paneList);
+				}
+			}
+		}
+
+		final ArrayList<IToolUITab> uitList = getToolUITabs();
+		if (uitList != null && uitList.size() > 0) {// TODO: Improve ordering of panes
+			for (int i = 0; i < uitList.size(); i++) {
+				paneList.add(uitList.get(i));
+			}
+		}
+
+		panes = new IToolUITab[paneList.size()];
+		paneList.toArray(panes);
+
+		return panes;
+	}
+
+	public static ExternalToolProcess[] getTools() {
+		return tools;
+	}
+
+	/**
+	 * @since 7.0
+	 */
+	public static ArrayList<IToolUITab> getToolUITabs() {
+		if (toolUITabs == null) {
+			toolUITabs = new ArrayList<IToolUITab>();
+
+			final IExtensionRegistry registry = Platform.getExtensionRegistry();
+			final IExtensionPoint extensionPoint = registry.getExtensionPoint("org.eclipse.ptp.etfw.toolUITabs"); //$NON-NLS-1$
+			final IExtension[] extensions = extensionPoint.getExtensions();
+
+			for (final IExtension ext : extensions) {
+				final IConfigurationElement[] elements = ext.getConfigurationElements();
+
+				for (final IConfigurationElement ce : elements) {
+					try {
+						final IToolUITab aGetter = (IToolUITab) ce.createExecutableExtension("class"); //$NON-NLS-1$
+						toolUITabs.add(aGetter);
+					} catch (final CoreException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		return toolUITabs;
 	}
 
 	/**
@@ -123,116 +317,29 @@ public class ETFWUtils {
 	}
 
 	/**
-	 * Returns an array of all of the non-virtual tool panes defined in available tool definition xml files
-	 * Panes are ordered by tool, and within each tool by compilation, execution and analysis step
-	 * 
-	 * @return
-	 * @since 7.0
-	 */
-	public static IToolUITab[] getToolPanes() {
-		ArrayList<IToolUITab> paneList = new ArrayList<IToolUITab>();
-		IToolUITab[] panes = null;
-
-		if (tools.length <= 0) {
-			return null;
-		}
-
-		for (ExternalToolProcess tool : tools) {
-			for (int j = 0; j < tool.externalTools.size(); j++) {
-				ExternalTool t = tool.externalTools.get(j);
-				if (t instanceof BuildTool) {
-					BuildTool bt = (BuildTool) t;
-					insertPanes(bt.getAllCompilerPanes(), paneList);
-
-				} else if (t instanceof ExecTool) {
-					ExecTool et = (ExecTool) t;
-					for (ToolApp execUtil : et.execUtils) {
-						insertPanes(execUtil.toolPanes, paneList);
-					}
-				} else if (t instanceof PostProcTool) {
-					PostProcTool pt = (PostProcTool) t;
-					for (ToolApp analysisCommand : pt.analysisCommands) {
-						insertPanes(analysisCommand.toolPanes, paneList);
-					}
-				}
-				if (t.global != null) {
-					insertPanes(t.global.toolPanes, paneList);
-				}
-			}
-		}
-
-		ArrayList<IToolUITab> uitList = getToolUITabs();
-		if (uitList != null && uitList.size() > 0) {// TODO: Improve ordering of panes
-			for (int i = 0; i < uitList.size(); i++) {
-				paneList.add(uitList.get(i));
-			}
-		}
-
-		panes = new IToolUITab[paneList.size()];
-		paneList.toArray(panes);
-
-		return panes;
-	}
-
-	private static ArrayList<IFileStore> workflowList = null;
-
-	private static ArrayList<IFileStore> getInternalXMLWorkflows() {
-		if (workflowList != null) {
-			return workflowList;
-		}
-
-		workflowList = new ArrayList<IFileStore>();
-
-		IExtensionRegistry registry = Platform.getExtensionRegistry();
-		IExtensionPoint extensionPoint = registry.getExtensionPoint("org.eclipse.ptp.etfw.workflows"); //$NON-NLS-1$
-		final IExtension[] extensions = extensionPoint.getExtensions();
-
-		for (final IExtension ext : extensions) {
-			final IConfigurationElement[] elements = ext.getConfigurationElements();
-
-			IFileStore ifs = null;
-
-			for (IConfigurationElement ce : elements) {
-				try {
-					String plugspace = ext.getNamespaceIdentifier();
-					String aGetter = ce.getAttribute("XMLFile"); //$NON-NLS-1$
-
-					URI iuri = new URI(FileLocator.toFileURL((Platform.getBundle(plugspace).getEntry(aGetter))).toString()
-							.replaceAll(" ", "%20")); //$NON-NLS-1$ //$NON-NLS-2$
-					ifs = EFS.getLocalFileSystem().getStore(iuri);
-					workflowList.add(ifs);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return workflowList;
-	}
-
-	/**
 	 * Reinitializes the performance tool data structures from the given XML definition file(s).
 	 * 
 	 */
 	public static void refreshTools(IPreferenceStore store) {
 		getInternalXMLWorkflows();
-		ArrayList<ExternalToolProcess> theTools = new ArrayList<ExternalToolProcess>();// null;
+		final ArrayList<ExternalToolProcess> theTools = new ArrayList<ExternalToolProcess>();// null;
 
-		IFileSystem loc = EFS.getLocalFileSystem();
+		final IFileSystem loc = EFS.getLocalFileSystem();
 
-		String fiList = store.getString(IToolLaunchConfigurationConstants.XMLLOCID);
-		String[] fiLocs = fiList.split(",,,"); //$NON-NLS-1$
+		final String fiList = store.getString(IToolLaunchConfigurationConstants.XMLLOCID);
+		final String[] fiLocs = fiList.split(",,,"); //$NON-NLS-1$
 
-		List<IFileStore> files = new ArrayList<IFileStore>();
+		final List<IFileStore> files = new ArrayList<IFileStore>();
 		IFileStore fi = null;
-		for (String fiLoc : fiLocs) {
+		for (final String fiLoc : fiLocs) {
 			try {
 				fi = loc.getStore(new URI(fiLoc));
-			} catch (URISyntaxException e) {
+			} catch (final URISyntaxException e) {
 				// TODO Auto-generated catch block
 
 				fi = EFS.getLocalFileSystem().getStore(new Path(fiLoc));
 			}
-			IFileInfo finf = fi.fetchInfo();
+			final IFileInfo finf = fi.fetchInfo();
 
 			if (finf.exists() && !finf.isDirectory()) {
 				files.add(fi);
@@ -240,7 +347,7 @@ public class ETFWUtils {
 		}
 
 		if (files.size() == 0) {
-			String epath = BuildLaunchUtils.checkLocalToolEnvPath("eclipse"); //$NON-NLS-1$
+			final String epath = BuildLaunchUtils.checkLocalToolEnvPath("eclipse"); //$NON-NLS-1$
 			if (epath != null) {
 				IFileStore toolxml = loc.getStore(new Path(epath));
 				IFileInfo finf = toolxml.fetchInfo();
@@ -257,7 +364,7 @@ public class ETFWUtils {
 		for (int i = 0; i < workflowList.size(); i++) {
 			tools = ToolMaker.makeTools(workflowList.get(i));
 			if (tools != null) {
-				for (ExternalToolProcess tool : tools) {
+				for (final ExternalToolProcess tool : tools) {
 					theTools.add(tool);
 				}
 			}
@@ -266,13 +373,13 @@ public class ETFWUtils {
 		for (int i = 0; i < files.size(); i++) {
 			try {
 				tools = ToolMaker.makeTools(files.get(i)); // ExternalToolProcess.getSample();//new ExternalToolProcess[1];;
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				tools = null;
 				e.printStackTrace();
 				System.out.println(Messages.Activator_ProblemReading + files.get(i).toString());
 			}
 			if (tools != null) {
-				for (ExternalToolProcess tool : tools) {
+				for (final ExternalToolProcess tool : tools) {
 					theTools.add(tool);
 				}
 			}
@@ -281,115 +388,9 @@ public class ETFWUtils {
 
 		tools = theTools.toArray(new ExternalToolProcess[theTools.size()]);
 
-		for (ExternalToolProcess tool : tools) {
+		for (final ExternalToolProcess tool : tools) {
 			BuildLaunchUtils.verifyLocalEnvToolPath(tool);
 		}
 
-	}
-
-	private static ArrayList<AbstractToolConfigurationTab> perfConfTabs = null;
-
-	public static ArrayList<AbstractToolConfigurationTab> getPerfTabs() {
-		if (perfConfTabs != null) {
-			return perfConfTabs;
-		}
-
-		perfConfTabs = new ArrayList<AbstractToolConfigurationTab>();
-
-		IExtensionRegistry registry = Platform.getExtensionRegistry();
-		IExtensionPoint extensionPoint = registry.getExtensionPoint("org.eclipse.ptp.etfw.configurationTabs"); //$NON-NLS-1$
-		final IExtension[] extensions = extensionPoint.getExtensions();
-
-		for (final IExtension ext : extensions) {
-			final IConfigurationElement[] elements = ext.getConfigurationElements();
-
-			for (IConfigurationElement ce : elements) {
-				try {
-					AbstractToolConfigurationTab aGetter = (AbstractToolConfigurationTab) ce.createExecutableExtension("class"); //$NON-NLS-1$
-					// aGetter.setId(ce.getAttribute("id"));
-					perfConfTabs.add(aGetter);
-				} catch (CoreException e) {
-					e.printStackTrace();
-					// PTPCorePlugin.log(e);
-				}
-			}
-		}
-
-		return perfConfTabs;
-	}
-
-	private static ArrayList<IToolUITab> toolUITabs = null;
-
-	/**
-	 * @since 7.0
-	 */
-	public static ArrayList<IToolUITab> getToolUITabs() {
-		if (toolUITabs == null) {
-			toolUITabs = new ArrayList<IToolUITab>();
-
-			IExtensionRegistry registry = Platform.getExtensionRegistry();
-			IExtensionPoint extensionPoint = registry.getExtensionPoint("org.eclipse.ptp.etfw.toolUITabs"); //$NON-NLS-1$
-			final IExtension[] extensions = extensionPoint.getExtensions();
-
-			for (final IExtension ext : extensions) {
-				final IConfigurationElement[] elements = ext.getConfigurationElements();
-
-				for (IConfigurationElement ce : elements) {
-					try {
-						IToolUITab aGetter = (IToolUITab) ce.createExecutableExtension("class"); //$NON-NLS-1$
-						toolUITabs.add(aGetter);
-					} catch (CoreException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-		return toolUITabs;
-	}
-
-	private static ArrayList<AbstractToolDataManager> perfConfManagers = null;
-
-	public static ArrayList<AbstractToolDataManager> getPerfConfManagers() {
-		if (perfConfManagers != null) {
-			return perfConfManagers;
-		}
-
-		perfConfManagers = new ArrayList<AbstractToolDataManager>();
-
-		IExtensionRegistry registry = Platform.getExtensionRegistry();
-		IExtensionPoint extensionPoint = registry.getExtensionPoint("org.eclipse.ptp.etfw.dataManagers"); //$NON-NLS-1$
-		final IExtension[] extensions = extensionPoint.getExtensions();
-
-		for (final IExtension ext : extensions) {
-			final IConfigurationElement[] elements = ext.getConfigurationElements();
-
-			for (IConfigurationElement ce : elements) {
-				try {
-					AbstractToolDataManager aGetter = (AbstractToolDataManager) ce.createExecutableExtension("class"); //$NON-NLS-1$
-					// aGetter.setId(ce.getAttribute("id"));
-					perfConfManagers.add(aGetter);
-				} catch (CoreException e) {
-					e.printStackTrace();
-					// PTPCorePlugin.log(e);
-				}
-			}
-		}
-
-		return perfConfManagers;
-	}
-
-	public static AbstractToolDataManager getPerfDataManager(String name) {
-		if (name == null) {
-			return null;
-		}
-		AbstractToolDataManager check = null;
-		Iterator<AbstractToolDataManager> perfit = perfConfManagers.iterator();
-		while (perfit.hasNext()) {
-			check = perfit.next();
-			if (check.getName().equals(name)) {
-				return (check);
-			}
-		}
-		return null;
 	}
 }

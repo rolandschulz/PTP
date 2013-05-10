@@ -33,6 +33,11 @@ public class ToolPaneListener extends SelectionAdapter implements ModifyListener
 
 	IToolUITab thisTool;
 
+	@SuppressWarnings("unused")
+	private ToolPaneListener() {
+
+	}
+
 	/**
 	 * @since 5.0
 	 */
@@ -40,20 +45,8 @@ public class ToolPaneListener extends SelectionAdapter implements ModifyListener
 		thisTool = tool;
 	}
 
-	@SuppressWarnings("unused")
-	private ToolPaneListener() {
-
-	}
-
 	protected void localAction() {
 		// updateLaunchConfigurationDialog();
-	}
-
-	@Override
-	public void widgetSelected(SelectionEvent e) {
-		thisTool.OptUpdate();
-		thisTool.updateOptDisplay();
-		localAction();
 	}
 
 	public void modifyText(ModifyEvent evt) {
@@ -61,6 +54,13 @@ public class ToolPaneListener extends SelectionAdapter implements ModifyListener
 		// if (thisTool.updateOptField(source))
 		// localAction();
 		// TODO: This should only be set off once per reload. For now, don't use it at all.
+	}
+
+	@Override
+	public void widgetSelected(SelectionEvent e) {
+		thisTool.OptUpdate();
+		thisTool.updateOptDisplay();
+		localAction();
 	}
 
 }

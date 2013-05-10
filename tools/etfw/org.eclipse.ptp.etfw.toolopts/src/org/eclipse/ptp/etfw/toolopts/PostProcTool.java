@@ -1,6 +1,5 @@
 package org.eclipse.ptp.etfw.toolopts;
 
-
 public class PostProcTool extends ExternalTool {
 	/**
 	 * The array of analysis commands to be invoked when execution is complete

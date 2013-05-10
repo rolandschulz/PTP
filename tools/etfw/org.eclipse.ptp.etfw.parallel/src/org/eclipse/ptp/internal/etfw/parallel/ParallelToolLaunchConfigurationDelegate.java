@@ -49,6 +49,10 @@ public class ParallelToolLaunchConfigurationDelegate extends ParallelLaunchConfi
 
 	private boolean initialized = false;
 
+	public boolean getInitialized() {
+		return initialized;
+	}
+
 	/**
 	 * The primary launch command of this launch configuration delegate. The operations in this function are divided into three
 	 * jobs: Buildig, Running and Data collection
@@ -64,17 +68,17 @@ public class ParallelToolLaunchConfigurationDelegate extends ParallelLaunchConfi
 		}
 
 		try {
-			SubMonitor progress = SubMonitor.convert(monitor, 110);
+			final SubMonitor progress = SubMonitor.convert(monitor, 110);
 			progress.setTaskName(NLS.bind(Messages.ParallelToolLaunchConfigurationDelegate_Launching, configuration.getName()));
 			progress.setWorkRemaining(90);
 			// save the executable location so we can access it in the postprocessing
-			ILaunchConfigurationWorkingCopy wc = configuration.getWorkingCopy();
-			String progName = wc.getAttribute(IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME, "defaultValue"); //$NON-NLS-1$
-			String progPath = wc.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, "defaultValue"); //$NON-NLS-1$
-			String projName = wc.getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, "defaultValue"); //$NON-NLS-1$
+			final ILaunchConfigurationWorkingCopy wc = configuration.getWorkingCopy();
+			final String progName = wc.getAttribute(IPTPLaunchConfigurationConstants.ATTR_APPLICATION_NAME, "defaultValue"); //$NON-NLS-1$
+			final String progPath = wc.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, "defaultValue"); //$NON-NLS-1$
+			final String projName = wc.getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, "defaultValue"); //$NON-NLS-1$
 
-			IFileStore pdir = EFS.getLocalFileSystem().getStore(new Path(progPath));
-			IFileStore prog = pdir.getChild(progName);
+			final IFileStore pdir = EFS.getLocalFileSystem().getStore(new Path(progPath));
+			final IFileStore prog = pdir.getChild(progName);
 
 			wc.setAttribute(EXTOOL_EXECUTABLE_NAME, prog.toURI().getPath());// Path+File.separator+progName
 			wc.setAttribute(EXTOOL_PROJECT_NAME, projName);
@@ -97,7 +101,7 @@ public class ParallelToolLaunchConfigurationDelegate extends ParallelLaunchConfi
 
 			wc.doSave();
 
-			ILaunchFactory lf = new ParallelLaunchFactory();
+			final ILaunchFactory lf = new ParallelLaunchFactory();
 
 			{
 				// initialized = true;
@@ -107,7 +111,7 @@ public class ParallelToolLaunchConfigurationDelegate extends ParallelLaunchConfi
 						return;
 					}
 
-					ToolLaunchManager plaunch = new ToolLaunchManager(this, lf, new RemoteBuildLaunchUtils(configuration));
+					final ToolLaunchManager plaunch = new ToolLaunchManager(this, lf, new RemoteBuildLaunchUtils(configuration));
 					plaunch.launch(configuration, mode, launchIn, monitor);
 				}
 			}
@@ -122,10 +126,6 @@ public class ParallelToolLaunchConfigurationDelegate extends ParallelLaunchConfi
 	public void setInitialized(boolean init) {
 		initialized = init;
 
-	}
-
-	public boolean getInitialized() {
-		return initialized;
 	}
 
 	@Override
@@ -147,9 +147,9 @@ public class ParallelToolLaunchConfigurationDelegate extends ParallelLaunchConfi
 	}
 
 	protected boolean verifyProfilingTool(ILaunchConfiguration configuration) throws CoreException {
-		String whichParser = configuration.getAttribute(IToolLaunchConfigurationConstants.ETFW_VERSION,
+		final String whichParser = configuration.getAttribute(IToolLaunchConfigurationConstants.ETFW_VERSION,
 				IToolLaunchConfigurationConstants.EMPTY_STRING);
-		String whichTool = configuration.getAttribute(IToolLaunchConfigurationConstants.SELECTED_TOOL,
+		final String whichTool = configuration.getAttribute(IToolLaunchConfigurationConstants.SELECTED_TOOL,
 				IToolLaunchConfigurationConstants.EMPTY_STRING);
 
 		if (whichParser.isEmpty() || whichTool.isEmpty()) {

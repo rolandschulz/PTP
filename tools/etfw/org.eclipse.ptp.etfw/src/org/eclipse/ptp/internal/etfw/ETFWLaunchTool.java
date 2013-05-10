@@ -88,21 +88,57 @@ public class ETFWLaunchTool extends ETFWToolStep implements IToolLaunchConfigura
 
 	}
 
-	@Override
-	protected IStatus run(IProgressMonitor monitor) {
+	/**
+	 * Restore the previous default build configuration and optionally remove
+	 * the performance tool's build configuration Restore the previous launch
+	 * configuration settings
+	 * 
+	 * @throws CoreException
+	 */
+	public void cleanup() throws CoreException {
+		final ILaunchConfigurationWorkingCopy confWC = configuration.getWorkingCopy();
 
-		try {
-			if (!performLaunch(paraDel, launch, monitor))
-				return new Status(IStatus.WARNING,
-						"com.ibm.jdg2e.concurrency", IStatus.WARNING, Messages.LauncherTool_NothingToRun, null); //$NON-NLS-1$
-		} catch (Exception e) {
-			try {
-				cleanup();
-			} catch (CoreException e1) {
-			}
-			return new Status(IStatus.ERROR, "com.ibm.jdg2e.concurrency", IStatus.ERROR, Messages.LauncherTool_ExecutionError, e); //$NON-NLS-1$
+		if (apppathattrib != null && savePath != null) {
+			confWC.setAttribute(apppathattrib, savePath);
 		}
-		return new Status(IStatus.OK, "com.ibm.jdg2e.concurrency", IStatus.OK, Messages.LauncherTool_ExecutionComplete, null); //$NON-NLS-1$
+
+		if (tool != null && swappedArgs)
+		{
+			confWC.setAttribute(appnameattrib, saveApp);
+			confWC.setAttribute(appargattrib, saveArgs);
+		}
+
+		if (tool != null && swappedEnv) {
+			confWC.setAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, saveEnv);
+		}
+
+		confWC.setAttribute(appnameattrib, application);
+		configuration = confWC.doSave();
+	}
+
+	/**
+	 * Given a string which may be a valid path, returns the last directory in the path, or null if it is not a path.
+	 * 
+	 * @param path
+	 * @return
+	 */
+	private String getDirectory(String path) {
+		String projectDir = null;
+		IFileStore pdStore = null;
+		IFileInfo pdInfo = null;
+		if (path != null)
+		{
+			pdStore = utilBlob.getFile(path);
+			pdInfo = pdStore.fetchInfo();
+			if (pdInfo.exists()) {
+				if (!pdInfo.isDirectory()) {
+					pdStore = pdStore.getParent();
+				}
+				projectDir = pdStore.toURI().getPath();
+			}
+		}
+
+		return projectDir;
 	}
 
 	/**
@@ -121,7 +157,7 @@ public class ETFWLaunchTool extends ETFWToolStep implements IToolLaunchConfigura
 
 			String path = null;
 			String prog = null;
-			ILaunchConfigurationWorkingCopy confWC = configuration.getWorkingCopy();
+			final ILaunchConfigurationWorkingCopy confWC = configuration.getWorkingCopy();
 			application = confWC.getAttribute(appnameattrib, (String) null);
 
 			/*
@@ -147,17 +183,18 @@ public class ETFWLaunchTool extends ETFWToolStep implements IToolLaunchConfigura
 			}
 
 			if ((testStore != null && testStore.fetchInfo().exists() && !testStore.fetchInfo().isDirectory()) || progStoreGood) {
-				if (apppathattrib != null)
+				if (apppathattrib != null) {
 					savePath = confWC.getAttribute(apppathattrib, (String) null);
-				else
+				} else {
 					savePath = null;
+				}
 
 				// IFileStore testStore=utilBlob.getFile(progPath);
 				// IFileStore progStore=utilBlob.getFile(projectLocation);
 				if (progStoreGood) {
 					// progStore=progStore.getChild(progPath);
 
-					String jaxbAtt = confWC.getAttribute(EXTOOL_JAXB_EXECUTABLE_PATH_TAG, EMPTY_STRING);
+					final String jaxbAtt = confWC.getAttribute(EXTOOL_JAXB_EXECUTABLE_PATH_TAG, EMPTY_STRING);
 					if (jaxbAtt.length() > 0) {
 						confWC.setAttribute(jaxbAtt, progStore.toURI().getPath());
 					}
@@ -198,17 +235,18 @@ public class ETFWLaunchTool extends ETFWToolStep implements IToolLaunchConfigura
 					}
 				}
 				// TODO: This needs to work for PTP too eventually
-				String arg = confWC.getAttribute(appargattrib, EMPTY_STRING);
+				final String arg = confWC.getAttribute(appargattrib, EMPTY_STRING);
 				saveApp = prog;
 				saveArgs = arg;
-				Map<String, String> envMap = new LinkedHashMap<String, String>();
+				final Map<String, String> envMap = new LinkedHashMap<String, String>();
 
 				if (tool.getExecUtils() != null && tool.getExecUtils().size() > 0) {
 
-					String firstExecUtil = getToolExecutable(tool.getExecUtils().get(0));// tool.execUtils[0]);
+					final String firstExecUtil = getToolExecutable(tool.getExecUtils().get(0));// tool.execUtils[0]);
 
-					if (firstExecUtil == null)
+					if (firstExecUtil == null) {
 						throw new Exception(Messages.LauncherTool_Tool + firstExecUtil + Messages.LauncherTool_NotFound);
+					}
 
 					if (!usepathforapp) {
 						confWC.setAttribute(appnameattrib, firstExecUtil);
@@ -235,13 +273,15 @@ public class ETFWLaunchTool extends ETFWToolStep implements IToolLaunchConfigura
 					confWC.setAttribute(appargattrib, toArgs);
 
 					String jaxbAtt = confWC.getAttribute(EXTOOL_JAXB_ATTR_ARGUMENTS_TAG, EMPTY_STRING);
-					if (jaxbAtt != null && jaxbAtt.length() > 0)
+					if (jaxbAtt != null && jaxbAtt.length() > 0) {
 						confWC.setAttribute(jaxbAtt, toArgs);
+					}
 					jaxbAtt = confWC.getAttribute(EXTOOL_JAXB_EXECUTABLE_PATH_TAG, EMPTY_STRING);
-					if (jaxbAtt != null && jaxbAtt.length() > 0)
+					if (jaxbAtt != null && jaxbAtt.length() > 0) {
 						confWC.setAttribute(jaxbAtt, firstExecUtil);
+					}
 
-					for (ToolAppType toolApp : tool.getExecUtils()) {
+					for (final ToolAppType toolApp : tool.getExecUtils()) {
 						envMap.putAll(ToolAppTypeUtil.getEnvVars(configuration, toolApp.getToolPanes(), toolApp.getToolArguments()));
 					}
 
@@ -254,12 +294,13 @@ public class ETFWLaunchTool extends ETFWToolStep implements IToolLaunchConfigura
 
 				if (envMap.size() > 0) {
 
-					String wd = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, (String) null);
+					final String wd = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, (String) null);
 					String projectDir = null;
-					if (wd != null && wd.length() > 0)
+					if (wd != null && wd.length() > 0) {
 						projectDir = wd;
-					else
+					} else {
 						projectDir = getDirectory(path);
+					}
 					if (projectDir == null) {
 						projectDir = getDirectory(prog);
 					}
@@ -268,11 +309,11 @@ public class ETFWLaunchTool extends ETFWToolStep implements IToolLaunchConfigura
 					}
 					if (projectDir != null) {
 						this.outputLocation = projectDir;
-						Set<String> mapKeys = envMap.keySet();
-						Iterator<String> keyIt = mapKeys.iterator();
+						final Set<String> mapKeys = envMap.keySet();
+						final Iterator<String> keyIt = mapKeys.iterator();
 						while (keyIt.hasNext()) {
-							String key = keyIt.next();
-							String var = envMap.get(key);
+							final String key = keyIt.next();
+							final String var = envMap.get(key);
 							if (var.equals(PROJECT_DIR)) {
 								envMap.put(key, projectDir);
 							}
@@ -280,10 +321,11 @@ public class ETFWLaunchTool extends ETFWToolStep implements IToolLaunchConfigura
 					}
 					saveEnv = confWC.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, (Map<String, String>) null);
 					Map<String, String> newvars = null;
-					if (saveEnv != null)
+					if (saveEnv != null) {
 						newvars = new LinkedHashMap<String, String>(saveEnv);
-					else
+					} else {
 						newvars = new LinkedHashMap<String, String>();
+					}
 					newvars.putAll(envMap);
 					swappedEnv = true;
 					confWC.setAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, newvars);
@@ -293,10 +335,10 @@ public class ETFWLaunchTool extends ETFWToolStep implements IToolLaunchConfigura
 			}
 			configuration = confWC.doSave();
 
-			boolean reRun = launch.isTerminated();
+			final boolean reRun = launch.isTerminated();
 			if (reRun) {
-				IProcess[] ip = launch.getProcesses();
-				for (IProcess p : ip) {
+				final IProcess[] ip = launch.getProcesses();
+				for (final IProcess p : ip) {
 					launch.removeProcess(p);
 				}
 			}
@@ -328,66 +370,33 @@ public class ETFWLaunchTool extends ETFWToolStep implements IToolLaunchConfigura
 		}
 	}
 
-	/**
-	 * Given a string which may be a valid path, returns the last directory in the path, or null if it is not a path.
-	 * 
-	 * @param path
-	 * @return
-	 */
-	private String getDirectory(String path) {
-		String projectDir = null;
-		IFileStore pdStore = null;
-		IFileInfo pdInfo = null;
-		if (path != null)
-		{
-			pdStore = utilBlob.getFile(path);
-			pdInfo = pdStore.fetchInfo();
-			if (pdInfo.exists()) {
-				if (!pdInfo.isDirectory()) {
-					pdStore = pdStore.getParent();
-				}
-				projectDir = pdStore.toURI().getPath();
+	@Override
+	protected IStatus run(IProgressMonitor monitor) {
+
+		try {
+			if (!performLaunch(paraDel, launch, monitor))
+			{
+				return new Status(IStatus.WARNING,
+						"com.ibm.jdg2e.concurrency", IStatus.WARNING, Messages.LauncherTool_NothingToRun, null); //$NON-NLS-1$
 			}
+		} catch (final Exception e) {
+			try {
+				cleanup();
+			} catch (final CoreException e1) {
+			}
+			return new Status(IStatus.ERROR, "com.ibm.jdg2e.concurrency", IStatus.ERROR, Messages.LauncherTool_ExecutionError, e); //$NON-NLS-1$
 		}
-
-		return projectDir;
+		return new Status(IStatus.OK, "com.ibm.jdg2e.concurrency", IStatus.OK, Messages.LauncherTool_ExecutionComplete, null); //$NON-NLS-1$
 	}
 
-	/**
-	 * Restore the previous default build configuration and optionally remove
-	 * the performance tool's build configuration Restore the previous launch
-	 * configuration settings
-	 * 
-	 * @throws CoreException
-	 */
-	public void cleanup() throws CoreException {
-		ILaunchConfigurationWorkingCopy confWC = configuration.getWorkingCopy();
-
-		if (apppathattrib != null && savePath != null) {
-			confWC.setAttribute(apppathattrib, savePath);
-		}
-
-		if (tool != null && swappedArgs)
-		{
-			confWC.setAttribute(appnameattrib, saveApp);
-			confWC.setAttribute(appargattrib, saveArgs);
-		}
-
-		if (tool != null && swappedEnv) {
-			confWC.setAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, saveEnv);
-		}
-
-		confWC.setAttribute(appnameattrib, application);
-		configuration = confWC.doSave();
-	}
-
+	@Override
 	public void setSuccessAttribute(String value) {
 		if (tool != null && tool.getSetSuccessAttribute() != null) {
 			try {
-				ILaunchConfigurationWorkingCopy configuration = this.configuration.getWorkingCopy();
+				final ILaunchConfigurationWorkingCopy configuration = this.configuration.getWorkingCopy();
 				configuration.setAttribute(tool.getSetSuccessAttribute(), value);
 				configuration.doSave();
-			} catch (CoreException e) {
+			} catch (final CoreException e) {
 				// Ignore
 			}
 		}

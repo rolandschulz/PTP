@@ -25,14 +25,47 @@ import org.eclipse.swt.widgets.Shell;
 
 public class EventTreeDialog extends Dialog {
 
+	class ETreeCellLabelProvider extends CellLabelProvider {
+
+		@Override
+		public int getToolTipDisplayDelayTime(Object object) {
+			return 1000;
+		}
+
+		@Override
+		public Point getToolTipShift(Object object) {
+			return new Point(5, 5);
+		}
+
+		@Override
+		public String getToolTipText(Object o) {
+			if (o instanceof ETItem) {
+				return ((ETItem) o).desc;
+			}
+			return null;
+		}
+
+		@Override
+		public int getToolTipTimeDisplayed(Object object) {
+			return 50000;
+		}
+
+		@Override
+		public void update(ViewerCell cell) {
+			cell.setText(((ETItem) cell.getElement()).label);
+		}
+
+	}
+
 	CheckboxTreeViewer treeV;
 	EventTree et;
 	private final IFileStore toolPath;
 	// private Tree tree;
 	PapiCSelect cSelect;
-	private final IBuildLaunchUtils utilBlob;
 
 	// private final String treeTop="treeTop";
+
+	private final IBuildLaunchUtils utilBlob;
 
 	/**
 	 * @since 4.0
@@ -44,14 +77,56 @@ public class EventTreeDialog extends Dialog {
 		toolPath = tp;
 	}
 
+	public ArrayList<String> checkCommands() {
+
+		// EventTree ett=(EventTree) treeV.getContentProvider();
+
+		final ArrayList<String> selE = new ArrayList<String>();
+
+		for (int i = 0; i < et.children.size(); i++) {
+			for (int j = 0; j < et.children.get(i).children.size(); j++) {
+				for (int k = 0; k < et.children.get(i).children.get(j).children.size(); k++) {
+					final Event e = (Event) et.children.get(i).children.get(j).children.get(k);
+					if (e.getCheck() && e.children.size() > 0 && e.testCommand().indexOf(":") < 0) //$NON-NLS-1$
+					{
+						selE.add(e.testCommand());
+					}
+				}
+			}
+		}
+
+		return selE;
+	}
+
+	private void checkGray(ArrayList<ETItem> all, Set<Integer> grey) {
+		boolean isGrey = false;
+		Event test = null;
+		for (int i = 0; i < all.size(); i++) {
+			test = (Event) all.get(i);
+			isGrey = (!test.checked) && grey.contains(new Integer(test.index));
+			if (isGrey) {
+				treeV.setGrayChecked(test, true);// grey.contains(new
+													// Integer(((Event)all.get(i)).index)));
+			} else {
+
+				treeV.setGrayed(test, false);
+				if (!test.checked) {
+					treeV.setChecked(test, false);
+				}
+
+			}
+			// if(isGrey)treeV.setChecked(all.get(i),isGrey);
+		}
+	}
+
 	@Override
 	protected Control createDialogArea(Composite top) {
 		top.getShell().setText(Messages.EventTreeDialog_PapiEventSelection);
-		Composite parent = (Composite) super.createDialogArea(top);
-		GridLayout gl = new GridLayout();
+		final Composite parent = (Composite) super.createDialogArea(top);
+		final GridLayout gl = new GridLayout();
 		parent.setLayout(gl);
 
-		GridData gd = new GridData(GridData.FILL_BOTH);
+		final GridData gd = new GridData(GridData.FILL_BOTH);
 		gd.heightHint = 500;
 		gd.widthHint = 350;
 
@@ -78,7 +153,7 @@ public class EventTreeDialog extends Dialog {
 		treeV.addCheckStateListener(new ICheckStateListener() {
 
 			public void checkStateChanged(CheckStateChangedEvent event) {
-				Object element = event.getElement();
+				final Object element = event.getElement();
 
 				if (treeV.getGrayed(element)) {
 					treeV.setChecked(element, true);
@@ -95,110 +170,9 @@ public class EventTreeDialog extends Dialog {
 		return parent;
 	}
 
-	class ETreeCellLabelProvider extends CellLabelProvider {
-
-		@Override
-		public Point getToolTipShift(Object object) {
-			return new Point(5, 5);
-		}
-
-		@Override
-		public int getToolTipDisplayDelayTime(Object object) {
-			return 1000;
-		}
-
-		@Override
-		public int getToolTipTimeDisplayed(Object object) {
-			return 50000;
-		}
-
-		@Override
-		public void update(ViewerCell cell) {
-			cell.setText(((ETItem) cell.getElement()).label);
-		}
-
-		@Override
-		public String getToolTipText(Object o) {
-			if (o instanceof ETItem) {
-				return ((ETItem) o).desc;
-			}
-			return null;
-		}
-
-	}
-
-	@Override
-	protected void okPressed() {
-		ArrayList<String> badCom = checkCommands();
-		if (badCom.size() > 0) {
-			String events = ""; //$NON-NLS-1$
-			for (int i = 0; i < badCom.size(); i++) {
-				events += badCom.get(i);
-				if (i != badCom.size() - 1) {
-					events += ", "; //$NON-NLS-1$
-				}
-			}
-			MessageDialog.openWarning(this.getShell(), Messages.EventTreeDialog_EventModifiersRequired,
-					Messages.EventTreeDialog_PleaseSelectAtLeastOneMod + events);
-			return;
-		}
-
-		super.okPressed();
-	}
-
-	public ArrayList<String> getCommands() {
-
-		// EventTree ett=(EventTree) treeV.getContentProvider();
-
-		ArrayList<String> selE = new ArrayList<String>();
-
-		for (int i = 0; i < et.children.size(); i++) {
-			for (int j = 0; j < et.children.get(i).children.size(); j++) {
-				for (int k = 0; k < et.children.get(i).children.get(j).children.size(); k++) {
-					Event e = (Event) et.children.get(i).children.get(j).children.get(k);
-					if (e.getCheck()) {
-						selE.add(e.getCommand());
-						// System.out.println(e.getCommand());
-						// for(int l=0;l<e.children.size();l++)
-						// {
-						// if(e.children.get(l).checked)
-						// {
-						// System.out.print(e.children.get(l).label);
-						// }
-						// }
-						// System.out.println();
-					}
-				}
-			}
-		}
-
-		return selE;
-	}
-
-	public ArrayList<String> checkCommands() {
-
-		// EventTree ett=(EventTree) treeV.getContentProvider();
-
-		ArrayList<String> selE = new ArrayList<String>();
-
-		for (int i = 0; i < et.children.size(); i++) {
-			for (int j = 0; j < et.children.get(i).children.size(); j++) {
-				for (int k = 0; k < et.children.get(i).children.get(j).children.size(); k++) {
-					Event e = (Event) et.children.get(i).children.get(j).children.get(k);
-					if (e.getCheck() && e.children.size() > 0 && e.testCommand().indexOf(":") < 0) //$NON-NLS-1$
-					{
-						selE.add(e.testCommand());
-					}
-				}
-			}
-		}
-
-		return selE;
-	}
-
 	private void doCheck(ETItem element, boolean checked) {
 		if (element instanceof EventTree || element instanceof Component || element instanceof EventSet) {
-			ETItem eti = element;
+			final ETItem eti = element;
 			ETItem toCheck = null;
 			eti.setCheck(checked);
 			for (int i = 0; i < eti.children.size(); i++) {
@@ -218,13 +192,13 @@ public class EventTreeDialog extends Dialog {
 			} else {
 				if (element instanceof Event) {
 					if (!treeV.getGrayed(element)) {
-						Event e = (Event) element;
+						final Event e = (Event) element;
 						e.setCheck(checked);// event.getChecked());
 
-						Component c = (Component) e.parent.parent;
+						final Component c = (Component) e.parent.parent;
 						// ((ETItem)element).checked=event.getChecked();
 
-						Set<Integer>[] av = cSelect.getAvailable(c.index, c.eNames);
+						final Set<Integer>[] av = cSelect.getAvailable(c.index, c.eNames);
 
 						if (av == null) {
 							return;
@@ -293,24 +267,51 @@ public class EventTreeDialog extends Dialog {
 		}
 	}
 
-	private void checkGray(ArrayList<ETItem> all, Set<Integer> grey) {
-		boolean isGrey = false;
-		Event test = null;
-		for (int i = 0; i < all.size(); i++) {
-			test = (Event) all.get(i);
-			isGrey = (!test.checked) && grey.contains(new Integer(test.index));
-			if (isGrey) {
-				treeV.setGrayChecked(test, true);// grey.contains(new
-													// Integer(((Event)all.get(i)).index)));
-			} else {
+	public ArrayList<String> getCommands() {
 
-				treeV.setGrayed(test, false);
-				if (!test.checked) {
-					treeV.setChecked(test, false);
+		// EventTree ett=(EventTree) treeV.getContentProvider();
+
+		final ArrayList<String> selE = new ArrayList<String>();
+
+		for (int i = 0; i < et.children.size(); i++) {
+			for (int j = 0; j < et.children.get(i).children.size(); j++) {
+				for (int k = 0; k < et.children.get(i).children.get(j).children.size(); k++) {
+					final Event e = (Event) et.children.get(i).children.get(j).children.get(k);
+					if (e.getCheck()) {
+						selE.add(e.getCommand());
+						// System.out.println(e.getCommand());
+						// for(int l=0;l<e.children.size();l++)
+						// {
+						// if(e.children.get(l).checked)
+						// {
+						// System.out.print(e.children.get(l).label);
+						// }
+						// }
+						// System.out.println();
+					}
 				}
-
 			}
-			// if(isGrey)treeV.setChecked(all.get(i),isGrey);
 		}
+
+		return selE;
+	}
+
+	@Override
+	protected void okPressed() {
+		final ArrayList<String> badCom = checkCommands();
+		if (badCom.size() > 0) {
+			String events = ""; //$NON-NLS-1$
+			for (int i = 0; i < badCom.size(); i++) {
+				events += badCom.get(i);
+				if (i != badCom.size() - 1) {
+					events += ", "; //$NON-NLS-1$
+				}
+			}
+			MessageDialog.openWarning(this.getShell(), Messages.EventTreeDialog_EventModifiersRequired,
+					Messages.EventTreeDialog_PleaseSelectAtLeastOneMod + events);
+			return;
+		}
+
+		super.okPressed();
 	}
 }

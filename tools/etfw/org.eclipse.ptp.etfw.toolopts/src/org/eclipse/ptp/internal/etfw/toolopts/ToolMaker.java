@@ -34,7 +34,6 @@ import org.eclipse.ptp.etfw.toolopts.ToolPaneListener;
 import org.eclipse.ptp.etfw.toolopts.ToolsOptionsConstants;
 import org.eclipse.ptp.internal.etfw.toolopts.messages.Messages;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -61,38 +60,146 @@ import org.xml.sax.SAXParseException;
 public class ToolMaker {
 
 	/**
-	 * Creates ExternalTools
+	 * Creates a checkbox
 	 * 
-	 * @param tooldef
-	 *            The xml file containing the definition of one or more tool-panes
-	 * @return The array of defined but uninitialized ToolPanes defined in the provided xml file
-	 * @since 4.0
+	 * @param parent
+	 *            The composite where the checkbox is created
+	 * @param label
+	 *            The label of the checkbox
+	 * @return The created checkbox
 	 */
-	public static ExternalToolProcess[] makeTools(IFileStore tooldef) {
-		SAXParserFactory factory = SAXParserFactory.newInstance();
-		// factory.setValidating(false);
-		ToolParser tparser = new ToolParser();
-		try {
-			try {
-				factory.newSAXParser().parse(tooldef.openInputStream(EFS.NONE, null), tparser);
-			} catch (CoreException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} catch (SAXParseException e) {
-			System.err.println(Messages.ToolMaker_ErrorInWorkflowDefinition + e.getSystemId() + Messages.ToolMaker_AtLine
-					+ e.getLineNumber() + Messages.ToolMaker_Column + e.getColumnNumber());
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+	protected static Button createCheckButton(Composite parent, String label) {
+		final Button button = new Button(parent, SWT.CHECK);
+		button.setText(label);
+		final GridData data = new GridData();
+		button.setLayoutData(data);
+		button.setFont(parent.getFont());
+		// SWTUtil.setButtonDimensionHint(button);
+		return button;
+	}
+
+	/**
+	 * Returns a new GridLayout
+	 * 
+	 * @param columns
+	 *            Number of columns
+	 * @param isEqual
+	 * @param mh
+	 * @param mw
+	 * @return
+	 */
+	protected static GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) {
+		final GridLayout gridLayout = new GridLayout();
+		gridLayout.numColumns = columns;
+		gridLayout.makeColumnsEqualWidth = isEqual;
+		gridLayout.marginHeight = mh;
+		gridLayout.marginWidth = mw;
+		return gridLayout;
+	}
+
+	/**
+	 * Creates a button
+	 * 
+	 * @param parent
+	 *            The composite where the button is created
+	 * @param label
+	 *            The label of the button
+	 * @return The created button
+	 */
+	protected static Button createPushButton(Composite parent, String label) {
+		final Button button = new Button(parent, SWT.PUSH);
+		button.setFont(parent.getFont());
+
+		if (label != null) {
+			button.setText(label);
 		}
-		ExternalToolProcess[] tparr = new ExternalToolProcess[tparser.externalToolList.size()];
-		tparser.externalToolList.toArray(tparr);
-		return tparr;
+		final GridData gd = new GridData();
+		button.setLayoutData(gd);
+		// SWTUtil.setButtonDimensionHint(button);
+		return button;
+	}
+
+	protected static void createVerticalSpacer(Composite comp, int colSpan) {
+		final Label label = new Label(comp, SWT.NONE);
+		final GridData gd = new GridData();
+		gd.horizontalSpan = colSpan;
+		label.setLayoutData(gd);
+		label.setFont(comp.getFont());
+	}
+
+	/**
+	 * Initializes a single tool option
+	 * 
+	 * @param comp
+	 *            The composite where the ToolOption is to be displayed
+	 * @param toolOpt
+	 *            The ToolOption to be displayed
+	 * @param browseListener
+	 *            The listener that defines behavior for this tool's browse buttons, if any
+	 * @param checkListener
+	 *            The listener that defines behavior for this tool's check boxe and value field, if any
+	 */
+	protected static void displayToolOption(Composite comp, ToolOption toolOpt, SelectionListener browseListener,
+			ToolPaneListener checkListener) {
+
+		initializeCheckLabel(comp, toolOpt);
+
+		// If this option is a boolean or a toggle we don't need any widgets but the checkbox
+		if (toolOpt.type == ToolOption.BOOL || toolOpt.type == ToolOption.TOGGLE) {
+
+			new Label(comp, SWT.NULL);
+			new Label(comp, SWT.NULL);
+		}
+		// If this option is text only we just need the argbox
+		else if (toolOpt.type == ToolOption.TEXT) {
+			toolOpt.argbox = new Text(comp, SWT.BORDER | SWT.SINGLE);
+			toolOpt.argbox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			toolOpt.argbox.setToolTipText(toolOpt.valueToolTip);
+			if (checkListener != null) {
+				toolOpt.argbox.addModifyListener(checkListener);
+			}
+
+			new Label(comp, SWT.NULL);
+		}
+		// This is a widget with a browse button, so build it accordingly
+		else if (toolOpt.type == ToolOption.DIR || toolOpt.type == ToolOption.FILE) {
+			toolOpt.argbox = new Text(comp, SWT.BORDER | SWT.SINGLE);
+			toolOpt.argbox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			toolOpt.argbox.setToolTipText(toolOpt.valueToolTip);
+
+			if (checkListener != null) {
+				toolOpt.argbox.addModifyListener(checkListener);
+			}
+			toolOpt.browser = createPushButton(comp, Messages.ToolMaker_Browse);
+			if (browseListener != null) {
+				toolOpt.browser.addSelectionListener(browseListener);
+			}
+		} else if (toolOpt.type == ToolOption.COMBO) {
+			toolOpt.combopt = new Combo(comp, SWT.NULL);
+			toolOpt.combopt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			toolOpt.combopt.setToolTipText(toolOpt.valueToolTip);
+			toolOpt.combopt.setItems(toolOpt.items);
+			toolOpt.combopt.select(toolOpt.defNum);
+			if (checkListener != null) {
+				toolOpt.combopt.addModifyListener(checkListener);
+			}
+			new Label(comp, SWT.NULL);
+		} else if (toolOpt.type == ToolOption.NUMBER) {
+			toolOpt.numopt = new Spinner(comp, SWT.NULL);
+			toolOpt.numopt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			toolOpt.numopt.setToolTipText(toolOpt.valueToolTip);
+			toolOpt.numopt.setMaximum(toolOpt.maxNum);
+			toolOpt.numopt.setMinimum(toolOpt.minNum);
+			if (checkListener != null) {
+				toolOpt.numopt.addModifyListener(checkListener);
+			}
+
+			new Label(comp, SWT.NULL);
+		}
+
+		if (checkListener != null && toolOpt.unitCheck != null) {
+			toolOpt.unitCheck.addSelectionListener(checkListener);
+		}
 	}
 
 	/**
@@ -130,6 +237,34 @@ public class ToolMaker {
 	}
 
 	/**
+	 * Creates a new shell from the workbench's current display
+	 * 
+	 * @return A fresh shell
+	 */
+	protected static Shell getShell() {
+		final Display thisDisplay = PlatformUI.getWorkbench().getDisplay();// .getCurrent();//.getDefault();
+
+		Shell s = thisDisplay.getActiveShell();
+		if (s == null) {
+			final Shell[] shells = thisDisplay.getShells();
+			s = shells[0];
+		}
+
+		return new Shell(s);
+	}
+
+	private static void initializeCheckLabel(Composite comp, ToolOption toolOpt) {
+		if (!toolOpt.required) {
+			toolOpt.unitCheck = createCheckButton(comp, toolOpt.optLabel);
+			toolOpt.unitCheck.setToolTipText(toolOpt.toolTip);
+		} else {
+			toolOpt.reqLabel = new Label(comp, SWT.NONE);
+			toolOpt.reqLabel.setText(toolOpt.optLabel);
+			toolOpt.reqLabel.setToolTipText(toolOpt.toolTip);
+		}
+	}
+
+	/**
 	 * Initializes a tool pane within a composite provided by the user
 	 * 
 	 * @param comp
@@ -148,7 +283,7 @@ public class ToolMaker {
 
 		if (pane.displayOptions) {
 			pane.showOpts = new Text(comp, SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL);
-			GridData showOptGD = new GridData();
+			final GridData showOptGD = new GridData();
 			showOptGD.horizontalAlignment = SWT.FILL;
 			showOptGD.verticalAlignment = SWT.FILL;
 			showOptGD.horizontalSpan = 3;
@@ -161,19 +296,19 @@ public class ToolMaker {
 			pane.showOpts.setLayoutData(showOptGD);
 		}
 
-		Composite invis = new Composite(comp, SWT.NONE);
+		final Composite invis = new Composite(comp, SWT.NONE);
 		invis.setVisible(false);
 
-		GridData gridData = new GridData(GridData.VERTICAL_ALIGN_END);
+		final GridData gridData = new GridData(GridData.VERTICAL_ALIGN_END);
 		gridData.horizontalSpan = 3;
 		gridData.horizontalAlignment = GridData.FILL;
 		invis.setLayoutData(gridData);
 
-		for (int i = 0; i < pane.options.length; i++) {
-			if (pane.options[i].visible) {
-				displayToolOption(comp, pane.options[i], pane.browseListener, checkListener);
+		for (final ToolOption option : pane.options) {
+			if (option.visible) {
+				displayToolOption(comp, option, pane.browseListener, checkListener);
 			} else {
-				displayToolOption(invis, pane.options[i], pane.browseListener, checkListener);
+				displayToolOption(invis, option, pane.browseListener, checkListener);
 			}
 		}
 		invis.setSize(0, 0);
@@ -181,131 +316,39 @@ public class ToolMaker {
 		// createVerticalSpacer(comp, 3);
 	}
 
-	private static void initializeCheckLabel(Composite comp, ToolOption toolOpt) {
-		if (!toolOpt.required) {
-			toolOpt.unitCheck = createCheckButton(comp, toolOpt.optLabel);
-			toolOpt.unitCheck.setToolTipText(toolOpt.toolTip);
-		} else {
-			toolOpt.reqLabel = new Label(comp, SWT.NONE);
-			toolOpt.reqLabel.setText(toolOpt.optLabel);
-			toolOpt.reqLabel.setToolTipText(toolOpt.toolTip);
-		}
-	}
-
 	/**
-	 * Initializes a single tool option
+	 * Creates ExternalTools
 	 * 
-	 * @param comp
-	 *            The composite where the ToolOption is to be displayed
-	 * @param toolOpt
-	 *            The ToolOption to be displayed
-	 * @param browseListener
-	 *            The listener that defines behavior for this tool's browse buttons, if any
-	 * @param checkListener
-	 *            The listener that defines behavior for this tool's check boxe and value field, if any
+	 * @param tooldef
+	 *            The xml file containing the definition of one or more tool-panes
+	 * @return The array of defined but uninitialized ToolPanes defined in the provided xml file
+	 * @since 4.0
 	 */
-	protected static void displayToolOption(Composite comp, ToolOption toolOpt, SelectionListener browseListener,
-			ToolPaneListener checkListener) {
-
-		initializeCheckLabel(comp, toolOpt);
-
-		// If this option is a boolean or a toggle we don't need any widgets but the checkbox
-		if (toolOpt.type == ToolOption.BOOL || toolOpt.type == ToolOption.TOGGLE) {
-
-			new Label(comp, SWT.NULL);
-			new Label(comp, SWT.NULL);
-		}
-		// If this option is text only we just need the argbox
-		else if (toolOpt.type == ToolOption.TEXT) {
-			toolOpt.argbox = new Text(comp, SWT.BORDER | SWT.SINGLE);
-			toolOpt.argbox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-			toolOpt.argbox.setToolTipText(toolOpt.valueToolTip);
-			if (checkListener != null) {
-				toolOpt.argbox.addModifyListener((ModifyListener) checkListener);
+	public static ExternalToolProcess[] makeTools(IFileStore tooldef) {
+		final SAXParserFactory factory = SAXParserFactory.newInstance();
+		// factory.setValidating(false);
+		final ToolParser tparser = new ToolParser();
+		try {
+			try {
+				factory.newSAXParser().parse(tooldef.openInputStream(EFS.NONE, null), tparser);
+			} catch (final CoreException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-
-			new Label(comp, SWT.NULL);
+		} catch (final SAXParseException e) {
+			System.err.println(Messages.ToolMaker_ErrorInWorkflowDefinition + e.getSystemId() + Messages.ToolMaker_AtLine
+					+ e.getLineNumber() + Messages.ToolMaker_Column + e.getColumnNumber());
+			e.printStackTrace();
+		} catch (final ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (final SAXException e) {
+			e.printStackTrace();
+		} catch (final IOException e) {
+			e.printStackTrace();
 		}
-		// This is a widget with a browse button, so build it accordingly
-		else if (toolOpt.type == ToolOption.DIR || toolOpt.type == ToolOption.FILE) {
-			toolOpt.argbox = new Text(comp, SWT.BORDER | SWT.SINGLE);
-			toolOpt.argbox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-			toolOpt.argbox.setToolTipText(toolOpt.valueToolTip);
-
-			if (checkListener != null) {
-				toolOpt.argbox.addModifyListener((ModifyListener) checkListener);
-			}
-			toolOpt.browser = createPushButton(comp, Messages.ToolMaker_Browse);
-			if (browseListener != null) {
-				toolOpt.browser.addSelectionListener(browseListener);
-			}
-		} else if (toolOpt.type == ToolOption.COMBO) {
-			toolOpt.combopt = new Combo(comp, SWT.NULL);
-			toolOpt.combopt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-			toolOpt.combopt.setToolTipText(toolOpt.valueToolTip);
-			toolOpt.combopt.setItems(toolOpt.items);
-			toolOpt.combopt.select(toolOpt.defNum);
-			if (checkListener != null) {
-				toolOpt.combopt.addModifyListener((ModifyListener) checkListener);
-			}
-			new Label(comp, SWT.NULL);
-		} else if (toolOpt.type == ToolOption.NUMBER) {
-			toolOpt.numopt = new Spinner(comp, SWT.NULL);
-			toolOpt.numopt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-			toolOpt.numopt.setToolTipText(toolOpt.valueToolTip);
-			toolOpt.numopt.setMaximum(toolOpt.maxNum);
-			toolOpt.numopt.setMinimum(toolOpt.minNum);
-			if (checkListener != null) {
-				toolOpt.numopt.addModifyListener((ModifyListener) checkListener);
-			}
-
-			new Label(comp, SWT.NULL);
-		}
-
-		if (checkListener != null && toolOpt.unitCheck != null) {
-			toolOpt.unitCheck.addSelectionListener(checkListener);
-		}
-	}
-
-	/**
-	 * Creates a checkbox
-	 * 
-	 * @param parent
-	 *            The composite where the checkbox is created
-	 * @param label
-	 *            The label of the checkbox
-	 * @return The created checkbox
-	 */
-	protected static Button createCheckButton(Composite parent, String label) {
-		Button button = new Button(parent, SWT.CHECK);
-		button.setText(label);
-		GridData data = new GridData();
-		button.setLayoutData(data);
-		button.setFont(parent.getFont());
-		// SWTUtil.setButtonDimensionHint(button);
-		return button;
-	}
-
-	/**
-	 * Creates a button
-	 * 
-	 * @param parent
-	 *            The composite where the button is created
-	 * @param label
-	 *            The label of the button
-	 * @return The created button
-	 */
-	protected static Button createPushButton(Composite parent, String label) {
-		Button button = new Button(parent, SWT.PUSH);
-		button.setFont(parent.getFont());
-
-		if (label != null) {
-			button.setText(label);
-		}
-		GridData gd = new GridData();
-		button.setLayoutData(gd);
-		// SWTUtil.setButtonDimensionHint(button);
-		return button;
+		final ExternalToolProcess[] tparr = new ExternalToolProcess[tparser.externalToolList.size()];
+		tparser.externalToolList.toArray(tparr);
+		return tparr;
 	}
 
 	/**
@@ -326,79 +369,43 @@ public class ToolMaker {
 		}
 
 		if (opt.type == ToolOption.DIR) {
-			DirectoryDialog dialog = new DirectoryDialog(getShell());
+			final DirectoryDialog dialog = new DirectoryDialog(getShell());
 			dialog.setText(dialogText);
 
-			String correctPath = opt.argbox.getText();// getFieldContent(tauArch.getText());
+			final String correctPath = opt.argbox.getText();// getFieldContent(tauArch.getText());
 			if (correctPath != null) {
-				IFileStore path = EFS.getLocalFileSystem().getStore(new Path(correctPath));
+				final IFileStore path = EFS.getLocalFileSystem().getStore(new Path(correctPath));
 				if (path.fetchInfo().exists()) {
 					dialog.setFilterPath(!path.fetchInfo().isDirectory() ? correctPath : path.getParent().toURI().getPath());
 				}
 			}
 
-			String selectedPath = dialog.open();
+			final String selectedPath = dialog.open();
 			if (selectedPath != null) {
 				opt.argbox.setText(selectedPath);
 			}
 		} else if (opt.type == ToolOption.FILE) {
-			FileDialog dialog = new FileDialog(getShell());
+			final FileDialog dialog = new FileDialog(getShell());
 			if (opt.fileLike != null) {
-				String[] filter = { opt.fileLike };
+				final String[] filter = { opt.fileLike };
 				dialog.setFilterExtensions(filter);
 			}
 			dialog.setText(dialogText);
 
-			String correctPath = opt.argbox.getText();// getFieldContent(tauArch.getText());
+			final String correctPath = opt.argbox.getText();// getFieldContent(tauArch.getText());
 			if (correctPath != null) {
-				IFileStore path = EFS.getLocalFileSystem().getStore(new Path(correctPath));
+				final IFileStore path = EFS.getLocalFileSystem().getStore(new Path(correctPath));
 				if (path.fetchInfo().exists()) {
 					dialog.setFilterPath(!path.fetchInfo().isDirectory() ? correctPath : path.getParent().toURI().getPath());
 				}
 			}
 
-			String selectedPath = dialog.open();
+			final String selectedPath = dialog.open();
 			if (selectedPath != null) {
 				opt.argbox.setText(selectedPath);
 			}
 		}
 
-	}
-
-	/**
-	 * Creates a new shell from the workbench's current display
-	 * 
-	 * @return A fresh shell
-	 */
-	protected static Shell getShell() {
-		Display thisDisplay = PlatformUI.getWorkbench().getDisplay();// .getCurrent();//.getDefault();
-
-		Shell s = thisDisplay.getActiveShell();
-		if (s == null) {
-			Shell[] shells = thisDisplay.getShells();
-			s = shells[0];
-		}
-
-		return new Shell(s);
-	}
-
-	/**
-	 * Returns a new GridLayout
-	 * 
-	 * @param columns
-	 *            Number of columns
-	 * @param isEqual
-	 * @param mh
-	 * @param mw
-	 * @return
-	 */
-	protected static GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) {
-		GridLayout gridLayout = new GridLayout();
-		gridLayout.numColumns = columns;
-		gridLayout.makeColumnsEqualWidth = isEqual;
-		gridLayout.marginHeight = mh;
-		gridLayout.marginWidth = mw;
-		return gridLayout;
 	}
 
 	protected static GridData spanGridData(int style, int space) {
@@ -410,13 +417,5 @@ public class ToolMaker {
 		}
 		gd.horizontalSpan = space;
 		return gd;
-	}
-
-	protected static void createVerticalSpacer(Composite comp, int colSpan) {
-		Label label = new Label(comp, SWT.NONE);
-		GridData gd = new GridData();
-		gd.horizontalSpan = colSpan;
-		label.setLayoutData(gd);
-		label.setFont(comp.getFont());
 	}
 }

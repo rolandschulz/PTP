@@ -283,9 +283,9 @@ public final class Preferences {
 	 * @return
 	 */
 	public static boolean isDefault(String qualifier, String name) {
-		String defVal = contexts[DEFAULT_CONTEXT].getNode(qualifier).get(name, null);
+		final String defVal = contexts[DEFAULT_CONTEXT].getNode(qualifier).get(name, null);
 		if (defVal != null) {
-			String val = contexts[INSTANCE_CONTEXT].getNode(qualifier).get(name, null);
+			final String val = contexts[INSTANCE_CONTEXT].getNode(qualifier).get(name, null);
 			return (val != null && val.equals(defVal));
 		}
 		return false;
@@ -313,7 +313,7 @@ public final class Preferences {
 		try {
 			contexts[DEFAULT_CONTEXT].getNode(qualifier).flush();
 			contexts[INSTANCE_CONTEXT].getNode(qualifier).flush();
-		} catch (BackingStoreException bse) {
+		} catch (final BackingStoreException bse) {
 			Activator.log(bse);
 		}
 	}

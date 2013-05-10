@@ -51,21 +51,199 @@ import org.eclipse.swt.widgets.Text;
 
 public class ParametricParameterTab extends AbstractLaunchConfigurationTab implements IToolLaunchConfigurationConstants {
 
+	/**
+	 * Listen for activity in the options widgets
+	 * 
+	 * @author wspear
+	 * 
+	 */
+	protected class WidgetListener extends SelectionAdapter implements ModifyListener, IPropertyChangeListener {
+		public void modifyText(ModifyEvent evt) {
+			updateLaunchConfigurationDialog();
+		}
+
+		public void propertyChange(PropertyChangeEvent event) {
+			updateLaunchConfigurationDialog();
+		}
+
+		@Override
+		public void widgetSelected(SelectionEvent e) {
+
+			updateLaunchConfigurationDialog();
+		}
+	}
+
+	private static boolean checkNoParTableCounts(Table t, boolean all) {
+		final TableItem[] tis = t.getItems();
+		int n = -1;
+		for (final TableItem ti : tis) {
+			if (ti.getChecked() || all) {
+				if (n == -1) {
+					n = getComArgs(ti.getText(1)).size();
+				}
+				if (getComArgs(ti.getText(0)).size() > 1 || getComArgs(ti.getText(1)).size() != n) {
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	private static boolean checkTableCounts(Table t, int n, boolean all) {
+
+		final TableItem[] tis = t.getItems();
+
+		for (final TableItem ti : tis) {
+			if (ti.getChecked() || all) {
+				if (getComArgs(ti.getText(0)).size() > 1 || getComArgs(ti.getText(1)).size() != n) {
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Returns a new GridLayout
+	 * 
+	 * @param columns
+	 *            Number of columns
+	 * @param isEqual
+	 * @param mh
+	 * @param mw
+	 * @return
+	 */
+	protected static GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) {
+		final GridLayout gridLayout = new GridLayout();
+		gridLayout.numColumns = columns;
+		gridLayout.makeColumnsEqualWidth = isEqual;
+		gridLayout.marginHeight = mh;
+		gridLayout.marginWidth = mw;
+		return gridLayout;
+	}
+
+	/**
+	 * Given a string of comma separated strings, returns an array of the
+	 * strings
+	 * 
+	 * @param combined
+	 *            The string to be tokenized by commas
+	 * @return
+	 */
+	static List<String> getComArgs(String combined) {
+		final StringTokenizer st = new StringTokenizer(combined, ","); //$NON-NLS-1$
+		final List<String> numProcesses = new ArrayList<String>();
+		while (st.hasMoreTokens()) {
+			numProcesses.add(st.nextToken().trim());
+		}
+		return numProcesses;
+	}
+
+	/**
+	 * Given two numeric values seperated by a bar, returns a list of all
+	 * numeric values in the range.
+	 * 
+	 * @param combined
+	 * @return
+	 */
+	static List<String> getRangeArgs(String combined) {
+		final List<String> numProcesses = new ArrayList<String>();
+
+		final StringTokenizer st = new StringTokenizer(combined, "-"); //$NON-NLS-1$
+
+		if (st.countTokens() == 2) {
+			final String from = st.nextToken().trim();
+			final String to = st.nextToken().trim();
+			final int fromi = Integer.parseInt(from);
+			final int toi = Integer.parseInt(to);
+			for (int i = fromi; i <= toi; i++) {
+				numProcesses.add(i + ""); //$NON-NLS-1$
+			}
+		}
+
+		return numProcesses;
+	}
+
+	private static List<String> getTableChecks(Table table) {
+		final List<String> l = new ArrayList<String>();
+		final TableItem[] tiA = table.getItems();
+
+		for (final TableItem it : tiA) {
+			if (it.getChecked()) {
+				l.add("1"); //$NON-NLS-1$
+			} else {
+				l.add("0"); //$NON-NLS-1$
+			}
+		}
+
+		return l;
+	}
+
+	private static List<String> getTableList(Table table, int index) {
+		final List<String> l = new ArrayList<String>();
+		final TableItem[] tiA = table.getItems();
+
+		for (final TableItem it : tiA) {
+			l.add(it.getText(index));
+		}
+
+		return l;
+	}
+
+	private static void setTableList(Table ta, List<String> data0, List<String> data1, List<String> checkList) {
+
+		if (data0 == null || data1 == null) {
+			return;
+		}
+		ta.removeAll();
+		for (int i = 0; i < data0.size(); i++) {
+			final TableItem ti = new TableItem(ta, SWT.NONE);
+			ti.setText(0, data0.get(i));
+			ti.setText(1, data1.get(i));
+			if (checkList.get(i).equals("1")) { //$NON-NLS-1$
+				ti.setChecked(true);
+			}
+		}
+	}
+
+	protected static GridData spanGridData(int style, int space) {
+		GridData gd = null;
+		if (style == -1) {
+			gd = new GridData();
+		} else {
+			gd = new GridData(style);
+		}
+		gd.horizontalSpan = space;
+		return gd;
+	}
+
 	private Button useParam;
 
 	private Text processors;
+
 	private Text optLevels;
+
 	// private Table cmpTab;
 	private Table argTab;
+
 	private Table varTab;
 
 	private Button allCom;
 
-	//private Text trial;
+	// private Text trial;
 	private Text script;
+
 	private Button scriptBrowse;
 
 	private boolean parallel = false;
+
+	private final WidgetListener wl = new WidgetListener();
+
+	private static final String weakError = Messages.ParametricParameterTab_25;
+
+	private static final String noParError = Messages.ParametricParameterTab_26;
 
 	@SuppressWarnings("unused")
 	private ParametricParameterTab() {
@@ -75,30 +253,6 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 	public ParametricParameterTab(boolean parallel) {
 		this.parallel = parallel;
 	}
-
-	/**
-	 * Listen for activity in the options widgets
-	 * 
-	 * @author wspear
-	 * 
-	 */
-	protected class WidgetListener extends SelectionAdapter implements ModifyListener, IPropertyChangeListener {
-		@Override
-		public void widgetSelected(SelectionEvent e) {
-
-			updateLaunchConfigurationDialog();
-		}
-
-		public void propertyChange(PropertyChangeEvent event) {
-			updateLaunchConfigurationDialog();
-		}
-
-		public void modifyText(ModifyEvent evt) {
-			updateLaunchConfigurationDialog();
-		}
-	}
-
-	private final WidgetListener wl = new WidgetListener();
 
 	public void createControl(Composite comp) {
 
@@ -121,7 +275,7 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 		useParam.setText(Messages.ParametricParameterTab_EnableParametric);
 		useParam.addSelectionListener(wl);
 
-		GridData fill3 = new GridData(GridData.FILL_HORIZONTAL);
+		final GridData fill3 = new GridData(GridData.FILL_HORIZONTAL);
 		fill3.horizontalSpan = 3;
 
 		Label lab;
@@ -198,9 +352,9 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 			}
 
 			public void widgetSelected(SelectionEvent e) {
-				FileDialog fd = new FileDialog(parent.getShell());
+				final FileDialog fd = new FileDialog(parent.getShell());
 				fd.setText(Messages.ParametricParameterTab_SelectPerfExScript);
-				String s = fd.open();
+				final String s = fd.open();
 				if (s != null) {
 					script.setText(s);
 				}
@@ -208,16 +362,78 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 
 		});
 
-		int thisHeight = parent.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
+		final int thisHeight = parent.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
 		sparent.setMinSize(400, thisHeight);
 		sparent.setExpandHorizontal(true);
 		sparent.setExpandVertical(true);
 		sparent.setContent(parent);
 	}
 
+	public String getName() {
+		return Messages.ParametricParameterTab_ParametricStudy;
+	}
+
+	@SuppressWarnings("unchecked")
+	public void initializeFrom(ILaunchConfiguration configuration) {
+
+		try {
+			if (parallel) {
+				processors.setText(configuration.getAttribute(PARA_NUM_PROCESSORS, "1")); //$NON-NLS-1$
+
+			}
+			allCom.setSelection(configuration.getAttribute(PARA_ALL_COMBO, false));
+			optLevels.setText(configuration.getAttribute(PARA_OPT_LEVELS, "")); //$NON-NLS-1$
+			setTableList(argTab, configuration.getAttribute(PARA_ARG_NAMES, (List<String>) null),
+					configuration.getAttribute(PARA_ARG_VALUES, (List<String>) null),
+					configuration.getAttribute(PARA_ARG_BOOLS, (List<String>) null));
+			setTableList(varTab, configuration.getAttribute(PARA_VAR_NAMES, (List<String>) null),
+					configuration.getAttribute(PARA_VAR_VALUES, (List<String>) null),
+					configuration.getAttribute(PARA_VAR_BOOLS, (List<String>) null));
+
+			useParam.setSelection(configuration.getAttribute(PARA_USE_PARAMETRIC, false));
+
+			script.setText(configuration.getAttribute(PARA_PERF_SCRIPT, "")); //$NON-NLS-1$
+
+		} catch (final CoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	@Override
+	public boolean isValid(ILaunchConfiguration config) {
+
+		setErrorMessage(null);
+		setMessage(null);
+
+		super.isValid(config);
+
+		boolean ok = true;
+		final boolean all = allCom.getSelection();
+		if (parallel) {
+			final int numProcArgs = getComArgs(processors.getText()).size();
+
+			ok = checkTableCounts(argTab, numProcArgs, !all);
+			ok &= checkTableCounts(varTab, numProcArgs, !all);
+
+			if (!ok) {
+				setErrorMessage(weakError);
+			}
+		} else {
+			ok = checkNoParTableCounts(argTab, !all);
+			ok &= checkNoParTableCounts(varTab, !all);
+			if (!ok) {
+				setErrorMessage(noParError);
+			}
+		}
+
+		return ok;
+	}
+
 	private Table makeArgTable(Composite suParent, String c1, String c2, String title) {
 
-		Group parent = new Group(suParent, SWT.NONE);
+		final Group parent = new Group(suParent, SWT.NONE);
 		parent.setLayout(createGridLayout(3, false, 0, 0));
 		parent.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
 		parent.setText(title);
@@ -237,12 +453,12 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 
 		});
 
-		GridData tableGD = new GridData(GridData.FILL_HORIZONTAL);
+		final GridData tableGD = new GridData(GridData.FILL_HORIZONTAL);
 		tableGD.heightHint = 80;
 		tableGD.horizontalSpan = 3;
 		argTab.setLayoutData(tableGD);
 
-		GridData span2 = new GridData(GridData.FILL_HORIZONTAL);
+		final GridData span2 = new GridData(GridData.FILL_HORIZONTAL);
 		span2.horizontalSpan = 2;
 
 		TableColumn tc = new TableColumn(argTab, SWT.NONE);
@@ -300,7 +516,7 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 		final Text vars = new Text(parent, SWT.BORDER);
 		vars.setLayoutData(span2);
 
-		Button addVar = new Button(parent, SWT.None);
+		final Button addVar = new Button(parent, SWT.None);
 		addVar.setText(Messages.ParametricParameterTab_Add);
 		addVar.addSelectionListener(new SelectionListener() {
 
@@ -309,7 +525,7 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 
 			public void widgetSelected(SelectionEvent e) {
 
-				TableItem it = new TableItem(argTab, SWT.NONE);
+				final TableItem it = new TableItem(argTab, SWT.NONE);
 
 				it.setText(0, flags.getText());
 				it.setText(1, vars.getText());
@@ -318,7 +534,7 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 
 		});
 
-		Button removeVar = new Button(parent, SWT.None);
+		final Button removeVar = new Button(parent, SWT.None);
 		removeVar.setText(Messages.ParametricParameterTab_Remove);
 		removeVar.addSelectionListener(new SelectionListener() {
 
@@ -336,80 +552,6 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 		new Label(parent, SWT.NULL);
 
 		return argTab;
-	}
-
-	public String getName() {
-		return Messages.ParametricParameterTab_ParametricStudy;
-	}
-
-	@SuppressWarnings("unchecked")
-	public void initializeFrom(ILaunchConfiguration configuration) {
-
-		try {
-			if (parallel) {
-				processors.setText(configuration.getAttribute(PARA_NUM_PROCESSORS, "1")); //$NON-NLS-1$
-
-			}
-			allCom.setSelection(configuration.getAttribute(PARA_ALL_COMBO, false));
-			optLevels.setText(configuration.getAttribute(PARA_OPT_LEVELS, "")); //$NON-NLS-1$
-			setTableList(argTab, configuration.getAttribute(PARA_ARG_NAMES, (List<String>) null),
-					configuration.getAttribute(PARA_ARG_VALUES, (List<String>) null),
-					configuration.getAttribute(PARA_ARG_BOOLS, (List<String>) null));
-			setTableList(varTab, configuration.getAttribute(PARA_VAR_NAMES, (List<String>) null),
-					configuration.getAttribute(PARA_VAR_VALUES, (List<String>) null),
-					configuration.getAttribute(PARA_VAR_BOOLS, (List<String>) null));
-
-			useParam.setSelection(configuration.getAttribute(PARA_USE_PARAMETRIC, false));
-
-			script.setText(configuration.getAttribute(PARA_PERF_SCRIPT, "")); //$NON-NLS-1$
-
-		} catch (CoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
-
-	private static void setTableList(Table ta, List<String> data0, List<String> data1, List<String> checkList) {
-
-		if (data0 == null || data1 == null) {
-			return;
-		}
-		ta.removeAll();
-		for (int i = 0; i < data0.size(); i++) {
-			TableItem ti = new TableItem(ta, SWT.NONE);
-			ti.setText(0, data0.get(i));
-			ti.setText(1, data1.get(i));
-			if (checkList.get(i).equals("1")) { //$NON-NLS-1$
-				ti.setChecked(true);
-			}
-		}
-	}
-
-	private static List<String> getTableList(Table table, int index) {
-		List<String> l = new ArrayList<String>();
-		TableItem[] tiA = table.getItems();
-
-		for (TableItem it : tiA) {
-			l.add(it.getText(index));
-		}
-
-		return l;
-	}
-
-	private static List<String> getTableChecks(Table table) {
-		List<String> l = new ArrayList<String>();
-		TableItem[] tiA = table.getItems();
-
-		for (TableItem it : tiA) {
-			if (it.getChecked())
-				l.add("1"); //$NON-NLS-1$
-			else {
-				l.add("0"); //$NON-NLS-1$
-			}
-		}
-
-		return l;
 	}
 
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
@@ -439,144 +581,6 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
 
-	}
-
-	private static final String weakError = Messages.ParametricParameterTab_25;
-
-	private static final String noParError = Messages.ParametricParameterTab_26;
-
-	@Override
-	public boolean isValid(ILaunchConfiguration config) {
-
-		setErrorMessage(null);
-		setMessage(null);
-
-		super.isValid(config);
-
-		boolean ok = true;
-		boolean all = allCom.getSelection();
-		if (parallel) {
-			int numProcArgs = getComArgs(processors.getText()).size();
-
-			ok = checkTableCounts(argTab, numProcArgs, !all);
-			ok &= checkTableCounts(varTab, numProcArgs, !all);
-
-			if (!ok) {
-				setErrorMessage(weakError);
-			}
-		} else {
-			ok = checkNoParTableCounts(argTab, !all);
-			ok &= checkNoParTableCounts(varTab, !all);
-			if (!ok) {
-				setErrorMessage(noParError);
-			}
-		}
-
-		return ok;
-	}
-
-	private static boolean checkNoParTableCounts(Table t, boolean all) {
-		TableItem[] tis = t.getItems();
-		int n = -1;
-		for (TableItem ti : tis) {
-			if (ti.getChecked() || all) {
-				if (n == -1) {
-					n = getComArgs(ti.getText(1)).size();
-				}
-				if (getComArgs(ti.getText(0)).size() > 1 || getComArgs(ti.getText(1)).size() != n) {
-					return false;
-				}
-			}
-		}
-
-		return true;
-	}
-
-	private static boolean checkTableCounts(Table t, int n, boolean all) {
-
-		TableItem[] tis = t.getItems();
-
-		for (TableItem ti : tis) {
-			if (ti.getChecked() || all) {
-				if (getComArgs(ti.getText(0)).size() > 1 || getComArgs(ti.getText(1)).size() != n) {
-					return false;
-				}
-			}
-		}
-
-		return true;
-	}
-
-	/**
-	 * Returns a new GridLayout
-	 * 
-	 * @param columns
-	 *            Number of columns
-	 * @param isEqual
-	 * @param mh
-	 * @param mw
-	 * @return
-	 */
-	protected static GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) {
-		GridLayout gridLayout = new GridLayout();
-		gridLayout.numColumns = columns;
-		gridLayout.makeColumnsEqualWidth = isEqual;
-		gridLayout.marginHeight = mh;
-		gridLayout.marginWidth = mw;
-		return gridLayout;
-	}
-
-	protected static GridData spanGridData(int style, int space) {
-		GridData gd = null;
-		if (style == -1) {
-			gd = new GridData();
-		} else {
-			gd = new GridData(style);
-		}
-		gd.horizontalSpan = space;
-		return gd;
-	}
-
-	/**
-	 * Given a string of comma separated strings, returns an array of the
-	 * strings
-	 * 
-	 * @param combined
-	 *            The string to be tokenized by commas
-	 * @return
-	 */
-	static List<String> getComArgs(String combined) {
-		StringTokenizer st = new StringTokenizer(combined, ","); //$NON-NLS-1$
-		List<String> numProcesses = new ArrayList<String>();
-		while (st.hasMoreTokens()) {
-			numProcesses.add(st.nextToken().trim());
-		}
-		return numProcesses;
-	}
-
-	/**
-	 * Given two numeric values seperated by a bar, returns a list of all
-	 * numeric values in the range.
-	 * 
-	 * @param combined
-	 * @return
-	 */
-	static List<String> getRangeArgs(String combined) {
-		List<String> numProcesses = new ArrayList<String>();
-
-		StringTokenizer st = new StringTokenizer(combined, "-"); //$NON-NLS-1$
-
-		if (st.countTokens() == 2) {
-			String from = st.nextToken().trim();
-			String to = st.nextToken().trim();
-			int fromi = Integer.parseInt(from);
-			int toi = Integer.parseInt(to);
-			for (int i = fromi; i <= toi; i++) {
-				numProcesses.add(i + ""); //$NON-NLS-1$
-			}
-		}
-
-		return numProcesses;
 	}
 
 }

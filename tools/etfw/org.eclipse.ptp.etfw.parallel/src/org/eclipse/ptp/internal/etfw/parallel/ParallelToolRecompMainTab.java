@@ -56,10 +56,10 @@ public class ParallelToolRecompMainTab extends ApplicationTab {
 		@Override
 		public void widgetSelected(SelectionEvent e) {
 			super.widgetSelected(e);
-			Object source = e.getSource();
+			final Object source = e.getSource();
 			if (source == projButton) {
-				int bDex = buildConfCombo.getSelectionIndex();
-				String bString = buildConfCombo.getText();
+				final int bDex = buildConfCombo.getSelectionIndex();
+				final String bString = buildConfCombo.getText();
 				initConfCombo();
 				if (bDex >= 0 && buildConfCombo.getItemCount() > bDex && buildConfCombo.getItem(bDex).equals(bString)) {
 					buildConfCombo.select(bDex);
@@ -76,11 +76,11 @@ public class ParallelToolRecompMainTab extends ApplicationTab {
 
 	private void createAppControl(Composite comp) {
 
-		Composite mainComp = new Composite(comp, SWT.NONE);
+		final Composite mainComp = new Composite(comp, SWT.NONE);
 		mainComp.setLayout(createGridLayout(2, false, 0, 0));
 		mainComp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-		Label appLabel = new Label(mainComp, SWT.NONE);
+		final Label appLabel = new Label(mainComp, SWT.NONE);
 		appLabel.setText(Messages.ParallelToolRecompMainTab_LangBuildConf);
 		appLabel.setLayoutData(spanGridData(-1, 2));
 
@@ -92,7 +92,7 @@ public class ParallelToolRecompMainTab extends ApplicationTab {
 	@Override
 	public void createControl(Composite parent) {
 
-		Composite comp = new Composite(parent, SWT.NONE);
+		final Composite comp = new Composite(parent, SWT.NONE);
 		setControl(comp);
 
 		comp.setLayout(new GridLayout());
@@ -105,18 +105,60 @@ public class ParallelToolRecompMainTab extends ApplicationTab {
 	}
 
 	/**
+	 * Return the ICProject corresponding to the project name in the project name text field, or null if the text does not match a
+	 * project name.
+	 */
+	protected ICProject getCProject() {
+		final String projectName = projText.getText().trim();
+		if (projectName.length() < 1) {
+			return null;
+		}
+		return CoreModel.getDefault().getCModel().getCProject(projectName);
+	}
+
+	/**
 	 * Allow the user to choose a project
 	 */
 	@Override
 	protected void handleProjectButtonSelected() {
-		IProject project = chooseProject();
+		final IProject project = chooseProject();
 		if (project == null) {
 			return;
 		}
 
-		String projectName = project.getName();
+		final String projectName = project.getName();
 		projText.setText(projectName);
 		initConfCombo();
+	}
+
+	/**
+	 * Initialize the combo box listing the available build configurations for this project
+	 * 
+	 */
+	@SuppressWarnings("restriction")
+	protected void initConfCombo() {
+		buildConfCombo.removeAll();
+		final ICProject project = getCProject();
+		if (project == null) {
+			// MessageDialog.openInformation(getShell(),
+			// org.eclipse.cdt.launch.internal.ui.LaunchMessages.getString("CMainTab.Project_required"),
+			// org.eclipse.cdt.launch.internal.ui.LaunchMessages.getString("CMainTab.Enter_project_before_searching_for_program"));
+			return;
+		}
+
+		final IManagedBuildInfo info = ManagedBuildManager.getBuildInfo(project.getResource());
+		if (info == null) {
+			MessageDialog.openInformation(getShell(),
+					org.eclipse.cdt.launch.internal.ui.LaunchMessages.CMainTab_Enter_project_before_searching_for_program,
+					org.eclipse.cdt.launch.internal.ui.LaunchMessages.CMainTab_Enter_project_before_searching_for_program);// .getString("CMainTab.Enter_project_before_searching_for_program"));
+			return;
+		}
+
+		final IConfiguration[] confs = info.getManagedProject().getConfigurations();
+
+		for (final IConfiguration conf : confs) {
+			buildConfCombo.add(conf.getName());
+		}
 	}
 
 	private void initializeConfCombo(ILaunchConfiguration configuration) {
@@ -124,10 +166,10 @@ public class ParallelToolRecompMainTab extends ApplicationTab {
 
 			initConfCombo();
 
-			String programName = configuration.getAttribute(
+			final String programName = configuration.getAttribute(
 					IToolLaunchConfigurationConstants.ATTR_PERFORMANCEBUILD_CONFIGURATION_NAME, EMPTY_STRING);
 
-			int progDex = buildConfCombo.indexOf(programName);
+			final int progDex = buildConfCombo.indexOf(programName);
 
 			if (!programName.equals(EMPTY_STRING) && progDex >= 0) {
 				buildConfCombo.select(progDex);
@@ -135,7 +177,7 @@ public class ParallelToolRecompMainTab extends ApplicationTab {
 				buildConfCombo.select(0);
 			}
 
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			e.printStackTrace();
 		}
 	}
@@ -149,67 +191,17 @@ public class ParallelToolRecompMainTab extends ApplicationTab {
 	}
 
 	@Override
-	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-		super.performApply(configuration);
-
-		configuration.setAttribute(IToolLaunchConfigurationConstants.ATTR_PERFORMANCEBUILD_CONFIGURATION_NAME,
-				buildConfCombo.getText());
-	}
-
-	/**
-	 * Return the ICProject corresponding to the project name in the project name text field, or null if the text does not match a
-	 * project name.
-	 */
-	protected ICProject getCProject() {
-		String projectName = projText.getText().trim();
-		if (projectName.length() < 1) {
-			return null;
-		}
-		return CoreModel.getDefault().getCModel().getCProject(projectName);
-	}
-
-	/**
-	 * Initialize the combo box listing the available build configurations for this project
-	 * 
-	 */
-	@SuppressWarnings("restriction")
-	protected void initConfCombo() {
-		buildConfCombo.removeAll();
-		ICProject project = getCProject();
-		if (project == null) {
-			// MessageDialog.openInformation(getShell(),
-			// org.eclipse.cdt.launch.internal.ui.LaunchMessages.getString("CMainTab.Project_required"),
-			// org.eclipse.cdt.launch.internal.ui.LaunchMessages.getString("CMainTab.Enter_project_before_searching_for_program"));
-			return;
-		}
-
-		IManagedBuildInfo info = ManagedBuildManager.getBuildInfo(project.getResource());
-		if (info == null) {
-			MessageDialog.openInformation(getShell(),
-					org.eclipse.cdt.launch.internal.ui.LaunchMessages.CMainTab_Enter_project_before_searching_for_program,
-					org.eclipse.cdt.launch.internal.ui.LaunchMessages.CMainTab_Enter_project_before_searching_for_program);// .getString("CMainTab.Enter_project_before_searching_for_program"));
-			return;
-		}
-
-		IConfiguration[] confs = info.getManagedProject().getConfigurations();
-
-		for (IConfiguration conf : confs) {
-			buildConfCombo.add(conf.getName());
-		}
-	}
-
-	@Override
 	public boolean isValid(ILaunchConfiguration config) {
 
 		String name = null;
 		boolean recompiles = false;
 		try {
 			recompiles = config.getAttribute(IToolLaunchConfigurationConstants.EXTOOL_RECOMPILE, false);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			e.printStackTrace();
 		}
 
-		boolean status = super.isValid(config);
+		final boolean status = super.isValid(config);
 
 		/*
 		 * If we are not in a recompilation workflow we don't care about the build configuration
@@ -225,5 +217,13 @@ public class ParallelToolRecompMainTab extends ApplicationTab {
 		}
 
 		return status;
+	}
+
+	@Override
+	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
+		super.performApply(configuration);
+
+		configuration.setAttribute(IToolLaunchConfigurationConstants.ATTR_PERFORMANCEBUILD_CONFIGURATION_NAME,
+				buildConfCombo.getText());
 	}
 }

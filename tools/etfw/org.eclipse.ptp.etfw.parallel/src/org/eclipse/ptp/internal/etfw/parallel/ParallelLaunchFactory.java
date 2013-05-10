@@ -8,11 +8,11 @@ import org.eclipse.ptp.internal.etfw.ILaunchFactory;
 
 public class ParallelLaunchFactory implements ILaunchFactory {
 
-	public ILaunch makeLaunch(ILaunchConfiguration config, String mode, ISourceLocator isl) {
-		return new PLaunch(config, mode, isl);
-	}
-
 	public String getType() {
 		return PARALLEL;
+	}
+
+	public ILaunch makeLaunch(ILaunchConfiguration config, String mode, ISourceLocator isl) {
+		return new PLaunch(config, mode, isl);
 	}
 }

@@ -78,15 +78,45 @@ public class ToolRecompMainTab extends CMainTab implements ILaunchConfigurationT
 		super(x);
 	}
 
+	/**
+	 * Defines the area of the tab where the project's build configuration is
+	 * selected
+	 */
+	protected void createBuildConfGroup(Composite parent, int colSpan) {
+		buildConfComp = new Composite(parent, SWT.NONE);
+		final GridLayout mainLayout = new GridLayout();
+		mainLayout.numColumns = 1;
+		mainLayout.marginHeight = 0;
+		mainLayout.marginWidth = 0;
+		buildConfComp.setLayout(mainLayout);
+		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = colSpan;
+		buildConfComp.setLayoutData(gd);
+		fProgLabel = new Label(buildConfComp, SWT.NONE);
+		fProgLabel.setText(Messages.ToolRecompMainTab_LangBuildConf);
+		gd = new GridData();
+		gd.horizontalSpan = 3;
+		fProgLabel.setLayoutData(gd);
+		buildConfCombo = new Combo(buildConfComp, SWT.DROP_DOWN | SWT.READ_ONLY | SWT.BORDER);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		buildConfCombo.setLayoutData(gd);
+		buildConfCombo.addModifyListener(new ModifyListener() {
+
+			public void modifyText(ModifyEvent evt) {
+				updateLaunchConfigurationDialog();
+			}
+		});
+	}
+
 	@Override
 	public void createControl(Composite parent) {
-		Composite comp = new Composite(parent, SWT.NONE);
+		final Composite comp = new Composite(parent, SWT.NONE);
 		setControl(comp);
 
 		LaunchUIPlugin.getDefault().getWorkbench().getHelpSystem()
 				.setHelp(getControl(), ICDTLaunchHelpContextIds.LAUNCH_CONFIGURATION_DIALOG_MAIN_TAB);
 
-		GridLayout topLayout = new GridLayout();
+		final GridLayout topLayout = new GridLayout();
 		comp.setLayout(topLayout);
 
 		createVerticalSpacer(comp, 1);
@@ -100,66 +130,10 @@ public class ToolRecompMainTab extends CMainTab implements ILaunchConfigurationT
 		LaunchUIPlugin.setDialogShell(parent.getShell());
 	}
 
-	/**
-	 * Defines the area of the tab where the project is selected
-	 */
-	@Override
-	protected void createProjectGroup(Composite parent, int colSpan) {
-		Composite projComp = new Composite(parent, SWT.NONE);
-		GridLayout projLayout = new GridLayout();
-		projLayout.numColumns = 2;
-		projLayout.marginHeight = 0;
-		projLayout.marginWidth = 0;
-		projComp.setLayout(projLayout);
-		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan = colSpan;
-		projComp.setLayoutData(gd);
-
-		fProjLabel = new Label(projComp, SWT.NONE);
-		fProjLabel.setText("&Project:"); //$NON-NLS-1$
-		gd = new GridData();
-		gd.horizontalSpan = 2;
-		fProjLabel.setLayoutData(gd);
-
-		fProjText = new Text(projComp, SWT.SINGLE | SWT.BORDER);
-		gd = new GridData(GridData.FILL_HORIZONTAL);
-		fProjText.setLayoutData(gd);
-		fProjText.addModifyListener(new ModifyListener() {
-
-			public void modifyText(ModifyEvent evt) {
-				int bDex = buildConfCombo.getSelectionIndex();
-				String bString = buildConfCombo.getText();
-				initConfCombo();
-				if (bDex >= 0 && buildConfCombo.getItemCount() > bDex && buildConfCombo.getItem(bDex).equals(bString))
-					buildConfCombo.select(bDex);
-				else if (buildConfCombo.getItemCount() > 0)
-					buildConfCombo.select(0);
-				updateLaunchConfigurationDialog();
-			}
-		});
-
-		fProjButton = createPushButton(projComp, LaunchMessages.Launch_common_Browse_1,null);//.getString("Launch.common.Browse_1"), null); //$NON-NLS-1$
-		fProjButton.addSelectionListener(new SelectionAdapter() {
-
-			@Override
-			public void widgetSelected(SelectionEvent evt) {
-				handleProjectButtonSelected();
-				int bDex = buildConfCombo.getSelectionIndex();
-				String bString = buildConfCombo.getText();
-				initConfCombo();
-				if (bDex >= 0 && buildConfCombo.getItemCount() > bDex && buildConfCombo.getItem(bDex).equals(bString))
-					buildConfCombo.select(bDex);
-				else if (buildConfCombo.getItemCount() > 0)
-					buildConfCombo.select(0);
-				updateLaunchConfigurationDialog();
-			}
-		});
-	}
-
 	@Override
 	protected void createExeFileGroup(Composite parent, int colSpan) {
 		exeComp = new Composite(parent, SWT.NONE);
-		GridLayout mainLayout = new GridLayout();
+		final GridLayout mainLayout = new GridLayout();
 		mainLayout.numColumns = 3;
 		mainLayout.marginHeight = 0;
 		mainLayout.marginWidth = 0;
@@ -205,30 +179,59 @@ public class ToolRecompMainTab extends CMainTab implements ILaunchConfigurationT
 	}
 
 	/**
-	 * Defines the area of the tab where the project's build configuration is
-	 * selected
+	 * Defines the area of the tab where the project is selected
 	 */
-	protected void createBuildConfGroup(Composite parent, int colSpan) {
-		buildConfComp = new Composite(parent, SWT.NONE);
-		GridLayout mainLayout = new GridLayout();
-		mainLayout.numColumns = 1;
-		mainLayout.marginHeight = 0;
-		mainLayout.marginWidth = 0;
-		buildConfComp.setLayout(mainLayout);
+	@Override
+	protected void createProjectGroup(Composite parent, int colSpan) {
+		final Composite projComp = new Composite(parent, SWT.NONE);
+		final GridLayout projLayout = new GridLayout();
+		projLayout.numColumns = 2;
+		projLayout.marginHeight = 0;
+		projLayout.marginWidth = 0;
+		projComp.setLayout(projLayout);
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = colSpan;
-		buildConfComp.setLayoutData(gd);
-		fProgLabel = new Label(buildConfComp, SWT.NONE);
-		fProgLabel.setText(Messages.ToolRecompMainTab_LangBuildConf);
+		projComp.setLayoutData(gd);
+
+		fProjLabel = new Label(projComp, SWT.NONE);
+		fProjLabel.setText("&Project:"); //$NON-NLS-1$
 		gd = new GridData();
-		gd.horizontalSpan = 3;
-		fProgLabel.setLayoutData(gd);
-		buildConfCombo = new Combo(buildConfComp, SWT.DROP_DOWN | SWT.READ_ONLY | SWT.BORDER);
+		gd.horizontalSpan = 2;
+		fProjLabel.setLayoutData(gd);
+
+		fProjText = new Text(projComp, SWT.SINGLE | SWT.BORDER);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
-		buildConfCombo.setLayoutData(gd);
-		buildConfCombo.addModifyListener(new ModifyListener() {
+		fProjText.setLayoutData(gd);
+		fProjText.addModifyListener(new ModifyListener() {
 
 			public void modifyText(ModifyEvent evt) {
+				final int bDex = buildConfCombo.getSelectionIndex();
+				final String bString = buildConfCombo.getText();
+				initConfCombo();
+				if (bDex >= 0 && buildConfCombo.getItemCount() > bDex && buildConfCombo.getItem(bDex).equals(bString)) {
+					buildConfCombo.select(bDex);
+				} else if (buildConfCombo.getItemCount() > 0) {
+					buildConfCombo.select(0);
+				}
+				updateLaunchConfigurationDialog();
+			}
+		});
+
+		fProjButton = createPushButton(projComp, LaunchMessages.Launch_common_Browse_1, null);// .getString("Launch.common.Browse_1"),
+																								// null);
+		fProjButton.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent evt) {
+				handleProjectButtonSelected();
+				final int bDex = buildConfCombo.getSelectionIndex();
+				final String bString = buildConfCombo.getText();
+				initConfCombo();
+				if (bDex >= 0 && buildConfCombo.getItemCount() > bDex && buildConfCombo.getItem(bDex).equals(bString)) {
+					buildConfCombo.select(bDex);
+				} else if (buildConfCombo.getItemCount() > 0) {
+					buildConfCombo.select(0);
+				}
 				updateLaunchConfigurationDialog();
 			}
 		});
@@ -242,28 +245,29 @@ public class ToolRecompMainTab extends CMainTab implements ILaunchConfigurationT
 	 */
 	protected void initConfCombo() {
 		buildConfCombo.removeAll();
-		ICProject project = getCProject();
+		final ICProject project = getCProject();
 		if (project == null) {
-			MessageDialog.openInformation(getShell(), LaunchMessages.CMainTab_Project_required,//.getString("CMainTab.Project_required"), //$NON-NLS-1$
-					LaunchMessages.CMainTab_Enter_project_before_searching_for_program);//.getString("CMainTab.Enter_project_before_searching_for_program")); //$NON-NLS-1$
+			MessageDialog.openInformation(getShell(), LaunchMessages.CMainTab_Project_required,// .getString("CMainTab.Project_required"),
+					LaunchMessages.CMainTab_Enter_project_before_searching_for_program);// .getString("CMainTab.Enter_project_before_searching_for_program"));
 			return;
 		}
 
-		IManagedBuildInfo info = ManagedBuildManager.getBuildInfo(project.getResource());
+		final IManagedBuildInfo info = ManagedBuildManager.getBuildInfo(project.getResource());
 		if (info == null) {
-			MessageDialog.openInformation(getShell(), LaunchMessages.CMainTab_Project_required,//.getString("CMainTab.Project_required"), //$NON-NLS-1$
-					LaunchMessages.CMainTab_Enter_project_before_searching_for_program);//.getString("CMainTab.Enter_project_before_searching_for_program")); //$NON-NLS-1$
+			MessageDialog.openInformation(getShell(), LaunchMessages.CMainTab_Project_required,// .getString("CMainTab.Project_required"),
+					LaunchMessages.CMainTab_Enter_project_before_searching_for_program);// .getString("CMainTab.Enter_project_before_searching_for_program"));
 			return;
 		}
 
-		IManagedProject imp = info.getManagedProject();
-		if(imp==null)
+		final IManagedProject imp = info.getManagedProject();
+		if (imp == null) {
 			return;
-		
-		IConfiguration[] confs = imp.getConfigurations();
+		}
 
-		for (int i = 0; i < confs.length; i++) {
-			buildConfCombo.add(confs[i].getName());
+		final IConfiguration[] confs = imp.getConfigurations();
+
+		for (final IConfiguration conf : confs) {
+			buildConfCombo.add(conf.getName());
 		}
 
 	}
@@ -280,16 +284,16 @@ public class ToolRecompMainTab extends CMainTab implements ILaunchConfigurationT
 
 		String name = fProjText.getText().trim();
 		if (name.length() == 0) {
-			setErrorMessage(LaunchMessages.CMainTab_Project_not_specified);//.getString("CMainTab.Project_not_specified")); //$NON-NLS-1$
+			setErrorMessage(LaunchMessages.CMainTab_Project_not_specified);// .getString("CMainTab.Project_not_specified"));
 			return false;
 		}
 		if (!ResourcesPlugin.getWorkspace().getRoot().getProject(name).exists()) {
-			setErrorMessage(LaunchMessages.Launch_common_Project_does_not_exist);//.getString("Launch.common.Project_does_not_exist")); //$NON-NLS-1$
+			setErrorMessage(LaunchMessages.Launch_common_Project_does_not_exist);// .getString("Launch.common.Project_does_not_exist"));
 			return false;
 		}
-		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
+		final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
 		if (!project.isOpen()) {
-			setErrorMessage(LaunchMessages.CMainTab_Project_must_be_opened);//.getString("CMainTab.Project_must_be_opened")); //$NON-NLS-1$
+			setErrorMessage(LaunchMessages.CMainTab_Project_must_be_opened);// .getString("CMainTab.Project_must_be_opened"));
 			return false;
 		}
 
@@ -302,35 +306,36 @@ public class ToolRecompMainTab extends CMainTab implements ILaunchConfigurationT
 					return false;
 				}
 
-				String bcdne = Messages.ToolRecompMainTab_BuildConfNoExist;
+				final String bcdne = Messages.ToolRecompMainTab_BuildConfNoExist;
 
 				if (name.equals(".") || name.equals("..")) { //$NON-NLS-1$ //$NON-NLS-2$
 					setErrorMessage(bcdne);
 					return false;
 				}
 
-				ICProject thisProject = getCProject();
+				final ICProject thisProject = getCProject();
 				if (thisProject == null) {
-					setErrorMessage(LaunchMessages.Launch_common_Project_does_not_exist);//.getString("Launch.common.Project_does_not_exist")); //$NON-NLS-1$
+					setErrorMessage(LaunchMessages.Launch_common_Project_does_not_exist);// .getString("Launch.common.Project_does_not_exist"));
 					return false;
 				}
 
-				IManagedBuildInfo info = ManagedBuildManager.getBuildInfo(thisProject.getResource());
+				final IManagedBuildInfo info = ManagedBuildManager.getBuildInfo(thisProject.getResource());
 				if (info == null) {
 					setErrorMessage(Messages.ToolRecompMainTab_ProjNoValidBuildInfo);
 					return false;
 				}
 
-				IConfiguration[] configs = info.getManagedProject().getConfigurations();
+				final IConfiguration[] configs = info.getManagedProject().getConfigurations();
 
 				if (configs.length < 1) {
 					setErrorMessage(Messages.ToolRecompMainTab_NoValidConfs);
 					return false;
 				}
 
-				for (int i = 0; i < configs.length; i++) {
-					if (configs[i].getName().equals(buildConfCombo.getText()))
+				for (final IConfiguration config2 : configs) {
+					if (config2.getName().equals(buildConfCombo.getText())) {
 						reVal = true;
+					}
 				}
 				if (!reVal) {
 					setErrorMessage(bcdne);
@@ -363,19 +368,19 @@ public class ToolRecompMainTab extends CMainTab implements ILaunchConfigurationT
 						return false;
 					}
 				}
-//				try {
-//					if (!isBinary(project, exePath)) {
-//						setErrorMessage("Program is not a recognized executable."); //$NON-NLS-1$
-//						return false;
-//					}
-//				} catch (CoreException e) {
-//					LaunchUIPlugin.log(e);
-//					setErrorMessage(e.getLocalizedMessage());
-//					return false;
-//				}
+				// try {
+				// if (!isBinary(project, exePath)) {
+				//						setErrorMessage("Program is not a recognized executable."); //$NON-NLS-1$
+				// return false;
+				// }
+				// } catch (CoreException e) {
+				// LaunchUIPlugin.log(e);
+				// setErrorMessage(e.getLocalizedMessage());
+				// return false;
+				// }
 			}
 
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -384,22 +389,16 @@ public class ToolRecompMainTab extends CMainTab implements ILaunchConfigurationT
 	}
 
 	/**
-	 * Load the last known selected project from this launch configuration If
-	 * the currently selected build configuration is not the same as the one
-	 * loaded, reinitialize the configuration-selection combo-box
+	 * Applies the selected options
 	 */
 	@Override
-	protected void updateProjectFromConfig(ILaunchConfiguration config) {
-		String curProj = fProjText.getText();
-		String projectName = EMPTY_STRING;
-		try {
-			projectName = config.getAttribute(ICDTLaunchConfigurationConstants.ATTR_PROJECT_NAME, EMPTY_STRING);
-		} catch (CoreException ce) {
-			LaunchUIPlugin.log(ce);
+	public void performApply(ILaunchConfigurationWorkingCopy config) {
+		config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_PROJECT_NAME, fProjText.getText());
+		config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_PROGRAM_NAME, fProgText.getText());
+		config.setAttribute(IToolLaunchConfigurationConstants.ATTR_PERFORMANCEBUILD_CONFIGURATION_NAME, buildConfCombo.getText());
+		if (fTerminalButton != null) {
+			config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_USE_TERMINAL, fTerminalButton.getSelection());
 		}
-		fProjText.setText(projectName);
-		if (!curProj.equals(projectName))
-			initConfCombo();
 	}
 
 	/**
@@ -417,7 +416,7 @@ public class ToolRecompMainTab extends CMainTab implements ILaunchConfigurationT
 			// boolean
 			// useExecUtil=config.getAttribute(IToolLaunchConfigurationConstants.USE_EXEC_UTIL,
 			// false);
-			boolean perfRecompile = config.getAttribute(IToolLaunchConfigurationConstants.EXTOOL_RECOMPILE, false);
+			final boolean perfRecompile = config.getAttribute(IToolLaunchConfigurationConstants.EXTOOL_RECOMPILE, false);
 
 			if (perfRecompile)// ||(!perfRecompile&&!useExecUtil))
 			{
@@ -426,13 +425,14 @@ public class ToolRecompMainTab extends CMainTab implements ILaunchConfigurationT
 				try {
 					programName = config.getAttribute(IToolLaunchConfigurationConstants.ATTR_PERFORMANCEBUILD_CONFIGURATION_NAME,
 							EMPTY_STRING);
-				} catch (CoreException ce) {
+				} catch (final CoreException ce) {
 					LaunchUIPlugin.log(ce);
 				}
-				if (!programName.equals(EMPTY_STRING))
+				if (!programName.equals(EMPTY_STRING)) {
 					buildConfCombo.select(buildConfCombo.indexOf(programName));
-				else
+				} else {
 					buildConfCombo.select(0);
+				}
 
 				exeComp.setEnabled(false);
 				fProgText.setEnabled(false);
@@ -441,7 +441,7 @@ public class ToolRecompMainTab extends CMainTab implements ILaunchConfigurationT
 				fProgText.setEnabled(true);
 				try {
 					programName = config.getAttribute(ICDTLaunchConfigurationConstants.ATTR_PROGRAM_NAME, EMPTY_STRING);
-				} catch (CoreException ce) {
+				} catch (final CoreException ce) {
 					LaunchUIPlugin.log(ce);
 				}
 				fProgText.setText(programName);
@@ -468,22 +468,29 @@ public class ToolRecompMainTab extends CMainTab implements ILaunchConfigurationT
 			// exeComp.setEnabled(false);
 			// fProgText.setEnabled(false);
 			// }
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
 	/**
-	 * Applies the selected options
+	 * Load the last known selected project from this launch configuration If
+	 * the currently selected build configuration is not the same as the one
+	 * loaded, reinitialize the configuration-selection combo-box
 	 */
 	@Override
-	public void performApply(ILaunchConfigurationWorkingCopy config) {
-		config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_PROJECT_NAME, fProjText.getText());
-		config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_PROGRAM_NAME, fProgText.getText());
-		config.setAttribute(IToolLaunchConfigurationConstants.ATTR_PERFORMANCEBUILD_CONFIGURATION_NAME, buildConfCombo.getText());
-		if (fTerminalButton != null) {
-			config.setAttribute(ICDTLaunchConfigurationConstants.ATTR_USE_TERMINAL, fTerminalButton.getSelection());
+	protected void updateProjectFromConfig(ILaunchConfiguration config) {
+		final String curProj = fProjText.getText();
+		String projectName = EMPTY_STRING;
+		try {
+			projectName = config.getAttribute(ICDTLaunchConfigurationConstants.ATTR_PROJECT_NAME, EMPTY_STRING);
+		} catch (final CoreException ce) {
+			LaunchUIPlugin.log(ce);
+		}
+		fProjText.setText(projectName);
+		if (!curProj.equals(projectName)) {
+			initConfCombo();
 		}
 	}
 

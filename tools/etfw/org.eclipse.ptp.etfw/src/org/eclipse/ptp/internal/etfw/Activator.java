@@ -35,6 +35,48 @@ public class Activator extends AbstractUIPlugin {
 	private static Activator plugin;
 
 	/**
+	 * Returns the shared instance
+	 * 
+	 * @return the shared instance
+	 */
+	public static Activator getDefault() {
+		return plugin;
+	}
+
+	/**
+	 * Generate a unique identifier
+	 * 
+	 * @return unique identifier string
+	 * @since 7.0
+	 */
+	public static String getUniqueIdentifier() {
+		if (getDefault() == null) {
+			return PLUGIN_ID;
+		}
+		return getDefault().getBundle().getSymbolicName();
+	}
+
+	/**
+	 * Create log entry from an IStatus
+	 * 
+	 * @param status
+	 * @since 7.0
+	 */
+	public static void log(IStatus status) {
+		getDefault().getLog().log(status);
+	}
+
+	/**
+	 * Create log entry from a Throwable
+	 * 
+	 * @param e
+	 * @since 7.0
+	 */
+	public static void log(Throwable e) {
+		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, "Internal Error", e)); //$NON-NLS-1$
+	}
+
+	/**
 	 * The constructor
 	 */
 	public Activator() {
@@ -63,48 +105,6 @@ public class Activator extends AbstractUIPlugin {
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
 		super.stop(context);
-	}
-
-	/**
-	 * Returns the shared instance
-	 * 
-	 * @return the shared instance
-	 */
-	public static Activator getDefault() {
-		return plugin;
-	}
-
-	/**
-	 * Create log entry from a Throwable
-	 * 
-	 * @param e
-	 * @since 7.0
-	 */
-	public static void log(Throwable e) {
-		log(new Status(IStatus.ERROR, getUniqueIdentifier(), IStatus.ERROR, "Internal Error", e)); //$NON-NLS-1$
-	}
-
-	/**
-	 * Create log entry from an IStatus
-	 * 
-	 * @param status
-	 * @since 7.0
-	 */
-	public static void log(IStatus status) {
-		getDefault().getLog().log(status);
-	}
-
-	/**
-	 * Generate a unique identifier
-	 * 
-	 * @return unique identifier string
-	 * @since 7.0
-	 */
-	public static String getUniqueIdentifier() {
-		if (getDefault() == null) {
-			return PLUGIN_ID;
-		}
-		return getDefault().getBundle().getSymbolicName();
 	}
 
 }

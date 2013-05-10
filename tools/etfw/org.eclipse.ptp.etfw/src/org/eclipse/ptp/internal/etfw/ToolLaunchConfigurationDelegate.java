@@ -37,6 +37,16 @@ public class ToolLaunchConfigurationDelegate extends LocalRunLaunchDelegate impl
 
 	private boolean initialized = false;
 
+	public boolean getInitialized() {
+		// TODO Auto-generated method stub
+		return initialized;
+	}
+
+	@Override
+	public String getPluginID() {
+		return Activator.PLUGIN_ID;
+	}
+
 	/**
 	 * The primary launch command of this launch configuration delegate. The operations in this function are divided into three
 	 * jobs: Building, Running and Data collection
@@ -56,9 +66,9 @@ public class ToolLaunchConfigurationDelegate extends LocalRunLaunchDelegate impl
 		// tool=new TAULaunch();
 
 		// save the executable location so we can access it in the postprocessing
-		ILaunchConfigurationWorkingCopy wc = configuration.getWorkingCopy();
-		String progName = wc.getAttribute(ICDTLaunchConfigurationConstants.ATTR_PROGRAM_NAME, "defaultValue");
-		String projName = wc.getAttribute(ICDTLaunchConfigurationConstants.ATTR_PROJECT_NAME, "defaultValue");
+		final ILaunchConfigurationWorkingCopy wc = configuration.getWorkingCopy();
+		final String progName = wc.getAttribute(ICDTLaunchConfigurationConstants.ATTR_PROGRAM_NAME, "defaultValue");
+		final String projName = wc.getAttribute(ICDTLaunchConfigurationConstants.ATTR_PROJECT_NAME, "defaultValue");
 		wc.setAttribute(EXTOOL_EXECUTABLE_NAME, progName);
 		wc.setAttribute(EXTOOL_PROJECT_NAME, projName);
 		wc.setAttribute(EXTOOL_ATTR_ARGUMENTS_TAG, ICDTLaunchConfigurationConstants.ATTR_PROGRAM_ARGUMENTS);
@@ -67,12 +77,12 @@ public class ToolLaunchConfigurationDelegate extends LocalRunLaunchDelegate impl
 		wc.setAttribute(EXTOOL_EXECUTABLE_PATH_TAG, (String) null);
 		wc.doSave();
 
-		ILaunchFactory lf = null;// TODO: Make a real non-parallel launch factory class.
+		final ILaunchFactory lf = null;// TODO: Make a real non-parallel launch factory class.
 		initialized = true;
 
 		try {
 
-			ToolLaunchManager plaunch = new ToolLaunchManager(this, lf, new BuildLaunchUtils());// ,ICDTLaunchConfigurationConstants.ATTR_PROGRAM_NAME,ICDTLaunchConfigurationConstants.ATTR_PROJECT_NAME);
+			final ToolLaunchManager plaunch = new ToolLaunchManager(this, lf, new BuildLaunchUtils());// ,ICDTLaunchConfigurationConstants.ATTR_PROGRAM_NAME,ICDTLaunchConfigurationConstants.ATTR_PROJECT_NAME);
 			plaunch.launch(configuration, mode, launchIn, monitor);// ,tool
 
 		} finally {
@@ -81,18 +91,8 @@ public class ToolLaunchConfigurationDelegate extends LocalRunLaunchDelegate impl
 
 	}
 
-	@Override
-	public String getPluginID() {
-		return Activator.PLUGIN_ID;
-	}
-
 	public void setInitialized(boolean init) {
 		initialized = init;
 
-	}
-
-	public boolean getInitialized() {
-		// TODO Auto-generated method stub
-		return initialized;
 	}
 }

@@ -15,6 +15,34 @@ import org.eclipse.ptp.etfw.toolopts.ExternalToolProcess;
 public interface IBuildLaunchUtils {
 
 	/**
+	 * Given a tool's name, ask the user for the location of the tool
+	 * */
+	public String askToolPath(String archpath, String toolName);
+
+	/**
+	 * Given a string as a starting point, this asks the user for the location of a tool's directory
+	 * */
+	public String askToolPath(String archpath, String toolText, String toolMessage);
+
+	public String checkToolEnvPath(String toolname);
+
+	/**
+	 * Returns the directory containing the tool's executable file. Prompts the user for the location if it is not found. Returns
+	 * the empty string if no selection is made
+	 * 
+	 * @param toolfind
+	 *            The name of the executable being sought
+	 * @param suggPath
+	 *            The suggested path upon which to focus the directory locator window
+	 * @param toolName
+	 *            The name of the tool used when prompting the user for its location
+	 * @param selshell
+	 *            The shell in which to launch the directory locator window
+	 * @return
+	 */
+	public String findToolBinPath(String toolfind, String suggPath, String toolName);
+
+	/**
 	 * Returns the directory containing the tool's executable file. Prompts the user for the location if it is not found. Returns
 	 * the empty string if no selection is made
 	 * 
@@ -33,24 +61,16 @@ public interface IBuildLaunchUtils {
 	public String findToolBinPath(String toolfind, String suggPath, String queryText, String queryMessage);
 
 	/**
-	 * Returns the directory containing the tool's executable file. Prompts the user for the location if it is not found. Returns
-	 * the empty string if no selection is made
+	 * Iterates through an array of tools, populating the preference store with their binary directory locations
 	 * 
-	 * @param toolfind
-	 *            The name of the executable being sought
-	 * @param suggPath
-	 *            The suggested path upon which to focus the directory locator window
-	 * @param toolName
-	 *            The name of the tool used when prompting the user for its location
-	 * @param selshell
-	 *            The shell in which to launch the directory locator window
-	 * @return
+	 * @param tools
+	 *            The array of tools to be checked
+	 * @param force
+	 *            If true existing values will be overridden.
 	 */
-	public String findToolBinPath(String toolfind, String suggPath, String toolName);
+	public void getAllToolPaths(ExternalToolProcess[] tools, boolean force);
 
 	public IFileStore getFile(String path);
-
-	public String getWorkingDirectory();
 
 	/**
 	 * Given a tool's ID, returns the path to that tool's bin directory if already known and stored locally, otherwise returns the
@@ -61,29 +81,12 @@ public interface IBuildLaunchUtils {
 	 */
 	public String getToolPath(String toolID);
 
-	public String checkToolEnvPath(String toolname);
+	public String getWorkingDirectory();
 
 	/**
-	 * Iterates through an array of tools, populating the preference store with their binary directory locations
-	 * 
-	 * @param tools
-	 *            The array of tools to be checked
-	 * @param force
-	 *            If true existing values will be overridden.
+	 * @since 7.0
 	 */
-	public void getAllToolPaths(ExternalToolProcess[] tools, boolean force);
-
-	public void verifyRequestToolPath(ExternalToolProcess tool, boolean force);
-
-	/**
-	 * Given a string as a starting point, this asks the user for the location of a tool's directory
-	 * */
-	public String askToolPath(String archpath, String toolText, String toolMessage);
-
-	/**
-	 * Given a tool's name, ask the user for the location of the tool
-	 * */
-	public String askToolPath(String archpath, String toolName);
+	public boolean isRemote();
 
 	/**
 	 * Launches a command on the local system.
@@ -111,8 +114,6 @@ public interface IBuildLaunchUtils {
 	 */
 	public boolean runTool(List<String> tool, Map<String, String> env, String directory, String output);
 
-	public void runVis(List<String> tool, Map<String, String> env, String directory);
-
 	public byte[] runToolGetOutput(List<String> tool, Map<String, String> env, String directory);
 
 	/**
@@ -120,9 +121,8 @@ public interface IBuildLaunchUtils {
 	 */
 	public byte[] runToolGetOutput(List<String> tool, Map<String, String> env, String directory, boolean showErr);
 
-	/**
-	 * @since 7.0
-	 */
-	public boolean isRemote();
+	public void runVis(List<String> tool, Map<String, String> env, String directory);
+
+	public void verifyRequestToolPath(ExternalToolProcess tool, boolean force);
 
 }

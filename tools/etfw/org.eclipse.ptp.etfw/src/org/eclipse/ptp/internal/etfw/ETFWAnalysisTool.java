@@ -51,10 +51,24 @@ import org.eclipse.ui.console.MessageConsole;
 public class ETFWAnalysisTool extends ETFWToolStep implements IToolLaunchConfigurationConstants {
 	// String outputLocation;
 
-	String currentFile;
+	public static MessageConsole findConsole(String name) {
+		final ConsolePlugin plugin = ConsolePlugin.getDefault();
+		final IConsoleManager conMan = plugin.getConsoleManager();
+		final IConsole[] existing = conMan.getConsoles();
+		for (final IConsole element : existing) {
+			if (name.equals(element.getName())) {
+				return (MessageConsole) element;
+			}
+		}
+		// no console found, so create a new one
+		final MessageConsole myConsole = new MessageConsole(name, null);
+		conMan.addConsoles(new IConsole[] { myConsole });
+		return myConsole;
+	}
 
 	// FileFilter dFil = new DirFilter();
 
+	String currentFile;
 	private AnalysisToolType tool = null;
 	/**
 	 * True only if the directory containing performance data is user-specified and not strictly part of the project.
@@ -62,6 +76,7 @@ public class ETFWAnalysisTool extends ETFWToolStep implements IToolLaunchConfigu
 	boolean externalTarget = false;
 	String projName = null;
 	private final IBuildLaunchUtils utilBLob;
+
 	private String syncProjectLocation = null;
 
 	public ETFWAnalysisTool(ILaunchConfiguration conf, AnalysisToolType ppTool, String outLoc, IBuildLaunchUtils utilBlob)
@@ -80,6 +95,77 @@ public class ETFWAnalysisTool extends ETFWToolStep implements IToolLaunchConfigu
 		// }
 	}
 
+	// TODO: The use of set here might gain us nothing
+	private void findFiles(Set<IFileStore> fileSet, IFileStore root, int depth, String matchSuffix, boolean latestOnly) {
+
+		final List<IFileStore> files = listFiles(root, matchSuffix);
+
+		for (final IFileStore f : files) {
+			if (latestOnly) {
+				if (fileSet.size() == 0) {
+					fileSet.add(f);
+				} else {
+					if (fileSet.iterator().next().fetchInfo().getLastModified() < f.fetchInfo().getLastModified()) {
+						fileSet.clear();
+						fileSet.add(f);
+					}
+				}
+			} else {
+				fileSet.add(f);
+			}
+		}
+
+		if (depth > 0 || depth < 0) {
+			final List<IFileStore> roots = listDirectories(root);
+			for (final IFileStore r : roots) {
+				findFiles(fileSet, r, depth - 1, matchSuffix, latestOnly);
+			}
+		}
+	}
+
+	private List<IFileStore> listDirectories(IFileStore root) {
+		final List<IFileStore> files = new ArrayList<IFileStore>();
+		IFileStore[] filea = null;
+		try {
+			filea = root.childStores(EFS.NONE, null);
+		} catch (final CoreException e) {
+			e.printStackTrace();
+		}
+
+		for (final IFileStore f : filea) {
+			if (f.fetchInfo().isDirectory()) {
+				files.add(f);
+			}
+		}
+
+		return files;
+	}
+
+	private List<IFileStore> listFiles(IFileStore root, String matchSuffix) {
+		final List<IFileStore> files = new ArrayList<IFileStore>();
+		IFileStore[] filea = null;
+		try {
+			if (root.fetchInfo().exists() && root.fetchInfo().isDirectory()) {
+				filea = root.childStores(EFS.NONE, null);
+			}
+			else {
+				return files;
+			}
+		} catch (final CoreException e) {
+			e.printStackTrace();
+		}
+		final String test = matchSuffix.toLowerCase();
+		if (filea != null) {
+			for (final IFileStore f : filea) {
+				if (f.getName().endsWith(test)) {
+					files.add(f);
+				}
+			}
+		}
+
+		return files;
+	}
+
 	/**
 	 * Handle data collection and cleanup after an instrumented application has
 	 * finished running
@@ -96,7 +182,7 @@ public class ETFWAnalysisTool extends ETFWToolStep implements IToolLaunchConfigu
 			/*
 			 * For every analysis command in our list...
 			 */
-			for (ToolAppType anap : tool.getAnalysisCommands()) {
+			for (final ToolAppType anap : tool.getAnalysisCommands()) {
 				/*
 				 * If the tool has no group or the group is, at least, not internal just run with what is defined in the xml
 				 */
@@ -104,7 +190,7 @@ public class ETFWAnalysisTool extends ETFWToolStep implements IToolLaunchConfigu
 				{
 					runTool = getToolCommandList(anap, configuration);
 					if (tool.getForAllLike() != null) {
-						IFileStore getname = utilBlob.getFile(currentFile);
+						final IFileStore getname = utilBlob.getFile(currentFile);
 						String name = getname.getName();
 						if (name.contains(DOT)) {
 							name = name.substring(0, name.lastIndexOf(DOT));
@@ -117,9 +203,9 @@ public class ETFWAnalysisTool extends ETFWToolStep implements IToolLaunchConfigu
 						}
 					}
 					if (runTool != null) {
-						if (anap.isVisualizer())
+						if (anap.isVisualizer()) {
 							utilBLob.runVis(runTool, null, outputLocation);
-						else {
+						} else {
 
 							if (anap.getOutToFile() != null)
 							{
@@ -127,16 +213,17 @@ public class ETFWAnalysisTool extends ETFWToolStep implements IToolLaunchConfigu
 							}
 							else {
 								byte[] utout = null;
-								MessageConsole mc = findConsole("ETFw");
+								final MessageConsole mc = findConsole("ETFw");
 								mc.clearConsole();
-								OutputStream os = mc.newOutputStream();
+								final OutputStream os = mc.newOutputStream();
 								utout = utilBlob.runToolGetOutput(runTool, null, outputLocation, true);
 
 								try {
-									if (utout != null)
+									if (utout != null) {
 										os.write(utout);
+									}
 									os.close();
-								} catch (IOException e) {
+								} catch (final IOException e) {
 									e.printStackTrace();
 								}
 								mc.activate();
@@ -151,7 +238,7 @@ public class ETFWAnalysisTool extends ETFWToolStep implements IToolLaunchConfigu
 				 * Otherwise, if we have an alternative tool defined in a plugin
 				 */
 				else {
-					AbstractToolDataManager manager = ETFWUtils.getPerfDataManager(anap.getToolCommand());
+					final AbstractToolDataManager manager = ETFWUtils.getPerfDataManager(anap.getToolCommand());
 					if (manager != null) {
 						if (externalTarget) {
 
@@ -163,8 +250,9 @@ public class ETFWAnalysisTool extends ETFWToolStep implements IToolLaunchConfigu
 						// TODO: This is sort of ok, but we should probably change the API to accept both the output dir and the
 						// project dir.
 						String outdir = outputLocation;
-						if (this.syncProjectLocation != null)
+						if (this.syncProjectLocation != null) {
 							outdir = syncProjectLocation;
+						}
 
 						manager.process(projName, configuration, outdir);
 						manager.cleanup();
@@ -182,7 +270,8 @@ public class ETFWAnalysisTool extends ETFWToolStep implements IToolLaunchConfigu
 		 * If there is no tool we have a failure
 		 */
 		if (tool == null) {
-			return new Status(IStatus.WARNING, "com.ibm.jdg2e.concurrency", IStatus.OK, Messages.PostlaunchTool_NoToolNoAnalysis, null); //$NON-NLS-1$
+			return new Status(IStatus.WARNING,
+					"com.ibm.jdg2e.concurrency", IStatus.OK, Messages.PostlaunchTool_NoToolNoAnalysis, null); //$NON-NLS-1$
 		}
 
 		/*
@@ -206,7 +295,7 @@ public class ETFWAnalysisTool extends ETFWToolStep implements IToolLaunchConfigu
 						if (s == null) {
 							s = PlatformUI.getWorkbench().getDisplay().getShells()[0];
 						}
-						DirectoryDialog dl = new DirectoryDialog(s);
+						final DirectoryDialog dl = new DirectoryDialog(s);
 						dl.setText(Messages.PostlaunchTool_SelectPerfDir);
 						outputLocation = dl.open();
 					}
@@ -225,7 +314,7 @@ public class ETFWAnalysisTool extends ETFWToolStep implements IToolLaunchConfigu
 
 			try {
 				customOutLoc = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, (String) null);
-			} catch (CoreException e1) {
+			} catch (final CoreException e1) {
 				e1.printStackTrace();
 			}
 
@@ -241,15 +330,15 @@ public class ETFWAnalysisTool extends ETFWToolStep implements IToolLaunchConfigu
 		try {
 
 			if (tool.getForAllLike() != null) {
-				IFileStore workDir = utilBlob.getFile(outputLocation);
+				final IFileStore workDir = utilBlob.getFile(outputLocation);
 
-				LinkedHashSet<IFileStore> fileSet = new LinkedHashSet<IFileStore>();
+				final LinkedHashSet<IFileStore> fileSet = new LinkedHashSet<IFileStore>();
 				findFiles(fileSet, workDir, tool.getDepth(), tool.getForAllLike(), tool.isUseLatestFileOnly());
 				if (fileSet.size() <= 0) {
 					return new Status(IStatus.ERROR,
 							"com.ibm.jdg2e.concurrency", IStatus.ERROR, Messages.PostlaunchTool_NoValidFiles, null); //$NON-NLS-1$
 				}
-				for (IFileStore f : fileSet) {
+				for (final IFileStore f : fileSet) {
 					currentFile = f.toURI().getPath();
 					postlaunch(monitor);
 				}
@@ -257,103 +346,20 @@ public class ETFWAnalysisTool extends ETFWToolStep implements IToolLaunchConfigu
 				postlaunch(monitor);
 			}
 
-		} catch (Exception e) {
-			return new Status(IStatus.ERROR,
-					"com.ibm.jdg2e.concurrency", IStatus.ERROR, Messages.PostlaunchTool_AnalysisError, e); //$NON-NLS-1$
+		} catch (final Exception e) {
+			return new Status(IStatus.ERROR, "com.ibm.jdg2e.concurrency", IStatus.ERROR, Messages.PostlaunchTool_AnalysisError, e); //$NON-NLS-1$
 		}
 		return new Status(IStatus.OK, "com.ibm.jdg2e.concurrency", IStatus.OK, Messages.PostlaunchTool_AnalysisSuccessful, null); //$NON-NLS-1$
 	}
 
-	private List<IFileStore> listFiles(IFileStore root, String matchSuffix) {
-		List<IFileStore> files = new ArrayList<IFileStore>();
-		IFileStore[] filea = null;
-		try {
-			if (root.fetchInfo().exists() && root.fetchInfo().isDirectory()) {
-				filea = root.childStores(EFS.NONE, null);
-			}
-			else {
-				return files;
-			}
-		} catch (CoreException e) {
-			e.printStackTrace();
-		}
-		String test = matchSuffix.toLowerCase();
-		if (filea != null)
-			for (IFileStore f : filea) {
-				if (f.getName().endsWith(test))
-					files.add(f);
-			}
-
-		return files;
-	}
-
-	private List<IFileStore> listDirectories(IFileStore root) {
-		List<IFileStore> files = new ArrayList<IFileStore>();
-		IFileStore[] filea = null;
-		try {
-			filea = root.childStores(EFS.NONE, null);
-		} catch (CoreException e) {
-			e.printStackTrace();
-		}
-
-		for (IFileStore f : filea) {
-			if (f.fetchInfo().isDirectory())
-				files.add(f);
-		}
-
-		return files;
-	}
-
-	// TODO: The use of set here might gain us nothing
-	private void findFiles(Set<IFileStore> fileSet, IFileStore root, int depth, String matchSuffix, boolean latestOnly) {
-
-		List<IFileStore> files = listFiles(root, matchSuffix);
-
-		for (IFileStore f : files) {
-			if (latestOnly) {
-				if (fileSet.size() == 0)
-					fileSet.add(f);
-				else {
-					if (fileSet.iterator().next().fetchInfo().getLastModified() < f.fetchInfo().getLastModified()) {
-						fileSet.clear();
-						fileSet.add(f);
-					}
-				}
-			}
-			else
-				fileSet.add(f);
-		}
-
-		if (depth > 0 || depth < 0) {
-			List<IFileStore> roots = listDirectories(root);
-			for (IFileStore r : roots) {
-				findFiles(fileSet, r, depth - 1, matchSuffix, latestOnly);
-			}
-		}
-	}
-
-	public static MessageConsole findConsole(String name) {
-		ConsolePlugin plugin = ConsolePlugin.getDefault();
-		IConsoleManager conMan = plugin.getConsoleManager();
-		IConsole[] existing = conMan.getConsoles();
-		for (int i = 0; i < existing.length; i++) {
-			if (name.equals(existing[i].getName())) {
-				return (MessageConsole) existing[i];
-			}
-		}
-		// no console found, so create a new one
-		MessageConsole myConsole = new MessageConsole(name, null);
-		conMan.addConsoles(new IConsole[] { myConsole });
-		return myConsole;
-	}
-	
+	@Override
 	public void setSuccessAttribute(String value) {
 		if (tool != null && tool.getSetSuccessAttribute() != null) {
 			try {
-				ILaunchConfigurationWorkingCopy configuration = this.configuration.getWorkingCopy();
+				final ILaunchConfigurationWorkingCopy configuration = this.configuration.getWorkingCopy();
 				configuration.setAttribute(tool.getSetSuccessAttribute(), value);
 				configuration.doSave();
-			} catch (CoreException e) {
+			} catch (final CoreException e) {
 				// Ignore
 			}
 		}

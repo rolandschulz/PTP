@@ -95,7 +95,7 @@ public class ExternalToolProcess {
 	 */
 	public PostProcTool getFirstAnalyzer(ILaunchConfiguration configuration) {
 		for (int i = 0; i < externalTools.size(); i++) {
-			ExternalTool pt = externalTools.get(i);
+			final ExternalTool pt = externalTools.get(i);
 			if (pt instanceof PostProcTool && (configuration == null || pt.canRun(configuration))) {
 				return (PostProcTool) externalTools.get(i);
 			}
@@ -108,7 +108,7 @@ public class ExternalToolProcess {
 	 */
 	public BuildTool getFirstBuilder(ILaunchConfiguration configuration) {
 		for (int i = 0; i < externalTools.size(); i++) {
-			ExternalTool pt = externalTools.get(i);
+			final ExternalTool pt = externalTools.get(i);
 			if (pt instanceof BuildTool && (configuration == null || pt.canRun(configuration))) {
 				return (BuildTool) externalTools.get(i);
 			}
@@ -121,7 +121,7 @@ public class ExternalToolProcess {
 	 */
 	public ExecTool getFirstRunner(ILaunchConfiguration configuration) {
 		for (int i = 0; i < externalTools.size(); i++) {
-			ExternalTool pt = externalTools.get(i);
+			final ExternalTool pt = externalTools.get(i);
 			if (pt instanceof ExecTool && (configuration == null || pt.canRun(configuration))) {
 				return (ExecTool) externalTools.get(i);
 			}
@@ -143,7 +143,7 @@ public class ExternalToolProcess {
 		}
 		int count = 0;
 		for (int i = 0; i < externalTools.size(); i++) {
-			ExternalTool pt = externalTools.get(i);
+			final ExternalTool pt = externalTools.get(i);
 			if (pt instanceof ExecTool && (configuration == null || pt.canRun(configuration))) {
 				count++;
 				if (count == n) {

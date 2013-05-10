@@ -23,8 +23,6 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-
-
 //import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -70,23 +68,9 @@ import org.osgi.service.prefs.BackingStoreException;
 public class ToolLocationPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
 
 	private class BinDirPanel {
-		String group = ""; //$NON-NLS-1$
-		Button browseBinButton = null;
-		Text binDir = null;
-		BinListener binLis = new BinListener();
-
 		protected class BinListener extends SelectionAdapter implements ModifyListener, IPropertyChangeListener {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				Object source = e.getSource();
-				if (source == browseBinButton) {
-					handleBinBrowseButtonSelected(binDir, group);
-				}
-				updatePreferencePage();
-			}
-
 			public void modifyText(ModifyEvent evt) {
-				Object source = evt.getSource();
+				final Object source = evt.getSource();
 				if (source == binDir) {
 				}
 
@@ -98,14 +82,33 @@ public class ToolLocationPreferencePage extends PreferencePage implements IWorkb
 					updatePreferencePage();
 				}
 			}
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				final Object source = e.getSource();
+				if (source == browseBinButton) {
+					handleBinBrowseButtonSelected(binDir, group);
+				}
+				updatePreferencePage();
+			}
+		}
+
+		String group = ""; //$NON-NLS-1$
+		Button browseBinButton = null;
+		Text binDir = null;
+
+		BinListener binLis = new BinListener();
+
+		public BinDirPanel(String group) {
+			this.group = group;
 		}
 
 		private void makeToolBinPane(Composite parent) {
-			Composite tauarch = new Composite(parent, SWT.NONE);
+			final Composite tauarch = new Composite(parent, SWT.NONE);
 			tauarch.setLayout(createGridLayout(3, false, 0, 0));
 			tauarch.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 5));
 
-			Label taubinComment = new Label(tauarch, SWT.WRAP);
+			final Label taubinComment = new Label(tauarch, SWT.WRAP);
 			taubinComment.setText(group + Messages.ToolLocationPreferencePage_BinDir);
 			binDir = new Text(tauarch, SWT.BORDER | SWT.SINGLE);
 			binDir.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -115,54 +118,9 @@ public class ToolLocationPreferencePage extends PreferencePage implements IWorkb
 			browseBinButton.setText(Messages.ToolLocationPreferencePage_Browse);
 			browseBinButton.addSelectionListener(binLis);
 		}
-
-		public BinDirPanel(String group) {
-			this.group = group;
-		}
-	}
-
-	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
-
-	BinDirPanel[] toolGroups = null;
-
-	// protected Text tauBin = null;
-	// protected Button browseBinButton = null;
-
-	public ToolLocationPreferencePage() {
-		setPreferenceStore(Activator.getDefault().getPreferenceStore());
-		Iterator<Map.Entry<String, String>> eIt = null;
-		String me = null;
-		ExternalToolProcess[] tools = ETFWUtils.getTools();
-		Set<String> groups = new LinkedHashSet<String>();
-		for (ExternalToolProcess tool : tools) {
-			eIt = tool.groupApp.entrySet().iterator();
-			while (eIt.hasNext()) {
-				me = (eIt.next()).getKey().toString();
-				if (!me.equals("internal")) {
-					groups.add(me);
-				}
-			}
-		}
-
-		toolGroups = new BinDirPanel[groups.size()];
-		Iterator<String> gIt = groups.iterator();
-		int i = 0;
-		while (gIt.hasNext()) {
-			toolGroups[i] = new BinDirPanel(gIt.next());
-			i++;
-		}
 	}
 
 	protected class WidgetListener extends SelectionAdapter implements ModifyListener, IPropertyChangeListener {
-		@Override
-		public void widgetSelected(SelectionEvent e) {
-			// Object source = e.getSource();
-			// if(source == browseBinButton) {
-			// handleBinBrowseButtonSelected();
-			// }
-			updatePreferencePage();
-		}
-
 		public void modifyText(ModifyEvent evt) {
 			// Object source = evt.getSource();
 			// if(source==tauBin){
@@ -176,13 +134,66 @@ public class ToolLocationPreferencePage extends PreferencePage implements IWorkb
 				updatePreferencePage();
 			}
 		}
+
+		@Override
+		public void widgetSelected(SelectionEvent e) {
+			// Object source = e.getSource();
+			// if(source == browseBinButton) {
+			// handleBinBrowseButtonSelected();
+			// }
+			updatePreferencePage();
+		}
 	}
+
+	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
+
+	// protected Text tauBin = null;
+	// protected Button browseBinButton = null;
+
+	BinDirPanel[] toolGroups = null;
 
 	protected WidgetListener listener = new WidgetListener();
 
+	public ToolLocationPreferencePage() {
+		setPreferenceStore(Activator.getDefault().getPreferenceStore());
+		Iterator<Map.Entry<String, String>> eIt = null;
+		String me = null;
+		final ExternalToolProcess[] tools = ETFWUtils.getTools();
+		final Set<String> groups = new LinkedHashSet<String>();
+		for (final ExternalToolProcess tool : tools) {
+			eIt = tool.groupApp.entrySet().iterator();
+			while (eIt.hasNext()) {
+				me = (eIt.next()).getKey().toString();
+				if (!me.equals("internal")) {
+					groups.add(me);
+				}
+			}
+		}
+
+		toolGroups = new BinDirPanel[groups.size()];
+		final Iterator<String> gIt = groups.iterator();
+		int i = 0;
+		while (gIt.hasNext()) {
+			toolGroups[i] = new BinDirPanel(gIt.next());
+			i++;
+		}
+	}
+
+	protected Button createButton(Composite parent, String label, int type) {
+		final Button button = new Button(parent, type);
+		button.setText(label);
+		final GridData data = new GridData();
+		button.setLayoutData(data);
+		return button;
+	}
+
+	protected Button createCheckButton(Composite parent, String label) {
+		return createButton(parent, label, SWT.CHECK | SWT.LEFT);
+	}
+
 	@Override
 	protected Control createContents(Composite parent) {
-		Composite composite = new Composite(parent, SWT.NONE);
+		final Composite composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(createGridLayout(1, true, 0, 0));
 		composite.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
 
@@ -192,23 +203,48 @@ public class ToolLocationPreferencePage extends PreferencePage implements IWorkb
 		return composite;
 	}
 
+	protected GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) {
+		final GridLayout gridLayout = new GridLayout();
+		gridLayout.numColumns = columns;
+		gridLayout.makeColumnsEqualWidth = isEqual;
+		gridLayout.marginHeight = mh;
+		gridLayout.marginWidth = mw;
+		return gridLayout;
+	}
+
 	/**
 	 * Create the TAU options UI
 	 * 
 	 * @param parent
 	 */
 	private void createTauConf(Composite parent) {
-		Group aGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
+		final Group aGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
 		aGroup.setLayout(createGridLayout(1, true, 10, 10));
 		aGroup.setLayoutData(spanGridData(GridData.FILL_HORIZONTAL, 2));
 		aGroup.setText(Messages.ToolLocationPreferencePage_ToolLocationConf);
 
 		if (toolGroups != null) {
-			for (BinDirPanel toolGroup : toolGroups) {
+			for (final BinDirPanel toolGroup : toolGroups) {
 				toolGroup.makeToolBinPane(aGroup);
 			}
 		}
 
+	}
+
+	protected void defaultSetting() {
+	}
+
+	@Override
+	public void dispose() {
+		super.dispose();
+	}
+
+	protected String getFieldContent(String text) {
+		if (text.trim().length() == 0 || text.equals(EMPTY_STRING)) {
+			return null;
+		}
+
+		return text;
 	}
 
 	/**
@@ -216,9 +252,9 @@ public class ToolLocationPreferencePage extends PreferencePage implements IWorkb
 	 * 
 	 */
 	protected void handleBinBrowseButtonSelected(Text field, String group) {
-		DirectoryDialog dialog = new DirectoryDialog(getShell());
+		final DirectoryDialog dialog = new DirectoryDialog(getShell());
 		IFileStore path = null;
-		String correctPath = getFieldContent(field.getText());
+		final String correctPath = getFieldContent(field.getText());
 		if (correctPath != null) {
 			path = EFS.getLocalFileSystem().getStore(new Path(correctPath));// new File(correctPath);
 			if (path.fetchInfo().exists()) {
@@ -243,7 +279,7 @@ public class ToolLocationPreferencePage extends PreferencePage implements IWorkb
 		dialog.setText(Messages.ToolLocationPreferencePage_Select + group + Messages.ToolLocationPreferencePage_BinDirectory);
 		// dialog.setMessage("You must select a valid TAU bin directory.  Such a directory should be created when you configure and install TAU.  It should contain least one valid stub makefile configured with the Program Database Toolkit (pdt)");
 
-		String selectedPath = dialog.open();// null;
+		final String selectedPath = dialog.open();// null;
 		if (selectedPath != null) {
 			field.setText(selectedPath);
 			// while(true)
@@ -268,12 +304,15 @@ public class ToolLocationPreferencePage extends PreferencePage implements IWorkb
 
 	}
 
+	public void init(IWorkbench workbench) {
+	}
+
 	private void loadSaved() {
 		// Preferences preferences = Activator.getDefault().getPluginPreferences();
-		IPreferencesService service = Platform.getPreferencesService();
+		final IPreferencesService service = Platform.getPreferencesService();
 
 		if (toolGroups != null) {
-			for (BinDirPanel toolGroup : toolGroups) {
+			for (final BinDirPanel toolGroup : toolGroups) {
 				toolGroup.binDir.setText(service.getString(Activator.PLUGIN_ID, IToolLaunchConfigurationConstants.TOOL_BIN_ID
 						+ "." + toolGroup.group, "", null));// ITAULaunchConfigurationConstants.TAU_BIN_PATH)); //$NON-NLS-1$
 			}
@@ -282,80 +321,33 @@ public class ToolLocationPreferencePage extends PreferencePage implements IWorkb
 	}
 
 	@Override
+	public void performDefaults() {
+		defaultSetting();
+		updateApplyButton();
+	}
+
+	@Override
 	public boolean performOk() {
 		// Preferences preferences = Activator.getDefault().getPluginPreferences();
 
 		// InstanceScope is = new InstanceScope();
 
-		IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
+		final IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
 
 		if (toolGroups != null) {
-			for (BinDirPanel toolGroup : toolGroups) {
+			for (final BinDirPanel toolGroup : toolGroups) {
 				preferences.put(IToolLaunchConfigurationConstants.TOOL_BIN_ID + "." + toolGroup.group, toolGroup.binDir.getText()); //$NON-NLS-1$
 			}
 		}
 
 		try {
 			preferences.flush();
-		} catch (BackingStoreException e) {
+		} catch (final BackingStoreException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		// Activator.getDefault().savePluginPreferences();
 		return true;
-	}
-
-	protected Button createCheckButton(Composite parent, String label) {
-		return createButton(parent, label, SWT.CHECK | SWT.LEFT);
-	}
-
-	protected Button createButton(Composite parent, String label, int type) {
-		Button button = new Button(parent, type);
-		button.setText(label);
-		GridData data = new GridData();
-		button.setLayoutData(data);
-		return button;
-	}
-
-	public void init(IWorkbench workbench) {
-	}
-
-	protected void defaultSetting() {
-	}
-
-	@Override
-	public void dispose() {
-		super.dispose();
-	}
-
-	@Override
-	public void performDefaults() {
-		defaultSetting();
-		updateApplyButton();
-	}
-
-	protected void updatePreferencePage() {
-		setErrorMessage(null);
-		setMessage(null);
-
-		setValid(true);
-	}
-
-	protected String getFieldContent(String text) {
-		if (text.trim().length() == 0 || text.equals(EMPTY_STRING)) {
-			return null;
-		}
-
-		return text;
-	}
-
-	protected GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) {
-		GridLayout gridLayout = new GridLayout();
-		gridLayout.numColumns = columns;
-		gridLayout.makeColumnsEqualWidth = isEqual;
-		gridLayout.marginHeight = mh;
-		gridLayout.marginWidth = mw;
-		return gridLayout;
 	}
 
 	protected GridData spanGridData(int style, int space) {
@@ -367,5 +359,12 @@ public class ToolLocationPreferencePage extends PreferencePage implements IWorkb
 		}
 		gd.horizontalSpan = space;
 		return gd;
+	}
+
+	protected void updatePreferencePage() {
+		setErrorMessage(null);
+		setMessage(null);
+
+		setValid(true);
 	}
 }

@@ -9,6 +9,23 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.etfw.tau.papiselect.messages.Messages;
 
+class Component extends ETItem {
+	int index;
+	String type;
+	String id;
+	Set<String> eNames;
+
+	public Component(EventTree parent, int i, String type, String id) {
+		super();
+		// setParent(parent);//this.ti=new TreeItem(parent,SWT.NONE);
+		this.label = type;// ti.setText(type);
+		this.index = i;
+		this.id = id;
+		this.type = type;
+		eNames = new HashSet<String>();
+	}
+}
+
 class ETItem implements IStructuredContentProvider, ITreeContentProvider {// ),IAdaptable
 																			// {
 	public ETItem parent;
@@ -17,33 +34,15 @@ class ETItem implements IStructuredContentProvider, ITreeContentProvider {// ),I
 	public String desc;
 	boolean checked = false;
 
-	public void setCheck(boolean state) {
-		checked = state;
-	}
-
-	public boolean getCheck() {
-		return checked;
-	}
+	boolean inited = false;
 
 	ETItem() {
 		children = new ArrayList<ETItem>();
 	}
 
-	boolean inited = false;
-
-	public Object[] getElements(Object inputElement) {
-
-		if (inputElement instanceof EventTree && !inited) {
-			Object[] o = { inputElement };// initialize() };
-			inited = true;
-			return o;
-		}
-
-		if (inputElement instanceof ETItem) {
-			return ((ETItem) inputElement).children.toArray();
-		}
-
-		return null;
+	public void addChild(ETItem child) {
+		children.add(child);
+		child.parent = this;
 	}
 
 	public void dispose() {
@@ -51,14 +50,28 @@ class ETItem implements IStructuredContentProvider, ITreeContentProvider {// ),I
 
 	}
 
-	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		// TODO Auto-generated method stub
-
+	public boolean getCheck() {
+		return checked;
 	}
 
 	public Object[] getChildren(Object parentElement) {
 		if (parentElement instanceof ETItem) {
 			return ((ETItem) parentElement).children.toArray();
+		}
+
+		return null;
+	}
+
+	public Object[] getElements(Object inputElement) {
+
+		if (inputElement instanceof EventTree && !inited) {
+			final Object[] o = { inputElement };// initialize() };
+			inited = true;
+			return o;
+		}
+
+		if (inputElement instanceof ETItem) {
+			return ((ETItem) inputElement).children.toArray();
 		}
 
 		return null;
@@ -79,9 +92,13 @@ class ETItem implements IStructuredContentProvider, ITreeContentProvider {// ),I
 		return false;
 	}
 
-	public void addChild(ETItem child) {
-		children.add(child);
-		child.parent = this;
+	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void setCheck(boolean state) {
+		checked = state;
 	}
 
 	void setParent(ETItem parent) {
@@ -101,48 +118,6 @@ class ETItem implements IStructuredContentProvider, ITreeContentProvider {// ),I
 	// // TODO Auto-generated method stub
 	// return null;
 	// }
-}
-
-class EventTree extends ETItem {
-	public EventTree() {
-		super();
-		label = Messages.EventTree_Events;
-		desc = null;
-
-	}
-}
-
-class Component extends ETItem {
-	int index;
-	String type;
-	String id;
-	Set<String> eNames;
-
-	public Component(EventTree parent, int i, String type, String id) {
-		super();
-		// setParent(parent);//this.ti=new TreeItem(parent,SWT.NONE);
-		this.label = type;// ti.setText(type);
-		this.index = i;
-		this.id = id;
-		this.type = type;
-		eNames = new HashSet<String>();
-	}
-}
-
-class EventSet extends ETItem {
-	String type;
-	Set<Integer> checkedSet;
-	Set<Integer> fullSet;
-
-	public EventSet(Component parent, String type) {
-		super();
-		// this.parent=parent;//ti=new TreeItem(parent,SWT.NONE);
-		// setParent(parent);
-		label = type;// ti.setText(type);
-		this.type = type;
-		checkedSet = new HashSet<Integer>();
-		fullSet = new HashSet<Integer>();
-	}
 }
 
 class Event extends ETItem {
@@ -179,6 +154,24 @@ class Event extends ETItem {
 		return com;
 	}
 
+	@Override
+	public void setCheck(boolean state) {
+		checked = state;
+
+		String modLabel = this.label;
+		if (this.children.size() > 0) {
+			modLabel += this.children.get(0).label;
+		}
+
+		if (state) {
+			((Component) this.parent.parent).eNames.add(modLabel);
+			((EventSet) this.parent).checkedSet.add(new Integer(this.index));
+		} else {
+			((Component) this.parent.parent).eNames.remove(modLabel);
+			((EventSet) this.parent).checkedSet.remove(new Integer(this.index));
+		}
+	}
+
 	public String testCommand() {
 		String com = label;
 		int modcount = 0;
@@ -196,23 +189,30 @@ class Event extends ETItem {
 
 		return com;
 	}
+}
 
-	@Override
-	public void setCheck(boolean state) {
-		checked = state;
+class EventSet extends ETItem {
+	String type;
+	Set<Integer> checkedSet;
+	Set<Integer> fullSet;
 
-		String modLabel = this.label;
-		if (this.children.size() > 0) {
-			modLabel += this.children.get(0).label;
-		}
+	public EventSet(Component parent, String type) {
+		super();
+		// this.parent=parent;//ti=new TreeItem(parent,SWT.NONE);
+		// setParent(parent);
+		label = type;// ti.setText(type);
+		this.type = type;
+		checkedSet = new HashSet<Integer>();
+		fullSet = new HashSet<Integer>();
+	}
+}
 
-		if (state) {
-			((Component) this.parent.parent).eNames.add(modLabel);
-			((EventSet) this.parent).checkedSet.add(new Integer(this.index));
-		} else {
-			((Component) this.parent.parent).eNames.remove(modLabel);
-			((EventSet) this.parent).checkedSet.remove(new Integer(this.index));
-		}
+class EventTree extends ETItem {
+	public EventTree() {
+		super();
+		label = Messages.EventTree_Events;
+		desc = null;
+
 	}
 }
 

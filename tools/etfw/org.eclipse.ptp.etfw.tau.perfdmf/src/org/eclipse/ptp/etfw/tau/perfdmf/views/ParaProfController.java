@@ -25,7 +25,66 @@ public class ParaProfController {
 		TRIAL
 	}
 
+	static class StreamRunner extends Thread {
+		private final LinkedBlockingQueue<String> pushQueue;
+		private final LinkedBlockingQueue<String> pullQueue;
+		InputStream is;
+		boolean exception = false;
+
+		StreamRunner(InputStream is) {
+			this.is = is;
+			pushQueue = null;
+			pullQueue = null;
+		}
+
+		StreamRunner(InputStream is, LinkedBlockingQueue<String> pushQueue, LinkedBlockingQueue<String> pullQueue) {
+			this.is = is;
+			this.pushQueue = pushQueue;
+			this.pullQueue = pullQueue;
+		}
+
+		@Override
+		public void run() {
+			try {
+				final InputStreamReader isr = new InputStreamReader(is);
+				final BufferedReader br = new BufferedReader(isr);
+				String line = null;
+				while ((line = br.readLine()) != null) {
+
+					if (pushQueue == null || pullQueue == null) {
+						if (line.contains("Exception")) { //$NON-NLS-1$
+							exception = true;
+						}
+						System.out.println(line);
+					} else {
+						if (line.startsWith("control sourcecode")) { //$NON-NLS-1$
+							pullQueue.add(line);
+						} else {
+							pushQueue.add(line);
+						}
+					}
+				}
+			} catch (final IOException e) {
+				e.printStackTrace();
+			}
+			// if (pullQueue != null){
+			// if(!exception)
+			//					pullQueue.add(DONE); //$NON-NLS-1$
+			// }
+
+			if (pushQueue != null) {
+				pushQueue.add(DONE);
+			}
+		}
+	}
+
 	public class TreeTuple {
+
+		public int id;
+
+		public String name;
+		public int dbid;
+		public Level level;
 
 		public TreeTuple(String name, int id, int dbid, Level level) {
 			this.id = id;
@@ -33,11 +92,6 @@ public class ParaProfController {
 			this.dbid = dbid;
 			this.level = level;
 		}
-
-		public int id;
-		public String name;
-		public int dbid;
-		public Level level;
 	}
 
 	private LinkedBlockingQueue<String> pushQueue = null;
@@ -52,21 +106,13 @@ public class ParaProfController {
 	private static final String DATABASES = "databases"; //$NON-NLS-1$
 	private static final String APPLICATIONS = "applications"; //$NON-NLS-1$
 	private static final String EXPERIMENTS = "experiments"; //$NON-NLS-1$
+
 	private static final String TRIALS = "trials"; //$NON-NLS-1$
 
 	private boolean canRun = true;
-
 	public static TreeTuple EMPTY;
+
 	private IBuildLaunchUtils utilBlob = null;
-
-	/**
-	 * @since 3.0
-	 */
-	public ParaProfController(IBuildLaunchUtils utilBlob) {
-		this.utilBlob = utilBlob;
-		createProcess();
-
-	}
 
 	/**
 	 * @since 3.0
@@ -81,18 +127,19 @@ public class ParaProfController {
 	 */
 	public static final String DONE = "DONE"; //$NON-NLS-1$
 
-	private void killProcess() {
-		pushQueue = null;
-		pullReady = false;
-		pullQueue.add(RESTART);
-		pullQueue = null;
-		pb = null;
-		errRun = null;
-		inRun = null;
+	private static final String SPACE = " "; //$NON-NLS-1$
+
+	/**
+	 * @since 3.0
+	 */
+	public ParaProfController(IBuildLaunchUtils utilBlob) {
+		this.utilBlob = utilBlob;
+		createProcess();
+
 	}
 
 	private void createProcess() {
-		String taubin = utilBlob.getToolPath("tau"); //$NON-NLS-1$
+		final String taubin = utilBlob.getToolPath("tau"); //$NON-NLS-1$
 		IFileStore paraprof = utilBlob.getFile(taubin);// + File.separator + "paraprof";
 		paraprof = paraprof.getChild("paraprof"); //$NON-NLS-1$
 		EMPTY = new TreeTuple("None", -1, -1, Level.DATABASE); //$NON-NLS-1$
@@ -104,7 +151,7 @@ public class ParaProfController {
 
 		pushQueue = new LinkedBlockingQueue<String>();
 		pullQueue = new LinkedBlockingQueue<String>();
-		List<String> command = new ArrayList<String>();
+		final List<String> command = new ArrayList<String>();
 		command.add(paraprof.toURI().getPath());
 		command.add("--control"); //$NON-NLS-1$
 		pb = new ProcessBuilder(command);
@@ -112,7 +159,7 @@ public class ParaProfController {
 		proc = null;
 		try {
 			proc = pb.start();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 		errRun = new StreamRunner(proc.getErrorStream());
@@ -123,11 +170,15 @@ public class ParaProfController {
 		pullReady = true;
 	}
 
+	public List<TreeTuple> getApplications(int db) {
+		return getInfo(APPLICATIONS, db, -1, Level.APPLICATION);
+	}
+
 	public List<TreeTuple> getDatabases() {
-		List<TreeTuple> l = getInfo(DATABASES, -1, -1, Level.DATABASE);
+		final List<TreeTuple> l = getInfo(DATABASES, -1, -1, Level.DATABASE);
 		TreeTuple t;
 		for (int i = 0; i < l.size(); i++) {
-			String name = l.get(i).name;
+			final String name = l.get(i).name;
 			if (name.equals("Default") || name.equals("default")) { //$NON-NLS-1$ //$NON-NLS-2$
 				t = l.remove(i);
 				l.add(0, t);
@@ -137,20 +188,12 @@ public class ParaProfController {
 		return l;
 	}
 
-	public List<TreeTuple> getApplications(int db) {
-		return getInfo(APPLICATIONS, db, -1, Level.APPLICATION);
-	}
-
 	public List<TreeTuple> getExperiments(int db, int ap) {
 		return getInfo(EXPERIMENTS, db, ap, Level.EXPERIMENT);
 	}
 
-	public List<TreeTuple> getTrials(int db, int ex) {
-		return getInfo(TRIALS, db, ex, Level.TRIAL);
-	}
-
 	private List<TreeTuple> getInfo(String type, int dbid, int hid, Level level) {
-		List<TreeTuple> out = new ArrayList<TreeTuple>();
+		final List<TreeTuple> out = new ArrayList<TreeTuple>();
 
 		if (!canRun) {
 			return out;
@@ -164,16 +207,16 @@ public class ParaProfController {
 				comBuf += " " + hid; //$NON-NLS-1$
 			}
 		}
-		int res = issueCommand(comBuf);
+		final int res = issueCommand(comBuf);
 		if (res != 0) {
 			return out;
 		}
-		List<String> l = getResults();
+		final List<String> l = getResults();
 
-		for (String s : l) {
+		for (final String s : l) {
 			if (s.startsWith("control return")) { //$NON-NLS-1$
-				String[] split = s.split(" "); //$NON-NLS-1$
-				int id = Integer.parseInt(split[2]);
+				final String[] split = s.split(" "); //$NON-NLS-1$
+				final int id = Integer.parseInt(split[2]);
 				String name = split[3];
 				for (int j = 4; j < split.length; j++) {
 					name += " " + split[j]; //$NON-NLS-1$
@@ -184,40 +227,19 @@ public class ParaProfController {
 		return out;
 	}
 
-	private static final String SPACE = " "; //$NON-NLS-1$
-
-	/**
-	 * @since 3.0
-	 */
-	public TreeTuple uploadTrial(IFileStore profile, int dbid, String app, String exp, String tri) {
-		String comBuf = "control upload " + profile.toURI().getPath() + SPACE + dbid + SPACE + app + SPACE + exp + SPACE + tri; //$NON-NLS-1$
-		int res = issueCommand(comBuf);
-		if (res != 0) {
-			return null;
-		}
-		TreeTuple tt = null;
-		List<String> l = getResults();
-
-		for (String s : l) {
-			if (s.startsWith("control return")) { //$NON-NLS-1$
-				String[] split = s.split(" "); //$NON-NLS-1$
-				int id = Integer.parseInt(split[2]);
-				tt = new TreeTuple(tri, id, dbid, Level.TRIAL);
-			}
-		}
-
-		return tt;
+	public BlockingQueue<String> getPullQueue() {
+		return pullQueue;
 	}
 
 	private List<String> getResults() {
 		boolean done = false;
-		List<String> l = new ArrayList<String>();
+		final List<String> l = new ArrayList<String>();
 		if (pushQueue != null) {
 			while (!done) {// for(int i=0;i<dex;i++){
 				String s = ""; //$NON-NLS-1$
 				try {
 					s = pushQueue.take();
-				} catch (InterruptedException e) {
+				} catch (final InterruptedException e) {
 					e.printStackTrace();
 				}
 				if (s.equals("control endreturn") || s.equals(DONE)) { //$NON-NLS-1$ 
@@ -228,6 +250,10 @@ public class ParaProfController {
 			}
 		}
 		return l;
+	}
+
+	public List<TreeTuple> getTrials(int db, int ex) {
+		return getInfo(TRIALS, db, ex, Level.TRIAL);
 	}
 
 	private int issueCommand(String command) {
@@ -250,71 +276,47 @@ public class ParaProfController {
 		return 0;
 	}
 
-	public void openTrial(int dbid, int tid) {
-		String comBuf = "control load " + dbid + " " + tid; //$NON-NLS-1$ //$NON-NLS-2$
-		issueCommand(comBuf);
+	private void killProcess() {
+		pushQueue = null;
+		pullReady = false;
+		pullQueue.add(RESTART);
+		pullQueue = null;
+		pb = null;
+		errRun = null;
+		inRun = null;
 	}
 
 	public void openManager() {
-		String comBuf = "control open manager"; //$NON-NLS-1$
+		final String comBuf = "control open manager"; //$NON-NLS-1$
 		issueCommand(comBuf);
 	}
 
-	public BlockingQueue<String> getPullQueue() {
-		return pullQueue;
+	public void openTrial(int dbid, int tid) {
+		final String comBuf = "control load " + dbid + " " + tid; //$NON-NLS-1$ //$NON-NLS-2$
+		issueCommand(comBuf);
 	}
 
-	static class StreamRunner extends Thread {
-		private final LinkedBlockingQueue<String> pushQueue;
-		private final LinkedBlockingQueue<String> pullQueue;
-		InputStream is;
-		boolean exception = false;
-
-		StreamRunner(InputStream is, LinkedBlockingQueue<String> pushQueue, LinkedBlockingQueue<String> pullQueue) {
-			this.is = is;
-			this.pushQueue = pushQueue;
-			this.pullQueue = pullQueue;
+	/**
+	 * @since 3.0
+	 */
+	public TreeTuple uploadTrial(IFileStore profile, int dbid, String app, String exp, String tri) {
+		final String comBuf = "control upload " + profile.toURI().getPath() + SPACE + dbid + SPACE + app + SPACE + exp + SPACE + tri; //$NON-NLS-1$
+		final int res = issueCommand(comBuf);
+		if (res != 0) {
+			return null;
 		}
+		TreeTuple tt = null;
+		final List<String> l = getResults();
 
-		StreamRunner(InputStream is) {
-			this.is = is;
-			pushQueue = null;
-			pullQueue = null;
-		}
-
-		@Override
-		public void run() {
-			try {
-				InputStreamReader isr = new InputStreamReader(is);
-				BufferedReader br = new BufferedReader(isr);
-				String line = null;
-				while ((line = br.readLine()) != null) {
-
-					if (pushQueue == null || pullQueue == null) {
-						if (line.contains("Exception")) { //$NON-NLS-1$
-							exception = true;
-						}
-						System.out.println(line);
-					} else {
-						if (line.startsWith("control sourcecode")) { //$NON-NLS-1$
-							pullQueue.add(line);
-						} else {
-							pushQueue.add(line);
-						}
-					}
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			// if (pullQueue != null){
-			// if(!exception)
-			//					pullQueue.add(DONE); //$NON-NLS-1$
-			// }
-
-			if (pushQueue != null) {
-				pushQueue.add(DONE);
+		for (final String s : l) {
+			if (s.startsWith("control return")) { //$NON-NLS-1$
+				final String[] split = s.split(" "); //$NON-NLS-1$
+				final int id = Integer.parseInt(split[2]);
+				tt = new TreeTuple(tri, id, dbid, Level.TRIAL);
 			}
 		}
+
+		return tt;
 	}
 
 }

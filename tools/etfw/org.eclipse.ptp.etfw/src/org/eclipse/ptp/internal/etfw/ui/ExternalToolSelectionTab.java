@@ -34,13 +34,13 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.etfw.ETFWUtils;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.toolopts.ExternalToolProcess;
@@ -75,35 +75,6 @@ import org.eclipse.ui.dialogs.ListDialog;
  * 
  */
 public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab implements IToolLaunchConfigurationConstants {
-	// private static final IPreferenceStore pstore =
-	// ETFWUtils.getDefault().getPreferenceStore();
-	/**
-	 * Determines if the launch configuration associated with this tab has
-	 * access to the PTP
-	 */
-	protected boolean noPTP = false;
-
-	protected final ExternalToolProcess[] tools = ETFWUtils.getTools();// null;
-
-	protected Combo toolTypes;
-
-	protected Button buildonlyCheck;
-
-	protected Button analyzeonlyCheck;
-
-	protected Button noParallelRun;
-
-	protected Button addWorkflowB;
-	protected Button removeWorkflowB;
-
-	// protected Button nocleanCheck;
-
-	protected Button keepprofsCheck;
-
-	protected final IToolUITab[] panes = ETFWUtils.getToolPanes();
-
-	// protected Button relocateTools;
-
 	/**
 	 * Listens for action in tool options panes
 	 * 
@@ -122,16 +93,106 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 	}
 
 	/**
-	 * Sets weather or not it is possible to initiate a parallel launch from
-	 * this tab
+	 * Listen for activity in the performance tool combo-box, or other options
 	 * 
-	 * @param noPar
-	 *            Availability of the PTP to this tab's launch configuration
-	 *            delegate
+	 * @author wspear
+	 * 
 	 */
-	public ExternalToolSelectionTab(boolean noPar) {
-		noPTP = noPar;
+	protected class WidgetListener extends SelectionAdapter implements ModifyListener, IPropertyChangeListener {
+		public void modifyText(ModifyEvent evt) {
+
+			updateLaunchConfigurationDialog();
+		}
+
+		public void propertyChange(PropertyChangeEvent event) {
+			updateLaunchConfigurationDialog();
+		}
+
+		@Override
+		public void widgetSelected(SelectionEvent e) {
+
+			final Object source = e.getSource();
+
+			if (source.equals(addWorkflowB)) {
+				addWorkflow();
+			}
+			if (source.equals(removeWorkflowB)) {
+				removeWorkflow();
+			}
+
+			if (source.equals(toolTypes)) {
+
+				final String selectedTool = toolTypes.getItem(toolTypes.getSelectionIndex());
+
+				loadPanesForTool(selectedTool);// ,configuration);
+				initializePanesForTool(selectedTool, localConfig);
+
+			}
+
+			updateLaunchConfigurationDialog();
+		}
 	}
+
+	/**
+	 * Produces a new GridLayout based on provided arguments
+	 * 
+	 * @param columns
+	 * @param isEqual
+	 * @param mh
+	 * @param mw
+	 * @return
+	 */
+	protected static GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) {
+		final GridLayout gridLayout = new GridLayout();
+		gridLayout.numColumns = columns;
+		gridLayout.makeColumnsEqualWidth = isEqual;
+		gridLayout.marginHeight = mh;
+		gridLayout.marginWidth = mw;
+		return gridLayout;
+	}
+
+	/**
+	 * Creates a new GridData based on provided style and space arguments
+	 * 
+	 * @param style
+	 * @param space
+	 * @return
+	 */
+	protected static GridData spanGridData(int style, int space) {
+		GridData gd = null;
+		if (style == -1) {
+			gd = new GridData();
+		} else {
+			gd = new GridData(style);
+		}
+		gd.horizontalSpan = space;
+		return gd;
+	}
+
+	// private static final IPreferenceStore pstore =
+	// ETFWUtils.getDefault().getPreferenceStore();
+	/**
+	 * Determines if the launch configuration associated with this tab has
+	 * access to the PTP
+	 */
+	protected boolean noPTP = false;
+
+	protected final ExternalToolProcess[] tools = ETFWUtils.getTools();// null;
+
+	protected Combo toolTypes;
+	protected Button buildonlyCheck;
+
+	// protected Button nocleanCheck;
+
+	protected Button analyzeonlyCheck;
+
+	protected Button noParallelRun;
+
+	// protected Button relocateTools;
+
+	protected Button addWorkflowB;
+
+	protected Button removeWorkflowB;
 
 	// private boolean toolHasPane(String toolName, String paneName){
 	// if(panes!=null){
@@ -147,58 +208,34 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 	// return false;
 	// }
 
+	protected Button keepprofsCheck;
+
+	protected final IToolUITab[] panes = ETFWUtils.getToolPanes();
+
+	protected WidgetListener listener = new WidgetListener();
+
+	private TabFolder tabParent = null;
+
+	ILaunchConfiguration localConfig = null;
+
 	/**
-	 * Listen for activity in the performance tool combo-box, or other options
+	 * Sets weather or not it is possible to initiate a parallel launch from
+	 * this tab
 	 * 
-	 * @author wspear
-	 * 
+	 * @param noPar
+	 *            Availability of the PTP to this tab's launch configuration
+	 *            delegate
 	 */
-	protected class WidgetListener extends SelectionAdapter implements ModifyListener, IPropertyChangeListener {
-		@Override
-		public void widgetSelected(SelectionEvent e) {
-
-			Object source = e.getSource();
-
-			if (source.equals(addWorkflowB)) {
-				addWorkflow();
-			}
-			if (source.equals(removeWorkflowB)) {
-				removeWorkflow();
-			}
-
-			if (source.equals(toolTypes)) {
-
-				String selectedTool = toolTypes.getItem(toolTypes.getSelectionIndex());
-
-				loadPanesForTool(selectedTool);// ,configuration);
-				initializePanesForTool(selectedTool, localConfig);
-
-			}
-
-			updateLaunchConfigurationDialog();
-		}
-
-		public void propertyChange(PropertyChangeEvent event) {
-			updateLaunchConfigurationDialog();
-		}
-
-		public void modifyText(ModifyEvent evt) {
-
-			updateLaunchConfigurationDialog();
-		}
-	}
-
-	private void warnXMLChange() {
-		MessageDialog.openInformation(PlatformUI.getWorkbench().getDisplay().getActiveShell(),
-				Messages.ExternalToolSelectionTab_TAUWarning, Messages.ExternalToolSelectionTab_ChancesNotEffectUntil);
+	public ExternalToolSelectionTab(boolean noPar) {
+		noPTP = noPar;
 	}
 
 	private void addWorkflow() {
-		FileDialog dialog = new FileDialog(getShell());
+		final FileDialog dialog = new FileDialog(getShell());
 
 		dialog.setText(Messages.ExternalToolSelectionTab_SelectToolDefXMLFile);
 
-		String out = getFieldContent(dialog.open());
+		final String out = getFieldContent(dialog.open());
 
 		if (out == null) {
 			return;
@@ -218,23 +255,23 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 		}
 
 		// Preferences preferences = ETFWUtils.getDefault().getPluginPreferences();
-		IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
+		final IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
 
-		IPreferencesService service = Platform.getPreferencesService();
+		final IPreferencesService service = Platform.getPreferencesService();
 		String fiList = service.getString(Activator.PLUGIN_ID, XMLLOCID, "", null);
 
 		// String fiList = preferences.getString(XMLLOCID);
 
-		String[] x = fiList.split(",,,"); //$NON-NLS-1$
-		LinkedHashSet<String> files = new LinkedHashSet<String>();
-		for (String element : x) {
+		final String[] x = fiList.split(",,,"); //$NON-NLS-1$
+		final LinkedHashSet<String> files = new LinkedHashSet<String>();
+		for (final String element : x) {
 			files.add(element);
 		}
 		files.add(out);
 
 		fiList = ""; //$NON-NLS-1$
 
-		Iterator<String> fit = files.iterator();
+		final Iterator<String> fit = files.iterator();
 
 		while (fit.hasNext()) {
 			fiList += fit.next();
@@ -247,57 +284,6 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 		warnXMLChange();
 
 	}
-
-	private void removeWorkflow() {
-		// Preferences preferences = Activator.getDefault().getPluginPreferences();
-		IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
-		IPreferencesService service = Platform.getPreferencesService();
-		String fiList = service.getString(Activator.PLUGIN_ID, XMLLOCID, "", null);
-		// String fiList = preferences.getString(XMLLOCID);
-
-		String[] x = fiList.split(",,,"); //$NON-NLS-1$
-		LinkedHashSet<String> files = new LinkedHashSet<String>();
-		for (String element : x) {
-			files.add(element);
-		}
-
-		ArrayContentProvider acp = new ArrayContentProvider();
-		// acp.getElements(x);
-
-		ListDialog ld = new ListDialog(getShell());
-
-		ld.setContentProvider(acp);
-		ld.setBlockOnOpen(true);
-		ld.setLabelProvider(new LabelProvider());
-		ld.setInput(x);
-		ld.setHelpAvailable(false);
-		ld.setTitle(Messages.ExternalToolSelectionTab_RemoveWorkflowFiles);
-		ld.open();
-		if (ld.getReturnCode() == Dialog.CANCEL) {
-			return;
-		}
-		Object[] y = ld.getResult();
-		for (Object element : y) {
-			files.remove(element);
-		}
-
-		fiList = ""; //$NON-NLS-1$
-
-		Iterator<String> fit = files.iterator();
-
-		while (fit.hasNext()) {
-			fiList += fit.next();
-			if (fit.hasNext()) {
-				fiList += ",,,"; //$NON-NLS-1$
-			}
-		}
-		preferences.put(XMLLOCID, fiList);// XMLLoc.getText());
-		ETFWUtils.refreshTools(Activator.getDefault().getPreferenceStore());
-		warnXMLChange();
-	}
-
-	protected WidgetListener listener = new WidgetListener();
-	private TabFolder tabParent = null;
 
 	/**
 	 * Generates the UI for the analyis tab, consisting of sub-tabs which may be
@@ -306,9 +292,9 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 	 * @see ILaunchConfigurationTab#createControl(Composite)
 	 */
 	public void createControl(Composite parent) {
-		Composite comp = new Composite(parent, SWT.NONE);
+		final Composite comp = new Composite(parent, SWT.NONE);
 		setControl(comp);
-		FillLayout topLayout = new FillLayout();
+		final FillLayout topLayout = new FillLayout();
 		comp.setLayout(topLayout);
 		tabParent = new TabFolder(comp, SWT.BORDER);
 
@@ -316,12 +302,12 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 		 * 
 		 * Analysis Options: TAU Makefile options and PAPI counter selection
 		 */
-		TabItem toolTab = new TabItem(tabParent, SWT.NULL);
+		final TabItem toolTab = new TabItem(tabParent, SWT.NULL);
 		toolTab.setText(Messages.ExternalToolSelectionTab_ToolSelection);
 
-		ScrolledComposite scrollTool = new ScrolledComposite(tabParent, SWT.V_SCROLL);
+		final ScrolledComposite scrollTool = new ScrolledComposite(tabParent, SWT.V_SCROLL);
 
-		Composite toolComp = new Composite(scrollTool, SWT.NONE);
+		final Composite toolComp = new Composite(scrollTool, SWT.NONE);
 		toolTab.setControl(scrollTool);
 
 		toolComp.setLayout(createGridLayout(1, false, 0, 0));
@@ -332,11 +318,11 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 		 */
 		createVerticalSpacer(toolComp, 1);
 
-		Composite toolComboComp = new Composite(toolComp, SWT.NONE);
+		final Composite toolComboComp = new Composite(toolComp, SWT.NONE);
 		toolComboComp.setLayout(createGridLayout(2, false, 0, 0));
 		toolComboComp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-		Label makeLab = new Label(toolComboComp, 0);
+		final Label makeLab = new Label(toolComboComp, 0);
 		makeLab.setText(Messages.ExternalToolSelectionTab_SelectTool);
 
 		toolTypes = new Combo(toolComboComp, SWT.DROP_DOWN | SWT.READ_ONLY | SWT.BORDER);
@@ -359,13 +345,124 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 		// nocleanCheck.addSelectionListener(listener);
 
 		toolComp.pack();
-		int toolCompHeight = toolComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
+		final int toolCompHeight = toolComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
 
 		scrollTool.setContent(toolComp);
 		scrollTool.setMinSize(400, toolCompHeight);
 		scrollTool.setExpandHorizontal(true);
 		scrollTool.setExpandVertical(true);
 
+	}
+
+	protected String getFieldContent(IntegerFieldEditor editorField) {
+		return getFieldContent(editorField.getStringValue());
+	}
+
+	/**
+	 * Treats empty strings as null
+	 * 
+	 * @param text
+	 * @return Contents of text, or null if text is the empty string
+	 */
+	protected String getFieldContent(String text) {
+		if (text == null || (text.trim().length() == 0) || text.equals("")) { //$NON-NLS-1$
+			return null;
+		}
+
+		return text;
+	}
+
+	/**
+	 * @see ILaunchConfigurationTab#getName()
+	 */
+	public String getName() {
+		return Messages.ExternalToolSelectionTab_PerfAnalysis;
+	}
+
+	/**
+	 * @see ILaunchConfigurationTab#initializeFrom(ILaunchConfiguration)
+	 */
+	public void initializeFrom(ILaunchConfiguration configuration) {
+
+		toolTypes.removeAll();
+		// toolTypes.add("TAU");
+
+		if (tools == null || tools.length == 0) {
+			toolTypes.add(Messages.ExternalToolSelectionTab_SpecValidToolConfFile);
+			if (tools == null) {
+				toolTypes.select(0);
+				return;
+			}
+		}
+
+		for (final ExternalToolProcess tool : tools) {
+			toolTypes.add(tool.toolName);
+		}
+		toolTypes.select(0);
+
+		try {
+			int toolDex;
+			toolDex = toolTypes.indexOf(configuration.getAttribute(SELECTED_TOOL, "")); //$NON-NLS-1$
+			if (toolDex >= 0) {
+				toolTypes.select(toolDex);
+			} else {
+				toolTypes.select(0);
+				// This means the available tools have changed!
+				if (configuration.getAttribute(SELECTED_TOOL, "").equals("")) { //$NON-NLS-1$ //$NON-NLS-2$
+					// This makes sure the tool panes are initialized
+					if (tools.length > 0) {
+						loadPanesForTool(toolTypes.getItem(toolTypes.getSelectionIndex()));
+						initializePanesForTool(toolTypes.getItem(toolTypes.getSelectionIndex()), configuration);
+						localConfig = configuration;
+					}
+					updateLaunchConfigurationDialog();
+				}
+			}
+
+			buildonlyCheck.setSelection(configuration.getAttribute(BUILDONLY, false));
+			analyzeonlyCheck.setSelection(configuration.getAttribute(ANALYZEONLY, false));
+			// nocleanCheck.setSelection(configuration.getAttribute(NOCLEAN,
+			// false));
+
+		} catch (final CoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		// This handles the case where a tool is previously selected, but the panes are not yet initialized
+		loadPanesForTool(toolTypes.getItem(toolTypes.getSelectionIndex()));
+		initializePanesForTool(toolTypes.getItem(toolTypes.getSelectionIndex()), configuration);
+		localConfig = configuration;
+	}
+
+	private void initializePanesForTool(String tool, ILaunchConfiguration configuration) {
+		if (panes != null) {
+			for (int i = 0; i < panes.length; i++) {
+				if (panes[i].getToolName() == null || !panes[i].getToolName().equals(tool)) {
+					continue;
+				}
+				panes[i].OptUpdate();
+				try {
+					panes[i].initializePane(configuration);
+				} catch (final CoreException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#isValid
+	 * (org.eclipse.debug.core.ILaunchConfiguration)
+	 */
+	@Override
+	public boolean isValid(ILaunchConfiguration configuration) {
+		setErrorMessage(null);
+		setMessage(null);
+
+		return true;
 	}
 
 	private void loadPanesForTool(String tool) {// , ILaunchConfiguration configuration){
@@ -431,103 +528,12 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 		}
 	}
 
-	private void initializePanesForTool(String tool, ILaunchConfiguration configuration) {
-		if (panes != null) {
-			for (int i = 0; i < panes.length; i++) {
-				if (panes[i].getToolName() == null || !panes[i].getToolName().equals(tool)) {
-					continue;
-				}
-				panes[i].OptUpdate();
-				try {
-					panes[i].initializePane(configuration);
-				} catch (CoreException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-
-	public void updateComboFromSelection() {
-		System.out.println("change startup"); //$NON-NLS-1$
-	}
-
-	/**
-	 * Defaults are empty.
-	 * 
-	 * @see ILaunchConfigurationTab#setDefaults(ILaunchConfigurationWorkingCopy)
-	 */
-	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
-		if (panes != null) {
-			for (IToolUITab pane : panes) {
-				pane.setDefaults(configuration);
-			}
-		}
-	}
-
-	ILaunchConfiguration localConfig = null;
-
-	/**
-	 * @see ILaunchConfigurationTab#initializeFrom(ILaunchConfiguration)
-	 */
-	public void initializeFrom(ILaunchConfiguration configuration) {
-
-		toolTypes.removeAll();
-		// toolTypes.add("TAU");
-
-		if (tools == null || tools.length == 0) {
-			toolTypes.add(Messages.ExternalToolSelectionTab_SpecValidToolConfFile);
-			if (tools == null) {
-				toolTypes.select(0);
-				return;
-			}
-		}
-
-		for (ExternalToolProcess tool : tools) {
-			toolTypes.add(tool.toolName);
-		}
-		toolTypes.select(0);
-
-		try {
-			int toolDex;
-			toolDex = toolTypes.indexOf(configuration.getAttribute(SELECTED_TOOL, "")); //$NON-NLS-1$
-			if (toolDex >= 0) {
-				toolTypes.select(toolDex);
-			} else {
-				toolTypes.select(0);
-				// This means the available tools have changed!
-				if (configuration.getAttribute(SELECTED_TOOL, "").equals("")) { //$NON-NLS-1$ //$NON-NLS-2$
-					// This makes sure the tool panes are initialized
-					if (tools.length > 0) {
-						loadPanesForTool(toolTypes.getItem(toolTypes.getSelectionIndex()));
-						initializePanesForTool(toolTypes.getItem(toolTypes.getSelectionIndex()), configuration);
-						localConfig = configuration;
-					}
-					updateLaunchConfigurationDialog();
-				}
-			}
-
-			buildonlyCheck.setSelection(configuration.getAttribute(BUILDONLY, false));
-			analyzeonlyCheck.setSelection(configuration.getAttribute(ANALYZEONLY, false));
-			// nocleanCheck.setSelection(configuration.getAttribute(NOCLEAN,
-			// false));
-
-		} catch (CoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		// This handles the case where a tool is previously selected, but the panes are not yet initialized
-		loadPanesForTool(toolTypes.getItem(toolTypes.getSelectionIndex()));
-		initializePanesForTool(toolTypes.getItem(toolTypes.getSelectionIndex()), configuration);
-		localConfig = configuration;
-	}
-
 	/**
 	 * @see ILaunchConfigurationTab#performApply(ILaunchConfigurationWorkingCopy)
 	 */
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 
-		String selectedtool = toolTypes.getItem(toolTypes.getSelectionIndex());
+		final String selectedtool = toolTypes.getItem(toolTypes.getSelectionIndex());
 
 		configuration.setAttribute(SELECTED_TOOL, selectedtool);
 
@@ -561,37 +567,65 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 		localConfig = configuration;
 	}
 
-	protected String getFieldContent(IntegerFieldEditor editorField) {
-		return getFieldContent(editorField.getStringValue());
+	private void removeWorkflow() {
+		// Preferences preferences = Activator.getDefault().getPluginPreferences();
+		final IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
+		final IPreferencesService service = Platform.getPreferencesService();
+		String fiList = service.getString(Activator.PLUGIN_ID, XMLLOCID, "", null);
+		// String fiList = preferences.getString(XMLLOCID);
+
+		final String[] x = fiList.split(",,,"); //$NON-NLS-1$
+		final LinkedHashSet<String> files = new LinkedHashSet<String>();
+		for (final String element : x) {
+			files.add(element);
+		}
+
+		final ArrayContentProvider acp = new ArrayContentProvider();
+		// acp.getElements(x);
+
+		final ListDialog ld = new ListDialog(getShell());
+
+		ld.setContentProvider(acp);
+		ld.setBlockOnOpen(true);
+		ld.setLabelProvider(new LabelProvider());
+		ld.setInput(x);
+		ld.setHelpAvailable(false);
+		ld.setTitle(Messages.ExternalToolSelectionTab_RemoveWorkflowFiles);
+		ld.open();
+		if (ld.getReturnCode() == Window.CANCEL) {
+			return;
+		}
+		final Object[] y = ld.getResult();
+		for (final Object element : y) {
+			files.remove(element);
+		}
+
+		fiList = ""; //$NON-NLS-1$
+
+		final Iterator<String> fit = files.iterator();
+
+		while (fit.hasNext()) {
+			fiList += fit.next();
+			if (fit.hasNext()) {
+				fiList += ",,,"; //$NON-NLS-1$
+			}
+		}
+		preferences.put(XMLLOCID, fiList);// XMLLoc.getText());
+		ETFWUtils.refreshTools(Activator.getDefault().getPreferenceStore());
+		warnXMLChange();
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Defaults are empty.
 	 * 
-	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#isValid
-	 * (org.eclipse.debug.core.ILaunchConfiguration)
+	 * @see ILaunchConfigurationTab#setDefaults(ILaunchConfigurationWorkingCopy)
 	 */
-	@Override
-	public boolean isValid(ILaunchConfiguration configuration) {
-		setErrorMessage(null);
-		setMessage(null);
-
-		return true;
-	}
-
-	/**
-	 * @see ILaunchConfigurationTab#getName()
-	 */
-	public String getName() {
-		return Messages.ExternalToolSelectionTab_PerfAnalysis;
-	}
-
-	/**
-	 * @see ILaunchConfigurationTab#setLaunchConfigurationDialog (ILaunchConfigurationDialog)
-	 */
-	@Override
-	public void setLaunchConfigurationDialog(ILaunchConfigurationDialog dialog) {
-		super.setLaunchConfigurationDialog(dialog);
+	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
+		if (panes != null) {
+			for (final IToolUITab pane : panes) {
+				pane.setDefaults(configuration);
+			}
+		}
 	}
 
 	// /**
@@ -603,52 +637,19 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 	// }
 
 	/**
-	 * Produces a new GridLayout based on provided arguments
-	 * 
-	 * @param columns
-	 * @param isEqual
-	 * @param mh
-	 * @param mw
-	 * @return
+	 * @see ILaunchConfigurationTab#setLaunchConfigurationDialog (ILaunchConfigurationDialog)
 	 */
-	protected static GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) {
-		GridLayout gridLayout = new GridLayout();
-		gridLayout.numColumns = columns;
-		gridLayout.makeColumnsEqualWidth = isEqual;
-		gridLayout.marginHeight = mh;
-		gridLayout.marginWidth = mw;
-		return gridLayout;
+	@Override
+	public void setLaunchConfigurationDialog(ILaunchConfigurationDialog dialog) {
+		super.setLaunchConfigurationDialog(dialog);
 	}
 
-	/**
-	 * Creates a new GridData based on provided style and space arguments
-	 * 
-	 * @param style
-	 * @param space
-	 * @return
-	 */
-	protected static GridData spanGridData(int style, int space) {
-		GridData gd = null;
-		if (style == -1) {
-			gd = new GridData();
-		} else {
-			gd = new GridData(style);
-		}
-		gd.horizontalSpan = space;
-		return gd;
+	public void updateComboFromSelection() {
+		System.out.println("change startup"); //$NON-NLS-1$
 	}
 
-	/**
-	 * Treats empty strings as null
-	 * 
-	 * @param text
-	 * @return Contents of text, or null if text is the empty string
-	 */
-	protected String getFieldContent(String text) {
-		if (text == null || (text.trim().length() == 0) || text.equals("")) { //$NON-NLS-1$
-			return null;
-		}
-
-		return text;
+	private void warnXMLChange() {
+		MessageDialog.openInformation(PlatformUI.getWorkbench().getDisplay().getActiveShell(),
+				Messages.ExternalToolSelectionTab_TAUWarning, Messages.ExternalToolSelectionTab_ChancesNotEffectUntil);
 	}
 }

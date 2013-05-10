@@ -30,21 +30,12 @@ import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.editors.text.TextEditor;
 
 /**
- * Action for adding selective instrumentation of monotonically increasing events to a Photran source file via selection of source code in the editor 
+ * Action for adding selective instrumentation of monotonically increasing events to a Photran source file via selection of source
+ * code in the editor
  */
 public class IncrementInstrument implements IEditorActionDelegate {
 
 	TextEditor textEditor;
-
-	/**
-	 * Saves a reference to the current active editor
-	 * 
-	 * @see org.eclipse.ui.IEditorActionDelegate#setActiveEditor(IAction,
-	 *      IEditorPart)
-	 */
-	public void setActiveEditor(IAction action, IEditorPart targetEditor) {
-		textEditor = (TextEditor) targetEditor;
-	}
 
 	/**
 	 * Takes the position of the selected text and creates a user-defined selective instrumentation entry
@@ -52,32 +43,33 @@ public class IncrementInstrument implements IEditorActionDelegate {
 	 * @see org.eclipse.ui.IActionDelegate#run(IAction)
 	 */
 	public void run(IAction action) {
-		IFileEditorInput input = (IFileEditorInput)textEditor.getEditorInput();
+		final IFileEditorInput input = (IFileEditorInput) textEditor.getEditorInput();
 		if (input != null) {
 			input.getFile().getProject().getLocation().toOSString();
-			String location = input.getFile().getProject().getLocation().toOSString();
-			
-			int insertregs=0;
-			int insertstops=0;
-			ITextSelection ts = (ITextSelection) textEditor.getSelectionProvider().getSelection();
-			if(ts.getLength()<=0)
+			final String location = input.getFile().getProject().getLocation().toOSString();
+
+			int insertregs = 0;
+			int insertstops = 0;
+			final ITextSelection ts = (ITextSelection) textEditor.getSelectionProvider().getSelection();
+			if (ts.getLength() <= 0)
 			{
 				System.out.println(Messages.IncrementInstrument_SelectAreaToInstrument);
 			}
-			insertregs = ts.getStartLine()+1;
-			insertstops= ts.getEndLine()+1;
-			
-			LinkedHashSet<String> instlines = new LinkedHashSet<String>();
-			
-			String mainLine=org.eclipse.ptp.etfw.tau.selinst.popup.actions.IncrementInstrument.getPhaseTimeLine(input.getFile().getName(),insertregs,insertstops);
-			
-			if(mainLine==null)
+			insertregs = ts.getStartLine() + 1;
+			insertstops = ts.getEndLine() + 1;
+
+			final LinkedHashSet<String> instlines = new LinkedHashSet<String>();
+
+			final String mainLine = org.eclipse.ptp.etfw.tau.selinst.popup.actions.IncrementInstrument.getPhaseTimeLine(input
+					.getFile().getName(), insertregs, insertstops);
+
+			if (mainLine == null)
 			{
 				return;
 			}
-			
+
 			instlines.add(mainLine);
-			Selector selectinst = new Selector(location);
+			final Selector selectinst = new Selector(location);
 			selectinst.addInst(instlines);
 		}
 	}
@@ -91,5 +83,14 @@ public class IncrementInstrument implements IEditorActionDelegate {
 	public void selectionChanged(IAction action, ISelection selection) {
 
 		action.setEnabled(true);
+	}
+
+	/**
+	 * Saves a reference to the current active editor
+	 * 
+	 * @see org.eclipse.ui.IEditorActionDelegate#setActiveEditor(IAction, IEditorPart)
+	 */
+	public void setActiveEditor(IAction action, IEditorPart targetEditor) {
+		textEditor = (TextEditor) targetEditor;
 	}
 }

@@ -12,35 +12,35 @@ import org.eclipse.swt.widgets.Composite;
  */
 public interface IToolUITab extends IAppInput {
 
-	public void performApply(ILaunchConfigurationWorkingCopy configuration);
+	public String getConfigID();
 
-	public void makeToolPane(Composite comp, ToolPaneListener paneListener);
-
-	public void makeToolPane(Composite comp);
-
-	public void OptUpdate();
-
-	abstract void updateOptDisplay();
-
-	public boolean updateOptField(Object source);
+	public String getConfigVarID();
 
 	public String getName();
+
+	public String getOptionString();
 
 	public String getToolName();
 
 	public Map<String, String> getVarMap();
 
-	public String getOptionString();
-
-	public String getConfigID();
-
-	public String getConfigVarID();
-
-	public void setDefaults(ILaunchConfigurationWorkingCopy configuration);
-
 	public void initializePane(ILaunchConfiguration configuration) throws CoreException;
+
+	public boolean isEmbedded();
 
 	public boolean isVirtual();
 
-	public boolean isEmbedded();
+	public void makeToolPane(Composite comp);
+
+	public void makeToolPane(Composite comp, ToolPaneListener paneListener);
+
+	public void OptUpdate();
+
+	public void performApply(ILaunchConfigurationWorkingCopy configuration);
+
+	public void setDefaults(ILaunchConfigurationWorkingCopy configuration);
+
+	abstract void updateOptDisplay();
+
+	public boolean updateOptField(Object source);
 }

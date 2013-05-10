@@ -41,119 +41,129 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.osgi.service.prefs.BackingStoreException;
 
-public class TAUPrefPage extends PreferencePage implements IWorkbenchPreferencePage{
-	protected Button checkAutoOpts=null;
-	protected Button checkAixOpts=null;
-	protected Button testPAPI=null;
-	
-	TestPAPI tp = new TestPAPI();
-	
-	
+public class TAUPrefPage extends PreferencePage implements IWorkbenchPreferencePage {
 	protected class WidgetListener extends SelectionAdapter implements ModifyListener, IPropertyChangeListener
 	{
-		public void widgetSelected(SelectionEvent e) {
-			Object source = e.getSource();
-			if(source == testPAPI) {
-				tp.run();
-			}
-			updatePreferencePage();
-		}
-
 		public void modifyText(ModifyEvent evt) {
-//			Object source = evt.getSource();
-//			if(source==tauBin){
-//			}
+			// Object source = evt.getSource();
+			// if(source==tauBin){
+			// }
 
 			updatePreferencePage();
 		}
 
 		public void propertyChange(PropertyChangeEvent event) {
-			if (event.getProperty().equals(FieldEditor.IS_VALID))
+			if (event.getProperty().equals(FieldEditor.IS_VALID)) {
 				updatePreferencePage();
+			}
+		}
+
+		@Override
+		public void widgetSelected(SelectionEvent e) {
+			final Object source = e.getSource();
+			if (source == testPAPI) {
+				tp.run();
+			}
+			updatePreferencePage();
 		}
 	}
 
+	protected Button checkAutoOpts = null;
+	protected Button checkAixOpts = null;
+
+	protected Button testPAPI = null;
+
+	TestPAPI tp = new TestPAPI();
+
 	protected WidgetListener listener = new WidgetListener();
-	
+
+	protected Button createButton(Composite parent, String label, int type) {
+		final Button button = new Button(parent, type);
+		button.setText(label);
+		final GridData data = new GridData();
+		button.setLayoutData(data);
+		return button;
+	}
+
+	protected Button createCheckButton(Composite parent, String label) {
+		return createButton(parent, label, SWT.CHECK | SWT.LEFT);
+	}
+
 	@Override
 	protected Control createContents(Composite parent) {
-		
-		//TODO: Implement tau-option checking
-		GridData gridData = new GridData(GridData.VERTICAL_ALIGN_END);
+
+		// TODO: Implement tau-option checking
+		final GridData gridData = new GridData(GridData.VERTICAL_ALIGN_END);
 		gridData.horizontalSpan = 3;
 		gridData.horizontalAlignment = GridData.FILL;
-		
-		if(org.eclipse.cdt.utils.Platform.getOS().toLowerCase().trim().indexOf("aix")>=0) //$NON-NLS-1$
+
+		if (org.eclipse.cdt.utils.Platform.getOS().toLowerCase().trim().indexOf("aix") >= 0) //$NON-NLS-1$
 		{
-			checkAixOpts=createCheckButton(parent,Messages.TAUPrefPage_AutoEclipseInternal);
+			checkAixOpts = createCheckButton(parent, Messages.TAUPrefPage_AutoEclipseInternal);
 			checkAixOpts.setLayoutData(gridData);
 			checkAixOpts.addSelectionListener(listener);
 		}
 
-		checkAutoOpts=createCheckButton(parent, Messages.TAUPrefPage_CheckTauOptions);
+		checkAutoOpts = createCheckButton(parent, Messages.TAUPrefPage_CheckTauOptions);
 		checkAutoOpts.setLayoutData(gridData);
 		checkAutoOpts.addSelectionListener(listener);
-		
-		testPAPI=new Button(parent, SWT.NONE);
+
+		testPAPI = new Button(parent, SWT.NONE);
 		testPAPI.setText(Messages.TAUPrefPage_TestPapi);
 		testPAPI.addSelectionListener(listener);
-		
+
 		return parent;
 	}
 
-	/*This may be unused...*/
+	public void init(IWorkbench workbench) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/* This may be unused... */
 	protected void loadSaved()
 	{
-		//Preferences preferences = ETFWUtils.getDefault().getPluginPreferences();
-		IPreferencesService service = Platform.getPreferencesService();
-		
-		//TODO: Add checks
-		checkAutoOpts.setSelection(service.getBoolean(Activator.PLUGIN_ID,ITAULaunchConfigurationConstants.TAU_CHECK_AUTO_OPT,true,null)); //$NON-NLS-1$
-		if(checkAixOpts!=null)
-			checkAixOpts.setSelection(service.getBoolean(Activator.PLUGIN_ID,ITAULaunchConfigurationConstants.TAU_CHECK_AIX_OPT,false,null)); //$NON-NLS-1$
-	}
-	
-	public boolean performOk() 
-	{
-		
-		IEclipsePreferences preferences = new InstanceScope().getNode(Activator.PLUGIN_ID);
-		//Preferences preferences = ETFWUtils.getDefault().getPluginPreferences();
+		// Preferences preferences = ETFWUtils.getDefault().getPluginPreferences();
+		final IPreferencesService service = Platform.getPreferencesService();
 
-		//TODO: Add checks
-		preferences.putBoolean(ITAULaunchConfigurationConstants.TAU_CHECK_AUTO_OPT, checkAutoOpts.getSelection()); //$NON-NLS-1$
-		if(checkAixOpts!=null)
-			preferences.putBoolean(ITAULaunchConfigurationConstants.TAU_CHECK_AIX_OPT, checkAixOpts.getSelection()); //$NON-NLS-1$
+		// TODO: Add checks
+		checkAutoOpts.setSelection(service.getBoolean(Activator.PLUGIN_ID, ITAULaunchConfigurationConstants.TAU_CHECK_AUTO_OPT,
+				true, null));
+		if (checkAixOpts != null)
+		{
+			checkAixOpts.setSelection(service.getBoolean(Activator.PLUGIN_ID, ITAULaunchConfigurationConstants.TAU_CHECK_AIX_OPT,
+					false, null));
+		}
+	}
+
+	@Override
+	public boolean performOk()
+	{
+
+		final IEclipsePreferences preferences = new InstanceScope().getNode(Activator.PLUGIN_ID);
+		// Preferences preferences = ETFWUtils.getDefault().getPluginPreferences();
+
+		// TODO: Add checks
+		preferences.putBoolean(ITAULaunchConfigurationConstants.TAU_CHECK_AUTO_OPT, checkAutoOpts.getSelection());
+		if (checkAixOpts != null)
+		{
+			preferences.putBoolean(ITAULaunchConfigurationConstants.TAU_CHECK_AIX_OPT, checkAixOpts.getSelection());
+		}
 
 		try {
 			preferences.flush();
-		} catch (BackingStoreException e) {
+		} catch (final BackingStoreException e) {
 			e.printStackTrace();
 		}
 		return true;
 	}
-	
-	public void init(IWorkbench workbench) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	protected void updatePreferencePage() 
+
+	protected void updatePreferencePage()
 	{
 		setErrorMessage(null);
 		setMessage(null);
 
 		setValid(true);
-	}
-	
-	protected Button createCheckButton(Composite parent, String label) {
-		return createButton(parent, label, SWT.CHECK | SWT.LEFT);
-	}
-	protected Button createButton(Composite parent, String label, int type) {
-		Button button = new Button(parent, type);
-		button.setText(label);
-		GridData data = new GridData();
-		button.setLayoutData(data);
-		return button;
 	}
 
 }

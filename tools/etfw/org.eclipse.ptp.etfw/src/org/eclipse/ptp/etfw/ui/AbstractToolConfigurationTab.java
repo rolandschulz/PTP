@@ -8,10 +8,6 @@ import org.eclipse.swt.layout.GridLayout;
  * @since 7.0
  */
 public abstract class AbstractToolConfigurationTab extends AbstractLaunchConfigurationTab {
-	public String getName() {
-		return null;
-	}
-
 	/**
 	 * Produces a new GridLayout based on provided arguments
 	 * 
@@ -22,7 +18,7 @@ public abstract class AbstractToolConfigurationTab extends AbstractLaunchConfigu
 	 * @return
 	 */
 	protected static GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) {
-		GridLayout gridLayout = new GridLayout();
+		final GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = columns;
 		gridLayout.makeColumnsEqualWidth = isEqual;
 		gridLayout.marginHeight = mh;
@@ -60,5 +56,9 @@ public abstract class AbstractToolConfigurationTab extends AbstractLaunchConfigu
 		}
 
 		return text;
+	}
+
+	public String getName() {
+		return null;
 	}
 }

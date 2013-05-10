@@ -19,101 +19,11 @@ public class ToolArgument implements IAppInput {
 	private boolean useConfValue = false;
 	private boolean requireValue = false;
 
-	/**
-	 * @since 1.1
-	 */
-	public boolean isRequireValue() {
-		return requireValue;
-	}
-
-	/**
-	 * @since 1.1
-	 */
-	public void setRequireValue(boolean requireValue) {
-		this.requireValue = requireValue;
-	}
-
 	public static int ARG = 0;
+
 	public static int VAR = 1;
+
 	private int type = ARG;
-
-	public void setType(int t) {
-		type = t;
-	}
-
-	public Map<String, String> getEnvVars(ILaunchConfiguration configuration) {
-		if (type != VAR || flag == null) {
-			return null;
-		}
-		Map<String, String> map = new LinkedHashMap<String, String>();
-
-		String val = ""; //$NON-NLS-1$
-		if (value != null) {
-			if (localFile) {
-				val += ToolsOptionsConstants.PROJECT_BUILD + File.separator;
-			}
-			val += value;
-		}
-		boolean ok = true;
-		if (isUseConfValue()) {
-			String cval = ""; //$NON-NLS-1$
-			try {
-				cval = configuration.getAttribute(getConfValue(), ""); //$NON-NLS-1$
-			} catch (CoreException e) {
-				e.printStackTrace();
-			}
-
-			val = val.replace(ToolsOptionsConstants.CONF_VALUE, cval);
-			if (requireValue && cval.trim().length() <= 0) {
-				ok = false;
-			}
-		}
-		if (ok) {
-			map.put(flag, val);
-		}
-		return map;
-	}
-
-	/**
-	 * Builds and returns the argument from the elements defined in this object
-	 */
-	public String getArgument(ILaunchConfiguration configuration) {
-
-		if (type != ARG) {
-			return null;
-		}
-
-		if (isUseConfValue()) {
-			String carg = getArg();
-			String cval = ""; //$NON-NLS-1$
-			try {
-				cval = configuration.getAttribute(getConfValue(), ""); //$NON-NLS-1$
-			} catch (CoreException e) {
-				e.printStackTrace();
-			}
-			if (requireValue && cval.trim().length() <= 0) {
-				return ""; //$NON-NLS-1$
-			}
-			carg = carg.replace(ToolsOptionsConstants.CONF_VALUE, cval);
-			return carg;
-		} else {
-			return getArg();
-		}
-	}
-
-	/**
-	 * If true the value string is a key for the actual value to be used from
-	 * the launch configuration object
-	 * 
-	 * @return
-	 */
-	public boolean isUseConfValue() {
-		return useConfValue;
-	}
-
-	public void setUseConfValue(boolean useConfValue) {
-		this.useConfValue = useConfValue;
-	}
 
 	public ToolArgument(String arg) {
 		value = arg;
@@ -128,13 +38,6 @@ public class ToolArgument implements IAppInput {
 		this.localFile = local;
 
 	}
-
-	// private String getArg(String buildDir, String rootDir){
-	// String arg=getArg();
-	// arg=arg.replaceAll(ToolsOptionsConstants.PROJECT_BUILD, buildDir);
-	// arg=arg.replaceAll(ToolsOptionsConstants.PROJECT_ROOT, rootDir);
-	// return arg;
-	// }
 
 	private String getArg() {
 
@@ -156,13 +59,112 @@ public class ToolArgument implements IAppInput {
 		return arg;
 	}
 
+	/**
+	 * Builds and returns the argument from the elements defined in this object
+	 */
+	public String getArgument(ILaunchConfiguration configuration) {
+
+		if (type != ARG) {
+			return null;
+		}
+
+		if (isUseConfValue()) {
+			String carg = getArg();
+			String cval = ""; //$NON-NLS-1$
+			try {
+				cval = configuration.getAttribute(getConfValue(), ""); //$NON-NLS-1$
+			} catch (final CoreException e) {
+				e.printStackTrace();
+			}
+			if (requireValue && cval.trim().length() <= 0) {
+				return ""; //$NON-NLS-1$
+			}
+			carg = carg.replace(ToolsOptionsConstants.CONF_VALUE, cval);
+			return carg;
+		} else {
+			return getArg();
+		}
+	}
+
+	public String getConfValue() {
+		return confVal;
+	}
+
+	public Map<String, String> getEnvVars(ILaunchConfiguration configuration) {
+		if (type != VAR || flag == null) {
+			return null;
+		}
+		final Map<String, String> map = new LinkedHashMap<String, String>();
+
+		String val = ""; //$NON-NLS-1$
+		if (value != null) {
+			if (localFile) {
+				val += ToolsOptionsConstants.PROJECT_BUILD + File.separator;
+			}
+			val += value;
+		}
+		boolean ok = true;
+		if (isUseConfValue()) {
+			String cval = ""; //$NON-NLS-1$
+			try {
+				cval = configuration.getAttribute(getConfValue(), ""); //$NON-NLS-1$
+			} catch (final CoreException e) {
+				e.printStackTrace();
+			}
+
+			val = val.replace(ToolsOptionsConstants.CONF_VALUE, cval);
+			if (requireValue && cval.trim().length() <= 0) {
+				ok = false;
+			}
+		}
+		if (ok) {
+			map.put(flag, val);
+		}
+		return map;
+	}
+
+	/**
+	 * @since 1.1
+	 */
+	public boolean isRequireValue() {
+		return requireValue;
+	}
+
+	/**
+	 * If true the value string is a key for the actual value to be used from
+	 * the launch configuration object
+	 * 
+	 * @return
+	 */
+	public boolean isUseConfValue() {
+		return useConfValue;
+	}
+
 	public void setConfValue(String cval) {
 		confVal = cval;
 
 	}
 
-	public String getConfValue() {
-		return confVal;
+	// private String getArg(String buildDir, String rootDir){
+	// String arg=getArg();
+	// arg=arg.replaceAll(ToolsOptionsConstants.PROJECT_BUILD, buildDir);
+	// arg=arg.replaceAll(ToolsOptionsConstants.PROJECT_ROOT, rootDir);
+	// return arg;
+	// }
+
+	/**
+	 * @since 1.1
+	 */
+	public void setRequireValue(boolean requireValue) {
+		this.requireValue = requireValue;
+	}
+
+	public void setType(int t) {
+		type = t;
+	}
+
+	public void setUseConfValue(boolean useConfValue) {
+		this.useConfValue = useConfValue;
 	}
 
 }

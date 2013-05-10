@@ -28,57 +28,128 @@ public class PapiCSelect {
 		toolPath = tpath.getChild(papiApp);// +File.separator+papiApp;
 		try {
 			sp = SAXParserFactory.newInstance().newSAXParser();
-		} catch (ParserConfigurationException e) {
+		} catch (final ParserConfigurationException e) {
 			e.printStackTrace();
-		} catch (SAXException e) {
+		} catch (final SAXException e) {
 			e.printStackTrace();
 		}
 		pparser = new PapiInfoParser();
 	}
 
-	private EventTree parseETree(InputStream is) {
-		sp.reset();
-		try {
-			sp.parse(is, pparser);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return pparser.getEventTree();
-	}
-
-	public EventTree getEventTree() {
-		// String papi_avail=location+File.separator+"papi_avail";
-		// String s = null;
-		// InputStream is=null;
+	/**
+	 * @since 4.0
+	 */
+	public EventTree findET(List<String> commands) {
 		EventTree et = null;
-		try {
-			// Process p = Runtime.getRuntime().exec(toolPath, null, null);
-
-			// BufferedReader stdErr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-			// is=p.getInputStream();
-			pparser.reset();
-			List<String> command = new ArrayList<String>();
-			command.add(toolPath.toURI().getPath());
-
-			et = findET(command);// new String[]{toolPath.toURI().getPath()});//parseETree(execItem(new
-									// String[]{toolPath}));//p.getInputStream());// new FileInputStream(new File(toolPath)));//
-
-			// BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-
-			// boolean fault=false;
-			// while ((s = stdErr.readLine()) != null)
-			// {
-			// fault=true;
-			// }
-
-			// p.destroy();
-		} catch (Exception e) {
-			e.printStackTrace();
+		// try {
+		// Process p = Runtime.getRuntime().exec(commands);
+		//
+		// //BufferedReader stdErr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+		// //boolean fault=false;
+		//
+		// OutReader errThd=new OutReader(p.getErrorStream());
+		// OutReader stdThd=new OutReader(p.getInputStream());
+		// stdThd.start();
+		// errThd.start();
+		//
+		// int result=p.waitFor();
+		//
+		// stdThd.join();
+		// errThd.join();
+		//
+		// p.destroy();
+		//
+		// if(result==0){
+		// s=stdThd.str.toString();
+		final byte[] xbytes = blt.runToolGetOutput(commands, null, null);// stdThd.str.toString().getBytes();
+		if (xbytes == null) {
+			return null;
 		}
+		final ByteArrayInputStream stringIS = new ByteArrayInputStream(xbytes);
+
+		et = parseETree(stringIS);// stdThd.et;
+		// }
+		// while ((s = stdErr.readLine()) != null)
+		// {
+		// //fault=true;
+		// System.out.println(s);
+		// }
+
+		// } catch (IOException e) {
+		// e.printStackTrace();
+		// } catch (InterruptedException e) {
+		// e.printStackTrace();
+		// }
+
 		return et;
 	}
+
+	public Set<Integer>[] getAvailable(int component, Set<String> checked) {
+		@SuppressWarnings("unchecked")
+		final Set<Integer>[] index = new HashSet[2];
+		pparser.reset();
+
+		final ArrayList<String> cAl = new ArrayList<String>(checked);
+
+		cAl.add(0, component + "");
+		cAl.add(0, "-c");
+		cAl.add(0, toolPath.toURI().getPath());
+
+		// String[]a=new String[cAl.size()];
+		// cAl.toArray(a);
+		// printCommand(a);
+
+		final EventTree et = findET(cAl);// parseETree(execItem(a));
+		// String s;
+		// Process p=null;
+		// try {
+		// p = Runtime.getRuntime().exec(a);
+		//
+		// //BufferedReader stdErr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+		// //boolean fault=false;
+		//
+		// OutputReader errThd=new OutputReader(p.getErrorStream());
+		// OutputReader stdThd=new OutputReader(p.getInputStream());
+		// stdThd.start();
+		// errThd.start();
+		//
+		// int result=p.waitFor();
+		//
+		// stdThd.join();
+		// errThd.join();
+		//
+		// et=parseETree(stdThd.str.toString());
+		// p.destroy();
+		// // while ((s = stdErr.readLine()) != null)
+		// // {
+		// // //fault=true;
+		// // System.out.println(s);
+		// // }
+		//
+		// } catch (IOException e) {
+		// e.printStackTrace();
+		// } catch (InterruptedException e) {
+		// e.printStackTrace();
+		// }
+
+		if (et == null) {
+			return null;
+		}
+		index[0] = ((EventSet) et.children.get(0).children.get(0)).fullSet;
+		index[1] = ((EventSet) et.children.get(0).children.get(1)).fullSet;
+
+		return index;
+	}
+
+	// private static void printCommand(String[] com){
+	// String s = "";
+	//
+	// for(int i=0;i<com.length;i++){
+	// s+=com[i]+" ";
+	// }
+	//
+	// System.out.println(s);
+	// }
 
 	// public class OutReader extends Thread{
 	// StringBuffer str;
@@ -135,117 +206,47 @@ public class PapiCSelect {
 	// // }
 	// }
 
-	/**
-	 * @since 4.0
-	 */
-	public EventTree findET(List<String> commands) {
+	public EventTree getEventTree() {
+		// String papi_avail=location+File.separator+"papi_avail";
+		// String s = null;
+		// InputStream is=null;
 		EventTree et = null;
-		// try {
-		// Process p = Runtime.getRuntime().exec(commands);
-		//
-		// //BufferedReader stdErr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-		// //boolean fault=false;
-		//
-		// OutReader errThd=new OutReader(p.getErrorStream());
-		// OutReader stdThd=new OutReader(p.getInputStream());
-		// stdThd.start();
-		// errThd.start();
-		//
-		// int result=p.waitFor();
-		//
-		// stdThd.join();
-		// errThd.join();
-		//
-		// p.destroy();
-		//
-		// if(result==0){
-		// s=stdThd.str.toString();
-		byte[] xbytes = blt.runToolGetOutput(commands, null, null);// stdThd.str.toString().getBytes();
-		if (xbytes == null) {
-			return null;
+		try {
+			// Process p = Runtime.getRuntime().exec(toolPath, null, null);
+
+			// BufferedReader stdErr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+			// is=p.getInputStream();
+			pparser.reset();
+			final List<String> command = new ArrayList<String>();
+			command.add(toolPath.toURI().getPath());
+
+			et = findET(command);// new String[]{toolPath.toURI().getPath()});//parseETree(execItem(new
+									// String[]{toolPath}));//p.getInputStream());// new FileInputStream(new File(toolPath)));//
+
+			// BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+			// boolean fault=false;
+			// while ((s = stdErr.readLine()) != null)
+			// {
+			// fault=true;
+			// }
+
+			// p.destroy();
+		} catch (final Exception e) {
+			e.printStackTrace();
 		}
-		ByteArrayInputStream stringIS = new ByteArrayInputStream(xbytes);
-
-		et = parseETree(stringIS);// stdThd.et;
-		// }
-		// while ((s = stdErr.readLine()) != null)
-		// {
-		// //fault=true;
-		// System.out.println(s);
-		// }
-
-		// } catch (IOException e) {
-		// e.printStackTrace();
-		// } catch (InterruptedException e) {
-		// e.printStackTrace();
-		// }
-
 		return et;
 	}
 
-	public Set<Integer>[] getAvailable(int component, Set<String> checked) {
-		@SuppressWarnings("unchecked")
-		Set<Integer>[] index = new HashSet[2];
-		pparser.reset();
-
-		ArrayList<String> cAl = new ArrayList<String>(checked);
-
-		cAl.add(0, component + "");
-		cAl.add(0, "-c");
-		cAl.add(0, toolPath.toURI().getPath());
-
-		// String[]a=new String[cAl.size()];
-		// cAl.toArray(a);
-		// printCommand(a);
-
-		EventTree et = findET(cAl);// parseETree(execItem(a));
-		// String s;
-		// Process p=null;
-		// try {
-		// p = Runtime.getRuntime().exec(a);
-		//
-		// //BufferedReader stdErr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-		// //boolean fault=false;
-		//
-		// OutputReader errThd=new OutputReader(p.getErrorStream());
-		// OutputReader stdThd=new OutputReader(p.getInputStream());
-		// stdThd.start();
-		// errThd.start();
-		//
-		// int result=p.waitFor();
-		//
-		// stdThd.join();
-		// errThd.join();
-		//
-		// et=parseETree(stdThd.str.toString());
-		// p.destroy();
-		// // while ((s = stdErr.readLine()) != null)
-		// // {
-		// // //fault=true;
-		// // System.out.println(s);
-		// // }
-		//
-		// } catch (IOException e) {
-		// e.printStackTrace();
-		// } catch (InterruptedException e) {
-		// e.printStackTrace();
-		// }
-
-		if (et == null) {
-			return null;
+	private EventTree parseETree(InputStream is) {
+		sp.reset();
+		try {
+			sp.parse(is, pparser);
+		} catch (final SAXException e) {
+			e.printStackTrace();
+		} catch (final IOException e) {
+			e.printStackTrace();
 		}
-		index[0] = ((EventSet) et.children.get(0).children.get(0)).fullSet;
-		index[1] = ((EventSet) et.children.get(0).children.get(1)).fullSet;
-
-		return index;
+		return pparser.getEventTree();
 	}
-	// private static void printCommand(String[] com){
-	// String s = "";
-	//
-	// for(int i=0;i<com.length;i++){
-	// s+=com[i]+" ";
-	// }
-	//
-	// System.out.println(s);
-	// }
 }
