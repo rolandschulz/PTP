@@ -15,12 +15,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.cdt.core.CCProjectNature;
+import org.eclipse.cdt.core.CProjectNature;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.ptp.internal.rdt.sync.cdt.core.Activator;
 import org.eclipse.ptp.internal.rdt.sync.cdt.ui.messages.Messages;
 import org.eclipse.ptp.internal.rdt.sync.ui.wizards.SyncWizardDataCache;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
@@ -38,11 +42,12 @@ import org.eclipse.swt.widgets.Label;
 /**
  * @noextend This class is not intended to be subclassed by clients.
  */
-public class SyncConfigToBuildConfigWizardPage extends WizardPage {
+public class SyncConfigToBuildConfigWizardPage extends WizardPage implements Runnable {
 	private static final String BuildConfigSetKey = "build-config-set"; //$NON-NLS-1$
 	private static final String ConfigMapKey = "config-map"; //$NON-NLS-1$
 	private static final String SyncConfigSetKey = "sync-config-set"; //$NON-NLS-1$
 	private static final String ProjectNameKey = "project-name"; //$NON-NLS-1$
+	private static final String DEFAULT_BUILD_CONFIG_ID = "default-build-config-id"; //$NON-NLS-1$
 
 	private String fConfigName;
 	
@@ -100,6 +105,13 @@ public class SyncConfigToBuildConfigWizardPage extends WizardPage {
 		setPageComplete(true);
 	}
 
+	private IProject getAndValidateProject() {
+		String projectName = SyncWizardDataCache.getProperty(getWizard().hashCode(), ProjectNameKey);
+		assert projectName != null : Messages.SyncConfigToBuildConfigWizardPage_3;
+		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+		assert project != null : Messages.SyncConfigToBuildConfigWizardPage_4 + projectName;
+		return project;
+	}
 	public String getBuildConfiguration() {
 		return fConfigName;
 	}
@@ -112,11 +124,8 @@ public class SyncConfigToBuildConfigWizardPage extends WizardPage {
 			assert buildConfigsSet != null && buildConfigsSet.size() > 0 : Messages.SyncConfigToBuildConfigWizardPage_7;
 			return buildConfigsSet.toArray(new String[0]);
 		case ADD_SYNC:
-			String projectName = SyncWizardDataCache.getProperty(getWizard().hashCode(), ProjectNameKey);
-			assert projectName != null : Messages.SyncConfigToBuildConfigWizardPage_3;
-			IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-			assert project != null : Messages.SyncConfigToBuildConfigWizardPage_4 + projectName;
-			assert RemoteSyncNature.hasNature(project) : Messages.SyncConfigToBuildConfigWizardPage_5 + project.getName();
+			IProject project = this.getAndValidateProject();
+			assert isCDTProject(project) : Messages.SyncConfigToBuildConfigWizardPage_5 + project.getName();
 			IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
 			IConfiguration[] buildConfigs = buildInfo.getManagedProject().getConfigurations();		
 			ArrayList<String> buildConfigNames = new ArrayList<String>();
@@ -139,11 +148,8 @@ public class SyncConfigToBuildConfigWizardPage extends WizardPage {
 			assert syncConfigsSet != null && syncConfigsSet.size() > 0 : Messages.SyncConfigToBuildConfigWizardPage_2;
 			return syncConfigsSet.toArray(new String[0]);
 		case ADD_CDT:
-			String projectName = SyncWizardDataCache.getProperty(getWizard().hashCode(), ProjectNameKey);
-			assert projectName != null : Messages.SyncConfigToBuildConfigWizardPage_3;
-			IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-			assert project != null : Messages.SyncConfigToBuildConfigWizardPage_4 + projectName;
-			assert RemoteSyncNature.hasNature(project) : Messages.SyncConfigToBuildConfigWizardPage_5 + project.getName();
+			IProject project = this.getAndValidateProject();
+			assert isSyncProject(project) : Messages.SyncConfigToBuildConfigWizardPage_5 + project.getName();
 			SyncConfig[] syncConfigs = SyncConfigManager.getConfigs(project);
 			ArrayList<String> syncConfigNames = new ArrayList<String>();
 			for (SyncConfig config : syncConfigs) {
@@ -153,6 +159,50 @@ public class SyncConfigToBuildConfigWizardPage extends WizardPage {
 		default:
 			assert false : Messages.SyncConfigToBuildConfigWizardPage_6;
 			return null;
+		}
+	}
+
+	/**
+	 * Test if given project is a CDT project.
+	 * @param project
+	 * @return whether a CDT project 
+	 */
+	private boolean isCDTProject(IProject project) {
+		try {
+			return (project.hasNature(CProjectNature.C_NATURE_ID) || project.hasNature(CCProjectNature.CC_NATURE_ID));
+		} catch (CoreException e) {
+			Activator.log(e);
+			return false;
+		}
+	}
+
+	/**
+	 * Test if given project is a synchronized project
+	 * @param project
+	 * @return whether a synchronized project
+	 */
+	private boolean isSyncProject(IProject project) {
+		return RemoteSyncNature.hasNature(project);
+	}	
+
+	@Override
+	public void run() {
+		IProject project = this.getAndValidateProject();
+		assert isSyncProject(project) && isCDTProject(project) : Messages.SyncConfigToBuildConfigWizardPage_5 + project.getName();
+
+		Map<String, String> configMap = SyncWizardDataCache.getMap(getWizard().hashCode(), ConfigMapKey);
+		SyncConfig[] allSyncConfigs = SyncConfigManager.getConfigs(project);
+		for (SyncConfig config : allSyncConfigs) {
+			String defaultBuildConfig = configMap.get(config.getName());
+			if (defaultBuildConfig != null) {
+				config.setProperty(DEFAULT_BUILD_CONFIG_ID, defaultBuildConfig);
+			}
+		}
+		
+		try {
+			SyncConfigManager.saveConfigs(project);
+		} catch (CoreException e) {
+			Activator.log(e);
 		}
 	}
 }
