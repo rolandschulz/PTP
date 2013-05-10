@@ -28,6 +28,10 @@ public class Messages extends NLS {
 	public static String NewRemoteSyncProjectWizardPage_syncProvider;
 	public static String WizardProjectConversion_windowLabel;
 	public static String ConvertFromRemoteCToSyncProjectWizardPage_3;
+	public static String ConvertLocalToSyncProjectWizard_0;
+	public static String ConvertLocalToSyncProjectWizard_1;
+	public static String ConvertLocalToSyncProjectWizard_2;
+	public static String ConvertLocalToSyncProjectWizard_3;
 	public static String ConvertLocalToSyncProjectWizard_Convert_nonexistent_project_error;
 	public static String ConvertLocalToSyncProjectWizardPage_2;
 	public static String ConvertLocalToSyncProjectWizardPage_3;
