@@ -248,7 +248,10 @@ public class SyncFileFilterDialog extends Dialog {
 
 	@Override
 	protected void okPressed() {
-		SyncManager.saveFileFilter(project, filter);
+		// Bug 407601 project is null during new project creation
+		if (project != null) { 
+			SyncManager.saveFileFilter(project, filter);
+		}
 		setReturnCode(OK);
 		close();
 	}
