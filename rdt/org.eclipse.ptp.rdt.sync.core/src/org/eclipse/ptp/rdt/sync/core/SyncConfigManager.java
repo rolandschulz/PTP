@@ -59,7 +59,7 @@ public class SyncConfigManager {
 	private static final String SYNC_ON_SAVE_ELEMENT = "sync-on-save"; //$NON-NLS-1$
 	private static final String CONFIG_PROPERTIES_ELEMENT = "config-properties"; //$NON-NLS-1$
 	private static final String LOCAL_SYNC_CONFIG_NAME = "Local"; //$NON-NLS-1$
-    private static final String PROJECT_LOCAL_PATH = "${project_loc}"; //$NON-NLS-1$
+	private static final String PROJECT_LOCAL_PATH = "${project_loc}"; //$NON-NLS-1$
 
 	private static final Map<String, ListenerList> fSyncConfigListenerMap = Collections
 			.synchronizedMap(new HashMap<String, ListenerList>());
@@ -243,20 +243,22 @@ public class SyncConfigManager {
 	/**
 	 * Get a local sync config, really a config that does no sync'ing, for when the user wants to just work locally.
 	 * This method must agree with {@link #isLocal(SyncConfig)}.
+	 * 
 	 * @return a local config
-	 * @throws CoreException on problems retrieving local service elements
+	 * @throws CoreException
+	 *             on problems retrieving local service elements
 	 */
 	public static SyncConfig getLocalConfig(ISynchronizeService syncService) throws CoreException {
-        IRemoteServices localService = RemoteServices.getLocalServices();
-        if (localService == null) {
-        	throw new CoreException(new Status(IStatus.ERROR, RDTSyncCorePlugin.PLUGIN_ID, Messages.SyncConfigManager_0));
-        }
+		IRemoteServices localService = RemoteServices.getLocalServices();
+		if (localService == null) {
+			throw new CoreException(new Status(IStatus.ERROR, RDTSyncCorePlugin.PLUGIN_ID, Messages.SyncConfigManager_0));
+		}
 
-        IRemoteConnection localConnection = localService.getConnectionManager().
-        		getConnection(IRemoteConnectionManager.LOCAL_CONNECTION_NAME);
-        if (localConnection == null) {
-        	throw new CoreException(new Status(IStatus.ERROR, RDTSyncCorePlugin.PLUGIN_ID, Messages.SyncConfigManager_1));
-        }
+		IRemoteConnection localConnection = localService.getConnectionManager().getConnection(
+				IRemoteConnectionManager.LOCAL_CONNECTION_NAME);
+		if (localConnection == null) {
+			throw new CoreException(new Status(IStatus.ERROR, RDTSyncCorePlugin.PLUGIN_ID, Messages.SyncConfigManager_1));
+		}
 
 		return SyncConfigManager.newConfig(LOCAL_SYNC_CONFIG_NAME, syncService.getId(), localConnection, PROJECT_LOCAL_PATH);
 	}
@@ -296,23 +298,23 @@ public class SyncConfigManager {
 	 */
 	public static boolean isActive(IProject project, SyncConfig config) {
 		SyncConfig active = fActiveSyncConfigMap.get(project);
-		return (active != null && config != null && active.getName().equals(config.getName()));
+		return (active != null && config != null && active.equals(config));
 	}
 
 	/**
 	 * Return whether the config is local (no sync'ing is done)
 	 * This definition must agree with how local configs are created in {@link #getLocalConfig()}.
-	 *
+	 * 
 	 * @param config
 	 * @return whether config is local
 	 */
 	public static boolean isLocal(SyncConfig config) {
-		return(config.getName() == LOCAL_SYNC_CONFIG_NAME);
+		return (config.getName() == LOCAL_SYNC_CONFIG_NAME);
 	}
 
 	/**
 	 * Return whether the config is remote (sync'ing is done)
-	 *
+	 * 
 	 * @param config
 	 * @return whether config is remote
 	 */
@@ -369,6 +371,21 @@ public class SyncConfigManager {
 	/**
 	 * @param name
 	 * @param providerId
+	 * @param conn
+	 * @param location
+	 * @return
+	 */
+	public static SyncConfig newConfig(String name, String providerId, IRemoteConnection conn, String location) {
+		SyncConfig config = new SyncConfig(name);
+		config.setSyncProviderId(providerId);
+		config.setConnection(conn);
+		config.setLocation(location);
+		return config;
+	}
+
+	/**
+	 * @param name
+	 * @param providerId
 	 * @param remoteServicesId
 	 * @param connName
 	 * @param location
@@ -379,21 +396,6 @@ public class SyncConfigManager {
 		config.setSyncProviderId(providerId);
 		config.setRemoteServicesId(remoteServicesId);
 		config.setConnectionName(connName);
-		config.setLocation(location);
-		return config;
-	}
-
-	/**
-	 * @param name
-	 * @param providerId
-	 * @param conn
-	 * @param location
-	 * @return
-	 */
-	public static SyncConfig newConfig(String name, String providerId, IRemoteConnection conn, String location) {
-		SyncConfig config = new SyncConfig(name);
-		config.setSyncProviderId(providerId);
-		config.setConnection(conn);
 		config.setLocation(location);
 		return config;
 	}
@@ -461,8 +463,8 @@ public class SyncConfigManager {
 				configMemento.putBoolean(SYNC_ON_POSTBUILD_ELEMENT, config.isSyncOnPostBuild());
 				configMemento.putBoolean(SYNC_ON_SAVE_ELEMENT, config.isSyncOnSave());
 				IMemento configPropertiesMemento = configMemento.createChild(CONFIG_PROPERTIES_ELEMENT);
-				for (Map.Entry<String, String> prop : config.getProperties().entrySet()) {
-					configPropertiesMemento.putString(prop.getKey(), prop.getValue());
+				for (String key : config.getKeys()) {
+					configPropertiesMemento.putString(key, config.getProperty(key));
 				}
 			}
 			SyncConfig active = fActiveSyncConfigMap.get(project);

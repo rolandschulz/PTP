@@ -74,7 +74,7 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	private boolean fSyncOnPreBuild = true;
 	private boolean fSyncOnPostBuild = true;
 	private boolean fSyncOnSave = true;
-	private Map<String, String> fProperties;
+	private final Map<String, String> fProperties = new HashMap<String, String>();
 
 	private IRemoteServices fRemoteServices;
 	private IRemoteConnection fRemoteConnection;
@@ -89,7 +89,6 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	 */
 	public SyncConfig(String name) {
 		fName = name;
-		fProperties = new HashMap<String, String>();
 	}
 
 	/*
@@ -133,6 +132,15 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	}
 
 	/**
+	 * Get the keys for all properties set for this configuration.
+	 * 
+	 * @return configuration properties keys
+	 */
+	public String[] getKeys() {
+		return fProperties.keySet().toArray(new String[0]);
+	}
+
+	/**
 	 * Get the remote fLocation
 	 * 
 	 * @return fLocation
@@ -165,23 +173,14 @@ public class SyncConfig implements Comparable<SyncConfig> {
 		return fProject;
 	}
 
-    /**
-     * Get an arbitrary property for the configuration
-     *
-     * @param key
-     * @return value
-     */
+	/**
+	 * Get an arbitrary property for the configuration
+	 * 
+	 * @param key
+	 * @return value
+	 */
 	public String getProperty(String key) {
 		return fProperties.get(key);
-	}
-
-	/**
-	 * Get all properties set for this configuration.
-	 * Note that modifying the returned map does not alter the configuration's properties.
-	 * @return copy of configuration's property map
-	 */
-	public Map<String, String> getProperties() {
-		return new HashMap<String, String>(fProperties);
 	}
 
 	/**
@@ -312,15 +311,15 @@ public class SyncConfig implements Comparable<SyncConfig> {
 		fProject = project;
 	}
 
-    /**
-     * Set an arbitrary property for the configuration
-     *
-     * @param key
-     * @param value
-     */
-    public void setProperty(String key, String value) {
-            fProperties.put(key, value);
-    }
+	/**
+	 * Set an arbitrary property for the configuration
+	 * 
+	 * @param key
+	 * @param value
+	 */
+	public void setProperty(String key, String value) {
+		fProperties.put(key, value);
+	}
 
 	/**
 	 * @param remoteServicesId
