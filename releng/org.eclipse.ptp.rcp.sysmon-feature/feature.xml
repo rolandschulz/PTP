@@ -153,13 +153,6 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.ptp.rm.core"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="org.eclipse.ptp.rm.jaxb.configs"
          download-size="0"
          install-size="0"
