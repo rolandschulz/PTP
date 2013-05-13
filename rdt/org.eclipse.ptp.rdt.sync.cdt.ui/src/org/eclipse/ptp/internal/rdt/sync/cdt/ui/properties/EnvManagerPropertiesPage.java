@@ -20,9 +20,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.ems.core.EnvManagerProjectProperties;
 import org.eclipse.ptp.ems.ui.EnvManagerConfigWidget;
 import org.eclipse.ptp.ems.ui.IErrorListener;
-import org.eclipse.ptp.internal.rdt.sync.cdt.core.SyncConfigListenerCDT;
 import org.eclipse.ptp.internal.rdt.sync.cdt.ui.Activator;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
+import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.swt.widgets.Composite;
@@ -39,92 +39,15 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.cdt.ui.newui.AbstractSinglePage#createWidgets(org.eclipse.swt.widgets.Composite)
+	 * @see org.eclipse.cdt.ui.newui.AbstractSinglePage#cfgChanged(org.eclipse.cdt.core.settings.model.ICConfigurationDescription)
 	 */
 	@Override
-	public void createWidgets(Composite parent) {
-		final IRemoteConnection remoteConnection = getConnection();
-
-		this.ui = new EnvManagerConfigWidget(parent, remoteConnection);
-		this.ui.setErrorListener(new IErrorListener() {
-			@Override
-			public void errorRaised(String message) {
-				setErrorMessage(message);
-			}
-
-			@Override
-			public void errorCleared() {
-				setErrorMessage(null);
-			}
-		});
-
-		this.ui.setUseEMSCheckbox(isEnvConfigSupportEnabled());
-		this.ui.setManualConfigCheckbox(isManualConfigEnabled());
-		this.ui.setManualConfigText(getManualConfigText());
-		this.ui.configurationChanged(getSyncURI(), remoteConnection, computeSelectedItems());
-	}
-
-	private IRemoteConnection getConnection() {
-		if (getControl().isDisposed()) {
-			return null;
+	protected void cfgChanged(ICConfigurationDescription cfgd) {
+		super.cfgChanged(cfgd);
+		if (ui != null) {
+			IRemoteConnection connection = getConnection();
+			ui.configurationChanged(getSyncURI(), connection, computeSelectedItems());
 		}
-
-		SyncConfig bs = null;
-		// final SyncConfig bs = SyncConfigListenerCDT.getSyncConfigForBuildConfiguration(getCfg());
-		if (bs == null) {
-			return null;
-		}
-
-		try {
-			return bs.getRemoteConnection();
-		} catch (MissingConnectionException e) {
-			return null;
-		}
-	}
-
-	private boolean isEnvConfigSupportEnabled() {
-		try {
-			return getProjectProperties().isEnvMgmtEnabled();
-		} catch (final Error e) {
-			return false;
-		}
-	}
-
-	private EnvManagerProjectProperties getProjectProperties() {
-		try {
-			return new EnvManagerProjectProperties(getProject());
-		} catch (final Error e) {
-			setErrorMessage(e.getClass().getSimpleName() + ": " + e.getLocalizedMessage()); //$NON-NLS-1$
-			Activator.log(e);
-			throw e;
-		}
-	}
-
-	private boolean isManualConfigEnabled() {
-		try {
-			return getProjectProperties().isManualConfigEnabled();
-		} catch (final Error e) {
-			return false;
-		}
-	}
-
-	private String getManualConfigText() {
-		try {
-			return getProjectProperties().getManualConfigText();
-		} catch (final Error e) {
-			return ""; //$NON-NLS-1$
-		}
-	}
-
-	private URI getSyncURI() {
-//		try {
-//			return SyncConfigListenerCDT.getSyncLocationURI(getCfg(), getCfg().getOwner().getProject());
-//		} catch (final CoreException e) {
-//			setErrorMessage(e.getClass().getSimpleName() + ": " + e.getLocalizedMessage()); //$NON-NLS-1$
-//			Activator.log(e);
-//			return null;
-//		}
-		return null;
 	}
 
 	private List<String> computeSelectedItems() {
@@ -146,15 +69,100 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.cdt.ui.newui.AbstractSinglePage#cfgChanged(org.eclipse.cdt.core.settings.model.ICConfigurationDescription)
+	 * @see org.eclipse.cdt.ui.newui.AbstractSinglePage#createWidgets(org.eclipse.swt.widgets.Composite)
 	 */
 	@Override
-	protected void cfgChanged(ICConfigurationDescription cfgd) {
-		super.cfgChanged(cfgd);
-		if (ui != null) {
-			IRemoteConnection connection = getConnection();
-			ui.configurationChanged(getSyncURI(), connection, computeSelectedItems());
+	public void createWidgets(Composite parent) {
+		final IRemoteConnection remoteConnection = getConnection();
+
+		this.ui = new EnvManagerConfigWidget(parent, remoteConnection);
+		this.ui.setErrorListener(new IErrorListener() {
+			@Override
+			public void errorCleared() {
+				setErrorMessage(null);
+			}
+
+			@Override
+			public void errorRaised(String message) {
+				setErrorMessage(message);
+			}
+		});
+
+		this.ui.setUseEMSCheckbox(isEnvConfigSupportEnabled());
+		this.ui.setManualConfigCheckbox(isManualConfigEnabled());
+		this.ui.setManualConfigText(getManualConfigText());
+		this.ui.configurationChanged(getSyncURI(), remoteConnection, computeSelectedItems());
+	}
+
+	private IRemoteConnection getConnection() {
+		if (getControl().isDisposed()) {
+			return null;
 		}
+
+		SyncConfig config = SyncConfigManager.getActive(getProject());
+		if (config != null) {
+			try {
+				return config.getRemoteConnection();
+			} catch (MissingConnectionException e) {
+				// Return null anyway
+			}
+		}
+		return null;
+	}
+
+	private String getManualConfigText() {
+		try {
+			return getProjectProperties().getManualConfigText();
+		} catch (final Error e) {
+			return ""; //$NON-NLS-1$
+		}
+	}
+
+	private EnvManagerProjectProperties getProjectProperties() {
+		try {
+			return new EnvManagerProjectProperties(getProject());
+		} catch (final Error e) {
+			setErrorMessage(e.getClass().getSimpleName() + ": " + e.getLocalizedMessage()); //$NON-NLS-1$
+			Activator.log(e);
+			throw e;
+		}
+	}
+
+	private URI getSyncURI() {
+		try {
+			return SyncConfigManager.getActiveSyncLocationURI(getProject());
+		} catch (CoreException e) {
+			setErrorMessage(e.getClass().getSimpleName() + ": " + e.getLocalizedMessage()); //$NON-NLS-1$
+			Activator.log(e);
+		}
+		return null;
+	}
+
+	private boolean isEnvConfigSupportEnabled() {
+		try {
+			return getProjectProperties().isEnvMgmtEnabled();
+		} catch (final Error e) {
+			return false;
+		}
+	}
+
+	private boolean isManualConfigEnabled() {
+		try {
+			return getProjectProperties().isManualConfigEnabled();
+		} catch (final Error e) {
+			return false;
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.cdt.ui.newui.AbstractSinglePage#performApply(org.eclipse.cdt.core.settings.model.ICResourceDescription,
+	 * org.eclipse.cdt.core.settings.model.ICResourceDescription)
+	 */
+	@Override
+	protected void performApply(ICResourceDescription src, ICResourceDescription dst) {
+		storeProjectProperties();
 	}
 
 	/*
@@ -168,17 +176,6 @@ public final class EnvManagerPropertiesPage extends AbstractSingleBuildPage {
 			ui.setUseEMSCheckbox(false);
 		}
 		super.performDefaults();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.cdt.ui.newui.AbstractSinglePage#performApply(org.eclipse.cdt.core.settings.model.ICResourceDescription,
-	 * org.eclipse.cdt.core.settings.model.ICResourceDescription)
-	 */
-	@Override
-	protected void performApply(ICResourceDescription src, ICResourceDescription dst) {
-		storeProjectProperties();
 	}
 
 	/*
