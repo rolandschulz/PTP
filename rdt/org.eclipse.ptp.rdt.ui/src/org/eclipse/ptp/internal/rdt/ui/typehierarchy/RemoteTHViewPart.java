@@ -878,7 +878,7 @@ public class RemoteTHViewPart extends ViewPart implements ITHModelPresenter {
 						CUIPlugin.log(e);
 					}
 				}
-				IEditorPart editor = EditorUtility.openInEditor(input);
+				IEditorPart editor = EditorUtility.openInEditor(elem.getLocationURI(), cproject);
 				if (editor instanceof ITextEditor && elem instanceof ISourceReference) {
 					ISourceReference sr = (ISourceReference) elem;
 					int offset = sr.getSourceRange().getIdStartPos();
