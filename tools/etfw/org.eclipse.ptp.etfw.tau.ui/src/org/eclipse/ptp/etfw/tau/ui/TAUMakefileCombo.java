@@ -32,6 +32,8 @@ import org.eclipse.ptp.rm.jaxb.control.ui.AbstractWidget;
 import org.eclipse.ptp.rm.jaxb.control.ui.IWidgetDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -104,26 +106,35 @@ public class TAUMakefileCombo extends AbstractWidget {
 		combo.select(0);
 		combo.setEnabled(false);
 
-		if (allmakefiles == null) {
-			Job job = new Job(Messages.TAUMakefileCombo_UpdatingMakefileList) {
-				@Override
-				protected IStatus run(IProgressMonitor monitor) {
-					refreshing = true;
-					initMakefiles();
-					Display.getDefault().asyncExec(new Runnable() {
-						@Override
-						public void run() {
-							// TODO handle case where user closes dialog before this finishes, leads to widget disposed error
-							updateMakefileCombo();
-							if(combo!=null&&!combo.isDisposed())
-								combo.getParent().layout();
-							refreshing = false;
-						}
-					});
+		final Job job = new Job(Messages.TAUMakefileCombo_UpdatingMakefileList) {
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				refreshing = true;
+				initMakefiles();
+				Display.getDefault().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						updateMakefileCombo();
+						if (combo != null && !combo.isDisposed())
+							combo.getParent().layout();
+						refreshing = false;
+					}
+				});
 
-					return Status.OK_STATUS;
-				}
-			};
+				return Status.OK_STATUS;
+			}
+		};
+
+		combo.addDisposeListener(new DisposeListener() {
+
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				job.cancel();
+			}
+		});
+
+		if (allmakefiles == null) {
+
 			job.setUser(true);
 			job.schedule();
 		}
@@ -151,19 +162,20 @@ public class TAUMakefileCombo extends AbstractWidget {
 		}
 	}
 
-	public void setSelectedMakefile(String makefile){
-		this.selectedMakefile=makefile;
+	public void setSelectedMakefile(String makefile) {
+		this.selectedMakefile = makefile;
 	}
-	public String getSelectedMakefile(){
+
+	public String getSelectedMakefile() {
 		return selectedMakefile;
 	}
-	
+
 	private void updateMakefileCombo() {
-		if(combo==null||combo.isDisposed()){
+		if (combo == null || combo.isDisposed()) {
 			return;
 		}
 		List<String> options = populateOptions();
-		int preDex=-1;
+		int preDex = -1;
 		List<String> makefiles = new ArrayList<String>();
 		makefiles.add(JAXBCoreConstants.ZEROSTR);
 		int i = 1;
@@ -177,8 +189,8 @@ public class TAUMakefileCombo extends AbstractWidget {
 
 			if (optionTypes == options.size()) {
 				makefiles.add(name);
-				if(selectedMakefile!=null&&selectedMakefile.endsWith(name)){
-					preDex=i;
+				if (selectedMakefile != null && selectedMakefile.endsWith(name)) {
+					preDex = i;
 				}
 				i++;
 			}
@@ -188,7 +200,7 @@ public class TAUMakefileCombo extends AbstractWidget {
 		combo.setItems(items);
 		combo.setEnabled(true);
 		if (items.length > 1) {
-			if(preDex>0)
+			if (preDex > 0)
 				combo.select(preDex);
 			else
 				combo.select(1);
