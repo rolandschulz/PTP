@@ -49,13 +49,13 @@ public class NewRemoteSyncProjectWizardOperation {
 	 * 
 	 * @param project
 	 * @param ISynchronizeParticipant
-	 *        the participant created by the wizard page
+	 *            the participant created by the wizard page
 	 * @param customFileFilter
-	 *        File filter created by user on the wizard page or null if user made no changes
+	 *            File filter created by user on the wizard page or null if user made no changes
 	 * @param localToolChains
-	 *        Set of local tool chains selected by user
+	 *            Set of local tool chains selected by user
 	 * @param remoteToolChains
-	 *        Set of remote tool chains selected by user
+	 *            Set of remote tool chains selected by user
 	 * @param monitor
 	 */
 	public static void run(IProject project, ISynchronizeParticipant participant, SyncFileFilter customFileFilter,
@@ -74,7 +74,7 @@ public class NewRemoteSyncProjectWizardOperation {
 			config.changeBuilder(syncBuilder, SYNC_BUILDER_CLASS, Messages.NewRemoteSyncProjectWizardOperation_1);
 			// turn off append contributed (local) environment variables for remote configs
 			String toolChainName = config.getToolChain().getSuperClass().getName();
-			if (isCDTProject(project) || remoteToolChains.contains(toolChainName)) {
+			if (remoteToolChains.contains(toolChainName)) {
 				ICConfigurationDescription c_mb_confgDes = ManagedBuildManager.getDescriptionForConfiguration(config);
 				if (c_mb_confgDes != null) {
 					EnvironmentVariableManager.fUserSupplier.setAppendContributedEnvironment(false, c_mb_confgDes);
@@ -84,8 +84,8 @@ public class NewRemoteSyncProjectWizardOperation {
 				defaultLocalBuildConfig = config;
 			}
 
-            // Bug 389899 - Synchronized project: "remote toolchain name" contains spaces
-            config.setName(config.getName().replace(' ', '_'));
+			// Bug 389899 - Synchronized project: "remote toolchain name" contains spaces
+			config.setName(config.getName().replace(' ', '_'));
 		}
 		assert defaultRemoteBuildConfig != null : Messages.NewRemoteSyncProjectWizardOperation_0;
 		// If user selects no local toolchain, use the remote default.
@@ -103,7 +103,7 @@ public class NewRemoteSyncProjectWizardOperation {
 			}
 		}
 
-        // Set active build config and the default build config for each sync config
+		// Set active build config and the default build config for each sync config
 		IConfiguration defaultBuildConfig;
 		SyncConfig[] allSyncConfigs = SyncConfigManager.getConfigs(project);
 		for (SyncConfig config : allSyncConfigs) {
@@ -137,8 +137,9 @@ public class NewRemoteSyncProjectWizardOperation {
 
 	/**
 	 * Test if given project is a CDT project.
+	 * 
 	 * @param project
-	 * @return whether a CDT project 
+	 * @return whether a CDT project
 	 */
 	private static boolean isCDTProject(IProject project) {
 		try {
@@ -151,6 +152,7 @@ public class NewRemoteSyncProjectWizardOperation {
 
 	/**
 	 * Test if given project is a synchronized project
+	 * 
 	 * @param project
 	 * @return whether a synchronized project
 	 */
