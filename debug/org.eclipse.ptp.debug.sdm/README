@@ -1,5 +1,5 @@
 This is the initial release of the PTP Scalable Debug Manager (SDM). The SDM is an 
-MPI-based client/server framework for controlling multiple distributed processes. The 
+client/server framework for controlling multiple distributed processes. The 
 primary purpose of this framework is to attach backend debuggers to the processes being 
 debugged, and to provide a library interface to control the debugging of these processes.
 
@@ -11,20 +11,14 @@ The following steps are used to set up your build environment so that the execut
 be installed in a fragment that corresponds to the architecture of the machine 
 it will be run on. 
 
-1. Make sure you have checked out the fragment corresponding to your architecture. 
-   For example, if you're on a Linux x86 machine, you should have the fragment:
-
-		org.eclipse.ptp.linux.x86
-
-2. Run the following command IN THE FRAGMENT DIRECTORY to configure, build and 
-   install the project:
+1. Run the following command to configure, build and install the executable:
    
    		sh BUILD
 
-3. You can also use 'make' and 'make install' from this directory, either from
-   the command line, or from the 'Make Targets' view in Eclipse to 
-   build and install the executable into the fragment directory.
+2. Once you've run the BUILD script once, you can also use 'make' and 'make install',
+   either from the command line, or from the 'Make Targets' view in Eclipse to 
+   build and install the executable.
 
-4. If any of the automake/autoconf files changes, you should just need to
+3. If any of the automake/autoconf files changes, you should just need to
    run 'make' and it will automatically regenerate the appropriate files.
 
