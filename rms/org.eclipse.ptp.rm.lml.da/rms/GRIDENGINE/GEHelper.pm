@@ -7,6 +7,7 @@
 #* 
 #* Contributors: 
 #*     Jeff Overbey (Illinois/NCSA) - Design and implementation
+#*     Carsten Karbach (Forschungszentrum Juelich GmbH)
 #*******************************************************************************
 
 package GEHelper;
@@ -22,9 +23,9 @@ our @EXPORT_OK = qw( parsexml trimtext get_jobs get_job_nodes get_nodes should_g
 our @EXPORT = qw( get_jobs get_job_nodes get_nodes should_group_nodes group_nodes MAX_CORES );
 
 use constant {
-    MAX_NODES => 64,    # If the system has more nodes than this, nodes will be
+    MAX_NODES => 10000, # If the system has more nodes than this, nodes will be
                         # grouped so that LML displays one node per box rather
-                        # than one core per box
+                        # than one core per box, in general nodes should not be grouped
     MAX_CORES => 64,    # If nodes are not grouped, this is the maximum number
                         # of cores that will be displayed for a single node
 };
@@ -53,8 +54,22 @@ sub get_jobs {
 
     my %jobs = ();
 
-    my @jobs_in_queue = @{$qstat_xml{queue_info}[0]{job_list}};
-    my @jobs_not_in_queue = @{$qstat_xml{job_info}[0]{job_list}};
+    my @jobs_in_queue;
+    if(defined($qstat_xml{queue_info}[0]{job_list})){
+    	@jobs_in_queue = @{$qstat_xml{queue_info}[0]{job_list}};
+    } 
+    else{
+    	@jobs_in_queue = ();
+    }
+    
+    my @jobs_not_in_queue;
+    if(defined($qstat_xml{job_info}[0]{job_list})){
+    	@jobs_not_in_queue = @{$qstat_xml{job_info}[0]{job_list}};
+    } 
+    else{
+    	@jobs_not_in_queue = ();
+    }
+    
     for my $job (@jobs_in_queue, @jobs_not_in_queue) {
         # The hash referenced by $job corresponds to an XML element like this:
         # <job_list state="running">
@@ -105,8 +120,10 @@ sub get_jobs {
 #                 job is running on (from qhost)
 ###############################################################################
 #
-# The returned hash has job numbers as its keys and a comma-separated list of
-# node names as its values.  Unfortunately, there is no information about what
+# The returned hash has job numbers as its keys and a list of node names attached with the
+# number of cores used on each node. E.g. for one job this string could look like (node1,10)(node2,7).
+# I.e. 10 cores are used on node1 and 7 cores on node2.
+# Unfortunately, there is no information about the exact
 # cores a job is assigned to on nodes with multiple cores.
 #
 sub get_job_nodes {
@@ -144,7 +161,30 @@ sub get_job_nodes {
                 if (!defined($job_hosts{$jobid})) {
                     $job_hosts{$jobid} = {};
                 }
-                $job_hosts{$jobid}->{$hostname} = 1;
+                if(! defined($job_hosts{$jobid}->{$hostname})){
+                	$job_hosts{$jobid}->{$hostname} = 0;
+                }
+                
+                #Check if pe_master has the value MASTER, 
+                #in this case do not increase the number of used slots on this host
+                
+                my $ismaster = 0;
+                
+                if( defined( $jobelt->{'jobvalue'} ) ){
+                	 my @jobvalues = @{ $jobelt->{'jobvalue'} };
+                	 for my $jobval (@jobvalues){
+                	 	if(defined ($jobval->{_attrs}{name} ) && $jobval->{_attrs}{name} eq "pe_master" ){
+                	 		if(defined($jobval->{_text}) && $jobval->{_text} eq "MASTER"){
+                	 			$ismaster = 1;
+                	 			last;
+                	 		}
+                	 	}
+                	 }
+                }
+                
+                if($ismaster == 0){
+                	$job_hosts{$jobid}->{$hostname} += 1;
+                }
             }
         }
     }
@@ -152,9 +192,8 @@ sub get_job_nodes {
     for my $jobid (keys %job_hosts) {
         my $nodelist = '';
         for my $node (keys %{$job_hosts{$jobid}}) {
-            $nodelist .= "$node,";
+            $nodelist .= "($node,$job_hosts{$jobid}->{$node})";
         }
-        chop($nodelist);
         $job_hosts{$jobid} = $nodelist;
     }
 

@@ -174,6 +174,16 @@ sub getParametersForBatchCommand{
 	$varpart =~ s/CMD_//;
 	$varpart =~ s/INFO//;
 	
+	#Special case for GRIDENGINE, source files do not match the required format -> thus explicit reference to their parameters necessary
+	if($rms eq "GRIDENGINE"){
+		if($varpart eq "JOB"){
+			return '-u \'*\' -s prsz -r -xml';
+		}
+		if($varpart eq "NODE"){
+			return '-j -xml';
+		}
+	}
+	
 	opendir(RMSDIR,"$instdir/rms/$rms") or die "Cannot open $instdir/rms/$rms -> this is not the root of lml_da installation\n";
     my @files = readdir(RMSDIR);
     closedir(RMSDIR);

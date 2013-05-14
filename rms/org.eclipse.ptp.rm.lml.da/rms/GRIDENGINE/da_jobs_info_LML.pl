@@ -1,13 +1,13 @@
 #!/usr/bin/perl -w
 #*******************************************************************************
-#* Copyright (c) 2011 Forschungszentrum Juelich GmbH and others.
+#* Copyright (c) 2011-2013 Forschungszentrum Juelich GmbH and others.
 #* All rights reserved. This program and the accompanying materials
 #* are made available under the terms of the Eclipse Public License v1.0
 #* which accompanies this distribution, and is available at
 #* http://www.eclipse.org/legal/epl-v10.html
 #*
 #* Contributors:
-#*    Wolfgang Frings (Forschungszentrum Juelich GmbH)
+#*    Wolfgang Frings, Carsten Karbach (Forschungszentrum Juelich GmbH)
 #*    Jeff Overbey (Illinois/NCSA) - Grid Engine support
 #*******************************************************************************/ 
 use strict;
@@ -54,7 +54,7 @@ my %nodes = get_nodes();
 my ($node_groups, $node_index, $nodes_per_group) = group_nodes();
 my %job_nodes = get_job_nodes();
 for my $jobid (keys %job_nodes) {
-    my $nodelist = $job_nodes{$jobid};
+    my $nodelist = $job_nodes{$jobid};#E.g. (node1,10)(node2,3)
     if (should_group_nodes()) {
         # Determine what groups this 
         my %groups = ();
@@ -64,22 +64,13 @@ for my $jobid (keys %job_nodes) {
             $groups{"($groupid,$groupidx)"} = 1;
         }
         $nodelist = join("", sort(keys(%groups)));
+        
+        $jobs{$jobid}{nodelist} = $nodelist;
+        
     } else {
-        my @nodes_in_list = split(/,/, $nodelist);
-        $nodelist = '';
-        for my $nd (@nodes_in_list) {
-            if (defined($nodes{$nd}{ncores}) && $nodes{$nd}{ncores} =~ /[0-9]+/) {
-                my $ncores = $nodes{$nd}{ncores};
-                for (my $i = 0; $i < $ncores; $i++) {
-                    $nodelist .= "($nd,$i)";
-                }
-            } else {
-                $nodelist .= "($nd,0)";
-            }
-        }
+        $jobs{$jobid}{vnodelist} = $nodelist;
     }
-
-    $jobs{$jobid}{nodelist} = $nodelist;
+    
 }
 
 # add unknown but manatory attributes to jobs
