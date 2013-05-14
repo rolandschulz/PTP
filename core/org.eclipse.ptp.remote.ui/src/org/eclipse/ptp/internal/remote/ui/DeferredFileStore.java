@@ -11,6 +11,7 @@
 package org.eclipse.ptp.internal.remote.ui;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -86,9 +87,14 @@ public class DeferredFileStore implements IDeferredWorkbenchAdapter {
 		if (fTargetInfo == null && fFileInfo.getAttribute(EFS.ATTRIBUTE_SYMLINK)) {
 			String target = fFileInfo.getStringAttribute(EFS.ATTRIBUTE_LINK_TARGET);
 			if (target != null) {
-				URI uri = fFileStore.toURI().resolve(target);
-				IFileStore store = fFileStore.getFileSystem().getStore(uri);
-				fTargetInfo = store.fetchInfo();
+				try {
+					URI targetUri = new URI(null, null, target, null); // Make sure target is escaped correctly
+					URI uri = fFileStore.toURI().resolve(targetUri.getRawPath());
+					IFileStore store = fFileStore.getFileSystem().getStore(uri);
+					fTargetInfo = store.fetchInfo();
+				} catch (URISyntaxException e) {
+					PTPRemoteUIPlugin.log(e);
+				}
 			}
 		}
 	}
