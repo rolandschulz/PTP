@@ -223,6 +223,7 @@ public class RemoteResourceBrowser extends Dialog {
 				@Override
 				public void widgetSelected(SelectionEvent event) {
 					connectionSelected();
+					updateDialog();
 				}
 			});
 		}
@@ -485,21 +486,24 @@ public class RemoteResourceBrowser extends Dialog {
 	}
 
 	private void updateDialog() {
-		if (remotePathText != null && okButton != null) {
-			if (remotePathText.getText().equals(EMPTY_STRING)) {
-				okButton.setEnabled(false);
-			} else {
-				okButton.setEnabled(true);
+		if (okButton != null && upButton != null && newFolderButton != null) {
+			okButton.setEnabled(false);
+			upButton.setEnabled(false);
+			newFolderButton.setEnabled(false);
+
+			if (fConnection != null) {
+				if (remotePathText != null) {
+					String pathText = remotePathText.getText();
+					if (!pathText.equals(EMPTY_STRING)) {
+						okButton.setEnabled(true);
+						newFolderButton.setEnabled(true);
+						IPath path = new Path(pathText);
+						if (!path.isRoot()) {
+							upButton.setEnabled(true);
+						}
+					}
+				}
 			}
-		}
-		if (remotePathText != null && upButton != null) {
-			boolean enabled = false;
-			String pathText = remotePathText.getText();
-			if (!pathText.equals("")) { //$NON-NLS-1$
-				IPath path = new Path(pathText);
-				enabled = !path.isRoot();
-			}
-			upButton.setEnabled(enabled);
 		}
 	}
 }

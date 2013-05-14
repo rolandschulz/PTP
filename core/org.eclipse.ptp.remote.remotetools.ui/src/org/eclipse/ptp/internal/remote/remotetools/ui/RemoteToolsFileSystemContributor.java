@@ -55,7 +55,9 @@ public class RemoteToolsFileSystemContributor extends FileSystemContributor {
 		String path = uiFileMgr.browseDirectory(shell, Messages.RemoteToolsFileSystemContributor_0, initialPath, 0);
 		if (path != null) {
 			IRemoteConnection conn = uiFileMgr.getConnection();
-			return RemoteToolsFileSystem.getURIFor(conn.getName(), path);
+			if (conn != null) {
+				return RemoteToolsFileSystem.getURIFor(conn.getName(), path);
+			}
 		}
 
 		return null;
