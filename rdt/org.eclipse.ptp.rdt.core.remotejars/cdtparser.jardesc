@@ -12,6 +12,7 @@
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
         <file path="/org.eclipse.cdt.core/utils/org/eclipse/cdt/internal/core/messages.properties"/>
         <javaElement handleIdentifier="=org.eclipse.cdt.core/parser&lt;org.eclipse.cdt.internal.core.parser.util"/>
+        <javaElement handleIdentifier="=org.eclipse.cdt.core/utils&lt;org.eclipse.cdt.internal.core{SafeStringInterner.java"/>
         <javaElement handleIdentifier="=org.eclipse.cdt.core/utils&lt;org.eclipse.cdt.internal.core{Messages.java"/>
         <javaElement handleIdentifier="=org.eclipse.cdt.core/parser&lt;org.eclipse.cdt.core.dom.parser.cpp"/>
         <javaElement handleIdentifier="=org.eclipse.cdt.core/parser&lt;org.eclipse.cdt.internal.core.index.composite.cpp"/>
