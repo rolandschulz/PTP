@@ -19,10 +19,10 @@
       </wizard>
       <wizard
             category="org.eclipse.ptp.rdt.ui.wizardCategory.Remote"
-            class="org.eclipse.ptp.internal.rdt.sync.cdt.ui.wizards.ConvertLocalToSyncProjectWizard"
+            class="org.eclipse.ptp.internal.rdt.sync.cdt.ui.wizards.ConvertCDTToSyncCDTProjectWizard"
             hasPages="true"
             icon="icons/obj16/convert-normal.gif"
-            id="org.eclipse.ptp.rdt.sync.cdt.ui.convertLocalToSyncProjectWizard"
+            id="org.eclipse.ptp.rdt.sync.cdt.ui.ConvertCDTToSyncCDTProjectWizard"
             name="%WizardConvertLocalProject.name">
          <description>
             %WizardConvertProject.description

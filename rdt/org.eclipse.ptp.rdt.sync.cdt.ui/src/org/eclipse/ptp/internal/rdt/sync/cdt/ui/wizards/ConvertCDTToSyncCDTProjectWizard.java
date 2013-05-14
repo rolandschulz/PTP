@@ -1,18 +1,15 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010, 2013 IBM Corporation and others.
+ * Copyright (c) 2013 Oak Ridge National Laboratory and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- * IBM - Initial API and implementation
- * Roland Schulz, University of Tennessee
- * John Eblen, Oak Ridge National Laboratory
+ * John Eblen - initial implementation
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.sync.cdt.ui.wizards;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,13 +25,10 @@ import org.eclipse.ptp.internal.rdt.sync.cdt.ui.wizards.SyncConfigToBuildConfigW
 import org.eclipse.ptp.internal.rdt.sync.ui.wizards.SyncWizardDataCache;
 
 /**
- * A wizard for creating new Synchronized C/C++ or Fortran Projects
- * <strong>EXPERIMENTAL</strong>. This class or interface has been added as part
- * of a work in progress. There is no guarantee that this API will work or that
- * it will remain the same. Please do not use this API without consulting with
- * the RDT team.
+ * A wizard for converting CDT projects to Sync + CDT projects (Synchronized C/C++ projects)
+ * This is a subclass of the CDT wizard that simply adds an additional page and data.
  */
-public class ConvertLocalToSyncProjectWizard extends ConversionWizard {
+public class ConvertCDTToSyncCDTProjectWizard extends ConversionWizard {
 	private static final String BuildConfigSetKey = "build-config-set"; //$NON-NLS-1$
 	private static final String wz_title = Messages.ConvertLocalToSyncProjectWizard_0;
 	private static final String wz_desc = Messages.ConvertLocalToSyncProjectWizard_1;
@@ -42,7 +36,7 @@ public class ConvertLocalToSyncProjectWizard extends ConversionWizard {
 	/**
 	 * 
 	 */
-	public ConvertLocalToSyncProjectWizard() {
+	public ConvertCDTToSyncCDTProjectWizard() {
 		super(wz_title, wz_desc);
 	}
 
