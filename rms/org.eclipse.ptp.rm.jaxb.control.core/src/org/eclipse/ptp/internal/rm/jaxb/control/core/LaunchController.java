@@ -40,8 +40,8 @@ import org.eclipse.ptp.ems.core.IEnvManagerConfig;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.messages.Messages;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.runnable.JobStatusMap;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.runnable.ManagedFilesJob;
-import org.eclipse.ptp.internal.rm.jaxb.control.core.runnable.ScriptHandler;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.runnable.ManagedFilesJob.Operation;
+import org.eclipse.ptp.internal.rm.jaxb.control.core.runnable.ScriptHandler;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.runnable.command.CommandJob;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.runnable.command.CommandJob.JobMode;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.runnable.command.CommandJobStatus;
@@ -1118,9 +1118,12 @@ public class LaunchController implements ILaunchController {
 
 		SubMonitor progress = SubMonitor.convert(monitor, 100);
 
+		/*
+		 * Create attribute representing job ID. This will be updated with a name (the job ID returned from the scheduler) and a
+		 * value (the job status) by the tokenizer for the job submission command.
+		 */
 		AttributeType a = new AttributeType();
 		a.setVisible(false);
-		a.setName(uuid);
 		getRMVariableMap().put(uuid, a);
 
 		/*
