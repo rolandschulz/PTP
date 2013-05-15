@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *    IBM Corporation - Initial API and implementation
+ *    John Eblen - initial implementation
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.ui;
 
@@ -14,7 +14,7 @@ package org.eclipse.ptp.rdt.sync.ui;
  * Must be implemented by extensions to the syncProperties extension point.
  * 
  */
-public interface ISynchronizePropertiesDescriptor {
+public interface ISynchronizeWizardExtensionDescriptor {
 
 	/**
 	 * @return the nature
@@ -22,7 +22,7 @@ public interface ISynchronizePropertiesDescriptor {
 	public String getNature();
 
 	/**
-	 * @return
+	 * @return the page
 	 */
-	public ISynchronizeProperties getProperties();
+	public ISynchronizeWizardExtension getWizardExtension();
 }
