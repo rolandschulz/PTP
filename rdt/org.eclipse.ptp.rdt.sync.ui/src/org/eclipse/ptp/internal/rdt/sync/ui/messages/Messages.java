@@ -127,6 +127,7 @@ public class Messages extends NLS {
 	public static String SyncProjectWidget_Local_directory_label;
 	public static String SyncProjectWidget_Modify_file_filtering;
 	public static String SyncProjectWidget_Project_already_exists;
+	public static String SyncProjectWidget_Project_name_must_be_specified;
 	public static String SyncProjectWidget_Remote_directory;
 	public static String SyncProjectWidget_Select_project_local_directory;
 	public static String SyncProjectWidget_Use_default_location;

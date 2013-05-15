@@ -74,9 +74,9 @@ public class SyncProjectWidget extends Composite {
 	private int fMessageType;
 
 	private boolean fIsComplete;
-	private boolean fHasLocalGroup;
+	private final boolean fHasLocalGroup;
 
-	private String fProjectName;
+	private String fProjectName = EMPTY_STRING;
 
 	/**
 	 * Return a widget for wizards that create new sync projects
@@ -304,7 +304,7 @@ public class SyncProjectWidget extends Composite {
 		// Build string if default location is indicated.
 		if (fUseDefaultLocationButton.getSelection()) {
 			String name = getProjectName();
-			if (name != null) {
+			if (!name.equals(EMPTY_STRING)) {
 				fLocalProjectLocationText.setText(Platform.getLocation().toOSString() + File.separator + name);
 			} else {
 				fLocalProjectLocationText.setText(Platform.getLocation().toOSString());
@@ -349,6 +349,11 @@ public class SyncProjectWidget extends Composite {
 	 * @return
 	 */
 	private boolean validateLocalLocation() {
+		if (getProjectName().equals(EMPTY_STRING)) {
+			fErrorMessage = Messages.SyncProjectWidget_Project_name_must_be_specified;
+			return false;
+		}
+
 		IProject handle = ResourcesPlugin.getWorkspace().getRoot().getProject(getProjectName());
 		URI location = URIUtil.toURI(fLocalProjectLocationText.getText());
 

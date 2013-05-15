@@ -89,13 +89,15 @@ import org.eclipse.ui.internal.ide.IIDEHelpContextIds;
 public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItemsListListener {
 	public static final String REMOTE_SYNC_WIZARD_PAGE_ID = "org.eclipse.ptp.rdt.sync.cdt.ui.remoteSyncWizardPage"; //$NON-NLS-1$
 	public static final String SERVICE_PROVIDER_PROPERTY = "org.eclipse.ptp.rdt.sync.cdt.ui.remoteSyncWizardPage.serviceProvider"; //$NON-NLS-1$
+	public static final String DESC = "EntryDescriptor"; //$NON-NLS-1$
+
 	private static final String RDT_PROJECT_TYPE = "org.eclipse.ptp.rdt"; //$NON-NLS-1$
 	private static final Image IMG_CATEGORY = CDTSharedImages.getImage(CDTSharedImages.IMG_OBJS_SEARCHFOLDER);
 	private static final Image IMG_ITEM = CDTSharedImages.getImage(CDTSharedImages.IMG_OBJS_VARIABLE);
 	private static final String EXTENSION_POINT_ID = "org.eclipse.cdt.ui.CDTWizard"; //$NON-NLS-1$
 	private static final String ELEMENT_NAME = "wizard"; //$NON-NLS-1$
 	private static final String CLASS_NAME = "class"; //$NON-NLS-1$
-	public static final String DESC = "EntryDescriptor"; //$NON-NLS-1$
+	private static final String EMPTY_STRING = ""; //$NON-NLS-1$
 	private static final int SIZING_TEXT_FIELD_WIDTH = 250;
 
 	// widgets
@@ -117,7 +119,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	private String message = null;
 	private int messageType = IMessageProvider.NONE;
 	private String errorMessage = null;
-	
+
 	private Set<String> localToolChainsSet;
 	private Set<String> remoteToolChainsSet;
 
@@ -317,7 +319,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	protected boolean validateProjectName() {
 		// Check if name is empty
 		String projectFieldContents = getProjectNameFieldValue();
-		if (projectFieldContents.equals("")) { //$NON-NLS-1$
+		if (projectFieldContents.equals(EMPTY_STRING)) {
 			message = Messages.SyncMainWizardPage_5;
 			messageType = IMessageProvider.NONE;
 			return false;
@@ -480,7 +482,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 
 	private static String getParentText(TreeItem item) {
 		if (item == null || item.getParentItem() == null) {
-			return ""; //$NON-NLS-1$
+			return EMPTY_STRING;
 		}
 		return item.getParentItem().getText();
 	}
@@ -732,7 +734,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 		projectNameField.addListener(SWT.Modify, new Listener() {
 			@Override
 			public void handleEvent(Event e) {
-				if (fSyncWidget != null) {
+				if (fSyncWidget != null && (validateProjectName() || getProjectName().equals(EMPTY_STRING))) {
 					fSyncWidget.setProjectName(getProjectName());
 				}
 				setPageComplete(validatePage());
@@ -785,7 +787,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	 */
 	private String getProjectNameFieldValue() {
 		if (projectNameField == null) {
-			return ""; //$NON-NLS-1$
+			return EMPTY_STRING;
 		}
 
 		return projectNameField.getText().trim();
@@ -885,6 +887,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 
 	/**
 	 * Get the set of local configs
+	 * 
 	 * @return configs
 	 */
 	public Set<String> getLocalToolChains() {
@@ -896,6 +899,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 
 	/**
 	 * Get the set of remote configs
+	 * 
 	 * @return configs
 	 */
 	public Set<String> getRemoteToolChains() {
@@ -915,7 +919,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 			localToolChainsSet.add(ti.getText());
 		}
 	}
-	
+
 	private void gatherRemoteToolChains() {
 		remoteToolChainsSet = new HashSet<String>();
 		for (TableItem ti : remoteToolChainTable.getSelection()) {
@@ -926,6 +930,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 			remoteToolChainsSet.add(ti.getText());
 		}
 	}
+
 	public SyncFileFilter getCustomFileFilter() {
 		return fSyncWidget.getCustomFileFilter();
 	}

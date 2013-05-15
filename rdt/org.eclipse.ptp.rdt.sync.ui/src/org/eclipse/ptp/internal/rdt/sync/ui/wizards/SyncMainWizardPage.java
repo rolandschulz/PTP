@@ -65,7 +65,7 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 	private Text fProjectNameText;
 	private Combo fProjectSelectionCombo;
 	private SyncProjectWidget fSyncWidget;
-	private boolean isNewProject;
+	private final boolean isNewProject;
 
 	/**
 	 * Creates a new wizard page for creating a new sync project.
@@ -146,7 +146,7 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 
 	/**
 	 * Creates controls for selecting an existing project
-	 *
+	 * 
 	 * @param parent
 	 *            the parent composite
 	 */
@@ -168,9 +168,10 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 			public void widgetDefaultSelected(SelectionEvent arg0) {
 				// nothing to do
 			}
+
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
-				if (fSyncWidget != null) {
+				if (fSyncWidget != null && (validateProjectName() || getProjectName().equals(EMPTY_STRING))) {
 					fSyncWidget.setProjectName(getProjectName());
 				}
 				setPageComplete(validatePage());
@@ -181,7 +182,7 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 
 	/**
 	 * Creates controls for entering a new project name
-	 *
+	 * 
 	 * @param parent
 	 *            the parent composite
 	 */
@@ -194,7 +195,7 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 
 		// new project name label
 		Label projectNameLabel = new Label(projectGroup, SWT.NONE);
-		projectNameLabel.setText(Messages.SyncMainWizardPage_Project_name); 
+		projectNameLabel.setText(Messages.SyncMainWizardPage_Project_name);
 		projectNameLabel.setFont(parent.getFont());
 
 		// new project name entry field
@@ -207,7 +208,7 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 		fProjectNameText.addListener(SWT.Modify, new Listener() {
 			@Override
 			public void handleEvent(Event e) {
-				if (fSyncWidget != null) {
+				if (fSyncWidget != null && (validateProjectName() || getProjectName().equals(EMPTY_STRING))) {
 					fSyncWidget.setProjectName(getProjectName());
 				}
 				setPageComplete(validatePage());
@@ -221,6 +222,7 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 	 * 
 	 * @return the project name
 	 */
+	@Override
 	public String getProjectName() {
 		if (isNewProject) {
 			if (fProjectNameText == null) {
@@ -309,7 +311,6 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 		return fSyncWidget.getSynchronizeParticipant();
 	}
 
-
 	private void populateProjectCombo() {
 		IProject[] allProjects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 		for (IProject p : allProjects) {
@@ -383,7 +384,7 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 		// Check if name is empty
 		String projectFieldContents = getProjectName();
 		if (projectFieldContents.equals(EMPTY_STRING)) {
-			message = Messages.SyncMainWizardPage_Project_name_must_be_specified; 
+			message = Messages.SyncMainWizardPage_Project_name_must_be_specified;
 			messageType = IMessageProvider.NONE;
 			return false;
 		}
@@ -398,7 +399,7 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 
 		// Do not allow # in the name
 		if (getProjectName().indexOf('#') >= 0) {
-			errorMessage = Messages.SyncMainWizardPage_Project_name_cannot_contain_hash; 
+			errorMessage = Messages.SyncMainWizardPage_Project_name_cannot_contain_hash;
 			return false;
 		}
 
