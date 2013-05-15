@@ -39,6 +39,8 @@ public class RemoteInactiveHighlightingService extends AbstractRemoteService imp
 
 	public List<Position> computeInactiveHighlightingPositions(IDocument document, IWorkingCopy workingCopy) {
 		ICIndexSubsystem subsystem = getSubSystem();
+		if(subsystem == null)
+			return Collections.emptyList();
 
 		subsystem.checkProject(workingCopy.getCProject().getProject(), new NullProgressMonitor());
 
