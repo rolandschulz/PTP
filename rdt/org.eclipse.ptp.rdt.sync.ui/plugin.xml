@@ -3,6 +3,7 @@
 <plugin>
    <extension-point id="synchronizeParticipants" name="Synchronize Participant" schema="schema/synchronizeParticipants.exsd"/>
    <extension-point id="synchronizeProperties" name="Synchronize Properies" schema="schema/synchronizeProperties.exsd"/>
+   <extension-point id="synchronizeWizardExtension" name="Synchronize Wizard Extension" schema="schema/synchronizeWizardExtension.exsd"/>
    <extension
          point="org.eclipse.ui.newWizards">
 	   <wizard

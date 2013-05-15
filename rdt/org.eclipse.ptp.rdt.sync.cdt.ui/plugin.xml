@@ -136,4 +136,11 @@
               nature="org.eclipse.cdt.core.cnature">
         </synchronizeProperties>
      </extension>
+     <extension
+           point="org.eclipse.ptp.rdt.sync.ui.synchronizeWizardExtension">
+        <synchronizeWizardExtension
+              class="org.eclipse.ptp.rdt.sync.cdt.ui.wizards.SynchronizeWizardExtension"
+              nature="org.eclipse.cdt.core.cnature">
+        </synchronizeWizardExtension>
+     </extension>
 </plugin>

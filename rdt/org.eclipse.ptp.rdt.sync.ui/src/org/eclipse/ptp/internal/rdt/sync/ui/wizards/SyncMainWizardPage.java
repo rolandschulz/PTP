@@ -22,11 +22,18 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.ptp.internal.rdt.sync.ui.RDTSyncUIPlugin;
+import org.eclipse.ptp.internal.rdt.sync.ui.SynchronizePropertiesRegistry;
+import org.eclipse.ptp.internal.rdt.sync.ui.SynchronizeWizardExtensionRegistry;
 import org.eclipse.ptp.internal.rdt.sync.ui.messages.Messages;
+import org.eclipse.ptp.internal.rdt.sync.ui.wizards.NewSyncProjectWizard.WizardMode;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
+import org.eclipse.ptp.rdt.sync.ui.ISynchronizeProperties;
+import org.eclipse.ptp.rdt.sync.ui.ISynchronizeWizardExtension;
 import org.eclipse.ptp.rdt.sync.ui.widgets.SyncProjectWidget;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -65,7 +72,7 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 	private Text fProjectNameText;
 	private Combo fProjectSelectionCombo;
 	private SyncProjectWidget fSyncWidget;
-	private final boolean isNewProject;
+	private IWizardPage nextPage;
 
 	/**
 	 * Creates a new wizard page for creating a new sync project.
@@ -173,6 +180,7 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 			public void widgetSelected(SelectionEvent arg0) {
 				if (fSyncWidget != null && (validateProjectName() || getProjectName().equals(EMPTY_STRING))) {
 					fSyncWidget.setProjectName(getProjectName());
+					handleProjectSelected(getProject());
 				}
 				setPageComplete(validatePage());
 				getWizard().getContainer().updateMessage();
@@ -215,6 +223,19 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 				getWizard().getContainer().updateMessage();
 			}
 		});
+	}
+
+	/**
+	 * Returns the currently selected project.
+	 * This only works for project conversion. For new projects, this function always returns null.
+	 * @return project
+	 */
+	public IProject getProject() {
+		if (isNewProject) {
+			return null;
+		} else {
+			return ResourcesPlugin.getWorkspace().getRoot().getProject(getProjectName());
+		}
 	}
 
 	/**
@@ -302,6 +323,14 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 		return messageType;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.wizard.WizardPage#getNextPage()
+	 */
+	@Override
+	public IWizardPage getNextPage() {
+		return nextPage;
+	}
 	/**
 	 * Get the synchronize participant, which contains remote information
 	 * 
@@ -310,7 +339,21 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 	public ISynchronizeParticipant getSynchronizeParticipant() {
 		return fSyncWidget.getSynchronizeParticipant();
 	}
-
+	
+	private void handleProjectSelected(IProject project) {
+		ISynchronizeWizardExtension prop = SynchronizeWizardExtensionRegistry.getSynchronizeWizardExtensionForProject(project);
+		if (prop == null) {
+			nextPage = null;
+			return;
+		}
+		WizardPage[] pages = prop.createConvertProjectWizardPages();
+		if (pages == null) {
+			nextPage = null;
+			return;
+		} else {
+			nextPage = pages[0];
+		}
+	}
 	private void populateProjectCombo() {
 		IProject[] allProjects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 		for (IProject p : allProjects) {
