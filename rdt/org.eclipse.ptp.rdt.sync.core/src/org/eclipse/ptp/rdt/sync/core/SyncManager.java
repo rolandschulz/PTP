@@ -154,12 +154,13 @@ public class SyncManager {
 	 *            synchronize filter, or null if no filter
 	 * @throws CoreException on problems adding sync nature
 	 */
-	public static void makeSyncProject(IProject project, ISynchronizeService provider, SyncFileFilter filter) throws CoreException {
+	public static void makeSyncProject(IProject project, String remoteSyncConfigName, ISynchronizeService provider, SyncFileFilter filter)
+			throws CoreException {
 		RemoteSyncNature.addNature(project, new NullProgressMonitor());
 
 		// Remote config
 		IRemoteConnection conn = provider.getRemoteConnection();
-		SyncConfig config = SyncConfigManager.newConfig(conn.getName(), provider.getId(), conn, provider.getLocation());
+		SyncConfig config = SyncConfigManager.newConfig(remoteSyncConfigName, provider.getId(), conn, provider.getLocation());
 		SyncConfigManager.addConfig(project, config);
 		SyncConfigManager.setActive(project, config);
 

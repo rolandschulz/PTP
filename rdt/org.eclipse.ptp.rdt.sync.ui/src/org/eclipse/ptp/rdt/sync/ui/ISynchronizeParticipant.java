@@ -47,6 +47,14 @@ public interface ISynchronizeParticipant extends ISynchronizeParticipantDescript
 	public ISynchronizeService getProvider(IProject project);
 
 	/**
+	 * Get the name of the sync config to create for this participant. Only
+	 * valid if {@link isConfigComplete()} is true.
+	 *
+	 * @return sync config name
+	 */
+	public String getSyncConfigName();
+
+	/**
 	 * Check if the configuration is complete
 	 * 
 	 * @return true if the configuration is complete

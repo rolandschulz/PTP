@@ -96,7 +96,8 @@ public class NewRemoteSyncProjectWizardOperation implements Runnable {
 		// Add elements for a sync project
 		if (!isSyncProject(project)) {
 			try {
-				SyncManager.makeSyncProject(project, participant.getProvider(project), customFileFilter);
+				SyncManager.makeSyncProject(project, participant.getSyncConfigName(), participant.getProvider(project),
+						customFileFilter);
 			} catch (CoreException e) {
 				Activator.log(e);
 				return;

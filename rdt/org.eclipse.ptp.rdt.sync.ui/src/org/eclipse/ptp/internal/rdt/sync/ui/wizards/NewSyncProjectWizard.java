@@ -377,8 +377,8 @@ public class NewSyncProjectWizard extends Wizard implements INewWizard, IExecuta
 		}
 		// Add sync-specific elements to project
 		try {
-			SyncManager.makeSyncProject(project, mainPage.getSynchronizeParticipant().getProvider(project),
-					mainPage.getCustomFileFilter());
+			SyncManager.makeSyncProject(project, mainPage.getSynchronizeParticipant().getSyncConfigName(),
+					mainPage.getSynchronizeParticipant().getProvider(project), mainPage.getCustomFileFilter());
 		} catch (CoreException e) {
 			return false;
 		}
