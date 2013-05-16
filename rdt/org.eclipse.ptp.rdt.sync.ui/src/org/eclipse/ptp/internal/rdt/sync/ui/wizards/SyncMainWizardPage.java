@@ -341,17 +341,11 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 	}
 	
 	private void handleProjectSelected(IProject project) {
-		ISynchronizeWizardExtension prop = SynchronizeWizardExtensionRegistry.getSynchronizeWizardExtensionForProject(project);
-		if (prop == null) {
+		ISynchronizeWizardExtension ext = SynchronizeWizardExtensionRegistry.getSynchronizeWizardExtensionForProject(project);
+		if (ext == null) {
 			nextPage = null;
-			return;
-		}
-		WizardPage[] pages = prop.createConvertProjectWizardPages();
-		if (pages == null) {
-			nextPage = null;
-			return;
 		} else {
-			nextPage = pages[0];
+			nextPage = ext.createConvertProjectWizardPage();
 		}
 	}
 	private void populateProjectCombo() {

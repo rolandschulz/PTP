@@ -13,23 +13,15 @@ package org.eclipse.ptp.rdt.sync.ui;
 import org.eclipse.jface.wizard.WizardPage;
 
 /*
- * Implemented by clients wishing to add pages to the synchronized project's new project wizard and conversion wizard.
+ * Implemented by clients wishing to add pages to the synchronized project's conversion wizard.
  */
 public interface ISynchronizeWizardExtension extends ISynchronizeWizardExtensionDescriptor {
-
-	/**
-	 * Create pages added to end of new project wizard
-	 * 
-	 * @return array of wizard pages
-	 */
-	public WizardPage[] createNewProjectWizardPages();
-
 	/**
 	 * Create pages added to end of conversion wizard
 	 * 
 	 * @return array of wizard pages
 	 */
-	public WizardPage[] createConvertProjectWizardPages();
+	public WizardPage createConvertProjectWizardPage();
 
 	/**
 	 * Called when the wizard exits and after the project has been created or converted.

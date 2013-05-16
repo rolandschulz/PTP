@@ -11,7 +11,7 @@
 package org.eclipse.ptp.rdt.sync.ui;
 
 /**
- * Must be implemented by extensions to the syncProperties extension point.
+ * Must be implemented by extensions to the syncWizardExtension extension point.
  * 
  */
 public interface ISynchronizeWizardExtensionDescriptor {
