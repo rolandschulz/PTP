@@ -19,19 +19,6 @@
      </view>
    </extension>
    <extension
-         point="org.eclipse.ui.propertyPages">
-      <page
-            class="org.eclipse.ptp.services.ui.ServiceConfigurationPropertyPage"
-            id="org.eclipse.ptp.services.ui.properties"
-            name="%ServiceConfigurationsPropertyPage.name">
-         <enabledWhen>
-            <instanceof
-                  value="org.eclipse.core.resources.IProject">
-            </instanceof>
-         </enabledWhen>
-      </page>
-   </extension>
-   <extension
          point="org.eclipse.ui.preferencePages">
       <page
             category="org.eclipse.ptp.remote.ui.RemoteDevelopmentPreferencePage"

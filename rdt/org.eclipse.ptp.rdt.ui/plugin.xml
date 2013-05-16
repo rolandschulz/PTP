@@ -294,6 +294,25 @@
             </adapt>
          </enabledWhen>
       </page>
+      <page
+            class="org.eclipse.ptp.services.ui.ServiceConfigurationPropertyPage"
+            id="org.eclipse.ptp.rdt.ui.properties.ServiceConfigurationPropertyPage"
+            name="%ServiceConfigurationsPropertyPage.name">
+         <filter
+               name="projectNature"
+               value="org.eclipse.ptp.rdt.core.remoteNature">
+         </filter>
+         <enabledWhen>
+            <or>
+               <instanceof
+                     value="org.eclipse.core.resources.IProject">
+               </instanceof>
+               <instanceof
+                     value="org.eclipse.cdt.core.model.ICProject">
+               </instanceof>
+            </or>
+         </enabledWhen>
+      </page>
    </extension>
    <extension
          point="org.eclipse.cdt.ui.cPropertyTab">
