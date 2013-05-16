@@ -27,6 +27,7 @@ import org.eclipse.ptp.internal.rdt.sync.ui.SyncMergeFileTableViewer;
 import org.eclipse.ptp.internal.rdt.sync.ui.handlers.CommonSyncExceptionHandler;
 import org.eclipse.ptp.internal.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.internal.rdt.sync.ui.preferences.SyncFileFilterDialog;
+import org.eclipse.ptp.internal.rdt.sync.ui.properties.ManageConfigurationDialog;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
@@ -58,6 +59,7 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 	private static final String checkoutCommand = "checkout"; //$NON-NLS-1$
 	private static final String resolveAsRemoteCommand = "checkout_remote_copy"; //$NON-NLS-1$
 	private static final String resolveMergeCommand = "resolve"; //$NON-NLS-1$
+	private static final String manageCommand = "manage"; //$NON-NLS-1$
 	private static final ISyncExceptionHandler syncExceptionHandler = new CommonSyncExceptionHandler(false, true);
 
 	@Override
@@ -157,6 +159,8 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 						viewer.update(null);
 					}
 				}
+			} else if (command.equals(manageCommand)) {
+				new ManageConfigurationDialog(HandlerUtil.getActiveShell(event), project).open();
 			}
 		} catch (CoreException e) {
 			// This should never happen because only a blocking sync can throw a core exception, and all syncs here are

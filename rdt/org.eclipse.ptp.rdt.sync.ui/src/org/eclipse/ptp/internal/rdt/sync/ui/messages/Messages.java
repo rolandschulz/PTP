@@ -39,6 +39,9 @@ public class Messages extends NLS {
 	public static String CommonSyncExceptionHandler_2;
 	public static String CommonSyncExceptionHandler_3;
 	public static String CommonSyncExceptionHandler_4;
+	public static String ManageConfigurationWidget_Connection_name;
+	public static String ManageConfigurationWidget_Project_location;
+	public static String ManageConfigurationWidget_Sync_provider;
 	public static String NewProject_caseVariantExistsError;
 	public static String NewProject_description;
 	public static String NewProject_errorMessage;
@@ -131,16 +134,16 @@ public class Messages extends NLS {
 	public static String SyncProjectWidget_Remote_directory;
 	public static String SyncProjectWidget_Select_project_local_directory;
 	public static String SyncProjectWidget_Use_default_location;
-	public static String SyncPropertyPage_Add;
-	public static String SyncPropertyPage_Cannot_remove_active;
-	public static String SyncPropertyPage_Failed_to_save_properties;
-	public static String SyncPropertyPage_Must_be_at_least_one;
-	public static String SyncPropertyPage_Only_one_configuration_active;
-	public static String SyncPropertyPage_Remove;
-	public static String SyncPropertyPage_Remove_Configuration;
-	public static String SyncPropertyPage_Save_failed;
-	public static String SyncPropertyPage_Set_Active;
-	public static String SyncPropertyPage_Set_Active_Configuration;
+	public static String ManageConfigurationWidget_Add;
+	public static String ManageConfigurationWidget_Cannot_remove_active;
+	public static String ManageConfigurationWidget_Failed_to_save_properties;
+	public static String ManageConfigurationWidget_Must_be_at_least_one;
+	public static String ManageConfigurationWidget_Only_one_configuration_active;
+	public static String ManageConfigurationWidget_Remove;
+	public static String ManageConfigurationWidget_Remove_Configuration;
+	public static String ManageConfigurationWidget_Save_failed;
+	public static String ManageConfigurationWidget_Set_Active;
+	public static String ManageConfigurationWidget_Set_Active_Configuration;
 
 	static {
 		// initialize resource bundle

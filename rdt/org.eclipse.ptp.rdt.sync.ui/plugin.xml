@@ -88,6 +88,15 @@
             </menu>
             <command
                   commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
+                  label="%ManageSync.name"
+                  style="push">
+               <parameter
+                     name="org.eclipse.ptp.rdt.sync.ui.syncCommand.syncModeParameter"
+                     value="manage">
+               </parameter>
+            </command>
+            <command
+                  commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
                   label="%SyncAllNow.name"
                   style="push">
                <parameter
