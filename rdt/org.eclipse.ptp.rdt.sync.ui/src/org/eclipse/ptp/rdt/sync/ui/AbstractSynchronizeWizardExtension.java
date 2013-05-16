@@ -12,7 +12,7 @@ package org.eclipse.ptp.rdt.sync.ui;
 
 
 /**
- * Must be extended by extensions to the syncProperties extension point.
+ * Must be extended by extensions to the syncWizardExtension extension point.
  * 
  */
 public abstract class AbstractSynchronizeWizardExtension implements ISynchronizeWizardExtension {

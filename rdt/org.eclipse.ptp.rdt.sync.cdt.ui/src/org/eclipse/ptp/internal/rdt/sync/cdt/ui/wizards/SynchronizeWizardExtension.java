@@ -16,7 +16,7 @@ import org.eclipse.ptp.rdt.sync.ui.AbstractSynchronizeWizardExtension;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeWizardExtensionDescriptor;
 
 /**
- * Synchronize Properties page extension for CDT to specify default build configurations *
+ * Synchronize conversion wizard extension for converting a CDT project to a synchronized CDT project
  */
 public class SynchronizeWizardExtension extends AbstractSynchronizeWizardExtension {
 	private SyncConfigToBuildConfigWizardPage fWizardPage;
@@ -25,20 +25,10 @@ public class SynchronizeWizardExtension extends AbstractSynchronizeWizardExtensi
 		super(descriptor);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.sync.ui.ISynchronizeWizardExtension#createNewProjectWizardPages()
-	 */
 	@Override
-	public WizardPage[] createNewProjectWizardPages() {
-		fWizardPage = new SyncConfigToBuildConfigWizardPage(WizardMode.NEW);
-		return new WizardPage[] {fWizardPage};
-	}
-
-	@Override
-	public WizardPage[] createConvertProjectWizardPages() {
+	public WizardPage createConvertProjectWizardPage() {
 		fWizardPage = new SyncConfigToBuildConfigWizardPage(WizardMode.ADD_SYNC);
-		return new WizardPage[] {fWizardPage};
+		return fWizardPage;
 	}
 
 	/*
