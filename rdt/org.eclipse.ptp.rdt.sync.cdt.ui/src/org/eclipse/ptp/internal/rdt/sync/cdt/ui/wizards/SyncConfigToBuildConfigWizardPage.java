@@ -23,6 +23,8 @@ import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.dialogs.IPageChangingListener;
+import org.eclipse.jface.dialogs.PageChangingEvent;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.ptp.internal.rdt.sync.cdt.core.Activator;
 import org.eclipse.ptp.internal.rdt.sync.cdt.ui.messages.Messages;
@@ -42,7 +44,7 @@ import org.eclipse.swt.widgets.Label;
 /**
  * @noextend This class is not intended to be subclassed by clients.
  */
-public class SyncConfigToBuildConfigWizardPage extends WizardPage implements Runnable {
+public class SyncConfigToBuildConfigWizardPage extends WizardPage implements IPageChangingListener, Runnable {
 	private static final String BuildConfigSetKey = "build-config-set"; //$NON-NLS-1$
 	private static final String ConfigMapKey = "config-map"; //$NON-NLS-1$
 	private static final String SyncConfigSetKey = "sync-config-set"; //$NON-NLS-1$
@@ -50,6 +52,9 @@ public class SyncConfigToBuildConfigWizardPage extends WizardPage implements Run
 	private static final String DEFAULT_BUILD_CONFIG_ID = "default-build-config-id"; //$NON-NLS-1$
 
 	private String fConfigName;
+	
+	private Composite parentComposite;
+	private Composite composite;
 	
 	private Map<String, String> syncConfigToBuildConfigMap = new HashMap<String, String>();
 	private Map<String, String> buildConfigNameToIdMap = new HashMap<String, String>();
@@ -73,36 +78,8 @@ public class SyncConfigToBuildConfigWizardPage extends WizardPage implements Run
 	 */
 	@Override
 	public void createControl(Composite parent) {
-		final Composite composite = new Composite(parent, SWT.NONE);
-		composite.setLayout(new GridLayout(2, false));
-		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-
-		String[] syncConfigNames = this.getSyncConfigs();
-		String[] buildConfigNames = this.getBuildConfigs();
-		//TODO: Set default selections
-		for (final String sname : syncConfigNames) {
-			Label label = new Label(composite, SWT.NONE);
-			label.setText(sname);
-			final Combo combo = new Combo(composite, SWT.NONE);
-			for (String bname : buildConfigNames) {
-				combo.add(bname);
-			}
-			combo.addSelectionListener( new SelectionAdapter() {
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-					int index = combo.getSelectionIndex();
-					if (index >= 0) {
-						String buildConfigId = buildConfigNameToIdMap.get(combo.getText());
-						syncConfigToBuildConfigMap.put(sname, buildConfigId);
-					} else {
-						syncConfigToBuildConfigMap.remove(sname);
-					}
-					SyncWizardDataCache.setMap(getWizard().hashCode(), ConfigMapKey, syncConfigToBuildConfigMap);
-				}
-			});
-		}
-		setControl(composite);
-		setPageComplete(true);
+		parentComposite = parent;
+		update();
 	}
 
 	private IProject getAndValidateProject() {
@@ -121,7 +98,10 @@ public class SyncConfigToBuildConfigWizardPage extends WizardPage implements Run
 		case NEW:
 		case ADD_CDT:
 			Set<String> buildConfigsSet = SyncWizardDataCache.getMultiValueProperty(getWizard().hashCode(), BuildConfigSetKey);
-			assert buildConfigsSet != null && buildConfigsSet.size() > 0 : Messages.SyncConfigToBuildConfigWizardPage_7;
+			if (buildConfigsSet == null) {
+				return null;
+			}
+			assert buildConfigsSet.size() > 0 : Messages.SyncConfigToBuildConfigWizardPage_7;
 			return buildConfigsSet.toArray(new String[0]);
 		case ADD_SYNC:
 			IProject project = this.getAndValidateProject();
@@ -145,7 +125,10 @@ public class SyncConfigToBuildConfigWizardPage extends WizardPage implements Run
 		case NEW:
 		case ADD_SYNC:
 			Set<String> syncConfigsSet = SyncWizardDataCache.getMultiValueProperty(getWizard().hashCode(), SyncConfigSetKey);
-			assert syncConfigsSet != null && syncConfigsSet.size() > 0 : Messages.SyncConfigToBuildConfigWizardPage_2;
+			if (syncConfigsSet == null) {
+				return null;
+			}
+			assert syncConfigsSet.size() > 0 : Messages.SyncConfigToBuildConfigWizardPage_2;
 			return syncConfigsSet.toArray(new String[0]);
 		case ADD_CDT:
 			IProject project = this.getAndValidateProject();
@@ -203,6 +186,54 @@ public class SyncConfigToBuildConfigWizardPage extends WizardPage implements Run
 			SyncConfigManager.saveConfigs(project);
 		} catch (CoreException e) {
 			Activator.log(e);
+		}
+	}
+	
+	public void update() {
+		if (composite != null) {
+			composite.dispose();
+		}
+		composite = new Composite(parentComposite, SWT.NONE);
+		composite.setLayout(new GridLayout(2, false));
+		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+		String[] syncConfigNames = this.getSyncConfigs();
+		String[] buildConfigNames = this.getBuildConfigs();
+		// This will occur when the page is first added to the wizard
+		if (syncConfigNames == null || buildConfigNames == null) {
+			return;
+		}
+		//TODO: Set default selections
+		for (final String sname : syncConfigNames) {
+			Label label = new Label(composite, SWT.NONE);
+			label.setText(sname);
+			final Combo combo = new Combo(composite, SWT.NONE);
+			for (String bname : buildConfigNames) {
+				combo.add(bname);
+			}
+			combo.addSelectionListener( new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					int index = combo.getSelectionIndex();
+					if (index >= 0) {
+						String buildConfigId = buildConfigNameToIdMap.get(combo.getText());
+						syncConfigToBuildConfigMap.put(sname, buildConfigId);
+					} else {
+						syncConfigToBuildConfigMap.remove(sname);
+					}
+					SyncWizardDataCache.setMap(getWizard().hashCode(), ConfigMapKey, syncConfigToBuildConfigMap);
+				}
+			});
+		}
+		setControl(composite);
+		setPageComplete(true);
+	}
+
+	// Update page to reflect the configs in the wizard cache just before page is viewed.
+	@Override
+	public void handlePageChanging(PageChangingEvent e) {
+		if (e.getTargetPage() == this) {
+			update();
 		}
 	}
 }
