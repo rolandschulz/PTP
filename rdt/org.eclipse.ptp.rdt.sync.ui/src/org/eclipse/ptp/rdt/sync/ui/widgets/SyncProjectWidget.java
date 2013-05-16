@@ -238,6 +238,13 @@ public class SyncProjectWidget extends Composite {
 	/**
 	 * @return
 	 */
+	public String getSyncConfigName() {
+		return fSelectedParticipant.getSyncConfigName();
+	}
+
+	/**
+	 * @return
+	 */
 	public SyncFileFilter getCustomFileFilter() {
 		return fCustomFilter;
 	}

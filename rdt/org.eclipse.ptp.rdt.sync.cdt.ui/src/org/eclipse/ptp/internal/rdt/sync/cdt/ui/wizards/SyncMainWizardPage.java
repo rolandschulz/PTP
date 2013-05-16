@@ -47,9 +47,12 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.osgi.util.TextProcessor;
 import org.eclipse.ptp.internal.rdt.sync.cdt.ui.Activator;
 import org.eclipse.ptp.internal.rdt.sync.cdt.ui.messages.Messages;
+import org.eclipse.ptp.internal.rdt.sync.cdt.ui.wizards.SyncConfigToBuildConfigWizardPage.WizardMode;
+import org.eclipse.ptp.internal.rdt.sync.ui.wizards.SyncWizardDataCache;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.rdt.sync.ui.widgets.SyncProjectWidget;
@@ -99,6 +102,8 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	private static final String CLASS_NAME = "class"; //$NON-NLS-1$
 	private static final String EMPTY_STRING = ""; //$NON-NLS-1$
 	private static final int SIZING_TEXT_FIELD_WIDTH = 250;
+	private static final String syncConfigSetKey = "sync-config-set"; //$NON-NLS-1$
+	private static final String projectNameKey = "project-name"; //$NON-NLS-1$
 
 	// widgets
 	private Text projectNameField;
@@ -114,6 +119,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	private Label categorySelectedForRemoteLabel;
 	private Label categorySelectedForLocalLabel;
 	private SyncProjectWidget fSyncWidget;
+	private IWizardPage fConfigMapPage;
 
 	private SortedMap<String, IToolChain> toolChainMap;
 	private String message = null;
@@ -186,7 +192,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 					return;
 				}
 				switchTo((CWizardHandler) tis[0].getData(), (EntryDescriptor) tis[0].getData(DESC));
-				setPageComplete(validatePage());
+				update();
 				getWizard().getContainer().updateMessage();
 			}
 		});
@@ -369,7 +375,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	 */
 	@Override
 	public String getMessage() {
-		setPageComplete(validatePage()); // Necessary to update message when participant changes
+		update(); // Necessary to update message when participant changes
 		return message;
 	}
 
@@ -380,7 +386,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	 */
 	@Override
 	public int getMessageType() {
-		setPageComplete(validatePage()); // Necessary to update message when participant changes
+		update(); // Necessary to update message when participant changes
 		return messageType;
 	}
 
@@ -391,7 +397,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	 */
 	@Override
 	public String getErrorMessage() {
-		setPageComplete(validatePage()); // Necessary to update message when participant changes
+		update(); // Necessary to update message when participant changes
 		return errorMessage;
 	}
 
@@ -677,7 +683,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 
 	@Override
 	public void toolChainListChanged(int count) {
-		setPageComplete(validatePage());
+		update();
 		getWizard().getContainer().updateButtons();
 	}
 
@@ -737,7 +743,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 				if (fSyncWidget != null && (validateProjectName() || getProjectName().equals(EMPTY_STRING))) {
 					fSyncWidget.setProjectName(getProjectName());
 				}
-				setPageComplete(validatePage());
+				update();
 				getWizard().getContainer().updateMessage();
 			}
 		});
@@ -749,7 +755,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 		fSyncWidget.addListener(SWT.Modify, new Listener() {
 			@Override
 			public void handleEvent(Event e) {
-				setPageComplete(validatePage());
+				update();
 				getWizard().getContainer().updateMessage();
 			}
 		});
@@ -933,5 +939,41 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 
 	public SyncFileFilter getCustomFileFilter() {
 		return fSyncWidget.getCustomFileFilter();
+	}
+	
+	/**
+	 * Numerous tasks to refresh the page:
+	 * 1) Validate the page, which updates messages
+	 * 2) Set whether or not page is complete
+	 * 3) Store data to sync cache for other wizard pages
+	 */
+	private void update() {
+		boolean isValid = validatePage();
+		setPageComplete(isValid);
+		if (isValid) {
+			Set<String> configNamesSet = new HashSet<String>();
+			for (String name : this.getSyncConfigNames()) {
+				configNamesSet.add(name);
+			}
+			SyncWizardDataCache.setProperty(getWizard().hashCode(), projectNameKey, getProjectName());
+			SyncWizardDataCache.setMultiValueProperty(getWizard().hashCode(), syncConfigSetKey, configNamesSet);
+			// This page can only be added once 
+			if (fConfigMapPage == null) {
+				IWizard wizard = getWizard();
+				assert(wizard instanceof Wizard);
+				fConfigMapPage = new SyncConfigToBuildConfigWizardPage(WizardMode.NEW);
+				((Wizard) getWizard()).addPage(fConfigMapPage);
+			}
+		}
+	}
+	
+	private String[] getSyncConfigNames() {
+		ArrayList<String> configNames = new ArrayList<String>();
+		configNames.add("Local"); //$NON-NLS-1$
+		String remoteConfigName = fSyncWidget.getSyncConfigName();
+		if (remoteConfigName != null) {
+			configNames.add(remoteConfigName);
+		}
+		return configNames.toArray(new String[0]);
 	}
 }
