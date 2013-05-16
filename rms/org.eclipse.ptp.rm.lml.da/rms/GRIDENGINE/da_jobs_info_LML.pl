@@ -52,7 +52,7 @@ my %mapping = map { $_ => $_ } (
 
 my %nodes = get_nodes();
 my ($node_groups, $node_index, $nodes_per_group) = group_nodes();
-my %job_nodes = get_job_nodes();
+my %job_nodes = get_job_nodes(\%jobs);
 for my $jobid (keys %job_nodes) {
     my $nodelist = $job_nodes{$jobid};#E.g. (node1,10)(node2,3)
     if (should_group_nodes()) {

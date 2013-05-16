@@ -120,6 +120,8 @@ sub get_jobs {
 #                 job is running on (from qhost)
 ###############################################################################
 #
+# @param $_[0] reference to the job hash returned by get_jobs, avoids calling get_jobs() multiple times
+#
 # The returned hash has job numbers as its keys and a list of node names attached with the
 # number of cores used on each node. E.g. for one job this string could look like (node1,10)(node2,7).
 # I.e. 10 cores are used on node1 and 7 cores on node2.
@@ -127,6 +129,7 @@ sub get_jobs {
 # cores a job is assigned to on nodes with multiple cores.
 #
 sub get_job_nodes {
+    my $jobs = shift;#Reference to the job hash returned by get_jobs
     my %qhost_xml = parsexml("$cmd_nodeinfo -j -xml |");
     trimtext(\%qhost_xml);
 
@@ -192,6 +195,15 @@ sub get_job_nodes {
     for my $jobid (keys %job_hosts) {
         my $nodelist = '';
         for my $node (keys %{$job_hosts{$jobid}}) {
+            #If a job only occurs once as MASTER, count this as a one
+            if($job_hosts{$jobid}->{$node} == 0){
+            	$job_hosts{$jobid}->{$node} = 1;
+            }
+            #Check for the maximum number of total cores
+            if( defined( $jobs->{$jobid}{totalcores} ) &&
+            	 $job_hosts{$jobid}->{$node} > $jobs->{$jobid}{totalcores} ){
+            	$job_hosts{$jobid}->{$node} = $jobs->{$jobid}{totalcores};
+            }
             $nodelist .= "($node,$job_hosts{$jobid}->{$node})";
         }
         $job_hosts{$jobid} = $nodelist;
