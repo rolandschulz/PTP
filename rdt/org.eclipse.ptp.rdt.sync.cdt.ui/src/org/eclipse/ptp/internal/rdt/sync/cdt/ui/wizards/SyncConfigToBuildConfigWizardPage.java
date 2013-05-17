@@ -48,6 +48,7 @@ import org.eclipse.swt.widgets.Label;
  */
 public class SyncConfigToBuildConfigWizardPage extends WizardPage implements Runnable {
 	private static final String ConfigMapKey = "config-map"; //$NON-NLS-1$
+	private static final String ToolchainMapKey = "toolchain-map"; //$NON-NLS-1$
 	private static final String SyncConfigSetKey = "sync-config-set"; //$NON-NLS-1$
 	private static final String ProjectNameKey = "project-name"; //$NON-NLS-1$
 	private static final String DEFAULT_BUILD_CONFIG_ID = "default-build-config-id"; //$NON-NLS-1$
@@ -59,7 +60,9 @@ public class SyncConfigToBuildConfigWizardPage extends WizardPage implements Run
 	private Composite composite;
 	
 	private Map<String, String> syncConfigToBuildConfigMap = new HashMap<String, String>();
-	private Map<String, String> buildConfigNameToIdMap = new HashMap<String, String>();
+	private Map<String, String> syncConfigToToolchainMap;
+	private Map<String, String> toolchainToBuildConfigMap = new HashMap<String, String>();
+	private Map<String, String> buildConfigToIdMap = new HashMap<String, String>();
 
 	enum WizardMode {
 		NEW, ADD_SYNC, ADD_CDT
@@ -118,6 +121,10 @@ public class SyncConfigToBuildConfigWizardPage extends WizardPage implements Run
 		CfgHolder[] cfgHolders = configPage.getCfgItems(false);
 		for (CfgHolder h : cfgHolders) {
 			configNames.add(h.getName());
+			String toolchainName = h.getToolChain().getName();
+			if (toolchainName != null) {
+				toolchainToBuildConfigMap.put(toolchainName, h.getName());
+			}
 		}
 		return configNames;
 	}
@@ -143,7 +150,7 @@ public class SyncConfigToBuildConfigWizardPage extends WizardPage implements Run
 			ArrayList<String> buildConfigNames = new ArrayList<String>();
 			for (IConfiguration config : buildConfigs) {
 				buildConfigNames.add(config.getName());
-				buildConfigNameToIdMap.put(config.getName(), config.getId());
+				buildConfigToIdMap.put(config.getName(), config.getId());
 			}
 			return buildConfigNames.toArray(new String[0]);
 		default:
@@ -239,27 +246,59 @@ public class SyncConfigToBuildConfigWizardPage extends WizardPage implements Run
 		composite.setLayout(new GridLayout(2, false));
 		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
+		// Headings
+		Label syncConfigLabel = new Label(composite, SWT.CENTER);
+		syncConfigLabel.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, false, false));
+		syncConfigLabel.setText(Messages.SyncConfigToBuildConfigWizardPage_10);
+		Label buildConfigLabel = new Label(composite, SWT.CENTER);
+		buildConfigLabel.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, false, false));
+		buildConfigLabel.setText(Messages.SyncConfigToBuildConfigWizardPage_11);
+
+		// Get config information from other wizard pages
 		String[] syncConfigNames = this.getSyncConfigs();
 		String[] buildConfigNames = this.getBuildConfigs();
+		syncConfigToToolchainMap = SyncWizardDataCache.getMap(getWizard().hashCode(), ToolchainMapKey);
+		if (syncConfigToToolchainMap == null) {
+			syncConfigToToolchainMap = new HashMap<String, String>();
+		}
 		// This will occur when the page is first added to the wizard
 		if (syncConfigNames == null || buildConfigNames == null) {
 			setControl(composite);
 			return;
 		}
-		//TODO: Set default selections
+
 		for (final String sname : syncConfigNames) {
+			// Label for sync config
 			Label label = new Label(composite, SWT.NONE);
-			label.setText(sname);
-			final Combo combo = new Combo(composite, SWT.NONE);
+			label.setLayoutData(new GridData(SWT.RIGHT, SWT.FILL, false, false));
+			label.setText(sname + ":"); //$NON-NLS-1$
+			final Combo combo = new Combo(composite, SWT.READ_ONLY);
+
+			// Combo for sync config. Contains all build configs with default build config selected.
+			
+			// Find default build config if sync config has one
+			String defaultBuildConfig = "none"; //$NON-NLS-1$
+			String defaultToolchain = syncConfigToToolchainMap.get(sname);
+			if (defaultToolchain != null && toolchainToBuildConfigMap.containsKey(defaultToolchain)) {
+				defaultBuildConfig = toolchainToBuildConfigMap.get(defaultToolchain);
+			}
+			int toSelect = -1;
 			for (String bname : buildConfigNames) {
+				if (defaultBuildConfig.equals(bname)) {
+					toSelect = combo.getItemCount();
+				}
 				combo.add(bname);
 			}
+			if (toSelect > -1) {
+				combo.select(toSelect);
+			}
+
 			combo.addSelectionListener( new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
 					int index = combo.getSelectionIndex();
 					if (index >= 0) {
-						String buildConfigId = buildConfigNameToIdMap.get(combo.getText());
+						String buildConfigId = buildConfigToIdMap.get(combo.getText());
 						syncConfigToBuildConfigMap.put(sname, buildConfigId);
 					} else {
 						syncConfigToBuildConfigMap.remove(sname);

@@ -76,6 +76,7 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 	private Combo fProjectSelectionCombo;
 	private SyncProjectWidget fSyncWidget;
 	private IWizardPage nextPage;
+	private final boolean isNewProject;
 
 	/**
 	 * Creates a new wizard page for creating a new sync project.

@@ -14,8 +14,6 @@ package org.eclipse.ptp.internal.rdt.sync.cdt.ui.wizards;
 
 import java.util.Set;
 
-import org.eclipse.cdt.core.CCProjectNature;
-import org.eclipse.cdt.core.CProjectNature;
 import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
 import org.eclipse.cdt.internal.core.envvar.EnvironmentVariableManager;
 import org.eclipse.cdt.managedbuilder.core.IBuilder;
@@ -134,21 +132,6 @@ public class NewRemoteSyncProjectWizardOperation implements Runnable {
 
 		// Enable sync'ing
 		SyncManager.setSyncMode(project, SyncMode.ACTIVE);
-	}
-
-	/**
-	 * Test if given project is a CDT project.
-	 * 
-	 * @param project
-	 * @return whether a CDT project
-	 */
-	private static boolean isCDTProject(IProject project) {
-		try {
-			return (project.hasNature(CProjectNature.C_NATURE_ID) || project.hasNature(CCProjectNature.CC_NATURE_ID));
-		} catch (CoreException e) {
-			Activator.log(e);
-			return false;
-		}
 	}
 
 	/**

@@ -13,6 +13,7 @@ package org.eclipse.ptp.internal.rdt.sync.cdt.ui.wizards;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -102,8 +103,9 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	private static final String CLASS_NAME = "class"; //$NON-NLS-1$
 	private static final String EMPTY_STRING = ""; //$NON-NLS-1$
 	private static final int SIZING_TEXT_FIELD_WIDTH = 250;
-	private static final String syncConfigSetKey = "sync-config-set"; //$NON-NLS-1$
 	private static final String projectNameKey = "project-name"; //$NON-NLS-1$
+	private static final String syncConfigSetKey = "sync-config-set"; //$NON-NLS-1$
+	private static final String toolChainMapKey = "toolchain-map"; //$NON-NLS-1$
 
 	// widgets
 	private Text projectNameField;
@@ -957,6 +959,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 			}
 			SyncWizardDataCache.setProperty(getWizard().hashCode(), projectNameKey, getProjectName());
 			SyncWizardDataCache.setMultiValueProperty(getWizard().hashCode(), syncConfigSetKey, configNamesSet);
+			SyncWizardDataCache.setMap(getWizard().hashCode(), toolChainMapKey, this.getSyncConfigToToolChainMap());
 			// This page can only be added once 
 			if (fConfigMapPage == null) {
 				IWizard wizard = getWizard();
@@ -975,5 +978,32 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 			configNames.add(remoteConfigName);
 		}
 		return configNames.toArray(new String[0]);
+	}
+
+	/**
+	 * Defines the default mapping of sync configurations to tool chains
+	 * @return map
+	 */
+	private Map<String, String> getSyncConfigToToolChainMap() {
+		Map<String, String> syncConfigToToolChainMap = new HashMap<String, String>();
+
+		String defaultLocalToolChainName = null;
+		if (localToolChainTable.getSelectionCount() > 0) {
+			defaultLocalToolChainName = localToolChainTable.getSelection()[0].getText();
+		}
+		String defaultRemoteToolChainName = null;
+		if (remoteToolChainTable.getSelectionCount() > 0) {
+			defaultRemoteToolChainName = remoteToolChainTable.getSelection()[0].getText();
+		}
+
+		for (String syncConfigName : getSyncConfigNames()) {
+			if (syncConfigName.equals("Local") && defaultLocalToolChainName != null) { //$NON-NLS-1$
+				syncConfigToToolChainMap.put(syncConfigName, defaultLocalToolChainName);
+			} else if (defaultRemoteToolChainName != null) {
+				syncConfigToToolChainMap.put(syncConfigName, defaultRemoteToolChainName);
+			}
+		}
+		
+		return syncConfigToToolChainMap;
 	}
 }
