@@ -17,20 +17,6 @@
              	%syncProject.desc
          	</description>
       </wizard>
-      <wizard
-            category="org.eclipse.ptp.rdt.ui.wizardCategory.Remote"
-            class="org.eclipse.ptp.internal.rdt.sync.cdt.ui.wizards.ConvertCToSyncCProjectWizard"
-            hasPages="true"
-            icon="icons/obj16/convert-normal.gif"
-            id="org.eclipse.ptp.rdt.sync.cdt.ui.convertCToSyncCProjectWizard"
-            name="%WizardConvertSyncProjectToSyncC.name">
-         <description>
-            %WizardConvertSyncProjectToSyncC.description
-         </description>
-         <selection
-            class="org.eclipse.core.resources.IProject">
-         </selection>
-      </wizard>
    </extension>
    <extension
          point="org.eclipse.ui.navigator.navigatorContent">
