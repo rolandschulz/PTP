@@ -408,6 +408,8 @@ sub modify {
     if(($mkey eq "bgp_state")) {
 		$ret=~s/\<unknown\>/unknown/gs;
     }
+    
+    $ret=~s/\&/\&amp;/gs;
 
     return($ret);
 }
