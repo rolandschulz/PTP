@@ -25,6 +25,9 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.IPageChangingListener;
 import org.eclipse.jface.dialogs.PageChangingEvent;
+import org.eclipse.jface.wizard.IWizard;
+import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.ptp.internal.rdt.sync.cdt.core.Activator;
 import org.eclipse.ptp.internal.rdt.sync.cdt.ui.messages.Messages;
@@ -39,12 +42,13 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
 /**
  * @noextend This class is not intended to be subclassed by clients.
  */
-public class SyncConfigToBuildConfigWizardPage extends WizardPage implements IPageChangingListener, Runnable {
+public class SyncConfigToBuildConfigWizardPage extends WizardPage implements Runnable {
 	private static final String BuildConfigSetKey = "build-config-set"; //$NON-NLS-1$
 	private static final String ConfigMapKey = "config-map"; //$NON-NLS-1$
 	private static final String SyncConfigSetKey = "sync-config-set"; //$NON-NLS-1$
@@ -68,7 +72,8 @@ public class SyncConfigToBuildConfigWizardPage extends WizardPage implements IPa
 		super("CDT SyncConfigToBuildConfigWizardPage"); //$NON-NLS-1$
 		wizardMode = mode;
 		setTitle(Messages.SyncConfigToBuildConfigWizardPage_0); 
-		setDescription(Messages.SyncConfigToBuildConfigWizardPage_1); 
+		setDescription(Messages.SyncConfigToBuildConfigWizardPage_1);
+		setPageComplete(true);
 	}
 
 	/*
@@ -188,7 +193,13 @@ public class SyncConfigToBuildConfigWizardPage extends WizardPage implements IPa
 			Activator.log(e);
 		}
 	}
-	
+
+	@Override
+	public void setVisible(boolean isVisible) {
+		update();
+		super.setVisible(isVisible);
+	}
+
 	public void update() {
 		if (composite != null) {
 			composite.dispose();
@@ -201,6 +212,7 @@ public class SyncConfigToBuildConfigWizardPage extends WizardPage implements IPa
 		String[] buildConfigNames = this.getBuildConfigs();
 		// This will occur when the page is first added to the wizard
 		if (syncConfigNames == null || buildConfigNames == null) {
+			setControl(composite);
 			return;
 		}
 		//TODO: Set default selections
@@ -226,14 +238,5 @@ public class SyncConfigToBuildConfigWizardPage extends WizardPage implements IPa
 			});
 		}
 		setControl(composite);
-		setPageComplete(true);
-	}
-
-	// Update page to reflect the configs in the wizard cache just before page is viewed.
-	@Override
-	public void handlePageChanging(PageChangingEvent e) {
-		if (e.getTargetPage() == this) {
-			update();
-		}
 	}
 }
