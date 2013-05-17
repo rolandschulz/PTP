@@ -12,6 +12,7 @@ package org.eclipse.ptp.internal.rdt.sync.cdt.ui.wizards;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,14 +21,12 @@ import org.eclipse.cdt.core.CProjectNature;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
+import org.eclipse.cdt.managedbuilder.ui.wizards.CDTConfigWizardPage;
+import org.eclipse.cdt.managedbuilder.ui.wizards.CfgHolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.dialogs.IPageChangingListener;
-import org.eclipse.jface.dialogs.PageChangingEvent;
-import org.eclipse.jface.wizard.IWizard;
-import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.ptp.internal.rdt.sync.cdt.core.Activator;
 import org.eclipse.ptp.internal.rdt.sync.cdt.ui.messages.Messages;
@@ -42,18 +41,17 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
 /**
  * @noextend This class is not intended to be subclassed by clients.
  */
 public class SyncConfigToBuildConfigWizardPage extends WizardPage implements Runnable {
-	private static final String BuildConfigSetKey = "build-config-set"; //$NON-NLS-1$
 	private static final String ConfigMapKey = "config-map"; //$NON-NLS-1$
 	private static final String SyncConfigSetKey = "sync-config-set"; //$NON-NLS-1$
 	private static final String ProjectNameKey = "project-name"; //$NON-NLS-1$
 	private static final String DEFAULT_BUILD_CONFIG_ID = "default-build-config-id"; //$NON-NLS-1$
+	public static final String CDT_CONFIG_PAGE_ID = "org.eclipse.cdt.managedbuilder.ui.wizard.CConfigWizardPage"; //$NON-NLS-1$
 
 	private String fConfigName;
 	
@@ -89,7 +87,9 @@ public class SyncConfigToBuildConfigWizardPage extends WizardPage implements Run
 
 	private IProject getAndValidateProject() {
 		String projectName = SyncWizardDataCache.getProperty(getWizard().hashCode(), ProjectNameKey);
-		assert projectName != null : Messages.SyncConfigToBuildConfigWizardPage_3;
+		if (projectName == null) {
+			return null;
+		}
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 		assert project != null : Messages.SyncConfigToBuildConfigWizardPage_4 + projectName;
 		return project;
@@ -97,12 +97,36 @@ public class SyncConfigToBuildConfigWizardPage extends WizardPage implements Run
 	public String getBuildConfiguration() {
 		return fConfigName;
 	}
-	
+
+	private CDTConfigWizardPage findCDTConfigPage() {
+		for (IWizardPage page = getPreviousPage(); page != null; page = page.getPreviousPage()) {
+			if (page instanceof CDTConfigWizardPage) {
+				return (CDTConfigWizardPage) page;
+			}
+		}
+		return null;
+	}
+
+	private Set<String> getBuildConfigNames() {
+		CDTConfigWizardPage configPage = findCDTConfigPage();
+		if (configPage == null) {
+			Activator.log(Messages.SyncConfigToBuildConfigWizardPage_8);
+			return new HashSet<String>();
+		}
+
+		Set<String> configNames = new HashSet<String>();
+		CfgHolder[] cfgHolders = configPage.getCfgItems(false);
+		for (CfgHolder h : cfgHolders) {
+			configNames.add(h.getName());
+		}
+		return configNames;
+	}
+
 	private String[] getBuildConfigs() {
 		switch (wizardMode) {
 		case NEW:
 		case ADD_CDT:
-			Set<String> buildConfigsSet = SyncWizardDataCache.getMultiValueProperty(getWizard().hashCode(), BuildConfigSetKey);
+			Set<String> buildConfigsSet = getBuildConfigNames();
 			if (buildConfigsSet == null) {
 				return null;
 			}
@@ -110,6 +134,9 @@ public class SyncConfigToBuildConfigWizardPage extends WizardPage implements Run
 			return buildConfigsSet.toArray(new String[0]);
 		case ADD_SYNC:
 			IProject project = this.getAndValidateProject();
+			if (project == null) {
+				return null;
+			}
 			assert isCDTProject(project) : Messages.SyncConfigToBuildConfigWizardPage_5 + project.getName();
 			IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
 			IConfiguration[] buildConfigs = buildInfo.getManagedProject().getConfigurations();		
@@ -137,6 +164,9 @@ public class SyncConfigToBuildConfigWizardPage extends WizardPage implements Run
 			return syncConfigsSet.toArray(new String[0]);
 		case ADD_CDT:
 			IProject project = this.getAndValidateProject();
+			if (project == null) {
+				return null;
+			}
 			assert isSyncProject(project) : Messages.SyncConfigToBuildConfigWizardPage_5 + project.getName();
 			SyncConfig[] syncConfigs = SyncConfigManager.getConfigs(project);
 			ArrayList<String> syncConfigNames = new ArrayList<String>();
@@ -176,6 +206,7 @@ public class SyncConfigToBuildConfigWizardPage extends WizardPage implements Run
 	@Override
 	public void run() {
 		IProject project = this.getAndValidateProject();
+		assert project != null : Messages.SyncConfigToBuildConfigWizardPage_9;
 		assert isSyncProject(project) && isCDTProject(project) : Messages.SyncConfigToBuildConfigWizardPage_5 + project.getName();
 
 		Map<String, String> configMap = SyncWizardDataCache.getMap(getWizard().hashCode(), ConfigMapKey);
@@ -238,5 +269,6 @@ public class SyncConfigToBuildConfigWizardPage extends WizardPage implements Run
 			});
 		}
 		setControl(composite);
+		parentComposite.layout(true, true);
 	}
 }

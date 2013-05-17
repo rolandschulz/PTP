@@ -1,18 +1,15 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010, 2013 IBM Corporation and others.
+ * Copyright (c) 2013 Oak Ridge National Laboratory and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- * IBM - Initial API and implementation
- * Roland Schulz, University of Tennessee
- * John Eblen, Oak Ridge National Laboratory
+ *     John Eblen - initial implementation
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.sync.cdt.ui.wizards;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,21 +25,20 @@ import org.eclipse.ptp.internal.rdt.sync.cdt.ui.wizards.SyncConfigToBuildConfigW
 import org.eclipse.ptp.internal.rdt.sync.ui.wizards.SyncWizardDataCache;
 
 /**
- * A wizard for creating new Synchronized C/C++ or Fortran Projects
- * <strong>EXPERIMENTAL</strong>. This class or interface has been added as part
- * of a work in progress. There is no guarantee that this API will work or that
- * it will remain the same. Please do not use this API without consulting with
- * the RDT team.
+ * Class to convert generic synchronized projects to Synchronized C/C++ projects.
+ * This simply subclasses the normal CDT conversion wizard in order to add the page for mapping sync configs and build configs.
+ * It also stores the data this page needs on finish. 
  */
-public class ConvertLocalToSyncProjectWizard extends ConversionWizard {
+public class ConvertCToSyncCProjectWizard extends ConversionWizard {
 	private static final String BuildConfigSetKey = "build-config-set"; //$NON-NLS-1$
-	private static final String wz_title = Messages.ConvertLocalToSyncProjectWizard_0;
-	private static final String wz_desc = Messages.ConvertLocalToSyncProjectWizard_1;
+	private static final String ProjectNameKey = "project-name"; //$NON-NLS-1$
+	private static final String wz_title = Messages.ConvertCToSyncCProjectWizard_0;
+	private static final String wz_desc = Messages.ConvertCToSyncCProjectWizard_1;
 
 	/**
 	 * 
 	 */
-	public ConvertLocalToSyncProjectWizard() {
+	public ConvertCToSyncCProjectWizard() {
 		super(wz_title, wz_desc);
 	}
 
@@ -72,9 +68,10 @@ public class ConvertLocalToSyncProjectWizard extends ConversionWizard {
     	}
 
     	IProject project = this.getNewProject();
-    	assert project != null : Messages.ConvertLocalToSyncProjectWizard_2;
+    	SyncWizardDataCache.setProperty(this.hashCode(), ProjectNameKey, project.getName());
+    	assert project != null : Messages.ConvertCToSyncCProjectWizard_2;
 		IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
-		assert buildInfo != null : Messages.ConvertLocalToSyncProjectWizard_3 + project.getName();
+		assert buildInfo != null : Messages.ConvertCToSyncCProjectWizard_3 + project.getName();
 		IConfiguration[] buildConfigs = buildInfo.getManagedProject().getConfigurations();		
 		Set<String> buildConfigNames = new HashSet<String>();
 		for (IConfiguration config : buildConfigs) {
