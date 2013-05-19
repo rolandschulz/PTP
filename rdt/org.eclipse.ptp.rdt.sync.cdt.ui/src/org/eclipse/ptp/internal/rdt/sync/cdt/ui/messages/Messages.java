@@ -24,6 +24,7 @@ public class Messages extends NLS {
 	public static String NewRemoteSyncProjectWizard_title;
 	public static String NewRemoteSyncProjectWizardOperation_0;
 	public static String NewRemoteSyncProjectWizardOperation_1;
+	public static String NewRemoteSyncProjectWizardOperation_2;
 	public static String NewRemoteSyncProjectWizardPage_0;
 	public static String NewRemoteSyncProjectWizardPage_syncProvider;
 	public static String WizardProjectConversion_windowLabel;

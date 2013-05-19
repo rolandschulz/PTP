@@ -61,7 +61,6 @@ public class SyncConfigToBuildConfigWizardPage extends WizardPage {
 	private Map<String, String> syncConfigToBuildConfigMap = new HashMap<String, String>();
 	private Map<String, String> syncConfigToToolchainMap;
 	private Map<String, String> toolchainToBuildConfigMap = new HashMap<String, String>();
-	private Map<String, String> buildConfigToIdMap = new HashMap<String, String>();
 
 	enum WizardMode {
 		NEW, ADD_SYNC, ADD_CDT
@@ -124,7 +123,6 @@ public class SyncConfigToBuildConfigWizardPage extends WizardPage {
 			if (toolchainName != null) {
 				toolchainToBuildConfigMap.put(toolchainName, h.getName());
 			}
-			buildConfigToIdMap.put(h.getName(), h.getConfiguration().getId());
 		}
 		return configNames;
 	}
@@ -150,7 +148,6 @@ public class SyncConfigToBuildConfigWizardPage extends WizardPage {
 			ArrayList<String> buildConfigNames = new ArrayList<String>();
 			for (IConfiguration config : buildConfigs) {
 				buildConfigNames.add(config.getName());
-				buildConfigToIdMap.put(config.getName(), config.getId());
 			}
 			return buildConfigNames.toArray(new String[0]);
 		default:
@@ -280,8 +277,7 @@ public class SyncConfigToBuildConfigWizardPage extends WizardPage {
 				public void widgetSelected(SelectionEvent e) {
 					int index = combo.getSelectionIndex();
 					if (index >= 0) {
-						String buildConfigId = buildConfigToIdMap.get(combo.getText());
-						syncConfigToBuildConfigMap.put(sname, buildConfigId);
+						syncConfigToBuildConfigMap.put(sname, combo.getText());
 					} else {
 						syncConfigToBuildConfigMap.remove(sname);
 					}

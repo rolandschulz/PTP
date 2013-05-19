@@ -116,8 +116,10 @@ public class NewRemoteSyncProjectWizardOperation implements Runnable {
 		for (SyncConfig config : allSyncConfigs) {
 			if (configMap.containsKey(config.getName())) {
 				// Before project creation, wizard pages can only store the base build config id
-				String baseBuildConfigId = configMap.get(config.getName());
-				defaultBuildConfig = findBuildConfigFromBaseId(baseBuildConfigId, allBuildConfigs);
+				String buildConfigName = configMap.get(config.getName());
+				buildConfigName = buildConfigName.replace(' ', '_');
+				defaultBuildConfig = findBuildConfigByName(buildConfigName, allBuildConfigs);
+				assert defaultBuildConfig != null : Messages.NewRemoteSyncProjectWizardOperation_2 + buildConfigName;
 			} else if (SyncConfigManager.isLocal(config)) {
 				defaultBuildConfig = defaultLocalBuildConfig;
 			} else {
@@ -162,9 +164,9 @@ public class NewRemoteSyncProjectWizardOperation implements Runnable {
 		
 	}
 	
-	private static IConfiguration findBuildConfigFromBaseId(String baseId, IConfiguration[] configArray) {
+	private static IConfiguration findBuildConfigByName(String name, IConfiguration[] configArray) {
 		for (IConfiguration config : configArray) {
-			if (config.getId().startsWith(baseId)) {
+			if (config.getName().equals(name)) {
 				return config;
 			}
 		}

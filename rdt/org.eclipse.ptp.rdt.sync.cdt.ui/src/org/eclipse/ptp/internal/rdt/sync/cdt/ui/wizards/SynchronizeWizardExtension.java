@@ -51,6 +51,15 @@ public class SynchronizeWizardExtension extends AbstractSynchronizeWizardExtensi
 		return fWizardPage;
 	}
 
+	private static IConfiguration findBuildConfigByName(String name, IConfiguration[] configArray) {
+		for (IConfiguration config : configArray) {
+			if (config.getName().equals(name)) {
+				return config;
+			}
+		}
+		return null;
+	}
+
     private IProject getAndValidateProject() {
         String projectName = SyncWizardDataCache.getProperty(ProjectNameKey);
         if (projectName == null) {
@@ -95,20 +104,21 @@ public class SynchronizeWizardExtension extends AbstractSynchronizeWizardExtensi
 
         Map<String, String> configMap = SyncWizardDataCache.getMap(ConfigMapKey);
         SyncConfig[] allSyncConfigs = SyncConfigManager.getConfigs(project);
+        IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
+        IConfiguration[] allBuildConfigs = buildInfo.getManagedProject().getConfigurations();
         for (SyncConfig config : allSyncConfigs) {
-            String defaultBuildConfigId = configMap.get(config.getName());
-            if (defaultBuildConfigId != null) {
-                config.setProperty(DEFAULT_BUILD_CONFIG_ID, defaultBuildConfigId);
-                if (SyncConfigManager.isActive(project, config)) {
-                	IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
-                	IConfiguration defaultBuildConfig = buildInfo.getManagedProject().getConfiguration(defaultBuildConfigId);
-                	if (defaultBuildConfig != null) {
-                		ManagedBuildManager.setDefaultConfiguration(project, defaultBuildConfig);
-                	} else {
-                		Activator.getDefault().logErrorMessage(Messages.SynchronizeWizardExtension_2);
-                	}
-                }
-            }
+        	String defaultBuildConfigName = configMap.get(config.getName());
+        	if (defaultBuildConfigName != null) {
+        		IConfiguration defaultBuildConfig = findBuildConfigByName(defaultBuildConfigName, allBuildConfigs);
+        		if (defaultBuildConfig != null) {
+        			config.setProperty(DEFAULT_BUILD_CONFIG_ID, defaultBuildConfig.getId());
+        			if (SyncConfigManager.isActive(project, config)) {
+        				ManagedBuildManager.setDefaultConfiguration(project, defaultBuildConfig);
+        			}
+        		} else {
+        			Activator.getDefault().logErrorMessage(Messages.SynchronizeWizardExtension_2 + defaultBuildConfigName);
+        		}
+        	}
         }
 
         try {
