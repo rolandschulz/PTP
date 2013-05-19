@@ -26,6 +26,7 @@ import org.eclipse.ptp.internal.rdt.sync.cdt.ui.Activator;
 import org.eclipse.ptp.internal.rdt.sync.cdt.ui.SyncPluginImages;
 import org.eclipse.ptp.internal.rdt.sync.cdt.ui.messages.Messages;
 import org.eclipse.ptp.internal.rdt.sync.ui.handlers.CommonSyncExceptionHandler;
+import org.eclipse.ptp.internal.rdt.sync.ui.wizards.SyncWizardDataCache;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
@@ -43,12 +44,15 @@ public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
 	private static final String PREFIX = "CProjectWizard"; //$NON-NLS-1$
 	private static final String wz_title = Messages.NewRemoteSyncProjectWizard_title;
 	private static final String wz_desc = Messages.NewRemoteSyncProjectWizard_description;
+	private static final String IsSyncWizardKey = "is-sync-wizard"; //$NON-NLS-1$
 
 	/**
 	 * 
 	 */
 	public NewRemoteSyncProjectWizard() {
 		super(wz_title, wz_desc);
+		SyncWizardDataCache.clearProperties();
+		SyncWizardDataCache.setProperty(IsSyncWizardKey, "true"); //$NON-NLS-1$
 	}
 
 	/*
@@ -62,6 +66,8 @@ public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
 		fMainPage.setTitle(wz_title);
 		fMainPage.setDescription(wz_desc);
 		addPage(fMainPage);
+//		IWizardPage configMapPage = new SyncConfigToBuildConfigWizardPage(WizardMode.NEW);
+//		addPage(configMapPage);
 	}
 
 	/*

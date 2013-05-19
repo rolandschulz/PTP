@@ -12,10 +12,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.sync.cdt.ui.wizards;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.cdt.core.CCProjectNature;
-import org.eclipse.cdt.core.CProjectNature;
 import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
 import org.eclipse.cdt.internal.core.envvar.EnvironmentVariableManager;
 import org.eclipse.cdt.managedbuilder.core.IBuilder;
@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.internal.rdt.sync.cdt.ui.Activator;
 import org.eclipse.ptp.internal.rdt.sync.cdt.ui.messages.Messages;
+import org.eclipse.ptp.internal.rdt.sync.ui.wizards.SyncWizardDataCache;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
@@ -38,9 +39,10 @@ import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 /**
  * Static class that houses the function ("run") for initializing a new synchronized project.
  */
-public class NewRemoteSyncProjectWizardOperation {
+public class NewRemoteSyncProjectWizardOperation implements Runnable {
 	private static final String DEFAULT_BUILD_CONFIG_ID = "default-build-config-id"; //$NON-NLS-1$
 	private static final String SYNC_BUILDER_CLASS = "org.eclipse.ptp.rdt.sync.cdt.core.SyncBuilder"; //$NON-NLS-1$
+	private static final String ConfigMapKey = "config-map"; //$NON-NLS-1$
 
 	/**
 	 * Does the actual initialization of a new synchronized project.
@@ -96,7 +98,8 @@ public class NewRemoteSyncProjectWizardOperation {
 		// Add elements for a sync project
 		if (!isSyncProject(project)) {
 			try {
-				SyncManager.makeSyncProject(project, participant.getProvider(project), customFileFilter);
+				SyncManager.makeSyncProject(project, participant.getSyncConfigName(), participant.getProvider(project),
+						customFileFilter);
 			} catch (CoreException e) {
 				Activator.log(e);
 				return;
@@ -104,10 +107,20 @@ public class NewRemoteSyncProjectWizardOperation {
 		}
 
 		// Set active build config and the default build config for each sync config
+		Map<String, String> configMap = SyncWizardDataCache.getMap(ConfigMapKey);
+		if (configMap == null) {
+			configMap = new HashMap<String, String>();
+		}
 		IConfiguration defaultBuildConfig;
 		SyncConfig[] allSyncConfigs = SyncConfigManager.getConfigs(project);
 		for (SyncConfig config : allSyncConfigs) {
-			if (SyncConfigManager.isLocal(config)) {
+			if (configMap.containsKey(config.getName())) {
+				// Before project creation, wizard pages can only store the base build config id
+				String buildConfigName = configMap.get(config.getName());
+				buildConfigName = buildConfigName.replace(' ', '_');
+				defaultBuildConfig = findBuildConfigByName(buildConfigName, allBuildConfigs);
+				assert defaultBuildConfig != null : Messages.NewRemoteSyncProjectWizardOperation_2 + buildConfigName;
+			} else if (SyncConfigManager.isLocal(config)) {
 				defaultBuildConfig = defaultLocalBuildConfig;
 			} else {
 				defaultBuildConfig = defaultRemoteBuildConfig;
@@ -136,21 +149,6 @@ public class NewRemoteSyncProjectWizardOperation {
 	}
 
 	/**
-	 * Test if given project is a CDT project.
-	 * 
-	 * @param project
-	 * @return whether a CDT project
-	 */
-	private static boolean isCDTProject(IProject project) {
-		try {
-			return (project.hasNature(CProjectNature.C_NATURE_ID) || project.hasNature(CCProjectNature.CC_NATURE_ID));
-		} catch (CoreException e) {
-			Activator.log(e);
-			return false;
-		}
-	}
-
-	/**
 	 * Test if given project is a synchronized project
 	 * 
 	 * @param project
@@ -158,5 +156,20 @@ public class NewRemoteSyncProjectWizardOperation {
 	 */
 	private static boolean isSyncProject(IProject project) {
 		return RemoteSyncNature.hasNature(project);
+	}
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	private static IConfiguration findBuildConfigByName(String name, IConfiguration[] configArray) {
+		for (IConfiguration config : configArray) {
+			if (config.getName().equals(name)) {
+				return config;
+			}
+		}
+		return null;
 	}
 }

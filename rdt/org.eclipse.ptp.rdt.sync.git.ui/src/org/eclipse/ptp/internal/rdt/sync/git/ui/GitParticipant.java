@@ -223,6 +223,11 @@ public class GitParticipant extends AbstractSynchronizeParticipant {
 		return service;
 	}
 
+	@Override
+	public String getSyncConfigName() {
+		return fSelectedConnection.getName();
+	}
+
 	/**
 	 * @return
 	 */

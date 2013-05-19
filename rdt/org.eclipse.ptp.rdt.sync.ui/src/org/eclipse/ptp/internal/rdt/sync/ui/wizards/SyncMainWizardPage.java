@@ -12,6 +12,9 @@ package org.eclipse.ptp.internal.rdt.sync.ui.wizards;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -22,11 +25,16 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.wizard.IWizard;
+import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ptp.internal.rdt.sync.ui.RDTSyncUIPlugin;
+import org.eclipse.ptp.internal.rdt.sync.ui.SynchronizeWizardExtensionRegistry;
 import org.eclipse.ptp.internal.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
+import org.eclipse.ptp.rdt.sync.ui.ISynchronizeWizardExtension;
 import org.eclipse.ptp.rdt.sync.ui.widgets.SyncProjectWidget;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -57,6 +65,8 @@ import org.eclipse.ui.internal.ide.IIDEHelpContextIds;
 public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 	private static final int SIZING_TEXT_FIELD_WIDTH = 250;
 	private static final String EMPTY_STRING = ""; //$NON-NLS-1$
+	private static final String syncConfigSetKey = "sync-config-set"; //$NON-NLS-1$
+	private static final String projectNameKey = "project-name"; //$NON-NLS-1$
 
 	private String message;
 	private int messageType = IMessageProvider.NONE;
@@ -65,6 +75,8 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 	private Text fProjectNameText;
 	private Combo fProjectSelectionCombo;
 	private SyncProjectWidget fSyncWidget;
+	private ISynchronizeWizardExtension extension;
+	private IWizardPage extWizardPage;
 	private final boolean isNewProject;
 
 	/**
@@ -132,7 +144,7 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 		fSyncWidget.addListener(SWT.Modify, new Listener() {
 			@Override
 			public void handleEvent(Event e) {
-				setPageComplete(validatePage());
+				update();
 				getWizard().getContainer().updateMessage();
 			}
 		});
@@ -173,8 +185,9 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 			public void widgetSelected(SelectionEvent arg0) {
 				if (fSyncWidget != null && (validateProjectName() || getProjectName().equals(EMPTY_STRING))) {
 					fSyncWidget.setProjectName(getProjectName());
+					handleProjectSelected(getProject());
 				}
-				setPageComplete(validatePage());
+				update();
 				getWizard().getContainer().updateMessage();
 			}
 		});
@@ -211,10 +224,23 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 				if (fSyncWidget != null && (validateProjectName() || getProjectName().equals(EMPTY_STRING))) {
 					fSyncWidget.setProjectName(getProjectName());
 				}
-				setPageComplete(validatePage());
+				update();
 				getWizard().getContainer().updateMessage();
 			}
 		});
+	}
+
+	/**
+	 * Returns the currently selected project.
+	 * This only works for project conversion. For new projects, this function always returns null.
+	 * @return project
+	 */
+	public IProject getProject() {
+		if (isNewProject) {
+			return null;
+		} else {
+			return ResourcesPlugin.getWorkspace().getRoot().getProject(getProjectName());
+		}
 	}
 
 	/**
@@ -251,7 +277,7 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 	 */
 	@Override
 	public String getErrorMessage() {
-		setPageComplete(validatePage()); // Necessary to update message when participant changes
+		update(); // Necessary to update message when participant changes
 		return errorMessage;
 	}
 
@@ -287,7 +313,7 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 	 */
 	@Override
 	public String getMessage() {
-		setPageComplete(validatePage()); // Necessary to update message when participant changes
+		update(); // Necessary to update message when participant changes
 		return message;
 	}
 
@@ -298,8 +324,27 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 	 */
 	@Override
 	public int getMessageType() {
-		setPageComplete(validatePage()); // Necessary to update message when participant changes
+		update(); // Necessary to update message when participant changes
 		return messageType;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.wizard.WizardPage#getNextPage()
+	 */
+	@Override
+	public IWizardPage getNextPage() {
+		return extWizardPage;
+	}
+
+	private String[] getSyncConfigNames() {
+		ArrayList<String> configNames = new ArrayList<String>();
+		configNames.add("Local"); //$NON-NLS-1$
+		String remoteConfigName = fSyncWidget.getSyncConfigName();
+		if (remoteConfigName != null) {
+			configNames.add(remoteConfigName);
+		}
+		return configNames.toArray(new String[0]);
 	}
 
 	/**
@@ -311,6 +356,30 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 		return fSyncWidget.getSynchronizeParticipant();
 	}
 
+	/**
+	 * Get the extension wizard page if any
+	 * @return page or null if no extension page
+	 */
+	public ISynchronizeWizardExtension getExtension() {
+		return extension;
+	}
+
+	/**
+	 * Add any extended wizard pages for the given project type
+	 * @param project
+	 */
+	private void handleProjectSelected(IProject project) {
+		ISynchronizeWizardExtension ext = SynchronizeWizardExtensionRegistry.getSynchronizeWizardExtensionForProject(project);
+		if (ext == null) {
+			extWizardPage = null;
+		} else {
+			extension = ext;
+			extWizardPage = ext.createConvertProjectWizardPage();
+			IWizard wizard = getWizard();
+			assert(wizard instanceof Wizard);
+			((Wizard) wizard).addPage(extWizardPage);
+		}
+	}
 	private void populateProjectCombo() {
 		IProject[] allProjects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 		for (IProject p : allProjects) {
@@ -342,6 +411,25 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 			} else {
 				fProjectSelectionCombo.setFocus();
 			}
+		}
+	}
+
+	/**
+	 * Numerous tasks to refresh the page:
+	 * 1) Validate the page, which updates messages
+	 * 2) Set whether or not page is complete
+	 * 3) Store data to sync cache for other wizard pages
+	 */
+	private void update() {
+		boolean isValid = validatePage();
+		setPageComplete(isValid);
+		if (isValid) {
+			Set<String> configNamesSet = new HashSet<String>();
+			for (String name : this.getSyncConfigNames()) {
+				configNamesSet.add(name);
+			}
+			SyncWizardDataCache.setProperty(projectNameKey, getProjectName());
+			SyncWizardDataCache.setMultiValueProperty(syncConfigSetKey, configNamesSet);
 		}
 	}
 
