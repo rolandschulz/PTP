@@ -133,7 +133,6 @@
            point="org.eclipse.cdt.managedbuilder.ui.newWizardPages">
         <wizardPage
               ID="org.eclipse.ptp.internal.rdt.sync.cdt.ui.wizards.SyncConfigToBuildConfigWizardPage"
-              operationClass="org.eclipse.ptp.internal.rdt.sync.cdt.ui.wizards.SyncConfigToBuildConfigWizardPageProxy"
               pageClass="org.eclipse.ptp.internal.rdt.sync.cdt.ui.wizards.SyncConfigToBuildConfigWizardPageProxy">
         </wizardPage>
      </extension>

@@ -43,6 +43,7 @@ public class Messages extends NLS {
 	public static String SyncConfigToBuildConfigWizardPage_1;
 	public static String SyncConfigToBuildConfigWizardPage_10;
 	public static String SyncConfigToBuildConfigWizardPage_11;
+	public static String SyncConfigToBuildConfigWizardPage_12;
 	public static String SyncConfigToBuildConfigWizardPage_2;
 	public static String SyncConfigToBuildConfigWizardPage_3;
 	public static String SyncConfigToBuildConfigWizardPage_4;
@@ -53,6 +54,8 @@ public class Messages extends NLS {
 	public static String SyncConfigToBuildConfigWizardPage_9;
 	public static String SynchronizeProperties_0;
 	public static String SynchronizeProperties_Default_configuration;
+	public static String SynchronizeWizardExtension_0;
+	public static String SynchronizeWizardExtension_1;
 	public static String SyncMainWizardPage_0;
 	public static String SyncMainWizardPage_1;
 	public static String SyncMainWizardPage_10;

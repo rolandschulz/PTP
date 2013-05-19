@@ -75,7 +75,8 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 	private Text fProjectNameText;
 	private Combo fProjectSelectionCombo;
 	private SyncProjectWidget fSyncWidget;
-	private IWizardPage nextPage;
+	private ISynchronizeWizardExtension extension;
+	private IWizardPage extWizardPage;
 	private final boolean isNewProject;
 
 	/**
@@ -333,7 +334,7 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 	 */
 	@Override
 	public IWizardPage getNextPage() {
-		return nextPage;
+		return extWizardPage;
 	}
 
 	private String[] getSyncConfigNames() {
@@ -356,18 +357,27 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 	}
 
 	/**
+	 * Get the extension wizard page if any
+	 * @return page or null if no extension page
+	 */
+	public ISynchronizeWizardExtension getExtension() {
+		return extension;
+	}
+
+	/**
 	 * Add any extended wizard pages for the given project type
 	 * @param project
 	 */
 	private void handleProjectSelected(IProject project) {
 		ISynchronizeWizardExtension ext = SynchronizeWizardExtensionRegistry.getSynchronizeWizardExtensionForProject(project);
 		if (ext == null) {
-			nextPage = null;
+			extWizardPage = null;
 		} else {
-			nextPage = ext.createConvertProjectWizardPage();
+			extension = ext;
+			extWizardPage = ext.createConvertProjectWizardPage();
 			IWizard wizard = getWizard();
 			assert(wizard instanceof Wizard);
-			((Wizard) wizard).addPage(nextPage);
+			((Wizard) wizard).addPage(extWizardPage);
 		}
 	}
 	private void populateProjectCombo() {
@@ -418,8 +428,8 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 			for (String name : this.getSyncConfigNames()) {
 				configNamesSet.add(name);
 			}
-			SyncWizardDataCache.setProperty(getWizard().hashCode(), projectNameKey, getProjectName());
-			SyncWizardDataCache.setMultiValueProperty(getWizard().hashCode(), syncConfigSetKey, configNamesSet);
+			SyncWizardDataCache.setProperty(projectNameKey, getProjectName());
+			SyncWizardDataCache.setMultiValueProperty(syncConfigSetKey, configNamesSet);
 		}
 	}
 

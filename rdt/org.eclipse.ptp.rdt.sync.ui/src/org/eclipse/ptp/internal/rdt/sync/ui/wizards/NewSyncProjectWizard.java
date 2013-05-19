@@ -49,6 +49,7 @@ import org.eclipse.ptp.internal.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.SyncManager.SyncMode;
+import org.eclipse.ptp.rdt.sync.ui.ISynchronizeWizardExtension;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveRegistry;
@@ -158,6 +159,7 @@ public class NewSyncProjectWizard extends Wizard implements INewWizard, IExecuta
 			section = workbenchSettings.addNewSection("NewSyncProjectWizard");//$NON-NLS-1$
 		}
 		setDialogSettings(section);
+		SyncWizardDataCache.clearProperties();
 	}
 	
 	/**
@@ -383,6 +385,11 @@ public class NewSyncProjectWizard extends Wizard implements INewWizard, IExecuta
 			return false;
 		}
 
+		// Execute any wizard page extension code. All project setup and creation should be done before invoking extension.
+		ISynchronizeWizardExtension ext = mainPage.getExtension();
+		if (ext != null) {
+			ext.performFinish();
+		}
 		// Enable syncing
 		SyncManager.setSyncMode(project, SyncMode.ACTIVE);
 

@@ -48,11 +48,9 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
-import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.osgi.util.TextProcessor;
 import org.eclipse.ptp.internal.rdt.sync.cdt.ui.Activator;
 import org.eclipse.ptp.internal.rdt.sync.cdt.ui.messages.Messages;
-import org.eclipse.ptp.internal.rdt.sync.cdt.ui.wizards.SyncConfigToBuildConfigWizardPage.WizardMode;
 import org.eclipse.ptp.internal.rdt.sync.ui.wizards.SyncWizardDataCache;
 import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
@@ -121,7 +119,6 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	private Label categorySelectedForRemoteLabel;
 	private Label categorySelectedForLocalLabel;
 	private SyncProjectWidget fSyncWidget;
-	private IWizardPage fConfigMapPage;
 
 	private SortedMap<String, IToolChain> toolChainMap;
 	private String message = null;
@@ -957,16 +954,9 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 			for (String name : this.getSyncConfigNames()) {
 				configNamesSet.add(name);
 			}
-			SyncWizardDataCache.setProperty(getWizard().hashCode(), projectNameKey, getProjectName());
-			SyncWizardDataCache.setMultiValueProperty(getWizard().hashCode(), syncConfigSetKey, configNamesSet);
-			SyncWizardDataCache.setMap(getWizard().hashCode(), toolChainMapKey, this.getSyncConfigToToolChainMap());
-			// This page can only be added once 
-			if (fConfigMapPage == null) {
-				IWizard wizard = getWizard();
-				assert(wizard instanceof Wizard);
-				fConfigMapPage = new SyncConfigToBuildConfigWizardPage(WizardMode.NEW);
-				((Wizard) getWizard()).addPage(fConfigMapPage);
-			}
+			SyncWizardDataCache.setProperty(projectNameKey, getProjectName());
+			SyncWizardDataCache.setMultiValueProperty(syncConfigSetKey, configNamesSet);
+			SyncWizardDataCache.setMap(toolChainMapKey, this.getSyncConfigToToolChainMap());
 		}
 	}
 	

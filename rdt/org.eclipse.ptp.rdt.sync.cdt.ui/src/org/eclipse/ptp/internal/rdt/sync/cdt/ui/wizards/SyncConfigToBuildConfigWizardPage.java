@@ -46,12 +46,11 @@ import org.eclipse.swt.widgets.Label;
 /**
  * @noextend This class is not intended to be subclassed by clients.
  */
-public class SyncConfigToBuildConfigWizardPage extends WizardPage implements Runnable {
+public class SyncConfigToBuildConfigWizardPage extends WizardPage {
 	private static final String ConfigMapKey = "config-map"; //$NON-NLS-1$
 	private static final String ToolchainMapKey = "toolchain-map"; //$NON-NLS-1$
 	private static final String SyncConfigSetKey = "sync-config-set"; //$NON-NLS-1$
 	private static final String ProjectNameKey = "project-name"; //$NON-NLS-1$
-	private static final String DEFAULT_BUILD_CONFIG_ID = "default-build-config-id"; //$NON-NLS-1$
 	public static final String CDT_CONFIG_PAGE_ID = "org.eclipse.cdt.managedbuilder.ui.wizard.CConfigWizardPage"; //$NON-NLS-1$
 
 	private String fConfigName;
@@ -89,7 +88,7 @@ public class SyncConfigToBuildConfigWizardPage extends WizardPage implements Run
 	}
 
 	private IProject getAndValidateProject() {
-		String projectName = SyncWizardDataCache.getProperty(getWizard().hashCode(), ProjectNameKey);
+		String projectName = SyncWizardDataCache.getProperty(ProjectNameKey);
 		if (projectName == null) {
 			return null;
 		}
@@ -125,6 +124,7 @@ public class SyncConfigToBuildConfigWizardPage extends WizardPage implements Run
 			if (toolchainName != null) {
 				toolchainToBuildConfigMap.put(toolchainName, h.getName());
 			}
+			buildConfigToIdMap.put(h.getName(), h.getConfiguration().getId());
 		}
 		return configNames;
 	}
@@ -163,7 +163,7 @@ public class SyncConfigToBuildConfigWizardPage extends WizardPage implements Run
 		switch (wizardMode) {
 		case NEW:
 		case ADD_SYNC:
-			Set<String> syncConfigsSet = SyncWizardDataCache.getMultiValueProperty(getWizard().hashCode(), SyncConfigSetKey);
+			Set<String> syncConfigsSet = SyncWizardDataCache.getMultiValueProperty(SyncConfigSetKey);
 			if (syncConfigsSet == null) {
 				return null;
 			}
@@ -208,30 +208,12 @@ public class SyncConfigToBuildConfigWizardPage extends WizardPage implements Run
 	 */
 	private boolean isSyncProject(IProject project) {
 		return RemoteSyncNature.hasNature(project);
-	}	
-
-	@Override
-	public void run() {
-		IProject project = this.getAndValidateProject();
-		assert project != null : Messages.SyncConfigToBuildConfigWizardPage_9;
-		assert isSyncProject(project) && isCDTProject(project) : Messages.SyncConfigToBuildConfigWizardPage_5 + project.getName();
-
-		Map<String, String> configMap = SyncWizardDataCache.getMap(getWizard().hashCode(), ConfigMapKey);
-		SyncConfig[] allSyncConfigs = SyncConfigManager.getConfigs(project);
-		for (SyncConfig config : allSyncConfigs) {
-			String defaultBuildConfig = configMap.get(config.getName());
-			if (defaultBuildConfig != null) {
-				config.setProperty(DEFAULT_BUILD_CONFIG_ID, defaultBuildConfig);
-			}
-		}
-		
-		try {
-			SyncConfigManager.saveConfigs(project);
-		} catch (CoreException e) {
-			Activator.log(e);
-		}
 	}
 
+    /**
+     * Page rendering depends on state set in other pages, so we need to render the page just before it becomes visible:
+     * http://stackoverflow.com/questions/10303123/how-to-catch-first-time-displaying-of-the-wizardpage
+     */
 	@Override
 	public void setVisible(boolean isVisible) {
 		update();
@@ -257,7 +239,7 @@ public class SyncConfigToBuildConfigWizardPage extends WizardPage implements Run
 		// Get config information from other wizard pages
 		String[] syncConfigNames = this.getSyncConfigs();
 		String[] buildConfigNames = this.getBuildConfigs();
-		syncConfigToToolchainMap = SyncWizardDataCache.getMap(getWizard().hashCode(), ToolchainMapKey);
+		syncConfigToToolchainMap = SyncWizardDataCache.getMap(ToolchainMapKey);
 		if (syncConfigToToolchainMap == null) {
 			syncConfigToToolchainMap = new HashMap<String, String>();
 		}
@@ -303,7 +285,7 @@ public class SyncConfigToBuildConfigWizardPage extends WizardPage implements Run
 					} else {
 						syncConfigToBuildConfigMap.remove(sname);
 					}
-					SyncWizardDataCache.setMap(getWizard().hashCode(), ConfigMapKey, syncConfigToBuildConfigMap);
+					SyncWizardDataCache.setMap(ConfigMapKey, syncConfigToBuildConfigMap);
 				}
 			});
 		}
