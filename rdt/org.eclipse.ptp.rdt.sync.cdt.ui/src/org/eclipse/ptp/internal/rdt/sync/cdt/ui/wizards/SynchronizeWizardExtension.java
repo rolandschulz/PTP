@@ -14,6 +14,9 @@ import java.util.Map;
 
 import org.eclipse.cdt.core.CCProjectNature;
 import org.eclipse.cdt.core.CProjectNature;
+import org.eclipse.cdt.managedbuilder.core.IConfiguration;
+import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
+import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -93,9 +96,18 @@ public class SynchronizeWizardExtension extends AbstractSynchronizeWizardExtensi
         Map<String, String> configMap = SyncWizardDataCache.getMap(ConfigMapKey);
         SyncConfig[] allSyncConfigs = SyncConfigManager.getConfigs(project);
         for (SyncConfig config : allSyncConfigs) {
-            String defaultBuildConfig = configMap.get(config.getName());
-            if (defaultBuildConfig != null) {
-                config.setProperty(DEFAULT_BUILD_CONFIG_ID, defaultBuildConfig);
+            String defaultBuildConfigId = configMap.get(config.getName());
+            if (defaultBuildConfigId != null) {
+                config.setProperty(DEFAULT_BUILD_CONFIG_ID, defaultBuildConfigId);
+                if (SyncConfigManager.isActive(project, config)) {
+                	IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
+                	IConfiguration defaultBuildConfig = buildInfo.getManagedProject().getConfiguration(defaultBuildConfigId);
+                	if (defaultBuildConfig != null) {
+                		ManagedBuildManager.setDefaultConfiguration(project, defaultBuildConfig);
+                	} else {
+                		Activator.getDefault().logErrorMessage(Messages.SynchronizeWizardExtension_2);
+                	}
+                }
             }
         }
 
