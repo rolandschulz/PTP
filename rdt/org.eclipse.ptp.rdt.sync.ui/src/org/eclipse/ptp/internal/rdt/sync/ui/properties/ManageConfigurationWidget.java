@@ -276,6 +276,10 @@ public class ManageConfigurationWidget extends Composite {
 			SyncConfigManager.updateConfigs(getProject(), fAddedConfigs.toArray(new SyncConfig[0]),
 					fRemovedConfigs.toArray(new SyncConfig[0]));
 		}
+		ISynchronizeProperties prop = SynchronizePropertiesRegistry.getSynchronizePropertiesForProject(getProject());
+		if (prop != null) {
+			prop.performApply();
+		}
 	}
 
 	public IProject getProject() {
@@ -292,6 +296,10 @@ public class ManageConfigurationWidget extends Composite {
 		fAddedConfigs.clear();
 		fRemovedConfigs.clear();
 		fTreeViewer.refresh();
+		ISynchronizeProperties prop = SynchronizePropertiesRegistry.getSynchronizePropertiesForProject(getProject());
+		if (prop != null) {
+			prop.performDefaults();
+		}
 	}
 
 	public void setProject(IProject project) {

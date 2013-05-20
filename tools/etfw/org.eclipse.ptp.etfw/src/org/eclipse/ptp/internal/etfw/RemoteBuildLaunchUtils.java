@@ -34,14 +34,12 @@ import java.util.TimeZone;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.util.LaunchUtils;
-import org.eclipse.ptp.ems.core.EnvManagerProjectProperties;
+import org.eclipse.ptp.ems.core.EnvManagerConfigString;
 import org.eclipse.ptp.ems.core.EnvManagerRegistry;
 import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.ems.core.IEnvManagerConfig;
@@ -103,6 +101,8 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 	}
 
 	public static final String REMOTE_MAKE_BUILDER_ID = "org.eclipse.ptp.rdt.core.remoteMakeBuilder"; //$NON-NLS-1$
+
+	private static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
 	/**
 	 * Get the current timestamp
@@ -215,9 +215,9 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 		try {
 			final IRemoteProcessBuilder rpb = remoteServices.getProcessBuilder(conn);
 			if (envManager != null) {
-				String com = "";
+				String com = EMPTY_STRING;
 				try {
-					com = envManager.createBashScript(null, false, envMgrConfig, "which " + toolname);
+					com = envManager.createBashScript(null, false, envMgrConfig, "which " + toolname); //$NON-NLS-1$
 					final IFileStore envScript = fileManager.getResource(com);
 					final IFileInfo envInfo = envScript.fetchInfo();
 					envInfo.setAttribute(EFS.ATTRIBUTE_OWNER_EXECUTE, true);
@@ -370,7 +370,7 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 	}
 
 	/**
-	 * Get the environment manager configuration associated with the project that was specified in the launch configuration. If no
+	 * Get the environment manager configuration that was specified in the launch configuration. If no
 	 * launchConfiguration was specified then this CommandJob does not need to use environment management so we can safely return
 	 * null.
 	 * 
@@ -378,15 +378,11 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 	 */
 	private IEnvManagerConfig getEnvManagerConfig(ILaunchConfiguration configuration) {
 		try {
-			final String projectName = configuration
-					.getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, (String) null);
-			if (projectName != null) {
-				final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-				if (project != null) {
-					final EnvManagerProjectProperties projectProperties = new EnvManagerProjectProperties(project);
-					if (projectProperties.isEnvMgmtEnabled()) {
-						return projectProperties;
-					}
+			String emsConfigAttr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EMS_CONFIG, (String) null);
+			if (emsConfigAttr != null) {
+				final EnvManagerConfigString config = new EnvManagerConfigString(emsConfigAttr);
+				if (config.isEnvMgmtEnabled()) {
+					return config;
 				}
 			}
 		} catch (final CoreException e) {
@@ -405,12 +401,11 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 		IRemoteProcessBuilder pb;
 
 		if (envManager != null) {
-			String com = "";
-			String concat = "";
+			String com = EMPTY_STRING;
+			String concat = EMPTY_STRING;
 			try {
-				concat = "";
 				for (int i = 0; i < tool.size(); i++) {
-					concat += " " + tool.get(i);
+					concat += " " + tool.get(i); //$NON-NLS-1$
 				}
 				com = envManager.createBashScript(null, false, envMgrConfig, concat);
 				final IFileStore envScript = fileManager.getResource(com);
@@ -597,8 +592,8 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 				env = new HashMap<String, String>();
 			}
 
-			if (env.get("DISPLAY") == null) {
-				env.put("DISPLAY", ":0.0");
+			if (env.get("DISPLAY") == null) { //$NON-NLS-1$
+				env.put("DISPLAY", ":0.0"); //$NON-NLS-1$//$NON-NLS-2$
 			}
 
 			getProcess(tool, env, directory, false);

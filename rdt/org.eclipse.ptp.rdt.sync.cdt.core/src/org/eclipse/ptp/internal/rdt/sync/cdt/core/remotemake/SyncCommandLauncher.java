@@ -26,8 +26,6 @@ import java.util.regex.Pattern;
 
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.ICommandLauncher;
-import org.eclipse.cdt.managedbuilder.core.IConfiguration;
-import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -37,11 +35,10 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.ptp.ems.core.EnvManagerProjectProperties;
+import org.eclipse.ptp.ems.core.EnvManagerConfigString;
 import org.eclipse.ptp.ems.core.EnvManagerRegistry;
 import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.internal.rdt.sync.cdt.core.Activator;
-import org.eclipse.ptp.internal.rdt.sync.cdt.core.SyncConfigListenerCDT;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
@@ -56,6 +53,7 @@ import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
 // TODO (Jeff): Remove/replace NON_ESCAPED_ASCII_CHARS, static initializer, and escape(String) after Bug 371691 is fixed
 public class SyncCommandLauncher implements ICommandLauncher {
+	public static final String EMS_CONFIG_PROPERTY = "ems-configuration"; //$NON-NLS-1$
 
 	/** ASCII characters that do <i>not</i> need to be escaped on a Bash command line */
 	private static final Set<Character> NON_ESCAPED_ASCII_CHARS;
@@ -175,7 +173,8 @@ public class SyncCommandLauncher implements ICommandLauncher {
 			throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 100);
 
-		final EnvManagerProjectProperties projectProperties = new EnvManagerProjectProperties(getProject());
+		SyncConfig config = SyncConfigManager.getActive(getProject());
+		final EnvManagerConfigString projectProperties = new EnvManagerConfigString(config.getProperty(EMS_CONFIG_PROPERTY));
 		if (projectProperties.isEnvMgmtEnabled()) {
 			// Environment management is enabled for the build. Issue custom Modules/SoftEnv commands to configure the environment.
 			IEnvManager envManager = EnvManagerRegistry.getEnvManager(progress.newChild(50), connection);

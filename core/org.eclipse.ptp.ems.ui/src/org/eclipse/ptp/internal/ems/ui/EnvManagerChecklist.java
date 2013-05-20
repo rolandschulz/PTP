@@ -78,28 +78,27 @@ public final class EnvManagerChecklist extends Composite {
 	 * 
 	 * @param parent
 	 *            parent {@link Composite} (non-<code>null</code>)
-	 * @param remoteConnection
-	 *            {@link IRemoteConnection} used to access files and execute shell commands on the remote machine (non-
-	 *            <code>null</code>)
+	 * @param style
+	 *            the style of widget to construct
 	 */
-	public EnvManagerChecklist(Composite parent, IRemoteConnection remoteConnection) {
-		super(parent, SWT.NONE);
-
-		this.remoteConnection = remoteConnection;
+	public EnvManagerChecklist(Composite parent, int style) {
+		super(parent, style);
 		this.envManager = EnvManagerRegistry.getNullEnvManager();
 		this.lastSyncURI = null;
 		this.lastSelectedItems = Collections.<String> emptyList();
 
 		this.errorListener = new NullErrorListener();
 
-		setLayoutData(new GridData(GridData.FILL_BOTH));
-		setLayout(new GridLayout(1, false));
+		GridLayout g = new GridLayout(1, false);
+		g.marginHeight = 0;
+		g.marginWidth = 0;
+		setLayout(g);
 
 		createStack(this);
 		createMsgComposite();
 		createChecklist();
 
-		checklist.setEnabledAndVisible(this.isEnabled());
+		checklist.setEnabledAndVisible(isEnabled());
 
 		stackLayout.topControl = messageComposite;
 		stack.layout(true, true);
@@ -191,6 +190,17 @@ public final class EnvManagerChecklist extends Composite {
 			RemoteUIServicesUtils.openConnectionWithProgress(getShell(), null, remoteConnection);
 		}
 		return remoteConnection.isOpen();
+	}
+
+	/**
+	 * Set the remote connection to use when querying for the remote environment
+	 * 
+	 * @param connection
+	 *            {@link IRemoteConnection} used to access files and execute shell commands on the remote machine (non-
+	 *            <code>null</code>)
+	 */
+	public void setConnection(IRemoteConnection connection) {
+		remoteConnection = connection;
 	}
 
 	private void createChecklist() {
@@ -386,10 +396,6 @@ public final class EnvManagerChecklist extends Composite {
 		});
 	}
 
-	// public boolean isModulesSupportEnabled() {
-	// return this.isEnabled();
-	// }
-
 	/**
 	 * @return the text of the elements which are checked in the checklist. This list may be empty but is never <code>null</code>.
 	 *         It is, in theory, a subset of the strings returned by
@@ -415,8 +421,4 @@ public final class EnvManagerChecklist extends Composite {
 	public IEnvManager getEnvManager() {
 		return envManager;
 	}
-
-	// public Set<String> determineDefaultModules() throws RemoteConnectionException, IOException {
-	// return modulesSupport.determineDefaultModules();
-	// }
 }

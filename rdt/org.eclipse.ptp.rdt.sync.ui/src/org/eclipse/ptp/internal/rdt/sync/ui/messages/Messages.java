@@ -39,6 +39,7 @@ public class Messages extends NLS {
 	public static String CommonSyncExceptionHandler_2;
 	public static String CommonSyncExceptionHandler_3;
 	public static String CommonSyncExceptionHandler_4;
+	public static String ManageConfigurationDialog_Title;
 	public static String ManageConfigurationWidget_Connection_name;
 	public static String ManageConfigurationWidget_Project_location;
 	public static String ManageConfigurationWidget_Sync_provider;

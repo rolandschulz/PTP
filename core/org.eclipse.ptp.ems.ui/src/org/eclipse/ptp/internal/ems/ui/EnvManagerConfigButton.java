@@ -155,7 +155,7 @@ public final class EnvManagerConfigButton extends AbstractWidget {
 			final Composite composite = (Composite) super.createDialogArea(parent);
 			composite.setLayout(new GridLayout());
 
-			envConfig = new EnvManagerConfigWidget(composite, null);
+			envConfig = new EnvManagerConfigWidget(composite, SWT.NONE);
 			envConfig.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 			final Label errorMessage = new Label(parent, SWT.LEFT | SWT.BOTTOM | SWT.BORDER);

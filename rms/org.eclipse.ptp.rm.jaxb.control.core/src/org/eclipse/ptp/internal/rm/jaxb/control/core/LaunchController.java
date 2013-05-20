@@ -18,8 +18,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -33,7 +31,7 @@ import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.jobs.JobManager;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
-import org.eclipse.ptp.ems.core.EnvManagerProjectProperties;
+import org.eclipse.ptp.ems.core.EnvManagerConfigString;
 import org.eclipse.ptp.ems.core.EnvManagerRegistry;
 import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.ems.core.IEnvManagerConfig;
@@ -384,7 +382,7 @@ public class LaunchController implements ILaunchController {
 	}
 
 	/**
-	 * Get the environment manager configuration associated with the project that was specified in the launch configuration. If no
+	 * Get the environment manager configuration that was specified in the launch configuration. If no
 	 * launchConfiguration was specified then this CommandJob does not need to use environment management so we can safely return
 	 * null.
 	 * 
@@ -392,14 +390,11 @@ public class LaunchController implements ILaunchController {
 	 */
 	private IEnvManagerConfig getEnvManagerConfig(ILaunchConfiguration configuration) {
 		try {
-			String projectName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_PROJECT_NAME, (String) null);
-			if (projectName != null) {
-				IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-				if (project != null) {
-					final EnvManagerProjectProperties projectProperties = new EnvManagerProjectProperties(project);
-					if (projectProperties.isEnvMgmtEnabled()) {
-						return projectProperties;
-					}
+			String emsConfigAttr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EMS_CONFIG, (String) null);
+			if (emsConfigAttr != null) {
+				final EnvManagerConfigString config = new EnvManagerConfigString(emsConfigAttr);
+				if (config.isEnvMgmtEnabled()) {
+					return config;
 				}
 			}
 		} catch (CoreException e) {

@@ -32,7 +32,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -112,6 +111,7 @@ public final class SearchableSelectionList extends Composite {
 						if (!fAvailableTable.isDisposed()) { // Make sure the user didn't close the project properties dialog
 							setItems(modules, modulesToSelect);
 							strategy.afterRepopulation();
+							layout(true, true);
 						}
 					}
 				});
@@ -120,7 +120,7 @@ public final class SearchableSelectionList extends Composite {
 		}
 	}
 
-	private final Group fMainGroup;
+	private final Composite fMainGroup;
 	private Label fInstructionsLabel;
 	private Text fSearchBoxText;
 	private Table fAvailableTable;
@@ -143,13 +143,19 @@ public final class SearchableSelectionList extends Composite {
 	public SearchableSelectionList(Composite parent) {
 		super(parent, SWT.NONE);
 
-		this.setLayout(new FillLayout());
+		GridLayout g = new GridLayout(4, false);
+		g.marginHeight = 0;
+		g.marginWidth = 0;
+		setLayout(g);
+		setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-		fMainGroup = new Group(this, SWT.SHADOW_ETCHED_IN);
-		fMainGroup.setText(""); //$NON-NLS-1$
+		// fMainGroup = new Group(this, SWT.SHADOW_ETCHED_IN);
+		//		fMainGroup.setText(""); //$NON-NLS-1$
+		// fMainGroup = new Composite(this, SWT.NONE);
+		// fMainGroup.setLayout(new GridLayout(4, false));
+		// fMainGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-		final GridLayout layout = new GridLayout(4, false);
-		fMainGroup.setLayout(layout);
+		fMainGroup = this;
 
 		createInstructionalMessage();
 		createTableWithSearchBox();
@@ -385,7 +391,7 @@ public final class SearchableSelectionList extends Composite {
 
 	private void createTable() {
 		fSelectedTable = new Table(fMainGroup, SWT.MULTI | SWT.V_SCROLL | SWT.BORDER);
-		final GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+		final GridData gd = new GridData(SWT.FILL, SWT.FILL, false, true);
 		gd.widthHint = 200;
 		gd.minimumWidth = 50;
 		fSelectedTable.setLayoutData(gd);
@@ -422,7 +428,7 @@ public final class SearchableSelectionList extends Composite {
 		new Label(fMainGroup, SWT.NONE);
 
 		fSearchBoxText = new Text(fMainGroup, SWT.SINGLE | SWT.SEARCH | SWT.ICON_SEARCH | SWT.ICON_CANCEL);
-		fSearchBoxText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+		fSearchBoxText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
 		fSearchBoxText.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent e) {
@@ -436,8 +442,11 @@ public final class SearchableSelectionList extends Composite {
 		new Label(fMainGroup, SWT.NONE);
 
 		fAvailableTable = new Table(fMainGroup, SWT.MULTI | SWT.V_SCROLL | SWT.BORDER);
-		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+		GridData gd = new GridData(SWT.FILL, SWT.FILL, false, false);
 		gd.widthHint = 200;
+		gd.heightHint = 100;
+		gd.minimumWidth = 50;
+		gd.minimumHeight = 50;
 		fAvailableTable.setLayoutData(gd);
 		fAvailableTable.setLinesVisible(false);
 		fAvailableTable.setHeaderVisible(true);
@@ -521,7 +530,7 @@ public final class SearchableSelectionList extends Composite {
 	/** Sets the instructions displayed above the checklist. */
 	public void setInstructions(String message) {
 		fInstructionsLabel.setText(message);
-		this.layout(true, true);
+		layout(true, true);
 	}
 
 	/** Sets the instructions displayed above the checklist. */
@@ -548,7 +557,7 @@ public final class SearchableSelectionList extends Composite {
 
 	/** Sets the text for this checklist's {@link Group} control. */
 	public void setTitle(String description) {
-		fMainGroup.setText(description);
+		// fMainGroup.setText(description);
 		layout(true, true);
 	}
 

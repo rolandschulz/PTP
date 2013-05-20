@@ -55,6 +55,7 @@ public class Messages extends NLS {
 	public static String SyncConfigToBuildConfigWizardPage_9;
 	public static String SynchronizeProperties_0;
 	public static String SynchronizeProperties_Default_configuration;
+	public static String SynchronizeProperties_Title;
 	public static String SynchronizeWizardExtension_0;
 	public static String SynchronizeWizardExtension_1;
 	public static String SynchronizeWizardExtension_2;

@@ -82,40 +82,6 @@
        </viewerContentBinding>
    </extension> 
      <extension
-           point="org.eclipse.ui.propertyPages">
-        <!--page
-              category="org.eclipse.cdt.managedbuilder.ui.properties.Page_head_build"
-              class="org.eclipse.ptp.internal.rdt.sync.cdt.ui.properties.BuildRemotePropertiesPage"
-              id="org.eclipse.ptp.rdt.sync.cdt.ui.properties.BuildRemotePropertiesPage"
-              name="Synchronize">
-  <enabledWhen>
-     <adapt
-           type="org.eclipse.core.resources.IProject">
-        <test
-              property="org.eclipse.core.resources.projectNature"
-              value="org.eclipse.ptp.rdt.sync.core.remoteSyncNature">
-        </test>
-     </adapt>
-  </enabledWhen>
-        </page-->
-        <!-- category="org.eclipse.cdt.managedbuilder.ui.properties.Page_Environment -->
-        <page
-              category="org.eclipse.cdt.managedbuilder.ui.properties.Page_head_build"
-              class="org.eclipse.ptp.internal.rdt.sync.cdt.ui.properties.EnvManagerPropertiesPage"
-              id="org.eclipse.ptp.rdt.sync.cdt.ui.properties.ModulesPropertiesPage"
-              name="Environment Management">
-           <enabledWhen>
-              <adapt type="org.eclipse.core.resources.IProject">
-                 <test
-                    property="org.eclipse.core.resources.projectNature"
-                    value="org.eclipse.ptp.rdt.sync.core.remoteSyncNature">
-                 </test>
-              </adapt>
-           </enabledWhen>
-        </page>
-
-     </extension>
-     <extension
            point="org.eclipse.ptp.rdt.sync.ui.synchronizeProperties">
         <synchronizeProperties
               class="org.eclipse.ptp.internal.rdt.sync.cdt.ui.properties.SynchronizeProperties"

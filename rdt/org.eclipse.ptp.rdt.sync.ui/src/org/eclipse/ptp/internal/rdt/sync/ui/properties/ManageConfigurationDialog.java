@@ -56,7 +56,7 @@ public class ManageConfigurationDialog extends Dialog {
 	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
-		shell.setText(Messages.NewSyncFileFilterPage_Title);
+		shell.setText(Messages.ManageConfigurationDialog_Title);
 	}
 
 	/**
@@ -71,7 +71,7 @@ public class ManageConfigurationDialog extends Dialog {
 	protected Control createDialogArea(Composite parent) {
 		Composite controls = (Composite) super.createDialogArea(parent);
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
-		data.widthHint = 400;
+		data.widthHint = 600;
 		controls.setLayoutData(data);
 
 		fWidget = new ManageConfigurationWidget(controls, SWT.NONE);

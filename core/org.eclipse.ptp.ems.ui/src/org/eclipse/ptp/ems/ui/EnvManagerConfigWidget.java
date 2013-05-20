@@ -75,30 +75,44 @@ public final class EnvManagerConfigWidget extends Composite {
 	 * 
 	 * @param parent
 	 *            parent {@link Composite} (non-<code>null</code>)
-	 * @param remoteConnection
-	 *            {@link IRemoteConnection} used to access files and execute shell commands on the remote machine (non-
-	 *            <code>null</code>)
+	 * @param style
+	 *            the style of widget to construct
+	 * @since 2.0
 	 */
-	public EnvManagerConfigWidget(Composite parent, IRemoteConnection remoteConnection) {
-		super(parent, SWT.NONE);
+	public EnvManagerConfigWidget(Composite parent, int style) {
+		super(parent, style);
 
-		if (parent.getLayout() instanceof GridLayout) {
-			setLayoutData(new GridData(GridData.FILL_BOTH));
-		}
-		setLayout(new GridLayout(1, false));
+		GridLayout g = new GridLayout(1, false);
+		g.marginHeight = 0;
+		g.marginWidth = 0;
+		setLayout(g);
 
 		createCheckbox(this);
 		createManualOverrideCheckbox(this);
 		createStack(this);
 		createNoEnvConfigLabel();
 		createEnvConfigTextbox();
-		createEnvConfigChecklist(remoteConnection);
+		createEnvConfigChecklist();
 
 		setTopControl();
 	}
 
+	/**
+	 * Set the remote connection to use when querying for the remote environment
+	 * 
+	 * @param connection
+	 *            {@link IRemoteConnection} used to access files and execute shell commands on the remote machine (non-
+	 *            <code>null</code>)
+	 * @since 2.0
+	 */
+	public void setConnection(IRemoteConnection connection) {
+		if (envConfigChecklist != null) {
+			envConfigChecklist.setConnection(connection);
+		}
+	}
+
 	private void createCheckbox(Composite composite) {
-		useEMSCheckbox = new Button(composite, SWT.CHECK);
+		useEMSCheckbox = new Button(composite, SWT.CHECK | SWT.WRAP);
 		useEMSCheckbox.setText(Messages.EnvConfigurationControl_UseEMS);
 		useEMSCheckbox.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 		useEMSCheckbox.addSelectionListener(new SelectionAdapter() {
@@ -183,14 +197,6 @@ public final class EnvManagerConfigWidget extends Composite {
 		envConfigTextbox.setText(""); //$NON-NLS-1$
 		allowEnterAndTabInTextbox(envConfigTextbox);
 		envConfigTextbox.setFont(JFaceResources.getTextFont());
-		/*
-		 * envConfigTextbox.addModifyListener(new ModifyListener() {
-		 * 
-		 * @Override
-		 * public void modifyText(ModifyEvent e) {
-		 * }
-		 * });
-		 */
 	}
 
 	/**
@@ -223,8 +229,8 @@ public final class EnvManagerConfigWidget extends Composite {
 		});
 	}
 
-	private void createEnvConfigChecklist(IRemoteConnection remoteConnection) {
-		envConfigChecklist = new EnvManagerChecklist(stack, remoteConnection);
+	private void createEnvConfigChecklist() {
+		envConfigChecklist = new EnvManagerChecklist(stack, SWT.NONE);
 		envConfigChecklist.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 	}
 

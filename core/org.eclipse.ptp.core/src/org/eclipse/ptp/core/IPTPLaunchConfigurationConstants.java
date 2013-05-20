@@ -224,4 +224,12 @@ public interface IPTPLaunchConfigurationConstants {
 	 * Launch configuration attribute key. The value is a list of rules of synchronization.
 	 */
 	public static final String ATTR_SYNC_RULES = PTP_LAUNCH_ID + ".ATTR_SYNC_RULES"; //$NON-NLS-1$
+
+	/**
+	 * Launch configuration attribute key. The value is an EMS configuration
+	 * 
+	 * @since 7.0
+	 */
+	public static final String ATTR_EMS_CONFIG = PTP_LAUNCH_ID + ".ATTR_EMS_CONFIG"; //$NON-NLS-1$
+
 }

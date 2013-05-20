@@ -21,15 +21,17 @@ import org.eclipse.ptp.rdt.sync.core.listeners.ISyncConfigListener;
  * Singleton class responsible for adjusting CDT build configurations in response to changes to the sync configurations.
  */
 public class SyncConfigListenerCDT implements ISyncConfigListener {
-	private static final String DEFAULT_BUILD_CONFIG_ID = "default-build-config-id"; //$NON-NLS-1$
+	public static final String DEFAULT_BUILD_CONFIG_ID = "default-build-config-id"; //$NON-NLS-1$
 
 	// Setup as a singleton
-	private SyncConfigListenerCDT() {}
+	private SyncConfigListenerCDT() {
+	}
 
 	private static SyncConfigListenerCDT fInstance = null;
 
 	/**
 	 * Get the single instance of a CDT sync config listener
+	 * 
 	 * @return the instance
 	 */
 	public static synchronized SyncConfigListenerCDT getInstance() {
