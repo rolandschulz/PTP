@@ -20,13 +20,14 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.ptp.internal.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.internal.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
@@ -40,12 +41,14 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.RemoteServices;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
+import org.osgi.service.prefs.BackingStoreException;
+import org.osgi.service.prefs.Preferences;
 
 /**
  * @since 3.0
  */
 public class SyncConfigManager {
-	private static final String PREF_SYNCCONFIG = "SYNC_CONFIG"; //$NON-NLS-1$
+	private static final String SYNC_CONFIG_KEY = "project-sync-config"; //$NON-NLS-1$
 	private static final String CONFIGS_ELEMENT = "sync-configs"; //$NON-NLS-1$
 	private static final String CONFIG_ELEMENT = "sync-config"; //$NON-NLS-1$
 	private static final String CONFIG_NAME_ELEMENT = "config-name"; //$NON-NLS-1$
@@ -324,7 +327,9 @@ public class SyncConfigManager {
 
 	private static void loadConfigs(IProject project) throws CoreException {
 		if (!fSyncConfigMap.containsKey(project)) {
-			String prefs = project.getPersistentProperty(new QualifiedName(RDTSyncCorePlugin.PLUGIN_ID, PREF_SYNCCONFIG));
+			IScopeContext context = new ProjectScope(project);
+			Preferences node = context.getNode(RDTSyncCorePlugin.PLUGIN_ID);
+			String prefs = node.get(SYNC_CONFIG_KEY, null);
 			if (prefs != null) {
 				StringReader reader = new StringReader(prefs);
 				XMLMemento rootMemento = XMLMemento.createReadRoot(reader);
@@ -446,8 +451,6 @@ public class SyncConfigManager {
 	 * @param project
 	 * @throws CoreException
 	 */
-	// TODO: Change method, maybe to use preference nodes, as this will fail once we have more than a few configs.
-	// (project.setPersistentProperty() will only work for strings less than 2k in length)
 	public static void saveConfigs(IProject project) throws CoreException {
 		Map<String, SyncConfig> projConfigs = fSyncConfigMap.get(project);
 		if (projConfigs != null) {
@@ -478,7 +481,14 @@ public class SyncConfigManager {
 				throw new CoreException(new Status(IStatus.ERROR, RDTSyncCorePlugin.PLUGIN_ID,
 						Messages.SyncConfigManager_Unable_to_save, e));
 			}
-			project.setPersistentProperty(new QualifiedName(RDTSyncCorePlugin.PLUGIN_ID, PREF_SYNCCONFIG), writer.toString());
+			IScopeContext context = new ProjectScope(project);
+			Preferences node = context.getNode(RDTSyncCorePlugin.PLUGIN_ID);
+			node.put(SYNC_CONFIG_KEY, writer.toString());
+			try {
+				node.flush();
+			} catch (BackingStoreException e) {
+				RDTSyncCorePlugin.log(e);
+			}
 		}
 	}
 

@@ -96,8 +96,6 @@ public class SyncManager {
 		ACTIVE, ALL, NONE, UNAVAILABLE
 	};
 
-	private static final String projectScopeSyncNode = "org.eclipse.ptp.rdt.sync.core"; //$NON-NLS-1$
-	private static final String instanceScopeSyncNode = "org.eclipse.ptp.rdt.sync.core"; //$NON-NLS-1$
 	private static final String SYNC_MODE_KEY = "sync-mode"; //$NON-NLS-1$
 	private static final String SYNC_AUTO_KEY = "sync-auto"; //$NON-NLS-1$
 	private static final String SHOW_ERROR_KEY = "show-error"; //$NON-NLS-1$
@@ -152,10 +150,11 @@ public class SyncManager {
 	 *            ISynchronizeService that has been correctly configured
 	 * @param filter
 	 *            synchronize filter, or null if no filter
-	 * @throws CoreException on problems adding sync nature
+	 * @throws CoreException
+	 *             on problems adding sync nature
 	 */
-	public static void makeSyncProject(IProject project, String remoteSyncConfigName, ISynchronizeService provider, SyncFileFilter filter)
-			throws CoreException {
+	public static void makeSyncProject(IProject project, String remoteSyncConfigName, ISynchronizeService provider,
+			SyncFileFilter filter) throws CoreException {
 		RemoteSyncNature.addNature(project, new NullProgressMonitor());
 
 		// Remote config
@@ -185,7 +184,7 @@ public class SyncManager {
 	 */
 	public static SyncFileFilter getDefaultFileFilter() {
 		IScopeContext context = InstanceScope.INSTANCE;
-		Preferences node = context.getNode(instanceScopeSyncNode);
+		Preferences node = context.getNode(RDTSyncCorePlugin.PLUGIN_ID);
 		if (node == null) {
 			RDTSyncCorePlugin.log(Messages.SyncManager_6);
 			return SyncFileFilter.createBuiltInDefaultFilter();
@@ -232,7 +231,7 @@ public class SyncManager {
 			throw new NullPointerException();
 		}
 		IScopeContext context = new ProjectScope(project);
-		Preferences node = context.getNode(projectScopeSyncNode);
+		Preferences node = context.getNode(RDTSyncCorePlugin.PLUGIN_ID);
 		if (node == null) {
 			RDTSyncCorePlugin.log(Messages.SyncManager_3);
 			return SyncManager.getDefaultFileFilter();
@@ -257,7 +256,7 @@ public class SyncManager {
 			throw new NullPointerException();
 		}
 		IScopeContext context = new ProjectScope(project);
-		Preferences node = context.getNode(projectScopeSyncNode);
+		Preferences node = context.getNode(RDTSyncCorePlugin.PLUGIN_ID);
 		if (node == null) {
 			RDTSyncCorePlugin.log(Messages.SyncManager_3);
 			return DEFAULT_SHOW_ERROR_SETTING;
@@ -272,7 +271,7 @@ public class SyncManager {
 	 */
 	public static boolean getSyncAuto() {
 		IScopeContext context = InstanceScope.INSTANCE;
-		Preferences node = context.getNode(instanceScopeSyncNode);
+		Preferences node = context.getNode(RDTSyncCorePlugin.PLUGIN_ID);
 		if (node == null) {
 			RDTSyncCorePlugin.log(Messages.SyncManager_6);
 			return DEFAULT_SYNC_AUTO_SETTING;
@@ -292,7 +291,7 @@ public class SyncManager {
 			throw new NullPointerException();
 		}
 		IScopeContext context = new ProjectScope(project);
-		Preferences node = context.getNode(projectScopeSyncNode);
+		Preferences node = context.getNode(RDTSyncCorePlugin.PLUGIN_ID);
 		if (node == null) {
 			RDTSyncCorePlugin.log(Messages.SyncManager_3);
 			return DEFAULT_SYNC_MODE;
@@ -338,7 +337,7 @@ public class SyncManager {
 		}
 
 		IScopeContext context = InstanceScope.INSTANCE;
-		Preferences node = context.getNode(instanceScopeSyncNode);
+		Preferences node = context.getNode(RDTSyncCorePlugin.PLUGIN_ID);
 		if (node == null) {
 			RDTSyncCorePlugin.log(Messages.SyncManager_6);
 			return;
@@ -364,7 +363,7 @@ public class SyncManager {
 		}
 
 		IScopeContext context = new ProjectScope(project);
-		Preferences node = context.getNode(projectScopeSyncNode);
+		Preferences node = context.getNode(RDTSyncCorePlugin.PLUGIN_ID);
 		if (node == null) {
 			RDTSyncCorePlugin.log(Messages.SyncManager_3);
 			return;
@@ -449,7 +448,7 @@ public class SyncManager {
 		}
 
 		IScopeContext context = new ProjectScope(project);
-		Preferences node = context.getNode(projectScopeSyncNode);
+		Preferences node = context.getNode(RDTSyncCorePlugin.PLUGIN_ID);
 		if (node == null) {
 			RDTSyncCorePlugin.log(Messages.SyncManager_3);
 			return;
@@ -471,7 +470,7 @@ public class SyncManager {
 	 */
 	public static void setSyncAuto(boolean isSyncAutomatic) {
 		IScopeContext context = InstanceScope.INSTANCE;
-		Preferences node = context.getNode(instanceScopeSyncNode);
+		Preferences node = context.getNode(RDTSyncCorePlugin.PLUGIN_ID);
 		if (node == null) {
 			RDTSyncCorePlugin.log(Messages.SyncManager_6);
 			return;
@@ -498,7 +497,7 @@ public class SyncManager {
 		}
 
 		IScopeContext context = new ProjectScope(project);
-		Preferences node = context.getNode(projectScopeSyncNode);
+		Preferences node = context.getNode(RDTSyncCorePlugin.PLUGIN_ID);
 		if (node == null) {
 			RDTSyncCorePlugin.log(Messages.SyncManager_3);
 			return;
