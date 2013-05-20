@@ -16,7 +16,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.internal.rdt.sync.ui.handlers.CommonSyncExceptionHandler;
@@ -33,10 +32,8 @@ public class ResourceChangeListener {
 	}
 
 	public static void startListening() {
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(
-				resourceListener,
-				IResourceChangeEvent.POST_CHANGE | IResourceChangeEvent.PRE_DELETE | IResourceChangeEvent.PRE_BUILD
-						| IResourceChangeEvent.POST_BUILD);
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceListener,
+				IResourceChangeEvent.POST_CHANGE | IResourceChangeEvent.PRE_DELETE);
 	}
 
 	public static void stopListening() {
@@ -74,42 +71,9 @@ public class ResourceChangeListener {
 					 */
 					if (syncConfig != null) {
 						try {
-							// Post-build event
-							// Force a sync in order to download any new remote files but no need to sync if sync'ing is disabled.
-							if (event.getType() == IResourceChangeEvent.POST_BUILD && syncConfig.isSyncOnPostBuild()) {
-								// Ignore auto builds, which are triggered for every resource change.
-								if (event.getBuildKind() == IncrementalProjectBuilder.AUTO_BUILD) {
-									continue;
-								}
-								if (!syncOn || syncMode == SyncMode.UNAVAILABLE) {
-									continue;
-								} else if (syncMode == SyncMode.ALL) {
-									SyncManager.syncAll(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(true, true));
-								} else if (syncMode == SyncMode.ACTIVE) {
-									SyncManager.sync(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(true, true));
-								}
-							}
-							// Pre-build event
-							// Force a sync in order to download any new remote files but no need to sync if sync'ing is disabled.
-							else if (event.getType() == IResourceChangeEvent.PRE_BUILD && syncConfig.isSyncOnPreBuild()) {
-								// Ignore auto builds, which are triggered for every resource change.
-								if (event.getBuildKind() == IncrementalProjectBuilder.AUTO_BUILD) {
-									continue;
-								}
-								if (!syncOn || syncMode == SyncMode.UNAVAILABLE) {
-									continue;
-								} else if (syncMode == SyncMode.ALL) {
-									SyncManager.syncAll(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(true, true));
-								} else if (syncMode == SyncMode.ACTIVE) {
-									SyncManager.sync(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(true, true));
-								}
-							}
-							// Post-change event
-							// Sync on all CHANGED events
-							else if (delta.getKind() == IResourceDelta.CHANGED && syncConfig.isSyncOnSave()) {
+							if (delta.getKind() == IResourceDelta.CHANGED && syncConfig.isSyncOnSave()) {
 								// Do a non-forced sync to update any changes reported in delta. Sync'ing is necessary even if user
-								// has
-								// turned it off. This allows for some bookkeeping but no files are transferred.
+								// has turned it off. This allows for some bookkeeping but no files are transferred.
 								if (syncMode == SyncMode.UNAVAILABLE) {
 									continue;
 								} else if (!syncOn) {

@@ -66,13 +66,44 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		}
 	}
 
-	protected IProject fProject;
+	// See RemoteToolsProcessBuilder ctor and #charEscapify(String, Set<String>)
+	private static String escape(String inputString) {
+		if (inputString == null) {
+			return null;
+		}
 
+		final StringBuilder newString = new StringBuilder(inputString.length() + 16);
+		final CharacterIterator it = new StringCharacterIterator(inputString);
+		for (char c = it.first(); c != CharacterIterator.DONE; c = it.next()) {
+			if (c == '\'') {
+				newString.append("'\\\\\\''"); //$NON-NLS-1$
+			} else if (c > 127 || NON_ESCAPED_ASCII_CHARS.contains(c)) { // Do not escape non-ASCII characters (> 127)
+				newString.append(c);
+			} else {
+				newString.append("\\" + c); //$NON-NLS-1$
+			}
+		}
+		return newString.toString();
+	}
+
+	private static String getCommandAsString(IPath commandPath, String[] args) {
+		final StringBuilder sb = new StringBuilder();
+		sb.append(escape(commandPath.toOSString()));
+		sb.append(' ');
+		for (String arg : args) {
+			sb.append(escape(arg));
+			sb.append(' ');
+		}
+		return sb.toString();
+	}
+	protected IProject fProject;
 	protected Process fProcess;
 	protected IRemoteProcess fRemoteProcess;
 	protected boolean fShowCommand;
 	protected String[] fCommandArgs;
+
 	protected String lineSeparator = "\r\n"; //$NON-NLS-1$
+
 	protected String fErrorMessage;
 
 	protected Map<String, String> remoteEnvMap;
@@ -81,6 +112,68 @@ public class SyncCommandLauncher implements ICommandLauncher {
 	 * The number of milliseconds to pause between polling.
 	 */
 	protected static final long DELAY = 50L;
+
+	private List<String> constructCommand(IPath commandPath, String[] args, IRemoteConnection connection, IProgressMonitor monitor)
+			throws CoreException {
+		SubMonitor progress = SubMonitor.convert(monitor, 100);
+
+		SyncConfig config = SyncConfigManager.getActive(getProject());
+		final EnvManagerConfigString projectProperties = new EnvManagerConfigString(config.getProperty(EMS_CONFIG_PROPERTY));
+		if (projectProperties.isEnvMgmtEnabled()) {
+			// Environment management is enabled for the build. Issue custom Modules/SoftEnv commands to configure the environment.
+			IEnvManager envManager = EnvManagerRegistry.getEnvManager(progress.newChild(50), connection);
+			try {
+				// Create and execute a Bash script which will configure the environment and then execute the command
+				final List<String> command = new LinkedList<String>();
+				command.add("bash"); //$NON-NLS-1$
+				command.add("-l"); //$NON-NLS-1$
+				final String bashScriptFilename = envManager.createBashScript(progress.newChild(50), true, projectProperties,
+						getCommandAsString(commandPath, args));
+				command.add(bashScriptFilename);
+				return command;
+			} catch (final Exception e) {
+				// An error occurred creating the Bash script, so attempt to put the whole thing onto the command line
+				Activator.log("Error creating bash script for launch; reverting to bash -l -c", e); //$NON-NLS-1$
+				final List<String> command = new LinkedList<String>();
+				command.add("bash"); //$NON-NLS-1$
+				command.add("-l"); //$NON-NLS-1$
+				command.add("-c"); //$NON-NLS-1$
+				final String bashCommand = envManager.getBashConcatenation(
+						"; ", true, projectProperties, getCommandAsString(commandPath, args)); //$NON-NLS-1$
+				command.add(bashCommand);
+				return command;
+			}
+		} else {
+			// Environment management disabled. Execute the build command in a login shell (so the default environment is
+			// configured).
+			final List<String> command = new LinkedList<String>();
+			command.add("bash"); //$NON-NLS-1$
+			command.add("-l"); //$NON-NLS-1$
+			command.add("-c"); //$NON-NLS-1$
+			command.add(getCommandAsString(commandPath, args));
+			return command;
+		}
+	}
+
+	/**
+	 * Constructs a command array that will be passed to the process
+	 */
+	protected String[] constructCommandArray(String command, String[] commandArgs) {
+		String[] args = new String[1 + commandArgs.length];
+		args[0] = command;
+		System.arraycopy(commandArgs, 0, args, 1, commandArgs.length);
+		return args;
+	}
+
+	private Properties convertEnvMapToProperties() {
+		Properties properties = new Properties();
+
+		for (String key : remoteEnvMap.keySet()) {
+			properties.put(key, remoteEnvMap.get(key));
+		}
+
+		return properties;
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -153,8 +246,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 			processBuilder.directory(fileManager.getResource(changeToDirectory.toString()));
 		}
 
-		// Synchronize before building
-		SyncManager.syncBlocking(null, getProject(), SyncFlag.FORCE, progress.newChild(60), null);
+		syncOnPreBuild(progress.newChild(60));
 
 		IRemoteProcess p = null;
 		try {
@@ -169,77 +261,24 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		return fProcess;
 	}
 
-	private List<String> constructCommand(IPath commandPath, String[] args, IRemoteConnection connection, IProgressMonitor monitor)
-			throws CoreException {
-		SubMonitor progress = SubMonitor.convert(monitor, 100);
-
-		SyncConfig config = SyncConfigManager.getActive(getProject());
-		final EnvManagerConfigString projectProperties = new EnvManagerConfigString(config.getProperty(EMS_CONFIG_PROPERTY));
-		if (projectProperties.isEnvMgmtEnabled()) {
-			// Environment management is enabled for the build. Issue custom Modules/SoftEnv commands to configure the environment.
-			IEnvManager envManager = EnvManagerRegistry.getEnvManager(progress.newChild(50), connection);
-			try {
-				// Create and execute a Bash script which will configure the environment and then execute the command
-				final List<String> command = new LinkedList<String>();
-				command.add("bash"); //$NON-NLS-1$
-				command.add("-l"); //$NON-NLS-1$
-				final String bashScriptFilename = envManager.createBashScript(progress.newChild(50), true, projectProperties,
-						getCommandAsString(commandPath, args));
-				command.add(bashScriptFilename);
-				return command;
-			} catch (final Exception e) {
-				// An error occurred creating the Bash script, so attempt to put the whole thing onto the command line
-				Activator.log("Error creating bash script for launch; reverting to bash -l -c", e); //$NON-NLS-1$
-				final List<String> command = new LinkedList<String>();
-				command.add("bash"); //$NON-NLS-1$
-				command.add("-l"); //$NON-NLS-1$
-				command.add("-c"); //$NON-NLS-1$
-				final String bashCommand = envManager.getBashConcatenation(
-						"; ", true, projectProperties, getCommandAsString(commandPath, args)); //$NON-NLS-1$
-				command.add(bashCommand);
-				return command;
-			}
-		} else {
-			// Environment management disabled. Execute the build command in a login shell (so the default environment is
-			// configured).
-			final List<String> command = new LinkedList<String>();
-			command.add("bash"); //$NON-NLS-1$
-			command.add("-l"); //$NON-NLS-1$
-			command.add("-c"); //$NON-NLS-1$
-			command.add(getCommandAsString(commandPath, args));
-			return command;
-		}
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.cdt.core.ICommandLauncher#getCommandArgs()
+	 */
+	@Override
+	public String[] getCommandArgs() {
+		return fCommandArgs;
 	}
 
-	private static String getCommandAsString(IPath commandPath, String[] args) {
-		final StringBuilder sb = new StringBuilder();
-		sb.append(escape(commandPath.toOSString()));
-		sb.append(' ');
-		for (String arg : args) {
-			sb.append(escape(arg));
-			sb.append(' ');
-		}
-		return sb.toString();
-	}
-
-	// See RemoteToolsProcessBuilder ctor and #charEscapify(String, Set<String>)
-	private static String escape(String inputString) {
-		if (inputString == null) {
-			return null;
-		}
-
-		final StringBuilder newString = new StringBuilder(inputString.length() + 16);
-		final CharacterIterator it = new StringCharacterIterator(inputString);
-		for (char c = it.first(); c != CharacterIterator.DONE; c = it.next()) {
-			if (c == '\'') {
-				newString.append("'\\\\\\''"); //$NON-NLS-1$
-			} else if (c > 127 || NON_ESCAPED_ASCII_CHARS.contains(c)) { // Do not escape non-ASCII characters (> 127)
-				newString.append(c);
-			} else {
-				newString.append("\\" + c); //$NON-NLS-1$
-			}
-		}
-		return newString.toString();
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.cdt.core.ICommandLauncher#getCommandLine()
+	 */
+	@Override
+	public String getCommandLine() {
+		return getCommandLine(getCommandArgs());
 	}
 
 	private String getCommandLine(String[] commandArgs) {
@@ -259,36 +298,6 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		return buf.toString();
 	}
 
-	/**
-	 * Constructs a command array that will be passed to the process
-	 */
-	protected String[] constructCommandArray(String command, String[] commandArgs) {
-		String[] args = new String[1 + commandArgs.length];
-		args[0] = command;
-		System.arraycopy(commandArgs, 0, args, 1, commandArgs.length);
-		return args;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.cdt.core.ICommandLauncher#getCommandLine()
-	 */
-	@Override
-	public String getCommandLine() {
-		return getCommandLine(getCommandArgs());
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.cdt.core.ICommandLauncher#getCommandArgs()
-	 */
-	@Override
-	public String[] getCommandArgs() {
-		return fCommandArgs;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -297,16 +306,6 @@ public class SyncCommandLauncher implements ICommandLauncher {
 	@Override
 	public Properties getEnvironment() {
 		return convertEnvMapToProperties();
-	}
-
-	private Properties convertEnvMapToProperties() {
-		Properties properties = new Properties();
-
-		for (String key : remoteEnvMap.keySet()) {
-			properties.put(key, remoteEnvMap.get(key));
-		}
-
-		return properties;
 	}
 
 	/*
@@ -319,6 +318,23 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		return fErrorMessage;
 	}
 
+	@Override
+	public IProject getProject() {
+		return fProject;
+	}
+
+	protected void printCommandLine(OutputStream os) {
+		if (os != null) {
+			String cmd = getCommandLine(getCommandArgs());
+			try {
+				os.write(cmd.getBytes());
+				os.flush();
+			} catch (IOException e) {
+				// ignore;
+			}
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -327,6 +343,11 @@ public class SyncCommandLauncher implements ICommandLauncher {
 	@Override
 	public void setErrorMessage(String error) {
 		fErrorMessage = error;
+	}
+
+	@Override
+	public void setProject(IProject project) {
+		fProject = project;
 	}
 
 	/*
@@ -340,14 +361,32 @@ public class SyncCommandLauncher implements ICommandLauncher {
 
 	}
 
-	protected void printCommandLine(OutputStream os) {
-		if (os != null) {
-			String cmd = getCommandLine(getCommandArgs());
-			try {
-				os.write(cmd.getBytes());
-				os.flush();
-			} catch (IOException e) {
-				// ignore;
+	private void syncOnPostBuild(IProgressMonitor monitor) throws CoreException {
+		SyncConfig config = SyncConfigManager.getActive(getProject());
+		if (SyncManager.getSyncAuto() && config.isSyncOnPostBuild()) {
+			switch (SyncManager.getSyncMode(getProject())) {
+			case ACTIVE:
+				SyncManager.syncBlocking(null, getProject(), SyncFlag.FORCE, monitor, null);
+				break;
+
+			case ALL:
+				SyncManager.syncAllBlocking(null, getProject(), SyncFlag.FORCE, null);
+				break;
+			}
+		}
+	}
+
+	private void syncOnPreBuild(IProgressMonitor monitor) throws CoreException {
+		SyncConfig config = SyncConfigManager.getActive(getProject());
+		if (SyncManager.getSyncAuto() && config.isSyncOnPreBuild()) {
+			switch (SyncManager.getSyncMode(getProject())) {
+			case ACTIVE:
+				SyncManager.syncBlocking(null, getProject(), SyncFlag.FORCE, monitor, null);
+				break;
+
+			case ALL:
+				SyncManager.syncAllBlocking(null, getProject(), SyncFlag.FORCE, null);
+				break;
 			}
 		}
 	}
@@ -380,6 +419,8 @@ public class SyncCommandLauncher implements ICommandLauncher {
 	 */
 	@Override
 	public int waitAndRead(OutputStream output, OutputStream err, IProgressMonitor monitor) {
+		SubMonitor progress = SubMonitor.convert(monitor, 15);
+
 		if (fShowCommand) {
 			printCommandLine(output);
 		}
@@ -390,9 +431,10 @@ public class SyncCommandLauncher implements ICommandLauncher {
 
 		RemoteProcessClosure closure = new RemoteProcessClosure(fRemoteProcess, output, err);
 		closure.runNonBlocking();
-		while (!monitor.isCanceled() && closure.isRunning()) {
+		while (!progress.isCanceled() && closure.isRunning()) {
 			try {
 				Thread.sleep(DELAY);
+				progress.worked(1);
 			} catch (InterruptedException ie) {
 				// ignore
 			}
@@ -403,7 +445,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 
 		int state = OK;
 		// Operation canceled by the user, terminate abnormally.
-		if (monitor.isCanceled()) {
+		if (progress.isCanceled()) {
 			closure.terminate();
 			state = COMMAND_CANCELED;
 			setErrorMessage(CCorePlugin.getResourceString("CommandLauncher.error.commandCanceled")); //$NON-NLS-1$
@@ -416,28 +458,24 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		}
 
 		try {
+			syncOnPostBuild(progress.newChild(5));
+		} catch (CoreException e) {
+			Activator.log(e);
+		}
+
+		try {
 			// Do not allow the cancel of the refresh, since the
 			// builder is external
 			// to Eclipse, files may have been created/modified
 			// and we will be out-of-sync.
 			// The caveat is that for huge projects, it may take a while
-			getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
+			getProject().refreshLocal(IResource.DEPTH_INFINITE, progress.newChild(5));
 		} catch (CoreException e) {
 			// this should never happen because we should never be building from a
 			// state where ressource changes are disallowed
 		}
 
 		return state;
-	}
-
-	@Override
-	public IProject getProject() {
-		return fProject;
-	}
-
-	@Override
-	public void setProject(IProject project) {
-		fProject = project;
 	}
 
 }

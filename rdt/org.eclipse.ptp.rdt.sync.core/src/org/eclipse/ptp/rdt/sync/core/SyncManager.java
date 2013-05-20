@@ -544,7 +544,6 @@ public class SyncManager {
 
 	/**
 	 * Invoke sync for all configurations on a project.
-	 * Note that there is no syncAllBlocking, because it was not needed but would be easy to add.
 	 * 
 	 * @param delta
 	 *            project delta
@@ -566,6 +565,32 @@ public class SyncManager {
 		}
 
 		return scheduleSyncJobs(delta, project, syncFlags, mode, false, true, seHandler, null);
+	}
+
+	/**
+	 * Invoke sync for all configurations on a project and block until the sync finishes. This does not spawn another thread and no
+	 * locking of resources is done. Throws sync exceptions for client to handle.
+	 * 
+	 * @param delta
+	 *            project delta
+	 * @param project
+	 *            project to sync
+	 * @param syncFlags
+	 *            sync flags
+	 * @param seHandler
+	 *            logic to handle exceptions
+	 * @return array of sync jobs scheduled
+	 * @throws CoreException
+	 *             on problems sync'ing
+	 */
+	public static Job[] syncAllBlocking(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags,
+			ISyncExceptionHandler seHandler) throws CoreException {
+		SyncMode mode = getSyncMode(project);
+		if (mode == SyncMode.UNAVAILABLE) {
+			return new Job[0];
+		}
+
+		return scheduleSyncJobs(delta, project, syncFlags, mode, true, true, seHandler, null);
 	}
 
 	/**
