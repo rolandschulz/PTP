@@ -582,7 +582,7 @@ public class LaunchController implements ILaunchController {
 	 * @see org.eclipse.ptp.rm.jaxb.control.core.ILaunchController#hasRunningJobs()
 	 */
 	public boolean hasRunningJobs() {
-		return !jobStatusMap.isEmpty();
+		return jobStatusMap != null && !jobStatusMap.isEmpty();
 	}
 
 	/*
