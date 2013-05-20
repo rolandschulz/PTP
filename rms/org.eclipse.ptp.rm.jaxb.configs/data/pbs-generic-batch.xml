@@ -142,6 +142,9 @@ no keep, return files to submission host.]]></tooltip>
 			<description>The set of users to whom mail may be sent when the job makes certain state changes.</description>
 			<tooltip>Format: "user@host[,user@host]"; default value: job owner only.</tooltip>
 		</attribute>
+		<attribute name="modules" type="string">
+			<description>Modules that will be loaded inside the job script.</description>
+		</attribute>
 		<attribute name="Output_Path" type="string">
 			<description>The final path name for the file containing the job's standard output stream.</description>
 			<tooltip><![CDATA[Format: "[hostname:]pathname". If the option
@@ -375,6 +378,9 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 			</line>
 			<line>
 				<arg isUndefinedIfMatches="#PBS">#PBS ${ptp_rm:export_all#value}</arg>
+			</line>
+			<line>
+				<arg isUndefinedIfMatches="">${ptp_rm:modules#value}</arg>
 			</line>
 			<line>
 				<arg>MPI_ARGS="-np ${ptp_rm:mpiNumberOfProcesses#value}"</arg>
@@ -739,15 +745,34 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						<fixed-text>Export Environment: </fixed-text>
 					</widget>
 					<widget type="checkbox" style="SWT.BORDER" attribute="export_all">
-                  <layout-data>
-                     <grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false"/>
-                  </layout-data>
-               </widget>
+                  		<layout-data>
+                     		<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false"/>
+                  		</layout-data>
+					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:export_all#description}</fixed-text>
+					</widget>
+					<!-- row 10 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:modules#tooltip}</tooltip>
+						<fixed-text>Modules to Load: </fixed-text>
+					</widget>
+					<widget type="custom" typeId="envconfig" style="SWT.NONE" attribute="modules">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:modules#description}</fixed-text>
 					</widget>
 				</composite>
 			</dynamic>
