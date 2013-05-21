@@ -24,7 +24,8 @@
         <debugger
               name="gdb-mi"
               priority="10"
-              sdmPath="/usr/local/bin/sdm">
+              sdmPath="/usr/local/bin/sdm"
+              useBuiltin="true">
         </debugger>
      </extension>
 </plugin>

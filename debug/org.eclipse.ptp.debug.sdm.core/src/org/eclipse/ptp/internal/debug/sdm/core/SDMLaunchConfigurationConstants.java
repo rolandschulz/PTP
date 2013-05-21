@@ -30,4 +30,9 @@ public interface SDMLaunchConfigurationConstants {
 	public static final String ATTR_DEBUGGER_SDM_BACKEND_PATH = IPTPLaunchConfigurationConstants.PTP_LAUNCH_ID
 			+ ".DEBUGGER_SDM_BACKEND_PATH"; //$NON-NLS-1$
 
+	/**
+	 * Launch configuration attribute key to specify that the built-in sdm should be used if available
+	 */
+	public static final String ATTR_DEBUGGER_USE_BUILTIN_SDM = IPTPLaunchConfigurationConstants.PTP_LAUNCH_ID
+			+ ".DEBUGGER_USE_BUILTIN_SDM"; //$NON-NLS-1$
 }

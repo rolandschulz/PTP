@@ -40,11 +40,13 @@ public class SDMDebugCorePlugin extends Plugin {
 			try {
 				pri1 = Integer.parseInt(debuggerBackends.get(o1));
 			} catch (NumberFormatException e) {
+				// Ignore
 			}
 			int pri2 = 0;
 			try {
 				pri2 = Integer.parseInt(debuggerBackends.get(o2));
 			} catch (NumberFormatException e) {
+				// Ignore
 			}
 			return pri2 - pri1;
 		}
@@ -67,6 +69,7 @@ public class SDMDebugCorePlugin extends Plugin {
 	private static final String ATTR_PRIORITY = "priority"; //$NON-NLS-1$
 	private static final String ATTR_NAME = "name"; //$NON-NLS-1$
 	private static final String ATTR_BACKEND_PATH = "backendPath"; //$NON-NLS-1$
+	private static final String ATTR_USE_BUILTIN = "useBuiltin"; //$NON-NLS-1$
 
 	private static SDMDebugCorePlugin plugin;
 
@@ -88,6 +91,7 @@ public class SDMDebugCorePlugin extends Plugin {
 
 	private Map<String, String> debuggerBackends = null;
 	private Map<String, String> debuggerBackendPaths = null;
+	private Map<String, Boolean> debuggerUseBuiltin = null;
 	private Map<String, String> debuggerSDMPaths = null;
 
 	/**
@@ -114,6 +118,15 @@ public class SDMDebugCorePlugin extends Plugin {
 		String[] backends = debuggerBackends.keySet().toArray(new String[debuggerBackends.size()]);
 		Arrays.sort(backends, new BackendSorter());
 		return backends;
+	}
+
+	public boolean getDebuggerUseBuiltin(String backend) {
+		initializeDebuggerBackends();
+		Boolean useBuiltin = debuggerUseBuiltin.get(backend);
+		if (useBuiltin != null) {
+			return useBuiltin.booleanValue();
+		}
+		return false;
 	}
 
 	/**
@@ -156,10 +169,12 @@ public class SDMDebugCorePlugin extends Plugin {
 		try {
 			pri1 = Integer.parseInt(p1);
 		} catch (NumberFormatException e) {
+			// Ignore
 		}
 		try {
 			pri2 = Integer.parseInt(p2);
 		} catch (NumberFormatException e) {
+			// Ignore
 		}
 		return pri1 - pri2;
 	}
@@ -168,6 +183,7 @@ public class SDMDebugCorePlugin extends Plugin {
 		if (debuggerBackends == null) {
 			debuggerBackends = new HashMap<String, String>();
 			debuggerBackendPaths = new HashMap<String, String>();
+			debuggerUseBuiltin = new HashMap<String, Boolean>();
 			debuggerSDMPaths = new HashMap<String, String>();
 			IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(getUniqueIdentifier(),
 					SDM_DEBUGGER_EXTENSION_POINT_ID);
@@ -184,8 +200,12 @@ public class SDMDebugCorePlugin extends Plugin {
 						debuggerBackends.put(backend, newPriority);
 						String path = configurationElement.getAttribute(ATTR_BACKEND_PATH);
 						debuggerBackendPaths.put(backend, path == null ? EMPTY_STRING : path);
-						String sdm_path = configurationElement.getAttribute(ATTR_SDM_PATH);
-						debuggerSDMPaths.put(backend, sdm_path == null ? EMPTY_STRING : sdm_path);
+						String sdmPath = configurationElement.getAttribute(ATTR_SDM_PATH);
+						debuggerSDMPaths.put(backend, sdmPath == null ? EMPTY_STRING : sdmPath);
+						String useBuiltin = configurationElement.getAttribute(ATTR_USE_BUILTIN);
+						if (useBuiltin != null) {
+							debuggerUseBuiltin.put(backend, Boolean.valueOf(useBuiltin));
+						}
 					}
 				}
 			}

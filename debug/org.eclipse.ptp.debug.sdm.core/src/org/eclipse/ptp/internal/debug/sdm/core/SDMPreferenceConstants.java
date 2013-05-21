@@ -102,4 +102,9 @@ public interface SDMPreferenceConstants {
 	 */
 	public static final String PREFS_SDM_PATH = PLUGIN_ID + ".sdm_path."; //$NON-NLS-1$
 
+	/**
+	 * Use the built-in sdm if available
+	 */
+	public static final String PREFS_USE_BUILTIN_SDM = PLUGIN_ID + ".use_builtin_sdm."; //$NON-NLS-1$
+
 }

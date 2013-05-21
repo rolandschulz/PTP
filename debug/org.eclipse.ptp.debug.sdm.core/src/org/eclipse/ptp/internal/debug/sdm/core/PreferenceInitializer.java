@@ -34,11 +34,14 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 	 */
 	@Override
 	public void initializeDefaultPreferences() {
+		Preferences.setDefaultString(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.PREFS_SDM_BACKEND, "gdb-mi"); //$NON-NLS-1$
 		for (String backend : SDMDebugCorePlugin.getDefault().getDebuggerBackends()) {
 			Preferences.setDefaultString(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.PREFS_SDM_BACKEND_PATH
 					+ backend, SDMDebugCorePlugin.getDefault().getDebuggerBackendPath(backend));
 			Preferences.setDefaultString(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.PREFS_SDM_PATH + backend,
 					SDMDebugCorePlugin.getDefault().getDebuggerSDMPath(backend));
+			Preferences.setDefaultBoolean(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.PREFS_USE_BUILTIN_SDM
+					+ backend, SDMDebugCorePlugin.getDefault().getDebuggerUseBuiltin(backend));
 		}
 	}
 }

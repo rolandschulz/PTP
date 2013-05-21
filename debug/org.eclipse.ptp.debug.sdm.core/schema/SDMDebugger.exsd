@@ -77,6 +77,13 @@
                </documentation>
             </annotation>
          </attribute>
+         <attribute name="useBuiltin" type="boolean">
+            <annotation>
+               <documentation>
+                  Use the built-in SDM if available. If not available, the launch will fall back to the SDM specified in the sdmPath attribute.
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 
