@@ -23,7 +23,9 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.jface.bindings.keys.KeyStroke;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.fieldassist.ComboContentAdapter;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
 import org.eclipse.jface.fieldassist.IContentProposal;
@@ -31,6 +33,7 @@ import org.eclipse.jface.fieldassist.IContentProposalListener;
 import org.eclipse.jface.fieldassist.SimpleContentProposalProvider;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.jobs.IJobControl;
 import org.eclipse.ptp.core.util.LaunchUtils;
 import org.eclipse.ptp.internal.rm.jaxb.core.JAXBExtensionUtils;
@@ -142,6 +145,25 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#createControl(org.eclipse .swt.widgets.Composite)
 	 */
 
+	private boolean changeConnection(IRemoteConnection conn, ILaunchController controller) {
+		boolean autoRun = false;
+		try {
+			autoRun = getLaunchConfiguration().getAttribute(IPTPLaunchConfigurationConstants.ATTR_AUTO_RUN_COMMAND, false);
+		} catch (CoreException e) {
+			// Ignore
+		}
+		if (!autoRun && controller.getConfiguration().getControlData().getStartUpCommand() != null) {
+			MessageDialogWithToggle dialog = MessageDialogWithToggle.openYesNoQuestion(getShell(),
+					Messages.ResourcesTab_openConnection, NLS.bind(Messages.ResourcesTab_noInformation, conn.getName()),
+					Messages.ResourcesTab_Dont_ask_to_run_command, false, null, null);
+			if (dialog.getReturnCode() == IDialogConstants.NO_ID) {
+				return false;
+			}
+			setAutoRun(dialog.getToggleState());
+		}
+		return true;
+	}
+
 	public void createControl(Composite parent) {
 		final int numColumns = 2;
 		final Composite comp = new Composite(parent, SWT.NONE);
@@ -169,16 +191,16 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		}
 		fSystemTypeCombo.addSelectionListener(new SelectionAdapter() {
 			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				// this is called when 'enter' is pressed as opposed to mouse-click
+				widgetSelected(e);
+			}
+
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				rmTypeSelectionChanged();
 				updateEnablement();
 				handleConnectionChanged();
-			}
-
-			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-				// this is called when 'enter' is pressed as opposed to mouse-click
-				widgetSelected(e);
 			}
 		});
 		enableContentProposal(fSystemTypeCombo);
@@ -198,7 +220,8 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			});
 		}
 
-		fRemoteConnectionWidget = new RemoteConnectionWidget(comp, SWT.NONE, Messages.ResourcesTab_Connection_Type, 0, getLaunchConfigurationDialog());
+		fRemoteConnectionWidget = new RemoteConnectionWidget(comp, SWT.NONE, Messages.ResourcesTab_Connection_Type, 0,
+				getLaunchConfigurationDialog());
 		fRemoteConnectionWidget.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
 		fRemoteConnectionWidget.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -213,6 +236,33 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		final ScrolledComposite scrollComp = createLaunchAttributeControlComposite(comp, numColumns);
 		setLaunchAttrsScrollComposite(scrollComp);
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#getId()
+	 */
+
+	/**
+	 * @param parent
+	 * @param colspan
+	 * @return
+	 */
+	private ScrolledComposite createLaunchAttributeControlComposite(Composite parent, int colspan) {
+		ScrolledComposite attrComp = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
+		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
+		gridData.horizontalSpan = colspan;
+		attrComp.setLayoutData(gridData);
+		attrComp.setExpandHorizontal(true);
+		attrComp.setExpandVertical(true);
+		return attrComp;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#getImage()
+	 */
 
 	/**
 	 * Enable content-assist-like completion/filtering of TSC type by typing
@@ -253,7 +303,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#getId()
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#getName()
 	 */
 
 	@Override
@@ -264,7 +314,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#getImage()
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#initializeFrom(org.eclipse .debug.core.ILaunchConfiguration)
 	 */
 
 	@Override
@@ -275,18 +325,127 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#getName()
+	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#isValid(org.eclipse .debug.core.ILaunchConfiguration)
 	 */
 
-	public String getName() {
-		return Messages.ResourcesTab_Resources;
+	/**
+	 * @return
+	 */
+	private ScrolledComposite getLaunchAttrsScrollComposite() {
+		return launchAttrsScrollComposite;
+	}
+
+	/**
+	 * Returns a cached launch configuration dynamic tab. If it isn't in the cache then it creates a new one, and puts it in the
+	 * cache. Does not require a progress monitor.
+	 * 
+	 * @param controller
+	 *            launch controller
+	 * @return
+	 */
+	private IRMLaunchConfigurationDynamicTab getLaunchConfigurationDynamicTab(final ILaunchController controller) {
+		if (!fDynamicTabs.containsKey(controller)) {
+			final IRMLaunchConfigurationDynamicTab[] dynamicTab = new IRMLaunchConfigurationDynamicTab[1];
+			try {
+				getLaunchConfigurationDialog().run(false, true, new IRunnableWithProgress() {
+
+					public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+						SubMonitor progress = SubMonitor.convert(monitor, 1);
+						dynamicTab[0] = getLaunchConfigurationDynamicTab(controller, progress.newChild(1));
+					}
+				});
+			} catch (InvocationTargetException e) {
+				// Ignore
+			} catch (InterruptedException e) {
+				// Ignore
+			}
+			return dynamicTab[0];
+		}
+		return fDynamicTabs.get(controller);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#initializeFrom(org.eclipse .debug.core.ILaunchConfiguration)
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#setDefaults(org.eclipse. debug.core.ILaunchConfigurationWorkingCopy)
 	 */
+
+	/**
+	 * Returns a cached launch configuration dynamic tab. If it isn't in the cache then it creates a new one, and puts it in the
+	 * cache.
+	 * 
+	 * @param controller
+	 *            launch controller
+	 * @param monitor
+	 *            progress monitor
+	 * @return
+	 */
+	private IRMLaunchConfigurationDynamicTab getLaunchConfigurationDynamicTab(final ILaunchController controller,
+			IProgressMonitor monitor) {
+		if (!fDynamicTabs.containsKey(controller)) {
+			try {
+				IRMLaunchConfigurationDynamicTab dynamicTab = new JAXBControllerLaunchConfigurationTab(controller, monitor);
+				dynamicTab.addContentsChangedListener(launchContentsChangedListener);
+				fDynamicTabs.put(controller, dynamicTab);
+				return dynamicTab;
+			} catch (Throwable e) {
+				setErrorMessage(e.getMessage());
+				PTPLaunchPlugin.errorDialog(e.getMessage(), e.getCause());
+				return null;
+			}
+		}
+		return fDynamicTabs.get(controller);
+	}
+
+	public String getName() {
+		return Messages.ResourcesTab_Resources;
+	}
+
+	private ILaunchController getNewController(final String remId, final String connName, final String type) {
+		try {
+			return LaunchControllerManager.getInstance().getLaunchController(remId, connName, type);
+		} catch (CoreException e) {
+			PTPLaunchPlugin.errorDialog(e.getMessage(), e.getCause());
+			return null;
+		}
+	}
+
+	private void handleConnectionChanged() {
+		/*
+		 * LaunchConfigurationsDialog#run() tries to preserve the focus control. However, updateLaunchAttributeControls() will
+		 * dispose of all the controls on the dynamic tab, leading to a widget disposed exception. The easy solution is to remove
+		 * focus from the dynamic controls first.
+		 */
+		fRemoteConnectionWidget.setFocus();
+
+		IRemoteConnection conn = null;
+		if (fRemoteConnectionWidget.isEnabled()) {
+			conn = fRemoteConnectionWidget.getConnection();
+		}
+		if (conn == null) {
+			stopController(fLaunchControl);
+			fLaunchControl = null;
+			fRemoteConnection = null;
+			updateLaunchAttributeControls(null, getLaunchConfiguration(), false);
+			updateLaunchConfigurationDialog();
+		} else {
+			// We assume fSystemTypeCombo selection is valid based on previous tests
+			String type = fSystemTypeCombo.getText();
+			ILaunchController controller = getNewController(conn.getRemoteServices().getId(), conn.getName(), type);
+			if (controller != null && changeConnection(conn, controller)) {
+				stopController(fLaunchControl);
+				fLaunchControl = controller;
+				fRemoteConnection = conn;
+				updateLaunchAttributeControls(fLaunchControl, getLaunchConfiguration(), true);
+				updateLaunchConfigurationDialog();
+			} else {
+				/*
+				 * Failed to change connection, reset back to the previous one
+				 */
+				fRemoteConnectionWidget.setConnection(fRemoteConnection);
+			}
+		}
+	}
 
 	@Override
 	public void initializeFrom(ILaunchConfiguration configuration) {
@@ -333,11 +492,23 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#isValid(org.eclipse .debug.core.ILaunchConfiguration)
+	/**
+	 * Determine if target system configuration selection in the combo box is a valid one -
+	 * one in the existing list has been selected:
+	 * not an invalid value typed, and not the "Please Select..." message at the top.
 	 */
+	private boolean isTSCselectionValid() {
+		String selected = fSystemTypeCombo.getText();
+		boolean result = false;
+		if (!fSystemTypeCombo.getText().equals(Messages.ResourcesTab_pleaseSelectTargetSystem)) {
+			for (String s : fSystemTypeCombo.getItems()) {
+				if (selected.equals(s)) {
+					result = true;
+				}
+			}
+		}
+		return result;
+	}
 
 	@Override
 	public boolean isValid(ILaunchConfiguration configuration) {
@@ -400,157 +571,27 @@ public class ResourcesTab extends LaunchConfigurationTab {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#setDefaults(org.eclipse. debug.core.ILaunchConfigurationWorkingCopy)
-	 */
-
-	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
-		// Do nothing
-	}
-
-	/**
-	 * @param parent
-	 * @param colspan
-	 * @return
-	 */
-	private ScrolledComposite createLaunchAttributeControlComposite(Composite parent, int colspan) {
-		ScrolledComposite attrComp = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
-		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
-		gridData.horizontalSpan = colspan;
-		attrComp.setLayoutData(gridData);
-		attrComp.setExpandHorizontal(true);
-		attrComp.setExpandVertical(true);
-		return attrComp;
-	}
-
-	/**
-	 * @return
-	 */
-	private ScrolledComposite getLaunchAttrsScrollComposite() {
-		return launchAttrsScrollComposite;
-	}
-
-	/**
-	 * Returns a cached launch configuration dynamic tab. If it isn't in the cache then it creates a new one, and puts it in the
-	 * cache. Does not require a progress monitor.
-	 * 
-	 * @param controller
-	 *            launch controller
-	 * @return
-	 */
-	private IRMLaunchConfigurationDynamicTab getLaunchConfigurationDynamicTab(final ILaunchController controller) {
-		if (!fDynamicTabs.containsKey(controller)) {
-			final IRMLaunchConfigurationDynamicTab[] dynamicTab = new IRMLaunchConfigurationDynamicTab[1];
-			try {
-				getLaunchConfigurationDialog().run(false, true, new IRunnableWithProgress() {
-
-					public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-						SubMonitor progress = SubMonitor.convert(monitor, 1);
-						dynamicTab[0] = getLaunchConfigurationDynamicTab(controller, progress.newChild(1));
-					}
-				});
-			} catch (InvocationTargetException e) {
-				// Ignore
-			} catch (InterruptedException e) {
-				// Ignore
-			}
-			return dynamicTab[0];
-		}
-		return fDynamicTabs.get(controller);
-	}
-
-	/**
-	 * Returns a cached launch configuration dynamic tab. If it isn't in the cache then it creates a new one, and puts it in the
-	 * cache.
-	 * 
-	 * @param controller
-	 *            launch controller
-	 * @param monitor
-	 *            progress monitor
-	 * @return
-	 */
-	private IRMLaunchConfigurationDynamicTab getLaunchConfigurationDynamicTab(final ILaunchController controller,
-			IProgressMonitor monitor) {
-		if (!fDynamicTabs.containsKey(controller)) {
-			try {
-				IRMLaunchConfigurationDynamicTab dynamicTab = new JAXBControllerLaunchConfigurationTab(controller, monitor);
-				dynamicTab.addContentsChangedListener(launchContentsChangedListener);
-				fDynamicTabs.put(controller, dynamicTab);
-				return dynamicTab;
-			} catch (Throwable e) {
-				setErrorMessage(e.getMessage());
-				PTPLaunchPlugin.errorDialog(e.getMessage(), e.getCause());
-				return null;
-			}
-		}
-		return fDynamicTabs.get(controller);
-	}
-
-	private ILaunchController getNewController(final String remId, final String connName, final String type) {
-		try {
-			return LaunchControllerManager.getInstance().getLaunchController(remId, connName, type);
-		} catch (CoreException e) {
-			PTPLaunchPlugin.errorDialog(e.getMessage(), e.getCause());
-			return null;
-		}
-	}
-
-	private void handleConnectionChanged() {
-		/*
-		 * LaunchConfigurationsDialog#run() tries to preserve the focus control. However, updateLaunchAttributeControls() will
-		 * dispose of all the controls on the dynamic tab, leading to a widget disposed exception. The easy solution is to remove
-		 * focus from the dynamic controls first.
-		 */
-		fRemoteConnectionWidget.setFocus();
-
-		IRemoteConnection conn = null;
-		if (fRemoteConnectionWidget.isEnabled()) {
-			conn = fRemoteConnectionWidget.getConnection();
-		}
-		if (conn == null) {
-			stopController(fLaunchControl);
-			fLaunchControl = null;
-			fRemoteConnection = null;
-			updateLaunchAttributeControls(null, getLaunchConfiguration(), false);
-			updateLaunchConfigurationDialog();
-		} else {
-			// We assume fSystemTypeCombo selection is valid based on previous tests
-			String type = fSystemTypeCombo.getText();
-			ILaunchController controller = getNewController(conn.getRemoteServices().getId(), conn.getName(), type);
-			if (controller != null && changeConnection(conn, controller)) {
-				stopController(fLaunchControl);
-				fLaunchControl = controller;
-				fRemoteConnection = conn;
-				updateLaunchAttributeControls(fLaunchControl, getLaunchConfiguration(), true);
-				updateLaunchConfigurationDialog();
-			} else {
-				/*
-				 * Failed to change connection, reset back to the previous one
-				 */
-				fRemoteConnectionWidget.setConnection(fRemoteConnection);
-			}
-		}
-	}
-
-	private boolean changeConnection(IRemoteConnection conn, ILaunchController controller) {
-		if (controller.getConfiguration().getControlData().getStartUpCommand() != null) {
-			boolean result = MessageDialog.openQuestion(getShell(), Messages.ResourcesTab_openConnection,
-					NLS.bind(Messages.ResourcesTab_noInformation, conn.getName()));
-			if (!result) {
-				return false;
-			}
-		}
-		return true;
-	}
-
 	/**
 	 * Handle selection of a resource manager type
 	 */
 	private void rmTypeSelectionChanged() {
 		stopController(fLaunchControl);
 		fLaunchControl = null;
+		setAutoRun(false);
+	}
+
+	private void setAutoRun(boolean auto) {
+		try {
+			ILaunchConfigurationWorkingCopy copy = getLaunchConfiguration().getWorkingCopy();
+			copy.setAttribute(IPTPLaunchConfigurationConstants.ATTR_AUTO_RUN_COMMAND, auto);
+			copy.doSave();
+		} catch (CoreException e) {
+			// Ignore
+		}
+	}
+
+	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
+		// Do nothing
 	}
 
 	/**
@@ -644,23 +685,5 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			}
 		}
 		launchAttrsScrollComp.layout(true);
-	}
-
-	/**
-	 * Determine if target system configuration selection in the combo box is a valid one -
-	 * one in the existing list has been selected:
-	 * not an invalid value typed, and not the "Please Select..." message at the top.
-	 */
-	private boolean isTSCselectionValid() {
-		String selected = fSystemTypeCombo.getText();
-		boolean result = false;
-		if (!fSystemTypeCombo.getText().equals(Messages.ResourcesTab_pleaseSelectTargetSystem)) {
-			for (String s : fSystemTypeCombo.getItems()) {
-				if (selected.equals(s)) {
-					result = true;
-				}
-			}
-		}
-		return result;
 	}
 }

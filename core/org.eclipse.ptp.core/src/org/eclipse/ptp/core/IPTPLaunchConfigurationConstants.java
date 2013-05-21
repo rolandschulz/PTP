@@ -226,10 +226,19 @@ public interface IPTPLaunchConfigurationConstants {
 	public static final String ATTR_SYNC_RULES = PTP_LAUNCH_ID + ".ATTR_SYNC_RULES"; //$NON-NLS-1$
 
 	/**
-	 * Launch configuration attribute key. The value is an EMS configuration
+	 * Launch configuration attribute key. The value is an EMS configuration that will be used to set the environment prior to
+	 * launching.
 	 * 
 	 * @since 7.0
 	 */
 	public static final String ATTR_EMS_CONFIG = PTP_LAUNCH_ID + ".ATTR_EMS_CONFIG"; //$NON-NLS-1$
+
+	/**
+	 * Launch configuration attribute key. The value is a boolean that indicates that a remote command should be automatically
+	 * run without asking the user for permission. Used by Resources Tab.
+	 * 
+	 * @since 7.0
+	 */
+	public static final String ATTR_AUTO_RUN_COMMAND = PTP_LAUNCH_ID + ".ATTR_AUTO_RUN_COMMAND"; //$NON-NLS-1$
 
 }
