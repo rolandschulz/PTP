@@ -104,7 +104,7 @@ public class ApplicationQueryControl extends LSFQueryControl {
 				commandResponse.clear();
 				while (data != null) {
 					if (headerLine) {
-						if (data.equals("No application found")) { //$NON-NLS-1$
+						if (data.equals("No application profiles found")) { //$NON-NLS-1$
 							MessageDialog.openWarning(getShell(), Messages.ApplicationQueryControl_2,
 									Messages.ApplicationQueryControl_3);
 							reader.close();
