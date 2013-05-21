@@ -15,7 +15,7 @@
 
 	<properties>
 		<eclipse-release>kepler</eclipse-release>
-		<tycho-version>0.15.0</tycho-version>
+		<tycho-version>0.17.0</tycho-version>
 		<platform-version>4.3milestones</platform-version>
 		<platform-site>http://download.eclipse.org/eclipse/updates/${platform-version}</platform-site>
 		<tm-version>3.5milestones</tm-version>
