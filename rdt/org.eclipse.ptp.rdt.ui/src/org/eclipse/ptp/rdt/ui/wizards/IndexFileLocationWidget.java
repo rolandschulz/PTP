@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.ptp.internal.rdt.ui.RSEUtils;
@@ -172,27 +173,33 @@ public class IndexFileLocationWidget extends Composite {
 	
 	private void restoreDefault() {
 		text.setText(RSEUtils.getDefaultConfigDirectory(host));
+		validateIndexLoc();
 	}
 	
 	private void validateIndexLoc() {
 		String path = text.getText();
 		IRemoteFileSubSystem remoteFileSubSystem = RemoteFileUtility.getFileSubSystem(host);
 		
+		// display the message in the property dialog if possible
+		Composite parent = text.getParent();
+		PreferenceDialog dialog = null;
+		while (parent!=null && !(parent instanceof Shell)) 
+			parent=parent.getParent();
+		if (parent instanceof Shell) {
+			if (parent.getData() instanceof PreferenceDialog) {
+				dialog = (PreferenceDialog)parent.getData();
+				dialog.setMessage(null, IMessageProvider.NONE); 
+			}					
+		}			
+		
 		try {
 			IRemoteFile currentRemoteFolder = 
 				remoteFileSubSystem.getRemoteFileObject(path, new NullProgressMonitor());
 						
-			if (!currentRemoteFolder.canWrite()){	
-				// display the message in the property dialog if possible
-				Composite parent = text.getParent();
-				while (parent!=null && !(parent instanceof Shell)) 
-					parent=parent.getParent();
-				if (parent instanceof Shell) {
-					if (parent.getData() instanceof PreferenceDialog) {
-						PreferenceDialog dialog = (PreferenceDialog)parent.getData();
-						dialog.setErrorMessage(Messages.getString("InvalidIndexLocationLabel")); //$NON-NLS-1$
-					}					
-				} else
+			if (currentRemoteFolder == null || !currentRemoteFolder.canWrite()){	
+				if (dialog!=null) 
+					dialog.setMessage(Messages.getString("InvalidIndexLocationLabel"), IMessageProvider.ERROR); //$NON-NLS-1$
+				else
 					// just display a dialog
 					MessageDialog.openWarning(getShell(), 
 							Messages.getString("InvalidIndexLocationTitle"), Messages.getString("InvalidIndexLocationLabel")); //$NON-NLS-1$ //$NON-NLS-2$
