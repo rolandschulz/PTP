@@ -20,8 +20,8 @@ import org.eclipse.ptp.internal.core.PTPCorePlugin;
 import org.osgi.service.prefs.BackingStoreException;
 
 /**
- * Convenience class to facilitate using the new {@link IEclipsePreferences}
- * story. Adapted from org.eclipse.debug.internal.core.Preferences.
+ * Convenience class to facilitate using the new {@link IEclipsePreferences} story. Adapted from
+ * org.eclipse.debug.internal.core.Preferences.
  * 
  * @since 5.0
  * @noinstantiate This class is not intended to be instantiated by clients.
@@ -34,8 +34,7 @@ public final class Preferences {
 	private static final int INSTANCE_CONTEXT = 1;
 
 	/**
-	 * Adds the given preference listener to the {@link DefaultScope} and the
-	 * {@link InstanceScope}
+	 * Adds the given preference listener to the {@link DefaultScope} and the {@link InstanceScope}
 	 * 
 	 * @param qualifier
 	 * @param listener
@@ -64,9 +63,8 @@ public final class Preferences {
 	 * 
 	 * @param qualifier
 	 * @param key
-	 * @param defaultvalue
 	 * 
-	 * @return the value of the preference or the given default value
+	 * @return the value of the preference or false if no preference has been set
 	 */
 	public static boolean getBoolean(String qualifier, String key) {
 		return Platform.getPreferencesService().getBoolean(qualifier, key, false, null);
@@ -79,9 +77,8 @@ public final class Preferences {
 	 * 
 	 * @param qualifier
 	 * @param key
-	 * @param defaultvalue
 	 * 
-	 * @return the value of the preference or the given default value
+	 * @return the value of the preference or null if no preference has been set
 	 */
 	public static byte[] getByteArray(String qualifier, String key) {
 		return Platform.getPreferencesService().getByteArray(qualifier, key, null, null);
@@ -104,8 +101,8 @@ public final class Preferences {
 	}
 
 	/**
-	 * Returns the default byte array value stored in the {@link DefaultScope}
-	 * for the given key or the specified default value if the key does not
+	 * Returns the default byte array value stored in the {@link DefaultScope} for the given key or the specified default value if
+	 * the key does not
 	 * appear in the {@link DefaultScope}
 	 * 
 	 * @param qualifier
@@ -206,9 +203,8 @@ public final class Preferences {
 	 * 
 	 * @param qualifier
 	 * @param key
-	 * @param defaultvalue
 	 * 
-	 * @return the value of the preference or the given default value
+	 * @return the value of the preference or 0.0 if no preference has been set
 	 */
 	public static double getDouble(String qualifier, String key) {
 		return Platform.getPreferencesService().getDouble(qualifier, key, 0.0, null);
@@ -221,9 +217,8 @@ public final class Preferences {
 	 * 
 	 * @param qualifier
 	 * @param key
-	 * @param defaultvalue
 	 * 
-	 * @return the value of the preference or the given default value
+	 * @return the value of the preference or 0.0f if no preference has been set
 	 */
 	public static float getFloat(String qualifier, String key) {
 		return Platform.getPreferencesService().getFloat(qualifier, key, 0.0f, null);
@@ -236,9 +231,8 @@ public final class Preferences {
 	 * 
 	 * @param qualifier
 	 * @param key
-	 * @param defaultvalue
 	 * 
-	 * @return the value of the preference or the given default value
+	 * @return the value of the preference or 0 if no preference has been set
 	 */
 	public static int getInt(String qualifier, String key) {
 		return Platform.getPreferencesService().getInt(qualifier, key, 0, null);
@@ -251,9 +245,8 @@ public final class Preferences {
 	 * 
 	 * @param qualifier
 	 * @param key
-	 * @param defaultvalue
 	 * 
-	 * @return the value of the preference or the given default value
+	 * @return the value of the preference or 0L if no preference has been set
 	 */
 	public static long getLong(String qualifier, String key) {
 		return Platform.getPreferencesService().getLong(qualifier, key, 0L, null);
@@ -266,9 +259,8 @@ public final class Preferences {
 	 * 
 	 * @param qualifier
 	 * @param key
-	 * @param defaultvalue
 	 * 
-	 * @return the value of the preference or the given default value
+	 * @return the value of the preference or "" if no preference has been set
 	 */
 	public static String getString(String qualifier, String key) {
 		return Platform.getPreferencesService().getString(qualifier, key, "", null); //$NON-NLS-1$
@@ -279,7 +271,7 @@ public final class Preferences {
 	 * 
 	 * @param qualifier
 	 * @param name
-	 * @return
+	 * @return true if the preference exists has a default value
 	 */
 	public static boolean isDefault(String qualifier, String name) {
 		String defVal = contexts[DEFAULT_CONTEXT].getNode(qualifier).get(name, null);

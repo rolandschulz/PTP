@@ -71,6 +71,29 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	protected Button fDefaultSessionAddressButton;
 	protected ExpandableComposite fAdvancedOptions;
 
+	/**
+	 * Browse for a file.
+	 * 
+	 * @return path to file selected in browser
+	 */
+	private String browseFile() {
+		if (fRemoteConnection != null) {
+			IRemoteUIServices remoteUISrv = RemoteUIServices.getRemoteUIServices(fRemoteConnection.getRemoteServices());
+			if (remoteUISrv != null) {
+				IRemoteUIFileManager fileManager = remoteUISrv.getUIFileManager();
+				if (fileManager != null) {
+					fileManager.setConnection(fRemoteConnection);
+					return fileManager.browseFile(getShell(), Messages.SDMPage_10, fSDMPathText.getText(), 0);
+				}
+			}
+		}
+
+		FileDialog dialog = new FileDialog(getShell());
+		dialog.setText(Messages.SDMPage_10);
+		dialog.setFileName(fSDMPathText.getText());
+		return dialog.open();
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -229,6 +252,20 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		setControl(parent);
 	}
 
+	/**
+	 * Get and clean content of a Text field
+	 * 
+	 * @param text
+	 *            text obtained from a Text field
+	 * @return cleaned up content
+	 */
+	protected String getFieldContent(String text) {
+		if (text.trim().length() == 0 || text.equals(EMPTY_STRING)) {
+			return null;
+		}
+		return text;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -236,6 +273,67 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 	 */
 	public String getName() {
 		return Messages.SDMPage_3;
+	}
+
+	private ScrolledPageContent getParentScrolledComposite(Control control) {
+		Control parent = control.getParent();
+		while (!(parent instanceof ScrolledPageContent) && parent != null) {
+			parent = parent.getParent();
+		}
+		if (parent instanceof ScrolledPageContent) {
+			return (ScrolledPageContent) parent;
+		}
+		return null;
+	}
+
+	/**
+	 * Helper method to locate the remote connection used by the launch configuration
+	 * 
+	 * @param configuration
+	 *            launch configuration
+	 * @throws CoreException
+	 */
+	private IRemoteConnection getRemoteConnection(ILaunchConfiguration configuration) {
+		try {
+			final String remId = configuration
+					.getAttribute(IPTPLaunchConfigurationConstants.ATTR_REMOTE_SERVICES_ID, (String) null);
+			if (remId != null) {
+				final IRemoteServices[] services = new IRemoteServices[1];
+				try {
+					getLaunchConfigurationDialog().run(false, true, new IRunnableWithProgress() {
+						public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+							services[0] = RemoteServices.getRemoteServices(remId, monitor);
+						}
+					});
+				} catch (InvocationTargetException e) {
+					// Ignore
+				} catch (InterruptedException e) {
+					// Ignore
+				}
+				if (services[0] != null) {
+					String name = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_CONNECTION_NAME, (String) null);
+					if (name != null) {
+						return services[0].getConnectionManager().getConnection(name);
+					}
+				}
+			}
+		} catch (CoreException e) {
+			// Ignore
+		}
+		return null;
+	}
+
+	private void initializeBackend() {
+		String backend = Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.PREFS_SDM_BACKEND);
+		int selected = 0;
+		for (int i = 0; i < fSDMBackendCombo.getItemCount(); i++) {
+			if (fSDMBackendCombo.getItem(i).equals(backend)) {
+				selected = i;
+				break;
+			}
+		}
+		fSDMBackendCombo.select(selected);
+		updateBackend();
 	}
 
 	/*
@@ -248,20 +346,8 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		 * Launch configuration is selected or we have just selected SDM as the debugger...
 		 */
 		try {
-			String backend = Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(),
-					SDMPreferenceConstants.PREFS_SDM_BACKEND);
-			fSDMBackendCombo
-					.setText(configuration.getAttribute(SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_BACKEND, backend));
+			initializeBackend();
 			fSessionAddressText.setText(configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, LOCALHOST));
-			fSDMPathText.setText(configuration
-					.getAttribute(
-							IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH,
-							Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.PREFS_SDM_PATH
-									+ backend)));
-			fBackendPathText.setText(configuration.getAttribute(
-					SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_BACKEND_PATH,
-					Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.PREFS_SDM_BACKEND_PATH
-							+ backend)));
 			fRemoteConnection = getRemoteConnection(configuration);
 			fDefaultSessionAddressButton.setSelection(fRemoteConnection == null
 					|| (fRemoteConnection.supportsTCPPortForwarding() && fSessionAddressText.getText().equals(LOCALHOST)));
@@ -329,77 +415,6 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, LOCALHOST);
 	}
 
-	/**
-	 * Browse for a file.
-	 * 
-	 * @return path to file selected in browser
-	 */
-	private String browseFile() {
-		if (fRemoteConnection != null) {
-			IRemoteUIServices remoteUISrv = RemoteUIServices.getRemoteUIServices(fRemoteConnection.getRemoteServices());
-			if (remoteUISrv != null) {
-				IRemoteUIFileManager fileManager = remoteUISrv.getUIFileManager();
-				if (fileManager != null) {
-					fileManager.setConnection(fRemoteConnection);
-					return fileManager.browseFile(getShell(), Messages.SDMPage_10, fSDMPathText.getText(), 0);
-				}
-			}
-		}
-
-		FileDialog dialog = new FileDialog(getShell());
-		dialog.setText(Messages.SDMPage_10);
-		dialog.setFileName(fSDMPathText.getText());
-		return dialog.open();
-	}
-
-	private ScrolledPageContent getParentScrolledComposite(Control control) {
-		Control parent = control.getParent();
-		while (!(parent instanceof ScrolledPageContent) && parent != null) {
-			parent = parent.getParent();
-		}
-		if (parent instanceof ScrolledPageContent) {
-			return (ScrolledPageContent) parent;
-		}
-		return null;
-	}
-
-	/**
-	 * Helper method to locate the remote connection used by the launch configuration
-	 * 
-	 * @param configuration
-	 *            launch configuration
-	 * @throws CoreException
-	 */
-	private IRemoteConnection getRemoteConnection(ILaunchConfiguration configuration) {
-		try {
-			final String remId = configuration
-					.getAttribute(IPTPLaunchConfigurationConstants.ATTR_REMOTE_SERVICES_ID, (String) null);
-			if (remId != null) {
-				final IRemoteServices[] services = new IRemoteServices[1];
-				try {
-					getLaunchConfigurationDialog().run(false, true, new IRunnableWithProgress() {
-						public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-							services[0] = RemoteServices.getRemoteServices(remId, monitor);
-						}
-					});
-				} catch (InvocationTargetException e) {
-					// Ignore
-				} catch (InterruptedException e) {
-					// Ignore
-				}
-				if (services[0] != null) {
-					String name = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_CONNECTION_NAME, (String) null);
-					if (name != null) {
-						return services[0].getConnectionManager().getConnection(name);
-					}
-				}
-			}
-		} catch (CoreException e) {
-			// Ignore
-		}
-		return null;
-	}
-
 	private void updateBackend() {
 		String backend = getFieldContent(fSDMBackendCombo.getText());
 		if (backend != null) {
@@ -412,19 +427,5 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 
 	private void updateEnablement() {
 		fSessionAddressText.setEnabled(!fDefaultSessionAddressButton.getSelection());
-	}
-
-	/**
-	 * Get and clean content of a Text field
-	 * 
-	 * @param text
-	 *            text obtained from a Text field
-	 * @return cleaned up content
-	 */
-	protected String getFieldContent(String text) {
-		if (text.trim().length() == 0 || text.equals(EMPTY_STRING)) {
-			return null;
-		}
-		return text;
 	}
 }
