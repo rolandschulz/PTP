@@ -8,7 +8,7 @@
 	xsi:schemaLocation="http://eclipse.org/ptp/rm http://eclipse.org/ptp/schemas/v1.1/rm.xsd"
 	name="IBM Platform LSF">
 	<!-- Make sure XML editor line length is set long enough (160) to avoid 
-		wrapping text so messages don't get wrapped when reformatting -->
+		wrapping text so messages do not get wrapped when reformatting -->
 	<control-data>
 		<!-- This is a necessary attribute for the functioning of LML; link it 
 			to the batch-specific variable name -->
@@ -26,7 +26,7 @@
 			<link-value-to>LSF_STDERR_PATH_NEW</link-value-to>
 		</attribute>
 		<attribute name="mpiCommand" type="choice">
-			<description>Optional MPI command to run job.</description>
+			<description>Optional MPI command to run job:</description>
 			<choice>,poe,mpiexec,mpirun</choice>
 		</attribute>
 
@@ -47,7 +47,7 @@
 			used as a conditional expansion for '<arg isUndefinedAsMatches ...' -->
 		<attribute name="LSF_NOTIFY_DISPATCH" type="boolean"
 			translateBooleanAs=" ,no">
-			<description>Dispatch_Notification:</description>
+			<description>Dispatch Notification:</description>
 			<tooltip>Send you email when your job is dispatched. (-B)</tooltip>
 			<default>no</default>
 		</attribute>
@@ -58,8 +58,8 @@
 			used as a conditional expansion for '<arg isUndefinedAsMatches ...' -->
 		<attribute name="LSF_NOTIFY_COMPLETION" type="boolean"
 			translateBooleanAs=" ,no">
-			<description>Completion_Notification:</description>
-			<tooltip>Send you email when your job completes. This option is disabled if STDOUT pathnames are blank (-N)</tooltip>
+			<description>Completion Notification:</description>
+			<tooltip>Send you email when your job completes. This option is disabled if STDOUT pathnames are blank. (-N)</tooltip>
 			<default>no</default>
 		</attribute>
 
@@ -80,7 +80,7 @@
 			used as a conditional expansion for '<arg isUndefinedAsMatches ...' -->
 		<attribute name="LSF_NORERUN_SYS_FAILURE" type="boolean"
 			translateBooleanAs=" ,no">
-			<description>Don't Rerun on System Failure:</description>
+			<description>Do not Rerun on System Failure:</description>
 			<tooltip>Job is never rerunnable. (-rn)</tooltip>
 			<default>no</default>
 		</attribute>
@@ -242,7 +242,7 @@
 		<!-- -Lp option -->
 		<attribute name="LSF_LICENSE_SCHEDULER_PROJECT" type="string">
 			<description>License Scheduler Project:</description>
-			<tooltip>Assigns the job to the specified License Sceduler project. (-Lp)</tooltip>
+			<tooltip>Assigns the job to the specified License Scheduler project. (-Lp)</tooltip>
 		</attribute>
 
 		<!-- -M option -->
@@ -265,7 +265,7 @@
 		<!-- -mig option -->
 		<attribute name="LSF_MIGRATION" type="string">
 			<description>Migration Threshold:</description>
-			<tooltip>Specify migration threhshold for checkpointable and rerunnable jobs. (-mig)</tooltip>
+			<tooltip>Specify migration threshold for checkpointable and rerunnable jobs. (-mig)</tooltip>
 		</attribute>
 
 		<!-- -n option -->
@@ -309,7 +309,7 @@
 		<!-- -p option -->
 		<attribute name="LSF_PROCESS_LIMIT" type="string">
 			<description>Process Limit:</description>
-			<tooltip>Sets the limit of the numer of processes for the entire job. (-p)</tooltip>
+			<tooltip>Sets the limit of the number of processes for the entire job. (-p)</tooltip>
 			<validator>
 				<regex expression=" *|[\d]+" />
 				<error-message>Process limit must be a numeric value.
@@ -338,7 +338,7 @@
 		<!-- -S option -->
 		<attribute name="LSF_STACK_LIMIT" type="string">
 			<description>Stack Limit:</description>
-			<tooltip>Sets a per process soft limit for the thye stack for each process in the job. (-S)</tooltip>
+			<tooltip>Sets a per process soft limit for the the stack for each process in the job. (-S)</tooltip>
 			<validator>
 				<regex expression=" *|[\d]+" />
 				<error-message>Stack limit must be a numeric value.
@@ -349,7 +349,7 @@
 		<!-- -s option -->
 		<attribute name="LSF_SIGNAL" type="string">
 			<description>Run Window Signal:</description>
-			<tooltip>Send the specified signal qhen a queue-level run window closes. (-s)</tooltip>
+			<tooltip>Send the specified signal when a queue-level run window closes. (-s)</tooltip>
 		</attribute>
 
 		<!-- -sla option -->
@@ -361,7 +361,7 @@
 		<!-- -sp option -->
 		<attribute name="LSF_JOB_PRIORITY" type="string">
 			<description>Job Priority:</description>
-			<tooltip>Set user-specified job priority for this job. (-sp)</tooltip>
+			<tooltip>Set the job priority for this job. (-sp)</tooltip>
 		</attribute>
 
 		<!-- -T option -->
@@ -446,7 +446,7 @@
 		<!-- Other options -->
 		<attribute name="LSF_OTHER_OPTIONS" type="string">
 			<description>Other Options:</description>
-			<tooltip>Specify LSF options that don't appear elsewhere in list.</tooltip>
+			<tooltip>Specify LSF options that do not appear elsewhere in list.</tooltip>
 		</attribute>
 
 		<attribute name="LSF_MPI_COMMAND" type="choice">
@@ -1054,7 +1054,7 @@
 						<tooltip>${ptp_rm:LSF_RERUN_SYS_FAILURE#tooltip}</tooltip>
 					</widget>
 
-					<!-- LSF_NORERUN_SYS_FAILURE - Don't rerun job on system failure -->
+					<!-- LSF_NORERUN_SYS_FAILURE - do not rerun job on system failure -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING"
@@ -1161,6 +1161,7 @@
 						</layout-data>
 						<tooltip>${ptp_rm:LSF_DEPENDENCIES#tooltip}</tooltip>
 					</widget>
+					
 					<!-- LSF_DISPATCH_AT: Dispatch job at or after time -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
@@ -1241,6 +1242,24 @@
 						</layout-data>
 						<tooltip>${ptp_rm:LSF_MIGRATION#tooltip}</tooltip>
 					</widget>
+					
+					<!-- LSF_LICENSE_SCHEDULER_PROJECT: License scheduler project -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_LICENSE_SCHEDULER_PROJECT#description}
+						</fixed-text>
+					</widget>
+
+					<widget type="text" attribute="LSF_LICENSE_SCHEDULER_PROJECT" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_LICENSE_SCHEDULER_PROJECT#tooltip}</tooltip>
+					</widget>
 				</composite>
 			</dynamic>
 
@@ -1291,6 +1310,24 @@
 								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
 						</layout-data>
 						<tooltip>${ptp_rm:LSF_NUM_PROCS#tooltip}</tooltip>
+					</widget>
+					
+					<!-- LSF_RESOURCES: Resource requirements -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:LSF_RESOURCES#description}
+						</fixed-text>
+					</widget>
+
+					<widget type="text" attribute="LSF_RESOURCES" style="SWT.BORDER">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								grabExcessHorizontal="false" widthHint="300" horizontalSpan="2" />
+						</layout-data>
+						<tooltip>${ptp_rm:LSF_RESOURCES#tooltip}</tooltip>
 					</widget>
 
 					<!-- LSF_NETWORK: LSF -network option -->
@@ -1860,6 +1897,7 @@
 							<include>LSF_EXCLUSIVE_EXECUTION</include>
 							<include>LSF_NUM_PROCS</include>
 							<include>LSF_HOST_NAMES</include>
+							<include>LSF_DEPENDENCIES</include>
 							<include>LSF_RESOURCES</include>
 							<include>LSF_HOST_NAMES</include>
 							<include>LSF_RESERVATION_ID</include>
@@ -1879,7 +1917,7 @@
 							<include>LSF_JSDL_FILE_STRICT</include>
 							<include>LSF_CHECKPOINT</include>
 							<include>LSF_SIGNAL</include>
-							<include>LSF_LOB_ACTION</include>
+							<include>LSF_JOB_ACTION</include>
 							<include>LSF_JOB_ACTION_TIME</include>
 							<include>LSF_DISPATCH_AT</include>
 							<include>LSF_TERMINATION_DEADLINE</include>
