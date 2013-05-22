@@ -159,7 +159,7 @@ public interface IPTPLaunchConfigurationConstants {
 	public static final String ATTR_DEBUGGER_START_MODE = PTP_LAUNCH_ID + ".DEBUGGER_START_MODE"; //$NON-NLS-1$
 
 	/**
-	 * Launch configuration attribute key. The value is the location of the executable being debugged.
+	 * Launch configuration attribute key. The value is the location of the debugger executable.
 	 */
 	public static final String ATTR_DEBUGGER_EXECUTABLE_PATH = PTP_LAUNCH_ID + ".DEBUGGER_EXECUTABLE_PATH"; //$NON-NLS-1$
 

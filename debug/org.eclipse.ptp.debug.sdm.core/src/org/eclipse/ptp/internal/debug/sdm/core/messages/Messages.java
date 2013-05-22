@@ -84,7 +84,15 @@ public class Messages extends NLS {
 
 	public static String SDMDebugger_6;
 
+	public static String SDMDebugger_Copying_SDM_to_target_system;
+
+	public static String SDMDebugger_Could_not_locate_SDM_exectuable;
+
+	public static String SDMDebugger_Could_not_open_connection;
+
 	public static String SDMDebugger_NoWorkingDir;
+
+	public static String SDMDebugger_Opening_connection;
 
 	public static String SDMDebugger_Operation_canceled_by_user;
 	public static String SDMEvaluateExpressionRequest_0;

@@ -1237,14 +1237,24 @@ public class LaunchController implements ILaunchController {
 		getRMVariableMap().overwrite(JAXBControlConstants.EXEC_PATH, JAXBControlConstants.EXEC_PATH, lcattr);
 		getRMVariableMap().overwrite(JAXBControlConstants.EXEC_DIR, JAXBControlConstants.EXEC_DIR, lcattr);
 		getRMVariableMap().overwrite(JAXBControlConstants.PROG_ARGS, JAXBControlConstants.PROG_ARGS, lcattr);
-		getRMVariableMap().overwrite(JAXBControlConstants.DEBUGGER_EXEC_PATH, JAXBControlConstants.DEBUGGER_EXEC_PATH, lcattr);
 		getRMVariableMap().overwrite(JAXBControlConstants.DEBUGGER_ID, JAXBControlConstants.DEBUGGER_ID, lcattr);
 		getRMVariableMap().overwrite(JAXBControlConstants.DEBUGGER_LAUNCHER, JAXBControlConstants.DEBUGGER_LAUNCHER, lcattr);
 
 		/*
 		 * update the dynamic attributes
 		 */
-		String attr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ARGS, (String) null);
+		String attr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, (String) null);
+		if (attr != null) {
+			AttributeType a = getEnvironment().get(JAXBControlConstants.DEBUGGER_EXEC_PATH);
+			if (a == null) {
+				a = new AttributeType();
+				a.setName(JAXBControlConstants.DEBUGGER_EXEC_PATH);
+				getEnvironment().put(JAXBControlConstants.DEBUGGER_EXEC_PATH, a);
+			}
+			a.setValue(attr);
+		}
+
+		attr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ARGS, (String) null);
 		if (attr != null) {
 			AttributeType a = getEnvironment().get(JAXBControlConstants.DEBUGGER_ARGS);
 			if (a == null) {

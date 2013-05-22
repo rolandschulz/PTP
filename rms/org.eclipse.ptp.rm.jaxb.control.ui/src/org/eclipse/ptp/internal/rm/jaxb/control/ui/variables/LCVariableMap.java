@@ -85,11 +85,6 @@ public class LCVariableMap implements IVariableMap {
 		if (!JAXBControlConstants.ZEROSTR.equals(attr)) {
 			configuration.setAttribute(rmPrefix + JAXBControlConstants.PROG_ARGS, attr);
 		}
-		attr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH,
-				JAXBControlConstants.ZEROSTR);
-		if (!JAXBControlConstants.ZEROSTR.equals(attr)) {
-			configuration.setAttribute(rmPrefix + JAXBControlConstants.DEBUGGER_EXEC_PATH, attr);
-		}
 		attr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ARGS, JAXBControlConstants.ZEROSTR);
 		if (!JAXBControlConstants.ZEROSTR.equals(attr)) {
 			configuration.setAttribute(rmPrefix + JAXBControlConstants.DEBUGGER_ARGS, attr);

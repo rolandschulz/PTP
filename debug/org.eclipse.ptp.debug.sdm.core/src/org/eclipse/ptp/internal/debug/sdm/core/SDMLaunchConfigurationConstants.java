@@ -35,4 +35,12 @@ public interface SDMLaunchConfigurationConstants {
 	 */
 	public static final String ATTR_DEBUGGER_USE_BUILTIN_SDM = IPTPLaunchConfigurationConstants.PTP_LAUNCH_ID
 			+ ".DEBUGGER_USE_BUILTIN_SDM"; //$NON-NLS-1$
+
+	/**
+	 * Launch configuration attribute key to specify the path to the sdm executable. This is the fallback path used if the builtin
+	 * sdm can't be used, or if the builtin option is disabled.
+	 */
+	public static final String ATTR_DEBUGGER_SDM_EXECUTABLE = IPTPLaunchConfigurationConstants.PTP_LAUNCH_ID
+			+ ".DEBUGGER_SDM_EXECUTABLE"; //$NON-NLS-1$
+
 }

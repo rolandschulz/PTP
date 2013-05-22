@@ -403,7 +403,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 					getFieldContent(fBackendPathText.getText()));
 			configuration
 					.setAttribute(SDMLaunchConfigurationConstants.ATTR_DEBUGGER_USE_BUILTIN_SDM, fUseBuiltinSDM.getSelection());
-			configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH,
+			configuration.setAttribute(SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_EXECUTABLE,
 					getFieldContent(fSDMPathText.getText()));
 			configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST,
 					getFieldContent(fSessionAddressText.getText()));
@@ -421,7 +421,7 @@ public class SDMPage extends AbstractLaunchConfigurationTab {
 		 */
 		String backend = Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.PREFS_SDM_BACKEND);
 		configuration.setAttribute(SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_BACKEND, backend);
-		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH,
+		configuration.setAttribute(SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_EXECUTABLE,
 				Preferences.getString(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.PREFS_SDM_PATH + backend));
 		configuration.setAttribute(
 				SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_BACKEND_PATH,

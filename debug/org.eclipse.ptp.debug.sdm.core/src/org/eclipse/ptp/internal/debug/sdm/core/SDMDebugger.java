@@ -18,16 +18,23 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.debug.sdm.core;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileInfo;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.osgi.util.NLS;
@@ -36,6 +43,7 @@ import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.jobs.IPJobStatus;
 import org.eclipse.ptp.core.jobs.JobManager;
+import org.eclipse.ptp.core.util.LaunchUtils;
 import org.eclipse.ptp.debug.core.IPDebugger;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.pdi.IPDIDebugger;
@@ -53,6 +61,8 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.RemoteServices;
+import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.osgi.framework.Bundle;
 
 /**
  * Main SDM debugger specified using the parallelDebugger extension point.
@@ -75,6 +85,7 @@ public class SDMDebugger implements IPDebugger {
 	 * @see org.eclipse.ptp.debug.core.IPDebugger#cleanup(org.eclipse.ptp.debug.core .launch.IPLaunch)
 	 */
 	public synchronized void cleanup(IPLaunch launch) {
+		// Nothing to do
 	}
 
 	/*
@@ -101,72 +112,68 @@ public class SDMDebugger implements IPDebugger {
 		return session;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.debug.core.IPDebugger#initialize(org.eclipse.debug.core .ILaunchConfiguration,
-	 * org.eclipse.core.runtime.IProgressMonitor)
-	 */
-	/**
-	 * @since 5.0
-	 */
-	public synchronized void initialize(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
+	private String deploySDM(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 40);
-		try {
-			if (Preferences.getBoolean(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUG_CLIENT_ENABLED)) {
-				int level = Preferences.getInt(SDMDebugCorePlugin.getUniqueIdentifier(),
-						SDMPreferenceConstants.SDM_DEBUG_CLIENT_LEVEL);
-				if ((level & SDMPreferenceConstants.DEBUG_CLIENT_TRACING) == SDMPreferenceConstants.DEBUG_CLIENT_TRACING) {
-					DebugUtil.SDM_MASTER_TRACING = true;
+		boolean useBuiltin = configuration.getAttribute(SDMLaunchConfigurationConstants.ATTR_DEBUGGER_USE_BUILTIN_SDM, false);
+		if (useBuiltin) {
+			String remoteId = LaunchUtils.getRemoteServicesId(configuration);
+			String connectionName = LaunchUtils.getConnectionName(configuration);
+			if (remoteId != null && connectionName != null) {
+				IRemoteServices remoteServices = RemoteServices.getRemoteServices(remoteId, progress.newChild(10));
+				if (remoteServices != null) {
+					IRemoteConnection remoteConnection = remoteServices.getConnectionManager().getConnection(connectionName);
+					if (remoteConnection != null) {
+						if (!remoteConnection.isOpen()) {
+							try {
+								progress.subTask(Messages.SDMDebugger_Opening_connection);
+								remoteConnection.open(progress.newChild(10));
+							} catch (RemoteConnectionException e) {
+								throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.getUniqueIdentifier(),
+										Messages.SDMDebugger_Could_not_open_connection, e));
+							}
+						}
+						if (remoteConnection.isOpen()) {
+							String osName = normalize(remoteConnection.getProperty(IRemoteConnection.OS_NAME_PROPERTY));
+							String osArch = remoteConnection.getProperty(IRemoteConnection.OS_ARCH_PROPERTY);
+							if (osName != null && osArch != null) {
+								Bundle bundle = Platform.getBundle("org.eclipse.ptp." + osName); //$NON-NLS-1$
+								if (bundle != null) {
+									IRemoteFileManager fileManager = remoteServices.getFileManager(remoteConnection);
+									if (fileManager != null) {
+										IPath destPath = new Path(remoteConnection.getWorkingDirectory())
+												.append(".eclipsesettings").append("sdm"); //$NON-NLS-1$//$NON-NLS-2$
+										IFileStore dest = fileManager.getResource(destPath.toString());
+										IFileInfo destInfo = dest.fetchInfo(EFS.NONE, progress.newChild(10));
+										IFileStore local = null;
+										IPath srcPath = new Path("os").append(osName).append(osArch).append("sdm"); //$NON-NLS-1$ //$NON-NLS-2$
+										URL jarURL = FileLocator.find(bundle, srcPath, null);
+										if (jarURL != null) {
+											try {
+												jarURL = FileLocator.toFileURL(jarURL);
+												local = EFS.getStore(URIUtil.toURI(jarURL));
+											} catch (Exception e) {
+												throw new CoreException(new Status(IStatus.ERROR,
+														SDMDebugCorePlugin.getUniqueIdentifier(),
+														Messages.SDMDebugger_Could_not_locate_SDM_exectuable, e));
+											}
+										}
+										if (local != null) {
+											IFileInfo localInfo = local.fetchInfo(EFS.NONE, progress.newChild(10));
+											if (!destInfo.exists() || destInfo.getLength() != localInfo.getLength()) {
+												progress.subTask(Messages.SDMDebugger_Copying_SDM_to_target_system);
+												local.copy(dest, EFS.OVERWRITE, progress.newChild(70));
+											}
+											return destPath.toString();
+										}
+									}
+								}
+							}
+						}
+					}
 				}
-				if ((level & SDMPreferenceConstants.DEBUG_CLIENT_TRACING_MORE) == SDMPreferenceConstants.DEBUG_CLIENT_TRACING_MORE) {
-					DebugUtil.SDM_MASTER_TRACING_MORE = true;
-				}
-				if ((level & SDMPreferenceConstants.DEBUG_CLIENT_OUTPUT) == SDMPreferenceConstants.DEBUG_CLIENT_OUTPUT) {
-					DebugUtil.SDM_MASTER_OUTPUT_TRACING = true;
-				}
-			}
-
-			ILaunchConfigurationWorkingCopy workingCopy = configuration.getWorkingCopy();
-
-			List<String> dbgArgs = new ArrayList<String>();
-
-			try {
-				fPdiDebugger.initialize(configuration, dbgArgs, progress.newChild(10));
-			} catch (PDIException e) {
-				throw newCoreException(e.getLocalizedMessage());
-			}
-
-			String localAddress = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, "localhost"); //$NON-NLS-1$
-
-			dbgArgs.add("--host=" + localAddress); //$NON-NLS-1$
-			String debuggerBackend = configuration.getAttribute(SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_BACKEND,
-					(String) null);
-			if (debuggerBackend != null) {
-				dbgArgs.add("--debugger=" + debuggerBackend); //$NON-NLS-1$
-			}
-			String dbgPath = configuration.getAttribute(SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_BACKEND_PATH,
-					(String) null);
-			if (dbgPath != null) {
-				dbgArgs.add("--debugger_path=" + dbgPath); //$NON-NLS-1$
-			}
-
-			if (Preferences.getBoolean(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUG_ENABLED)) {
-				dbgArgs.add("--debug=" + Preferences.getInt(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUG_LEVEL)); //$NON-NLS-1$
-			}
-
-			workingCopy.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ARGS, stringify(dbgArgs));
-
-			String dbgExePath = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, ""); //$NON-NLS-1$
-			verifyResource(dbgExePath, configuration, progress.newChild(10));
-
-			workingCopy.doSave();
-
-		} finally {
-			if (monitor != null) {
-				monitor.done();
 			}
 		}
+		return configuration.getAttribute(SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_EXECUTABLE, ""); //$NON-NLS-1$
 	}
 
 	/**
@@ -214,6 +221,66 @@ public class SDMDebugger implements IPDebugger {
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.debug.core.IPDebugger#initialize(org.eclipse.debug.core .ILaunchConfiguration,
+	 * org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	/**
+	 * @since 5.0
+	 */
+	public synchronized void initialize(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
+		SubMonitor progress = SubMonitor.convert(monitor, 30);
+		if (Preferences.getBoolean(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUG_CLIENT_ENABLED)) {
+			int level = Preferences.getInt(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUG_CLIENT_LEVEL);
+			if ((level & SDMPreferenceConstants.DEBUG_CLIENT_TRACING) == SDMPreferenceConstants.DEBUG_CLIENT_TRACING) {
+				DebugUtil.SDM_MASTER_TRACING = true;
+			}
+			if ((level & SDMPreferenceConstants.DEBUG_CLIENT_TRACING_MORE) == SDMPreferenceConstants.DEBUG_CLIENT_TRACING_MORE) {
+				DebugUtil.SDM_MASTER_TRACING_MORE = true;
+			}
+			if ((level & SDMPreferenceConstants.DEBUG_CLIENT_OUTPUT) == SDMPreferenceConstants.DEBUG_CLIENT_OUTPUT) {
+				DebugUtil.SDM_MASTER_OUTPUT_TRACING = true;
+			}
+		}
+
+		ILaunchConfigurationWorkingCopy workingCopy = configuration.getWorkingCopy();
+
+		List<String> dbgArgs = new ArrayList<String>();
+
+		try {
+			fPdiDebugger.initialize(configuration, dbgArgs, progress.newChild(10));
+		} catch (PDIException e) {
+			throw newCoreException(e.getLocalizedMessage());
+		}
+
+		String localAddress = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_HOST, "localhost"); //$NON-NLS-1$
+
+		dbgArgs.add("--host=" + localAddress); //$NON-NLS-1$
+		String debuggerBackend = configuration.getAttribute(SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_BACKEND,
+				(String) null);
+		if (debuggerBackend != null) {
+			dbgArgs.add("--debugger=" + debuggerBackend); //$NON-NLS-1$
+		}
+		String dbgPath = configuration.getAttribute(SDMLaunchConfigurationConstants.ATTR_DEBUGGER_SDM_BACKEND_PATH, (String) null);
+		if (dbgPath != null) {
+			dbgArgs.add("--debugger_path=" + dbgPath); //$NON-NLS-1$
+		}
+
+		if (Preferences.getBoolean(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUG_ENABLED)) {
+			dbgArgs.add("--debug=" + Preferences.getInt(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUG_LEVEL)); //$NON-NLS-1$
+		}
+
+		String dbgExePath = deploySDM(configuration, progress.newChild(10));
+		verifyResource(dbgExePath, configuration, progress.newChild(10));
+
+		workingCopy.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ARGS, stringify(dbgArgs));
+		workingCopy.setAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_EXECUTABLE_PATH, dbgExePath);
+		workingCopy.doSave();
+
+	}
+
 	/**
 	 * Create a CoreException that can be thrown
 	 * 
@@ -223,6 +290,10 @@ public class SDMDebugger implements IPDebugger {
 	private CoreException newCoreException(String message) {
 		Status status = new Status(IStatus.ERROR, SDMDebugCorePlugin.getUniqueIdentifier(), message, null);
 		return new CoreException(status);
+	}
+
+	private String normalize(String osName) {
+		return osName.toLowerCase().replaceAll("\\s", ""); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
@@ -267,7 +338,7 @@ public class SDMDebugger implements IPDebugger {
 			throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.PLUGIN_ID, Messages.SDMDebugger_3));
 		}
 		if (!fileManager.getResource(path).fetchInfo().exists()) {
-			throw new CoreException(new Status(IStatus.INFO, SDMDebugCorePlugin.PLUGIN_ID, NLS.bind(Messages.SDMDebugger_5,
+			throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.PLUGIN_ID, NLS.bind(Messages.SDMDebugger_5,
 					new Object[] { path })));
 		}
 		return new Path(path);

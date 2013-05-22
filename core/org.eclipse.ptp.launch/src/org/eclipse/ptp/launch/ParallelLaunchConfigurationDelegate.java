@@ -173,77 +173,70 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 
 	public void launch(final ILaunchConfiguration configuration, String mode, ILaunch launch, final IProgressMonitor monitor)
 			throws CoreException {
+		if (!(launch instanceof IPLaunch)) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
+					Messages.ParallelLaunchConfigurationDelegate_Invalid_launch_object));
+		}
+		SubMonitor progress = SubMonitor.convert(monitor, 110);
+		progress.setTaskName(NLS.bind(Messages.ParallelLaunchConfigurationDelegate_3, configuration.getName()));
+		progress.setWorkRemaining(90);
+		if (progress.isCanceled()) {
+			return;
+		}
+
+		progress.worked(10);
+		progress.subTask(Messages.ParallelLaunchConfigurationDelegate_4);
+
+		if (!verifyLaunchAttributes(configuration, mode, progress.newChild(10)) || progress.isCanceled()) {
+			return;
+		}
+
+		// All copy pre-"job submission" occurs here
+		copyExecutable(configuration, progress.newChild(10));
+		if (progress.isCanceled()) {
+			return;
+		}
+
+		doPreLaunchSynchronization(configuration, progress.newChild(10));
+		if (progress.isCanceled()) {
+			return;
+		}
+
+		IPDebugger debugger = null;
+
 		try {
-			if (!(launch instanceof IPLaunch)) {
-				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
-						Messages.ParallelLaunchConfigurationDelegate_Invalid_launch_object));
-			}
-			SubMonitor progress = SubMonitor.convert(monitor, 110);
-			//		progress.beginTask("", 25); //$NON-NLS-1$
-			progress.setTaskName(NLS.bind(Messages.ParallelLaunchConfigurationDelegate_3, configuration.getName()));
-			progress.setWorkRemaining(90);
-			if (progress.isCanceled()) {
-				return;
+			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
+				/*
+				 * Show ptp debug view
+				 */
+				showPTPDebugView(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
+				progress.subTask(Messages.ParallelLaunchConfigurationDelegate_6);
+
+				/*
+				 * Create the debugger extension, then the connection point for the debug server. The debug server is launched
+				 * via the submitJob() command.
+				 */
+
+				IPDebugConfiguration debugConfig = getDebugConfig(configuration);
+				debugger = debugConfig.getDebugger();
+				debugger.initialize(configuration, progress.newChild(10));
+				if (progress.isCanceled()) {
+					return;
+				}
 			}
 
 			progress.worked(10);
-			progress.subTask(Messages.ParallelLaunchConfigurationDelegate_4);
+			progress.subTask(Messages.ParallelLaunchConfigurationDelegate_7);
 
-			if (!verifyLaunchAttributes(configuration, mode, progress.newChild(10)) || progress.isCanceled()) {
-				return;
+			submitJob(mode, (IPLaunch) launch, debugger, progress.newChild(40));
+
+			progress.worked(10);
+		} catch (CoreException e) {
+			if (debugger != null) {
+				debugger.cleanup((IPLaunch) launch);
 			}
-
-			// All copy pre-"job submission" occurs here
-			copyExecutable(configuration, progress.newChild(10));
-			if (progress.isCanceled()) {
-				return;
-			}
-
-			doPreLaunchSynchronization(configuration, progress.newChild(10));
-			if (progress.isCanceled()) {
-				return;
-			}
-
-			IPDebugger debugger = null;
-
-			try {
-				if (mode.equals(ILaunchManager.DEBUG_MODE)) {
-					/*
-					 * Show ptp debug view
-					 */
-					showPTPDebugView(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
-					progress.subTask(Messages.ParallelLaunchConfigurationDelegate_6);
-
-					/*
-					 * Create the debugger extension, then the connection point for the debug server. The debug server is launched
-					 * via the submitJob() command.
-					 */
-
-					IPDebugConfiguration debugConfig = getDebugConfig(configuration);
-					debugger = debugConfig.getDebugger();
-					debugger.initialize(configuration, progress.newChild(10));
-					if (progress.isCanceled()) {
-						return;
-					}
-				}
-
-				progress.worked(10);
-				progress.subTask(Messages.ParallelLaunchConfigurationDelegate_7);
-
-				submitJob(mode, (IPLaunch) launch, debugger, progress.newChild(40));
-
-				progress.worked(10);
-			} catch (CoreException e) {
-				if (debugger != null) {
-					debugger.cleanup((IPLaunch) launch);
-				}
-				if (e.getStatus().getCode() != IStatus.CANCEL) {
-					throw e;
-				}
-			}
-		} finally {
-			if (monitor != null) {
-				monitor.done();
+			if (e.getStatus().getCode() != IStatus.CANCEL) {
+				throw e;
 			}
 		}
 	}

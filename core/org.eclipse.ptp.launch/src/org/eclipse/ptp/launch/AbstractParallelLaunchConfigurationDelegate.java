@@ -144,16 +144,35 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
 			SubMonitor subMon = SubMonitor.convert(monitor, 100);
+			String jobId = fLaunch.getJobId();
+			fSubLock.lock();
 			try {
-				String jobId = fLaunch.getJobId();
+				while (fLaunchControl.getJobStatus(jobId, subMon.newChild(50)).getState().equals(IJobStatus.SUBMITTED)
+						&& !subMon.isCanceled()) {
+					try {
+						fSubCondition.await(500, TimeUnit.MILLISECONDS);
+					} catch (InterruptedException e) {
+						// Expect to be interrupted if monitor is canceled
+					}
+				}
+			} catch (CoreException e) {
+				// Ignore
+			} finally {
+				fSubLock.unlock();
+			}
+
+			if (!subMon.isCanceled()) {
+				doCompleteJobLaunch(fLaunch, fDebugger);
+
 				fSubLock.lock();
 				try {
-					while (fLaunchControl.getJobStatus(jobId, subMon.newChild(50)).getState().equals(IJobStatus.SUBMITTED)
+					while (!fLaunchControl.getJobStatus(jobId, subMon.newChild(50)).getState().equals(IJobStatus.COMPLETED)
 							&& !subMon.isCanceled()) {
 						try {
-							fSubCondition.await(500, TimeUnit.MILLISECONDS);
+							fSubCondition.await(1000, TimeUnit.MILLISECONDS);
 						} catch (InterruptedException e) {
-							// Expect to be interrupted if monitor is canceled
+							// Expect to be interrupted if monitor is
+							// canceled
 						}
 					}
 				} catch (CoreException e) {
@@ -163,59 +182,34 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 				}
 
 				if (!subMon.isCanceled()) {
-					doCompleteJobLaunch(fLaunch, fDebugger);
-
-					fSubLock.lock();
+					/*
+					 * When the job terminates, do any post launch data synchronization.
+					 */
+					// If needed, copy data back.
 					try {
-						while (!fLaunchControl.getJobStatus(jobId, subMon.newChild(50)).getState().equals(IJobStatus.COMPLETED)
-								&& !subMon.isCanceled()) {
-							try {
-								fSubCondition.await(1000, TimeUnit.MILLISECONDS);
-							} catch (InterruptedException e) {
-								// Expect to be interrupted if monitor is
-								// canceled
-							}
-						}
+						// Get the list of paths to be copied back.
+						doPostLaunchSynchronization(fLaunch.getLaunchConfiguration());
 					} catch (CoreException e) {
-						// Ignore
-					} finally {
-						fSubLock.unlock();
+						PTPLaunchPlugin.log(e);
 					}
 
-					if (!subMon.isCanceled()) {
-						/*
-						 * When the job terminates, do any post launch data synchronization.
-						 */
-						// If needed, copy data back.
-						try {
-							// Get the list of paths to be copied back.
-							doPostLaunchSynchronization(fLaunch.getLaunchConfiguration());
-						} catch (CoreException e) {
-							PTPLaunchPlugin.log(e);
-						}
+					/*
+					 * Clean up any launch activities.
+					 */
+					doCleanupLaunch(fLaunch);
 
-						/*
-						 * Clean up any launch activities.
-						 */
-						doCleanupLaunch(fLaunch);
-
-						/*
-						 * Remove job submission
-						 */
-						synchronized (jobSubmissions) {
-							jobSubmissions.remove(jobId);
-							if (jobSubmissions.size() == 0) {
-								JobManager.getInstance().removeListener(fJobListener);
-							}
+					/*
+					 * Remove job submission
+					 */
+					synchronized (jobSubmissions) {
+						jobSubmissions.remove(jobId);
+						if (jobSubmissions.size() == 0) {
+							JobManager.getInstance().removeListener(fJobListener);
 						}
 					}
-				}
-				return Status.OK_STATUS;
-			} finally {
-				if (monitor != null) {
-					monitor.done();
 				}
 			}
+			return Status.OK_STATUS;
 		}
 	}
 
@@ -311,33 +305,27 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	protected void copyFileFromRemoteHost(String remotePath, String localPath, ILaunchConfiguration configuration,
 			IProgressMonitor monitor) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 15);
-		try {
-			IRemoteFileManager localFileManager = getLocalFileManager(configuration);
-			IRemoteFileManager remoteFileManager = getRemoteFileManager(configuration, progress.newChild(5));
-			if (progress.isCanceled()) {
-				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
-						Messages.AbstractParallelLaunchConfigurationDelegate_Operation_cancelled_by_user, null));
-			}
-			if (remoteFileManager == null) {
-				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
-						Messages.AbstractParallelLaunchConfigurationDelegate_0));
-			}
-
-			IFileStore rres = remoteFileManager.getResource(remotePath);
-			if (!rres.fetchInfo(EFS.NONE, progress.newChild(5)).exists()) {
-				// Local file not found!
-				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
-						Messages.AbstractParallelLaunchConfigurationDelegate_Remote_resource_does_not_exist));
-			}
-			IFileStore lres = localFileManager.getResource(localPath);
-
-			// Copy file
-			rres.copy(lres, EFS.OVERWRITE, progress.newChild(5));
-		} finally {
-			if (monitor != null) {
-				monitor.done();
-			}
+		IRemoteFileManager localFileManager = getLocalFileManager(configuration);
+		IRemoteFileManager remoteFileManager = getRemoteFileManager(configuration, progress.newChild(5));
+		if (progress.isCanceled()) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
+					Messages.AbstractParallelLaunchConfigurationDelegate_Operation_cancelled_by_user, null));
 		}
+		if (remoteFileManager == null) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
+					Messages.AbstractParallelLaunchConfigurationDelegate_0));
+		}
+
+		IFileStore rres = remoteFileManager.getResource(remotePath);
+		if (!rres.fetchInfo(EFS.NONE, progress.newChild(5)).exists()) {
+			// Local file not found!
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
+					Messages.AbstractParallelLaunchConfigurationDelegate_Remote_resource_does_not_exist));
+		}
+		IFileStore lres = localFileManager.getResource(localPath);
+
+		// Copy file
+		rres.copy(lres, EFS.OVERWRITE, progress.newChild(5));
 	}
 
 	/**
@@ -351,33 +339,27 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	protected void copyFileToRemoteHost(String localPath, String remotePath, ILaunchConfiguration configuration,
 			IProgressMonitor monitor) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 15);
-		try {
-			IRemoteFileManager localFileManager = getLocalFileManager(configuration);
-			IRemoteFileManager remoteFileManager = getRemoteFileManager(configuration, progress.newChild(5));
-			if (progress.isCanceled()) {
-				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
-						Messages.AbstractParallelLaunchConfigurationDelegate_Operation_cancelled_by_user, null));
-			}
-			if (remoteFileManager == null) {
-				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
-						Messages.AbstractParallelLaunchConfigurationDelegate_0));
-			}
-
-			IFileStore lres = localFileManager.getResource(localPath);
-			if (!lres.fetchInfo(EFS.NONE, progress.newChild(5)).exists()) {
-				// Local file not found!
-				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
-						Messages.AbstractParallelLaunchConfigurationDelegate_Local_resource_does_not_exist));
-			}
-			IFileStore rres = remoteFileManager.getResource(remotePath);
-
-			// Copy file
-			lres.copy(rres, EFS.OVERWRITE, progress.newChild(5));
-		} finally {
-			if (monitor != null) {
-				monitor.done();
-			}
+		IRemoteFileManager localFileManager = getLocalFileManager(configuration);
+		IRemoteFileManager remoteFileManager = getRemoteFileManager(configuration, progress.newChild(5));
+		if (progress.isCanceled()) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
+					Messages.AbstractParallelLaunchConfigurationDelegate_Operation_cancelled_by_user, null));
 		}
+		if (remoteFileManager == null) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
+					Messages.AbstractParallelLaunchConfigurationDelegate_0));
+		}
+
+		IFileStore lres = localFileManager.getResource(localPath);
+		if (!lres.fetchInfo(EFS.NONE, progress.newChild(5)).exists()) {
+			// Local file not found!
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
+					Messages.AbstractParallelLaunchConfigurationDelegate_Local_resource_does_not_exist));
+		}
+		IFileStore rres = remoteFileManager.getResource(remotePath);
+
+		// Copy file
+		lres.copy(rres, EFS.OVERWRITE, progress.newChild(5));
 	}
 
 	/**
@@ -431,28 +413,23 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 */
 	protected void doPreLaunchSynchronization(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
 		if (configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_SYNC_BEFORE, false)) {
+			SubMonitor progress = SubMonitor.convert(monitor, 10);
 			// This faction generate action objects which execute according to
 			// rules
-			RuleActionFactory ruleActFactory = new RuleActionFactory(configuration, monitor);
+			RuleActionFactory ruleActFactory = new RuleActionFactory(configuration, progress.newChild(10));
 
-			try {
-				List<?> rulesList = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_SYNC_RULES,
-						new ArrayList<String>());
+			List<?> rulesList = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_SYNC_RULES,
+					new ArrayList<String>());
 
-				// Iterate over rules executing them
-				for (Object ruleObj : rulesList) {
-					ISynchronizationRule syncRule = RuleFactory.createRuleFromString((String) ruleObj);
-					if (syncRule.isUploadRule()) {
-						// Execute the action
-						IRuleAction action = ruleActFactory.getAction(syncRule);
-						action.run();
-					}
-
+			// Iterate over rules executing them
+			for (Object ruleObj : rulesList) {
+				ISynchronizationRule syncRule = RuleFactory.createRuleFromString((String) ruleObj);
+				if (syncRule.isUploadRule()) {
+					// Execute the action
+					IRuleAction action = ruleActFactory.getAction(syncRule);
+					action.run();
 				}
-			} finally {
-				if (monitor != null) {
-					monitor.done();
-				}
+
 			}
 		}
 	}
@@ -545,65 +522,59 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 */
 	protected void submitJob(String mode, IPLaunch launch, IPDebugger debugger, IProgressMonitor progress) throws CoreException {
 		SubMonitor subMon = SubMonitor.convert(progress, 50);
-		try {
-			final ILaunchController control = RMLaunchUtils.getLaunchController(launch.getLaunchConfiguration());
-			if (control == null) {
-				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
-						Messages.AbstractParallelLaunchConfigurationDelegate_Specified_resource_manager_not_found));
-			}
-			/*
-			 * Make sure controller is started before we submit the job
-			 */
-			control.start(subMon.newChild(10));
+		final ILaunchController control = RMLaunchUtils.getLaunchController(launch.getLaunchConfiguration());
+		if (control == null) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
+					Messages.AbstractParallelLaunchConfigurationDelegate_Specified_resource_manager_not_found));
+		}
+		/*
+		 * Make sure controller is started before we submit the job
+		 */
+		control.start(subMon.newChild(10));
 
-			if (!mode.equals(ILaunchManager.DEBUG_MODE) && LaunchUtils.getSystemType(launch.getLaunchConfiguration()) != null) {
-				IMonitorControl monitor = MonitorControlManager.getInstance().getMonitorControl(control.getControlId());
-				if (monitor == null) {
+		if (!mode.equals(ILaunchManager.DEBUG_MODE) && LaunchUtils.getSystemType(launch.getLaunchConfiguration()) != null) {
+			IMonitorControl monitor = MonitorControlManager.getInstance().getMonitorControl(control.getControlId());
+			if (monitor == null) {
+				if (switchPerspective(ILMLUIConstants.ID_SYSTEM_MONITORING_PERSPECTIVE,
+						Messages.AbstractParallelLaunchConfigurationDelegate_launchType1,
+						PreferenceConstants.PREF_SWITCH_TO_MONITORING_PERSPECTIVE, true)) {
+
+					monitor = MonitorControlManager.getInstance().createMonitorControl(control);
+					monitor.start(subMon.newChild(10));
+				}
+			} else {
+				if (!monitor.isActive()) {
 					if (switchPerspective(ILMLUIConstants.ID_SYSTEM_MONITORING_PERSPECTIVE,
-							Messages.AbstractParallelLaunchConfigurationDelegate_launchType1,
+							Messages.AbstractParallelLaunchConfigurationDelegate_launchType2,
 							PreferenceConstants.PREF_SWITCH_TO_MONITORING_PERSPECTIVE, true)) {
 
-						monitor = MonitorControlManager.getInstance().createMonitorControl(control);
 						monitor.start(subMon.newChild(10));
 					}
 				} else {
-					if (!monitor.isActive()) {
-						if (switchPerspective(ILMLUIConstants.ID_SYSTEM_MONITORING_PERSPECTIVE,
-								Messages.AbstractParallelLaunchConfigurationDelegate_launchType2,
-								PreferenceConstants.PREF_SWITCH_TO_MONITORING_PERSPECTIVE, true)) {
-
-							monitor.start(subMon.newChild(10));
-						}
-					} else {
-						switchPerspective(ILMLUIConstants.ID_SYSTEM_MONITORING_PERSPECTIVE,
-								Messages.AbstractParallelLaunchConfigurationDelegate_launchType3,
-								PreferenceConstants.PREF_SWITCH_TO_MONITORING_PERSPECTIVE, false);
-					}
+					switchPerspective(ILMLUIConstants.ID_SYSTEM_MONITORING_PERSPECTIVE,
+							Messages.AbstractParallelLaunchConfigurationDelegate_launchType3,
+							PreferenceConstants.PREF_SWITCH_TO_MONITORING_PERSPECTIVE, false);
 				}
 			}
-
-			JobManager.getInstance().addListener(control.getControlId(), fJobListener);
-			String jobId = control.submitJob(launch.getLaunchConfiguration(), mode, subMon.newChild(10));
-			if (subMon.isCanceled()) {
-				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
-						Messages.AbstractParallelLaunchConfigurationDelegate_Launch_was_cancelled));
-			}
-			if (control.getJobStatus(jobId, subMon.newChild(10)).equals(IJobStatus.UNDETERMINED)) {
-				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
-						Messages.AbstractParallelLaunchConfigurationDelegate_UnableToDetermineJobStatus));
-			}
-			launch.setJobControl(control);
-			launch.setJobId(jobId);
-			JobSubmission jobSub = new JobSubmission(launch, control, debugger);
-			synchronized (jobSubmissions) {
-				jobSubmissions.put(jobId, jobSub);
-			}
-			jobSub.schedule();
-		} finally {
-			if (progress != null) {
-				progress.done();
-			}
 		}
+
+		JobManager.getInstance().addListener(control.getControlId(), fJobListener);
+		String jobId = control.submitJob(launch.getLaunchConfiguration(), mode, subMon.newChild(10));
+		if (subMon.isCanceled()) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
+					Messages.AbstractParallelLaunchConfigurationDelegate_Launch_was_cancelled));
+		}
+		if (control.getJobStatus(jobId, subMon.newChild(10)).equals(IJobStatus.UNDETERMINED)) {
+			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
+					Messages.AbstractParallelLaunchConfigurationDelegate_UnableToDetermineJobStatus));
+		}
+		launch.setJobControl(control);
+		launch.setJobId(jobId);
+		JobSubmission jobSub = new JobSubmission(launch, control, debugger);
+		synchronized (jobSubmissions) {
+			jobSubmissions.put(jobId, jobSub);
+		}
+		jobSub.schedule();
 	}
 
 	/**
@@ -719,38 +690,25 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 30);
 
-		try {
-			/*
-			 * Verify executable path
-			 */
-			IPath path = verifyExecutablePath(configuration, progress.newChild(10));
+		/*
+		 * Verify executable path
+		 */
+		IPath path = verifyExecutablePath(configuration, progress.newChild(10));
+		if (progress.isCanceled() || path == null) {
+			return false;
+		}
+
+		/*
+		 * Verify working directory. Use the executable path if no working directory has been set.
+		 */
+		String workPath = LaunchUtils.getWorkingDirectory(configuration);
+		if (workPath != null) {
+			path = verifyResource(workPath, configuration, progress.newChild(10));
 			if (progress.isCanceled() || path == null) {
 				return false;
 			}
-
-			/*
-			 * Verify working directory. Use the executable path if no working directory has been set.
-			 */
-			String workPath = LaunchUtils.getWorkingDirectory(configuration);
-			if (workPath != null) {
-				path = verifyResource(workPath, configuration, progress.newChild(10));
-				if (progress.isCanceled() || path == null) {
-					return false;
-				}
-			}
-
-			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
-				path = verifyDebuggerPath(configuration, progress.newChild(10));
-				if (progress.isCanceled() || path == null) {
-					return false;
-				}
-			}
-			return true;
-		} finally {
-			if (monitor != null) {
-				monitor.done();
-			}
 		}
+		return true;
 	}
 
 	/**
