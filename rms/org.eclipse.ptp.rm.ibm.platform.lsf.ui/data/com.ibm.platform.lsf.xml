@@ -37,7 +37,7 @@
 		<attribute name="LSF_JOB_RESIZABLE" type="boolean"
 			translateBooleanAs=" ,no">
 			<description>Job Is Resizable:</description>
-			<tooltip>The job is autoresizable. (-ar)</tooltip>
+			<tooltip>Sets the job as autoresizable. (-ar)</tooltip>
 			<default>no</default>
 		</attribute>
 
@@ -48,7 +48,7 @@
 		<attribute name="LSF_NOTIFY_DISPATCH" type="boolean"
 			translateBooleanAs=" ,no">
 			<description>Dispatch Notification:</description>
-			<tooltip>Send you email when your job is dispatched. (-B)</tooltip>
+			<tooltip>Specifies that email is sent when your job is dispatched. (-B)</tooltip>
 			<default>no</default>
 		</attribute>
 
@@ -59,7 +59,7 @@
 		<attribute name="LSF_NOTIFY_COMPLETION" type="boolean"
 			translateBooleanAs=" ,no">
 			<description>Completion Notification:</description>
-			<tooltip>Send you email when your job completes. This option is disabled if STDOUT pathnames are blank. (-N)</tooltip>
+			<tooltip>Specifies that email is sent when your job completes. This option is disabled if STDOUT pathnames are blank. (-N)</tooltip>
 			<default>no</default>
 		</attribute>
 
@@ -70,7 +70,7 @@
 		<attribute name="LSF_RERUN_SYS_FAILURE" type="boolean"
 			translateBooleanAs=" ,no">
 			<description>Rerun on System Failure:</description>
-			<tooltip>Rerun job if host or system fails. (-r)</tooltip>
+			<tooltip>Specifies the job will be rerun if host or system fails. (-r)</tooltip>
 			<default>no</default>
 		</attribute>
 
@@ -81,7 +81,7 @@
 		<attribute name="LSF_NORERUN_SYS_FAILURE" type="boolean"
 			translateBooleanAs=" ,no">
 			<description>Do not Rerun on System Failure:</description>
-			<tooltip>Job is never rerunnable. (-rn)</tooltip>
+			<tooltip>Specifies the job is never re-runnable. (-rn)</tooltip>
 			<default>no</default>
 		</attribute>
 
@@ -92,7 +92,7 @@
 		<attribute name="LSF_PASS_USER_LIMITS" type="boolean"
 			translateBooleanAs=" ,no">
 			<description>Pass User Limits:</description>
-			<tooltip>Pass user shell limits to execution host. User limits cannot override OS or queue limits. (-ul)</tooltip>
+			<tooltip>Passes user's local shell limits to execution host. User limits cannot override OS or queue limits. (-ul)</tooltip>
 			<default>no</default>
 		</attribute>
 
@@ -110,13 +110,13 @@
 		<!-- -app option -->
 		<attribute name="LSF_APP_PROFILE" type="string">
 			<description>Application Profile:</description>
-			<tooltip>Submit the job to the specified, existing application profile. (-app)</tooltip>
+			<tooltip>Submits the job to the specified, existing application profile. (-app)</tooltip>
 		</attribute>
 
 		<!-- -b option -->
 		<attribute name="LSF_DISPATCH_AT" type="string">
 			<description>Dispatch At:</description>
-			<tooltip>Dispatch the job at or after the specified date and time. (-b)</tooltip>
+			<tooltip>Dispatches the job at or after the specified date and time. (-b)</tooltip>
 			<validator>
 				<!-- Validate time spec where time can be blank, yyyy:mm:dd:hh:mm, mm:dd:hh:mm, 
 					dd:hh:mm or hh:mm -->
@@ -130,7 +130,7 @@
 		<!-- -C option -->
 		<attribute name="LSF_COREFILE_LIMIT" type="string">
 			<description>Core File Limit:</description>
-			<tooltip>Set a soft per-process core file size limit for all processes in this batch job. (-C)</tooltip>
+			<tooltip>Sets the soft per-process core file size limit for all processes in this batch job. (-C)</tooltip>
 			<validator>
 				<regex expression=" *|[\d]+" />
 				<error-message>Core file limit must be a numeric value.
@@ -141,13 +141,13 @@
 		<!-- -c option -->
 		<attribute name="LSF_CPUTIME_LIMIT" type="string">
 			<description>CPU Time Limit:</description>
-			<tooltip>Limits the total CPU time for the job to prevent runaway jobs. (-c)</tooltip>
+			<tooltip>Sets the total CPU time limit for the job to prevent runaway jobs. (-c)</tooltip>
 		</attribute>
 
 		<!-- -D option -->
 		<attribute name="LSF_DATA_LIMIT" type="string">
 			<description>Data Limit:</description>
-			<tooltip>Set a per process soft data segment size limit for each process in the job. (-D)</tooltip>
+			<tooltip>Sets the per process soft data segment size limit for each process in the job. (-D)</tooltip>
 			<validator>
 				<regex expression=" *|[\d]+" />
 				<error-message>Data segment limit must be a numeric value.
@@ -158,20 +158,20 @@
 		<!-- -e option -->
 		<attribute name="LSF_STDERR_PATH_APPEND" type="string">
 			<description>STDERR Path (Append):</description>
-			<tooltip>Standard error (STDERR) application output is appended to the file specified by this option. (-e)</tooltip>
+			<tooltip>Specifies that standard error (STDERR) application output is appended to the file specified by this option. (-e)</tooltip>
 		</attribute>
 
 		<!-- -eo option -->
 		<attribute name="LSF_STDERR_PATH_NEW" type="string">
 			<description>STDERR Path (New):</description>
-			<tooltip>Standard error (STDERR) application output is written to the file specified by this option. (-eo)</tooltip>
+			<tooltip>Specifies that standard error (STDERR) application output is written to the file specified by this option. (-eo)</tooltip>
 			<default>stderr.%J.%I.txt</default>
 		</attribute>
 
 		<!-- -F option -->
 		<attribute name="LSF_FILESIZE_LIMIT" type="string">
 			<description>File Size Limit:</description>
-			<tooltip>Set a per process soft file size limit for each process in the job. (-F)</tooltip>
+			<tooltip>Sets the per process soft file size limit for each process in the job. (-F)</tooltip>
 			<validator>
 				<regex expression=" *|[\d]+" />
 				<error-message>File size limit must be a numeric value.
@@ -194,13 +194,13 @@
 		<!-- -i option -->
 		<attribute name="LSF_STDIN_PATH" type="string">
 			<description>STDIN Path:</description>
-			<tooltip>Use the specified file for standard input (STDIN). (-i)</tooltip>
+			<tooltip>Specifies that the specified file is used for standard input (STDIN). (-i)</tooltip>
 		</attribute>
 
 		<!-- -is option -->
 		<attribute name="LSF_STDIN_EDITABLE_PATH" type="string">
 			<description>STDIN Path (Editable):</description>
-			<tooltip>Use the specified file for standard input (STDIN). The original file may be edited or deleted after job submission. (-is)</tooltip>
+			<tooltip>Specifies that the specified file is used for standard input (STDIN). The original file may be edited or deleted after job submission. (-is)</tooltip>
 		</attribute>
 
 		<!-- -J option -->
@@ -218,25 +218,25 @@
 		<!-- -jsdl option -->
 		<attribute name="LSF_JSDL_FILE" type="string">
 			<description>Submit JSDL Job (LSF Extensions):</description>
-			<tooltip>Submit a job using a JSDL file with LSF extensions schema. (-jsdl)</tooltip>
+			<tooltip>Submits a job using a JSDL file with LSF extensions schema. (-jsdl)</tooltip>
 		</attribute>
 
 		<!-- -jsdl_strict option -->
 		<attribute name="LSF_JSDL_FILE_STRICT" type="string">
 			<description>Submit JSDL Job (strict):</description>
-			<tooltip>Submit a job using a JSDL file with standard schema. (-jsdl_strict)</tooltip>
+			<tooltip>Submits a job using a JSDL file with standard schema. (-jsdl_strict)</tooltip>
 		</attribute>
 
 		<!-- -k option -->
 		<attribute name="LSF_CHECKPOINT" type="string">
 			<description>Checkpointing:</description>
-			<tooltip>Make a job checkpointable and specify the checkpoint directory. (-k)</tooltip>
+			<tooltip>Makes a job checkpointable and specifies the checkpoint directory. (-k)</tooltip>
 		</attribute>
 
 		<!-- -L option -->
 		<attribute name="LSF_LOGIN_SHELL" type="string">
 			<description>Login Shell:</description>
-			<tooltip>Initialize the execution environment using the specified login shell. (-L)</tooltip>
+			<tooltip>Initializes the execution environment using the specified login shell. (-L)</tooltip>
 		</attribute>
 
 		<!-- -Lp option -->
@@ -248,7 +248,7 @@
 		<!-- -M option -->
 		<attribute name="LSF_MEMORY_LIMIT" type="string">
 			<description>Memory Limit:</description>
-			<tooltip>Set a per process soft memory limit for all processes in this job. (-M)</tooltip>
+			<tooltip>Sets the per process soft memory limit for all processes in this job. (-M)</tooltip>
 			<validator>
 				<regex expression=" *|[\d]+" />
 				<error-message>Memory limit must be a numeric value.
@@ -259,19 +259,19 @@
 		<!-- -m option -->
 		<attribute name="LSF_HOST_NAMES" type="string">
 			<description>Execution Host Name(s):</description>
-			<tooltip>Run the job on one of the specified hosts, host groups or compute units. (-m)</tooltip>
+			<tooltip>Runs the job on one of the specified hosts, host groups or compute units. (-m)</tooltip>
 		</attribute>
 
 		<!-- -mig option -->
 		<attribute name="LSF_MIGRATION" type="string">
 			<description>Migration Threshold:</description>
-			<tooltip>Specify migration threshold for checkpointable and rerunnable jobs. (-mig)</tooltip>
+			<tooltip>Specifies the migration threshold for checkpointable and rerunnable jobs. (-mig)</tooltip>
 		</attribute>
 
 		<!-- -n option -->
 		<attribute name="LSF_NUM_PROCS" type="string">
 			<description>Number of Processors:</description>
-			<tooltip>Specify minimum and optional maximum number of processors to run the job. (-n)</tooltip>
+			<tooltip>Specifies the minimum and optional maximum number of processors to run the job. (-n)</tooltip>
 			<validator>
 				<!-- Validate # of processors as blank, n, or m,n where m and n must 
 					be integers -->
@@ -284,7 +284,7 @@
 		<!-- -network option -->
 		<attribute name="LSF_NETWORK" type="string">
 			<description>Network Attributes:</description>
-			<tooltip>Specify network attributes (type, protocol, mode, usage, instance, etc). (-network)</tooltip>
+			<tooltip>Specifies the network attributes (type, protocol, mode, usage, instance, etc) for the job. (-network)</tooltip>
 		</attribute>
 
 		<!-- -o option -->
@@ -320,7 +320,7 @@
 		<!-- -Q option -->
 		<attribute name="LSF_REQUEUE_CODES" type="string">
 			<description>Auto Requeue Exit Codes:</description>
-			<tooltip>Specify automatic job requeue exit values. (-Q)</tooltip>
+			<tooltip>Specifies automatic job requeue exit values. (-Q)</tooltip>
 		</attribute>
 
 		<!-- -q option -->
@@ -338,7 +338,7 @@
 		<!-- -S option -->
 		<attribute name="LSF_STACK_LIMIT" type="string">
 			<description>Stack Limit:</description>
-			<tooltip>Sets a per process soft limit for the the stack for each process in the job. (-S)</tooltip>
+			<tooltip>Sets the per process soft limit for the the stack for each process in the job. (-S)</tooltip>
 			<validator>
 				<regex expression=" *|[\d]+" />
 				<error-message>Stack limit must be a numeric value.
@@ -349,7 +349,7 @@
 		<!-- -s option -->
 		<attribute name="LSF_SIGNAL" type="string">
 			<description>Run Window Signal:</description>
-			<tooltip>Send the specified signal when a queue-level run window closes. (-s)</tooltip>
+			<tooltip>Sends the specified signal when a queue-level run window closes. (-s)</tooltip>
 		</attribute>
 
 		<!-- -sla option -->
@@ -361,7 +361,7 @@
 		<!-- -sp option -->
 		<attribute name="LSF_JOB_PRIORITY" type="string">
 			<description>Job Priority:</description>
-			<tooltip>Set the job priority for this job. (-sp)</tooltip>
+			<tooltip>Sets the job priority for this job. (-sp)</tooltip>
 		</attribute>
 
 		<!-- -T option -->
@@ -393,19 +393,19 @@
 		<!-- -U option -->
 		<attribute name="LSF_RESERVATION_ID" type="string">
 			<description>Reservation ID:</description>
-			<tooltip>Use the specified reservation id when scheduling the job. (-U)</tooltip>
+			<tooltip>Uses the specified reservation id when scheduling the job. (-U)</tooltip>
 		</attribute>
 
 		<!-- -u option -->
 		<attribute name="LSF_EMAIL_ID" type="string">
 			<description>Email ID:</description>
-			<tooltip>Send notification emails to the specified email address. (-u)</tooltip>
+			<tooltip>Sends notification emails to the specified email address. (-u)</tooltip>
 		</attribute>
 
 		<!-- -v option -->
 		<attribute name="LSF_SWAP_LIMIT" type="string">
 			<description>Swap Limit:</description>
-			<tooltip>Set the total process virtual memory limit for the job. (-v)</tooltip>
+			<tooltip>Sets the total process virtual memory limit for the job. (-v)</tooltip>
 			<validator>
 				<regex expression=" *|[\d]+" />
 				<error-message>Swap limit must be a numeric value.
@@ -416,42 +416,42 @@
 		<!-- -W option -->
 		<attribute name="LSF_RUNTIME_LIMIT" type="string">
 			<description>Runtime Limit:</description>
-			<tooltip>Set the runtime limit for job. (-W)</tooltip>
+			<tooltip>Sets the runtime limit for job. (-W)</tooltip>
 		</attribute>
 
 		<!-- -We option -->
 		<attribute name="LSF_RUNTIME_ESTIMATE" type="string">
 			<description>Estimated Runtime:</description>
-			<tooltip>Specify estimated runtime for job. (-We)</tooltip>
+			<tooltip>Specifies the estimated runtime for job. (-We)</tooltip>
 		</attribute>
 
 		<!-- -w option -->
 		<attribute name="LSF_DEPENDENCIES" type="string">
 			<description>Job Dependencies:</description>
-			<tooltip>Specify dependencies for job. (-w)</tooltip>
+			<tooltip>Specifies dependencies for job. (-w)</tooltip>
 		</attribute>
 
 		<!-- -wa option -->
 		<attribute name="LSF_JOB_ACTION" type="string">
 			<description>Job Action Signal:</description>
-			<tooltip>Specify job action to be taken before a job action occurs. (-wa)</tooltip>
+			<tooltip>Specifies the job action to be taken before a job action occurs. (-wa)</tooltip>
 		</attribute>
 
 		<!-- -wt option -->
 		<attribute name="LSF_JOB_ACTION_TIME" type="string">
 			<description>Job Action Time:</description>
-			<tooltip>Specify time before a job control action that a job action occurs. (-wt)</tooltip>
+			<tooltip>Specifies the time before a job control action that a job action occurs. (-wt)</tooltip>
 		</attribute>
 
 		<!-- Other options -->
 		<attribute name="LSF_OTHER_OPTIONS" type="string">
 			<description>Other Options:</description>
-			<tooltip>Specify LSF options that do not appear elsewhere in list.</tooltip>
+			<tooltip>Specifies LSF options that do not appear elsewhere in list.</tooltip>
 		</attribute>
 
 		<attribute name="LSF_MPI_COMMAND" type="choice">
 			<description>MPI Command:</description>
-			<tooltip>Optional MPI command to run job.</tooltip>
+			<tooltip>Specifies an optional MPI command to run job.</tooltip>
 			<choice>,poe,mpiexec,mpirun</choice>
 		</attribute>
 
