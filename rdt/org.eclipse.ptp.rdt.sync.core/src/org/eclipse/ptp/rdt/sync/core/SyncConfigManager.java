@@ -312,7 +312,7 @@ public class SyncConfigManager {
 	 * @return whether config is local
 	 */
 	public static boolean isLocal(SyncConfig config) {
-		return (config.getName() == LOCAL_SYNC_CONFIG_NAME);
+		return LOCAL_SYNC_CONFIG_NAME.equals(config.getName());
 	}
 
 	/**
