@@ -13,8 +13,11 @@ import org.eclipse.ptp.etfw.tau.ui.PerformanceDatabaseCombo;
 import org.eclipse.ptp.internal.rm.jaxb.core.JAXBCoreConstants;
 import org.eclipse.ptp.rm.jaxb.control.ui.AbstractUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateHandler;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 
 /**
  * This stores the performance database custom widget selection.
@@ -32,6 +35,20 @@ public class PerformanceDatabaseComboModel extends AbstractUpdateModel {
 		super(name, handler);
 
 		comboComposite = (PerformanceDatabaseCombo) control;
+		comboComposite.getCombo().addListener(SWT.Selection, new Listener() {
+
+			@Override
+			public void handleEvent(Event event) {
+				try {
+					Object value = storeValue();
+					handleUpdate(value);
+//					if(value!=null&&value instanceof String){
+//						makefileCombo.setSelectedMakefile((String)value);
+//					}
+				} catch (Exception ignored) {
+				}
+			}
+		});
 	}
 
 	@Override
@@ -58,9 +75,45 @@ public class PerformanceDatabaseComboModel extends AbstractUpdateModel {
 
 	}
 
+	/**
+	 * Retrieves the value from the control, then writes to the current environment map and calls the update handler. <br>
+	 * <br>
+	 */
+	public Object storeValue() throws Exception {
+		Object value = validate();
+		lcMap.putValue(name, value);
+		return value;
+	}
+	
 	@Override
 	public Object getControl() {
 		return comboComposite;
+	}
+	
+	/**
+	 * Gets value from control and runs validator on it, if there is one. If there is an error, this is registered with the handler.
+	 * 
+	 * @return valid value
+	 * @throws Exception
+	 *             thrown if invalid
+	 */
+	private Object validate() throws Exception {
+		Object value = getValueFromControl();
+		String error = null;
+		if (validator != null) {
+			try {
+				validator.validate(value);
+			} catch (Exception t) {
+				error = validator.getErrorMessage();
+			}
+		}
+		if (error != null) {
+			handler.addError(name, error);
+			throw new Exception(error);
+		} else {
+			handler.removeError(name);
+		}
+		return value;
 	}
 
 }

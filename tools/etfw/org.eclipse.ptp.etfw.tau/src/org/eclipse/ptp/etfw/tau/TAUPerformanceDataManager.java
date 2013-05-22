@@ -823,7 +823,16 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager {
 		if (hasLocalParaprof) {
 			final String xmlMetaData = configuration.getAttribute(IToolLaunchConfigurationConstants.EXTOOL_XML_METADATA,
 					(String) null);
-			database = PerfDMFView.extractDatabaseName(configuration.getAttribute(ITAULaunchConfigurationConstants.PERFDMF_DB,
+			final String RM_NAME = "org.eclipse.ptp.launch.RESOURCE_MANAGER_NAME";
+			final String ETFW_VERSION= "ETFW_VERSION";
+			final String jaxbParser="jaxb-parser";
+			String attributeKey = ITAULaunchConfigurationConstants.PERFDMF_DB;
+			String etfwCheck = configuration.getAttribute(ETFW_VERSION, "");
+			if(etfwCheck.equals(jaxbParser)){
+				String controlId = configuration.getAttribute(RM_NAME,"");
+				attributeKey = controlId + (IToolLaunchConfigurationConstants.DOT + ITAULaunchConfigurationConstants.PERFDMF_DB);
+			}
+			database = PerfDMFView.extractDatabaseName(configuration.getAttribute(attributeKey,
 					(String) null));
 
 			if (xmlFile != null) {

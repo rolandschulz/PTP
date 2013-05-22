@@ -431,6 +431,12 @@
 			<rm:default>None</rm:default>
 		</attribute>
 		<!-- End Selective Instrumentation Tab -->
+		<!-- Data Management Tab -->
+		<attribute name="perfdmf_database_configuration" type="string">
+			<rm:description></rm:description>
+			<rm:tooltip></rm:tooltip>
+			<rm:default>None</rm:default>
+		</attribute>
 	</controlData>
 	<buildTool tool-id="TAU" replace-compiler="true">
 		<cc-compiler tool-command="tau_cc.sh" tool-group="tau" />
@@ -1200,7 +1206,7 @@
 								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
 							</rm:layout-data>
 						</rm:widget>
-						<rm:browse title="Browse..." localOnly="true" textStyle="SWT.BORDER" attribute="Tau Compiler.performance.options.configuration_id_-OPTTAUSELECTFILE_ARGUMENT_SAVED">
+						<rm:browse title="Browse..." localOnly="false" directory="false" textStyle="SWT.BORDER" attribute="Tau Compiler.performance.options.configuration_id_-OPTTAUSELECTFILE_ARGUMENT_SAVED">
 							<rm:text-layout-data>
 								<rm:grid-data horizontalSpan="1" horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="true" />
 							</rm:text-layout-data>
@@ -1450,7 +1456,7 @@
 							<rm:button type="radiobutton" title="User Defined" buttonId="UserDefinedButton" style="SWT.LEFT">
 							</rm:button>
 						</rm:button-group>
-						<rm:browse title="Browse..." localOnly="false" directory="false" textStyle="SWT.BORDER">
+						<rm:browse title="Browse..." localOnly="false" directory="false" attribute="Tau Compiler.performance.options.configuration_id_-OPTTAUSELECTFILE_ARGUMENT_SAVED" textStyle="SWT.BORDER">
 							<rm:text-layout-data>
 								<rm:grid-data horizontalSpan="2" horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="true" />
 							</rm:text-layout-data>
@@ -1489,7 +1495,7 @@
 							</rm:layout-data>
 							<rm:fixed-text>Select Database:</rm:fixed-text>
 						</rm:widget>
-						<rm:widget type="custom" typeId="performance-database" style="SWT.BORDER">
+						<rm:widget type="custom" typeId="performance-database" attribute="perfdmf_database_configuration" style="SWT.BORDER">
 							<rm:layout-data>
 								<rm:grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false" />
 							</rm:layout-data> 

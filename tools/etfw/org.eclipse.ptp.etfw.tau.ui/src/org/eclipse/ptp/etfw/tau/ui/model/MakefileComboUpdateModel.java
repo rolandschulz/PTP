@@ -9,12 +9,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.etfw.tau.ui.model;
 
-import java.util.Iterator;
-
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.etfw.tau.ui.TAUMakefileCombo;
-import org.eclipse.ptp.internal.rm.jaxb.control.ui.utils.WidgetActionUtils;
 import org.eclipse.ptp.rm.jaxb.control.ui.AbstractUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateHandler;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
