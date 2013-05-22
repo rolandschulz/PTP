@@ -3,7 +3,7 @@
 <plugin>
    <extension
          point="org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagerConfigurations">
-      <JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
             configurationFile="data/pbs-generic-batch.xml"
             name="PBS-Generic-Batch">
       </JAXBResourceManagerConfiguration>
