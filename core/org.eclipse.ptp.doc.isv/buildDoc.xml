@@ -58,7 +58,7 @@
 			
 		<pathconvert property="javadoc.classpath">
 			<path>				
-				<fileset dir="${baseLocation}">
+				<fileset dir="${basedir}">
 					<patternset refid="platform.classpath.pattern"/>
 		    	</fileset>
 			</path>
