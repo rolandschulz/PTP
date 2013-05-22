@@ -12,8 +12,11 @@ package org.eclipse.ptp.internal.etfw.launch;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
@@ -67,7 +70,7 @@ import org.eclipse.swt.widgets.Label;
  * @author Chris Navarro
  * 
  */
-public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab implements IToolLaunchConfigurationConstants {
+public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab implements IToolLaunchConfigurationConstants, IExecutableExtension {
 
 	private static final String TAB_ID = "org.eclipse.ptp.internal.etfw.launch.PerformanceAnalysisTab"; //$NON-NLS-1$
 	/**
@@ -99,7 +102,7 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 	private ExternalToolSelectionTab saxETFWTab;
 
 	public PerformanceAnalysisTab() {
-		this(true);
+		this(false);
 	}
 
 	public PerformanceAnalysisTab(boolean noPar) {
@@ -138,18 +141,22 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 		analyzeonlyCheck = new Button(bottomComposite, SWT.CHECK);
 		analyzeonlyCheck.setText(Messages.PerformanceAnalysisTab_SelectExistingPerfData);
 
-		String parser = PreferenceConstants.getVersion();
-		if (parser.equals(IToolLaunchConfigurationConstants.USE_SAX_PARSER)) {
+		if (noPTP) {
 			buildSAXParserUI();
 		} else {
-			buildJAXBParserUI();
+			String parser = PreferenceConstants.getVersion();
+			if (parser.equals(IToolLaunchConfigurationConstants.USE_SAX_PARSER)) {
+				buildSAXParserUI();
+			} else {
+				buildJAXBParserUI();
+			}
 		}
 	}
 
 	private void buildSAXParserUI() {
 		bottomComposite.setVisible(false);
 
-		saxETFWTab = new ExternalToolSelectionTab(true);
+		saxETFWTab = new ExternalToolSelectionTab(noPTP);
 		saxETFWTab.createControl(toolComposite);
 		saxETFWTab.setLaunchConfigurationDialog(this.getLaunchConfigurationDialog());
 
@@ -343,55 +350,67 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 	@Override
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		launchConfiguration = configuration;
-		final String rmType = LaunchUtils.getTemplateName(configuration);
-		final String remId = LaunchUtils.getRemoteServicesId(configuration);
-		final String remName = LaunchUtils.getConnectionName(configuration);
-		try {
-			controller = LaunchControllerManager.getInstance().getLaunchController(remId, remName, rmType);
-			if (controller != null) {
-				String parser = PreferenceConstants.getVersion();
-				if (parser.equals(IToolLaunchConfigurationConstants.USE_SAX_PARSER)) {
-					saxETFWTab.initializeFrom(configuration);
-				} else {
-					String toolName = configuration.getAttribute(IToolLaunchConfigurationConstants.SELECTED_TOOL,
-							IToolLaunchConfigurationConstants.EMPTY_STRING);
-					for (int index = 0; index < toolCombo.getItemCount(); index++) {
-						if (toolCombo.getItem(index).equals(toolName)) {
-							toolCombo.select(index);
-							toolCombo.notifyListeners(SWT.Selection, null);
-							break;
+
+		if (noPTP) {
+			saxETFWTab.initializeFrom(configuration);
+		} else {
+
+			final String rmType = LaunchUtils.getTemplateName(configuration);
+			final String remId = LaunchUtils.getRemoteServicesId(configuration);
+			final String remName = LaunchUtils.getConnectionName(configuration);
+			try {
+				controller = LaunchControllerManager.getInstance().getLaunchController(remId, remName, rmType);
+				if (controller != null) {
+					String parser = PreferenceConstants.getVersion();
+					if (parser.equals(IToolLaunchConfigurationConstants.USE_SAX_PARSER)) {
+						saxETFWTab.initializeFrom(configuration);
+					} else {
+						String toolName = configuration.getAttribute(IToolLaunchConfigurationConstants.SELECTED_TOOL,
+								IToolLaunchConfigurationConstants.EMPTY_STRING);
+						for (int index = 0; index < toolCombo.getItemCount(); index++) {
+							if (toolCombo.getItem(index).equals(toolName)) {
+								toolCombo.select(index);
+								toolCombo.notifyListeners(SWT.Selection, null);
+								break;
+							}
+						}
+
+						if (toolName.equals(IToolLaunchConfigurationConstants.EMPTY_STRING)) {
+							// When switching between launch configurations, clear out old widgets
+							toolCombo.select(0);
+							clearOldWidgets();
 						}
 					}
-
-					if (toolName.equals(IToolLaunchConfigurationConstants.EMPTY_STRING)) {
-						// When switching between launch configurations, clear out old widgets
-						toolCombo.select(0);
-						clearOldWidgets();
-					}
 				}
-			}
 
-		} catch (CoreException e) {
-			e.printStackTrace();
+			} catch (CoreException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
 	@Override
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-		String parser = PreferenceConstants.getVersion();
-		configuration.setAttribute(IToolLaunchConfigurationConstants.ETFW_VERSION, parser);
-		if (parser.equals(IToolLaunchConfigurationConstants.USE_SAX_PARSER)) {
+		if (noPTP) {
+			configuration.setAttribute(IToolLaunchConfigurationConstants.ETFW_VERSION,
+					IToolLaunchConfigurationConstants.USE_SAX_PARSER);
 			saxETFWTab.performApply(configuration);
 		} else {
-			if (toolCombo.getSelectionIndex() > 0) {
-				String selectedtool = toolCombo.getItem(toolCombo.getSelectionIndex());
-				configuration.setAttribute(SELECTED_TOOL, selectedtool);
+			String parser = PreferenceConstants.getVersion();
+			configuration.setAttribute(IToolLaunchConfigurationConstants.ETFW_VERSION, parser);
+			if (parser.equals(IToolLaunchConfigurationConstants.USE_SAX_PARSER)) {
+				saxETFWTab.performApply(configuration);
+			} else {
+				if (toolCombo.getSelectionIndex() > 0) {
+					String selectedtool = toolCombo.getItem(toolCombo.getSelectionIndex());
+					configuration.setAttribute(SELECTED_TOOL, selectedtool);
 
-				configuration.setAttribute(BUILDONLY, buildOnlyCheck.getSelection());
-				configuration.setAttribute(ANALYZEONLY, analyzeonlyCheck.getSelection());
+					configuration.setAttribute(BUILDONLY, buildOnlyCheck.getSelection());
+					configuration.setAttribute(ANALYZEONLY, analyzeonlyCheck.getSelection());
 
-				if (launchTabParent != null) {
-					launchTabParent.performApply(configuration);
+					if (launchTabParent != null) {
+						launchTabParent.performApply(configuration);
+					}
 				}
 			}
 		}
@@ -471,6 +490,22 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 		}
 
 		return true;
+	}
+	
+	/**
+	 * Sets whether it is possible to initiate a parallel launch from
+	 * this tab
+	 *
+	 * @param noPar
+	 *            Availability of the PTP to this tab's launch configuration
+	 *            delegate
+	 */
+	public void setInitializationData(IConfigurationElement config,
+			String propertyName, Object data) throws CoreException {
+		if (data != null) {
+			Map<String, String> parameters = (Map<String, String>) data;
+			noPTP = Boolean.valueOf(parameters.get("noPTP")); //$NON-NLS-1$
+		}
 	}
 
 	private final class ContentsChangedListener implements IRMLaunchConfigurationContentsChangedListener {

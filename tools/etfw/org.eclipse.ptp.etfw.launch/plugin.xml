@@ -4,16 +4,99 @@
    <extension
          point="org.eclipse.debug.ui.launchConfigurationTabs">
       <tab
+            class="org.eclipse.ptp.internal.etfw.ui.ToolRecompMainTab"
+            group="org.eclipse.cdt.launch.applicationProfileLaunchTabGroup"
+            id="org.eclipse.ptp.etfw.launch.ToolRecompMainTab"
+            name="%MainTab.name">
+         <associatedDelegate
+               delegate="org.eclipse.ptp.etfw.tau.performance.performancelaunch">
+         </associatedDelegate>
+      </tab>
+      <tab
+            class="org.eclipse.cdt.launch.ui.CArgumentsTab"
+            group="org.eclipse.cdt.launch.applicationProfileLaunchTabGroup"
+            id="org.eclipse.ptp.etfw.launch.argumentsTab"
+            name="%ArgumentsTab.name">
+         <associatedDelegate
+               delegate="org.eclipse.ptp.etfw.tau.performance.performancelaunch">
+         </associatedDelegate>
+         <placement
+               after="org.eclipse.cdt.cdi.launch.mainTab">
+         </placement>
+      </tab>
+      <tab
+            class="org.eclipse.debug.ui.EnvironmentTab"
+            group="org.eclipse.cdt.launch.applicationProfileLaunchTabGroup"
+            id="org.eclipse.ptp.etfw.launch.environmentTab"
+            name="%EnvironmentTab.name">
+         <associatedDelegate
+               delegate="org.eclipse.ptp.etfw.tau.performance.performancelaunch">
+         </associatedDelegate>
+         <placement
+               after="org.eclipse.cdt.cdi.launch.argumentsTab">
+         </placement>
+      </tab>
+      <tab
+            class="org.eclipse.debug.ui.sourcelookup.SourceLookupTab"
+            group="org.eclipse.cdt.launch.applicationProfileLaunchTabGroup"
+            id="org.eclipse.ptp.etfw.launch.sourceLookupTab"
+            name="%SourceLookupTab.name">
+         <associatedDelegate
+               delegate="org.eclipse.ptp.etfw.tau.performance.performancelaunch">
+         </associatedDelegate>
+         <placement
+               after="org.eclipse.debug.ui.environmentTab">
+         </placement>
+      </tab>
+      <tab
+            class="org.eclipse.debug.ui.CommonTab"
+            group="org.eclipse.cdt.launch.applicationProfileLaunchTabGroup"
+            id="org.eclipse.ptp.etfw.launch.commonTab"
+            name="%CommonTab.name">
+         <associatedDelegate
+               delegate="org.eclipse.ptp.etfw.tau.performance.performancelaunch">
+         </associatedDelegate>
+         <placement
+               after="org.eclipse.debug.ui.sourceLookupTab">
+         </placement>
+      </tab>
+      <tab
+            group="org.eclipse.cdt.launch.applicationProfileLaunchTabGroup"
+            id="org.eclipse.ptp.etfw.launch.PerformanceAnalysisTab"
+            name="%PerformanceAnalysisTab.name">
+            <class class="org.eclipse.ptp.internal.etfw.launch.PerformanceAnalysisTab">
+                <parameter name="noPTP" value="true"/>
+            </class>
+            <associatedDelegate
+                  delegate="org.eclipse.ptp.etfw.tau.performance.performancelaunch">
+            </associatedDelegate>
+            <placement
+                  after="org.eclipse.debug.ui.commonTab">
+            </placement>
+      </tab>
+      <tab
             class="org.eclipse.ptp.internal.etfw.launch.PerformanceAnalysisTab"
             group="org.eclipse.ptp.etfw.launchConfigurationTabGroup"
             id="org.eclipse.ptp.etfw.launch.PerformanceAnalysisTab"
-            name="Performance Analysis">
+            name="%PerformanceAnalysisTab.name">
          <placement
                after="org.eclipse.ptp.launch.applicationLaunch.environmentTab">
          </placement>
          <associatedDelegate
                delegate="org.eclipse.ptp.etfw.parallelLaunch">
          </associatedDelegate>
+      </tab>
+      <tab
+            class="org.eclipse.ptp.internal.etfw.ui.ParametricParameterTab"
+            group="org.eclipse.cdt.launch.applicationProfileLaunchTabGroup"
+            id="org.eclipse.ptp.etfw.launch.ParametricParameterTab"
+            name="%ParametricParameterTab.name">
+         <associatedDelegate
+               delegate="org.eclipse.ptp.etfw.tau.performance.performancelaunch">
+         </associatedDelegate>
+         <placement
+               after="org.eclipse.ptp.internal.etfw.launch.PerformanceAnalysisTab">
+         </placement>
       </tab>
    </extension>
 

@@ -14,6 +14,7 @@
  *
  * Contributors:
  *    Wyatt Spear - initial API and implementation
+ *    Roland Grunberg - added support for initialization data
  ****************************************************************************/
 package org.eclipse.ptp.internal.etfw.ui;
 
@@ -21,10 +22,13 @@ package org.eclipse.ptp.internal.etfw.ui;
 import java.io.File;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.Map;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
@@ -74,7 +78,7 @@ import org.eclipse.ui.dialogs.ListDialog;
  * @author wspear
  * 
  */
-public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab implements IToolLaunchConfigurationConstants {
+public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab implements IToolLaunchConfigurationConstants, IExecutableExtension {
 	/**
 	 * Listens for action in tool options panes
 	 * 
@@ -228,6 +232,9 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 	 */
 	public ExternalToolSelectionTab(boolean noPar) {
 		noPTP = noPar;
+	}
+
+	public ExternalToolSelectionTab() {
 	}
 
 	private void addWorkflow() {
@@ -651,5 +658,21 @@ public class ExternalToolSelectionTab extends AbstractLaunchConfigurationTab imp
 	private void warnXMLChange() {
 		MessageDialog.openInformation(PlatformUI.getWorkbench().getDisplay().getActiveShell(),
 				Messages.ExternalToolSelectionTab_TAUWarning, Messages.ExternalToolSelectionTab_ChancesNotEffectUntil);
+	}
+
+	/**
+	 * Sets whether it is possible to initiate a parallel launch from
+	 * this tab
+	 *
+	 * @param noPar
+	 *            Availability of the PTP to this tab's launch configuration
+	 *            delegate
+	 */
+	public void setInitializationData(IConfigurationElement config,
+			String propertyName, Object data) throws CoreException {
+		if (data != null) {
+			Map<String, String> parameters = (Map<String, String>) data;
+			noPTP = Boolean.valueOf(parameters.get("noPTP")); //$NON-NLS-1$
+		}
 	}
 }

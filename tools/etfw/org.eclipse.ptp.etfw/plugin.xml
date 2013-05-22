@@ -9,7 +9,7 @@
          point="org.eclipse.debug.ui.launchConfigurationTabGroups">
       <launchConfigurationTabGroup
             class="org.eclipse.ptp.internal.etfw.ui.ToolLaunchConfigurationTabGroup"
-            id="org.eclipse.ptp.etfw.tau.performance.launchConfigurationTabGroup"
+            id="org.eclipse.cdt.launch.applicationProfileLaunchTabGroup"
             type="org.eclipse.cdt.launch.applicationLaunchType">
          <launchMode
                description="Build C, C++ or Fortran applications with performance analysis tools.  Launch as sequential programs or use the command line for parallel execution."

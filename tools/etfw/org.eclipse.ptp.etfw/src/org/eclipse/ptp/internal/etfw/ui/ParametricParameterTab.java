@@ -14,14 +14,18 @@
  *
  * Contributors:
  *    Wyatt Spear - initial API and implementation
+ *    Roland Grunberg - added support for initialization data
  ****************************************************************************/
 package org.eclipse.ptp.internal.etfw.ui;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
@@ -49,7 +53,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
-public class ParametricParameterTab extends AbstractLaunchConfigurationTab implements IToolLaunchConfigurationConstants {
+public class ParametricParameterTab extends AbstractLaunchConfigurationTab implements IToolLaunchConfigurationConstants, IExecutableExtension {
 
 	/**
 	 * Listen for activity in the options widgets
@@ -245,9 +249,7 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 
 	private static final String noParError = Messages.ParametricParameterTab_26;
 
-	@SuppressWarnings("unused")
-	private ParametricParameterTab() {
-
+	public ParametricParameterTab() {
 	}
 
 	public ParametricParameterTab(boolean parallel) {
@@ -581,6 +583,14 @@ public class ParametricParameterTab extends AbstractLaunchConfigurationTab imple
 
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
 
+	}
+
+	public void setInitializationData(IConfigurationElement config,
+			String propertyName, Object data) throws CoreException {
+		if (data != null) {
+			Map<String, String> parameters = (Map<String, String>) data;
+			parallel = Boolean.valueOf(parameters.get("parallel")); //$NON-NLS-1$
+		}
 	}
 
 }

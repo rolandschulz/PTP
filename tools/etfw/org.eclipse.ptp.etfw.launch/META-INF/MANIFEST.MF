@@ -19,7 +19,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ptp.rm.jaxb.ui,
  org.eclipse.core.variables,
  org.eclipse.ptp.ems.core,
- org.eclipse.ptp.etfw
+ org.eclipse.ptp.etfw,
+ org.eclipse.cdt.launch
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: org.eclipse.ptp.internal.etfw.launch;x-internal:=true,
