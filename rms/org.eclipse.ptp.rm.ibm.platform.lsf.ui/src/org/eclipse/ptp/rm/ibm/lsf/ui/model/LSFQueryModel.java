@@ -99,7 +99,7 @@ public class LSFQueryModel extends AbstractUpdateModel implements ModifyListener
 		} else {
 			initialValue = mapValue;
 		}
-		control.setSelectedValue((String) mapValue);
+		control.setSelectedValues((String) mapValue);
 	}
 
 }

@@ -5,6 +5,7 @@
 
 package org.eclipse.ptp.rm.ibm.lsf.ui.widgets;
 
+import java.util.List;
 import java.util.Vector;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -37,11 +38,18 @@ public class LSFQueryDialog extends Dialog {
 		 * @param e: Notification event
 		 */
 		public void selectionChanged(SelectionChangedEvent arg0) {
-			Object obj;
+			List<String[]> selections;
 
-			obj = ((IStructuredSelection) arg0.getSelection())
-					.getFirstElement();
-			selectedValue = ((String[]) obj)[0];
+			// Each element in the selections list is an array of strings with
+			// table
+			// column values for the selected row. Extract the value from the
+			// first column
+			// of the row.
+			selections = ((IStructuredSelection) arg0.getSelection()).toList();
+			selectedValues = " ";
+			for (String[] s : selections) {
+				selectedValues = selectedValues + s[0] + " ";
+			}
 		}
 	}
 
@@ -50,17 +58,19 @@ public class LSFQueryDialog extends Dialog {
 	private String dialogTitle;
 	protected Shell parentShell;
 	private Table queryTable;
-	private String selectedValue;
+	private String selectedValues;
+	private boolean multiSelect;
 
 	private TableSelectionListener tableSelectionListener;
 
 	LSFQueryDialog(Shell parent, String title, String labels[],
-			Vector<String[]> response) {
+			Vector<String[]> response, boolean mSelect) {
 		super(parent);
 		parentShell = parent;
 		dialogTitle = title;
 		columnLabels = labels;
 		commandResponse = response;
+		multiSelect = mSelect;
 	}
 
 	/**
@@ -90,12 +100,21 @@ public class LSFQueryDialog extends Dialog {
 		TableViewerColumn viewColumns[];
 		TableColumnLayout tableLayout;
 		int n;
+		String selections[];
+		int trialSelectionIndices[];
+		int selectionIndices[];
+		int matchCount;
 
 		composite = (Composite) super.createDialogArea(parent);
 		tableLayout = new TableColumnLayout();
 		composite.setLayout(tableLayout);
-		viewer = new TableViewer(composite, SWT.SINGLE | SWT.V_SCROLL
-				| SWT.H_SCROLL);
+		if (multiSelect) {
+			viewer = new TableViewer(composite, SWT.MULTI | SWT.V_SCROLL
+					| SWT.H_SCROLL);
+		} else {
+			viewer = new TableViewer(composite, SWT.SINGLE | SWT.V_SCROLL
+					| SWT.H_SCROLL);
+		}
 		queryTable = viewer.getTable();
 		queryTable.clearAll();
 		queryTable.setHeaderVisible(true);
@@ -124,15 +143,33 @@ public class LSFQueryDialog extends Dialog {
 		contentsProvider = new TableContentsProvider();
 		viewer.setLabelProvider(contentsProvider);
 		viewer.setInput(commandResponse);
+		// Select rows in the table corresponding to names in the selectedValues
+		// string.
 		n = queryTable.getItemCount();
-		for (int i = 0; i < n; i++) {
-			TableItem rowData;
+		selections = selectedValues.split(" ");
+		trialSelectionIndices = new int[selections.length];
+		// First, find which rows have values matching a string in the
+		// selectedValues string and save their indices
+		matchCount = 0;
+		for (int i = 0; i < trialSelectionIndices.length; i++) {
+			for (int j = 0; j < n; j++) {
+				TableItem rowData;
 
-			rowData = queryTable.getItem(i);
-			if (rowData.getText(0).equals(selectedValue)) {
-				queryTable.select(i);
-				break;
+				rowData = queryTable.getItem(j);
+				if (rowData.getText(0).equals(selections[i])) {
+					trialSelectionIndices[matchCount++] = j;
+					break;
+				}
 			}
+		}
+		// Then copy matching indices to a new array of correct size and mark
+		// those rows selected
+		if (matchCount > 0) {
+			selectionIndices = new int[matchCount];
+			for (int i = 0; i < matchCount; i++) {
+				selectionIndices[i] = trialSelectionIndices[i];
+			}
+			queryTable.select(selectionIndices);
 		}
 		return composite;
 	}
@@ -142,8 +179,8 @@ public class LSFQueryDialog extends Dialog {
 	 * 
 	 * @return Selected value
 	 */
-	public String getSelectedValue() {
-		return selectedValue;
+	public String getSelectedValues() {
+		return selectedValues;
 	}
 
 	@Override
@@ -158,6 +195,6 @@ public class LSFQueryDialog extends Dialog {
 	 *            Initial selection value
 	 */
 	public void setSelectedValue(String value) {
-		selectedValue = value;
+		selectedValues = value;
 	}
 }

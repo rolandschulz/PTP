@@ -23,7 +23,7 @@ public abstract class LSFQueryControl extends Composite {
 	protected Vector<String[]> commandResponse;
 	protected LSFQueryDialog dialog;
 	private final List<ModifyListener> modifyListeners = new LinkedList<ModifyListener>();
-	protected String selectedValue = ""; //$NON-NLS-1$
+	protected String selectedValues = ""; //$NON-NLS-1$
 
 	public LSFQueryControl(Composite parent, final IWidgetDescriptor wd) {
 		super(parent, wd.getStyle());
@@ -58,7 +58,7 @@ public abstract class LSFQueryControl extends Composite {
 	 * @return Application name
 	 */
 	public String getSelectedValue() {
-		return selectedValue;
+		return selectedValues;
 	}
 
 	/**
@@ -89,8 +89,8 @@ public abstract class LSFQueryControl extends Composite {
 	 * @param value
 	 *            Value to set
 	 */
-	public void setSelectedValue(String value) {
-		selectedValue = value;
+	public void setSelectedValues(String value) {
+		selectedValues = value;
 	}
 
 	/**
@@ -101,7 +101,7 @@ public abstract class LSFQueryControl extends Composite {
 	 *         box
 	 */
 	public boolean widgetSelected() {
-		if (selectedValue == null) {
+		if (selectedValues == null) {
 			return false;
 		}
 		return true;

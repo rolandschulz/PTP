@@ -37,7 +37,8 @@ public class ApplicationQueryControl extends LSFQueryControl {
 	}
 
 	@Override
-	protected void configureQueryButton(Button button, final IRemoteConnection connection) {
+	protected void configureQueryButton(Button button,
+			final IRemoteConnection connection) {
 		button.addSelectionListener(new SelectionAdapter() {
 			@Override
 			/**
@@ -51,11 +52,13 @@ public class ApplicationQueryControl extends LSFQueryControl {
 				int selection;
 
 				if (getQueryResponse(connection)) {
-					dialog = new LSFQueryDialog(getShell(), Messages.ApplicationQueryControl_0, columnLabels, commandResponse);
-					dialog.setSelectedValue(selectedValue);
+					dialog = new LSFQueryDialog(getShell(),
+							Messages.ApplicationQueryControl_0, columnLabels,
+							commandResponse, false);
+					dialog.setSelectedValue(selectedValues);
 					selection = dialog.open();
 					if (selection == 0) {
-						selectedValue = dialog.getSelectedValue();
+						selectedValues = dialog.getSelectedValues();
 						notifyListeners();
 					}
 				}
@@ -77,7 +80,8 @@ public class ApplicationQueryControl extends LSFQueryControl {
 		IRemoteProcess process;
 
 		remoteServices = connection.getRemoteServices();
-		processBuilder = remoteServices.getProcessBuilder(connection, "bapp", "-w"); //$NON-NLS-1$ //$NON-NLS-2$
+		processBuilder = remoteServices.getProcessBuilder(connection,
+				"bapp", "-w"); //$NON-NLS-1$ //$NON-NLS-2$
 		process = null;
 		try {
 			BufferedReader reader;
@@ -98,14 +102,16 @@ public class ApplicationQueryControl extends LSFQueryControl {
 				 * blank-delimited strings. The first line of output is the
 				 * column headings. Subsequent lines are reservation data.
 				 */
-				reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+				reader = new BufferedReader(new InputStreamReader(
+						process.getInputStream()));
 				data = reader.readLine();
 				headerLine = true;
 				commandResponse.clear();
 				while (data != null) {
 					if (headerLine) {
 						if (data.equals("No application profiles found")) { //$NON-NLS-1$
-							MessageDialog.openWarning(getShell(), Messages.ApplicationQueryControl_2,
+							MessageDialog.openWarning(getShell(),
+									Messages.ApplicationQueryControl_2,
 									Messages.ApplicationQueryControl_3);
 							reader.close();
 							return false;
