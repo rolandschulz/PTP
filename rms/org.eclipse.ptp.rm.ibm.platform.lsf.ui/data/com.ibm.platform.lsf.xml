@@ -651,6 +651,19 @@
 					</match>
 				</target>
 			</stdout-parser>
+			<stderr-parser delim="\n">
+				<target ref="@jobId">
+					<match>
+						<expression>IBM Platform LSF.*</expression>
+						<set field="name">
+							<entry value="-1" />
+						</set>
+						<set field="value">
+							<entry value="SUBMITTED" />
+						</set>
+					</match>
+				</target>
+			</stderr-parser>
 		</submit-batch>
 
 		<get-job-status name="get-job-status" ignoreExitStatus="true">
