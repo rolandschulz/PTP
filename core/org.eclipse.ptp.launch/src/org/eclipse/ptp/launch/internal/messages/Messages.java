@@ -61,6 +61,8 @@ public class Messages extends NLS {
 	public static String ResourcesTab_Dont_ask_to_run_command;
 
 	public static String ResourcesTab_Resources;
+
+	public static String ResourcesTab_Run_Command;
 	public static String ResourcesTab_No_Launch_Configuration;
 	public static String ResourcesTab_InvalidConfig_message;
 	public static String ResourcesTab_InvalidConfig_title;
@@ -70,6 +72,8 @@ public class Messages extends NLS {
 	public static String ResourcesTab_openConnection;
 	public static String ResourcesTab_pleaseSelectTargetSystem;
 	public static String ResourcesTab_targetSystemConfiguration;
+
+	public static String ResourcesTab_There_is_no_connection;
 
 	public static String ArgumentsTab_Arguments;
 	public static String ArgumentsTab_Cannot_read_configuration;

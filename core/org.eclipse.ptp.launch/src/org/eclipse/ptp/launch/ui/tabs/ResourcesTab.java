@@ -45,6 +45,7 @@ import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
 import org.eclipse.ptp.launch.ui.extensions.JAXBControllerLaunchConfigurationTab;
 import org.eclipse.ptp.launch.ui.extensions.RMLaunchValidation;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.ui.widgets.RemoteConnectionWidget;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.core.LaunchControllerManager;
@@ -145,8 +146,9 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#createControl(org.eclipse .swt.widgets.Composite)
 	 */
 
-	private boolean changeConnection(IRemoteConnection conn, ILaunchController controller) {
+	private boolean changeConnection(final IRemoteConnection conn, ILaunchController controller) {
 		boolean autoRun = false;
+		boolean askToOpen = true;
 		try {
 			autoRun = getLaunchConfiguration().getAttribute(IPTPLaunchConfigurationConstants.ATTR_AUTO_RUN_COMMAND, false);
 		} catch (CoreException e) {
@@ -154,12 +156,35 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		}
 		if (!autoRun && controller.getConfiguration().getControlData().getStartUpCommand() != null) {
 			MessageDialogWithToggle dialog = MessageDialogWithToggle.openYesNoQuestion(getShell(),
-					Messages.ResourcesTab_openConnection, NLS.bind(Messages.ResourcesTab_noInformation, conn.getName()),
+					Messages.ResourcesTab_Run_Command, NLS.bind(Messages.ResourcesTab_noInformation, conn.getName()),
 					Messages.ResourcesTab_Dont_ask_to_run_command, false, null, null);
 			if (dialog.getReturnCode() == IDialogConstants.NO_ID) {
 				return false;
 			}
 			setAutoRun(dialog.getToggleState());
+			askToOpen = false;
+		}
+		if (!conn.isOpen()) {
+			if (!askToOpen
+					|| MessageDialog.openQuestion(getShell(), Messages.ResourcesTab_openConnection,
+							Messages.ResourcesTab_There_is_no_connection)) {
+				try {
+					getLaunchConfigurationDialog().run(false, true, new IRunnableWithProgress() {
+						public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+							try {
+								conn.open(monitor);
+							} catch (RemoteConnectionException e) {
+								PTPLaunchPlugin.errorDialog(e.getMessage(), e.getCause());
+							}
+						}
+					});
+				} catch (Exception e) {
+					// Ignore
+				}
+			}
+			if (!conn.isOpen()) {
+				return false;
+			}
 		}
 		return true;
 	}
@@ -660,7 +685,6 @@ public class ResourcesTab extends LaunchConfigurationTab {
 								dynamicTab[0] = getLaunchConfigurationDynamicTab(controller, progress.newChild(10));
 							} catch (CoreException e) {
 								PTPLaunchPlugin.errorDialog(e.getMessage(), e.getCause());
-
 							}
 						}
 					});
