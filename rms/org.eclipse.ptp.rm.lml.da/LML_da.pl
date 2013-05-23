@@ -67,8 +67,8 @@ my $pwd=`pwd`;
 chomp($pwd);
 $globalvarref->{instdir} = $FindBin::RealBin;
 $globalvarref->{pwd}     = $pwd;
-$globalvarref->{permdir} = "./perm_dedault";
-$globalvarref->{tmpdir}  = "./tmp_dedault";
+$globalvarref->{permdir} = "./perm_default";
+$globalvarref->{tmpdir}  = "./tmp_default";
 $globalvarref->{verbose} = $opt_verbose;
 &LML_da_util::init_globalvar($vardefs,$globalvarref); 
 
