@@ -39,46 +39,6 @@ public class RMVariableResolver implements IDynamicVariableResolver {
 
 	private static RMVariableMap fActive;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.variables.IDynamicVariableResolver#resolveValue(org.eclipse.core.variables.IDynamicVariable,
-	 * java.lang.String)
-	 */
-	public String resolveValue(IDynamicVariable variable, String argument) throws CoreException {
-		if (fActive != null && argument != null) {
-			String[] parts = argument.split(JAXBControlConstants.PDRX);
-			Object value = fActive.get(parts[0]);
-			if (value != null) {
-				if (parts.length == 2) {
-					String result;
-					try {
-						result = invokeGetter(value, parts[1]);
-					} catch (Throwable t) {
-						throw CoreExceptionUtils.newException(Messages.RMVariableResolver_derefError, t);
-					}
-					if (result != null && !result.equals("") && EnvManagerConfigString.isEnvMgmtConfigString(result)) { //$NON-NLS-1$
-						if (fActive.getEnvManager() != null) {
-							return fActive.getEnvManager().getBashConcatenation("\n", false, new EnvManagerConfigString(result), //$NON-NLS-1$
-									null);
-						}
-						return ""; //$NON-NLS-1$
-					}
-					return result;
-				}
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * @param active
-	 *            current instance of the map
-	 */
-	public static void setActive(RMVariableMap active) {
-		fActive = active;
-	}
-
 	/**
 	 * Auxiliary reflection method for retrieving the field value of the object corresponding to the resolved name.
 	 * 
@@ -102,5 +62,53 @@ public class RMVariableResolver implements IDynamicVariableResolver {
 			return null;
 		}
 		return String.valueOf(result);
+	}
+
+	/**
+	 * @param active
+	 *            current instance of the map
+	 */
+	public static void setActive(RMVariableMap active) {
+		fActive = active;
+	}
+
+	private String resolveEMS(String value) {
+		if (!value.equals("") && EnvManagerConfigString.isEnvMgmtConfigString(value)) { //$NON-NLS-1$
+			if (fActive.getEnvManager() != null) {
+				return fActive.getEnvManager().getBashConcatenation("\n", false, new EnvManagerConfigString(value), //$NON-NLS-1$
+						null);
+			}
+			return ""; //$NON-NLS-1$
+		}
+		return value;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.variables.IDynamicVariableResolver#resolveValue(org.eclipse.core.variables.IDynamicVariable,
+	 * java.lang.String)
+	 */
+	public String resolveValue(IDynamicVariable variable, String argument) throws CoreException {
+		if (fActive != null && argument != null) {
+			String[] parts = argument.split(JAXBControlConstants.PDRX);
+			Object value = fActive.get(parts[0]);
+			if (value != null) {
+				if (parts.length == 2) {
+					String result;
+					try {
+						result = invokeGetter(value, parts[1]);
+					} catch (Throwable t) {
+						throw CoreExceptionUtils.newException(Messages.RMVariableResolver_derefError, t);
+					}
+					if (result != null) {
+						return resolveEMS(result);
+					}
+					return result;
+				}
+				return resolveEMS(String.valueOf(value));
+			}
+		}
+		return null;
 	}
 }
