@@ -51,24 +51,20 @@ public class RMVariableResolver implements IDynamicVariableResolver {
 			Object value = fActive.get(parts[0]);
 			if (value != null) {
 				if (parts.length == 2) {
+					String result;
 					try {
-						return invokeGetter(value, parts[1]);
+						result = invokeGetter(value, parts[1]);
 					} catch (Throwable t) {
 						throw CoreExceptionUtils.newException(Messages.RMVariableResolver_derefError, t);
 					}
-				} else {
-					if (value instanceof String
-							&& !((String) value).equals("") && EnvManagerConfigString.isEnvMgmtConfigString((String) value)) { //$NON-NLS-1$
+					if (result != null && !result.equals("") && EnvManagerConfigString.isEnvMgmtConfigString(result)) { //$NON-NLS-1$
 						if (fActive.getEnvManager() != null) {
-							return fActive.getEnvManager().getBashConcatenation(
-									"\n", false, new EnvManagerConfigString((String) value), //$NON-NLS-1$
+							return fActive.getEnvManager().getBashConcatenation("\n", false, new EnvManagerConfigString(result), //$NON-NLS-1$
 									null);
-						} else {
-							return ""; //$NON-NLS-1$
 						}
-					} else {
-						return String.valueOf(value);
+						return ""; //$NON-NLS-1$
 					}
+					return result;
 				}
 			}
 		}

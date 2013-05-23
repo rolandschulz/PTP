@@ -53,9 +53,8 @@ public class LCVariableResolver implements IDynamicVariableResolver {
 					if (envMgr != null) {
 						return envMgr.getBashConcatenation("\n", false, new EnvManagerConfigString((String) value), //$NON-NLS-1$
 								null);
-					} else {
-						return ""; //$NON-NLS-1$
 					}
+					return ""; //$NON-NLS-1$
 				} else {
 					return String.valueOf(value);
 				}
