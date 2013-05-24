@@ -151,7 +151,7 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 			List<IConsoleParser> parsers = new ArrayList<IConsoleParser>();
 			parsers.add(consoleParser);
 
-			buildRunnerHelper.setLaunchParameters(launcher, program, args, buildDirURI, envp);
+			buildRunnerHelper.setLaunchParameters(launcher, program, args, currentProject.getLocationURI(), envp);
 			buildRunnerHelper.prepareStreams(epm, parsers, console, new SubProgressMonitor(monitor, TICKS_OUTPUT_PARSING));
 
 			buildRunnerHelper.greeting(ManagedMakeMessages.getFormattedString(Messages.SyncGCCBuiltinSpecsDetector_1, getName()));

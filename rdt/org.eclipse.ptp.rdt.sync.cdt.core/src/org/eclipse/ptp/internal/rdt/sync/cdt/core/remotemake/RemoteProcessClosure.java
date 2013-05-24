@@ -100,7 +100,7 @@ public class RemoteProcessClosure {
 				} finally {
 					try {
 
-						if (!fIsErrorReader && !lastLine.contains(Messages.RemoteProcessClosure_exit_code)) {
+						if (!fIsErrorReader && ((lastLine == null) || (!lastLine.contains(Messages.RemoteProcessClosure_exit_code)))) {
 							// make sure the Spawner has finished up and that the exit code is retrievable
 							int exit_code = 0;
 							try {

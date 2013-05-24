@@ -10,7 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.sync.cdt.ui.wizards;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.cdt.core.CCProjectNature;
 import org.eclipse.cdt.core.CProjectNature;
@@ -102,22 +104,43 @@ public class SynchronizeWizardExtension extends AbstractSynchronizeWizardExtensi
 		IProject project = this.getAndValidateProject();
         assert isSyncProject(project) && isCDTProject(project) : Messages.SynchronizeWizardExtension_1 + project.getName();
 
+        // Set default build configs
         Map<String, String> configMap = SyncWizardDataCache.getMap(ConfigMapKey);
         SyncConfig[] allSyncConfigs = SyncConfigManager.getConfigs(project);
         IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
         IConfiguration[] allBuildConfigs = buildInfo.getManagedProject().getConfigurations();
+        Set<IConfiguration> localBuildConfigs = new HashSet<IConfiguration>();
+        Set<IConfiguration> remoteBuildConfigs = new HashSet<IConfiguration>();
         for (SyncConfig config : allSyncConfigs) {
         	String defaultBuildConfigName = configMap.get(config.getName());
         	if (defaultBuildConfigName != null) {
         		IConfiguration defaultBuildConfig = findBuildConfigByName(defaultBuildConfigName, allBuildConfigs);
         		if (defaultBuildConfig != null) {
         			config.setProperty(DEFAULT_BUILD_CONFIG_ID, defaultBuildConfig.getId());
+        			if (SyncConfigManager.isLocal(config)) {
+        				localBuildConfigs.add(defaultBuildConfig);
+        			} else {
+        				remoteBuildConfigs.add(defaultBuildConfig);
+        			}
         			if (SyncConfigManager.isActive(project, config)) {
         				ManagedBuildManager.setDefaultConfiguration(project, defaultBuildConfig);
         			}
         		} else {
         			Activator.getDefault().logErrorMessage(Messages.SynchronizeWizardExtension_2 + defaultBuildConfigName);
         		}
+        	}
+        }
+
+        // Modify build configs for synchronized projects.
+        // TODO: By default, build configs are assumed to be remote unless mapped to a local sync config. We need to consider the
+        // consequences of this.
+        for (IConfiguration buildConfig : allBuildConfigs) {
+        	WizardUtil.modifyBuildConfigForSync(buildConfig);
+        	// Careful - it is possible for a build config to be used for both local and remote.
+        	if ((localBuildConfigs.contains(buildConfig)) && (!remoteBuildConfigs.contains(buildConfig))) {
+        		WizardUtil.modifyLocalBuildConfigForSync(buildConfig);
+        	} else {
+        		WizardUtil.modifyRemoteBuildConfigForSync(buildConfig);
         	}
         }
 

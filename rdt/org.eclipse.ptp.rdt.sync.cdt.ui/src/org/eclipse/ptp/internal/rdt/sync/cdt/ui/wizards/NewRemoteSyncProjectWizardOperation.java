@@ -16,9 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
-import org.eclipse.cdt.internal.core.envvar.EnvironmentVariableManager;
-import org.eclipse.cdt.managedbuilder.core.IBuilder;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
@@ -41,7 +38,6 @@ import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
  */
 public class NewRemoteSyncProjectWizardOperation implements Runnable {
 	private static final String DEFAULT_BUILD_CONFIG_ID = "default-build-config-id"; //$NON-NLS-1$
-	private static final String SYNC_BUILDER_CLASS = "org.eclipse.ptp.rdt.sync.cdt.core.SyncBuilder"; //$NON-NLS-1$
 	private static final String ConfigMapKey = "config-map"; //$NON-NLS-1$
 
 	/**
@@ -69,20 +65,15 @@ public class NewRemoteSyncProjectWizardOperation implements Runnable {
 		}
 		IConfiguration defaultLocalBuildConfig = null;
 		IConfiguration defaultRemoteBuildConfig = null;
-		IBuilder syncBuilder = ManagedBuildManager.getExtensionBuilder(SYNC_BUILDER_CLASS);
 		IConfiguration[] allBuildConfigs = buildInfo.getManagedProject().getConfigurations();
 		for (IConfiguration config : allBuildConfigs) {
-			// Set all configs to use the sync builder, which ensures the build always occurs at the active sync config location.
-			config.changeBuilder(syncBuilder, SYNC_BUILDER_CLASS, Messages.NewRemoteSyncProjectWizardOperation_1);
-			// turn off append contributed (local) environment variables for remote configs
+			WizardUtil.modifyBuildConfigForSync(config);
 			String toolChainName = config.getToolChain().getSuperClass().getName();
 			if (remoteToolChains.contains(toolChainName)) {
-				ICConfigurationDescription c_mb_confgDes = ManagedBuildManager.getDescriptionForConfiguration(config);
-				if (c_mb_confgDes != null) {
-					EnvironmentVariableManager.fUserSupplier.setAppendContributedEnvironment(false, c_mb_confgDes);
-				}
+				WizardUtil.modifyRemoteBuildConfigForSync(config);
 				defaultRemoteBuildConfig = config;
 			} else {
+				WizardUtil.modifyLocalBuildConfigForSync(config);
 				defaultLocalBuildConfig = config;
 			}
 
