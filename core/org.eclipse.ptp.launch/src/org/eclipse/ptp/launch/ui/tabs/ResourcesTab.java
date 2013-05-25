@@ -167,7 +167,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		if (!conn.isOpen()) {
 			if (!askToOpen
 					|| MessageDialog.openQuestion(getShell(), Messages.ResourcesTab_openConnection,
-							Messages.ResourcesTab_There_is_no_connection)) {
+							NLS.bind(Messages.ResourcesTab_There_is_no_connection, conn.getName()))) {
 				try {
 					getLaunchConfigurationDialog().run(false, true, new IRunnableWithProgress() {
 						public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {

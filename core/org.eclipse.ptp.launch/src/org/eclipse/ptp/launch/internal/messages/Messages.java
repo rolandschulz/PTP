@@ -245,18 +245,14 @@ public class Messages extends NLS {
 	public static String UploadRuleDialog_RemoteDirectoryFrame_Title;
 	public static String UploadRuleDialog_Title;
 
-	public static String AbstractRMLaunchConfigurationFactory_0;
-
 	public static String RuntimeProcess_Exit_value_not_available;
 
 	public static String DefaultDynamicTab_title;
-	public static String JAXBControllerLaunchConfigurationTab_Unable_to_obtain_remote_connection;
 
 	public static String JAXBControllerLaunchConfigurationTab_unableToObtainConfigurationInfo;
 	public static String JAXBControllerLaunchConfigurationTab_unableToObtainConnectionInfo;
 	public static String VoidLaunchTabMessage;
 	public static String VoidLaunchTabTitle;
-	public static String UninitializedRemoteServices;
 	public static String CreateControlConfigurableError;
 	public static String ViewScript;
 	public static String ViewConfig;
