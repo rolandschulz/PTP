@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2012 IBM Corporation and others.
+ * Copyright (c) 2009, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -229,6 +229,13 @@ public class RemoteIndexerInfoProviderFactory {
 	}
 	
 	
+	private static IScannerInfoProvider getLocalScannerInfoProvider(IProject project) {
+		// return CCorePlugin.getDefault().getScannerInfoProvider(project); 
+		// Warning: this is here to work around a defect in CDT
+		return new LanguageSettingsScannerInfoProvider_Hack();
+	}
+	
+	
 
 	/**
 	 * Returns a RemoteIndexerInfoProvider that contains IScannerInfos for every
@@ -252,7 +259,7 @@ public class RemoteIndexerInfoProviderFactory {
 		
 		// we assume all the elements are from the same project
 		IProject project = elements.get(0).getCProject().getProject(); 
-		IScannerInfoProvider provider = CCorePlugin.getDefault().getScannerInfoProvider(project);
+		IScannerInfoProvider provider = getLocalScannerInfoProvider(project);
 
 		RemoteScannerInfoCache cache = new RemoteScannerInfoCache();
 		
@@ -391,7 +398,7 @@ public class RemoteIndexerInfoProviderFactory {
 	 * This code was copied from PDOMIndexerTask.createDefaultScannerConfig(int)
 	 */
 	private static IScannerInfo getDefaultScannerInfo(IProject project, int linkageID) {
-		IScannerInfoProvider provider = CCorePlugin.getDefault().getScannerInfoProvider(project);
+		IScannerInfoProvider provider = getLocalScannerInfoProvider(project);
 		if(provider == null)
 			return null;
 		
@@ -421,7 +428,7 @@ public class RemoteIndexerInfoProviderFactory {
 	 * Convenience method for getting a RemoteScannerInfo for a resource.
 	 */
 	public static RemoteScannerInfo getScannerInfo(IResource resource) {
-		final IScannerInfoProvider provider = CCorePlugin.getDefault().getScannerInfoProvider(resource.getProject());
+		final IScannerInfoProvider provider = getLocalScannerInfoProvider(resource.getProject());
 		IScannerInfo scannerInfo = provider.getScannerInformation(resource);
 		return new RemoteScannerInfo(scannerInfo);
 	}
