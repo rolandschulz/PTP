@@ -644,6 +644,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 		// Create remote view
 		remoteToolChainTable.removeAll();
 		toolChainMap = ((MBSWizardHandler) h_selected).getToolChains();
+		filterIncompatibleToolChains(toolChainMap);
 		for (String name : toolChainMap.keySet()) {
 			TableItem ti = new TableItem(remoteToolChainTable, SWT.NONE);
 			ti.setText(name);
@@ -655,6 +656,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 		// Create local view
 		localToolChainTable.removeAll();
 		toolChainMap = ((MBSWizardHandler) h_selected).getToolChains();
+		filterIncompatibleToolChains(toolChainMap);
 		boolean filterToolChains = showSupportedOnlyButton.getSelection();
 		for (Map.Entry<String, IToolChain> entry : toolChainMap.entrySet()) {
 			String name = entry.getKey();
@@ -670,6 +672,24 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 		}
 
 		this.updateHiddenToolChainList();
+	}
+
+	/**
+	 * Filter tool chains from the given map that are not compatible with synchronized projects
+	 *
+	 * @param toolChainMap
+	 * 				the original map of tool chains
+	 */
+	private static void filterIncompatibleToolChains(Map<String, IToolChain> toolChainMap) {
+		Iterator<Map.Entry<String, IToolChain>> iter = toolChainMap.entrySet().iterator();
+		while (iter.hasNext()) {
+			Map.Entry<String, IToolChain> entry = iter.next();
+			IToolChain tc = entry.getValue();
+			// Filter all RDT tool chains
+			if (tc != null && tc.getId().startsWith(RDT_PROJECT_TYPE)) {
+				iter.remove();
+			}
+		}
 	}
 
 	public static EntryDescriptor getDescriptor(Tree _tree) {
