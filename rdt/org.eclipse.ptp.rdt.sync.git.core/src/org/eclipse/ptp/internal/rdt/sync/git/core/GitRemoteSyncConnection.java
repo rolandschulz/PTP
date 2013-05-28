@@ -548,6 +548,7 @@ public class GitRemoteSyncConnection {
 			filesToAdd.addAll(status.getModified());
 			if (includeUntrackedFiles) {
 				filesToAdd.addAll(status.getUntracked());
+				filesToAdd.addAll(status.getIgnoredNotInIndex());
 			}
 			filesToDelete.addAll(status.getMissing());
 		} catch (GitAPIException e) {
