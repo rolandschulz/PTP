@@ -433,7 +433,7 @@ three processors on one red node: -l nodes=2:blue:ppn=2+red:ppn=3.]]></tooltip>
 						</layout-data>
 						<fixed-text>MPI Number of Processes: </fixed-text>
 					</widget>
-					<widget type="spinner" style="SWT.BORDER" readOnly="true" attribute="mpiNumberOfProcesses">
+					<widget type="spinner" style="SWT.BORDER" attribute="mpiNumberOfProcesses">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false" widthHint="100"/>
 						</layout-data>
