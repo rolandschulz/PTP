@@ -681,7 +681,10 @@
 					<!-- Match job status line like '219 wootton RUN short hpcvictim.p hpcvictim.p 
 						sleep 360 Jan 28 11:10' -->
 					<match>
-						<expression>^[\d]+[\s]+[\S]+[\s]+RUN[\s]+.*$</expression>
+						<expression>^([\d]+)[\s]+[\S]+[\s]+RUN[\s]+.*$</expression>
+						<set field="name">
+							<entry valueGroup="1" />
+						</set>
 						<set field="value">
 							<entry value="RUNNING" />
 						</set>
@@ -689,7 +692,10 @@
 					<!-- Match job status line like '219 wootton USUSP short hpcvictim.p 
 						hpcvictim.p sleep 360 Jan 28 11:10' -->
 					<match>
-						<expression>^[\d]+[\s]+[\S]+[\s]+USUSP[\s]+.*$</expression>
+						<expression>^([\d]+)[\s]+[\S]+[\s]+USUSP[\s]+.*$</expression>
+						<set field="name">
+							<entry valueGroup="1" />
+						</set>
 						<set field="value">
 							<entry value="SUSPENDED" />
 						</set>
@@ -697,7 +703,10 @@
 					<!-- Match job status line like '219 wootton PEND short hpcvictim.p 
 						hpcvictim.p sleep 360 Jan 28 11:10' -->
 					<match>
-						<expression>^[\d]+[\s]+[\S]+[\s]+PEND[\s]+.*$</expression>
+						<expression>^([\d]+)[\s]+[\S]+[\s]+PEND[\s]+.*$</expression>
+						<set field="name">
+							<entry valueGroup="1" />
+						</set>
 						<set field="value">
 							<entry value="SUBMITTED" />
 						</set>
@@ -705,7 +714,10 @@
 					<!-- Match job status line like '219 wootton WAIT short hpcvictim.p 
 						hpcvictim.p sleep 360 Jan 28 11:10' -->
 					<match>
-						<expression>^[\d]+[\s]+[\S]+[\s]+WAIT[\s]+.*$</expression>
+						<expression>^([\d]+)[\s]+[\S]+[\s]+WAIT[\s]+.*$</expression>
+						<set field="name">
+							<entry valueGroup="1" />
+						</set>
 						<set field="value">
 							<entry value="SUBMITTED" />
 						</set>
@@ -713,7 +725,10 @@
 					<!-- Match job status line like '219 wootton EXIT short hpcvictim.p 
 						hpcvictim.p sleep 360 Jan 28 11:10' -->
 					<match>
-						<expression>^[\d]+[\s]+[\S]+[\s]+EXIT[\s]+.*$</expression>
+						<expression>^([\d]+)[\s]+[\S]+[\s]+EXIT[\s]+.*$</expression>
+						<set field="name">
+							<entry valueGroup="1" />
+						</set>
 						<set field="value">
 							<entry value="COMPLETED" />
 						</set>
@@ -721,7 +736,10 @@
 					<!-- Match job status line like '219 wootton DONE short hpcvictim.p 
 						hpcvictim.p sleep 360 Jan 28 11:10' -->
 					<match>
-						<expression>^[\d]+[\s]+[\S]+[\s]+DONE[\s]+.*$</expression>
+						<expression>^([\d]+)[\s]+[\S]+[\s]+DONE[\s]+.*$</expression>
+						<set field="name">
+							<entry valueGroup="1" />
+						</set>
 						<set field="value">
 							<entry value="COMPLETED" />
 						</set>
@@ -729,7 +747,10 @@
 					<!-- Match job status line like '219 wootton PSUSP short hpcvictim.p 
 						hpcvictim.p sleep 360 Jan 28 11:10' -->
 					<match>
-						<expression>^[\d]+[\s]+[\S]+[\s]+PSUSP[\s]+.*$</expression>
+						<expression>^([\d]+)[\s]+[\S]+[\s]+PSUSP[\s]+.*$</expression>
+						<set field="name">
+							<entry valueGroup="1" />
+						</set>
 						<set field="value">
 							<entry value="SUBMITTED" />
 						</set>
@@ -737,7 +758,10 @@
 					<!-- Match job status line like '219 wootton SSUSP short hpcvictim.p 
 						hpcvictim.p sleep 360 Jan 28 11:10' -->
 					<match>
-						<expression>^[\d]+[\s]+[\S]+[\s]+SSUSP[\s]+.*$</expression>
+						<expression>^([\d]+)[\s]+[\S]+[\s]+SSUSP[\s]+.*$</expression>
+						<set field="name">
+							<entry valueGroup="1" />
+						</set>
 						<set field="value">
 							<entry value="SUSPENDED" />
 						</set>
@@ -745,7 +769,10 @@
 					<!-- Match job status line like '219 wootton ZOMBI short hpcvictim.p 
 						hpcvictim.p sleep 360 Jan 28 11:10' -->
 					<match>
-						<expression>^[\d]+[\s]+[\S]+[\s]+ZOMBI[\s]+.*$</expression>
+						<expression>^([\d]+)[\s]+[\S]+[\s]+ZOMBI[\s]+.*$</expression>
+						<set field="name">
+							<entry valueGroup="1" />
+						</set>
 						<set field="value">
 							<entry value="COMPLETED" />
 						</set>
