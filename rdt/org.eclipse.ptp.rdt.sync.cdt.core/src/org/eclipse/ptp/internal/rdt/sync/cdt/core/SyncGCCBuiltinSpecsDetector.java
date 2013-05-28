@@ -99,10 +99,11 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 
 	/**
 	 * A copy of: {@link org.eclipse.cdt.managedbuilder.language.settings.providers.AbstractBuiltinSpecsDetector#runForLanguage()}
-	 * modified to use the sync command launcher. Note that this method is called by "runForLanguage," it does not override it.
-	 * Thus, all of the setup for running is done twice. Specifically, a BuildRunnerHelper is built twice,
-	 * Ideally, CDT would provide an extension point to change the command launcher, as it does for builds.
-	 * 
+	 * modified to use the sync command launcher and to not run if spec file is null (see code comments). Note that this method is
+	 * called by "runForLanguage," it does not override it. Thus, all of the setup for running is done twice. Specifically, a
+	 * BuildRunnerHelper is built twice. Ideally, CDT would provide an extension point to change the command launcher, as it does for
+	 * builds.
+	 *
 	 * @return ICommandLauncher status of run
 	 */
 	@Override
@@ -118,6 +119,13 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 		try {
 			monitor.beginTask(ManagedMakeMessages.getFormattedString(Messages.SyncGCCBuiltinSpecsDetector_0, getName()),
 					TICKS_EXECUTE_COMMAND + TICKS_OUTPUT_PARSING);
+
+			// Do not run if spec file is undefined. This can happen if the detector is called when no current project is defined.
+			// The spec file is project-independent for CDT but not for synchronized projects, because the spec file location
+			// depends on the current project's sync configuration.
+			if (specFile == null) {
+				return retval;
+			}
 
 			IConsole console;
 			if (super.isConsoleEnabled()) {
@@ -172,8 +180,9 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 					ManagedBuilderCorePlugin.log(e1);
 				}
 			}
+		} finally {
+			monitor.done();
 		}
-		monitor.done();
 		return retval;
 	}
 
@@ -228,6 +237,10 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 	 */
 	@Override
 	protected String getSpecFile(String languageId) {
+		// This check is only necessary for synchronized projects, since file location is dependent on the current project.
+		if (currentProject == null) {
+			return null;
+		}
 		SyncConfig config = SyncConfigManager.getActive(currentProject);
 		// For local configurations, we can fall back to the original implementation.
 		if (config.getSyncProviderId() == null) {
