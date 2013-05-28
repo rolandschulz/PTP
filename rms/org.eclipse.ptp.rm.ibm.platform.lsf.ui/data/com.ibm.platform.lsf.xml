@@ -525,7 +525,7 @@
 				<arg isUndefinedIfMatches="#BSUB -is">#BSUB -is ${ptp_rm:LSF_STDIN_EDITABLE_PATH#value}</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#BSUB -J">#BSUB -J {ptp_rm:LSF_JOB_NAME#value}</arg>
+				<arg isUndefinedIfMatches="#BSUB -J">#BSUB -J ${ptp_rm:LSF_JOB_NAME#value}</arg>
 			</line>
 			<line>
 				<arg isUndefinedIfMatches="#BSUB -Jd">#BSUB -Jd	${ptp_rm:LSF_JOB_DESCRIPTION#value}</arg>
