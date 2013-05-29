@@ -125,9 +125,6 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	private int messageType = IMessageProvider.NONE;
 	private String errorMessage = null;
 
-	private Set<String> localToolChainsSet;
-	private Set<String> remoteToolChainsSet;
-
 	/**
 	 * Creates a new project creation wizard page.
 	 * 
@@ -916,10 +913,15 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	 * @return configs
 	 */
 	public Set<String> getLocalToolChains() {
-		if (localToolChainsSet == null) {
-			this.gatherLocalToolChains();
+		Set<String> localToolChainsSet = new HashSet<String>();
+		for (TableItem ti : localToolChainTable.getSelection()) {
+			String name = ti.getText();
+			if (name.equals("-- Other Toolchain --")) { //$NON-NLS-1$
+				name = "No ToolChain"; //$NON-NLS-1$
+			}
+			localToolChainsSet.add(name);
 		}
-		return new HashSet<String>(localToolChainsSet);
+		return localToolChainsSet;
 	}
 
 	/**
@@ -928,32 +930,15 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	 * @return configs
 	 */
 	public Set<String> getRemoteToolChains() {
-		if (remoteToolChainsSet == null) {
-			this.gatherRemoteToolChains();
-		}
-		return new HashSet<String>(remoteToolChainsSet);
-	}
-
-	private void gatherLocalToolChains() {
-		localToolChainsSet = new HashSet<String>();
-		for (TableItem ti : localToolChainTable.getSelection()) {
-			String name = ti.getText();
-			if (name.equals("No ToolChain")) { //$NON-NLS-1$
-				name = "-- Other Toolchain --"; //$NON-NLS-1$
-			}
-			localToolChainsSet.add(ti.getText());
-		}
-	}
-
-	private void gatherRemoteToolChains() {
-		remoteToolChainsSet = new HashSet<String>();
+		Set<String> remoteToolChainsSet = new HashSet<String>();
 		for (TableItem ti : remoteToolChainTable.getSelection()) {
 			String name = ti.getText();
-			if (name.equals("No ToolChain")) { //$NON-NLS-1$
-				name = "-- Other Toolchain --"; //$NON-NLS-1$
+			if (name.equals("-- Other Toolchain --")) { //$NON-NLS-1$
+				name = "No ToolChain"; //$NON-NLS-1$
 			}
-			remoteToolChainsSet.add(ti.getText());
+			remoteToolChainsSet.add(name);
 		}
+		return remoteToolChainsSet;
 	}
 
 	public SyncFileFilter getCustomFileFilter() {
@@ -997,13 +982,17 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 	private Map<String, String> getSyncConfigToToolChainMap() {
 		Map<String, String> syncConfigToToolChainMap = new HashMap<String, String>();
 
+		// For now, the default tool chain is just the first one in the set (not necessarily first on the list)
+		Set<String> localToolChains = this.getLocalToolChains();
 		String defaultLocalToolChainName = null;
-		if (localToolChainTable.getSelectionCount() > 0) {
-			defaultLocalToolChainName = localToolChainTable.getSelection()[0].getText();
+		if (localToolChains.size() > 0) {
+			defaultLocalToolChainName = localToolChains.iterator().next();
 		}
+
+		Set<String> remoteToolChains = this.getRemoteToolChains();
 		String defaultRemoteToolChainName = null;
-		if (remoteToolChainTable.getSelectionCount() > 0) {
-			defaultRemoteToolChainName = remoteToolChainTable.getSelection()[0].getText();
+		if (remoteToolChains.size() > 0) {
+			defaultRemoteToolChainName = remoteToolChains.iterator().next();
 		}
 
 		for (String syncConfigName : getSyncConfigNames()) {

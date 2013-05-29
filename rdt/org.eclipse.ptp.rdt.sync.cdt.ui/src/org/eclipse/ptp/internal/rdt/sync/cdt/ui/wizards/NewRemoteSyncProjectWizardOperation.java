@@ -72,9 +72,13 @@ public class NewRemoteSyncProjectWizardOperation implements Runnable {
 			if (remoteToolChains.contains(toolChainName)) {
 				WizardUtil.modifyRemoteBuildConfigForSync(config);
 				defaultRemoteBuildConfig = config;
-			} else {
+			} else if (localToolChains.contains(toolChainName)){
 				WizardUtil.modifyLocalBuildConfigForSync(config);
 				defaultLocalBuildConfig = config;
+			} else {
+				assert false : Messages.NewRemoteSyncProjectWizardOperation_3;
+				WizardUtil.modifyRemoteBuildConfigForSync(config);
+				defaultRemoteBuildConfig = config;
 			}
 
 			// Bug 389899 - Synchronized project: "remote toolchain name" contains spaces

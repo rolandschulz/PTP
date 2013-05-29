@@ -20,6 +20,7 @@ import org.eclipse.cdt.core.CCProjectNature;
 import org.eclipse.cdt.core.CProjectNature;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
+import org.eclipse.cdt.managedbuilder.core.IToolChain;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.ui.wizards.CDTConfigWizardPage;
 import org.eclipse.cdt.managedbuilder.ui.wizards.CfgHolder;
@@ -119,7 +120,13 @@ public class SyncConfigToBuildConfigWizardPage extends WizardPage {
 		CfgHolder[] cfgHolders = configPage.getCfgItems(false);
 		for (CfgHolder h : cfgHolders) {
 			configNames.add(h.getName());
-			String toolchainName = h.getToolChain().getName();
+			IToolChain toolchain = h.getToolChain();
+			String toolchainName;
+			if (toolchain == null) {
+				toolchainName = "No ToolChain"; //$NON-NLS-1$
+			} else {
+				toolchainName = h.getToolChain().getName();
+			}
 			if (toolchainName != null) {
 				toolchainToBuildConfigMap.put(toolchainName, h.getName());
 			}
