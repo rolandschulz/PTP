@@ -16,18 +16,6 @@
             name="edu.illinois.ncsa.bluewaters.pbs.batch">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
-            configurationFile="data/edu.illinois.ncsa.forge.pbs.batch.mvapich2.xml"
-            name="edu.illinois.ncsa.forge.pbs.batch.mvapich2">
-      </JAXBResourceManagerConfiguration>
-      <JAXBResourceManagerConfiguration
-            configurationFile="data/edu.illinois.ncsa.forge.pbs.batch.openmpi.xml"
-            name="edu.illinois.ncsa.forge.pbs.batch.openmpi">
-      </JAXBResourceManagerConfiguration>
-      <JAXBResourceManagerConfiguration
-            configurationFile="data/edu.illinois.ncsa.forge.pbs.interactive.openmpi.xml"
-            name="edu.illinois.ncsa.forge.pbs.interactive.openmpi">
-      </JAXBResourceManagerConfiguration>
-      <JAXBResourceManagerConfiguration
             configurationFile="data/edu.sdsc.trestles.torque.batch.xml"
             name="edu.sdsc.trestles.torque.batch">
       </JAXBResourceManagerConfiguration>
