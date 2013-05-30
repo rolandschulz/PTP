@@ -111,7 +111,7 @@ public class WizardUtil {
 				if (replacementId == null) {
 					continue;
 				}
-				p = LanguageSettingsManager.getWorkspaceProvider(replacementId);
+				p = LanguageSettingsManager.getExtensionProviderCopy(replacementId, false);
 			}
 			newProviders.add(p);
 		}

@@ -74,6 +74,11 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 	private static final int TICKS_OUTPUT_PARSING = 1 * MONITOR_SCALE;
 	private static final int TICKS_EXECUTE_COMMAND = 1 * MONITOR_SCALE;
 
+	// Indicate whether the spec file has been created or verified to exist. This may be false on project startup before project is
+	// fully initialized or become false if there are problems connecting to and running commands on the remote machine. Checking
+	// this variable before execution prevents spurious error messages.
+	private boolean specFileExists = false;
+
 	/**
 	 * Internal ICConsoleParser to handle individual run for one language.
 	 * This is basically a copy of: {@link
@@ -120,10 +125,7 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 			monitor.beginTask(ManagedMakeMessages.getFormattedString(Messages.SyncGCCBuiltinSpecsDetector_0, getName()),
 					TICKS_EXECUTE_COMMAND + TICKS_OUTPUT_PARSING);
 
-			// Do not run if spec file is undefined. This can happen if the detector is called when no current project is defined.
-			// The spec file is project-independent for CDT but not for synchronized projects, because the spec file location
-			// depends on the current project's sync configuration.
-			if (specFile == null) {
+			if (!specFileExists) {
 				return retval;
 			}
 
@@ -136,7 +138,9 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 			}
 			console.start(currentProject);
 
-			ICommandLauncher launcher = new SyncCommandLauncher();
+			SyncCommandLauncher launcher = new SyncCommandLauncher();
+			launcher.setSyncBeforeRun(false);
+			launcher.setSyncAfterRun(false);
 			launcher.setProject(currentProject);
 
 			IPath program = new Path(""); //$NON-NLS-1$
@@ -237,14 +241,15 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 	 */
 	@Override
 	protected String getSpecFile(String languageId) {
-		// This check is only necessary for synchronized projects, since file location is dependent on the current project.
+		// These checks are only necessary for synchronized projects, since file location is dependent on the current project and
+		// current sync configuration.
+		specFileExists = false;
 		if (currentProject == null) {
 			return null;
 		}
 		SyncConfig config = SyncConfigManager.getActive(currentProject);
-		// For local configurations, we can fall back to the original implementation.
-		if (config.getSyncProviderId() == null) {
-			return super.getSpecFile(languageId);
+		if (config == null) {
+			return null;
 		}
 
 		// Build spec file name
@@ -282,6 +287,7 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 				Activator.log(e);
 			}
 		}
+		specFileExists = true;
 		return fileLocation.toString();
 	}
 
