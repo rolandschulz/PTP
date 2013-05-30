@@ -23,7 +23,7 @@ public class SuspendJobHandler extends AbstractControlHandler {
 	 */
 	@Override
 	protected String getOperation() {
-		return IJobControl.RESUME_OPERATION;
+		return IJobControl.SUSPEND_OPERATION;
 	}
 
 }
