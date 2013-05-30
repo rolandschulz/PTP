@@ -11,6 +11,7 @@
 package org.eclipse.ptp.internal.rdt.sync.git.core;
 
 import java.io.ByteArrayInputStream;
+import java.io.ObjectInputStream.GetField;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -34,7 +35,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.internal.rdt.sync.git.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.RecursiveSubMonitor;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
-import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
+import org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
@@ -116,6 +117,8 @@ public class GitSyncService extends AbstractSynchronizeService {
 	private final Map<ProjectAndScenario, GitRemoteSyncConnection> syncConnectionMap = Collections
 			.synchronizedMap(new HashMap<ProjectAndScenario, GitRemoteSyncConnection>());
 
+	private AbstractSyncFileFilter fileFilter = null;
+
 	public GitSyncService(ISynchronizeServiceDescriptor descriptor) {
 		super(descriptor);
 	}
@@ -128,7 +131,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 	 */
 	@Override
 	public void checkout(IProject project, SyncConfig syncConfig, IPath[] paths) throws RemoteSyncException {
-		GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, syncConfig, SyncManager.getFileFilter(project),
+		GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, syncConfig,
 				null);
 		if (fSyncConnection != null) {
 			fSyncConnection.checkout(paths);
@@ -143,7 +146,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 	 */
 	@Override
 	public void checkoutRemoteCopy(IProject project, SyncConfig syncConfig, IPath[] paths) throws RemoteSyncException {
-		GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, syncConfig, SyncManager.getFileFilter(project),
+		GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, syncConfig,
 				null);
 		if (fSyncConnection != null) {
 			fSyncConnection.checkoutRemoteCopy(paths);
@@ -171,7 +174,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 	 */
 	@Override
 	public Set<IPath> getMergeConflictFiles(IProject project, SyncConfig syncConfig) throws RemoteSyncException {
-		GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, syncConfig, SyncManager.getFileFilter(project),
+		GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, syncConfig,
 				null);
 		if (fSyncConnection == null) {
 			return new HashSet<IPath>();
@@ -188,7 +191,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 	 */
 	@Override
 	public String[] getMergeConflictParts(IProject project, SyncConfig syncConfig, IFile file) throws RemoteSyncException {
-		GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, syncConfig, SyncManager.getFileFilter(project),
+		GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, syncConfig,
 				null);
 		if (fSyncConnection == null) {
 			return null;
@@ -202,7 +205,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 	// to set the file filter (always, not just for new connections).
 	// TODO: Create progress monitor if passed monitor is null.
 	private synchronized GitRemoteSyncConnection getSyncConnection(IProject project, SyncConfig syncConfig,
-			SyncFileFilter fileFilter, IProgressMonitor monitor) throws RemoteSyncException {
+			IProgressMonitor monitor) throws RemoteSyncException {
 		try {
 			if (syncConfig.getSyncProviderId() == null) {
 				return null;
@@ -211,14 +214,14 @@ public class GitSyncService extends AbstractSynchronizeService {
 			if (!syncConnectionMap.containsKey(pas)) {
 				try {
 					GitRemoteSyncConnection grsc = new GitRemoteSyncConnection(project, project.getLocation().toString(),
-							syncConfig, fileFilter, monitor);
+							syncConfig, getSyncFileFilter(), monitor);
 					syncConnectionMap.put(pas, grsc);
 				} catch (MissingConnectionException e) {
 					return null;
 				}
 			}
 			GitRemoteSyncConnection fSyncConnection = syncConnectionMap.get(pas);
-			fSyncConnection.setFileFilter(fileFilter);
+			fSyncConnection.setFileFilter(getSyncFileFilter());
 			return fSyncConnection;
 		} finally {
 			if (monitor != null) {
@@ -227,6 +230,9 @@ public class GitSyncService extends AbstractSynchronizeService {
 		}
 	}
 
+	
+	//TODO: should I make getFileFilter not depend on config? if so instead of using repo the exclude file name could be computed from project folder + .ptp_sync
+	
 	// Paths that the Git sync provider can ignore.
 	private boolean irrelevantPath(IProject project, IResource resource) {
 		if (SyncManager.getFileFilter(project).shouldIgnore(resource)) {
@@ -253,7 +259,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 	 */
 	@Override
 	public void setMergeAsResolved(IProject project, SyncConfig syncConfig, IPath[] paths) throws RemoteSyncException {
-		GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, syncConfig, SyncManager.getFileFilter(project),
+		GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, syncConfig,
 				null);
 		if (fSyncConnection != null) {
 			fSyncConnection.setMergeAsResolved(paths);
@@ -268,7 +274,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 	 * org.eclipse.core.runtime.IProgressMonitor, java.util.EnumSet)
 	 */
 	@Override
-	public void synchronize(final IProject project, SyncConfig syncConfig, IResourceDelta delta, SyncFileFilter fileFilter,
+	public void synchronize(final IProject project, SyncConfig syncConfig, IResourceDelta delta,
 			IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException {
 		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 1000);
 
@@ -412,7 +418,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 				}
 
 				subMon.subTask(Messages.GitServiceProvider_7);
-				GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, syncConfig, fileFilter,
+				GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, syncConfig,
 						subMon.newChild(98));
 				if (fSyncConnection == null) {
 					// Should never happen
@@ -462,5 +468,12 @@ public class GitSyncService extends AbstractSynchronizeService {
 				monitor.done();
 			}
 		}
+	}
+
+	@Override
+	public AbstractSyncFileFilter getSyncFileFilter(IProject project, SyncConfig syncConfig) throws RemoteSyncException {
+		GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, syncConfig,
+				null);
+		return fSyncConnection.fileFilter;
 	}
 }

@@ -13,9 +13,8 @@ package org.eclipse.ptp.internal.rdt.sync.ui.preferences;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.internal.rdt.sync.ui.messages.Messages;
-import org.eclipse.ptp.rdt.sync.core.ResourceMatcher;
-import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
-import org.eclipse.ptp.rdt.sync.core.SyncFileFilter.PatternType;
+import org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter;
+import org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter.AbstractIgnoreRule;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -47,24 +46,25 @@ public class SyncFilterWidget extends Composite {
 	 * pattern should be inside the specific matcher.
 	 */
 	private class SimpleEditPatternDialog extends Dialog {
-		private final ResourceMatcher oldMatcher;
-		private ResourceMatcher newMatcher;
-		private PatternType patternType;
-		private String pattern;
-		private String matcherType;
 
+		private AbstractIgnoreRule oldRule;
+		
+		private boolean exclude;
+		private String pattern;
+		
+		
 		private Text patternText;
 		private Label errorLabel;
 
-		public SimpleEditPatternDialog(Shell parentShell, ResourceMatcher rm) {
+		public SimpleEditPatternDialog(Shell parentShell, AbstractIgnoreRule rule) {
 			super(parentShell);
-			oldMatcher = rm;
+			oldRule = rule;
 		}
 
 		@Override
 		protected void configureShell(Shell shell) {
 			super.configureShell(shell);
-			if (oldMatcher == null) {
+			if (oldRule == null) {
 				shell.setText(Messages.NewSyncFileFilterPage_Add_Pattern);
 			} else {
 				shell.setText(Messages.NewSyncFileFilterPage_Edit_pattern);
@@ -98,41 +98,6 @@ public class SyncFilterWidget extends Composite {
 				}
 			});
 
-			Group matcherTypeGroup = new Group(main, SWT.NONE);
-			matcherTypeGroup.setText(Messages.NewSyncFileFilterPage_Matcher_Type);
-			matcherTypeGroup.setLayout(new GridLayout(3, false));
-			matcherTypeGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-
-			Button pathTypeButton = new Button(matcherTypeGroup, SWT.RADIO);
-			pathTypeButton.setText("Path"); //$NON-NLS-1$
-			pathTypeButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
-			pathTypeButton.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-					matcherType = PATH_MATCHER;
-				}
-			});
-
-			Button regexTypeButton = new Button(matcherTypeGroup, SWT.RADIO);
-			regexTypeButton.setText("Regex"); //$NON-NLS-1$
-			regexTypeButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
-			regexTypeButton.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-					matcherType = REGEX_MATCHER;
-				}
-			});
-
-			Button wildcardTypeButton = new Button(matcherTypeGroup, SWT.RADIO);
-			wildcardTypeButton.setText("Wildcard"); //$NON-NLS-1$
-			wildcardTypeButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
-			wildcardTypeButton.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-					matcherType = WILDCARD_MATCHER;
-				}
-			});
-
 			Group patternTypeGroup = new Group(main, SWT.NONE);
 			patternTypeGroup.setText(Messages.NewSyncFileFilterPage_Pattern_Type);
 			patternTypeGroup.setLayout(new GridLayout(2, false));
@@ -144,7 +109,7 @@ public class SyncFilterWidget extends Composite {
 			inclusiveButton.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
-					patternType = PatternType.INCLUDE;
+					exclude = false;
 				}
 			});
 
@@ -154,7 +119,7 @@ public class SyncFilterWidget extends Composite {
 			exclusiveButton.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
-					patternType = PatternType.EXCLUDE;
+					exclude = true;
 				}
 			});
 
@@ -162,77 +127,24 @@ public class SyncFilterWidget extends Composite {
 			errorLabel.setForeground(display.getSystemColor(SWT.COLOR_DARK_RED));
 			errorLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-			regexTypeButton.setSelection(false);
-			wildcardTypeButton.setSelection(false);
-			if (oldMatcher != null) {
-				patternText.setText(oldMatcher.toString());
-				patternType = fFilter.getPatternType(oldMatcher);
-				inclusiveButton.setSelection(patternType == PatternType.INCLUDE);
-				exclusiveButton.setSelection(patternType == PatternType.EXCLUDE);
-				pathTypeButton.setSelection(false);
-				matcherType = oldMatcher.getType();
-				if (oldMatcher.getType().equals(PATH_MATCHER)) {
-					pathTypeButton.setSelection(true);
-				} else if (oldMatcher.getType().equals(REGEX_MATCHER)) {
-					regexTypeButton.setSelection(true);
-				} else if (oldMatcher.getType().equals(WILDCARD_MATCHER)) {
-					wildcardTypeButton.setSelection(true);
-				}
+			if (oldRule != null) {
+				patternText.setText(oldRule.toString());
+				exclude = oldRule.getResult();
+				inclusiveButton.setSelection(!exclude);
+				exclusiveButton.setSelection(exclude);
 			} else {
-				patternType = PatternType.EXCLUDE;
-				matcherType = PATH_MATCHER;
+				exclude = true;
 				inclusiveButton.setSelection(false);
 				exclusiveButton.setSelection(true);
-				pathTypeButton.setSelection(true);
 			}
 
 			return main;
 		}
-
-		public ResourceMatcher getNewMatcher() {
-			return newMatcher;
-		}
-
-		public PatternType getPatternType() {
-			return patternType;
-		}
-
-		@Override
-		protected void okPressed() {
-			try {
-				if (matcherType.equals(PATH_MATCHER)) {
-					newMatcher = SyncFileFilter.getPathResourceMatcher(pattern);
-				} else if (matcherType.equals(REGEX_MATCHER)) {
-					newMatcher = SyncFileFilter.getRegexResourceMatcher(pattern);
-				} else if (matcherType.equals(WILDCARD_MATCHER)) {
-					newMatcher = SyncFileFilter.getWildcardResourceMatcher(pattern);
-				}
-			} catch (IllegalArgumentException e) {
-				errorLabel.setText(e.getLocalizedMessage());
-				display.timerExec(ERROR_DISPLAY_SECONDS * 1000, new Runnable() {
-					@Override
-					public void run() {
-						if (errorLabel.isDisposed()) {
-							return;
-						}
-						errorLabel.setText(""); //$NON-NLS-1$
-					}
-				});
-				return;
-			}
-			super.okPressed();
-		}
 	}
 
-	private static final int ERROR_DISPLAY_SECONDS = 3;
-
 	private static final Display display = Display.getCurrent();
-	private static final String PATH_MATCHER = "path"; //$NON-NLS-1$
-	private static final String REGEX_MATCHER = "regex"; //$NON-NLS-1$
 
-	private static final String WILDCARD_MATCHER = "wildcard"; //$NON-NLS-1$
-
-	private SyncFileFilter fFilter;
+	private AbstractSyncFileFilter fFilter;
 	private Table fPatternTable;
 	private Button fAddButton;
 	private Button fUpButton;
@@ -275,8 +187,6 @@ public class SyncFilterWidget extends Composite {
 		column.setText(Messages.NewSyncFileFilterPage_Pattern);
 		column = new TableColumn(fPatternTable, SWT.LEFT, 1);
 		column.setText(Messages.NewSyncFileFilterPage_Type);
-		column = new TableColumn(fPatternTable, SWT.LEFT, 2);
-		column.setText(Messages.NewSyncFileFilterPage_Matcher);
 		fPatternTable.setHeaderVisible(true);
 
 		fPatternTable.addMouseListener(new MouseListener() {
@@ -334,8 +244,8 @@ public class SyncFilterWidget extends Composite {
 			public void widgetSelected(SelectionEvent event) {
 				TableItem[] selectedPatternItems = fPatternTable.getSelection();
 				for (TableItem selectedPatternItem : selectedPatternItems) {
-					ResourceMatcher selectedPattern = (ResourceMatcher) selectedPatternItem.getData();
-					fFilter.removePattern(selectedPattern);
+					AbstractIgnoreRule selectedRule = (AbstractIgnoreRule) selectedPatternItem.getData();
+					fFilter.removePattern(selectedRule);
 				}
 				updateTable();
 				updateButtonEnablement();
@@ -358,7 +268,7 @@ public class SyncFilterWidget extends Composite {
 					return;
 				}
 				int patternIndex = fPatternTable.getSelectionIndex();
-				if (fFilter.promote((ResourceMatcher) selectedPatternItems[0].getData())) {
+				if (fFilter.promote((AbstractIgnoreRule) selectedPatternItems[0].getData())) {
 					patternIndex--;
 				}
 				updateTable();
@@ -379,7 +289,7 @@ public class SyncFilterWidget extends Composite {
 					return;
 				}
 				int patternIndex = fPatternTable.getSelectionIndex();
-				if (fFilter.demote((ResourceMatcher) selectedPatternItems[0].getData())) {
+				if (fFilter.demote((AbstractIgnoreRule) selectedPatternItems[0].getData())) {
 					patternIndex++;
 				}
 				updateTable();
@@ -393,7 +303,7 @@ public class SyncFilterWidget extends Composite {
 	private void addPattern() {
 		SimpleEditPatternDialog dialog = new SimpleEditPatternDialog(fPatternTable.getShell(), null);
 		if (dialog.open() == Window.OK) {
-			fFilter.addPattern(dialog.getNewMatcher(), dialog.getPatternType());
+			fFilter.addPattern(dialog.pattern, dialog.exclude);
 			updateTable();
 		}
 	}
@@ -409,24 +319,25 @@ public class SyncFilterWidget extends Composite {
 
 	/** Creates a modal dialog to edit the selected pattern and replaces it if user hits "OK" */
 	private void editPattern() {
-		TableItem[] selectedPatternItem = fPatternTable.getSelection();
+		TableItem[] selectedRuleItem = fPatternTable.getSelection();
 		// Modifying more than one pattern at a time is not supported
-		if (selectedPatternItem.length != 1) {
+		if (selectedRuleItem.length != 1) {
 			return;
 		}
-		ResourceMatcher selectedPattern = (ResourceMatcher) selectedPatternItem[0].getData();
-		SimpleEditPatternDialog dialog = new SimpleEditPatternDialog(fPatternTable.getShell(), selectedPattern);
+		AbstractIgnoreRule selectedRule = (AbstractIgnoreRule) selectedRuleItem[0].getData();
+		SimpleEditPatternDialog dialog = new SimpleEditPatternDialog(fPatternTable.getShell(), selectedRule);
 		if (dialog.open() == Window.OK) {
-			fFilter.replacePattern(selectedPattern, dialog.getNewMatcher(), dialog.getPatternType());
+			fFilter.removePattern(selectedRule);
+			fFilter.addPattern(dialog.pattern, dialog.exclude);
 			updateTable();
 		}
 	}
 
-	public SyncFileFilter getFilter() {
+	public AbstractSyncFileFilter getFilter() {
 		return fFilter;
 	}
 
-	public void setFilter(SyncFileFilter filter) {
+	public void setFilter(AbstractSyncFileFilter filter) {
 		fFilter = filter;
 		updateTable();
 	}
@@ -451,24 +362,22 @@ public class SyncFilterWidget extends Composite {
 
 	private void updateTable() {
 		fPatternTable.removeAll();
-		for (ResourceMatcher pattern : fFilter.getPatterns()) {
+		for (AbstractIgnoreRule rule : fFilter.getPatterns()) {
 			TableItem ti = new TableItem(fPatternTable, SWT.LEFT);
-			ti.setData(pattern);
+			ti.setData(rule);
 
-			String[] tableValues = new String[3];
-			tableValues[0] = pattern.toString();
-			if (fFilter.getPatternType(pattern) == PatternType.EXCLUDE) {
+			String[] tableValues = new String[2];
+			tableValues[0] = rule.toString();
+			if (rule.getResult()) {
 				tableValues[1] = Messages.NewSyncFileFilterPage_exclude;
 			} else {
 				tableValues[1] = Messages.NewSyncFileFilterPage_include;
 			}
-			tableValues[2] = pattern.getType();
 
 			ti.setText(tableValues);
 		}
 
 		fPatternTable.getColumn(0).pack();
 		fPatternTable.getColumn(1).pack();
-		fPatternTable.getColumn(2).pack();
 	}
 }

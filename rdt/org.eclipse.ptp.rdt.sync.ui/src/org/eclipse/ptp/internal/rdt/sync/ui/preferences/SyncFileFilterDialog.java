@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.sync.ui.preferences;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -31,8 +32,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.internal.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
-import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
-import org.eclipse.ptp.rdt.sync.core.SyncFileFilter.PatternType;
+import org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
 import org.eclipse.swt.SWT;
@@ -63,7 +63,7 @@ public class SyncFileFilterDialog extends Dialog {
 	private static final Display display = Display.getCurrent();
 
 	private final IProject project;
-	private final SyncFileFilter filter;
+	private final AbstractSyncFileFilter filter;
 	private CheckboxTreeViewer treeViewer;
 	private Button showRemoteButton;
 	private Label remoteErrorLabel;
@@ -82,7 +82,7 @@ public class SyncFileFilterDialog extends Dialog {
 	 *            project
 	 * @param targetFilter
 	 */
-	private SyncFileFilterDialog(Shell parent, IProject p, SyncFileFilter targetFilter) {
+	private SyncFileFilterDialog(Shell parent, IProject p, AbstractSyncFileFilter targetFilter) {
 		super(parent);
 		setShellStyle(SWT.RESIZE | getShellStyle());
 
@@ -127,7 +127,7 @@ public class SyncFileFilterDialog extends Dialog {
 	 *            a sync file filter that will be modified
 	 * @return open return code
 	 */
-	public static int openBlocking(Shell parent, SyncFileFilter filter) {
+	public static int openBlocking(Shell parent, AbstractSyncFileFilter filter) {
 		SyncFileFilterDialog page = new SyncFileFilterDialog(parent, null, filter);
 		page.setBlockOnOpen(true);
 		return page.open();
@@ -207,13 +207,7 @@ public class SyncFileFilterDialog extends Dialog {
 			treeViewer.addCheckStateListener(new ICheckStateListener() {
 				@Override
 				public void checkStateChanged(CheckStateChangedEvent event) {
-					IPath path = ((IResource) (event.getElement())).getProjectRelativePath();
-					if (event.getChecked()) {
-						filter.addPattern(SyncFileFilter.getPathResourceMatcher(path), PatternType.INCLUDE);
-					} else {
-						filter.addPattern(SyncFileFilter.getPathResourceMatcher(path), PatternType.EXCLUDE);
-					}
-
+					filter.addPattern((IResource)event.getElement(), event.getChecked());
 					update();
 				}
 			});
@@ -250,7 +244,12 @@ public class SyncFileFilterDialog extends Dialog {
 	protected void okPressed() {
 		// Bug 407601 project is null during new project creation
 		if (project != null) { 
-			SyncManager.saveFileFilter(project, filter);
+			try {
+				SyncManager.saveFileFilter(project, filter);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		setReturnCode(OK);
 		close();

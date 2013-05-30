@@ -60,7 +60,7 @@ public class SyncFileFilterPage extends PreferencePage implements IWorkbenchPref
 	@Override
 	public boolean performOk() {
 		if (fWidget != null) {
-			SyncManager.saveDefaultFileFilter(fWidget.getFilter());
+			fWidget.getFilter().saveFilter();
 		}
 		return true;
 	}

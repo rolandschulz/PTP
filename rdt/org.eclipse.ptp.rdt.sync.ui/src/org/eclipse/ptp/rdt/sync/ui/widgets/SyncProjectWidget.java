@@ -30,7 +30,8 @@ import org.eclipse.ptp.internal.rdt.sync.ui.RDTSyncUIPlugin;
 import org.eclipse.ptp.internal.rdt.sync.ui.SynchronizeParticipantRegistry;
 import org.eclipse.ptp.internal.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.internal.rdt.sync.ui.preferences.SyncFileFilterDialog;
-import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
+import org.eclipse.ptp.rdt.sync.core.PreferenceSyncFileFilterStorage;
+import org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipantDescriptor;
@@ -65,7 +66,7 @@ public class SyncProjectWidget extends Composite {
 	private Text fLocalProjectLocationText;
 	private Button fUseDefaultLocationButton;
 	private Button fLocalBrowseButton;
-	private SyncFileFilter fCustomFilter;
+	private AbstractSyncFileFilter fCustomFilter;
 
 	private ISynchronizeParticipant fSelectedParticipant;
 
@@ -149,11 +150,11 @@ public class SyncProjectWidget extends Composite {
 		filterButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				SyncFileFilter tmpFilter;
+				AbstractSyncFileFilter tmpFilter;
 				if (fCustomFilter == null) {
 					tmpFilter = SyncManager.getDefaultFileFilter();
 				} else {
-					tmpFilter = new SyncFileFilter(fCustomFilter);
+					tmpFilter = new PreferenceSyncFileFilterStorage(fCustomFilter);
 				}
 				int filterReturnCode = SyncFileFilterDialog.openBlocking(filterButton.getShell(), tmpFilter);
 				if (filterReturnCode == Window.OK) {
@@ -245,7 +246,7 @@ public class SyncProjectWidget extends Composite {
 	/**
 	 * @return
 	 */
-	public SyncFileFilter getCustomFileFilter() {
+	public AbstractSyncFileFilter getCustomFileFilter() {
 		return fCustomFilter;
 	}
 

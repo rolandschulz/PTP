@@ -69,7 +69,7 @@ import org.eclipse.ptp.internal.rdt.sync.git.core.CommandRunner.CommandResults;
 import org.eclipse.ptp.internal.rdt.sync.git.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.RecursiveSubMonitor;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
-import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
+import org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
 import org.eclipse.ptp.rdt.sync.core.exceptions.RemoteExecutionException;
 import org.eclipse.ptp.rdt.sync.core.exceptions.RemoteSyncException;
@@ -98,7 +98,7 @@ public class GitRemoteSyncConnection {
 	private static final String remotePushBranch = "ptp-push"; //$NON-NLS-1$
 	private final String localDirectory;
 	private final SyncConfig syncConfig;
-	private SyncFileFilter fileFilter;
+	AbstractSyncFileFilter fileFilter;
 	private Git git;
 	private TransportGitSsh transport;
 	private final IProject project;
@@ -123,7 +123,7 @@ public class GitRemoteSyncConnection {
 	 *             when connection missing. In this case, the instance is
 	 *             also invalid.
 	 */
-	public GitRemoteSyncConnection(IProject proj, String localDir, SyncConfig bs, SyncFileFilter filter, IProgressMonitor monitor)
+	public GitRemoteSyncConnection(IProject proj, String localDir, SyncConfig bs, AbstractSyncFileFilter filter, IProgressMonitor monitor)
 			throws RemoteSyncException, MissingConnectionException {
 		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
 		try {
@@ -977,7 +977,7 @@ public class GitRemoteSyncConnection {
 	 * 
 	 * @param sff
 	 */
-	public void setFileFilter(SyncFileFilter sff) {
+	public void setFileFilter(AbstractSyncFileFilter sff) {
 		fileFilter = sff;
 	}
 

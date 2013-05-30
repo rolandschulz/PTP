@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.sync.ui.menus;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -30,7 +31,7 @@ import org.eclipse.ptp.internal.rdt.sync.ui.preferences.SyncFileFilterDialog;
 import org.eclipse.ptp.internal.rdt.sync.ui.properties.ManageConfigurationDialog;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
-import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
+import org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.SyncManager.SyncMode;
@@ -98,12 +99,9 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 					}
 				}
 			} else if (command.equals(syncExcludeCommand) || command.equals(syncIncludeCommand)) {
-				SyncFileFilter sff = SyncManager.getFileFilter(project);
+				AbstractSyncFileFilter sff = SyncManager.getFileFilter(project);
 				IStructuredSelection sel = this.getSelectedElements();
-				SyncFileFilter.PatternType type = SyncFileFilter.PatternType.EXCLUDE;
-				if (command.equals(syncIncludeCommand)) {
-					type = SyncFileFilter.PatternType.INCLUDE;
-				}
+				boolean exclude = command.equals(syncExcludeCommand);
 
 				for (Object element : sel.toArray()) {
 					IResource selection;
@@ -116,10 +114,14 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 						continue;
 					}
 
-					IPath path = selection.getProjectRelativePath();
-					sff.addPattern(SyncFileFilter.getPathResourceMatcher(path), type);
+					sff.addPattern(selection, exclude);
 				}
-				SyncManager.saveFileFilter(project, sff);
+				try {
+					SyncManager.saveFileFilter(project, sff);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			} else if (command.equals(syncFileList)) {
 				SyncFileFilterDialog.open(HandlerUtil.getActiveShell(event), project);
 			} else if (command.equals(syncDefaultFileList)) {
