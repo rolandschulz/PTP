@@ -338,7 +338,7 @@
 		<!-- -S option -->
 		<attribute name="LSF_STACK_LIMIT" type="string">
 			<description>Stack Limit:</description>
-			<tooltip>Sets the per process soft limit for the the stack for each process in the job. (-S)</tooltip>
+			<tooltip>Sets the per process soft limit for the stack for each process in the job. (-S)</tooltip>
 			<validator>
 				<regex expression=" *|[\d]+" />
 				<error-message>Stack limit must be a numeric value.
