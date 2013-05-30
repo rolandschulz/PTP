@@ -25,7 +25,6 @@ public class SyncImages {
 	private static ImageRegistry imageRegistry = new ImageRegistry();
 
 	// Subdirectory (under the icons directory within this plugin) where 16 color images are
-	private static final String T_TABS = "obj16/"; //$NON-NLS-1$
 	private static final String T_WIZBAN = "wizban/"; //$NON-NLS-1$
 
 	private static URL fgIconBaseURL;
@@ -37,13 +36,8 @@ public class SyncImages {
 		}
 	}
 
-	public static String EXCLUDE = NAME_PREFIX + "exclude_minus.png"; //$NON-NLS-1$
-	public static String INCLUDE = NAME_PREFIX + "include_plus.png"; //$NON-NLS-1$
-	// alternate images to consider
 	public static String NEW_PRJ_WIZARD = NAME_PREFIX + "newprj_wiz.png"; //$NON-NLS-1$
 
-	public static final ImageDescriptor DESC_EXCLUDE = createManaged(T_TABS, EXCLUDE);
-	public static final ImageDescriptor DESC_INCLUDE = createManaged(T_TABS, INCLUDE);
 	public static final ImageDescriptor DESC_NEW_PRJ_WIZARD = createManaged(T_WIZBAN, NEW_PRJ_WIZARD);
 
 	private static ImageDescriptor createManaged(String prefix, String name) {
