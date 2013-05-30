@@ -108,6 +108,9 @@ public class SyncCommandLauncher implements ICommandLauncher {
 
 	protected Map<String, String> remoteEnvMap;
 
+	private boolean shouldSyncBeforeRun = true;
+	private boolean shouldSyncAfterRun = true;
+
 	/**
 	 * The number of milliseconds to pause between polling.
 	 */
@@ -350,6 +353,22 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		fProject = project;
 	}
 
+	/**
+	 * Set whether launcher should sync project after executing. The default behavior is to sync.
+	 * @param shouldSync
+	 */
+	public void setSyncAfterRun(boolean shouldSync) {
+		shouldSyncAfterRun = shouldSync;
+	}
+
+	/**
+	 * Set whether launcher should sync project before executing. The default behavior is to sync.
+	 * @param shouldSync
+	 */
+	public void setSyncBeforeRun(boolean shouldSync) {
+		shouldSyncBeforeRun = shouldSync;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -363,7 +382,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 
 	private void syncOnPostBuild(IProgressMonitor monitor) throws CoreException {
 		SyncConfig config = SyncConfigManager.getActive(getProject());
-		if (SyncManager.getSyncAuto() && config.isSyncOnPostBuild()) {
+		if (shouldSyncAfterRun && SyncManager.getSyncAuto() && config.isSyncOnPostBuild()) {
 			switch (SyncManager.getSyncMode(getProject())) {
 			case ACTIVE:
 				SyncManager.syncBlocking(null, getProject(), SyncFlag.FORCE, monitor, null);
@@ -378,7 +397,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 
 	private void syncOnPreBuild(IProgressMonitor monitor) throws CoreException {
 		SyncConfig config = SyncConfigManager.getActive(getProject());
-		if (SyncManager.getSyncAuto() && config.isSyncOnPreBuild()) {
+		if (shouldSyncBeforeRun && SyncManager.getSyncAuto() && config.isSyncOnPreBuild()) {
 			switch (SyncManager.getSyncMode(getProject())) {
 			case ACTIVE:
 				SyncManager.syncBlocking(null, getProject(), SyncFlag.FORCE, monitor, null);
