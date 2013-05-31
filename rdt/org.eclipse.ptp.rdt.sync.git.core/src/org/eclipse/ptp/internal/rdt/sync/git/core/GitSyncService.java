@@ -11,7 +11,6 @@
 package org.eclipse.ptp.internal.rdt.sync.git.core;
 
 import java.io.ByteArrayInputStream;
-import java.io.ObjectInputStream.GetField;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -214,14 +213,14 @@ public class GitSyncService extends AbstractSynchronizeService {
 			if (!syncConnectionMap.containsKey(pas)) {
 				try {
 					GitRemoteSyncConnection grsc = new GitRemoteSyncConnection(project, project.getLocation().toString(),
-							syncConfig, getSyncFileFilter(), monitor);
+							syncConfig, getSyncFileFilter(project), monitor);
 					syncConnectionMap.put(pas, grsc);
 				} catch (MissingConnectionException e) {
 					return null;
 				}
 			}
 			GitRemoteSyncConnection fSyncConnection = syncConnectionMap.get(pas);
-			fSyncConnection.setFileFilter(getSyncFileFilter());
+			fSyncConnection.setFileFilter(getSyncFileFilter(project));
 			return fSyncConnection;
 		} finally {
 			if (monitor != null) {
@@ -471,9 +470,12 @@ public class GitSyncService extends AbstractSynchronizeService {
 	}
 
 	@Override
-	public AbstractSyncFileFilter getSyncFileFilter(IProject project, SyncConfig syncConfig) throws RemoteSyncException {
-		GitRemoteSyncConnection fSyncConnection = this.getSyncConnection(project, syncConfig,
-				null);
-		return fSyncConnection.fileFilter;
+	public AbstractSyncFileFilter getSyncFileFilter(IProject project) {
+		return GitSyncFileFilter.getFilter(project);
+	}
+
+	@Override
+	public void setSyncFileFilter(IProject project, AbstractSyncFileFilter filter) {
+		GitSyncFileFilter.setFilter(project, filter);
 	}
 }

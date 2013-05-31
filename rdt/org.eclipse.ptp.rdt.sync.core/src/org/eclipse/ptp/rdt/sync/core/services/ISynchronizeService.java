@@ -148,10 +148,21 @@ public interface ISynchronizeService extends ISynchronizeServiceDescriptor {
 			IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException;
 	
 	/**
-	 * Load SyncFileFilter. Empty if not initialized before
+	 * Get SyncFileFilter. Empty if not initialized before
+	 *
+	 * @param project
 	 *
 	 * @return file filter
 	 * @throws RemoteSyncException 
 	 */
-	public AbstractSyncFileFilter getSyncFileFilter(IProject project, SyncConfig syncConfig) throws RemoteSyncException;
+	public AbstractSyncFileFilter getSyncFileFilter(IProject project);
+
+	/**
+	 * Set sync file filter for the given project
+	 *
+	 * @param project - cannot be null
+	 * @param filter
+	 *          generic file filter  - cannot be null
+	 */
+	public void setSyncFileFilter(IProject project, AbstractSyncFileFilter filter);
 }

@@ -163,13 +163,8 @@ public class SyncManager {
 		SyncConfig config = SyncConfigManager.newConfig(remoteSyncConfigName, provider.getId(), conn, provider.getLocation());
 		SyncConfigManager.addConfig(project, config);
 		SyncConfigManager.setActive(project, config);
-		provider.getSyncFileFilter(project, config).clone(fileFilter);
-		try {
-			provider.getSyncFileFilter(project, config).saveFilter();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		provider.setSyncFileFilter(project, fileFilter);
+
 		// Local config
 		try {
 			config = SyncConfigManager.getLocalConfig(provider);
@@ -220,11 +215,9 @@ public class SyncManager {
 	 * @param project
 	 *            cannot be null
 	 * @return the file filter. This is never null.
-	 * 
-	 * @deprecated
 	 */
 	public static AbstractSyncFileFilter getFileFilter(IProject project) {
-		return SyncConfigManager.getActive(project).getSyncService().getSyncFileFilter(project,config);
+		return SyncConfigManager.getActive(project).getSyncService().getSyncFileFilter(project);
 	}
 
 	/**
@@ -316,11 +309,9 @@ public class SyncManager {
 	 * @param filter
 	 *            cannot be null
 	 * @throws IOException 
-	 *            
-	 *  @deprecated          
 	 */
 	public static void saveFileFilter(IProject project, AbstractSyncFileFilter filter) throws IOException {
-		filter.saveFilter();
+		SyncConfigManager.getActive(project).getSyncService().getSyncFileFilter(project).clone(filter);
 	}
 
 	// Note that the monitor is ignored for non-blocking jobs since SynchronizeJob creates its own monitor

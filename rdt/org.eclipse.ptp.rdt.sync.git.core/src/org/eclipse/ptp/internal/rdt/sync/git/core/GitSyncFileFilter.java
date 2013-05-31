@@ -6,7 +6,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jgit.ignore.IgnoreNode;
 import org.eclipse.jgit.lib.Constants;
@@ -15,6 +18,17 @@ import org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 
 public class GitSyncFileFilter extends AbstractSyncFileFilter {
+	// Map of projects to file filters along with basic getter and setter methods. These static data and methods operate
+	// independently of the rest of the class and could be moved into a separate class if desired.
+	private static Map<IProject, GitSyncFileFilter> projectToFilterMap = new HashMap<IProject, GitSyncFileFilter>();
+	public static GitSyncFileFilter getFilter(IProject project) {
+		return projectToFilterMap.get(project);
+	}
+
+	public static void setFilter(IProject project, AbstractSyncFileFilter filter) {
+		// TODO: Figure out how to convert filter to a Git filter.
+		projectToFilterMap.put(project, filter);
+	}
 
 	private Repository repository;
 	
@@ -119,5 +133,4 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		for (AbstractIgnoreRule rule : fileFilter.rules)
 			rules.add(new GitIgnoreRule(rule.getPattern(),rule.getResult()));
 	}
-
 }
