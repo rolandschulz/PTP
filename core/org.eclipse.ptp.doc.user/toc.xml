@@ -43,8 +43,5 @@
       <topic label="Graphical Explorer of MPI Programs (GEM)">
       	<anchor id="ptpGEM"/>
       	</topic>
-      	<topic label="Graphical Inquirer of GPU Programs (GIG)">
-      	<anchor id="ptpGIG"/>
-      </topic>
    
 </toc>

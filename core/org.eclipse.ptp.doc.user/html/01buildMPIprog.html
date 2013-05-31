@@ -6,33 +6,187 @@
 </head> 
 <body>
 <h1>Introduction to Creating MPI Projects</h1>
-<p>This section provides a brief introduction to creating, building and launching an MPI program. It will cover the following steps:
+<p>This section provides a brief introduction to creating, building and launching an MPI program. 
+<p>Two different creation scenarios are covered:
+<ol>
+<li><a href="#sync">Creating a synchronized MPI project with a Makefile</a>
+<p>This is an example of a parallel program to be built and run on a remote machine.  Source files are edited
+on the local (Eclipse) machine and then it can be built and run on a remote target machine.
+A remote terminal view within Eclipse, to verify the files on the remote target,  is also used.
+</li>
+<li><a href="#sync">Creating a local MPI project without an explicitly provided Makefile - a "Managed Build"  project</a>
+with "Hello MPI World"  sample source code
+<p>This is an example of a small MPI program to create and edit on the local machine - as an
+introduction to using Eclipse to develop C and MPI source codes.
+</li>
+</ol>
+
+<!-- ------ -->
+
+<h2 id="sync">Creating a Synchronized MPI project with a Makefile</h2>
+<p>
+<p>This describes creating a synchronized project with an explicitly provided Makefile - a "Makefile"  project.
+Actually this means that the user provides a build command, and the default build command is "make".
+This can be easily changed for other build mechanisms.
+<p>It will cover the following steps:
+<ul>
+
+<li><a href="#sync-create">Create the project</a> from source code existing on the remote target machine. 
+The files are copied to the local machine.
+</li>
+<li>(Optional) <a href="#sync-term">Open a Remote Terminal View</a> to the target system</li>
+<li><a href="#sync-build">Build the executable on the remote machine</a></li>
+<li><a href="#sync-launch">Launch the program</a></li>
+</ul>
+
+<h2 id="sync-create">Step 1: Create the project</h2>
+<p>We assume for this example that the source code exists on the remote target machine.
+<pre>
+<code>
+$> pwd
+/u/userid/shallow
+$> ls
+calc.c  copy.c  decs.h  diag.c  dump.c  init.c  main.c  Makefile  time.c  tstep.c  tstep.f90  worker.c
+</code></pre>
+<p>In the Project Explorer view, right click, then choose <b>New > Synchronized C/C++ Project</b>
+if your project is C/C++ only.  
+<ul><li>
+If your project contains Fortran files, Choose <b>New > Synchronized Fortran Project</b>.  
+(This adds a Fortran nature to the project so you can access Fortran properties, etc.)
+See <a href="PLUGINS_ROOT/org.eclipse.photran.doc.user/html/toc.html">Photran</a> for more details
+on Eclipse features for Fortran.
+</li></ul>
+
+<!-- BRT FIXME using images from slides -- need to recapture them for improved resolution -->
+<p>
+<img src="images/01sync-newProj.png">
+<p>&nbsp;
+<p>In the <b>New Synchronized Project</b> wizard, enter the project name, e.g. "shallow"
+<p>
+<img src="images/01sync-newProj2.png">
+<p>The <b>Local Directory</b> specifies where the local files are located. The default value is a directory 
+under your Eclipse workspace directory, so leave this as is.
+<p>The <b>Remote Directory</b> specifies where the remote files are located, so we must tell Eclipse where it is.
+<p>Here we create a new connection to the remote machine.
+Click on <b>New...</b> next to <b>Connection:</b>
+to create a new connection.
+<ul><li>If a connection already exists, simply select it.</li></ul>
+<h4 id="newconn">Creating a new connection</h4>
+<p>The dialog to create a new remote connection appears, <b>Target Environment Configuration</b>.
+Enter a name for the connection in <b>Target name:</b>
+and enter the host name, user name, and password.
+<p>
+<img src="images/01sync-newConn.png">
+<p>&nbsp;
+<p>If your machine access requires ssh access through a frontend/intermediate node, use localhost and port -
+see 
+<a href="remoteTools.html#tunnel">SSH tunneling via Remote Tools</a>
+
+<p>Select <b>Finish</b> when the connection information is filled in.
+<p>Back on the wizard dialog, once the connection has been created, choose the remote location
+of the source files of your project - for <b>Remote Directory</b>, select the <b>Browse</b> button.
+Note that this is the first time the connection information is used, so if you have specified
+hostname, userid, or password incorrectly it will fail.
+If this is the case, either
+<ul>
+<li>create another connection right here
+in the new sync project wizard.  You can always delete the first one later ... or
+<li>cancel out of the new project wizard and see
+<a href="remoteTools.html#edit">editing connection information in Remote Tools</a>
+to change the connection information.
+</ul>
+
+<p>If the connection information is successful, you will see a  dialog on the remote system
+allowing you to select the <b>Project Location</b> on that system.
+Select the location of your source files - or create a new directory to which you can
+add files later - and select <b>OK</b>.
+<p>
+<p>
+<img src="images/01sync-newProjBrowse.png">
+
+
+<p>Back in the new project wizard, choose the project type and toolchain(s).
+If you are synchronizing with an existing directory of source code and have your own
+makefile (or other build command), choose a <b>Project type</b> of <b>Makefile Project > Empty Project</b>.
+For <b>Remote Toolchain</b>, choose the toolchain that most closely matches the remote system.
+
+<ul>
+<li><i>Empty project</i> only indicates that Eclipse isn't adding any files to the project - it will use your files.
+<li>
+Note: toolchain information is only  used for scanner discovery (???) in determining the location
+of the include files, etc. that are used in your build - to help Eclipse find the same information
+to help with editor navigation, special features, etc.
+Actual build command information is taken from your Makefile.
+</ul>
+
+If you intend to build locally (on the same machine where Eclipse is installed)
+then specify a local toolchain as well.  A local toolchain is not necessary.
+<p>
+<img src="images/01sync-newProj3.png">
+<p>If you want to control which files get synchronized back to the local machine, for example, to 
+not sync binary files that are built on the remote machine, choose <a href="sync.html#file-filter">File Filtering</a>.
+
+<p>Select <b>Finish</b> to complete the sync project setup.
+
+
+
+
+
+
+
+
+
+
+
+<!--   OH WAIT.  sync.html already covers alot of this. screen shots need to be updated tho.???? -->
+
+<h2 id="sync-term">Step 2: (Optional) Open a remote terminal on the remote machine</h2>
+<p>This example describes how to create a synchronized project mirrored on a remote machine.
+It assumes a directory on the remote machine exists with source code and a Makefile already existing in it.
+While using the remote terminal within Eclipse is not necessary to create the project, this is a
+good point to demonstrate doing so and show what files exist on the remote machine for this example.
+<p>
+The Remote Terminals view should be near the bottom of the workbench.
+
+<h2 id="sync-build">Step 3: Build the executable on the remote machine</h2>
+<p>blah
+
+
+<h2 id="sync-launch">Step 4: Launch the program</h2>
+<p>blah
+
+
+<p></p>
+<h2 id="local-helloMPI">Creating a local MPI project - "Hello MPI World"</h2>
+<p>This describes creating a local MPI project without an explicitly provided Makefile - a "Managed Build"  project
+with "Hello MPI World"  sample source code.
+<p>It will cover the following steps:
 <ul>
 <li><a href="#create">Create the project</a></li>
 <li><a href="#configure">Configure to use MPI</a></li>
 <li><a href="#build">Build the executable</a></li>
 <li><a href="#launch">Launch the program</a></li>
 </ul>
-
-<h2 id="create">Step 1: Create the project</h2>
+<h3 id="create">Step 1: Create the project</h2>
 <p>Note: this tutorial uses the
 <a href="PLUGINS_ROOT/org.eclipse.ptp.pldt.doc.user/html/toc.html">Parallel Language Development Tools (PLDT)</a> wizards for creating MPI projects. 
-Please make sure this feature is installed before continuing.
 
 <ol>
-<li><p>Switch to the C/C++ Perspective using <b>Window &gt; Open Perspective &gt; Other...</b>  and then choose <b>C/C++</b></p><p><br></p></li>
+<li><p>If not already there, switch to the C/C++ Perspective using <b>Window &gt; Open Perspective &gt; Other...</b>  and then choose <b>C/C++</b></p><p><br></p></li>
 <li><p>Create a new MPI project using the managed build facility. Select <b>File &gt; New &gt; C Project ...</b> and the <b>New Project</b> dialog should open.</p><p><br></p></li>
 <li><p>Enter a name for the project e.g. MyMPIProject.</p><p><br></p></li>
 <li><p>From the <b>Project types</b> list, expand <b>Executable</b> and select <b>MPI Hello World C Project</b></p><p><br></p>
 <p>Make sure the toolchain selected is valid for your machine.
 <p><img src="images/01newMPIproject.png"></p><p><br></p>
+<p>Click the <b>Next></b> button to advance to the next page of the new project wizard.
+<p>&nbsp;
 </li>
 <li><p>In the <b>Basic Settings</b> dialog, fill in the author name and change any other values you like.
 The 'Source' value indicates the name of the folder in which the source file will be created.
 
 </p><p><br></p>
 <p><img src="images/01projBasicSettings.png"></p><p><br></p>
-<p>Click <b>Next</b>.</p><p><br></p></li>
+<p>Click <b>Next ></b>.</p><p><br></p></li>
 </ol>
 
 <h2 id="configure">Step 2: Configure the project to use MPI</h2>
@@ -47,7 +201,7 @@ or MPI build commands.
 </p><p><br></p>
 <p><img src="images/01mpiProjSettings.png"></p><p><br></p>
 <p>Click <b>Finish</b>.</p><p><br></p></li>
-<li><p>The new project is created and appears in the <b>C/C++ Projects</b> view. Expand the <b>src</b> folder to see the new source file.</p><p><br></p>
+<li><p>The new project is created and appears in the <b>Project Explorer</b> view. Expand the <b>src</b> folder to see the new source file.</p><p><br></p>
 <p><script> full("images/01proj.png") </script></p>
 </li>
 </ol>
@@ -55,18 +209,29 @@ or MPI build commands.
 <h2 id="build">Step 3: Build the executable</h2>
 <p></p>
 <ol>
-<li><p>Assuming that you have MPI installed and that the project was configured correctly, the application should now autmatically build. When the automatic 
+<li><p>Assuming that you have MPI installed and that the project was configured correctly, the application should now automatically build. 
+When the automatic 
 build setting is selected, Eclipse will build the application whenever you save changes in an editor. 
-Automatic/manual build can be toggled by selecting <b>Project &gt; Build Automatically...</b>. When 
-manual build is selected, a build can be initiated using <b>Project &gt; Build All</b>.</p><p><br></p></li>
-<li><p>Once the build is complete, any errors will be dislayed in the <b>Problems view</b>, the 
-corresponding source files will be flagged, and markers will be insterted into the editor window.</p><p><br></p></li>
+Automatic/manual build can be toggled by selecting <b>Project &gt; Build Automatically...</b>. 
+</p>
+<p>A build can be initiated manually using <b>Project &gt; Build Project</b> or selecting the project in
+the Project Explorer view and selecting the hammer icon in the toolbar.
+
+</p><p><br></p></li>
+<li><p>Once the build is complete, any errors will be displayed in the <b>Problems view</b>, the 
+corresponding source files will be flagged, and markers will be inserted into the editor window.</p><p><br></p></li>
 <li><p>Double-click on the source file name to open the C/C++ editor in order to correct any errors.</p><p><br></p>
 <p><img src="images/01wbSrcEditor.png"></p><p><br></p>
 </li>
 <li><p>Details of the commands that were executed to complete the build can be seen in the <b>Console 
-view</b> (click on the <b>Console</b> tab near the bottom right hand corner of the Eclispe 
+view</b> (click on the <b>Console</b> tab near the bottom right hand corner of the Eclipse 
 workbench.)</p></li>
+<li>Note: this project assumes that the command <b>mpicc</b> will build an MPI program on your system.
+If your MPI build command is different, you can access the Project Properties (right mouse on project name in Project Explorer
+and select <b>Properties</b>, then select <b>C/C++ Build > Settings </b> and on the <b>GCC C Compiler</b>
+tree item, change the <b>Command:</b> string from mpicc to whatever your MPI build command may be.
+)
+</li>
 </ol>
 
 <h2 id="launch">Step 4: Launch the program</h2>

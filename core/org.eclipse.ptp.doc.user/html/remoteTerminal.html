@@ -1,0 +1,57 @@
+<html>
+<head>
+<title>PTP Remote Terminal</title>
+<link rel="stylesheet" type="text/css" href="help.css">
+<script type="text/javascript" src="thumb.js"> </script>
+</head> 
+<body>
+<h1 id="top">PTP Remote Terminal</h1>
+<p><b>Remote Terminal</b> is a lightweight remote terminal that can be used to provide a shell from within Eclipse.
+It is included with the Parallel Tools Platform (PTP) and uses the same connection information
+that is used by remote and synchronized projects.
+<p>The <b>Terminal</b> view should be available near the bottom of the workbench
+<p>
+<img src="images/rterm_wbench.png">
+<p>If it is not visible, you can open it via <b>Window > Show View > Other...</b>
+and under <b>Terminal</b>, select <b>Terminal</b>.
+<p>
+<img src="images/rterm_showview.png">
+
+<p>The <b>Terminal</b> view is a convenient way to provide shell
+access to remote systems, and uses the same connection information that may be in use
+already for e.g. a synchronized project.
+
+<p>In the <b>Terminal</b> view, select the <img src="images/rterm_icon_connect.png"> <b>Connect</b> 
+<!-- or the <b>New Terminal Connection</b>  -->
+button.
+
+<p>
+
+<p><img src="images/rterm_connect2.png"></p>
+<p>&nbsp;</p>
+<p>In the next dialog, choose <b>Connection Type:</b> to use e.g. <b>Remote Tools</b>,
+and under <b>Settings</b>, select the connection to use. 
+If you have not already established a connection, select <b>New...</b>
+and enter hostname, user, password, etc.
+For more information about creating connections, see <a href="remoteTools.html">Remote Tools</a>.
+<p><img src="images/rterm_connect1.png"></p>
+
+<p>Select <b>OK</b> to open the shell on the selected system.
+<p><img src="images/rterm_connected.png"></p>
+<p>Shell commands can be entered on the selected system.
+<p>&nbsp;
+<h2 id="other">Other Features</h2>
+<!-- FIXME caveat these don't seem to work quite right. -->
+
+<p>To create an additional view for another terminal connection use <b>New Terminal View</b>
+from the dropdown menu next to the 
+<img src="images/rterm_icon_newConn.png"> button in the view toolbar.
+<p><img src="images/rterm_newTermView.png"></p>
+<p>Then multiple <b>Terminal</b> views will exist, each can have a different connection.
+<p><img src="images/rterm_2views.png"></p>
+
+
+<p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a></p>
+</body>
+
+</html>

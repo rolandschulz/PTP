@@ -11,7 +11,7 @@
 this is called &quot;running a job&quot;. 
 <p>Previous releases of PTP required setting up a <i>Resource Manager</i> for each job scheduler/runtime environment before
 a job could be launched.
-In PTP 6.0 this is not handled separately, and instead a 
+In PTP 6.0 and later this is not handled separately, and instead a 
 <i>Target System Configuration</i>
 is specified on the Run Configuration page.  Further interaction to set up the parallel
 job is highly dependent on which TSC is selected.
@@ -86,9 +86,14 @@ configuration</h2>
 <h2 id="resources">Step 2: Complete the Resources tab</h2>
 <p>The <b>Resources tab</b> is used to specify the resources
 required for the job execution. After selecting the <b>target system configuration</b>, the contents of this tab will vary for
-different target configurations, and your installation may have added others. PTP includes a number of target configurations
-for different systems. The following table lists the common configurations along with 
+different target configurations, and your installation may have added others. 
+<h3 id="ptp-tscs">PTP supported Target System Configurations</h3>
+<p>
+PTP includes a number of target configurations
+for different systems that support various parallel runtime systems and job schedulers. The following table lists the common configurations along with 
 links to additional help documentation.
+<p>
+Note that the associated runtime or job scheduler needs to be available on the target system prior to using PTP:
 <blockquote>
 <table border="1">
    <tr>
