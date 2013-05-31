@@ -187,7 +187,7 @@ public class ManagedFilesJob extends Job {
 			}
 			AttributeType a = new AttributeType();
 			a.setName(file.getName());
-			if (localTarget) {
+			if (localTarget && !new File(target).isAbsolute()) {
 				a.setValue(new File(System.getProperty(JAXBControlConstants.JAVA_USER_HOME), target).getAbsolutePath());
 			} else {
 				a.setValue(target);
