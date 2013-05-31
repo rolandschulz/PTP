@@ -224,7 +224,7 @@ public class SimpleCommandJob extends Job {
 
 			if (!fCommand.isIgnoreExitStatus() && exit > 0) {
 				throw CoreExceptionUtils.newException(builder.command().get(0) + JAXBControlConstants.SP
-						+ Messages.ProcessExitValueError + (JAXBControlConstants.ZEROSTR + exit), null);
+						+ Messages.ProcessExitValueError + Integer.toString(exit), null);
 			}
 
 		} catch (CoreException ce) {

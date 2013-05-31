@@ -661,7 +661,7 @@ public class CommandJob extends Job implements ICommandJob {
 		String message = error.toString();
 		error.setLength(0);
 		return CoreExceptionUtils.getErrorStatus(arg + JAXBControlConstants.SP + Messages.ProcessExitValueError
-				+ (JAXBControlConstants.ZEROSTR + exit) + JAXBControlConstants.LINE_SEP + message, null);
+				+ Integer.toString(exit) + JAXBControlConstants.LINE_SEP + message, null);
 	}
 
 	/*
