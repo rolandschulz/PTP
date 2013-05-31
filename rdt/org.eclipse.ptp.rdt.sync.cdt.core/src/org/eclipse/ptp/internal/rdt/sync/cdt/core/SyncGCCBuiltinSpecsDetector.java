@@ -16,6 +16,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.ErrorParserManager;
@@ -74,6 +75,8 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 	private static final int TICKS_OUTPUT_PARSING = 1 * MONITOR_SCALE;
 	private static final int TICKS_EXECUTE_COMMAND = 1 * MONITOR_SCALE;
 
+	private AtomicBoolean isBeingExecuted = new AtomicBoolean(false);
+
 	// Indicate whether the spec file has been created or verified to exist. This may be false on project startup before project is
 	// fully initialized or become false if there are problems connecting to and running commands on the remote machine. Checking
 	// this variable before execution prevents spurious error messages.
@@ -124,6 +127,10 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 		try {
 			monitor.beginTask(ManagedMakeMessages.getFormattedString(Messages.SyncGCCBuiltinSpecsDetector_0, getName()),
 					TICKS_EXECUTE_COMMAND + TICKS_OUTPUT_PARSING);
+
+			if (!isBeingExecuted.compareAndSet(false, true)) {
+				return retval;
+			}
 
 			if (!specFileExists) {
 				return retval;
@@ -186,6 +193,7 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 			}
 		} finally {
 			monitor.done();
+			isBeingExecuted.set(false);
 		}
 		return retval;
 	}
