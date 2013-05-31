@@ -12,7 +12,6 @@
 <li><a href="#sync">Creating a synchronized MPI project with a Makefile</a>
 <p>This is an example of a parallel program to be built and run on a remote machine.  Source files are edited
 on the local (Eclipse) machine and then it can be built and run on a remote target machine.
-A remote terminal view within Eclipse, to verify the files on the remote target,  is also used.
 </li>
 <li><a href="#sync">Creating a local MPI project without an explicitly provided Makefile - a "Managed Build"  project</a>
 with "Hello MPI World"  sample source code
@@ -26,7 +25,7 @@ introduction to using Eclipse to develop C and MPI source codes.
 <h2 id="sync">Creating a Synchronized MPI project with a Makefile</h2>
 <p>
 <p>This describes creating a synchronized project with an explicitly provided Makefile - a "Makefile"  project.
-Actually this means that the user provides a build command, and the default build command is "make".
+Actually this doesn't require a makefile - it means that the user provides a build command, and the default build command is "make".
 This can be easily changed for other build mechanisms.
 <p>It will cover the following steps:
 <ul>
@@ -125,28 +124,29 @@ then specify a local toolchain as well.  A local toolchain is not necessary.
 <img src="images/01sync-newProj3.png">
 <p>If you want to control which files get synchronized back to the local machine, for example, to 
 not sync binary files that are built on the remote machine, choose <a href="sync.html#file-filter">File Filtering</a>.
-
+By default all files are synchronized between the local and remote systems
+(including binaries).
 <p>Select <b>Finish</b> to complete the sync project setup.
+<p>&nbsp;
+<p>For more details on synchronization, configurations, filters, Synchronization properties,
+etc. see <a href="sync.html">Synchronized Projects</a>.
 
-
-
-
-
-
-
-
-
-
-
-<!--   OH WAIT.  sync.html already covers alot of this. screen shots need to be updated tho.???? -->
+<!-- FIXME  Note sync.html already covers alot of this. screen shots need to be updated tho.???? -->
 
 <h2 id="sync-term">Step 2: (Optional) Open a remote terminal on the remote machine</h2>
-<p>This example describes how to create a synchronized project mirrored on a remote machine.
-It assumes a directory on the remote machine exists with source code and a Makefile already existing in it.
+<p>Since this example describes how to create a synchronized project mirrored on a remote machine,
+it assumes a directory on the remote machine exists with source code and a Makefile already existing in it.
+
 While using the remote terminal within Eclipse is not necessary to create the project, this is a
 good point to demonstrate doing so and show what files exist on the remote machine for this example.
-<p>
-The Remote Terminals view should be near the bottom of the workbench.
+<p>See <a href="remoteTerminal.html">Remote Terminal</a>
+for how to connect with shell access to the remote system, within an Eclipse view,
+using the same information already available in the connection you created for the synchronized
+project.
+<p>This example shows the files in the remote directory that are mirrored in the synchronized
+project within Eclipse PTP.
+<img src="images/01sync-term.png">
+
 
 <h2 id="sync-build">Step 3: Build the executable on the remote machine</h2>
 <p>blah
