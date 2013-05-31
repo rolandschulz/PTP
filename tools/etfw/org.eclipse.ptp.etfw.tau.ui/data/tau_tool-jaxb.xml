@@ -366,6 +366,9 @@
 		<!-- END TAU Compiler tab -->
 		
 		<!-- TAU Makefile tab -->
+		<attribute name="TAU Runtime.performance.options.environmentvariables.configuration_id_PAPI-SELECTION-MAP">
+		
+		</attribute>
 		<attribute name="use_mpi" type="boolean">
 			<rm:description></rm:description>
 			<rm:tooltip>MPI Attribute</rm:tooltip>
@@ -560,7 +563,7 @@
 								</rm:disable-if>
 							</rm:control-state>
 						</rm:widget>
-						<rm:widget type="custom" typeId="papi" style="SWT.BORDER">
+						<rm:widget type="custom" typeId="papi" style="SWT.BORDER" attribute="TAU Runtime.performance.options.environmentvariables.configuration_id_PAPI-SELECTION-MAP">
 							<rm:layout-data>
 								<rm:grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false" />
 							</rm:layout-data>

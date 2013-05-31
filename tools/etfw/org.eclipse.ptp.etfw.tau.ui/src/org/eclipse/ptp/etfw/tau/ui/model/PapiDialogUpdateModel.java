@@ -16,6 +16,8 @@ import org.eclipse.ptp.rm.jaxb.control.ui.AbstractUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateHandler;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Control;
 
 /**
@@ -33,16 +35,42 @@ public class PapiDialogUpdateModel extends AbstractUpdateModel implements Modify
 	public PapiDialogUpdateModel(String name, IUpdateHandler handler, Control control) {
 		super(name, handler);
 		papiOptionDialog = (PapiOptionDialog) control;
-	}
+		papiOptionDialog.getButton().addSelectionListener(new SelectionListener() {
 
-	@Override
-	public Object getValueFromControl() {
-		return null;
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+
+			}
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				try {
+					final Object value = storeValue();
+					handleUpdate(value);
+				} catch (final Exception ignored) {
+				}
+			}
+		});
 	}
 
 	@Override
 	public Object getControl() {
 		return papiOptionDialog;
+	}
+
+	@Override
+	public Object getValueFromControl() {
+		return papiOptionDialog.getVariableMap();
+		// String accum="";
+		// Collection<Object>vals = papiOptionDialog.getPapiMap().values();
+		// Iterator<Object> valit = vals.iterator();
+		// while(valit.hasNext()){
+		// Object o = valit.next();
+		// if(o!=null&&o instanceof String){
+		// accum+=o;
+		// }
+		// }
+		// return accum;
 	}
 
 	@Override
@@ -52,9 +80,9 @@ public class PapiDialogUpdateModel extends AbstractUpdateModel implements Modify
 		}
 
 		try {
-			Object value = storeValue();
+			final Object value = storeValue();
 			handleUpdate(value);
-		} catch (Exception ignored) {
+		} catch (final Exception ignored) {
 		}
 
 	}
@@ -74,7 +102,7 @@ public class PapiDialogUpdateModel extends AbstractUpdateModel implements Modify
 		}
 
 		if (lcMap.get(ITauConstants.TAU_MAKEFILE_TAB_ID) != null) {
-			String selItem = lcMap.get(ITauConstants.TAU_MAKEFILE_TAB_ID).getValue().toString();
+			final String selItem = lcMap.get(ITauConstants.TAU_MAKEFILE_TAB_ID).getValue().toString();
 			papiOptionDialog.setSelection(selItem);
 		}
 

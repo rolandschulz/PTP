@@ -84,9 +84,27 @@ public class ToolPaneTypeUtil {
 			while (iterator.hasNext()) {
 				String key = iterator.next().toString();
 				if (key.startsWith(keyStartsWith)) {
-					// split the key with the variable name (after the last underscore)
-					String mapKey = key.replace(keyStartsWith, JAXBCoreConstants.ZEROSTR);
+					
 					String value = ""; //$NON-NLS-1$
+					if (key.endsWith("MAP")) {
+						value = configuration.getAttribute(key, JAXBCoreConstants.ZEROSTR);
+						if(value.length()>0&&value.startsWith("{")){
+							value=value.substring(1);
+						}
+						if(value.length()>0&&value.endsWith("}")){
+							value=value.substring(0,value.length()-1);
+						}
+						String[] valuePairs = value.split(JAXBCoreConstants.CM);
+						for(String valuePair : valuePairs) {
+							if(valuePair.contains(JAXBCoreConstants.EQ)){
+								String[] pair = valuePair.split(JAXBCoreConstants.EQ);
+								envMap.put(pair[0].trim(), pair[1].trim());
+							}
+						}
+					}
+					else{
+						// split the key with the variable name (after the last underscore)
+						String mapKey = key.replace(keyStartsWith, JAXBCoreConstants.ZEROSTR);
 					try {
 						// Try string attribute
 						value = configuration.getAttribute(key, JAXBCoreConstants.ZEROSTR);
@@ -101,6 +119,7 @@ public class ToolPaneTypeUtil {
 					if (value != null && value.trim().length() > 0) {
 						envMap.put(mapKey, value);
 					}
+				}
 				}
 			}
 			return envMap;
