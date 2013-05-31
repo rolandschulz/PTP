@@ -80,8 +80,7 @@ public class ApplicationQueryControl extends LSFQueryControl {
 		IRemoteProcess process;
 
 		remoteServices = connection.getRemoteServices();
-		processBuilder = remoteServices.getProcessBuilder(connection,
-				"bapp", "-w"); //$NON-NLS-1$ //$NON-NLS-2$
+		processBuilder = remoteServices.getProcessBuilder(connection, "bapp", "-w"); //$NON-NLS-1$ //$NON-NLS-2$
 		process = null;
 		try {
 			BufferedReader reader;
@@ -98,6 +97,29 @@ public class ApplicationQueryControl extends LSFQueryControl {
 				String columnData[];
 
 				/*
+				 * Read stderr and check for "No application profiles found."
+				 * as the first line of output. Subsequent lines are ignored.
+				 */
+				reader = new BufferedReader(new InputStreamReader(
+						process.getErrorStream()));
+				data = reader.readLine();
+				headerLine = true;
+				while (data != null) {
+					if (headerLine) {
+						if (data.equals("No application profiles found.")) { //$NON-NLS-1$
+							MessageDialog.openWarning(getShell(),
+									Messages.ApplicationQueryControl_2,
+									Messages.ApplicationQueryControl_3);
+							reader.close();
+							return false;
+						}
+						headerLine = false;
+					}
+					data = reader.readLine();
+				}
+				reader.close();
+
+				/*
 				 * Read stdout and tokenize each line of data into an array of
 				 * blank-delimited strings. The first line of output is the
 				 * column headings. Subsequent lines are reservation data.
@@ -109,13 +131,6 @@ public class ApplicationQueryControl extends LSFQueryControl {
 				commandResponse.clear();
 				while (data != null) {
 					if (headerLine) {
-						if (data.equals("No application profiles found")) { //$NON-NLS-1$
-							MessageDialog.openWarning(getShell(),
-									Messages.ApplicationQueryControl_2,
-									Messages.ApplicationQueryControl_3);
-							reader.close();
-							return false;
-						}
 						columnLabels = data.split(" +"); //$NON-NLS-1$
 						headerLine = false;
 					} else {
