@@ -6,7 +6,8 @@
 </head> 
 <body>
 <h1 id="top">Synchronized Projects</h1>
-
+<!-- FIXME this isn't complete - partially updated for Kepler.  
+build config / sync config info is in build.html, perhaps some of this can be removed? -->
 <p>
 <ul>
 <li><a href="#prereq">Requirements for Synchronized Projects</a>
@@ -44,9 +45,14 @@ select <b>New > Synchronized C/C++ Project</b> or <b>Synchronized Fortran Projec
 <p><img src="images/sync-newprojContext.png">
 <p><br></p>
 <p id="new-sync-proj">Now fill out the <b>New Synchronized Project</b> dialog shown.
-<p><img src="images/sync-newprojCreate.png">
+
+<p>
+<img src="images/sync-newprojCreate.png">
+
 <p><br></p>
-As for any Eclipse project, give the project name and location, which must be a local directory for a Synchronized Project.
+Fill in a name for the project.
+For <b>Local Directory</b> give the project name and location, most probably the default location
+within the local workspace directory.
 Then give a remote location by specifying a <a href="#connection">connection</a> and remote directory.
 Next, specify the project type. Finally, select toolchains to be used for remote and local sites.
 Normally, you will select only one toolchain for each, but it is possible to select additional toolchains.
@@ -58,19 +64,29 @@ are not synchronized between the local and the remote system.  Binary files are.
 for more information.  See <a href="#prefs">Sync Preferences </a> for information on how to modify the default behavior 
 for subsequent new synchronized projects.
 <p>
-Select <b>Next</b> to scroll through the remaining pages, which differ based on the selected project types and toolchains.
-At some point, you should see the configuration page, which will list a separate build configuration for each toolchain selected earlier.
+At this point you may select <b>Finish</b> to complete project setup with defaults for the
+remainder of the options.
+<p>Alternatively, you may 
+select <b>Next</b> to scroll through the remaining pages, which differ based on the selected project types and toolchains.
+This includes the configuration page, which will list a separate build configuration for each toolchain selected earlier.
 <p><br></p>
+<!-- <p><img src="images/sync-newprojConfig.png"> -->
 <p><img src="images/sync-newprojConfig.png">
 <p><br></p>
 From here, you can configure build properties. (This can also be done after the project is created.)
 Note that if you select the same toolchain for both local and remote, only one configuration is shown.
 During project creation, this configuration will be duplicated, creating one for local and another for remote.
-
+<p>
+If you then select <b>Next ></b> instead of <b>Finish</b>, the <b>Default Build Configurations</b> page appears.
+<p><img src="images/sync-build-config.png"></p>
+<p>&nbsp;
+<p>Select <b>Finish</b> to end the New Project Wizard.
+<p>&nbsp
 <h3 id="connection">Creating a remote connection</h3>
 On the first wizard page, the <b>New...</b> button can be used to create a new remote connection.
 Fill in host name, user, and password (or other authentication information).
-Select <b>Finish</b>.  The connection will be tested at this point.
+Select <b>Finish</b>.  The connection is not tested until you return to the previous dialog
+and select the <b>Browse...</b> button or some other communication is required.
 <p><br></p>
 <p><img src="images/sync-newprojConnection.png">
 <p>Note: To edit connection information after a connection has been created, e.g. to change user name or password, see
@@ -89,17 +105,55 @@ If you create or delete files, the remote system will be updated appropriately.
 By default, a synchronized project is configured to build on the same remote host as for synchronization.
 To build the project (assuming you have already created a makefile), make sure the project is selected in the <b>Project Explorer</b> view, then click
 on the build icon (the icon that looks like a hammer). The Console view shows the results of the build.
+For more examples of creating and building a simple new Synchronized project, see
+<a href="01buildMPIprog.html">Introduction to Creating MPI Projects</a>.
 </p>
+For more details see <a href="build.html">C/C++ Project Properties and Build Configurations</a>
 <p>
+
+
+<!--  -->
+<!--  -->
+<!--  -->
+<p>=================</p>
+<p>=================</p>
+<p>=================</p>
+<p>=================</p>
+
+<p>Projects can have multiple build configurations. 
+Each configuration specifies a different set of options for a build.
+Within the Project Properties page for Synchronize, select the <b>Configuration:</b> dropdown box to view and change settings for the
+other configurations.
+The active configuration can be selected from the sundial menu on the main workbench
+toolbar, or from the <b>Manage Configurations...</b> button here, which brings up
+a dialog to set the active configuration or add, edit, or delete build configurations.
+<p><img src="images/sync-manageConfigs.png"></p>
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<p> Back to original topics...
+<p> Back to original topics...
+<p> Back to original topics...
+<p> Back to original topics...
+<h3>Back to original topics...</h3>
 Synchronization and building are done between the local workspace and the active configuration.
-You can change the active configuration by using the "sundial" icon next to the build icon, or build and switch simultaneously using the arrow next to the build icon.
+You can change the active configuration by using the "sundial" icon next to the build icon.
+<p><img src="images/sync-selectConfiguration.png"></p>
+Or you can build and switch simultaneously using the arrow next to the build icon.
+<p><img src="images/sync-selectConfigAndBuild.png"></p>
+
 Local configurations have sync disabled initially and build in the Eclipse workspace.
 </p>
 <p>
-You can create configurations to synchronize and build on other remote systems from the <b>C/C++ Build > Synchronize</b> in project properties.
+You can create configurations to synchronize and build on other remote systems from the 
+<b>Synchronize</b> page in project properties.
 To bring up the Synchronize project properties, in the <b>Project Explorer</b> view, select the project and choose <b>Properties</b> from the context
 menu (right click).
-You can also use these property pages to modify configurations in general. See the CDT documentation for more details.
+<p>On the Synchronize page of Project Properties, the build configuration can be set
+for each Sync configuration.
 </p>
 <p><img src="images/sync-projProperties.png">
 
@@ -110,7 +164,7 @@ See "<a href="#file-filter">Sync Filtering: Changing which files are synchronize
 <p><img src="images/sync-contextMenu.png">
 
 <h2 id="file-filter">Sync Filtering: Changing which files are synchronized</h2>
-<!-- need the word FILTER On the dialog itself ? -->
+<!-- FIXME screenshots need to be updated -->
 <p>Some files do not need to be synchronized between local and remote locations. 
 For example, binaries may not be of use on the local machine (and may be large and slow to replicate), but source files usually are
 since they are usually edited from the local Eclipse workbench but used to build on the remote target system. 
