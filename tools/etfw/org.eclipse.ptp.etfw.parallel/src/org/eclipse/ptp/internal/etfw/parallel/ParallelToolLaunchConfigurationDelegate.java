@@ -79,6 +79,8 @@ public class ParallelToolLaunchConfigurationDelegate extends ParallelLaunchConfi
 
 			final IFileStore pdir = EFS.getLocalFileSystem().getStore(new Path(progPath));
 			final IFileStore prog = pdir.getChild(progName);
+			
+			verifyProject(configuration);
 
 			wc.setAttribute(EXTOOL_EXECUTABLE_NAME, prog.toURI().getPath());// Path+File.separator+progName
 			wc.setAttribute(EXTOOL_PROJECT_NAME, projName);
