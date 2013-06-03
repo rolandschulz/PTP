@@ -106,6 +106,42 @@ public class GitRemoteSyncConnection {
 	private final Map<IPath, String[]> FileToMergePartsMap = new HashMap<IPath, String[]>();
 	private int remoteGitVersion;
 
+	// Static storage for each project's local Git repository (one repo per project)
+	private static Map<IProject, Repository> projectToRepoMap = new HashMap<IProject, Repository>();
+
+	/**
+	 * Get the local Git repository for the given project, creating it if necessary.
+	 *
+	 * @param project
+	 * @param localDirectory
+	 * 				project location on local host
+	 * @return new local Git repository - should never be null.
+	 * @throws IOException
+	 */
+	public static Repository getLocalRepo(IProject project, String localDirectory) throws IOException {
+		if (projectToRepoMap.containsKey(project)) {
+			return projectToRepoMap.get(project);
+		} else {
+			Repository repository = createLocalRepo(project, localDirectory);
+			projectToRepoMap.put(project, repository);
+			return repository;
+		}
+	}
+
+	private static Repository createLocalRepo(final IProject project, String localDirectory) throws IOException {
+		final File localDir = new File(localDirectory);
+		final FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
+		File gitDirFile = new File(localDirectory + File.separator + gitDir);
+		Repository repository = repoBuilder.setWorkTree(localDir).setGitDir(gitDirFile).build();
+
+		// Create and configure local repository if it is not already present
+		if (!(gitDirFile.exists())) {
+			repository.create(false);
+		}
+
+		return repository;
+	}
+
 	/**
 	 * Create a remote sync connection using git. Assumes that the local
 	 * directory exists but not necessarily the remote directory. It is created
@@ -206,24 +242,16 @@ public class GitRemoteSyncConnection {
 			MissingConnectionException {
 		final RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
 		try {
-			final File localDir = new File(localDirectory);
-			final FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
-			File gitDirFile = new File(localDirectory + File.separator + gitDir);
-			Repository repository = repoBuilder.setWorkTree(localDir).setGitDir(gitDirFile).build();
-			git = new Git(repository);
-
-			// Create and configure local repository if it is not already present
-			if (!(gitDirFile.exists())) {
-				repository.create(false);
-
-				// An initial commit to create the master branch.
-				subMon.subTask(Messages.GitRemoteSyncConnection_22);
-				doCommit(subMon.newChild(4));
-			}
+			subMon.subTask(Messages.GitRemoteSyncConnection_1);
+			git = new Git(getLocalRepo(project, localDirectory));
+			
+            // An initial commit to create the master branch.
+            subMon.subTask(Messages.GitRemoteSyncConnection_22);
+            doCommit(subMon.newChild(4));
 
 			// Refresh project
 			subMon.subTask(Messages.GitRemoteSyncConnection_23);
-			final Thread refreshThread = this.doRefresh(subMon.newChild(1));
+			final Thread refreshThread = doRefresh(project, subMon.newChild(1));
 
 			// Set git repo as derived, which can only be done after refresh completes.
 			// This prevents user-level operations, such as searching, from considering the repo directory.
@@ -1028,7 +1056,7 @@ public class GitRemoteSyncConnection {
 			throw new RemoteSyncException(e);
 		}
 
-		this.doRefresh(null);
+		doRefresh(project, null);
 	}
 
 	/**
@@ -1049,13 +1077,13 @@ public class GitRemoteSyncConnection {
 			throw new RemoteSyncException(e);
 		}
 
-		this.doRefresh(null);
+		doRefresh(project, null);
 	}
 
 	// Refresh the workspace after creating new local files
 	// Bug 374409 - run refresh in a separate thread to avoid possible deadlock from locking both the sync lock and the
 	// workspace lock.
-	private Thread doRefresh(final IProgressMonitor subMon) {
+	private static Thread doRefresh(final IProject project, final IProgressMonitor subMon) {
 		Thread refreshWorkspaceThread = new Thread(new Runnable() {
 			@Override
 			public void run() {

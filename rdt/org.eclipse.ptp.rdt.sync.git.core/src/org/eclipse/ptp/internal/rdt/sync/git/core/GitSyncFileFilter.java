@@ -17,6 +17,9 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.NoFilepatternException;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jgit.dircache.DirCache;
 import org.eclipse.jgit.dircache.DirCacheIterator;
 import org.eclipse.jgit.ignore.IgnoreNode;
@@ -26,6 +29,7 @@ import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.treewalk.FileTreeIterator;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.treewalk.filter.IndexDiffFilter;
+import org.eclipse.ptp.internal.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
@@ -40,9 +44,15 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		return projectToFilterMap.get(project);
 	}
 
-	public static void setFilter(IProject project, AbstractSyncFileFilter filter) {
-		// TODO: Figure out how to convert filter to a Git filter.
-		projectToFilterMap.put(project, filter);
+	public static void setFilter(IProject project, AbstractSyncFileFilter filter, Repository repository) {
+		GitSyncFileFilter newGitFilter = new GitSyncFileFilter(repository, project);
+		newGitFilter.clone(filter);
+		try {
+			newGitFilter.saveFilter();
+		} catch (IOException e) {
+			RDTSyncCorePlugin.log("Unable to save file filter for project " + project.getName(), e);
+		}
+		projectToFilterMap.put(project, newGitFilter);
 	}
 
 	private Repository repository;

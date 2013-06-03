@@ -26,6 +26,7 @@ public class Messages extends NLS {
 	public static String GSP_ChangeConnectionError;
 	public static String GSP_ChangeLocationError;
 	public static String GitRemoteSyncConnection_0;
+	public static String GitRemoteSyncConnection_1;
 	public static String GitRemoteSyncConnection_10;
 	public static String GitRemoteSyncConnection_11;
 	public static String GitRemoteSyncConnection_12;
@@ -64,6 +65,7 @@ public class Messages extends NLS {
 	public static String GitServiceProvider_7;
 	public static String GitServiceProvider_8;
 	public static String GitServiceProvider_9;
+	public static String GitSyncService_0;
 	public static String CommandRunner_0;
 	public static String CommandRunner_1;
 	public static String CommandRunner_3;

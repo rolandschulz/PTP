@@ -11,6 +11,7 @@
 package org.eclipse.ptp.internal.rdt.sync.git.core;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -31,6 +32,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.ptp.internal.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.internal.rdt.sync.git.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.RecursiveSubMonitor;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
@@ -115,8 +118,6 @@ public class GitSyncService extends AbstractSynchronizeService {
 
 	private final Map<ProjectAndScenario, GitRemoteSyncConnection> syncConnectionMap = Collections
 			.synchronizedMap(new HashMap<ProjectAndScenario, GitRemoteSyncConnection>());
-
-	private AbstractSyncFileFilter fileFilter = null;
 
 	public GitSyncService(ISynchronizeServiceDescriptor descriptor) {
 		super(descriptor);
@@ -476,6 +477,15 @@ public class GitSyncService extends AbstractSynchronizeService {
 
 	@Override
 	public void setSyncFileFilter(IProject project, AbstractSyncFileFilter filter) {
-		GitSyncFileFilter.setFilter(project, filter);
+		Repository repository;
+		try {
+			repository = GitRemoteSyncConnection.getLocalRepo(project, project.getLocation().toString());
+		} catch (IOException e) {
+			RDTSyncCorePlugin.log("Unable to save file filter for project " + project.getName(), e);
+			return;
+		}
+		assert repository != null : Messages.GitSyncService_0;
+		GitSyncFileFilter.setFilter(project, filter, repository);
+		
 	}
 }
