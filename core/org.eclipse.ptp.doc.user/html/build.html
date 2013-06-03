@@ -1,29 +1,42 @@
 <html>
 <head>
-<title>Build</title>
+<title>Building Synchronized Projects</title>
 <link rel="stylesheet" type="text/css" href="help.css">
 <script type="text/javascript" src="thumb.js"> </script>
 </head> 
 <body>
-<h1 id="top">C/C++ Project Properties and Build Configurations</h1>
+<h1 id="top">Building Synchronized Projects</h1>
 <!--  FIXME  this may need some work. Most of the content taken from SciComP slides and may replace
 some info in sync.html and modules.html  -->
 <p>This section discusses
 <ul>
-<li>Build Configurations
-<li>Sync Configurations
-<li>Environment Management (e.g. with Modules)
+<li><a href="#buildConfig">Build Configurations</a>
+<li><a href="#selectBuildConfig">Selecting a Build Configuration</a>
+<li><a href="#build">Building</a>
+<li><a href="#syncConfig">Sync Configurations<a>
+<li><a href="#envMgmt">Environment Management </a>(e.g. with Modules)
 </ul>
-
+<h2 id="buildConfig">Build Configurations</h2>
 <p>A build configuration provides the necessary information to build the project.
+<p>A synchronized project may have both a local and remote build configuration, 
+or it may have only a build configuration for the remote target.
+If both local and remote toolchains were specified when the project was created, 
+the remote build configuration will usually be the default.
 <p>The build configuration information is specified in the project properties.
-<p>Open the project properties by right-clicking on the project name in the
+<p>Open the 
+<a href="misc.html#projProps">Project Properties</a>
+by right-clicking on the project name in the
 <b>Project Explorer</b> view and selecting <b>Properties</b> from the bottom of the
 context menu list.
+<p>The project properties dialog for the project appears.
+<p>Select <b>C/C++ Build</b> to view the <b>Build Properties</b> for the project.
 <p><img src="images/sync-buildConfig.png"></p>
+
+<p>The build <b>Configuration</b> can be selected at the top of this page.  The following pages can be selected
+on the left side of the dialog: 
 <p><b>C/C++ Build</b> - the main properties page for build.  Allows you to configure the build command.
 The default build command is "make" but this can be changed to anything.
-The properties listed under <b>C/C++ Build </b> include:
+<p>The other pages listed under <b>C/C++ Build </b> include:
 <ul>
 <li><b>Build Variables</b> - create and manage variables that can be used in other build configuration pages
 <li><b>Discovery Options</b> - obsolete options page for discovering compiler settings
@@ -40,7 +53,7 @@ The properties listed under <b>C/C++ Build </b> include:
 <li><b>XL C/C++ Compiler</b> - Compiler settings for XL C/C++ compilers (if installed)
 </ul>
 
-<h2>Selecting a Build Configuration</h2>
+<h2 id="selectBuildConfig">Selecting a Build Configuration</h2>
 <p>Multiple build configurations may be available for a project.
 Synchronized projects will usually have a remote and a local build configuration
 (the local build configuration is optional).
@@ -48,46 +61,58 @@ Build configurations can be specified for different architectures on different r
 <p>The active build configuration will be used when the build button 
 <img src="images/01sync-hammer-icon.png">
 is selected.
-
-You can change the active configuration by using the "sundial" icon next to the build icon.
-<p><img src="images/sync-selectConfiguration.png"></p>
-Or you can build and switch simultaneously using the arrow next to the build icon.
-build-set-config.png
+<p>You can build and switch simultaneously using the arrow next to the build icon.
+<p><img src="images/sync-selectConfigAndBuild.png"></p>
+Or you can change the active configuration only by using the "sundial" icon next to the build icon.
+<p><img src="images/sync-selectConfiguration.png"></p> 
 
 <p>You can also use the <b>Build Configurations</b> project context menu to change
 the active configuration.  To do so, right click on the project, select 
 <b>Build Configurations > Set Active > </b> and select the desired build configuration.
 <p><img src="images/build-set-config.png"></p>
 
-<h2>Building Synchronized Projects</h2>
-<p>Build configurations and syncronize configurations are independent.
+<h2 id="build">Building Synchronized Projects</h2>
+<p>Build configurations and synchronize configurations are independent.
 <p>When the build button
 <img src="images/01sync-hammer-icon.png">
 is selected, the <b>active <i>build</i> configuration</b> will be built on the remote system specified by the
-<b>active <i>synchronize</i> configuration</b>.
+<b>active <i>synchronize</i> configuration</b>.  
+<p>The result can be viewed in the <b>Console</b> view.
+<p><img src="images/build-console.png"></p>
 <p>It is possible to change which build configuration is active, but make sure 
 this makes sense on the remote system specified in the
 synchronize configuration.
 <p>A build configuration can be associated with a synchronize configuration,
 so that it is automatically selected when the synchronize configuration is changed.
 
-
-<p>On the Synchronize page of Project Properties, the build configuration can be set
-for each Sync configuration.
-</p>
-<p><img src="images/sync-projProperties.png">
-<p>&nbsp
-<p>This can also be done via right mouse on project in <b>Project Explorer</b>,
-select <b>Synchronize > Manage ...</b>
+<h2 id="syncConfig">Sync Configurations</h2>
+<p>With synchronize configurations (sync configurations, or sync configs for short), the build configuration can be set independently for each location where the project
+can be built.
+<p>Sync Configurations 
+can be located from both
+	<ul>
+		<li>the Synchronize context menu on the project within Project
+			Explorer and
+		<li>the <a href="misc.html#projProps">Project Properties</a> dialog.
+	</ul>
+	<p>To access Sync configurations from the project context menu, use the right mouse on the project in <b>Project Explorer</b>,
+and select <b>Synchronize > Manage ...</b>
 <p><img src="images/build-sync-manage.png"></p>
 <p>This brings up the <b>Manage Synchronize Configurations</b>
 dialog.
 <p><img src="images/build-sync-manage-dialog.png">
+<p>The same information can be accessed on the <b>Synchronize</b> page of 
+<a href="misc.html#projProps">Project Properties</a>.
 
-<h3 id="envMgmt">Environment Management</h3>
+<p>The top area lists sync configs which indicate different locations the project can be built.
+Select a sync config and the default build configuration is listed beneath it under
+<b>CDT Build Configuration</b>
+</p>
+<p><img src="images/sync-projProperties.png">
+<h2 id="envMgmt">Environment Management</h3>
 <p>If the remote system has an environment system (such as Modules)
 installed, a custom set of modules can be configured for building C/C++ projects.
-<p>In the <b>Manage Synchronize Configurations</b>
+<p>In the <a href="#syncConfig"><b>Manage Synchronize Configurations</b></a>
 dialog,
 select the configuration you wish to change at the top, then check
 <b>Use an environment management system to customize the remote build environment</b>.
@@ -103,7 +128,7 @@ list.
 <p>Use the <b>Filter list</b> field to quickly find modules with a given name.
 <p>Use the <b>Up</b> and <b>Down</b> buttons to change the order of the
 <b>Selected Modules</b>.
-<p>Click <b>Select Default</b> to load only those modules that are present
+<p>Click <b>Set Default</b> to load only those modules that are present
 in a new login shell.
 <h3>Building with Modules</h3>
 <p>To build the project, Eclipse will
@@ -118,7 +143,7 @@ in a new login shell.
 common paths like <code>/bin</code> or <code>/usr/bin</code>.
 <p><img src="images/build-sync-manage-env-console.png"></p>
 
-<a href="sync.html">Synchronized projects</a>
+<p>For more details see <a href="sync.html">Synchronized projects</a>.
 
 
 

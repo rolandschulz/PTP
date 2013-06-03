@@ -262,9 +262,13 @@ corresponding source files will be flagged, and markers will be inserted into th
 <li><p>Details of the commands that were executed to complete the build can be seen in the <b>Console 
 view</b> (click on the <b>Console</b> tab near the bottom right hand corner of the Eclipse 
 workbench.)</p></li>
+<p>
 <li>Note: this project assumes that the command <b>mpicc</b> will build an MPI program on your system.
-If your MPI build command is different, you can access the Project Properties (right mouse on project name in Project Explorer
-and select <b>Properties</b>, then select <b>C/C++ Build > Settings </b> and on the <b>GCC C Compiler</b>
+If your MPI build command is different, you can access the 
+<a href="misc.html#projProps">Project Properties</a> to view or change it.
+</a>
+
+<p>To change the MPI command, in the project properties, select <b>C/C++ Build > Settings </b> and on the <b>GCC C Compiler</b>
 tree item, change the <b>Command:</b> string from mpicc to whatever your MPI build command may be.
 )
 </li>

@@ -14,7 +14,7 @@ build config / sync config info is in build.html, perhaps some of this can be re
 <li><a href="#create">Creating a new Synchronized Project</a>
 <li><a href="#work">Working with a Synchronized Project</a>
 <li><a href="#context-menu">Changing sync behavior with the Sync Context Menu</a>
-<li><a href="#file-filter">Changing which files are synchronized with Sync Filtering</a>
+<li><a href="#file-filter">Changing which files are synchronized with File Filtering</a>
 <li><a href="#conversion-wizard">Converting a project to a Synchronized Project</a>
 <li><a href="#merge-conflict">Resolving merge conflicts</a>
 <li><a href="#remote-discovery">Discovering the remote environment (remote includes and code analysis)</a>
@@ -31,7 +31,7 @@ connection is lost.
 <p>
 <h2 id=prereq>Requirements for Synchronized Projects</h2>
 <p>To host a synchronized project, the remote system must support the <a href="http://git-scm.com/">Git</a> distributed version control system.
-
+Note that this is completely independent of using <a href="http://git-scm.com/">Git</a> for source code control.
 <h2 id=create>Creating a new Synchronized Project</h2>
 <p>To create a new Synchronized Project, first select an appropriate wizard:</p>
 Select <b>File > New > Other...</b>
@@ -60,7 +60,8 @@ Normally, you will select only one toolchain for each, but it is possible to sel
 <p>File filtering specifies which files will be synchronized between the local machine and the remote target.
 The default can be altered for this new project
 via the <b>Modify File Filtering...</b> button.  By default, eclipse-related files such as <code>.project</code>
-are not synchronized between the local and the remote system.  Binary files are.  See <a href="#file-filter">Sync Filtering</a>
+are not synchronized between the local and the remote system.  Binary files are.  
+See <a href="#file-filter">File Filtering</a>
 for more information.  See <a href="#prefs">Sync Preferences </a> for information on how to modify the default behavior 
 for subsequent new synchronized projects.
 <p>
@@ -105,134 +106,143 @@ If you create or delete files, the remote system will be updated appropriately.
 By default, a synchronized project is configured to build on the same remote host as for synchronization.
 To build the project (assuming you have already created a makefile), make sure the project is selected in the <b>Project Explorer</b> view, then click
 on the build icon (the icon that looks like a hammer). The Console view shows the results of the build.
-For more examples of creating and building a simple new Synchronized project, see
+<p>For more examples of creating and building a simple new Synchronized project, see
 <a href="01buildMPIprog.html">Introduction to Creating MPI Projects</a>.
 </p>
-For more details see <a href="build.html">C/C++ Project Properties and Build Configurations</a>
+For more details see <a href="build.html">Building Synchronized Projects</a>
 <p>
-
-
-<!--  -->
-<!--  -->
-<!--  -->
-<p>=================</p>
-<p>=================</p>
-<p>=================</p>
-<p>=================</p>
 
 <p>Projects can have multiple build configurations. 
-Each configuration specifies a different set of options for a build.
-Within the Project Properties page for Synchronize, select the <b>Configuration:</b> dropdown box to view and change settings for the
-other configurations.
-The active configuration can be selected from the sundial menu on the main workbench
-toolbar, or from the <b>Manage Configurations...</b> button here, which brings up
-a dialog to set the active configuration or add, edit, or delete build configurations.
-<p><img src="images/sync-manageConfigs.png"></p>
-<!--  -->
-<!--  -->
-<!--  -->
-<!--  -->
-<!--  -->
-<!--  -->
-<p> Back to original topics...
-<p> Back to original topics...
-<p> Back to original topics...
-<p> Back to original topics...
-<h3>Back to original topics...</h3>
-Synchronization and building are done between the local workspace and the active configuration.
-You can change the active configuration by using the "sundial" icon next to the build icon.
-<p><img src="images/sync-selectConfiguration.png"></p>
-Or you can build and switch simultaneously using the arrow next to the build icon.
-<p><img src="images/sync-selectConfigAndBuild.png"></p>
-
-Local configurations have sync disabled initially and build in the Eclipse workspace.
-</p>
+Each build configuration specifies a different set of options for a build.
+Build configurations and synchronize configurations are independent. 
+A build configuration can be associated with a synchronize configuration, so that it is
+automatically selected when the synchronize configuration is changed.
 <p>
-You can create configurations to synchronize and build on other remote systems from the 
-<b>Synchronize</b> page in project properties.
-To bring up the Synchronize project properties, in the <b>Project Explorer</b> view, select the project and choose <b>Properties</b> from the context
-menu (right click).
-<p>On the Synchronize page of Project Properties, the build configuration can be set
-for each Sync configuration.
-</p>
-<p><img src="images/sync-projProperties.png">
+For more information on build configurations, sync configurations, etc. see
+<a href="build.html#syncConfig">Sync Configurations</a> on the 
+<a href="build.html">Building Synchronized Projects</a> page.
 
 <h2 id="context-menu">Changing sync behavior with the Sync Context Menu</h2>
-<p>The sync context menu lets you alter the sync behavior and can be accessed with a right click on a sync project. From this menu, you can turn off automatic sync'ing (sync after saving files and other resource changes) so that syncs only occur on request. This setting is applied to all projects in the workspace. The "Project Auto-Sync Settings" submenu allows you to alter the behavior of automatic sync'ing per project. The next two selections allow you to force an immediate sync of the current project. A "sync all" syncs all configurations of a project. Note that this can be quite slow if your project has several configurations. Prior to a build, files are always updated with a forced sync of only the active configuration, regardless of any settings. This ensures that the build is based on the latest revisions. Another sync may occur after the build to update files, since the build may alter the remote files during compilation. (This sync, however, does respect the user's settings.) 
-See "<a href="#file-filter">Sync Filtering: Changing which files are synchronized</a>" for information on the "Filter..." option.
+<p>The sync context menu lets you view or alter several properties related to the sync behavior.
+To access the sync context menu, right-click on the project in the <b>Project Explorer</b> view and 
+move down to the <b>Synchronize</b> sub-menu.
+<p><img src="images/sync-contextMenu.png"></p>
+<p>
+From this menu, you can force a synchronization immediately for the active configuration,
+Set the active configuration, Manage configurations (sync configurations and their associated build configurations),
+force a sync of all the configs, etc.
+<b>Auto-sync (Global)</b> and <b>Auto-sync Settings</b> allow you to alter the behavior of automatic sync'ing
+for all projects or per project.
+<p> 
+Prior to a build, files are always updated with a forced sync of only the active configuration, regardless of any settings. This ensures that the build is based on the latest revisions. Another sync may occur after the build to update files, since the build may alter the remote files during compilation. (This sync, however, does respect the user's settings.) 
+See "<a href="#file-filter">File Filtering: Changing which files are synchronized</a>" for information on the "Filter..." option.
 
-<p><img src="images/sync-contextMenu.png">
 
-<h2 id="file-filter">Sync Filtering: Changing which files are synchronized</h2>
-<!-- FIXME screenshots need to be updated -->
-<p>Some files do not need to be synchronized between local and remote locations. 
+
+<h2 id="file-filter">File Filtering: Changing which files are synchronized</h2>
+<p>By default, all files are usually synchronized.
+<p>But some files do not need to be synchronized between local and remote locations. 
 For example, binaries may not be of use on the local machine (and may be large and slow to replicate), but source files usually are
 since they are usually edited from the local Eclipse workbench but used to build on the remote target system. 
 <p>From the "Filter..." option of the <a href="#context-menu">sync context menu</a>,
-you can change which files are synchronized for the current project. You can also change the default settings for future projects on the 
+<p><img src="images/sync-filter-menu.png"></p>
+you can change which files are synchronized for the current project. 
+
+You can also change the default settings for future projects on the 
 <a href="#prefs">Synchronized Project preference page</a>. 
-For files and folders, "Exclude Selection" and "Include Selection" shortcut options are also available from the context menu. 
-By default, files and directories specifically used by Eclipse are excluded. (Note that these files, such as <code>.project</code> and <code>.project</code> etc.  are normally not visible.)
+By default, files and directories specifically used by Eclipse are excluded from synchronization. 
+(Note that these files, such as <code>.project</code> and <code>.project</code> etc.  are normally not visible.)
 <p>Sync filtering information is accessible in three places:
 <ol>
-<li>The sync filter dialog for existing projects (shown below)
-shows settings and what it does to files in the currently selected existing project
+<li>The <b>Configure Synchronize Project Filters</b> dialog (sync filter dialog) for existing projects, available from the sync context menu shown above,
+is shown below.  It shows settings and what it does to files in the currently selected existing project
 <li>The <b>File Filters</b> popup dialog from the 
 <a href="#new-sync-proj">new synchronized project dialog</a> (from the <b>Modify File Filtering...</b> button)
 allows setting sync filter settings as a project is created, and 
 <li>The <href="#sync-prefs">Sync Filters Preference page</href> sets defaults that will be used in new projects.
 </ol>
-<p>There are three parts to the sync filter dialog for an existing project:
+<p>Parts of the <b>Configure Synchronize Project Filters</b> dialog for an existing project:
 <ul>
-<li>The <b>File View</b> always indicates the currently excluded and included directories and files - based on the patterns and selections beneath it. 
+<li>The <b>files/folders</b> list at the top indicates the currently excluded and included directories and files 
+for the currently selected project
+- based on the patterns and selections beneath it. 
 (Not included on the <a href="#prefs">Sync Preferences</a> page.)
-<li>The <b>Pattern View</b> always shows the current exclude and include patterns.
-<li>Finally the bottom portion of the dialog allows you to enter additional patterns, files, and paths to include or exclude from synchronization,
-and the results will be shown above it in the dialog.
+<li>The <b>Patterns</b> area near the bottom shows the current exclude and include patterns. Patterns
+can be added, editing, or removed.  The reulsts will be shown above in the files/folders list.
 </ul>
+<p><img src="images/sync-filter-dialog.png">
 <p>
-Each view updates automatically if the other view is changed, so that they are always in agreement. 
+Each part of the dialog updates automatically if the other part is changed, so that they are always in agreement. 
 This allows you to see immediately the effect of adding a new pattern. 
 By default, remote files are not shown. Showing remote files may lead to a slower response time while updating views. 
-An error message is printed if the remote is disconnected.
+Check <b>Show remote files</b> if you wish to view them.
+An error message is printed if the remote system is disconnected.
 <p>
-You can deselect or select directories or files in the <b>File View</b>, which will add the corresponding exclude or include pattern to the <b>Pattern View</b>. 
+You can select or deselect directories or files in the <b>files/folders</b> list, which will add the corresponding 
+exclude or include pattern to the <b>Patterns</b> area. 
 These are "path" patterns, meaning that directories or files in the specified path are excluded or included. 
-Underneath the <b>Pattern View</b>, you can manually enter a path (Enter Path:). You can also enter a regular expression ("regex") that is compared to the project-relative path. 
-The regular expression syntax is that of the Java programming language. An error message is printed if the regular expression is not valid. 
-<!--Finally, you can select "special" patterns from the "Select pattern" drop-down. Currently the only special pattern is one for matching binary files.
-  -->
-Lastly, you can also enter a simple wildcard pattern ("Enter Wildcard:").
+In the <b>Patterns</b> area, you can enter paths, regular expressions, and wildcard patterns.
+<p>To enter a new pattern, select the <b>Add...</b> button. 
+The <b>Add Pattern</b> dialog appears.
+<p><img src="images/sync-filter-add-dialog.png"></p>
+<p>In the <b>Pattern:</b> field, enter a path, a regular expression ("Regex") or a simple Wildcard (e.g. <code>*.o</code>) 
+that is compared to the project-relative path. Select the radio button beneath the <b>Pattern:</b> field
+to indicate the type of pattern.
+The regular expression syntax is that of the Java programming language. 
+An error message is printed if the regular expression is not valid. 
+
 <p>
-Patterns are applied in the order given in the <b>Pattern View</b>, and new patterns are always placed at the top (highest priority). 
+Patterns are applied in the order given in the patterns area of the 
+<b>Configure Synchronize Project Filters</b> dialog. New patterns are  placed at the top (highest priority). 
 So a file will be excluded or included based on the first matching pattern, or included if no pattern matches. 
-Use the "Up" and "Down" buttons to change a pattern's priority. 
+Use the "Move Up" and "Move Down" buttons to change a pattern's priority. 
 If a new pattern is identical to an old pattern and has the same type, the old pattern is removed. 
 Note that it doesn't matter whether the old pattern was an exclude or include pattern, since the new pattern supersedes it.
 
-<p><img src="images/sync-fileExcludeIncludeList.png">
-<p>To enter a new pattern of file(s) to exclude from synchronization, for example, enter the pattern <code>*.o</code> into the <b>Enter Wildcard:</b> field
-and hit the <b>Exclude</b> button, the "minus-sign" button.  To force inclusion of a file or pattern in the synchronization, 
-for example, to override a more general pattern, use the "plus-sign" button to <b>Include</b> the file or pattern..
-<!-- fixme fix this image -->
-<br><img src="images/sync-exclude-include-buttons2.png" >
-<p>The file is changed to unchecked in the <b>File View</b> and the wildcard pattern is added to the <b>Pattern View</b>.
-<br><img src="images/sync-fileExcludeIncludeList_mod.png">
+<p>For example, to exclude <code>*.o</code> files from synchronization 
+(e.g. they are built on the remote system but you do not want them copied back to the local directory),
+Select the <b>Add...</b> button in the patterns area of the <b>Configure Synchronize Project Filters</b> dialog.
+<p>Type <code>*.o</code> in the pattern field and select <b>Wildcard</b> for the pattern Matcher type,
+and <b>Exclude</b> for the <b>Pattern Type</b>.
+<p><img src="images/sync-filter-add-dialog-dot-o.png"></p>
+<p>Then select the <b>OK</b> button.  The new filter will appear in the patterns area of the 
+<b>Configure Synchronize Project Filters</b> dialog, and the <code>*.o</code> files are no longer checked
+in the files/folders area.
+<p><img src="images/sync-filter-add-dialog-dot-o-results.png"></p>
+<p>You can move the priority down, edit the pattern, etc. with the buttons.
+<p>
 <p>Hit <b>OK</b> to save any changes you have made to the sync filtering.
 
 <h2 id="conversion-wizard">Converting a project to a Synchronized Project</h2>
 <p>
 The conversion wizard allows you to convert current C/C++ or Fortran projects to synchronized projects. 
-Currently only local projects can be converted. To convert a project right-click in the workspace and select <b>New > Other...</b> In the wizard selection dialog, select <b> Remote > Convert C/C++ or Fortran Project to a Synchronized Project > Next</b>. From this dialog, you can select a project to convert and configure a remote site. See <a href="#connection">Creating a remote connection</a> for details on creating new connections. The selected configurations are duplicated to create a local version and a remote version. Unselected configurations remain as local configurations only. After creating the project, you may want to change the toolchain for the remote configurations. You can do this from <b>Project > Properties > C/C++ Build > Tool Chain Editor</b>. <b>After selecting a toolchain, you must change the current builder back to the "Sync Builder" in order for builds to occur remotely.</b>
-</p>
-<p>Note that in order to have a project appear in the list of projects to convert to synchronized, the project must already be a C/C++ or Fortran project.
-<table cellpadding="5" cellspacing="5" border="0">
-<tr>
-<td><img src="images/sync-selectConversionWizard.png"></td>
-<td><img src="images/sync-conversionWizard.png"></td>
-</tr>
-</table>
+Currently only local projects can be converted. 
+To convert a project, right-click in the <b>Project Explorer</b> view and select <b>New > Other...</b> 
+In the wizard selection dialog, select <b> Remote > Convert to Synchronized Project</b> and select <b>Next></b>.
+<p><img src="images/sync-selectConversionWizard.png"></p>
 
+<p>
+From this dialog, you can select a project to convert. 
+<p><img src="images/sync-conversionWizard.png"><p>
+<p>Select a local project to convert it to a synchronized project.
+Select a connection (or <a href="remoteTools.html#create"></a>create a new connection</a>.)
+<p>Select <b>Next></b> and in the next dialog, select the Build Configurations for each Sync Configuration
+to be duplicated on the remote system.
+<p><img src="images/sync-conversionWizard2.png"><p>
+<p>Select <b>Finish</b> and the project is synchronized (copied) to the remote system specified by the connection.
+<!-- 
+The selected configurations are duplicated to create a local version and a remote version. 
+Unselected configurations remain as local configurations only. 
+After creating the project, you may want to change the toolchain for the remote configurations. 
+You can do this from <b>Project > Properties > C/C++ Build > Tool Chain Editor</b>. 
+<b>After selecting a toolchain, you must change the current builder back to the "Sync Builder" in order for builds to occur remotely.</b>
+ -->
+ 
+<!--  
+<p>Note that in order to have a project appear in the list of projects to convert to synchronized, the project must already be a C/C++ or Fortran project.
+-->
+
+<!-- FIXME not changed after this. merge conflicts ok? -->
 <h2 id="merge-conflict">Resolving merge conflicts</h2>
 <p>
 A "merge conflict" can occur, in general, when merging two different versions of a file into a single version. There may be disagreement, for various reasons, on what the final version should be. For synchronized projects, merge conflicts do not occur during normal use, because the underlying system knows that local file changes are updates to older remote versions, or vice versa. Merge conflicts may occur, however, if files are changed both locally and remotely without an intervening sync, because the next sync may not know how to merge the two versions. (It is a good idea to sync after making remote changes before resuming work in Eclipse.) When a conflict is detected, the following dialog appears:
@@ -273,9 +283,11 @@ The list of discovered paths and macros can be found under the Entries tab on th
 <p>
 By default, the build output parser discovers entries per file. This can be changed under the provider's tab (see above figure). If discovery is per file, though, the list of includes and macros will be empty if accessed from the project menu or by right-clicking on the project or a folder and selecting "Properties." Instead, right-click on an individual file and select "Properties" to see the entries for that particular file.
 
+<!-- FIXME end not changed to here -->
 <h3 id="prefs">Sync Preferences</h3>
 <p>The preferences page for Synchronized projects includes setting defaults for sync filtering.
 <p><img src="images/sync-prefs.png">
+<p>See also <a href="07ptpPrefs.html">PTP Preferences</a>.
 <p>&nbsp;
 <h3>Tips</h3>
 <dl>
@@ -289,7 +301,7 @@ By default, the build output parser discovers entries per file. This can be chan
 
 <p>See also 
 <a href="http://wiki.eclipse.org/PTP/sync-projects">Synchronized Projects usage info on the PTP Wiki page</a>
-for information available after the PTP 6.0 release.
+for more information on synchronized projects.
 
 <p>&nbsp;<p>&nbsp;<p>&nbsp;
 
