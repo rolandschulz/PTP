@@ -21,6 +21,7 @@ public class Messages extends NLS {
 	public static String GRSC_GitInitFailure;
 	public static String GRSC_GitLsFilesFailure;
 	public static String GRSC_GitMergeFailure;
+	public static String GRSC_GitRemoveFilteredFailure1;
 	public static String GRSC_GitRmFailure;
 	public static String GSP_ChangeConnectionError;
 	public static String GSP_ChangeLocationError;

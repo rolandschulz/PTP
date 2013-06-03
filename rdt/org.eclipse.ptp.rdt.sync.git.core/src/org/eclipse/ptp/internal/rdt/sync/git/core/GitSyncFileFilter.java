@@ -7,12 +7,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.NoFilepatternException;
 import org.eclipse.jgit.dircache.DirCache;
 import org.eclipse.jgit.dircache.DirCacheIterator;
 import org.eclipse.jgit.ignore.IgnoreNode;
@@ -23,9 +27,12 @@ import org.eclipse.jgit.treewalk.FileTreeIterator;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.treewalk.filter.IndexDiffFilter;
 import org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter;
+import org.eclipse.ptp.rdt.sync.core.SyncConfig;
+import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 
 public class GitSyncFileFilter extends AbstractSyncFileFilter {
+	public static final String REMOTE_FILTER_IS_DIRTY = "remote_filter_is_dirty"; //$NON-NLS-1$
 	// Map of projects to file filters along with basic getter and setter methods. These static data and methods operate
 	// independently of the rest of the class and could be moved into a separate class if desired.
 	private static Map<IProject, GitSyncFileFilter> projectToFilterMap = new HashMap<IProject, GitSyncFileFilter>();
@@ -39,6 +46,7 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 	}
 
 	private Repository repository;
+	private IProject project;
 	
 	public class GitIgnoreRule extends AbstractIgnoreRule {
 		private org.eclipse.jgit.ignore.IgnoreRule rule;
@@ -88,8 +96,9 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		}
 	}
 	
-	GitSyncFileFilter(Repository repository) {
+	GitSyncFileFilter(Repository repository, IProject project) {
 		this.repository = repository;
+		this.project = project;
 	}
 	
 	@Override
@@ -117,6 +126,20 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		} finally {
 			out.close();
 		}
+		final RmCommandCached rmCommand = new RmCommandCached(repository);
+		for (String fileName : getIgnoredFiles()) {
+			rmCommand.addFilepattern(fileName);
+		}
+		try {
+			rmCommand.call();
+		} catch (NoFilepatternException e) {
+			new IOException(e);  //TODO: a bit ugly to wrap it into IOExcpetion
+		} catch (GitAPIException e) {
+			new IOException(e);
+		}
+		
+		for (SyncConfig config : SyncConfigManager.getConfigs(project))
+			config.setProperty(REMOTE_FILTER_IS_DIRTY, "TRUE"); //$NON-NLS-1$
 	}
 	
 	public void loadFilter() throws IOException {
@@ -146,11 +169,11 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 	}
 	
 	/* returns ignored files in the index */
-	public List<String> getIgnoredFiles() throws IOException {
+	public Set<String> getIgnoredFiles() throws IOException {
 		TreeWalk treeWalk = new TreeWalk(repository);
 		DirCache dirCache = repository.readDirCache();
 		treeWalk.addTree(new DirCacheIterator(dirCache));
-		List<String> ignoredFiles = new ArrayList<String>();
+		HashSet<String> ignoredFiles = new HashSet<String>();
 		int ignoreDepth = Integer.MAX_VALUE; //if the current subtree is ignored - than this is the depth at which to ignoring starts
 		while (treeWalk.next()) {
 			boolean isSubtree = treeWalk.isSubtree();
@@ -176,7 +199,7 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 	 * 
 	 * assumes that no files are in conflict (don't call during merge) 
 	 * */
-	public List<String> getDiffFiles() throws IOException {
+	public Set<String> getDiffFiles() throws IOException {
 		final int INDEX = 0;
 		final int WORKDIR = 1;
 		
@@ -188,7 +211,7 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		//would require a WorkingTreeIteraotr which does the ignore handing correct 
 		//(both directory including bugs 401161 and only using info/exclude not .gitignore)
 		treeWalk.setFilter(new IndexDiffFilter(INDEX, WORKDIR,false)); 
-		List<String> diffFiles = new ArrayList<String>();
+		Set<String> diffFiles = new HashSet<String>();
 		int ignoreDepth = Integer.MAX_VALUE; //if the current subtree is ignored - than this is the depth at which to ignoring starts
 		while (treeWalk.next()) {
 			DirCacheIterator dirCacheIterator = treeWalk.getTree(INDEX,
@@ -220,10 +243,10 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		final FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
 		File gitDirFile = new File(localDir + File.separator + args[1]); 
 		Repository repository = repoBuilder.setWorkTree(localDir).setGitDir(gitDirFile).build();
-		GitSyncFileFilter filter = new GitSyncFileFilter(repository);
+		GitSyncFileFilter filter = new GitSyncFileFilter(repository, null);
 		filter.loadFilter();
 		//List<String> files = filter.getIgnoredFiles();
-		List<String> files = filter.getDiffFiles();
+		Set<String> files = filter.getDiffFiles();
 		for (String path : files) 
 			System.out.println(path);
 	}
