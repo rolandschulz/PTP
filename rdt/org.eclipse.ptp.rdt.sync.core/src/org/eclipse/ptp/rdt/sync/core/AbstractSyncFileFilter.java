@@ -11,6 +11,7 @@
 package org.eclipse.ptp.rdt.sync.core;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,6 +36,7 @@ public abstract class AbstractSyncFileFilter {
 	 */
 	public abstract class AbstractIgnoreRule {
 		public abstract boolean isMatch(IResource target);
+		public abstract boolean isMatch(String target, boolean isFolder);
 		public int hashCode() { return toString().hashCode(); }
 		public boolean equals(Object o) { return o == this || 				
 				(o != null && o.getClass() == this.getClass() && toString().equals(o.toString())); }
@@ -43,8 +45,8 @@ public abstract class AbstractSyncFileFilter {
 		public abstract String getPattern(); //return String without encoding of extra flags (i.e. exclude)
 	}
 	
-	/* highest precedence is first rule (reverse from Git) */
-	public List<AbstractIgnoreRule> rules;
+	/* highest precedence is last rule (as for Git - reverse from PTP Juno) */
+	public List<AbstractIgnoreRule> rules = new ArrayList<AbstractIgnoreRule>();
 
 	protected AbstractSyncFileFilter() {}
 	
@@ -164,9 +166,26 @@ public abstract class AbstractSyncFileFilter {
 	 */
 	public boolean shouldIgnore(IResource r) {
 		//If there is a rule to ignore a folder all members are ignored
-		for (AbstractIgnoreRule pm : rules) {
-			if (pm.isMatch(r)) {
-				return pm.getResult();
+		for (int i = rules.size() - 1; i > -1; i--) {
+			if (rules.get(i).isMatch(r)) {
+				return rules.get(i).getResult();
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Apply the filter to the given string
+	 * 
+	 * @param s
+	 *            - the string
+	 * @return whether the string should be ignored
+	 */
+	public boolean shouldIgnore(String path, boolean isFolder) {
+		//If there is a rule to ignore a folder all members are ignored
+		for (int i = rules.size() - 1; i > -1; i--) {
+			if (rules.get(i).isMatch(path, isFolder)) {
+				return rules.get(i).getResult();
 			}
 		}
 		return false;

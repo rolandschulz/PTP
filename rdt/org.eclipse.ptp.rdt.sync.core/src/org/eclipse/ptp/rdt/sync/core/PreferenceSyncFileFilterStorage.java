@@ -37,6 +37,11 @@ public class PreferenceSyncFileFilterStorage extends AbstractSyncFileFilter  {
 		public boolean isMatch(IResource target) {
 			throw new UnsupportedOperationException(); //only for storage - doesn't support matching
 		}
+		
+		@Override
+		public boolean isMatch(String target, boolean isFolder) {
+			throw new UnsupportedOperationException(); //only for storage - doesn't support matching
+		}
 
 		@Override
 		public boolean getResult() {
@@ -51,7 +56,6 @@ public class PreferenceSyncFileFilterStorage extends AbstractSyncFileFilter  {
 		public String getPattern() {
 			return pattern;
 		}
-		
 	}
 	
 	private static final String PATTERN_NODE_NAME = "pattern"; //$NON-NLS-1$

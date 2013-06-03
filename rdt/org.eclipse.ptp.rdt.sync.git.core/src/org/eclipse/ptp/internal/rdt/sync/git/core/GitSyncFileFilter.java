@@ -8,12 +8,20 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.jgit.dircache.DirCache;
+import org.eclipse.jgit.dircache.DirCacheIterator;
 import org.eclipse.jgit.ignore.IgnoreNode;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
+import org.eclipse.jgit.treewalk.FileTreeIterator;
+import org.eclipse.jgit.treewalk.TreeWalk;
+import org.eclipse.jgit.treewalk.filter.IndexDiffFilter;
 import org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 
@@ -55,7 +63,13 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		
 		@Override
 		public boolean isMatch(IResource target) {
-			return rule.isMatch(target.getProjectRelativePath().toString(), target.getType()==IResource.FOLDER);
+			return rule.isMatch(target.getProjectRelativePath().toString(), 
+					target.getType()==IResource.FOLDER);
+		}
+		
+		@Override
+		public boolean isMatch(String target, boolean isFolder) {
+			return rule.isMatch(target,isFolder);
 		}
 
 		@Override
@@ -65,15 +79,12 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		
 		@Override
 		public String toString() {
-			return rule.getPattern();
+			return (rule.getNegation()?"!":"") + rule.getPattern() + (rule.dirOnly()?"/":""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		}
 		
 		@Override
 		public String getPattern() {
-			String pattern = rule.getPattern();
-			if (pattern.charAt(0)=='!')
-				pattern.substring(1);
-			return pattern;
+			return rule.getPattern();
 		}
 	}
 	
@@ -132,5 +143,88 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		//
 		for (AbstractIgnoreRule rule : fileFilter.rules)
 			rules.add(new GitIgnoreRule(rule.getPattern(),rule.getResult()));
+	}
+	
+	/* returns ignored files in the index */
+	public List<String> getIgnoredFiles() throws IOException {
+		TreeWalk treeWalk = new TreeWalk(repository);
+		DirCache dirCache = repository.readDirCache();
+		treeWalk.addTree(new DirCacheIterator(dirCache));
+		List<String> ignoredFiles = new ArrayList<String>();
+		int ignoreDepth = Integer.MAX_VALUE; //if the current subtree is ignored - than this is the depth at which to ignoring starts
+		while (treeWalk.next()) {
+			boolean isSubtree = treeWalk.isSubtree();
+			int depth = treeWalk.getDepth();
+			String path = treeWalk.getPathString();
+			if (isSubtree) treeWalk.enterSubtree();
+			if (depth > ignoreDepth) {
+				if (!isSubtree) ignoredFiles.add(path);
+				continue;
+			}
+			if (depth <= ignoreDepth) { //sibling or parent of ignore subtree => reset
+				ignoreDepth = Integer.MAX_VALUE;
+			}
+			if (shouldIgnore(path, isSubtree)) {
+				if (isSubtree) ignoreDepth = depth;
+				else ignoredFiles.add(path);
+			}
+		}
+		return ignoredFiles;
+	}
+	
+	/* get all different files (modified/changed, missing/removed, untracked/added)
+	 * 
+	 * assumes that no files are in conflict (don't call during merge) 
+	 * */
+	public List<String> getDiffFiles() throws IOException {
+		final int INDEX = 0;
+		final int WORKDIR = 1;
+		
+		TreeWalk treeWalk = new TreeWalk(repository);
+		treeWalk.addTree(new DirCacheIterator(repository.readDirCache()));
+		treeWalk.addTree(new FileTreeIterator(repository));
+
+		//don't honor ignores - we do it manual instead. Doing it all with the filter
+		//would require a WorkingTreeIteraotr which does the ignore handing correct 
+		//(both directory including bugs 401161 and only using info/exclude not .gitignore)
+		treeWalk.setFilter(new IndexDiffFilter(INDEX, WORKDIR,false)); 
+		List<String> diffFiles = new ArrayList<String>();
+		int ignoreDepth = Integer.MAX_VALUE; //if the current subtree is ignored - than this is the depth at which to ignoring starts
+		while (treeWalk.next()) {
+			DirCacheIterator dirCacheIterator = treeWalk.getTree(INDEX,
+					DirCacheIterator.class);
+			String path = treeWalk.getPathString();
+			boolean isSubtree = treeWalk.isSubtree();
+			int depth = treeWalk.getDepth();
+			if (dirCacheIterator != null ||          //in index => either missing or modified
+					!shouldIgnore(path, isSubtree)) { //not in index => untracked
+				if (depth <= ignoreDepth)  //sibling or parent of ignore subtree => reset
+					ignoreDepth = Integer.MAX_VALUE;
+				if (dirCacheIterator != null && isSubtree && ignoreDepth==Integer.MAX_VALUE &&
+						shouldIgnore(path, isSubtree))
+					ignoreDepth = depth;
+				if (isSubtree) 
+					treeWalk.enterSubtree(); 
+				else if(dirCacheIterator != null || ignoreDepth==Integer.MAX_VALUE) 
+					diffFiles.add(path);
+			}
+		}
+		return diffFiles;
+	}
+	
+	
+	//for testing. args: work folder, git folder
+	public static void main(String [] args) throws IOException
+	{
+		final File localDir = new File(args[0]);
+		final FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
+		File gitDirFile = new File(localDir + File.separator + args[1]); 
+		Repository repository = repoBuilder.setWorkTree(localDir).setGitDir(gitDirFile).build();
+		GitSyncFileFilter filter = new GitSyncFileFilter(repository);
+		filter.loadFilter();
+		//List<String> files = filter.getIgnoredFiles();
+		List<String> files = filter.getDiffFiles();
+		for (String path : files) 
+			System.out.println(path);
 	}
 }
