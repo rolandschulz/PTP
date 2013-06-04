@@ -121,7 +121,7 @@
 				<!-- Validate time spec where time can be blank, yyyy:mm:dd:hh:mm, mm:dd:hh:mm, 
 					dd:hh:mm or hh:mm -->
 				<regex
-					expression=" *|(?:[\d]{4}:[\d]{2}:[\d]{2}:|[\d]{2}:[\d]{2}:|[\d]{2}:)?[\d]{2}:[\d]{2}" />
+					expression=" *|(?:[\d]{1,4}:[\d]{1,2}:[\d]{1,2}:|[\d]{1,2}:[\d]{1,2}:|[\d]{1,2}:)?[\d]{1,2}:[\d]{1,2}" />
 				<error-message>Dispatch At Time format is incorrect.
                 </error-message>
 			</validator>
@@ -142,6 +142,11 @@
 		<attribute name="LSF_CPUTIME_LIMIT" type="string">
 			<description>CPU Time Limit:</description>
 			<tooltip>Sets the total CPU time limit for the job to prevent runaway jobs. (-c)</tooltip>
+			<validator>
+				<regex expression=" *|([\d]+:)?[\d]+(/.+)?" />
+				<error-message>CPU time limit must be a valid time specification with optional host name or model.
+                </error-message>
+			</validator>
 		</attribute>
 
 		<!-- -D option -->
@@ -321,6 +326,11 @@
 		<attribute name="LSF_REQUEUE_CODES" type="string">
 			<description>Auto Requeue Exit Codes:</description>
 			<tooltip>Specifies automatic job requeue exit values. (-Q)</tooltip>
+			<validator>
+				<regex expression=" *|~?[\d]+( ~?[\d+])*|EXCLUDE\(~?[\d]+( ~?[\d]+)*\)" />
+				<error-message>Requeue exit code (-Q) specification is incorrect.
+                </error-message>
+			</validator>
 		</attribute>
 
 		<!-- -q option -->
@@ -383,7 +393,7 @@
 				<!-- Validate time spec where time can be blank, yyyy:mm:dd:hh:mm, mm:dd:hh:mm, 
 					dd:hh:mm or hh:mm -->
 				<regex
-					expression=" *|(?:[\d]{4}:[\d]{2}:[\d]{2}:|[\d]{2}:[\d]{2}:|[\d]{2}:)?[\d]{2}:[\d]{2}" />
+					expression=" *|(?:[\d]{1,4}:[\d]{1,2}:[\d]{1,2}:|[\d]{1,2}:[\d]{1,2}:|[\d]{1,2}:)?[\d]{1,2}:[\d]{1,2}" />
 				<error-message>Termination Deadline format is incorrect.
                 </error-message>
 			</validator>
@@ -417,12 +427,22 @@
 		<attribute name="LSF_RUNTIME_LIMIT" type="string">
 			<description>Runtime Limit:</description>
 			<tooltip>Sets the runtime limit for job. (-W)</tooltip>
+			<validator>
+				<regex expression=" *|([\d]+:)?[\d]+(/.+)?" />
+				<error-message>Runtime limit must be a valid time specification with optional host name or model.
+                </error-message>
+			</validator>
 		</attribute>
 
 		<!-- -We option -->
 		<attribute name="LSF_RUNTIME_ESTIMATE" type="string">
 			<description>Estimated Runtime:</description>
 			<tooltip>Specifies the estimated runtime for job. (-We)</tooltip>
+			<validator>
+				<regex expression=" *|([\d]+:)?[\d]+(/.+)?" />
+				<error-message>Runtime estimate must be a valid time specification with optional host name or model.
+                </error-message>
+			</validator>
 		</attribute>
 
 		<!-- -w option -->
@@ -441,6 +461,11 @@
 		<attribute name="LSF_JOB_ACTION_TIME" type="string">
 			<description>Job Action Time:</description>
 			<tooltip>Specifies the time before a job control action that a job action occurs. (-wt)</tooltip>
+			<validator>
+				<regex expression=" *|([\d]+:)?[\d]+" />
+				<error-message>Job action time must be a valid time specification.
+                </error-message>
+			</validator>
 		</attribute>
 
 		<!-- Other options -->
@@ -465,7 +490,7 @@
 				      
 				      In general, strings in the 'isUndefinedIfMatches' left hand side are surrounded by double
 				      quotes. The exception is where the expression being matched contains double quotes.
-				      In that case, to avoid issues with nested quoues, single quotes are used to surround the
+				      In that case, to avoid issues with nested quoutes, single quotes are used to surround the
 				      left hand side string.
 				      
 				      Make sure that all of the <arg> specifications do not wrap to multiple lines since
