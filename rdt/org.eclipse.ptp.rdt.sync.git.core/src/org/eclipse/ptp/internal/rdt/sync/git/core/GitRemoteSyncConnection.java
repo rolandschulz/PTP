@@ -13,6 +13,8 @@ package org.eclipse.ptp.internal.rdt.sync.git.core;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,6 +51,7 @@ import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.revwalk.filter.RevFilter;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
@@ -105,7 +108,7 @@ public class GitRemoteSyncConnection {
 	private boolean mergeMapInitialized = false; // Call "readMergeConflictFiles" at least once before using the map.
 	private final Map<IPath, String[]> FileToMergePartsMap = new HashMap<IPath, String[]>();
 	private int remoteGitVersion;
-
+	
 	// Static storage for each project's local Git repository (one repo per project)
 	private static Map<IProject, Repository> projectToRepoMap = new HashMap<IProject, Repository>();
 
@@ -361,16 +364,25 @@ public class GitRemoteSyncConnection {
 				local.copy(remote, EFS.OVERWRITE, monitor);
 				
 				//remove ignored files from index
-				//TODO: add a work-around for git <1.8.1.2 (those will not remove those in ignored folder)
-				//Thus because we do remove the locally they will be removed in the workspace on the remote end
-				final String  command = gitCommand() + " ls-files -X " + gitDir + "/" + Constants.INFO_EXCLUDE + " -i | " + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-						gitCommand() + " update-index --force-remove --stdin ; " + //$NON-NLS-1$
-						gitCommand() + " commit -m \"" + commitMessage + "\""; //$NON-NLS-1$ //$NON-NLS-2$
-				CommandResults commandResults = this.executeRemoteCommand(command, monitor);
-				if (commandResults.getExitCode() != 0) {
-					throw new RemoteSyncException(Messages.GRSC_GitRemoveFilteredFailure1 + commandResults.getStderr());
+				if (remoteGitVersion>=1080102) {
+					final String  command = gitCommand() + " ls-files -X " + gitDir + "/" + Constants.INFO_EXCLUDE + " -i | " + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							gitCommand() + " update-index --force-remove --stdin ; " + //$NON-NLS-1$
+							gitCommand() + " commit -m \"" + commitMessage + "\""; //$NON-NLS-1$ //$NON-NLS-2$
+					CommandResults commandResults = this.executeRemoteCommand(command, monitor);
+					if (commandResults.getExitCode() != 0) {
+						throw new RemoteSyncException(Messages.GRSC_GitRemoveFilteredFailure1 + commandResults.getStderr());
+					}
+				} else {
+					CommandResults commandResults = this.executeRemoteCommand(gitCommand() + "rev-parse HEAD", monitor); //$NON-NLS-1$
+					ObjectId objectId = repository.resolve(commandResults.getStdout());
+					RevTree ref=null;
+					if (objectId!=null)
+						ref = new RevWalk(repository).parseTree(objectId);
+					if (ref!=null) {
+						Set<String> filesToRemove = fileFilter.getIgnoredFiles(ref);
+						deleteRemoteFiles(filesToRemove,monitor);
+					}
 				}
-				
 				syncConfig.setProperty(GitSyncFileFilter.REMOTE_FILTER_IS_DIRTY, "FALSE"); //$NON-NLS-1$
 			}
 			
@@ -390,12 +402,55 @@ public class GitRemoteSyncConnection {
 			throw new RemoteSyncException(e);
 		} catch (CoreException e) {
 			throw new RemoteSyncException(e);
+		} catch (RemoteExecutionException e) {
+			throw new RemoteSyncException(e);
 		} finally {
 			if (monitor != null) {
 				monitor.done();
 			}
 		}
 	}
+	
+    /*
+     * Do a "git rm <Files>" on the remote host
+     */
+    private void deleteRemoteFiles(Set<String> filesToDelete, IProgressMonitor monitor) throws IOException,
+                    RemoteExecutionException, RemoteSyncException, MissingConnectionException {
+    	try {
+    		while (!filesToDelete.isEmpty()) {
+    			List<String> commandList = stringToList(gitCommand() + " rm --"); //$NON-NLS-1$
+    			int count = 1;
+    			for (String fileName : filesToDelete.toArray(new String[0])) {
+    				if (count++ % MAX_FILES == 0) {
+    					break;
+    				}
+    				commandList.add(fileName);
+    				filesToDelete.remove(fileName);
+    			}
+
+    			CommandResults commandResults = null;
+    			try {
+    				commandResults = this.executeRemoteCommand(commandList, monitor);
+    			} catch (final InterruptedException e) {
+    				throw new RemoteExecutionException(e);
+    			} catch (RemoteConnectionException e) {
+    				throw new RemoteExecutionException(e);
+    			}
+    			if (commandResults.getExitCode() != 0) {
+    				throw new RemoteExecutionException(Messages.GRSC_GitRmFailure + commandResults.getStderr());
+    			}
+    		}
+    	} finally {
+    		if (monitor != null) {
+    			monitor.done();
+    		}
+    	}
+    }
+
+    private List<String> stringToList(String command) {
+            return new ArrayList<String>(Arrays.asList(command.split(" "))); //$NON-NLS-1$
+    }
+
 
 	// Subclass JGit's generic RemoteSession to set up running of remote
 	// commands using the available process builder.
@@ -981,10 +1036,12 @@ public class GitRemoteSyncConnection {
 			throw new RemoteExecutionException(Messages.GRSC_GitInitFailure + commandResults.getStderr());
 		}
 
-		Matcher m = Pattern.compile("git version ([0-9]+)\\.([0-9]+)\\.([0-9]+).*").matcher(commandResults.getStdout().trim()); //$NON-NLS-1$
+		Matcher m = Pattern.compile("git version ([0-9]+)\\.([0-9]+)\\.([0-9]+)\\.?([0-9]*)").matcher(commandResults.getStdout().trim()); //$NON-NLS-1$
 
 		if (m.matches()) {
-			return Integer.parseInt(m.group(1)) * 10000 + Integer.parseInt(m.group(2)) * 100 + Integer.parseInt(m.group(3));
+			int patch=0;
+			if (m.group(4).length()>0) patch=Integer.parseInt(m.group(4));
+			return Integer.parseInt(m.group(1)) * 1000000 + Integer.parseInt(m.group(2)) * 10000 + Integer.parseInt(m.group(3)) * 100 + patch;
 		} else {
 			return 0;
 		}

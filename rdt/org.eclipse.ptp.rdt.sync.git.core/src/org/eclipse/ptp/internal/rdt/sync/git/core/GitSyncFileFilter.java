@@ -20,6 +20,7 @@ import org.eclipse.jgit.dircache.DirCacheIterator;
 import org.eclipse.jgit.ignore.IgnoreNode;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.treewalk.FileTreeIterator;
 import org.eclipse.jgit.treewalk.TreeWalk;
@@ -134,7 +135,7 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 			out.close();
 		}
 		final RmCommandCached rmCommand = new RmCommandCached(repository);
-		for (String fileName : getIgnoredFiles()) {
+		for (String fileName : getIgnoredFiles(null)) {
 			rmCommand.addFilepattern(fileName);
 		}
 		try {
@@ -175,11 +176,16 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 			rules.add(new GitIgnoreRule(rule.getPattern(),rule.getResult()));
 	}
 	
-	/* returns ignored files in the index */
-	public Set<String> getIgnoredFiles() throws IOException {
+	/* returns ignored files in the index 
+	 * @param ref reference to compute list of files for. If null use index.
+	 * */
+	public Set<String> getIgnoredFiles(RevTree ref) throws IOException {
 		TreeWalk treeWalk = new TreeWalk(repository);
-		DirCache dirCache = repository.readDirCache();
-		treeWalk.addTree(new DirCacheIterator(dirCache));
+		if (ref==null) {
+			DirCache dirCache = repository.readDirCache();
+			treeWalk.addTree(new DirCacheIterator(dirCache));
+		} else
+			treeWalk.addTree(ref);
 		HashSet<String> ignoredFiles = new HashSet<String>();
 		int ignoreDepth = Integer.MAX_VALUE; //if the current subtree is ignored - than this is the depth at which to ignoring starts
 		while (treeWalk.next()) {
