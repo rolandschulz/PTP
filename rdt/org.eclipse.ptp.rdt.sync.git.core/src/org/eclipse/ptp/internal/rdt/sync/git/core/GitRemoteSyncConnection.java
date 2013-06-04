@@ -358,7 +358,7 @@ public class GitRemoteSyncConnection {
 				IFileStore local = EFS.getLocalFileSystem().getStore(new Path(exclude.getAbsolutePath()));
 				String remoteExclude = syncConfig.getLocation(project) + "/" + gitDir + "/" + Constants.INFO_EXCLUDE;  //$NON-NLS-1$ //$NON-NLS-2$
 				IFileStore remote = remoteServices.getFileManager(conn).getResource(remoteExclude);
-				local.copy(remote, EFS.NONE, monitor);
+				local.copy(remote, EFS.OVERWRITE, monitor);
 				
 				//remove ignored files from index
 				//TODO: add a work-around for git <1.8.1.2 (those will not remove those in ignored folder)
