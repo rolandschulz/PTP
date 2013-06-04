@@ -51,13 +51,6 @@ public abstract class AbstractSyncFileFilter {
 	/* highest precedence is last rule (as for Git - reverse from PTP Juno) */
 	public List<AbstractIgnoreRule> rules = new ArrayList<AbstractIgnoreRule>();
 
-	protected AbstractSyncFileFilter() {}
-	
-	public AbstractSyncFileFilter(AbstractSyncFileFilter o) {
-		clone(o);
-	}
-	
-	
 	public void addPattern(String pattern, boolean exclude) {
 		addPattern(pattern,exclude,rules.size());
 	}
@@ -195,7 +188,6 @@ public abstract class AbstractSyncFileFilter {
 	}
 
 	abstract public void saveFilter() throws IOException;
-
-	abstract public void clone(AbstractSyncFileFilter fileFilter);
-
+	
+	abstract public AbstractSyncFileFilter clone();
 }

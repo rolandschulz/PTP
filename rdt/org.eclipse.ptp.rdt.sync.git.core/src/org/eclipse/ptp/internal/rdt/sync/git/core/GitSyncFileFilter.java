@@ -118,6 +118,12 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		this.project = project;
 	}
 	
+	public GitSyncFileFilter(GitSyncFileFilter filter) {
+		this.repository = filter.repository;
+		this.project = filter.project;
+		rules.addAll(filter.rules);
+	}
+
 	@Override
 	public void addPattern(String pattern, boolean exclude, int index) {
 		rules.add(index, new GitIgnoreRule(pattern, exclude));
@@ -183,18 +189,16 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 	 * 
 	 * @param filter to copy 
 	 */
-	public void initialize(AbstractSyncFileFilter abstractSyncFileFilter) {
-		clone(abstractSyncFileFilter);
-		rules.add(new GitIgnoreRule("/.ptp-sync/", true)); //$NON-NLS-1$
+	public void initialize(AbstractSyncFileFilter fileFilter) {
+		if (fileFilter instanceof GitSyncFileFilter) { 
+			rules.addAll(fileFilter.rules);
+		} else {								//convert rules and add git specific rule 
+			for (AbstractIgnoreRule rule : fileFilter.rules)
+				rules.add(new GitIgnoreRule(rule.getPattern(),rule.getResult()));
+			rules.add(new GitIgnoreRule("/.ptp-sync/", true)); //$NON-NLS-1$
+		}  
 	}
 
-	@Override
-	public void clone(AbstractSyncFileFilter fileFilter) {
-		//
-		for (AbstractIgnoreRule rule : fileFilter.rules)
-			rules.add(new GitIgnoreRule(rule.getPattern(),rule.getResult()));
-	}
-	
 	/* returns ignored files in the index 
 	 * @param ref reference to compute list of files for. If null use index.
 	 * */
@@ -291,5 +295,10 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		Set<String> files = filter.getDiffFiles().added;
 		for (String path : files) 
 			System.out.println(path);
+	}
+
+	@Override
+	public AbstractSyncFileFilter clone() {
+		return new GitSyncFileFilter(this);
 	}
 }

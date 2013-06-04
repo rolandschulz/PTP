@@ -182,7 +182,7 @@ public class SyncManager {
 	 * 
 	 * @return the file filter. This is never null.
 	 */
-	public static AbstractSyncFileFilter getDefaultFileFilter() {
+	public static PreferenceSyncFileFilterStorage getDefaultFileFilter() {
 
 		PreferenceSyncFileFilterStorage filter = new PreferenceSyncFileFilterStorage();
 		if (!filter.loadFilter())
@@ -313,7 +313,7 @@ public class SyncManager {
 	 * @throws IOException 
 	 */
 	public static void saveFileFilter(IProject project, AbstractSyncFileFilter filter) throws IOException {
-		SyncConfigManager.getActive(project).getSyncService().getSyncFileFilter(project).clone(filter);
+		SyncConfigManager.getActive(project).getSyncService().setSyncFileFilter(project, filter);
 	}
 
 	// Note that the monitor is ignored for non-blocking jobs since SynchronizeJob creates its own monitor

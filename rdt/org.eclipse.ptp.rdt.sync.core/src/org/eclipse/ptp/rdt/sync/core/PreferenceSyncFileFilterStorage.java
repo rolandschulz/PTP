@@ -8,6 +8,7 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.ptp.internal.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.internal.rdt.sync.core.SyncUtils;
 import org.eclipse.ptp.internal.rdt.sync.core.messages.Messages;
+import org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter.AbstractIgnoreRule;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
@@ -61,8 +62,8 @@ public class PreferenceSyncFileFilterStorage extends AbstractSyncFileFilter  {
 	
 	public PreferenceSyncFileFilterStorage() {};
 	
-	public PreferenceSyncFileFilterStorage(AbstractSyncFileFilter fCustomFilter) {
-		super(fCustomFilter);
+	public PreferenceSyncFileFilterStorage(PreferenceSyncFileFilterStorage filter) {
+		rules.addAll(filter.rules);
 	}
 
 	public void loadBuiltInDefaultFilter() {
@@ -155,10 +156,8 @@ public class PreferenceSyncFileFilterStorage extends AbstractSyncFileFilter  {
 		rules.add(new PreferenceIngoreRule(rule));
 	}
 
-	
 	@Override
-	public void clone(AbstractSyncFileFilter fileFilter) {
-		for (AbstractIgnoreRule rule : fileFilter.rules)
-			rules.add(new PreferenceIngoreRule(rule.getPattern(),rule.getResult()));
+	public AbstractSyncFileFilter clone() {
+		return new PreferenceSyncFileFilterStorage(this);
 	}
 }

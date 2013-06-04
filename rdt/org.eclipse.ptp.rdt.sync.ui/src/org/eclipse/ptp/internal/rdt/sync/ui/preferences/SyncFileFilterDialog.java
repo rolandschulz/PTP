@@ -92,7 +92,7 @@ public class SyncFileFilterDialog extends Dialog {
 			if (project == null) {
 				filter = SyncManager.getDefaultFileFilter();
 			} else {
-				filter = SyncManager.getFileFilter(project);
+				filter = SyncManager.getFileFilter(project).clone();
 			}
 		} else {
 			filter = targetFilter;

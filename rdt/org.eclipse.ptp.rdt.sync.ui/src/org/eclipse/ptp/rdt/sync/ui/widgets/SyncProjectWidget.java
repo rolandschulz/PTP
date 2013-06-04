@@ -66,7 +66,7 @@ public class SyncProjectWidget extends Composite {
 	private Text fLocalProjectLocationText;
 	private Button fUseDefaultLocationButton;
 	private Button fLocalBrowseButton;
-	private AbstractSyncFileFilter fCustomFilter;
+	private PreferenceSyncFileFilterStorage fCustomFilter;
 
 	private ISynchronizeParticipant fSelectedParticipant;
 
@@ -150,7 +150,7 @@ public class SyncProjectWidget extends Composite {
 		filterButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				AbstractSyncFileFilter tmpFilter;
+				PreferenceSyncFileFilterStorage tmpFilter;
 				if (fCustomFilter == null) {
 					tmpFilter = SyncManager.getDefaultFileFilter();
 				} else {
