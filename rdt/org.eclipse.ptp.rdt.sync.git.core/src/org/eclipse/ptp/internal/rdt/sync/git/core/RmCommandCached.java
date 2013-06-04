@@ -42,7 +42,6 @@
  */
 package org.eclipse.ptp.internal.rdt.sync.git.core;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -55,8 +54,6 @@ import org.eclipse.jgit.dircache.DirCache;
 import org.eclipse.jgit.dircache.DirCacheBuildIterator;
 import org.eclipse.jgit.dircache.DirCacheBuilder;
 import org.eclipse.jgit.internal.JGitText;
-import org.eclipse.jgit.lib.Constants;
-import org.eclipse.jgit.lib.FileMode;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.treewalk.filter.PathFilterGroup;
@@ -75,6 +72,7 @@ import org.eclipse.jgit.treewalk.filter.PathFilterGroup;
  * @see <a href="http://www.kernel.org/pub/software/scm/git/docs/git-rm.html"
  *      >Git documentation about Rm</a>
  */
+@SuppressWarnings("restriction")
 public class RmCommandCached extends GitCommand<DirCache> {
 
 	private Collection<String> filepatterns;
@@ -123,17 +121,6 @@ public class RmCommandCached extends GitCommand<DirCache> {
 			tw.setFilter(PathFilterGroup.createFromStrings(filepatterns));
 			tw.addTree(new DirCacheBuildIterator(builder));
 
-			while (tw.next()) {
-				final File path = new File(repo.getWorkTree(),
-						tw.getPathString());
-				final FileMode mode = tw.getFileMode(0);
-				if (mode.getObjectType() == Constants.OBJ_BLOB) {
-					// Deleting a blob is simply a matter of removing
-					// the file or symlink named by the tree entry.
-					// Do not delete the file - only difference from org.eclipse.jgit.api.RmCommand
-					// delete(path);
-				}
-			}
 			builder.commit();
 			setCallable(false);
 		} catch (IOException e) {
@@ -145,11 +132,6 @@ public class RmCommandCached extends GitCommand<DirCache> {
 		}
 
 		return dc;
-	}
-
-	private void delete(File p) {
-		while (p != null && !p.equals(repo.getWorkTree()) && p.delete())
-			p = p.getParentFile();
 	}
 
 }

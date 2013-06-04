@@ -17,7 +17,6 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
-import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.services.ISynchronizeService;
 
@@ -34,8 +33,8 @@ public class SyncRunner {
 		provider = ssp;
 	}
 	
-	public void synchronize(IProject project, SyncConfig syncConfig, IResourceDelta delta, SyncFileFilter filter,
+	public void synchronize(IProject project, SyncConfig syncConfig, IResourceDelta delta,
 			IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException {
-		provider.synchronize(project, syncConfig, delta, filter, monitor, syncFlags);
+		provider.synchronize(project, syncConfig, delta, monitor, syncFlags);
 	}
 }

@@ -52,7 +52,7 @@ import org.eclipse.osgi.util.TextProcessor;
 import org.eclipse.ptp.internal.rdt.sync.cdt.ui.Activator;
 import org.eclipse.ptp.internal.rdt.sync.cdt.ui.messages.Messages;
 import org.eclipse.ptp.internal.rdt.sync.ui.wizards.SyncWizardDataCache;
-import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
+import org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.rdt.sync.ui.widgets.SyncProjectWidget;
 import org.eclipse.swt.SWT;
@@ -941,7 +941,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 		return remoteToolChainsSet;
 	}
 
-	public SyncFileFilter getCustomFileFilter() {
+	public AbstractSyncFileFilter getCustomFileFilter() {
 		return fSyncWidget.getCustomFileFilter();
 	}
 	

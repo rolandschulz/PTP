@@ -20,7 +20,7 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.ptp.internal.rdt.sync.git.core.GitRemoteSyncConnection;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
-import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
+import org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
@@ -115,7 +115,7 @@ public class TemporaryGitRemoteSyncConnection extends ExternalResource {
 
 		SyncConfig syncConfig = SyncConfigManager.newConfig("tmp", "Git", fRemoteConnection, remoteFolder);
 		fGITConn = new GitRemoteSyncConnection(null, localFolder.getRoot().getPath(), syncConfig,
-				SyncFileFilter.createBuiltInDefaultFilter(), null);
+				AbstractSyncFileFilter.createBuiltInDefaultFilter(), null);
 	}
 
 	private void delete() {

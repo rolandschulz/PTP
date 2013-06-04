@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -73,7 +74,7 @@ public class SyncManager {
 		protected IStatus run(IProgressMonitor monitor) {
 			RecursiveSubMonitor subMonitor = RecursiveSubMonitor.convert(monitor);
 			try {
-				fSyncRunner.synchronize(fProject, fBuildScenario, fDelta, getFileFilter(fProject), subMonitor, fSyncFlags);
+				fSyncRunner.synchronize(fProject, fBuildScenario, fDelta, subMonitor, fSyncFlags);
 			} catch (CoreException e) {
 				if (fSyncExceptionHandler == null) {
 					defaultSyncExceptionHandler.handle(fProject, e);
@@ -148,13 +149,12 @@ public class SyncManager {
 	 *            project to convert
 	 * @param provider
 	 *            ISynchronizeService that has been correctly configured
-	 * @param filter
+	 * @param fileFilter 
 	 *            synchronize filter, or null if no filter
 	 * @throws CoreException
 	 *             on problems adding sync nature
 	 */
-	public static void makeSyncProject(IProject project, String remoteSyncConfigName, ISynchronizeService provider,
-			SyncFileFilter filter) throws CoreException {
+	public static void makeSyncProject(IProject project, String remoteSyncConfigName, ISynchronizeService provider, AbstractSyncFileFilter fileFilter) throws CoreException {
 		RemoteSyncNature.addNature(project, new NullProgressMonitor());
 
 		// Remote config
@@ -162,6 +162,10 @@ public class SyncManager {
 		SyncConfig config = SyncConfigManager.newConfig(remoteSyncConfigName, provider.getId(), conn, provider.getLocation());
 		SyncConfigManager.addConfig(project, config);
 		SyncConfigManager.setActive(project, config);
+		if (fileFilter == null) {
+			fileFilter = SyncManager.getDefaultFileFilter();
+		}
+		provider.setSyncFileFilter(project, fileFilter);
 
 		// Local config
 		try {
@@ -169,10 +173,6 @@ public class SyncManager {
 			SyncConfigManager.addConfig(project, config);
 		} catch (CoreException e) {
 			RDTSyncCorePlugin.log(Messages.SyncManager_0, e);
-		}
-
-		if (filter != null) {
-			SyncManager.saveFileFilter(project, filter);
 		}
 	}
 
@@ -182,20 +182,12 @@ public class SyncManager {
 	 * 
 	 * @return the file filter. This is never null.
 	 */
-	public static SyncFileFilter getDefaultFileFilter() {
-		IScopeContext context = InstanceScope.INSTANCE;
-		Preferences node = context.getNode(RDTSyncCorePlugin.PLUGIN_ID);
-		if (node == null) {
-			RDTSyncCorePlugin.log(Messages.SyncManager_6);
-			return SyncFileFilter.createBuiltInDefaultFilter();
-		}
+	public static PreferenceSyncFileFilterStorage getDefaultFileFilter() {
 
-		SyncFileFilter filter = SyncFileFilter.loadFilter(node);
-		if (filter == null) {
-			return SyncFileFilter.createBuiltInDefaultFilter();
-		} else {
-			return filter;
-		}
+		PreferenceSyncFileFilterStorage filter = new PreferenceSyncFileFilterStorage();
+		if (!filter.loadFilter())
+			filter.loadBuiltInDefaultFilter();
+		return filter;
 	};
 
 	/**
@@ -226,23 +218,8 @@ public class SyncManager {
 	 *            cannot be null
 	 * @return the file filter. This is never null.
 	 */
-	public static SyncFileFilter getFileFilter(IProject project) {
-		if (project == null) {
-			throw new NullPointerException();
-		}
-		IScopeContext context = new ProjectScope(project);
-		Preferences node = context.getNode(RDTSyncCorePlugin.PLUGIN_ID);
-		if (node == null) {
-			RDTSyncCorePlugin.log(Messages.SyncManager_3);
-			return SyncManager.getDefaultFileFilter();
-		}
-
-		SyncFileFilter filter = SyncFileFilter.loadFilter(node);
-		if (filter == null) {
-			return SyncManager.getDefaultFileFilter();
-		} else {
-			return filter;
-		}
+	public static AbstractSyncFileFilter getFileFilter(IProject project) {
+		return SyncConfigManager.getActive(project).getSyncService().getSyncFileFilter(project);
 	}
 
 	/**
@@ -324,29 +301,6 @@ public class SyncManager {
 		}
 	}
 
-	/**
-	 * Save a new default file filter.
-	 * Use this in conjunction with "getDefaultFileFilter()" to modify the default filter.
-	 * 
-	 * @param filter
-	 *            cannot be null
-	 */
-	public static void saveDefaultFileFilter(SyncFileFilter filter) {
-		if (filter == null) {
-			throw new NullPointerException();
-		}
-
-		IScopeContext context = InstanceScope.INSTANCE;
-		Preferences node = context.getNode(RDTSyncCorePlugin.PLUGIN_ID);
-		if (node == null) {
-			RDTSyncCorePlugin.log(Messages.SyncManager_6);
-			return;
-		}
-
-		filter.saveFilter(node);
-
-		SyncUtils.flushNode(node);
-	}
 
 	/**
 	 * Save a new file filter for a project.
@@ -356,22 +310,10 @@ public class SyncManager {
 	 *            cannot be null
 	 * @param filter
 	 *            cannot be null
+	 * @throws IOException 
 	 */
-	public static void saveFileFilter(IProject project, SyncFileFilter filter) {
-		if (project == null || filter == null) {
-			throw new NullPointerException();
-		}
-
-		IScopeContext context = new ProjectScope(project);
-		Preferences node = context.getNode(RDTSyncCorePlugin.PLUGIN_ID);
-		if (node == null) {
-			RDTSyncCorePlugin.log(Messages.SyncManager_3);
-			return;
-		}
-
-		filter.saveFilter(node);
-
-		SyncUtils.flushNode(node);
+	public static void saveFileFilter(IProject project, AbstractSyncFileFilter filter) throws IOException {
+		SyncConfigManager.getActive(project).getSyncService().setSyncFileFilter(project, filter);
 	}
 
 	// Note that the monitor is ignored for non-blocking jobs since SynchronizeJob creates its own monitor
@@ -393,7 +335,7 @@ public class SyncManager {
 			if (syncRunner != null) {
 				if (isBlocking) {
 					try {
-						syncRunner.synchronize(project, config, delta, getFileFilter(project), monitor, syncFlags);
+						syncRunner.synchronize(project, config, delta, monitor, syncFlags);
 					} catch (CoreException e) {
 						if (!useExceptionHandler) {
 							throw e;

@@ -10,7 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.sync.ui.preferences;
 
+import java.io.IOException;
+
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.ptp.internal.rdt.sync.ui.RDTSyncUIPlugin;
 import org.eclipse.ptp.internal.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.swt.SWT;
@@ -59,10 +62,13 @@ public class SyncFileFilterPage extends PreferencePage implements IWorkbenchPref
 	 */
 	@Override
 	public boolean performOk() {
-		if (fWidget != null) {
-			SyncManager.saveDefaultFileFilter(fWidget.getFilter());
+		try {
+			if (fWidget != null) {
+				fWidget.getFilter().saveFilter();
+			}
+		} catch(IOException e) {
+			RDTSyncUIPlugin.log(Messages.SyncFileFilterPage_0, e);
 		}
 		return true;
 	}
-
 }

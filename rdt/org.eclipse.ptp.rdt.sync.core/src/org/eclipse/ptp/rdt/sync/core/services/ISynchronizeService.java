@@ -20,8 +20,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
-import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
+import org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
+import org.eclipse.ptp.rdt.sync.core.exceptions.RemoteSyncException;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 
 /**
@@ -143,6 +144,25 @@ public interface ISynchronizeService extends ISynchronizeServiceDescriptor {
 	 * @throws CoreException
 	 *             if synchronization fails
 	 */
-	public void synchronize(IProject project, SyncConfig syncConfig, IResourceDelta delta, SyncFileFilter filter,
+	public void synchronize(IProject project, SyncConfig syncConfig, IResourceDelta delta,
 			IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException;
+	
+	/**
+	 * Get SyncFileFilter. Empty if not initialized before
+	 *
+	 * @param project
+	 *
+	 * @return file filter
+	 * @throws RemoteSyncException 
+	 */
+	public AbstractSyncFileFilter getSyncFileFilter(IProject project);
+
+	/**
+	 * Set sync file filter for the given project
+	 *
+	 * @param project - cannot be null
+	 * @param filter
+	 *          generic file filter  - cannot be null
+	 */
+	public void setSyncFileFilter(IProject project, AbstractSyncFileFilter filter);
 }

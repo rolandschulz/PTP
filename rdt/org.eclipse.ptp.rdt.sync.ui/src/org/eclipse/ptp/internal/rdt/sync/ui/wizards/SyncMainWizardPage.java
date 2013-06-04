@@ -31,7 +31,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ptp.internal.rdt.sync.ui.RDTSyncUIPlugin;
 import org.eclipse.ptp.internal.rdt.sync.ui.SynchronizeWizardExtensionRegistry;
 import org.eclipse.ptp.internal.rdt.sync.ui.messages.Messages;
-import org.eclipse.ptp.rdt.sync.core.SyncFileFilter;
+import org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeWizardExtension;
@@ -266,7 +266,7 @@ public class SyncMainWizardPage extends WizardNewProjectCreationPage {
 	 * 
 	 * @return sync filter
 	 */
-	public SyncFileFilter getCustomFileFilter() {
+	public AbstractSyncFileFilter getCustomFileFilter() {
 		return fSyncWidget.getCustomFileFilter();
 	}
 
