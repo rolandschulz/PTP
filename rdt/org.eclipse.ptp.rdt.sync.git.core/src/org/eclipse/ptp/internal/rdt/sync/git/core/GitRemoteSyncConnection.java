@@ -413,13 +413,13 @@ public class GitRemoteSyncConnection {
 	}
 	
     /*
-     * Do a "git rm <Files>" on the remote host
+     * Do a "git rm --cached -f <Files>" on the remote host
      */
     private void deleteRemoteFiles(Set<String> filesToDelete, IProgressMonitor monitor) throws IOException,
                     RemoteExecutionException, RemoteSyncException, MissingConnectionException {
     	try {
     		while (!filesToDelete.isEmpty()) {
-    			List<String> commandList = stringToList(gitCommand() + " rm --"); //$NON-NLS-1$ //the MAX_FILES trick can be avoided by sending files to stdin instead of passing as arguments
+    			List<String> commandList = stringToList(gitCommand() + " rm --cached -f --"); //$NON-NLS-1$ //the MAX_FILES trick can be avoided by sending files to stdin instead of passing as arguments
     			int count = 1;
     			for (String fileName : filesToDelete.toArray(new String[0])) {
     				if (count++ % MAX_FILES == 0) {
