@@ -367,7 +367,7 @@ public class GitRemoteSyncConnection {
 				if (remoteGitVersion>=1080102) {
 					final String  command = gitCommand() + " ls-files -X " + gitDir + "/" + Constants.INFO_EXCLUDE + " -i | " + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 							gitCommand() + " update-index --force-remove --stdin ; " + //$NON-NLS-1$
-							gitCommand() + " commit -m \"" + commitMessage + "\""; //$NON-NLS-1$ //$NON-NLS-2$
+							gitCommand() + " commit --allow-empty -m \"" + commitMessage + "\""; //$NON-NLS-1$ //$NON-NLS-2$
 					CommandResults commandResults = this.executeRemoteCommand(command, monitor);
 					if (commandResults.getExitCode() != 0) {
 						throw new RemoteSyncException(Messages.GRSC_GitRemoveFilteredFailure1 + commandResults.getStderr());
@@ -386,10 +386,11 @@ public class GitRemoteSyncConnection {
 				syncConfig.setProperty(GitSyncFileFilter.REMOTE_FILTER_IS_DIRTY, "FALSE"); //$NON-NLS-1$
 			}
 			
-			
+			//it would be nicer to  not do the commit instead of using allow-empty. But I can't find a way to check whether the list of files is empty (or update-index)
+			//didn't do anything
 		    final String command = gitCommand() + " ls-files -X " + gitDir + "/" + Constants.INFO_EXCLUDE + " -om | " + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					gitCommand() + " update-index --add --remove --stdin ; " + //$NON-NLS-1$
-					gitCommand() + " commit -m \"" + commitMessage + "\""; //$NON-NLS-1$ //$NON-NLS-2$
+					gitCommand() + " commit --allow-empty -m \"" + commitMessage + "\""; //$NON-NLS-1$ //$NON-NLS-2$
 			CommandResults commandResults = this.executeRemoteCommand(command, monitor);
 			if (commandResults.getExitCode() != 0) {
 				throw new RemoteSyncException(Messages.GRSC_GitCommitFailure + commandResults.getStderr());
