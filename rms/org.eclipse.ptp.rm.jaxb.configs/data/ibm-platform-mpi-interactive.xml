@@ -21,12 +21,12 @@
 			<default></default>
 		</attribute>
 		<attribute name="mpiNumberOfProcesses" min="1" type="integer"/>
-		<attribute name="byNodeOption" type="boolean"/>
+		<!--attribute name="byNodeOption" type="boolean"/>
 		<attribute name="bySlotOption" type="boolean"/>
 		<attribute name="noOversubscribeOption" type="boolean"/>
 		<attribute name="noLocalOption" type="boolean"/>
 		<attribute name="prefixOption" type="boolean"/>
-		<attribute name="prefix" type="string"/>
+		<attribute name="prefix" type="string"/-->
 		<attribute name="hostFileOption" type="boolean"/>
 		<attribute name="hostFile" type="string"/>
 		<attribute name="hostListOption" type="boolean"/>
@@ -106,13 +106,13 @@
 			<arg>perl ${ptp_rm:ptpDirectory#value}/rms/PLATFORM_MPI/start_job.pl</arg>
 			<arg>${ptp_rm:local_prefix#value}mpirun</arg>
 			<arg>-np ${ptp_rm:mpiNumberOfProcesses#value}</arg>
-			<arg attribute="byNodeOption" isUndefinedIfMatches="false">-bynode</arg>
+			<!--arg attribute="byNodeOption" isUndefinedIfMatches="false">-bynode</arg>
 			<arg attribute="bySlotOption" isUndefinedIfMatches="false">-byslot</arg>
 			<arg attribute="noOversubscribeOption" isUndefinedIfMatches="false">-nooversubscribe</arg>
 			<arg attribute="noLocalOption" isUndefinedIfMatches="false">-nolocal</arg>
-			<arg attribute="prefixOption" isUndefinedIfMatches="false">--prefix ${ptp_rm:prefix#value}</arg>
-			<arg attribute="hostListOption" isUndefinedIfMatches="false">--host ${ptp_rm:hostList#value}</arg>
-			<arg attribute="hostFileOption" isUndefinedIfMatches="false">--hostfile ${ptp_rm:hostFile#value}</arg>
+			<arg attribute="prefixOption" isUndefinedIfMatches="false">\-\-prefix ${ptp_rm:prefix#value}</arg-->
+			<arg attribute="hostListOption" isUndefinedIfMatches="false">-hostlist ${ptp_rm:hostList#value}</arg>
+			<arg attribute="hostFileOption" isUndefinedIfMatches="false">-hostfile ${ptp_rm:hostFile#value}</arg>
 			<arg>${ptp_rm:executablePath#value}</arg>
 			<arg>${ptp_rm:progArgs#value}</arg>
 			<environment name="PTP_JOBID" value="@jobId"/>
@@ -143,13 +143,13 @@
 			<arg>perl ${ptp_rm:ptpDirectory#value}/rms/PLATFORM_MPI/start_job.pl</arg>
 			<arg>${ptp_rm:local_prefix#value}mpirun</arg>
 			<arg>-np ${ptp_rm:mpiNumberOfProcesses#value}</arg>
-			<arg attribute="byNodeOption" isUndefinedIfMatches="false">-bynode</arg>
+			<!--arg attribute="byNodeOption" isUndefinedIfMatches="false">-bynode</arg>
 			<arg attribute="bySlotOption" isUndefinedIfMatches="false">-byslot</arg>
 			<arg attribute="noOversubscribeOption" isUndefinedIfMatches="false">-nooversubscribe</arg>
 			<arg attribute="noLocalOption" isUndefinedIfMatches="false">-nolocal</arg>
-			<arg attribute="prefixOption" isUndefinedIfMatches="false">--prefix ${ptp_rm:prefix#value}</arg>
-			<arg attribute="hostListOption" isUndefinedIfMatches="false">--host ${ptp_rm:hostList#value}</arg>
-			<arg attribute="hostFileOption" isUndefinedIfMatches="false">--hostfile ${ptp_rm:hostFile#value}</arg>
+			<arg attribute="prefixOption" isUndefinedIfMatches="false">\-\-prefix ${ptp_rm:prefix#value}</arg-->
+			<arg attribute="hostListOption" isUndefinedIfMatches="false">-hostlist ${ptp_rm:hostList#value}</arg>
+			<arg attribute="hostFileOption" isUndefinedIfMatches="false">-hostfile ${ptp_rm:hostFile#value}</arg>
 			<environment name="PTP_JOBID" value="@jobId"/>
 			<environment name="PTP_LAUNCH_MODE" value="${ptp_rm:launchMode#value}" />
 			<environment name="PTP_DEBUGGER_EXECUTABLE_PATH" value="${ptp_rm:debuggerExecutablePath#value}"/>
@@ -198,7 +198,7 @@
 					</widget>
 				</composite>
 				<!-- Options group -->
-				<composite group="true">
+				<composite group="false">
 					<layout>
 						<grid-layout numColumns="4"/>
 					</layout>
@@ -206,7 +206,7 @@
 						<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true"/>
 					</layout-data>
 					<title>Options</title>
-					<widget type="checkbox" title="By node" attribute="byNodeOption"/>
+					<!--widget type="checkbox" title="By node" attribute="byNodeOption"/>
 					<widget type="checkbox" title="By slot" attribute="bySlotOption"/>
 					<widget type="checkbox" title="No oversubscribe" attribute="noOversubscribeOption"/>
 					<widget type="checkbox" title="No local" attribute="noLocalOption"/>
@@ -218,7 +218,7 @@
 						<control-state>
 							<enable-if button="prefixButton" selected="true"/>
 						</control-state>
-					</widget>
+					</widget-->
 				</composite>
 				<composite group="true">
 					<layout>
@@ -293,43 +293,19 @@
 								<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" grabExcessVertical="false" widthHint="400"/>
 							</layout-data>
 							<dynamic-text>
-								<arg attribute="byNodeOption" isUndefinedIfMatches="false">-bynode</arg>
+								<!--arg attribute="byNodeOption" isUndefinedIfMatches="false">-bynode</arg>
 								<arg attribute="bySlotOption" isUndefinedIfMatches="false">-byslot</arg>
 								<arg attribute="noOversubscribeOption" isUndefinedIfMatches="false">-nooversubscribe</arg>
 								<arg attribute="noLocalOption" isUndefinedIfMatches="false">-nolocal</arg>
-								<arg attribute="prefixOption" isUndefinedIfMatches="false">--prefix ${ptp_rm:prefix#value}</arg>
-								<arg attribute="hostListOption" isUndefinedIfMatches="false">--host ${ptp_rm:hostList#value}</arg>
-								<arg attribute="hostFileOption" isUndefinedIfMatches="false">--hostfile ${ptp_rm:hostFile#value}</arg>
+								<arg attribute="prefixOption" isUndefinedIfMatches="false">\-\-prefix ${ptp_rm:prefix#value}</arg-->
+								<arg attribute="hostListOption" isUndefinedIfMatches="false">-hostlist ${ptp_rm:hostList#value}</arg>
+								<arg attribute="hostFileOption" isUndefinedIfMatches="false">-hostfile ${ptp_rm:hostFile#value}</arg>
 								<arg>${ptp_rm:allAttributes#value}</arg>
 							</dynamic-text>
 							<control-state>
 								<enable-if button="defaultArguments" selected="false"/>
 							</control-state>
 						</widget>
-					</composite>
-					<!-- MCA group -->
-					<composite group="true">
-						<layout>
-							<grid-layout numColumns="1"/>
-						</layout>
-						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true"/>
-						</layout-data>
-						<title>MCA Parameters</title>
-						<viewer name="allAttributes" style="SWT.BORDER | SWT.MULTI" sort="true" type="table" initialAllChecked="false">
-							<layout-data>
-								<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true"/>
-							</layout-data>
-							<column-data name="Name" width="175">
-								<tooltip>Double-click on selected rows toggles their checked value.</tooltip>
-							</column-data>
-							<column-data name="Value" width="200">
-								<tooltip>Click to activate value widget.</tooltip>
-							</column-data>
-							<items allDiscovered="true">
-							</items>
-							<value pattern="-mca @name &quot;@value&quot;"/>
-						</viewer>
 					</composite>
 				</composite>
 			</dynamic>
