@@ -109,7 +109,7 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		
 		@Override
 		public String getPattern() {
-			return rule.getPattern();
+			return rule.getPattern() + (rule.dirOnly()?"/":""); //$NON-NLS-1$ //$NON-NLS-2$ 
 		}
 	}
 	

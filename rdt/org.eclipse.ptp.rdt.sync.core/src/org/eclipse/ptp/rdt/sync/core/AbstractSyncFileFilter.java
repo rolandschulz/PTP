@@ -44,7 +44,7 @@ public abstract class AbstractSyncFileFilter {
 		public abstract boolean getResult(); 
 		/** @return String representing the full pattern (e.g. including an encoding for exclude)*/
 		public abstract String toString(); 
-		/** @return String without encoding of extra flags (i.e. exclude)*/
+		/** @return String without encoding of extra flags which are querryable separately  (currently only exclude)*/
 		public abstract String getPattern(); 
 	}
 	
