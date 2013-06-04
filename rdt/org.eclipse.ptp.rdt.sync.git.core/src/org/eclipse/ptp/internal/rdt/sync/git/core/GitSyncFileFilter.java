@@ -23,6 +23,7 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.treewalk.FileTreeIterator;
 import org.eclipse.jgit.treewalk.TreeWalk;
+import org.eclipse.jgit.treewalk.WorkingTreeIterator;
 import org.eclipse.jgit.treewalk.filter.IndexDiffFilter;
 import org.eclipse.ptp.internal.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter;
@@ -201,11 +202,16 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		return ignoredFiles;
 	}
 	
+	public class DiffFiles {
+		public Set<String> added = new HashSet<String>(); //modified and added
+		public Set<String> removed = new HashSet<String>();
+	}
+	
 	/* get all different files (modified/changed, missing/removed, untracked/added)
 	 * 
 	 * assumes that no files are in conflict (don't call during merge) 
 	 * */
-	public Set<String> getDiffFiles() throws IOException {
+	public DiffFiles getDiffFiles() throws IOException {
 		final int INDEX = 0;
 		final int WORKDIR = 1;
 		
@@ -217,7 +223,7 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		//would require a WorkingTreeIteraotr which does the ignore handing correct 
 		//(both directory including bugs 401161 and only using info/exclude not .gitignore)
 		treeWalk.setFilter(new IndexDiffFilter(INDEX, WORKDIR,false)); 
-		Set<String> diffFiles = new HashSet<String>();
+		DiffFiles diffFiles = new DiffFiles();
 		int ignoreDepth = Integer.MAX_VALUE; //if the current subtree is ignored - than this is the depth at which to ignoring starts
 		while (treeWalk.next()) {
 			DirCacheIterator dirCacheIterator = treeWalk.getTree(INDEX,
@@ -234,8 +240,13 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 					ignoreDepth = depth;
 				if (isSubtree) 
 					treeWalk.enterSubtree(); 
-				else if(dirCacheIterator != null || ignoreDepth==Integer.MAX_VALUE) 
-					diffFiles.add(path);
+				else if(dirCacheIterator != null || ignoreDepth==Integer.MAX_VALUE) {
+					WorkingTreeIterator workTreeIter = treeWalk.getTree(WORKDIR, WorkingTreeIterator.class);
+					if (workTreeIter != null)   //in work-tree => modified or untracked 
+						diffFiles.added.add(path);
+					else
+						diffFiles.removed.add(path);
+				}
 			}
 		}
 		return diffFiles;
@@ -252,7 +263,7 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		GitSyncFileFilter filter = new GitSyncFileFilter(repository, null);
 		filter.loadFilter();
 		//List<String> files = filter.getIgnoredFiles();
-		Set<String> files = filter.getDiffFiles();
+		Set<String> files = filter.getDiffFiles().added;
 		for (String path : files) 
 			System.out.println(path);
 	}

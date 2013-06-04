@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +63,7 @@ import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.util.FS;
 import org.eclipse.ptp.internal.rdt.sync.git.core.CommandRunner.CommandResults;
+import org.eclipse.ptp.internal.rdt.sync.git.core.GitSyncFileFilter.DiffFiles;
 import org.eclipse.ptp.internal.rdt.sync.git.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.RecursiveSubMonitor;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
@@ -397,40 +397,6 @@ public class GitRemoteSyncConnection {
 		}
 	}
 
-	/*
-	 * Use "git status" to obtain a list of files that need to be added or deleted from the git index.
-	 */
-	private Status getFileStatus(Set<String> filesToAdd, Set<String> filesToDelete, boolean includeUntrackedFiles)
-			throws RemoteSyncException {
-		StatusCommand statusCommand = git.status();
-		Status status;
-		try {
-			status = statusCommand.call();
-			filesToAdd.addAll(status.getModified());
-			if (includeUntrackedFiles) {
-				filesToAdd.addAll(status.getUntracked());
-				filesToAdd.addAll(status.getIgnoredNotInIndex());
-			}
-			filesToDelete.addAll(status.getMissing());
-		} catch (GitAPIException e) {
-			throw new RemoteSyncException(e);
-		}
-
-		Set<String> allFiles = new HashSet<String>();
-		allFiles.addAll(filesToAdd);
-		allFiles.addAll(filesToDelete);
-		Set<String> filesToBeIgnored = new HashSet<String>();
-		for (String fileName : allFiles) {
-			if (fileFilter.shouldIgnore(project.getFile(fileName))) {
-				filesToBeIgnored.add(fileName);
-			}
-		}
-		filesToAdd.removeAll(filesToBeIgnored);
-		filesToDelete.removeAll(filesToBeIgnored);
-
-		return status;
-	}
-
 	// Subclass JGit's generic RemoteSession to set up running of remote
 	// commands using the available process builder.
 	public class PTPSession implements RemoteSession {
@@ -542,27 +508,18 @@ public class GitRemoteSyncConnection {
 	private boolean doCommit(IProgressMonitor monitor) throws RemoteSyncException {
 		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
 		
-		//TODO: using the add command is not OK because it checks ignore files - also it would be nice to not have to split rm and add
-
-		try {
-				
-			
-			Set<String> files = fileFilter.getDiffFiles();
-		} catch (IOException e) {
-			throw new RemoteSyncException(e);
-		}
-		
-		
-		Set<String> filesToAdd = new HashSet<String>();
-		Set<String> filesToRemove = new HashSet<String>();
-		Status status = this.getFileStatus(filesToAdd, filesToRemove, true);
 		boolean addedOrRemovedFiles = false;
 
 		try {
+			DiffFiles diffFiles = fileFilter.getDiffFiles();
+			
 			subMon.subTask(Messages.GitRemoteSyncConnection_9);
-			if (!filesToAdd.isEmpty()) {
+			if (!diffFiles.added.isEmpty()) {
 				final AddCommand addCommand = git.add();
-				for (String fileName : filesToAdd) {
+				//Bug 401161 doesn't matter here because files are already filtered anyhow. It would be OK
+				//if the tree iterator would always return false in isEntryIgnored
+				addCommand.setWorkingTreeIterator(new SyncFileTreeIterator(git.getRepository(), fileFilter));
+				for (String fileName : diffFiles.added) {
 					addCommand.addFilepattern(fileName);
 				}
 				addCommand.call();
@@ -571,9 +528,9 @@ public class GitRemoteSyncConnection {
 			subMon.worked(10);
 
 			subMon.subTask(Messages.GitRemoteSyncConnection_10);
-			if (!filesToRemove.isEmpty()) {
+			if (!diffFiles.removed.isEmpty()) {
 				final RmCommandCached rmCommand = new RmCommandCached(git.getRepository());
-				for (String fileName : filesToRemove) {
+				for (String fileName : diffFiles.removed) {
 					rmCommand.addFilepattern(fileName);
 				}
 				rmCommand.call();
@@ -582,13 +539,8 @@ public class GitRemoteSyncConnection {
 			subMon.worked(10);
 
 			// Check if a commit is required.
-			// Note that we need the "addedOrRemovedFiles" boolean too because the status object reflects the repository state
-			// before files were added or removed.
 			subMon.subTask(Messages.GitRemoteSyncConnection_11);
-			boolean indexHasNewFiles = !status.getAdded().isEmpty();
-			boolean indexHasModifiedFiles = !status.getChanged().isEmpty();
-			boolean indexHasDeletedFiles = !status.getRemoved().isEmpty();
-			if (addedOrRemovedFiles || indexHasNewFiles || indexHasModifiedFiles || indexHasDeletedFiles || inMergeState()) {
+			if (addedOrRemovedFiles || inMergeState()) {
 				final CommitCommand commitCommand = git.commit();
 				commitCommand.setMessage(commitMessage);
 				commitCommand.call();

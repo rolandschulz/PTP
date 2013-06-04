@@ -231,8 +231,6 @@ public class GitSyncService extends AbstractSynchronizeService {
 	}
 
 	
-	//TODO: should I make getFileFilter not depend on config? if so instead of using repo the exclude file name could be computed from project folder + .ptp_sync
-	
 	// Paths that the Git sync provider can ignore.
 	private boolean irrelevantPath(IProject project, IResource resource) {
 		if (SyncManager.getFileFilter(project).shouldIgnore(resource)) {
