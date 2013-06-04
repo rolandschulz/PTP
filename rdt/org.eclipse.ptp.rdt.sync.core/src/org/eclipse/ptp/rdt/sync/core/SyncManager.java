@@ -150,7 +150,6 @@ public class SyncManager {
 	 * @param provider
 	 *            ISynchronizeService that has been correctly configured
 	 * @param fileFilter 
-	 * @param filter
 	 *            synchronize filter, or null if no filter
 	 * @throws CoreException
 	 *             on problems adding sync nature
@@ -163,6 +162,9 @@ public class SyncManager {
 		SyncConfig config = SyncConfigManager.newConfig(remoteSyncConfigName, provider.getId(), conn, provider.getLocation());
 		SyncConfigManager.addConfig(project, config);
 		SyncConfigManager.setActive(project, config);
+		if (fileFilter == null) {
+			fileFilter = SyncManager.getDefaultFileFilter();
+		}
 		provider.setSyncFileFilter(project, fileFilter);
 
 		// Local config

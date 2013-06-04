@@ -121,6 +121,7 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 	public void saveFilter() throws IOException  {
 		File exclude = repository.getFS().resolve(repository.getDirectory(),
 				Constants.INFO_EXCLUDE);
+		exclude.getParentFile().mkdirs();
 		FileOutputStream file = new FileOutputStream(exclude);
 		BufferedWriter out = new BufferedWriter(new OutputStreamWriter(file,Constants.CHARSET));
 		try {
