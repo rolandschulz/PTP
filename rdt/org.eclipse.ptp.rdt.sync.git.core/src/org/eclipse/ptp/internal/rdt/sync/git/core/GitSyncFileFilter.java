@@ -38,7 +38,17 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 	// independently of the rest of the class and could be moved into a separate class if desired.
 	private static Map<IProject, GitSyncFileFilter> projectToFilterMap = new HashMap<IProject, GitSyncFileFilter>();
 	public static GitSyncFileFilter getFilter(IProject project) {
-		return projectToFilterMap.get(project);
+		GitSyncFileFilter filter = projectToFilterMap.get(project);
+		if (filter==null) {
+			try {
+				filter = new GitSyncFileFilter(GitRemoteSyncConnection.getLocalRepo(project, project.getLocation().toString()), project);
+				filter.loadFilter();
+				projectToFilterMap.put(project, filter);
+			} catch (IOException e) {
+				RDTSyncCorePlugin.log("Unable to load file filter for project " + project.getName(), e);
+			}
+		}
+		return filter;
 	}
 
 	public static void setFilter(IProject project, AbstractSyncFileFilter filter, Repository repository) {
@@ -47,7 +57,7 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		try {
 			newGitFilter.saveFilter();
 		} catch (IOException e) {
-			RDTSyncCorePlugin.log("Unable to save file filter for project " + project.getName(), e); //$NON-NLS-1$
+			RDTSyncCorePlugin.log("Unable to save file filter for project " + project.getName(), e);
 		}
 		projectToFilterMap.put(project, newGitFilter);
 	}
