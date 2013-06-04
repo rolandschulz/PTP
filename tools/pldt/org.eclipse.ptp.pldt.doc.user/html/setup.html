@@ -9,8 +9,14 @@ Setup for MPI Tools within the Parallel Language Development Tools
 <h1 id="top">Setup for MPI Tools within the Parallel Language Development Tools</h1>
 <p>&nbsp;
 <!--  ============= -->
-<p>This section describes how to set up a C/C++ project for MPI.
-There are at several ways to do this:
+<p>This section describes how to set up a simple <i>local</i> C/C++ project for MPI.
+A local project exists on the local machine (same machine on which Eclipse is installed).
+See also the information about creating synchronized projects, where source code etc. is mirrored on the
+local machine as well as a remote target on which you can build and run the program.
+For another sample project creation example using synchronized projects, see
+<a href="PLUGINS_ROOT/org.eclipse.ptp.doc.user/html/01buildMPIprog.html">Introduction to MPI projects (synchronized and local)</a>
+<p>
+There are several ways to set up the MPI information in an Eclipse C/C++/Fortran project:
 <ul><li>Managed Build Projects
 <ul>
 <li><a href="#wizard">Use the PLDT new project wizards</a>
@@ -33,7 +39,7 @@ to find the include paths for build as well as for other Eclipse tools.
 refer to a C project in which it manages the makefile as  a "Managed Make Project" or a "Managed Build Project."
 They refer to a project which 
 you supply the makefile is a "Standard Make project".
-<p>The current version of CDT that works with PTP 6.0 is CDT 8.1.
+<p>The current version of CDT that works with PTP 7.0 is CDT 8.2.
 CDT 5.0 and later refers to a C project in which it manages the makefile as just a "C Project" and a project which 
 you supply the makefile is a <a href="setupMakefileProject.html">"Makefile project."</a>
 <p>Both terminologies are sometimes used in these instructions.

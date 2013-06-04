@@ -7,7 +7,6 @@
 <body>
 <h1 id="top">Configuring Environment Modules</h1>
 <p>
-<!-- FIXME not updated for kepler; info in build.html may replace this -->
 <p>Environment modules allow users to switch between different versions of
 compilers, libraries, and other installed software on a supercomputer.
 On the command line, environment modules are typically configured using commands like
@@ -18,18 +17,41 @@ modules to be loaded when a synchronized C/C++ or Fortran project is built.
 Module commands can be entered manually -- just as you would enter at the command
 line -- or they can be configured using a graphical interface.</p>
 
+<p>A brief description of Environment Management with Modules
+is available in the <a href="build.html#envMgmt">Environment Management section of Building Synchronized Projects</a>.
+<br>This section covers more additional details.
+
 <p><i><b>Note: The following instructions apply only to synchronized projects.</b>
 Currently, it is not possible to configure modules for local or remote projects.</i></p>
 
-<p>To configure environment modules used to build a synchronized C/C++ or Fortran project:</p>
+<p>To configure environment modules used to build a synchronized C/C++ or Fortran project, 
+the information can be accessed in two places:</p>
+<p></p>
 <ol>
-<li>In the Project Explorer view, right-click on a C/C++ or Fortran project.</li>
-<li>In the context menu, select Properties.  This will open the <a href="misc.html#projProps">Project Properties</a> dialog.</li>
-<li>In the tree on the left, navigate to <b>C/C++ Build &gt; Environment Management</b>.
-<br/>
-<p align="center"><script>thumb("images/modules-unchecked.png",245)</script></p><p><br/></p>
+<li>From the project context menu (right-click on a C/C++ or Fortran project), select
+<b>Synchronize > Manage ...</b> 
+<p><img src="images/build-sync-manage.png"></p>
+<p>&nbsp
+<p>This brings up the <b>Manage Synchronize Configurations</b> dialog.
+<p><img src="images/build-sync-manage-dialog.png"></p>
+<p>&nbsp
 </li>
-<li>Select <b>Use an environment management system to customize the remote build environment</b>.</li>
+<li>Alternatively, this is also available from  the <a href="misc.html#projProps">Project Properties</a> dialog,
+on the <b>Synchronize</b> page.  
+
+</ol>
+
+<p>Here we illustrate it from the first alternative, the <b>Manage Synchronize Configurations</b> dialog.
+
+<!--  ----------------------------- -->
+
+
+</li>
+
+<li>Check <b>Use an environment management system to customize the remote build environment</b>.
+<p align="center"><script>thumb("images/build-sync-manage-dialog-box.png",245)</script></p><p><br/></p>
+
+<p>&nbsp
 <li>If a message appears reading <b>The remote environment <i>(connection name)</i> is not connected</b>,
     click the <b>Connect</b> button.
     If no such message appears, proceed to the next step.
@@ -45,9 +67,9 @@ Currently, it is not possible to configure modules for local or remote projects.
         <br/>
         <p align="center"><script>thumb("images/modules-notDetected.png",245)</script></p><p><br/></p>
         </li>
-    <li>If a check list with a list of modules appears,
-        you may select the modules to be loaded from the check list.
-        <a href="#checklist">Click here</a> for further instructions.
+    <li>If a list of modules appears,
+        you may select the modules to be loaded from the  list.
+        <a href="#select">Click here</a> for further instructions.
         <br/>
         <p align="center"><script>thumb("images/modules-list.png",245)</script></p><p><br/></p>
         </li>
@@ -57,9 +79,9 @@ Currently, it is not possible to configure modules for local or remote projects.
     click the <b>OK</b> button to save the configuration and close the Project Properties dialog.</li>
 </ol>
 
-<h2 id="top">Configuring Environment Modules Using the Module List</h1>
+<h2 id="select">Configuring Environment Modules Using the Module List</h1>
 
-<p>PTP allows modules to be configured using a check list when the remote
+<p>PTP allows modules to be configured using a  list of available, and selected, modules, when the remote
 machine runs one of the following environment management systems:</p>
 <ul>
 <li><a href="http://modules.sourceforge.net/">Modules</a> - C or Tcl versions</li>
@@ -67,17 +89,19 @@ machine runs one of the following environment management systems:</p>
 <li>SoftEnv</li>
 </ul>
 
-<p align="center"><img src="images/modules-checklist-cropped.png"/></p><p><br/></p>
+<p align="center"><img src="images/modules-list.png"/></p><p><br/></p>
 
 <p>The module configuration area contains the following elements.</p>
 <ul>
-<li>The list displays all of the modules available on the remote machine.
-    If a module is checked, that module will be loaded when the project is
-    built.  If a module is not checked, PTP will ensure that the module is
+<li>The list of <b>Available Modules</b> on the left displays all of the modules available on the remote machine.
+    Select a module from the list on the left and click the <b>Add&nbsp-></b> button to add it to the list of selected modules.
+    Select a module from the list of modules on the right and use the <b><-&nbspRemove</b> button to remove modules from the selected modules list.
+    If a module is listed on the right in the <b>Selected Modules</b> list, that module will be loaded when the project is
+    built.  If a module is not in the list of selected modules, PTP will ensure that the module is
     not loaded when the project is built.</li>
-<li>A <b>Clear Selection</b> button clears all of the check boxes in the
-    module list.</li>
-<li>A <b>Select Defaults</b> button restores the list so that only the
+<li>Selet a module in the list on the right and use the <b>Up</b> and <b>Down</b> buttons to re-order the selected modules so they will be loaded
+    in the order listed.
+<li>A <b>Set Default</b> button restores the list so that only the
     default modules are checked.  The &quot;default modules&quot; are
     those that are loaded automatically when a new Bash login shell is
     launched on the remote machine.  (Some systems allow users to customize
@@ -90,13 +114,13 @@ machine runs one of the following environment management systems:</p>
 <li>A <b>Filter List</b> text field allows you to temporarily display only a
     subset of the available modules.  This is useful for quickly finding
     modules with a particular name.  Note that entering filter text does
-    <i>not</i> change what modules are checked; rather, it temporarily removes
+    <i>not</i> change what modules are selected; rather, it temporarily removes
     some modules from view.  For further instructions,
     <a href="#filter">see below</a>.</li>
 </ul>
 </p>
 
-<h3 id="top">Using the <b>Filter List</b> Text Field</h1>
+<h3 id="filter">Using the <b>Filter List</b> Text Field</h1>
 
 <p>The <b>Filter List</b> text field can be used to temporarily display only
 modules with a particular name.  (Entering text in this field does not affect
@@ -125,18 +149,20 @@ filter text is cleared.)</p>
     <li>Entering "openmpi-1.?-intel" would match a module named openmpi-1.6-intel-12.0.4
     but not openmpi-1.4.3-intel-12.0.4.)</li>
     </ul></li>
+        <p><img src="images/modules-filter-list.png"></p>
 </ul>
 
-<h2 id="top">Configuring Environment Modules Manually</h1>
+<h2 id="manual">Configuring Environment Modules Manually</h1>
 
 <p>To configure environment modules manually:</p>
 <ol>
 <li>Select <b>Manually specify environment configuration commands</b>.</li>
 <li>A text box will appear.  If the check list was previously visible, the text
     box will contain the commands needed to configure the modules according to
-    what was selected in the checklist.</li>
+    the list of <b>Selected Modules</b>.  Otherwise the text area will be blank.</li>
 <li>Enter Bash shell commands necessary to configure the environment, one per
     line.</li>
+    <p><img src="images/modules-manual.png"></p>
 </ol>
 
 <p>&nbsp;</p>

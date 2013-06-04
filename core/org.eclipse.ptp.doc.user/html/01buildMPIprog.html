@@ -146,8 +146,23 @@ project.
 <p>This example shows the files in the remote directory that are mirrored in the synchronized
 project within Eclipse PTP.
 <br><img src="images/01sync-term.png">
+<h2 id="sync-build">Step 3: Edit source files</h2>
+<p>To edit a source file, double-click on a file in the Project explorer view.
+The editor opens on that file.
 
-
+You may see <a href="PLUGINS_ROOT/org.eclipse.ptp.pldt.doc.user/html/codan.html">Codan</a> errors on lines that use APIs
+from include files that aren't on your system, and in the Eclipse
+<b>Problems</b> view.
+<p><img src="images/01edit-codanErrors.png"></p>
+<p>&nbsp
+<p>
+To tell Eclipse about remote include files see
+<a href="includes.html">Include files for Synchronized Projects</a>.
+<p>&nbsp
+<p>With include files successfully specified, the editor errors
+should go away:
+<p><img src="images/01edit-no-codanErrors.png"></p>
+<p>&nbsp
 <h2 id="sync-build">Step 3: Build the executable on the remote machine</h2>
 <p></p>
 <ol>
@@ -270,7 +285,7 @@ If your MPI build command is different, you can access the
 
 <p>To change the MPI command, in the project properties, select <b>C/C++ Build > Settings </b> and on the <b>GCC C Compiler</b>
 tree item, change the <b>Command:</b> string from mpicc to whatever your MPI build command may be.
-)
+
 </li>
 </ol>
 
