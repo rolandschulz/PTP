@@ -388,7 +388,7 @@ public class GitRemoteSyncConnection {
 			
 			//it would be nicer to  not do the commit instead of using allow-empty. But I can't find a way to check whether the list of files is empty (or update-index)
 			//didn't do anything
-		    final String command = gitCommand() + " ls-files -X " + gitDir + "/" + Constants.INFO_EXCLUDE + " -om | " + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		    final String command = gitCommand() + " ls-files -X " + gitDir + "/" + Constants.INFO_EXCLUDE + " -o -m | " + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					gitCommand() + " update-index --add --remove --stdin ; " + //$NON-NLS-1$
 					gitCommand() + " commit --allow-empty -m \"" + commitMessage + "\""; //$NON-NLS-1$ //$NON-NLS-2$
 			CommandResults commandResults = this.executeRemoteCommand(command, monitor);
@@ -419,7 +419,7 @@ public class GitRemoteSyncConnection {
                     RemoteExecutionException, RemoteSyncException, MissingConnectionException {
     	try {
     		while (!filesToDelete.isEmpty()) {
-    			List<String> commandList = stringToList(gitCommand() + " rm --"); //$NON-NLS-1$
+    			List<String> commandList = stringToList(gitCommand() + " rm --"); //$NON-NLS-1$ //the MAX_FILES trick can be avoided by sending files to stdin instead of passing as arguments
     			int count = 1;
     			for (String fileName : filesToDelete.toArray(new String[0])) {
     				if (count++ % MAX_FILES == 0) {
