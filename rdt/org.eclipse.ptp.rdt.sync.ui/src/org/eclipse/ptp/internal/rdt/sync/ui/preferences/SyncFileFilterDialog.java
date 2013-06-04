@@ -67,6 +67,7 @@ public class SyncFileFilterDialog extends Dialog {
 	private CheckboxTreeViewer treeViewer;
 	private Button showRemoteButton;
 	private Label remoteErrorLabel;
+	private SyncFilterWidget filterWidget;
 
 	/** Boolean to help tell which boolean arguments do what */
 	private static final boolean GRAB_EXCESS = true;
@@ -207,7 +208,7 @@ public class SyncFileFilterDialog extends Dialog {
 			treeViewer.addCheckStateListener(new ICheckStateListener() {
 				@Override
 				public void checkStateChanged(CheckStateChangedEvent event) {
-					filter.addPattern((IResource)event.getElement(), event.getChecked());
+					filter.addPattern((IResource)event.getElement(), !event.getChecked());
 					update();
 				}
 			});
@@ -232,7 +233,7 @@ public class SyncFileFilterDialog extends Dialog {
 			}
 		}
 
-		SyncFilterWidget filterWidget = new SyncFilterWidget(composite, SWT.NONE);
+		filterWidget = new SyncFilterWidget(composite, SWT.NONE);
 		filterWidget.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		filterWidget.setFilter(filter);
 
@@ -269,6 +270,7 @@ public class SyncFileFilterDialog extends Dialog {
 			showRemoteButton.setSelection(showRemote);
 			((SFTTreeContentProvider) treeViewer.getContentProvider()).setShowRemoteFiles(showRemote);
 			treeViewer.refresh();
+			filterWidget.update();
 		}
 	}
 

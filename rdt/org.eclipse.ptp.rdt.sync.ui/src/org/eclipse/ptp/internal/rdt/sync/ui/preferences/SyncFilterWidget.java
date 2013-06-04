@@ -342,6 +342,16 @@ public class SyncFilterWidget extends Composite {
 		updateTable();
 	}
 
+	/**
+	 * Update filter - useful for when patterns are changed externally.
+	 */
+	@Override
+	public void update() {
+		super.update();
+		updateButtonEnablement();
+		updateTable();
+	}
+
 	private void updateButtonEnablement() {
 		fEditButton.setEnabled(false);
 		removeButton.setEnabled(false);
