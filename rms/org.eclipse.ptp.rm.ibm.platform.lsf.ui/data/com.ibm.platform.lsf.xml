@@ -459,7 +459,14 @@
 			<file-staging-location>${ptp_rm:directory#value}</file-staging-location>
 				<!--  If the substituted value of the statement following the '>' in the following <arg> 
 				      specifications evaluates to the value specified for isUndefinedIfMatches then the 
-				      statement is suppressed. Regular expressions are allowed in 'isUndefinedIfMatches' 
+				      statement is suppressed. Regular expressions are allowed in 'isUndefinedIfMatches'
+				      The evaluation of both sides of the isUndefinedIfMatches is an exact match (by regex rules)
+				      so spaces, tabs, etc are important. 
+				      
+				      In general, strings in the 'isUndefinedIfMatches' left hand side are surrounded by double
+				      quotes. The exception is where the expression being matched contains double quotes.
+				      In that case, to avoid issues with nested quoues, single quotes are used to surround the
+				      left hand side string.
 				      
 				      Make sure that all of the <arg> specifications do not wrap to multiple lines since
 				      the newline characters will also appear in the script file, which will result in an 
@@ -525,10 +532,10 @@
 				<arg isUndefinedIfMatches="#BSUB -is">#BSUB -is ${ptp_rm:LSF_STDIN_EDITABLE_PATH#value}</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#BSUB -J">#BSUB -J "${ptp_rm:LSF_JOB_NAME#value}"</arg>
+				<arg isUndefinedIfMatches='#BSUB -J ""'>#BSUB -J "${ptp_rm:LSF_JOB_NAME#value}"</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#BSUB -Jd">#BSUB -Jd	"${ptp_rm:LSF_JOB_DESCRIPTION#value}"</arg>
+				<arg isUndefinedIfMatches='#BSUB -Jd ""'>#BSUB -Jd "${ptp_rm:LSF_JOB_DESCRIPTION#value}"</arg>
 			</line>
 			<line>
 				<arg isUndefinedIfMatches="#BSUB -jsdl">#BSUB -jsdl	${ptp_rm:LSF_JSDL_FILE#value}</arg>
@@ -537,7 +544,7 @@
 				<arg isUndefinedIfMatches="#BSUB -jsdl_strict">#BSUB -jsdl_strict ${ptp_rm:LSF_JSDL_FILE_STRICT#value}</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#BSUB -k">#BSUB -k "${ptp_rm:LSF_CHECKPOINT#value}"</arg>
+				<arg isUndefinedIfMatches='#BSUB -k ""'>#BSUB -k "${ptp_rm:LSF_CHECKPOINT#value}"</arg>
 			</line>
 			<line>
 				<arg isUndefinedIfMatches="#BSUB -L">#BSUB -L ${ptp_rm:LSF_LOGIN_SHELL#value}</arg>
@@ -549,7 +556,7 @@
 				<arg isUndefinedIfMatches="#BSUB -M">#BSUB -M ${ptp_rm:LSF_MEMORY_LIMIT#value}</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#BSUB -m">#BSUB -m "${ptp_rm:LSF_HOST_NAMES#value}"</arg>
+				<arg isUndefinedIfMatches='#BSUB -m ""'>#BSUB -m "${ptp_rm:LSF_HOST_NAMES#value}"</arg>
 			</line>
 			<line>
 				<arg isUndefinedIfMatches="#BSUB -mig">#BSUB -mig ${ptp_rm:LSF_MIGRATION#value}</arg>
@@ -558,7 +565,7 @@
 				<arg isUndefinedIfMatches="#BSUB -n">#BSUB -n ${ptp_rm:LSF_NUM_PROCS#value}</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#BSUB -network">#BSUB -network "${ptp_rm:LSF_NETWORK#value}"</arg>
+				<arg isUndefinedIfMatches='#BSUB -network ""'>#BSUB -network "${ptp_rm:LSF_NETWORK#value}"</arg>
 			</line>
 			<line>
 				<arg isUndefinedIfMatches="#BSUB -o">#BSUB -o ${ptp_rm:LSF_STDOUT_PATH_APPEND#value}</arg>
@@ -573,13 +580,13 @@
 				<arg isUndefinedIfMatches="#BSUB -p">#BSUB -p ${ptp_rm:LSF_PROCESS_LIMIT#value}</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#BSUB -Q">#BSUB -Q "${ptp_rm:LSF_REQUEUE_CODES#value}"</arg>
+				<arg isUndefinedIfMatches='#BSUB -Q ""'>#BSUB -Q "${ptp_rm:LSF_REQUEUE_CODES#value}"</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#BSUB -q">#BSUB -q "${ptp_rm:LSF_QUEUE#value}"</arg>
+				<arg isUndefinedIfMatches='#BSUB -q ""'>#BSUB -q "${ptp_rm:LSF_QUEUE#value}"</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#BSUB -R">#BSUB -R "${ptp_rm:LSF_RESOURCES#value}"</arg>
+				<arg isUndefinedIfMatches='#BSUB -R ""'>#BSUB -R "${ptp_rm:LSF_RESOURCES#value}"</arg>
 			</line>
 			<line>
 				<arg isUndefinedIfMatches="#BSUB -S">#BSUB -S ${ptp_rm:LSF_STACK_LIMIT#value}</arg>
@@ -615,13 +622,13 @@
 				<arg isUndefinedIfMatches="#BSUB -We">#BSUB -We	${ptp_rm:LSF_RUNTIME_ESTIMATE#value}</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#BSUB -w">#BSUB -w '${ptp_rm:LSF_DEPENDENCIES#value}'</arg>
+				<arg isUndefinedIfMatches="#BSUB -w ''">#BSUB -w '${ptp_rm:LSF_DEPENDENCIES#value}'</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#BSUB -wa">#BSUB -wa '${ptp_rm:LSF_JOB_ACTION#value}'</arg>
+				<arg isUndefinedIfMatches="#BSUB -wa ''">#BSUB -wa '${ptp_rm:LSF_JOB_ACTION#value}'</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#BSUB -wt">#BSUB -wt	'${ptp_rm:LSF_JOB_ACTION_TIME#value}'</arg>
+				<arg isUndefinedIfMatches="#BSUB -wt ''">#BSUB -wt '${ptp_rm:LSF_JOB_ACTION_TIME#value}'</arg>
 			</line>
 			<line>
 				<arg isUndefinedIfMatches="#BSUB ">#BSUB ${ptp_rm:LSF_OTHER_OPTIONS#value}</arg>
