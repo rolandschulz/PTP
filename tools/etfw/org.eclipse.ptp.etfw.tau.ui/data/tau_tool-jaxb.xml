@@ -440,6 +440,21 @@
 			<rm:tooltip></rm:tooltip>
 			<rm:default>None</rm:default>
 		</attribute>
+		<attribute name="keep_profile_files" type="boolean">
+			<rm:description></rm:description>
+			<rm:tooltip></rm:tooltip>
+			<rm:default>None</rm:default>
+		</attribute>
+		<attribute name="print_profile_summary_only" type="boolean">
+			<rm:description></rm:description>
+			<rm:tooltip></rm:tooltip>
+			<rm:default>None</rm:default>
+		</attribute>
+		<attribute name="upload_profiles_to_portal" type="boolean">
+			<rm:description></rm:description>
+			<rm:tooltip></rm:tooltip>
+			<rm:default>None</rm:default>
+		</attribute>
 	</controlData>
 	<buildTool tool-id="TAU" replace-compiler="true">
 		<cc-compiler tool-command="tau_cc.sh" tool-group="tau" />
@@ -1506,17 +1521,17 @@
 								/> <rm:rule button="Opari" selected="true" /> <rm:rule button="OpenMP" selected="true" /> <rm:rule button="Papi" selected="true" /> <rm:rule 
 								button="Trace" selected="true" /> <rm:rule button="PDT" selected="true" /> </rm:or> </rm:enable-if> </rm:control-state> -->
 						</rm:widget> 
-						<rm:widget type="checkbox" title="Keep profiles" style="SWT.LEFT">
+						<rm:widget type="checkbox" title="Keep profiles" attribute="keep_profile_files" style="SWT.LEFT">
 							<rm:layout-data>
 								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
 							</rm:layout-data>
 						</rm:widget>
-						<rm:widget type="checkbox" title="Print Profile Summary Only" style="SWT.LEFT">
+						<rm:widget type="checkbox" title="Print Profile Summary Only" attribute="print_profile_summary_only" style="SWT.LEFT">
 							<rm:layout-data>
 								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
 							</rm:layout-data>
 						</rm:widget>
-						<rm:widget type="checkbox" title="Upload profile data to TAU Portal" style="SWT.LEFT">
+						<rm:widget type="checkbox" title="Upload profile data to TAU Portal" attribute="upload_profiles_to_portal" style="SWT.LEFT">
 							<rm:layout-data>
 								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
 							</rm:layout-data>

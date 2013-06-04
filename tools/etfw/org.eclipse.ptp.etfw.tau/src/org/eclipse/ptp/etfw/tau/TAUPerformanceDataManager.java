@@ -673,7 +673,7 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager {
 	@Override
 	public void process(String projname, ILaunchConfiguration configuration, String directory) throws CoreException {
 		// String projectDirectory = directory;
-		boolean profsummary = configuration.getAttribute(ITAULaunchConfigurationConstants.PROFSUMMARY, false);
+		boolean profsummary = configuration.getAttribute(getETFWKey(configuration,ITAULaunchConfigurationConstants.PROFSUMMARY), false);
 		final IBuildLaunchUtils tmpub = new BuildLaunchUtils();
 		final String pppath = tmpub.checkToolEnvPath("paraprof");
 		boolean hasLocalParaprof = true;
@@ -760,7 +760,7 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager {
 		}
 
 		final boolean runtauinc = configuration.getAttribute(ITAULaunchConfigurationConstants.TAUINC, false);
-		final boolean usePortal = configuration.getAttribute(ITAULaunchConfigurationConstants.PORTAL, false);
+		final boolean usePortal = configuration.getAttribute(getETFWKey(configuration,ITAULaunchConfigurationConstants.PORTAL), false);
 		if (xmlFile == null && profiles != null && profiles.size() > 0 || usePortal) {
 			ppkFile = getPPKFile(directory, projname, projtype, projtrial);
 			if (!ppkFile.fetchInfo().exists())
@@ -800,7 +800,8 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager {
 
 		// Put the profile data in the database and delete any profile files
 		// Also generate MPI include list if specified (@author: raportil)
-		final boolean keepprofs = configuration.getAttribute(ITAULaunchConfigurationConstants.KEEPPROFS, false);
+		
+		final boolean keepprofs = configuration.getAttribute(getETFWKey(configuration,ITAULaunchConfigurationConstants.KEEPPROFS), false);
 		final boolean useParametric = configuration.getAttribute(IToolLaunchConfigurationConstants.PARA_USE_PARAMETRIC, false);
 		// IFileStore xmlprof=null;
 		// TODO: Return support for regular profiles/ppk files
@@ -823,15 +824,16 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager {
 		if (hasLocalParaprof) {
 			final String xmlMetaData = configuration.getAttribute(IToolLaunchConfigurationConstants.EXTOOL_XML_METADATA,
 					(String) null);
-			final String RM_NAME = "org.eclipse.ptp.launch.RESOURCE_MANAGER_NAME";
-			final String ETFW_VERSION= "ETFW_VERSION";
-			final String jaxbParser="jaxb-parser";
-			String attributeKey = ITAULaunchConfigurationConstants.PERFDMF_DB;
-			String etfwCheck = configuration.getAttribute(ETFW_VERSION, "");
-			if(etfwCheck.equals(jaxbParser)){
-				String controlId = configuration.getAttribute(RM_NAME,"");
-				attributeKey = controlId + (IToolLaunchConfigurationConstants.DOT + ITAULaunchConfigurationConstants.PERFDMF_DB);
-			}
+			
+			//final String RM_NAME = "org.eclipse.ptp.launch.RESOURCE_MANAGER_NAME";
+			//final String ETFW_VERSION= "ETFW_VERSION";
+			//final String jaxbParser="jaxb-parser";
+			String attributeKey = getETFWKey(configuration,ITAULaunchConfigurationConstants.PERFDMF_DB);
+			//String etfwCheck = configuration.getAttribute(ETFW_VERSION, "");
+//			if(etfwCheck.equals(jaxbParser)){
+//				String controlId = configuration.getAttribute(RM_NAME,"");
+//				attributeKey = controlId + (IToolLaunchConfigurationConstants.DOT + ITAULaunchConfigurationConstants.PERFDMF_DB);
+//			}
 			database = PerfDMFView.extractDatabaseName(configuration.getAttribute(attributeKey,
 					(String) null));
 
@@ -918,6 +920,32 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager {
 		// if(tracout||configuration.getAttribute(ITAULaunchConfigurationConstants.TRACE, false))
 		// manageTraceFiles(directory, projtype,now);
 
+	}
+	
+	/**
+	 * Checks if we're using jaxb or original etfw and returns the appropriate key for that value
+	 * @param configuration
+	 * @param key
+	 * @return
+	 * @throws CoreException
+	 */
+	private static String getETFWKey(ILaunchConfiguration configuration,String attributeKey) throws CoreException{
+		final String RM_NAME = "org.eclipse.ptp.launch.RESOURCE_MANAGER_NAME";
+		final String ETFW_VERSION= "ETFW_VERSION";
+		final String jaxbParser="jaxb-parser";
+		//String attributeKey = ITAULaunchConfigurationConstants.PERFDMF_DB;
+		String etfwCheck = configuration.getAttribute(ETFW_VERSION, "");
+		if(etfwCheck.equals(jaxbParser)){
+			String controlId = configuration.getAttribute(RM_NAME,"");
+			String tmpAttributeKey = controlId + (IToolLaunchConfigurationConstants.DOT + attributeKey);
+			
+			if(configuration.hasAttribute(tmpAttributeKey)){
+				return tmpAttributeKey;
+			}
+			
+		}
+		
+		return attributeKey;
 	}
 
 	private void runPerfEx(String directory, String database, String projname, String projtype, String perfExScript) {
