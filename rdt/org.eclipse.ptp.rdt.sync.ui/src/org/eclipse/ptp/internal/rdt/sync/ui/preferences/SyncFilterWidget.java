@@ -367,7 +367,7 @@ public class SyncFilterWidget extends Composite {
 			ti.setData(rule);
 
 			String[] tableValues = new String[2];
-			tableValues[0] = rule.toString();
+			tableValues[0] = rule.getPattern();
 			if (rule.getResult()) {
 				tableValues[1] = Messages.NewSyncFileFilterPage_exclude;
 			} else {

@@ -40,9 +40,12 @@ public abstract class AbstractSyncFileFilter {
 		public int hashCode() { return toString().hashCode(); }
 		public boolean equals(Object o) { return o == this || 				
 				(o != null && o.getClass() == this.getClass() && toString().equals(o.toString())); }
-		public abstract boolean getResult(); //True if the target is to be ignored, false otherwise.
-		public abstract String toString(); //return String representing the full pattern (e.g. including an encoding for exclude) 
-		public abstract String getPattern(); //return String without encoding of extra flags (i.e. exclude)
+		/**@return true if the target is to be ignored, false otherwise.*/
+		public abstract boolean getResult(); 
+		/** @return String representing the full pattern (e.g. including an encoding for exclude)*/
+		public abstract String toString(); 
+		/** @return String without encoding of extra flags (i.e. exclude)*/
+		public abstract String getPattern(); 
 	}
 	
 	/* highest precedence is last rule (as for Git - reverse from PTP Juno) */

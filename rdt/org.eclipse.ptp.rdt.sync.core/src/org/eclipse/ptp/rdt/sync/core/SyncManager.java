@@ -185,7 +185,7 @@ public class SyncManager {
 	public static AbstractSyncFileFilter getDefaultFileFilter() {
 
 		PreferenceSyncFileFilterStorage filter = new PreferenceSyncFileFilterStorage();
-		if (!filter.loadFilter());
+		if (!filter.loadFilter())
 			filter.loadBuiltInDefaultFilter();
 		return filter;
 	};
