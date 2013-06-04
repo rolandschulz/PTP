@@ -44,10 +44,12 @@ public class WizardUtil {
 	private static final Map<String, String> languageSettingsProviderReplacementsMap;
 	static {
 		languageSettingsProviderReplacementsMap = new HashMap<String, String>();
-		languageSettingsProviderReplacementsMap.put("org.eclipse.cdt.managedbuilder.core.GCCBuiltinSpecsDetector", //$NON-NLS-1$
-				"org.eclipse.ptp.rdt.sync.core.SyncGCCBuiltinSpecsDetector"); //$NON-NLS-1$
-		languageSettingsProviderReplacementsMap.put("org.eclipse.cdt.managedbuilder.core.GCCBuildCommandParser", //$NON-NLS-1$
-				"org.eclipse.ptp.rdt.sync.core.SyncGCCBuildCommandParser"); //$NON-NLS-1$
+		// Bug 409587 - Due to several problems, do not enable sync providers by default for Kepler.
+		// Uncomment once this bug is fixed.
+		// languageSettingsProviderReplacementsMap.put("org.eclipse.cdt.managedbuilder.core.GCCBuiltinSpecsDetector", //$NON-NLS-1$
+		// "org.eclipse.ptp.rdt.sync.core.SyncGCCBuiltinSpecsDetector"); //$NON-NLS-1$
+		// languageSettingsProviderReplacementsMap.put("org.eclipse.cdt.managedbuilder.core.GCCBuildCommandParser", //$NON-NLS-1$
+		// "org.eclipse.ptp.rdt.sync.core.SyncGCCBuildCommandParser"); //$NON-NLS-1$
 	}
 
 	/**
