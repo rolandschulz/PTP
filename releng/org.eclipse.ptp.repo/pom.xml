@@ -48,14 +48,14 @@
 											dest="${ptp-install}"/>
 										<unzip src="${basedir}/../../releng/org.eclipse.ptp.aix/target/org.eclipse.ptp.aix-${project.version}.jar"
 											dest="${ptp-install}/sdm/org.eclipse.ptp.aix_${unqualifiedVersion}.${buildQualifier}"/>
-										<chmod perm="a+x" file="${ptp-install}/sdm/org.eclipse.ptp.aix_${unqualifiedVersion}.${buildQualifier}/os/ppc64/sdm"/>
+										<chmod perm="a+x" file="${ptp-install}/sdm/org.eclipse.ptp.aix_${unqualifiedVersion}.${buildQualifier}/os/aix/ppc64/sdm"/>
 										<unzip src="${basedir}/../../releng/org.eclipse.ptp.linux/target/org.eclipse.ptp.linux-${project.version}.jar"
 											dest="${ptp-install}/sdm/org.eclipse.ptp.linux_${unqualifiedVersion}.${buildQualifier}"/>
-										<chmod perm="a+x" file="${ptp-install}/sdm/org.eclipse.ptp.linux_${unqualifiedVersion}.${buildQualifier}/os/ppc64/sdm"/>
-										<chmod perm="a+x" file="${ptp-install}/sdm/org.eclipse.ptp.linux_${unqualifiedVersion}.${buildQualifier}/os/x86_64/sdm"/>
+										<chmod perm="a+x" file="${ptp-install}/sdm/org.eclipse.ptp.linux_${unqualifiedVersion}.${buildQualifier}/os/linux/ppc64/sdm"/>
+										<chmod perm="a+x" file="${ptp-install}/sdm/org.eclipse.ptp.linux_${unqualifiedVersion}.${buildQualifier}/os/linux/x86_64/sdm"/>
 										<unzip src="${basedir}/../../releng/org.eclipse.ptp.macosx/target/org.eclipse.ptp.macosx-${project.version}.jar"
 											dest="${ptp-install}/sdm/org.eclipse.ptp.macosx_${unqualifiedVersion}.${buildQualifier}"/>
-										<chmod perm="a+x" file="${ptp-install}/sdm/org.eclipse.ptp.macosx_${unqualifiedVersion}.${buildQualifier}/os/x86_64/sdm"/>
+										<chmod perm="a+x" file="${ptp-install}/sdm/org.eclipse.ptp.macosx_${unqualifiedVersion}.${buildQualifier}/os/macosx/x86_64/sdm"/>
 										<unzip src="${basedir}/../../debug/org.eclipse.ptp.debug.sdm/target/org.eclipse.ptp.debug.sdm-${project.version}.jar"
 											dest="${ptp-install}/sdm/org.eclipse.ptp.debug.sdm_${unqualifiedVersion}.${buildQualifier}"/>
 										<unzip src="${basedir}/../../core/org.eclipse.ptp.proxy/target/org.eclipse.ptp.proxy-${project.version}.jar"
