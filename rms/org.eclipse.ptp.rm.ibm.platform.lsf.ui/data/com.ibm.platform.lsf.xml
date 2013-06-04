@@ -664,6 +664,7 @@
 				<arg>${ptp_rm:progArgs#value}</arg>
 			</line>
 		</script>
+
 		<!-- Invocation command definition -->
 		<submit-batch name="LSF job submission" waitForId="true"
 			directory="${ptp_rm:directory#value}">
@@ -697,6 +698,18 @@
 				</target>
 			</stderr-parser>
 		</submit-batch>
+		<submit-batch-debug name="Debug not supported">
+			<arg>echo</arg>
+			<arg>"Debug not supported"</arg> 
+			<stdout-parser delim="\n">
+				<target>
+					<match>
+						<expression>.*</expression>
+						<throw message="Debug not supported"/>
+					</match>
+				</target>
+			</stdout-parser>
+		</submit-batch-debug>
 
 		<get-job-status name="get-job-status" ignoreExitStatus="true">
 			<arg>${ptp_rm:bindir#value}bjobs</arg>
