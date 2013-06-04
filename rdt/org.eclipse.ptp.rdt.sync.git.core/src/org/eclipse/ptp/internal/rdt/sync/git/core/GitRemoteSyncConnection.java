@@ -375,7 +375,9 @@ public class GitRemoteSyncConnection {
 				} else {
 					final String  command = gitCommand() + " rev-parse HEAD"; //$NON-NLS-1$
 					CommandResults commandResults = this.executeRemoteCommand(command, monitor); 
-					ObjectId objectId = repository.resolve(commandResults.getStdout());
+					ObjectId objectId = null;
+					if (commandResults.getExitCode()==0)
+						objectId = repository.resolve(commandResults.getStdout());
 					RevTree ref=null;
 					if (objectId!=null)
 						ref = new RevWalk(repository).parseTree(objectId);
