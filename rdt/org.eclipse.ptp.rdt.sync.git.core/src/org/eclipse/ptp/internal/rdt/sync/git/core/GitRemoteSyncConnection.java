@@ -373,7 +373,8 @@ public class GitRemoteSyncConnection {
 						throw new RemoteSyncException(Messages.GRSC_GitRemoveFilteredFailure1 + commandResults.getStderr());
 					}
 				} else {
-					CommandResults commandResults = this.executeRemoteCommand(gitCommand() + "rev-parse HEAD", monitor); //$NON-NLS-1$
+					final String  command = gitCommand() + " rev-parse HEAD"; //$NON-NLS-1$
+					CommandResults commandResults = this.executeRemoteCommand(command, monitor); 
 					ObjectId objectId = repository.resolve(commandResults.getStdout());
 					RevTree ref=null;
 					if (objectId!=null)
