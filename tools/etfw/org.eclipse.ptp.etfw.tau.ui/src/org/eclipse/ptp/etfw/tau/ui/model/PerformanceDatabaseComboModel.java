@@ -9,10 +9,13 @@
  *******************************************************************************/
 package org.eclipse.ptp.etfw.tau.ui.model;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.etfw.tau.ui.PerformanceDatabaseCombo;
 import org.eclipse.ptp.internal.rm.jaxb.core.JAXBCoreConstants;
 import org.eclipse.ptp.rm.jaxb.control.ui.AbstractUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateHandler;
+import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Control;
@@ -114,6 +117,27 @@ public class PerformanceDatabaseComboModel extends AbstractUpdateModel {
 			handler.removeError(name);
 		}
 		return value;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ptp.internal.rm.jaxb.control.ui.model.AbstractUpdateModel#initialize(org.eclipse.ptp.rm.jaxb.core.IVariableMap,
+	 * org.eclipse.ptp.rm.jaxb.core.IVariableMap)
+	 */
+	@Override
+	public void initialize(ILaunchConfiguration configuration, IVariableMap rmMap, IVariableMap lcMap) {
+		
+		String val = (String)lcMap.getValue(name);
+		if(val!=null&&val.length()>0){
+			int loc = comboComposite.getCombo().indexOf(val);
+			if(loc>=0){
+				comboComposite.getCombo().select(loc);
+			}
+		}
+		
+		super.initialize(configuration, rmMap, lcMap);
 	}
 
 }
