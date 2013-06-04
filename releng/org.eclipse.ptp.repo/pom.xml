@@ -62,8 +62,8 @@
 											dest="${ptp-install}/sdm/org.eclipse.ptp.proxy_${unqualifiedVersion}.${buildQualifier}"/>
 										<unzip src="${basedir}/../../core/org.eclipse.ptp.utils/target/org.eclipse.ptp.utils-${project.version}.jar"
 											dest="${ptp-install}/sdm/org.eclipse.ptp.utils_${unqualifiedVersion}.${buildQualifier}"/>
-										<exec executable="zip" spawn="true">
-											<arg line="-r ${ptp-install}/ptp-sdm-${unqualifiedVersion}.zip ${ptp-install}/sdm" />
+										<exec executable="zip" spawn="true" dir="${ptp-install}">
+											<arg line="-r ${ptp-install}/ptp-sdm-${unqualifiedVersion}.zip sdm" />
 										</exec>
 									</tasks>
 								</configuration>
