@@ -377,7 +377,7 @@ public class GitRemoteSyncConnection {
 					CommandResults commandResults = this.executeRemoteCommand(command, monitor); 
 					ObjectId objectId = null;
 					if (commandResults.getExitCode()==0)
-						objectId = repository.resolve(commandResults.getStdout());
+						objectId = repository.resolve(commandResults.getStdout().trim());
 					RevTree ref=null;
 					if (objectId!=null)
 						ref = new RevWalk(repository).parseTree(objectId);
