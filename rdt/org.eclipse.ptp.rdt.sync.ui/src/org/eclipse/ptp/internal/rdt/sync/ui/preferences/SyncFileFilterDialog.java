@@ -321,7 +321,7 @@ public class SyncFileFilterDialog extends Dialog {
 		public Object[] getChildren(Object element) {
 			ArrayList<IResource> children = new ArrayList<IResource>();
 
-			if (element instanceof IFolder) {
+			if (element instanceof IFolder && !filter.shouldIgnore((IResource) element)) {
 				if (((IFolder) element).isAccessible()) {
 					try {
 						for (IResource localChild : ((IFolder) element).members()) {
