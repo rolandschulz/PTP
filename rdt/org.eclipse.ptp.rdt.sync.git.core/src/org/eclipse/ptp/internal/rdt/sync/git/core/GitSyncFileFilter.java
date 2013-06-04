@@ -43,7 +43,7 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 
 	public static void setFilter(IProject project, AbstractSyncFileFilter filter, Repository repository) {
 		GitSyncFileFilter newGitFilter = new GitSyncFileFilter(repository, project);
-		newGitFilter.clone(filter);
+		newGitFilter.initialize(filter);
 		try {
 			newGitFilter.saveFilter();
 		} catch (IOException e) {
@@ -164,9 +164,18 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 				in.close();
 			}
 		} else {
-			clone(SyncManager.getDefaultFileFilter());
-			rules.add(new GitIgnoreRule("/.ptp-sync/", true)); //$NON-NLS-1$
+			initialize(SyncManager.getDefaultFileFilter());
 		}
+	}
+
+	/**
+	 * Initialize based on other filter. Adds provider dependent default. 
+	 * 
+	 * @param filter to copy 
+	 */
+	public void initialize(AbstractSyncFileFilter abstractSyncFileFilter) {
+		clone(abstractSyncFileFilter);
+		rules.add(new GitIgnoreRule("/.ptp-sync/", true)); //$NON-NLS-1$
 	}
 
 	@Override
