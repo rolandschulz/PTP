@@ -45,7 +45,7 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		try {
 			newGitFilter.saveFilter();
 		} catch (IOException e) {
-			RDTSyncCorePlugin.log("Unable to save file filter for project " + project.getName(), e);
+			RDTSyncCorePlugin.log("Unable to save file filter for project " + project.getName(), e); //$NON-NLS-1$
 		}
 		projectToFilterMap.put(project, newGitFilter);
 	}

@@ -1,7 +1,5 @@
 package org.eclipse.ptp.rdt.sync.core;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.eclipse.core.resources.IResource;
@@ -10,7 +8,6 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.ptp.internal.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.internal.rdt.sync.core.SyncUtils;
 import org.eclipse.ptp.internal.rdt.sync.core.messages.Messages;
-import org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter.AbstractIgnoreRule;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
