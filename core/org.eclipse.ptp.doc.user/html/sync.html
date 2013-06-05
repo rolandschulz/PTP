@@ -20,9 +20,6 @@ build config / sync config info is in build.html, perhaps some of this can be re
 <li><a href="#remote-discovery">Discovering the remote environment (remote includes and code analysis)</a>
 <li><a href="#prefs">Sync Preferences</a>
 </ul>
-<!--  FIXME include info from scicomp tutorial  -->
-<!--  fixme: redo screenshots later, since title has changed for file filtering  -->
-<!--  Note: some of this is now duplicated in 01buildMPIprog.html -->
 <p>Synchronized projects consist of files that are mirrored on the local system as well as on one or more remote systems.
 Editing occurs locally and each file is synchronized with the currently active remote system when it is changed, created, or deleted.  
 This enables faster interaction with the files
@@ -95,7 +92,7 @@ and select the <b>Browse...</b> button or some other communication is required.
 <br></p>
 
 <h2 id="work">Working with a Synchronized Project</h2>
-<p>The starting configuration will be for one of the remote toolchains.
+<p>The starting configuration will be for one of the toolchains with a connection to a remote system.
 Thus, for the most common case (a single remote site to be modified and built), a synchronized project works out-of-the-box.
 If the remote location does not exist, it is created. Otherwise, the files in that directory will be synchronized to the local workspace.
 Edit the files as you would any local project.
@@ -159,7 +156,7 @@ is shown below.  It shows settings and what it does to files in the currently se
 <li>The <b>File Filters</b> popup dialog from the 
 <a href="#new-sync-proj">new synchronized project dialog</a> (from the <b>Modify File Filtering...</b> button)
 allows setting sync filter settings as a project is created, and 
-<li>The <href="#sync-prefs">Sync Filters Preference page</href> sets defaults that will be used in new projects.
+<li>The <q href="#sync-prefs">Sync Filters Preference page</a> sets defaults that will be used in new projects.
 </ol>
 <p>Parts of the <b>Configure Synchronize Project Filters</b> dialog for an existing project:
 <ul>
@@ -168,7 +165,7 @@ for the currently selected project
 - based on the patterns and selections beneath it. 
 (Not included on the <a href="#prefs">Sync Preferences</a> page.)
 <li>The <b>Patterns</b> area near the bottom shows the current exclude and include patterns. Patterns
-can be added, editing, or removed.  The reulsts will be shown above in the files/folders list.
+can be added, editing, or removed.  The results will be shown above in the files/folders list.
 </ul>
 <p><img src="images/sync-filter-dialog.png">
 <p>
@@ -180,20 +177,25 @@ An error message is printed if the remote system is disconnected.
 <p>
 You can select or deselect directories or files in the <b>files/folders</b> list, which will add the corresponding 
 exclude or include pattern to the <b>Patterns</b> area. 
-These are "path" patterns, meaning that directories or files in the specified path are excluded or included. 
-In the <b>Patterns</b> area, you can enter paths, regular expressions, and wildcard patterns.
 <p>To enter a new pattern, select the <b>Add...</b> button. 
 The <b>Add Pattern</b> dialog appears.
 <p><img src="images/sync-filter-add-dialog.png"></p>
-<p>In the <b>Pattern:</b> field, enter a path, a regular expression ("Regex") or a simple Wildcard (e.g. <code>*.o</code>) 
-that is compared to the project-relative path. Select the radio button beneath the <b>Pattern:</b> field
-to indicate the type of pattern.
-The regular expression syntax is that of the Java programming language. 
-An error message is printed if the regular expression is not valid. 
+<p>In the <b>Pattern:</b> field, enter a pattern which uses Git syntax (gitignore)
+<ul>
+<li>support for fnmatch (*,?,[])
+<li>filtering of directories ignores all files inside
+<li>last pattern has highest precedence
+<li>path ends in / matches only directory
+</ul>
+<p>Select the radio button beneath the <b>Pattern:</b> field
+to indicate the should be included or excluded in the synchronization.  Default is excluded.
+
 
 <p>
 Patterns are applied in the order given in the patterns area of the 
-<b>Configure Synchronize Project Filters</b> dialog. New patterns are  placed at the top (highest priority). 
+<b>Configure Synchronize Project Filters</b> dialog. 
+<!-- FIXME i think this is not true now. new patterns now go at the bottom; last pattern has highest precedence. -->
+New patterns are  placed at the top (highest priority). 
 So a file will be excluded or included based on the first matching pattern, or included if no pattern matches. 
 Use the "Move Up" and "Move Down" buttons to change a pattern's priority. 
 If a new pattern is identical to an old pattern and has the same type, the old pattern is removed. 
@@ -202,14 +204,13 @@ Note that it doesn't matter whether the old pattern was an exclude or include pa
 <p>For example, to exclude <code>*.o</code> files from synchronization 
 (e.g. they are built on the remote system but you do not want them copied back to the local directory),
 Select the <b>Add...</b> button in the patterns area of the <b>Configure Synchronize Project Filters</b> dialog.
-<p>Type <code>*.o</code> in the pattern field and select <b>Wildcard</b> for the pattern Matcher type,
-and <b>Exclude</b> for the <b>Pattern Type</b>.
+<p>Type <code>*.o</code> in the pattern field and <b>Exclude</b> for the <b>Pattern Type</b>.
 <p><img src="images/sync-filter-add-dialog-dot-o.png"></p>
 <p>Then select the <b>OK</b> button.  The new filter will appear in the patterns area of the 
-<b>Configure Synchronize Project Filters</b> dialog, and the <code>*.o</code> files are no longer checked
-in the files/folders area.
+<b>Configure Synchronize Project Filters</b> dialog, and the <code>*.o</code> files are no longer included in
+the synchronization.
 <p><img src="images/sync-filter-add-dialog-dot-o-results.png"></p>
-<p>You can move the priority down, edit the pattern, etc. with the buttons.
+<p>You can move the priority up or down, edit the pattern, etc. with the buttons.
 <p>
 <p>Hit <b>OK</b> to save any changes you have made to the sync filtering.
 
