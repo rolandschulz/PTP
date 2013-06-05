@@ -8,6 +8,7 @@
  * Contributors:
  *    Roland Schulz - initial implementation
  *******************************************************************************/
+
 package org.eclipse.ptp.internal.rdt.sync.git.core;
 
 import java.io.BufferedWriter;
@@ -16,6 +17,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.text.CharacterIterator;
+import java.text.StringCharacterIterator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -37,11 +40,17 @@ import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.treewalk.WorkingTreeIterator;
 import org.eclipse.jgit.treewalk.filter.IndexDiffFilter;
 import org.eclipse.ptp.internal.rdt.sync.core.RDTSyncCorePlugin;
+import org.eclipse.ptp.internal.rdt.sync.git.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 
+/**
+ * File filtering using git build in filtering. All file filter patterns are stored in .ptp-sync/info/exclude.
+ * The git syntax is used (see man gitignore). 
+ * 
+ */
 public class GitSyncFileFilter extends AbstractSyncFileFilter {
 	public static final String REMOTE_FILTER_IS_DIRTY = "remote_filter_is_dirty"; //$NON-NLS-1$
 	// Map of projects to file filters along with basic getter and setter methods. These static data and methods operate
@@ -55,7 +64,7 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 				filter.loadFilter();
 				projectToFilterMap.put(project, filter);
 			} catch (IOException e) {
-				RDTSyncCorePlugin.log("Unable to load file filter for project " + project.getName(), e);
+				RDTSyncCorePlugin.log(Messages.GitSyncFileFilter_UnableToLoad + project.getName(), e);
 			}
 		}
 		return filter;
@@ -67,7 +76,7 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		try {
 			newGitFilter.saveFilter();
 		} catch (IOException e) {
-			RDTSyncCorePlugin.log("Unable to save file filter for project " + project.getName(), e);
+			RDTSyncCorePlugin.log(Messages.GitSyncFileFilter_UnableToSave + project.getName(), e);
 		}
 		projectToFilterMap.put(project, newGitFilter);
 	}
@@ -75,6 +84,12 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 	private Repository repository;
 	private IProject project;
 	
+	private static Set<Character> escapifyCharSet = new HashSet<Character>();
+	static {
+		CharacterIterator it = new StringCharacterIterator("#\\!*?[]"); //$NON-NLS-1$
+		for (char c = it.first(); c != CharacterIterator.DONE; c = it.next())
+			escapifyCharSet.add(c);
+	}
 	public class GitIgnoreRule extends AbstractIgnoreRule {
 		private org.eclipse.jgit.ignore.IgnoreRule rule;
 		
@@ -83,10 +98,22 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 			rule = new org.eclipse.jgit.ignore.IgnoreRule(pattern);
 		}
 		
+		private String charEscapify(String inputString) {
+			StringBuffer newString = new StringBuffer(""); //$NON-NLS-1$
+			CharacterIterator it = new StringCharacterIterator(inputString);
+			for (char c = it.first(); c != CharacterIterator.DONE; c = it.next()) {
+				if (escapifyCharSet.contains(c)) { // Do not escape non-ASCII characters (> 127)
+					newString.append("\\" + c); //$NON-NLS-1$
+				} else {
+					newString.append(c);
+				}
+			}
+			inputString = newString.toString();
+			return inputString;
+		}
+		
 		public GitIgnoreRule(IResource resource, boolean exclude) {
-			//TODO: is toString the correct method? or should it be toPortableString
-			//TODO: !,*,[,? need to be escaped 
-			String pattern = resource.getProjectRelativePath().toString();
+			String pattern = charEscapify(resource.getProjectRelativePath().toString());
 			if (resource.getType()==IResource.FOLDER) pattern += "/"; //$NON-NLS-1$
 			if (!exclude) pattern = "!" + pattern; //$NON-NLS-1$
 			rule = new org.eclipse.jgit.ignore.IgnoreRule(pattern);

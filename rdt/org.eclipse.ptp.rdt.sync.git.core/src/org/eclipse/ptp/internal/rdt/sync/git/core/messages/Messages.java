@@ -65,6 +65,8 @@ public class Messages extends NLS {
 	public static String GitServiceProvider_7;
 	public static String GitServiceProvider_8;
 	public static String GitServiceProvider_9;
+	public static String GitSyncFileFilter_UnableToLoad;
+	public static String GitSyncFileFilter_UnableToSave;
 	public static String GitSyncService_0;
 	public static String CommandRunner_0;
 	public static String CommandRunner_1;

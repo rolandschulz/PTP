@@ -8,6 +8,7 @@
  * Contributors:
  *    Roland Schulz - initial implementation
  *******************************************************************************/
+
 package org.eclipse.ptp.rdt.sync.core;
 
 import java.util.NoSuchElementException;
@@ -23,6 +24,8 @@ import org.osgi.service.prefs.Preferences;
 
 
 /**
+ * Class for storing file filter in eclipse preferences. Does not implement any filtering.
+ *
  * @since 3.0
  */
 public class PreferenceSyncFileFilterStorage extends AbstractSyncFileFilter  {

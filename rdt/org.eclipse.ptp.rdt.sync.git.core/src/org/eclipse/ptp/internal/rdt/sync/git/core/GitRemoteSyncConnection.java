@@ -420,8 +420,9 @@ public class GitRemoteSyncConnection {
                     RemoteExecutionException, RemoteSyncException, MissingConnectionException {
     	try {
     		while (!filesToDelete.isEmpty()) {
-    			List<String> commandList = stringToList(gitCommand() + " rm --cached -f --"); //$NON-NLS-1$ //the MAX_FILES trick can be avoided by sending files to stdin instead of passing as arguments
+    			List<String> commandList = stringToList(gitCommand() + " rm --cached -f --"); //$NON-NLS-1$ 
     			int count = 1;
+    			//the MAX_FILES trick could be avoided by sending files to stdin instead of passing as arguments
     			for (String fileName : filesToDelete.toArray(new String[0])) {
     				if (count++ % MAX_FILES == 0) {
     					break;

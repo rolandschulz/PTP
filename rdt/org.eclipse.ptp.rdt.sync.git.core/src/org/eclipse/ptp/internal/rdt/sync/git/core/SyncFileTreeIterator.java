@@ -8,6 +8,7 @@
  * Contributors:
  *    Roland Schulz - initial implementation
  *******************************************************************************/
+
 package org.eclipse.ptp.internal.rdt.sync.git.core;
 
 import java.io.IOException;

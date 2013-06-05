@@ -119,8 +119,7 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 				try {
 					SyncManager.saveFileFilter(project, sff);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					RDTSyncUIPlugin.getDefault().log(e);
 				}
 			} else if (command.equals(syncFileList)) {
 				SyncFileFilterDialog.open(HandlerUtil.getActiveShell(event), project);

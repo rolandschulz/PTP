@@ -1,12 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2011 Oak Ridge National Laboratory and others.
+ * Copyright (c) 2011, 2013 Oak Ridge National Laboratory, University of Tennessee and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *    John Eblen - initial implementation
+ *    John Eblen & Roland Schulz - initial implementation
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core;
 
@@ -18,14 +18,7 @@ import java.util.List;
 import org.eclipse.core.resources.IResource;
 
 /**
- * Class for filtering files during synchronization. Instead of a constructor, the user can create an empty filter or a filter that
- * has decent default behavior, filtering, for example, configuration files like .project and .cproject.
- * <p>
- * Facilities are then provided for adding and removing files and directories from filtering.
- * <p>
- * Note that a SyncFileFilter can include several patterns which each have a ResourceMatcher. A pattern has a type (exclude or
- * include) and a ResourceMatcher (e.g. path, regex, or wildcard matcher). A single SyncFileFilter is used for a project.
- * SyncFileFilters are saved in preferences.
+ * Class for filtering files during synchronization. The non-abstract class is provided by the sync provider.
  * 
  * @since 3.0
  */
@@ -72,16 +65,6 @@ public abstract class AbstractSyncFileFilter {
 	 */
 	public abstract void addPattern(IResource resource, boolean exclude, int index);
 	
-//	/**
-//	 * Add the common, default list of paths to be filtered. This should not be called until the files
-//	 * filtered already exist.
-//	 */
-//	public void addDefaults() {
-//		for (String pattern: getDefaults()) {
-//			addPattern(ResourcesPlugin.getWorkspace().getRoot().findMember(pattern), true);
-//		}
-//	}
-
 	/**
 	 * Swap a pattern with its higher-index neighbor
 	 * Assumes pattern appears no more than once
