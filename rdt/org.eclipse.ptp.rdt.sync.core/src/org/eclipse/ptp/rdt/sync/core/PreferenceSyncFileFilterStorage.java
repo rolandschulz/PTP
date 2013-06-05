@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2013 The University of Tennessee and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Roland Schulz - initial implementation
+ *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core;
 
 import java.util.NoSuchElementException;
@@ -8,7 +18,6 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.ptp.internal.rdt.sync.core.RDTSyncCorePlugin;
 import org.eclipse.ptp.internal.rdt.sync.core.SyncUtils;
 import org.eclipse.ptp.internal.rdt.sync.core.messages.Messages;
-import org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter.AbstractIgnoreRule;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
