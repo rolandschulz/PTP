@@ -18,7 +18,9 @@ import java.util.List;
 import org.eclipse.core.resources.IResource;
 
 /**
- * Class for filtering files during synchronization. The non-abstract class is provided by the sync provider.
+ * Class for filtering files during synchronization. The non-abstract class is provided 
+ * by the sync provider. All read operations (e.g. shouldIgnore) are thread safe (/need to
+ * implemented thread safe by the subclasses).
  * 
  * @since 3.0
  */

@@ -125,13 +125,13 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		
 		@Override
 		public boolean isMatch(IResource target) {
-			return rule.isMatch(target.getProjectRelativePath().toString(), 
+			return isMatch(target.getProjectRelativePath().toString(), 
 					target.getType()==IResource.FOLDER);
 		}
 		
 		@Override
-		public boolean isMatch(String target, boolean isFolder) {
-			return rule.isMatch(target,isFolder);
+		public synchronized boolean isMatch(String target, boolean isFolder) {
+			return rule.isMatch(target,isFolder); // JGit's rule.isMatch isn't thread safe
 		}
 
 		@Override

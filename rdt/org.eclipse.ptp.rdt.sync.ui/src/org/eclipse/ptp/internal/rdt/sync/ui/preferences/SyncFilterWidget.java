@@ -131,7 +131,7 @@ public class SyncFilterWidget extends Composite {
 			errorLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 			if (oldRule != null) {
-				patternText.setText(oldRule.toString());
+				patternText.setText(oldRule.getPattern());
 				exclude = oldRule.getResult();
 				inclusiveButton.setSelection(!exclude);
 				exclusiveButton.setSelection(exclude);
