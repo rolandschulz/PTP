@@ -379,8 +379,12 @@ public class GitRemoteSyncConnection {
 					if (commandResults.getExitCode()==0)
 						objectId = repository.resolve(commandResults.getStdout().trim());
 					RevTree ref=null;
-					if (objectId!=null)
-						ref = new RevWalk(repository).parseTree(objectId);
+					try {
+						if (objectId!=null)
+							ref = new RevWalk(repository).parseTree(objectId);
+					} catch (Exception e){
+						//ignore. Can happen if the local repo doesn't yet have the remote commit
+					}
 					if (ref!=null) {
 						Set<String> filesToRemove = fileFilter.getIgnoredFiles(ref);
 						deleteRemoteFiles(filesToRemove,monitor);
