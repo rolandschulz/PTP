@@ -60,7 +60,7 @@ import org.eclipse.ui.PlatformUI;
  * Uses ResourceMatchers (e.g. PathResourceMatcher, RegexResourceMatcher, and WildcardResourceMatcher) to match the
  * "patterns" entered to actual files in the project.
  */
-public class SyncFileFilterDialog extends Dialog {
+public class SyncFileFilterDialog extends Dialog implements ISyncFilterWidgetPatternChangeListener {
 	private static final Display display = Display.getCurrent();
 
 	private final IProject project;
@@ -237,6 +237,7 @@ public class SyncFileFilterDialog extends Dialog {
 		filterWidget = new SyncFilterWidget(composite, SWT.NONE);
 		filterWidget.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		filterWidget.setFilter(filter);
+		filterWidget.addNewPatternChangeListener(this);
 
 		update();
 		return composite;
@@ -527,5 +528,24 @@ public class SyncFileFilterDialog extends Dialog {
 			comp.setBackground(gcolor);
 		}
 
+	}
+
+	/**
+	 * Updates tree whenever patterns change in the sync filter widget
+	 */
+	@Override
+	public void patternChanged() {
+		if (treeViewer != null) {
+			treeViewer.refresh();
+		}
+	}
+
+	/**
+	 * Intercept close events to remove the dialog as a pattern-change listener.
+	 */
+	@Override
+	public boolean close() {
+		filterWidget.removePatternChangeListener(this);
+		return super.close();
 	}
 }

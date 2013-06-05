@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.sync.ui.preferences;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.internal.rdt.sync.ui.messages.Messages;
@@ -37,7 +40,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * Fitler widget
+ * Filter widget
  */
 public class SyncFilterWidget extends Composite {
 	/**
@@ -150,8 +153,11 @@ public class SyncFilterWidget extends Composite {
 	private Button fUpButton;
 	private Button fDownButton;
 	private Button fEditButton;
+	private Button fRemoveButton;
 
-	private Button removeButton;
+	private Set<ISyncFilterWidgetPatternChangeListener> patternChangeListeners =
+			new HashSet<ISyncFilterWidgetPatternChangeListener>();
+
 	/** Boolean to help tell which boolean arguments do what */
 	private static final boolean GRAB_EXCESS = true;
 
@@ -236,10 +242,10 @@ public class SyncFilterWidget extends Composite {
 		});
 		fEditButton.setEnabled(false);
 
-		removeButton = new Button(patternTableComposite, SWT.PUSH);
-		removeButton.setText(Messages.NewSyncFileFilterPage_Remove);
-		removeButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
-		removeButton.addSelectionListener(new SelectionAdapter() {
+		fRemoveButton = new Button(patternTableComposite, SWT.PUSH);
+		fRemoveButton.setText(Messages.NewSyncFileFilterPage_Remove);
+		fRemoveButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
+		fRemoveButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				TableItem[] selectedPatternItems = fPatternTable.getSelection();
@@ -249,9 +255,10 @@ public class SyncFilterWidget extends Composite {
 				}
 				updateTable();
 				updateButtonEnablement();
+				notifyPatternChangeListeners();
 			}
 		});
-		removeButton.setEnabled(false);
+		fRemoveButton.setEnabled(false);
 
 		// Spacer
 		new Label(patternTableComposite, SWT.NONE);
@@ -274,6 +281,7 @@ public class SyncFilterWidget extends Composite {
 				updateTable();
 				fPatternTable.select(patternIndex);
 				updateButtonEnablement();
+				notifyPatternChangeListeners();
 			}
 		});
 		fUpButton.setEnabled(false);
@@ -295,9 +303,18 @@ public class SyncFilterWidget extends Composite {
 				updateTable();
 				fPatternTable.select(patternIndex);
 				updateButtonEnablement();
+				notifyPatternChangeListeners();
 			}
 		});
 		fDownButton.setEnabled(false);
+	}
+
+	/**
+	 * Add a new listener that will be notified when patterns change
+	 * @param listener
+	 */
+	public void addNewPatternChangeListener(ISyncFilterWidgetPatternChangeListener listener) {
+		patternChangeListeners.add(listener);
 	}
 
 	private void addPattern() {
@@ -305,6 +322,7 @@ public class SyncFilterWidget extends Composite {
 		if (dialog.open() == Window.OK) {
 			fFilter.addPattern(dialog.pattern, dialog.exclude);
 			updateTable();
+			notifyPatternChangeListeners();
 		}
 	}
 
@@ -330,11 +348,26 @@ public class SyncFilterWidget extends Composite {
 			fFilter.removePattern(selectedRule);
 			fFilter.addPattern(dialog.pattern, dialog.exclude);
 			updateTable();
+			notifyPatternChangeListeners();
 		}
 	}
 
 	public AbstractSyncFileFilter getFilter() {
 		return fFilter;
+	}
+
+	private void notifyPatternChangeListeners() {
+		for (ISyncFilterWidgetPatternChangeListener listener : patternChangeListeners) {
+			listener.patternChanged();
+		}
+	}
+
+	/**
+	 * Remove the given pattern-change listener
+	 * @param listener
+	 */
+	public void removePatternChangeListener(ISyncFilterWidgetPatternChangeListener listener) {
+		patternChangeListeners.remove(listener);
 	}
 
 	public void setFilter(AbstractSyncFileFilter filter) {
@@ -354,13 +387,13 @@ public class SyncFilterWidget extends Composite {
 
 	private void updateButtonEnablement() {
 		fEditButton.setEnabled(false);
-		removeButton.setEnabled(false);
+		fRemoveButton.setEnabled(false);
 		fUpButton.setEnabled(false);
 		fDownButton.setEnabled(false);
 		int index = fPatternTable.getSelectionIndex();
 		if (index >= 0) {
 			fEditButton.setEnabled(true);
-			removeButton.setEnabled(true);
+			fRemoveButton.setEnabled(true);
 			if (index > 0) {
 				fUpButton.setEnabled(true);
 			}
