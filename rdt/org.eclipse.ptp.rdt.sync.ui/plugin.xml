@@ -14,7 +14,7 @@
 	      project="true"
 	      id="org.eclipse.ptp.rdt.sync.ui.newSyncProjectWizard">
 	      <description>
-	            %NewWizards.project.description
+	            %syncProject.desc
 	      </description>
 	   </wizard>
     <wizard
@@ -25,7 +25,7 @@
           name="%ConvertWizards.project"
           project="false">
        <description>
-          %NewWizards.project.description
+          %ConvertSyncProject.desc
        </description>
     </wizard>
    </extension>
