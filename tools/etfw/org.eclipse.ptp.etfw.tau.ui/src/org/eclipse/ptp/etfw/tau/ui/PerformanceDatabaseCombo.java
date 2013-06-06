@@ -1,12 +1,21 @@
-/*******************************************************************************
- * Copyright (c) 2012 University of Illinois and others.  All rights reserved.
- * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License v1.0 which accompanies this distribution,
- * and is available at http://www.eclipse.org/legal/epl-v10.html 
- *   
- * Contributors: 
- * 		Chris Navarro (Illinois/NCSA) - Design and implementation
- *******************************************************************************/
+/****************************************************************************
+ *			Tuning and Analysis Utilities
+ *			http://www.cs.uoregon.edu/research/paracomp/tau
+ ****************************************************************************
+ * Copyright (c) 1997-2006
+ *    Department of Computer and Information Science, University of Oregon
+ *    Advanced Computing Laboratory, Los Alamos National Laboratory
+ *    Research Center Juelich, ZAM Germany	
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Wyatt Spear - initial API and implementation
+ *    Chris Navarro - re-implemented for JAXB custom widget
+ ****************************************************************************/
 package org.eclipse.ptp.etfw.tau.ui;
 
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -29,7 +38,8 @@ import org.eclipse.swt.widgets.Composite;
  * 
  * @see TAUDataTab
  * 
- * @author Chris Navarro
+ * @author Wyatt Spear
+ * @author Chris Navarro - re-implemented for JAXB custom widget
  * 
  */
 public class PerformanceDatabaseCombo extends AbstractWidget {
