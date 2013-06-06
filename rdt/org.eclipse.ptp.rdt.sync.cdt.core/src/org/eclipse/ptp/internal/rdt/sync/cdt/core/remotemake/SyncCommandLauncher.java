@@ -397,7 +397,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 
 	private void syncOnPreBuild(IProgressMonitor monitor) throws CoreException {
 		SyncConfig config = SyncConfigManager.getActive(getProject());
-		if (shouldSyncBeforeRun && SyncManager.getSyncAuto() && config.isSyncOnPreBuild()) {
+		if (shouldSyncBeforeRun && config.isSyncOnPreBuild()) {
 			switch (SyncManager.getSyncMode(getProject())) {
 			case ACTIVE:
 				SyncManager.syncBlocking(null, getProject(), SyncFlag.FORCE, monitor, null);
