@@ -350,7 +350,8 @@ public class GitRemoteSyncConnection {
 	 */
 	private void commitRemoteFiles(IProgressMonitor monitor) throws RemoteSyncException, MissingConnectionException {
 		try {
-			if (syncConfig.getProperty(GitSyncFileFilter.REMOTE_FILTER_IS_DIRTY).equals("TRUE")) { //$NON-NLS-1$
+			String property = syncConfig.getProperty(GitSyncFileFilter.REMOTE_FILTER_IS_DIRTY);
+			if (property==null || property.equals("TRUE")) { //$NON-NLS-1$
 				IRemoteConnection conn = syncConfig.getRemoteConnection();
 				IRemoteServices remoteServices = conn.getRemoteServices();
 				Repository repository = git.getRepository();
