@@ -108,9 +108,6 @@ public class GitRemoteSyncConnection {
 	private boolean mergeMapInitialized = false; // Call "readMergeConflictFiles" at least once before using the map.
 	private final Map<IPath, String[]> FileToMergePartsMap = new HashMap<IPath, String[]>();
 	private int remoteGitVersion;
-	
-	// Static storage for each project's local Git repository (one repo per project)
-	private static Map<IProject, Repository> projectToRepoMap = new HashMap<IProject, Repository>();
 
 	/**
 	 * Get the local Git repository for the given project, creating it if necessary.
@@ -121,17 +118,7 @@ public class GitRemoteSyncConnection {
 	 * @return new local Git repository - should never be null.
 	 * @throws IOException
 	 */
-	public static Repository getLocalRepo(IProject project, String localDirectory) throws IOException {
-		if (projectToRepoMap.containsKey(project)) {
-			return projectToRepoMap.get(project);
-		} else {
-			Repository repository = createLocalRepo(project, localDirectory);
-			projectToRepoMap.put(project, repository);
-			return repository;
-		}
-	}
-
-	private static Repository createLocalRepo(final IProject project, String localDirectory) throws IOException {
+	public static Repository getLocalRepo(String localDirectory) throws IOException {
 		final File localDir = new File(localDirectory);
 		final FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
 		File gitDirFile = new File(localDirectory + File.separator + gitDir);
@@ -246,7 +233,7 @@ public class GitRemoteSyncConnection {
 		final RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
 		try {
 			subMon.subTask(Messages.GitRemoteSyncConnection_1);
-			git = new Git(getLocalRepo(project, localDirectory));
+			git = new Git(getLocalRepo(localDirectory));
 			
             // An initial commit to create the master branch.
             subMon.subTask(Messages.GitRemoteSyncConnection_22);

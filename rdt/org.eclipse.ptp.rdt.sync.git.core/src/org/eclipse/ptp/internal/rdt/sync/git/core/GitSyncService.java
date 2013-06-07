@@ -477,7 +477,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 	public void setSyncFileFilter(IProject project, AbstractSyncFileFilter filter) {
 		Repository repository;
 		try {
-			repository = GitRemoteSyncConnection.getLocalRepo(project, project.getLocation().toString());
+			repository = GitRemoteSyncConnection.getLocalRepo(project.getLocation().toString());
 		} catch (IOException e) {
 			RDTSyncCorePlugin.log("Unable to save file filter for project " + project.getName(), e); //$NON-NLS-1$
 			return;

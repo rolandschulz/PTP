@@ -60,7 +60,7 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		GitSyncFileFilter filter = projectToFilterMap.get(project);
 		if (filter==null) {
 			try {
-				filter = new GitSyncFileFilter(GitRemoteSyncConnection.getLocalRepo(project, project.getLocation().toString()), project);
+				filter = new GitSyncFileFilter(GitRemoteSyncConnection.getLocalRepo(project.getLocation().toString()), project);
 				filter.loadFilter();
 				projectToFilterMap.put(project, filter);
 			} catch (IOException e) {
