@@ -73,6 +73,11 @@ import org.osgi.framework.Bundle;
  * 
  */
 public class SDMDebugger implements IPDebugger {
+	private static final String WORKING_DIR = ".eclipsesettings"; //$NON-NLS-1$
+	private static final String SDM = "sdm"; //$NON-NLS-1$
+	private static final String BUNDLE_PREFIX = "org.eclipse.ptp."; //$NON-NLS-1$
+	private static final String OS = "os"; //$NON-NLS-1$
+
 	private final IPDIDebugger fPdiDebugger = new PDIDebugger();
 	private final IPDIModelFactory fModelFactory = new SDMModelFactory();
 	private final IPDIManagerFactory fManagerFactory = new SDMManagerFactory();
@@ -136,16 +141,23 @@ public class SDMDebugger implements IPDebugger {
 							String osName = normalize(remoteConnection.getProperty(IRemoteConnection.OS_NAME_PROPERTY));
 							String osArch = remoteConnection.getProperty(IRemoteConnection.OS_ARCH_PROPERTY);
 							if (osName != null && osArch != null) {
-								Bundle bundle = Platform.getBundle("org.eclipse.ptp." + osName); //$NON-NLS-1$
+								Bundle bundle = Platform.getBundle(BUNDLE_PREFIX + osName);
 								if (bundle != null) {
 									IRemoteFileManager fileManager = remoteServices.getFileManager(remoteConnection);
 									if (fileManager != null) {
-										IPath destPath = new Path(remoteConnection.getWorkingDirectory())
-												.append(".eclipsesettings").append("sdm"); //$NON-NLS-1$//$NON-NLS-2$
-										IFileStore dest = fileManager.getResource(destPath.toString());
-										IFileInfo destInfo = dest.fetchInfo(EFS.NONE, progress.newChild(10));
+										/*
+										 * Create the .eclipssettings directory if it doesn't exist on the remote machine. The mkdir
+										 * does nothing if the directory already exists.
+										 */
+										IPath destDirPath = new Path(remoteConnection.getWorkingDirectory()).append(WORKING_DIR);
+										IFileStore destDir = fileManager.getResource(destDirPath.toString());
+										destDir.mkdir(EFS.NONE, progress.newChild(1));
+
+										/*
+										 * Find sdm in correct bundle
+										 */
 										IFileStore local = null;
-										IPath srcPath = new Path("os").append(osName).append(osArch).append("sdm"); //$NON-NLS-1$ //$NON-NLS-2$
+										IPath srcPath = new Path(OS).append(osName).append(osArch).append(SDM);
 										URL jarURL = FileLocator.find(bundle, srcPath, null);
 										if (jarURL != null) {
 											try {
@@ -157,13 +169,24 @@ public class SDMDebugger implements IPDebugger {
 														Messages.SDMDebugger_Could_not_locate_SDM_exectuable, e));
 											}
 										}
+
+										/*
+										 * Now copy the sdm if necessary
+										 */
 										if (local != null) {
+											IFileStore destPath = destDir.getChild(SDM);
+											IFileInfo destInfo = destPath.fetchInfo(EFS.NONE, progress.newChild(10));
 											IFileInfo localInfo = local.fetchInfo(EFS.NONE, progress.newChild(10));
+
+											/*
+											 * Only copy if the sdm does not exist, or the size is different from the local version
+											 * TODO: checking the size is not very accurate, it would be better to use a crypto hash
+											 */
 											if (!destInfo.exists() || destInfo.getLength() != localInfo.getLength()) {
 												progress.subTask(Messages.SDMDebugger_Copying_SDM_to_target_system);
-												local.copy(dest, EFS.OVERWRITE, progress.newChild(70));
+												local.copy(destPath, EFS.OVERWRITE, progress.newChild(70));
 											}
-											return destPath.toString();
+											return destPath.toURI().getPath();
 										}
 									}
 								}
