@@ -217,11 +217,13 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				updateHiddenToolChainList();
+				update();
 			}
 
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				updateHiddenToolChainList();
+				update();
 			}
 		});
 		remoteToolChainTable.setVisible(true);
@@ -239,11 +241,13 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				updateHiddenToolChainList();
+				update();
 			}
 
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				updateHiddenToolChainList();
+				update();
 			}
 		});
 		localToolChainTable.setVisible(true);
