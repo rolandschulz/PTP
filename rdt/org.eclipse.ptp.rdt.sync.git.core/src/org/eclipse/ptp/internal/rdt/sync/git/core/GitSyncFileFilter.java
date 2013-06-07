@@ -114,6 +114,7 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		
 		public GitIgnoreRule(IResource resource, boolean exclude) {
 			String pattern = charEscapify(resource.getProjectRelativePath().toString());
+			if (pattern.charAt(0)!='/') pattern = "/" + pattern; //$NON-NLS-1$
 			if (resource.getType()==IResource.FOLDER) pattern += "/"; //$NON-NLS-1$
 			if (!exclude) pattern = "!" + pattern; //$NON-NLS-1$
 			rule = new org.eclipse.jgit.ignore.IgnoreRule(pattern);
@@ -180,8 +181,8 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		FileOutputStream file = new FileOutputStream(exclude);
 		BufferedWriter out = new BufferedWriter(new OutputStreamWriter(file,Constants.CHARSET));
 		try {
-			for (AbstractIgnoreRule rule : rules) {
-				out.write(rule.toString());
+			for (int i=rules.size()-1;i>=0;i--) {
+				out.write(rules.get(i).toString());
 				out.newLine();
 			}
 		} finally {
@@ -211,8 +212,8 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 			try {
 				IgnoreNode node = new IgnoreNode();
 				node.parse(in);
-				for (org.eclipse.jgit.ignore.IgnoreRule rule : node.getRules())
-					rules.add(new GitIgnoreRule(rule));
+				for (int i=node.getRules().size()-1;i>=0;i--)
+					rules.add(0,new GitIgnoreRule(node.getRules().get(i)));
 			} finally {
 				in.close();
 			}

@@ -80,7 +80,7 @@ public class PreferenceSyncFileFilterStorage extends AbstractSyncFileFilter  {
 
 	public void loadBuiltInDefaultFilter() {
 		for (String pattern : java.util.Arrays.asList(new String[]{
-				".project", ".cproject", ".settings"})) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				"/.project", "/.cproject", "/.settings/"})) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			addPattern(pattern, true);
 	}
 	
@@ -104,7 +104,7 @@ public class PreferenceSyncFileFilterStorage extends AbstractSyncFileFilter  {
 			}
 
 			
-			for (int i = numPatterns - 1; i >= 0; i--) {
+			for (int i = 0; i < numPatterns; i++) {
 				if (!prefPatternNode.nodeExists(Integer.toString(i))) {
 					RDTSyncCorePlugin.log(Messages.SyncFileFilter_1);
 					rules.clear();
@@ -156,15 +156,15 @@ public class PreferenceSyncFileFilterStorage extends AbstractSyncFileFilter  {
 
 	@Override
 	public void addPattern(String pattern, boolean exclude, int index) {
-		rules.add(new PreferenceIngoreRule(pattern, exclude));
+		rules.add(index, new PreferenceIngoreRule(pattern, exclude));
 	}
 
 	@Override
 	public void addPattern(IResource resource, boolean exclude, int index) {
-		rules.add(new PreferenceIngoreRule(resource.getProjectRelativePath().toString(), exclude));
+		rules.add(index, new PreferenceIngoreRule(resource.getProjectRelativePath().toString(), exclude));
 	}
 
-	public void addPattern(String rule) {
+	private void addPattern(String rule) {
 		rules.add(new PreferenceIngoreRule(rule));
 	}
 

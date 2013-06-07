@@ -182,9 +182,9 @@ public class SyncFilterWidget extends Composite {
 		patternTableComposite.setLayoutData(new GridData(SWT.FILL, SWT.TOP, GRAB_EXCESS, GRAB_EXCESS));
 
 		// Label for pattern table
-		Label patternTableLabel = new Label(patternTableComposite, SWT.NONE);
+		Label patternTableLabel = new Label(patternTableComposite, SWT.WRAP);
 		patternTableLabel.setText(Messages.NewSyncFileFilterPage_Patterns_to_include);
-		patternTableLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
+		patternTableLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 4, 1));
 
 		// Pattern table
 		fPatternTable = new Table(patternTableComposite, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
@@ -345,8 +345,7 @@ public class SyncFilterWidget extends Composite {
 		AbstractIgnoreRule selectedRule = (AbstractIgnoreRule) selectedRuleItem[0].getData();
 		SimpleEditPatternDialog dialog = new SimpleEditPatternDialog(fPatternTable.getShell(), selectedRule);
 		if (dialog.open() == Window.OK) {
-			fFilter.removePattern(selectedRule);
-			fFilter.addPattern(dialog.pattern, dialog.exclude);
+			fFilter.replacePattern(selectedRule, dialog.pattern, dialog.exclude);
 			updateTable();
 			notifyPatternChangeListeners();
 		}
