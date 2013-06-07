@@ -32,16 +32,16 @@ Note that this is completely independent of using <a href="http://git-scm.com/">
 <h2 id=create>Creating a new Synchronized Project</h2>
 <p>To create a new Synchronized Project, first select an appropriate wizard:</p>
 Select <b>File > New > Other...</b>
-then in the wizard selection dialog, select <b>Remote > Synchronized C/C++ Project</b> or <b>Synchronized Fortran Project</b>
+then in the wizard selection dialog, select <b>Remote > Synchronized C/C++ Project</b>, <b>Synchronized Fortran Project</b>, or <b>Synchronized Project</b> for synchronization only without support for a specific language.
 <p><br></p>
 <p><img src="images/sync-newproj.png">
 <p><br></p>
 <p>Or, from the context menu (right-mouse) in the Project Explorer of the C/C++ Perspective,
-select <b>New > Synchronized C/C++ Project</b> or <b>Synchronized Fortran Project</b>
+select <b>New > Synchronized C/C++ Project</b>, <b>Synchronized Fortran Project</b>, or <b>Synchronized Project</b> for synchronization only without support for a specific language.
 <p><br></p>
 <p><img src="images/sync-newprojContext.png">
 <p><br></p>
-<p id="new-sync-proj">Now fill out the <b>New Synchronized Project</b> dialog shown.
+<p id="new-sync-proj">Now fill out the <b>New Synchronized Project</b> dialog shown. The dialog for synchronization only will not contain the lower portion for selecting project types and toolchains.
 
 <p>
 <img src="images/sync-newprojCreate.png">
@@ -75,7 +75,7 @@ From here, you can configure build properties. (This can also be done after the 
 Note that if you select the same toolchain for both local and remote, only one configuration is shown.
 During project creation, this configuration will be duplicated, creating one for local and another for remote.
 <p>
-If you then select <b>Next ></b> instead of <b>Finish</b>, the <b>Default Build Configurations</b> page appears.
+If you then select <b>Next ></b> instead of <b>Finish</b>, the <b>Default Build Configurations</b> page appears. See <a href="#work">Working with a Synchronized Project</a> for more information on sync configs and build configs.
 <p><img src="images/sync-build-config.png"></p>
 <p>&nbsp;
 <p>Select <b>Finish</b> to end the New Project Wizard.
@@ -92,15 +92,20 @@ and select the <b>Browse...</b> button or some other communication is required.
 <br></p>
 
 <h2 id="work">Working with a Synchronized Project</h2>
-<p>The starting configuration will be for one of the toolchains with a connection to a remote system.
+<p>In Eclipse Kepler, the settings for synchronization and for building have been separated. For the former, "sync configurations" are used and are available in all synchronized projects. These are used mainly to specify where (machine and directory) local files should be synchronized. For building, "build configurations" are used and are only available for synchronized C, C++, or Fortran projects. They are used to configure build parameters, such as the compiler and compiler options. These two configuration types operate mostly independently, and sync'ing or building always uses the current "active" sync or build configuration, respectively.
+
+<p>The only dependence is that builds occur, by default, at the location specified by the active sync configuration. Also, you can specify a default build configuration for each sync configuration. When switching to a different sync configuration, its default build configuration is automatically selected. This is only for convenience, so that two settings do not need to be changed when switching to a different remote. You can also change the build configuration independently of the sync configuration. It is common to have multiple types of builds, say a "debug" and a "release" build, for the same source location or even to use the same build configuration for multiple remote locations (sync configurations).
+
+<p>The starting sync configuration will be for the remote system with its default build configuration, if selected in the wizard.
 Thus, for the most common case (a single remote site to be modified and built), a synchronized project works out-of-the-box.
 If the remote location does not exist, it is created. Otherwise, the files in that directory will be synchronized to the local workspace.
 Edit the files as you would any local project.
 Each time you save a file, it will be synchronized with the remote system.
 If you create or delete files, the remote system will be updated appropriately.
+Note that a local sync config is always created for convenience, even if no local tool chain was selected.
+It provides a simple way to disable all remote operations and work locally without changing other sync settings.
 </p>
 <p>
-By default, a synchronized project is configured to build on the same remote host as for synchronization.
 To build the project (assuming you have already created a makefile), make sure the project is selected in the <b>Project Explorer</b> view, then click
 on the build icon (the icon that looks like a hammer). The Console view shows the results of the build.
 <p>For more examples of creating and building a simple new Synchronized project, see
@@ -109,11 +114,6 @@ on the build icon (the icon that looks like a hammer). The Console view shows th
 For more details see <a href="build.html">Building Synchronized Projects</a>
 <p>
 
-<p>Projects can have multiple build configurations. 
-Each build configuration specifies a different set of options for a build.
-Build configurations and synchronize configurations are independent. 
-A build configuration can be associated with a synchronize configuration, so that it is
-automatically selected when the synchronize configuration is changed.
 <p>
 For more information on build configurations, sync configurations, etc. see
 <a href="build.html#syncConfig">Sync Configurations</a> on the 
@@ -125,9 +125,9 @@ To access the sync context menu, right-click on the project in the <b>Project Ex
 move down to the <b>Synchronize</b> sub-menu.
 <p><img src="images/sync-contextMenu.png"></p>
 <p>
-From this menu, you can force a synchronization immediately for the active configuration,
-Set the active configuration, Manage configurations (sync configurations and their associated build configurations),
-force a sync of all the configs, etc.
+From this menu, you can force a synchronization immediately for the active sync configuration,
+Set the active sync configuration, Manage configurations (sync configurations and their associated build configurations),
+force a sync of all the sync configs, etc.
 <b>Auto-sync (Global)</b> and <b>Auto-sync Settings</b> allow you to alter the behavior of automatic sync'ing
 for all projects or per project.
 <p> 
@@ -161,11 +161,11 @@ allows setting sync filter settings as a project is created, and
 <p>Parts of the <b>Configure Synchronize Project Filters</b> dialog for an existing project:
 <ul>
 <li>The <b>files/folders</b> list at the top indicates the currently excluded and included directories and files 
-for the currently selected project
-- based on the patterns and selections beneath it. 
+for the currently selected project.
 (Not included on the <a href="#prefs">Sync Preferences</a> page.)
+You can select (include) or unselect (exclude) individual files and folders, which will add a corresponding pattern to the <b>Patterns</b> area.
 <li>The <b>Patterns</b> area near the bottom shows the current exclude and include patterns. Patterns
-can be added, editing, or removed.  The results will be shown above in the files/folders list.
+can be added, edited, or removed.  The results will be shown above in the files/folders list.
 </ul>
 <p><img src="images/sync-filter-dialog.png">
 <p>
@@ -175,8 +175,6 @@ By default, remote files are not shown. Showing remote files may lead to a slowe
 Check <b>Show remote files</b> if you wish to view them.
 An error message is printed if the remote system is disconnected.
 <p>
-You can select or deselect directories or files in the <b>files/folders</b> list, which will add the corresponding 
-exclude or include pattern to the <b>Patterns</b> area. 
 <p>To enter a new pattern, select the <b>Add...</b> button. 
 The <b>Add Pattern</b> dialog appears.
 <p><img src="images/sync-filter-add-dialog.png"></p>
@@ -188,7 +186,7 @@ The <b>Add Pattern</b> dialog appears.
 <li>path ends in / matches only directory
 </ul>
 <p>Select the radio button beneath the <b>Pattern:</b> field
-to indicate the should be included or excluded in the synchronization.  Default is excluded.
+to indicate whether the pattern should be included or excluded in the synchronization.  Default is excluded.
 
 
 <p>
@@ -216,8 +214,8 @@ the synchronization.
 
 <h2 id="conversion-wizard">Converting a project to a Synchronized Project</h2>
 <p>
-The conversion wizard allows you to convert current C/C++ or Fortran projects to synchronized projects. 
-Currently only local projects can be converted. 
+The conversion wizard allows you to convert any project type to a synchronized project.
+Currently only local projects can be converted.
 To convert a project, right-click in the <b>Project Explorer</b> view and select <b>New > Other...</b> 
 In the wizard selection dialog, select <b> Remote > Convert to Synchronized Project</b> and select <b>Next></b>.
 <p><img src="images/sync-selectConversionWizard.png"></p>
@@ -227,8 +225,7 @@ From this dialog, you can select a project to convert.
 <p><img src="images/sync-conversionWizard.png"><p>
 <p>Select a local project to convert it to a synchronized project.
 Select a connection (or <a href="remoteTools.html#create"></a>create a new connection</a>.)
-<p>Select <b>Next></b> and in the next dialog, select the Build Configurations for each Sync Configuration
-to be duplicated on the remote system.
+<p>Select <b>Next></b> and in the next dialog, select the default Build Configurations for each Sync Configuration (only for C, C++, or Fortran projects).
 <p><img src="images/sync-conversionWizard2.png"><p>
 <p>Select <b>Finish</b> and the project is synchronized (copied) to the remote system specified by the connection.
 <!-- 

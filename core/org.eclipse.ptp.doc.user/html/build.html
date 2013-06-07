@@ -18,10 +18,12 @@ some info in sync.html and modules.html  -->
 </ul>
 <h2 id="buildConfig">Build Configurations</h2>
 <p>A build configuration provides the necessary information to build the project.
-<p>A synchronized project may have both a local and remote build configuration, 
-or it may have only a build configuration for the remote target.
-If both local and remote toolchains were specified when the project was created, 
-the remote build configuration will usually be the default.
+Note that only C, C++, or Fortran synchronized projects will have build configurations.
+<p>A project's build configurations are initially based on the selected project type and selected remote and local tool chains,
+but really there is no restriction on which host a build configuration can be used.
+It is common to use the same build configuration for both remote and local hosts.
+The distinction of "remote" vs "local" only applies to sync configurations.
+
 <p>The build configuration information is specified in the project properties.
 <p>Open the 
 <a href="misc.html#projProps">Project Properties</a>
@@ -55,9 +57,7 @@ The default build command is "make" but this can be changed to anything.
 
 <h2 id="selectBuildConfig">Selecting a Build Configuration</h2>
 <p>Multiple build configurations may be available for a project.
-Synchronized projects will usually have a remote and a local build configuration
-(the local build configuration is optional).
-Build configurations can be specified for different architectures on different remote target platforms.
+Build configurations can be specified for different architectures on different target platforms.
 <p>The active build configuration will be used when the build button 
 <img src="images/01sync-hammer-icon.png">
 is selected.
