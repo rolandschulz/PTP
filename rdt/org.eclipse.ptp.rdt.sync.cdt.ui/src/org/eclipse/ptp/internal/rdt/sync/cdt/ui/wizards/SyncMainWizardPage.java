@@ -78,6 +78,7 @@ import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.ide.IIDEHelpContextIds;
+import org.eclipse.swt.custom.StackLayout;
 
 /**
  * Main wizard page for creating new synchronized projects. All elements needed for a synchronized project are configured here. This
@@ -155,6 +156,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 		createProjectDetailedInfoGroup(composite);
 		this.switchTo(this.updateData(projectTypeTree, allToolChainsHiddenComposite, false, SyncMainWizardPage.this, getWizard()),
 				getDescriptor(projectTypeTree));
+		allToolChainsHiddenComposite.setLayout(new StackLayout());
 
 		setPageComplete(false);
 		errorMessage = null;
