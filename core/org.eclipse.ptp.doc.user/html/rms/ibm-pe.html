@@ -8,16 +8,12 @@
 
 <h1 id="top">IBM Parallel Environment</h1>
 <p>This section describes how to set up a run configuration using IBM Parallel Environment as a PTP target system configuration
-<ul>
-<!-- remove for PTP 7.0 -->
-<li>For information about the legacy (proxy-based) resource manager for IBM PE from prior PTP releases,
-see
-  <a href="PLUGINS_ROOT/org.eclipse.ptp.rm.ibm.pe.doc.user/html/PEMainHelp.html">IBM PE proxy-based resource manager.</a>
-</ul>
+
 <p>When running a parallel application with IBM PE, first create a C/C++/Fortran project, and build it.
 For more information, see
 <ul>
-<li><a href="../sync.html">Synchronized Projects</a> - creating and building projects on remote machines
+<li><a href="../01buildMPIprog.html">Introduction to Creating MPI Projects</a> - introduction to creating a simple project, including a synchronized project
+<li><a href="../sync.html">Synchronized Projects</a> - more detail on creating and building projects on remote machines
 </ul> 
 <p>As described in <a href="../03pRunConfig.html">Running Parallel Programs</a>, next create a run configuration
 via Run > Run Configurations ... and create a new <b>Parallel Application</b>.
@@ -29,7 +25,7 @@ For <b>Target System Configuration</b>, select <b>IBM Parallel Environment</b>
 for a <a href="../sync.html">Synchronized Project</a> or a remote project,
 it will be selected already.
 If you are launching a local application (on the same machine where Eclipse is running), 
-you must specify a connection back to the local machine.
+select <b>Local</b> for the <b>Connection Type</b>.
 
 <p><img src="../images/rms-ibmpe2.png">
 <blockquote>
