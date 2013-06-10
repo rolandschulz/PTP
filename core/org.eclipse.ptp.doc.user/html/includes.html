@@ -13,8 +13,9 @@ remote target machine.  Usually you edit locally, but build and run on the remot
 So this complicates things with respect to include files.
 <ul>
 <li><b>Local:</b> Eclipse can use include files to provide information about
-APIs in the editor, via hover-help, for example.  Having correct include files
-available can prevent 
+APIs in the editor, via hover-help, for example.  Macro definitions also can be established via include files.
+The header files within your project are synchronized to the local machine and will be found by Eclipse. 
+Having correct include files available (for system and library includes)  can prevent 
 <a href="PLUGINS_ROOT/org.eclipse.ptp.pldt.doc.user/html/codan.html">Codan</a> (C/C++ Code Analysis in CDT) 
 from flagging potential errors incorrectly.
 (Codan analysis can also be turned off if this is preferable.  See above link.)
@@ -22,9 +23,13 @@ from flagging potential errors incorrectly.
 for this.  The Eclipse settings don't matter for this.
 </li></ul>
 
-<p>Your local environment (where Eclipse is installed) may not have the same set of include
+<p>Your local environment (where Eclipse is installed) may not have the same set of system and library include
 files that your program should be built with.
-So we need to tell Eclipse where the remote files are.
+So you may want to tell Eclipse where the remote files are.
+<ul><li>There's nothing wrong with having your eclipse project <b>Paths and Symbols</b> point
+at local include paths for system and library include files so that hover help, Codan, etc., will resolve to something
+useful.  These aren't used for the build, just to assist with Eclipse tools.
+</li></ul>
 <p><b>Note:</b> In the past, other mechanisms in the project properties have worked to set remote include paths for CDT
 that worked with Synchronized projects.
 (There are several places that <b>Paths and Symbols</b> can be set.)
