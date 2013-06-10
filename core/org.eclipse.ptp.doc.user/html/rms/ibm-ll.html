@@ -10,9 +10,6 @@
 <p>This section describes how to set up a run configuration using IBM LoadLeveler as a PTP target system configuration
 <ul>
 <li>For related information see the <a href="ibm-pe.html">IBM PE</a> target system configuration.
-<li>For information about the legacy (proxy-based) resource manager for IBM LoadLeveler from prior PTP releases,
-see
-  <a href="PLUGINS_ROOT/org.eclipse.ptp.rm.ibm.ll.doc.user/html/IBMLLMainHelp.html">IBM LoadLeveler proxy-based resource manager.</a>
 </ul>
 <p>As described in <a href="../03pRunConfig.html">Running Parallel Programs</a>, next create a run configuration
 via Run > Run Configurations ... and create a new <b>Parallel Application</b>.
@@ -25,7 +22,12 @@ For <b>Target System Configuration</b>, select <b>IBM LoadLeveler</b>
 for a <a href="../sync.html">Synchronized Project</a> or a remote project,
 it will be selected already.
 If you are launching a local application (on the same machine where Eclipse is running), 
-you must specify a connection back to the local machine.
+select <b>Local</b> for the <b>Connection Type</b>.
+
+<p><img src="../images/rms-ibmpe2.png">
+<blockquote>
+<p>See <a href="../remoteTools.html#create">Creating Remote Connections</a> and 
+<a href="../remoteTools.html#local">Local Connections</a>
 
 <p id=pe>After selecting IBM LoadLeveler, the Resources tab will be filled with information specific to this
 target configuration.  
