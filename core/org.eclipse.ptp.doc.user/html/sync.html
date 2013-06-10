@@ -146,7 +146,7 @@ since they are usually edited from the local Eclipse workbench but used to build
 you can change which files are synchronized for the current project. 
 
 You can also change the default settings for future projects on the 
-<a href="#prefs">Synchronized Project preference page</a>. 
+<a href="#prefs">Synchronized Projects preference page</a>. 
 By default, files and directories specifically used by Eclipse are excluded from synchronization. 
 (Note that these files, such as <code>.project</code> and <code>.project</code> etc.  are normally not visible.)
 <p>Sync filtering information is accessible in three places:
@@ -261,9 +261,12 @@ After a merge conflict, the local file has markers and annotation added to show 
 
 <h2 id="remote-discovery">Discovering the remote environment (remote includes and code analysis)</h2>
 <h3>Introduction</h3>
-Modern software projects almost always depend on external code, macros, and variables, which are introduced into source code through include directives and various compiler commands and settings. We refer to all of these external elements as the project's "environment." Detecting this environment is a difficult problem but essential in order for Eclipse to provide useful code assistance (bug highlighting, code navigation, etc.) It is difficult because this environment is partially built into the compiler and partially "discovered" by the compiler while building. CDT has a long history of developing "scanner discovery" to solve this problem and recently unveiled a redesign of the discovery mechanism. Synchronized projects extends this new redesign so that discovery can reflect the environment of the current remote machine (as specified by the active build configuration). At the moment, only the GCC compiler is supported. Note that CDT still makes available the old method of scanner discovery, but it has not been extended to work with synchronized projects.
+Modern software projects almost always depend on external code, macros, and variables, which are introduced into source code through include directives and various compiler commands and settings. We refer to all of these external elements as the project's "environment." Detecting this environment is a difficult problem but essential in order for Eclipse to provide useful code assistance (bug highlighting, code navigation, etc.) It is difficult because this environment is partially built into the compiler and partially "discovered" by the compiler while building. CDT has a long history of developing <b><i>scanner discovery</i></b> to solve this problem and recently unveiled a redesign of the discovery mechanism. Synchronized projects extends this new redesign so that discovery can reflect the environment of the current remote machine (as specified by the active build configuration). At the moment, only the GCC compiler is supported. Note that CDT still makes available the old method of scanner discovery, but it has not been extended to work with synchronized projects.
 <p>
-The elements discovered by scanner discovery are used by the CDT "indexer" and the CDT "Codan (CODe ANalysis)" tool. The former is a potentially long-running tasks that gathers information about all of the source code components (variables, functions, classes, etc.) Codan then uses this information to analyze and potentially markup source files with various bug reports and warnings. Each of these three components, discovery, indexing, and Codan, run independently and at different times. In addition, the build process may produce markings for compiler errors. Codan uses an icon that resembles a bug, which distinguishes it from the more traditional icons used by the build system. (Due to the complexity of analyzing C++, it frequently occurs that programs will compile while still showing Codan markings. This can be due to problems in discovery, indexing, or code analysis.)
+The elements discovered by scanner discovery are used by the CDT "indexer" and the CDT "Codan (CODe ANalysis)" tool. The former is a potentially long-running tasks that gathers information about all of the source code components (variables, functions, classes, etc.) Codan then uses this information to analyze and potentially mark up source files with various bug reports and warnings. 
+Each of these three components (discovery, indexing, and Codan) run independently and at different times. 
+In addition, the build process may produce markings for compiler errors in the <b>Problems</b> view.
+Codan uses an icon that resembles a bug, which distinguishes it from the more traditional icons used by the build system. (Due to the complexity of analyzing C++, it frequently occurs that programs will compile while still showing Codan markings. This can be due to problems in discovery, indexing, or code analysis.)
 <p>
 <h3>Setup</h3>
 <p>Note: this may be superceded by
@@ -286,7 +289,8 @@ By default, the build output parser discovers entries per file. This can be chan
 
 <!-- FIXME end not changed to here -->
 <h3 id="prefs">Sync Preferences</h3>
-<p>The preferences page for Synchronized projects includes setting defaults for sync filtering.
+<p>The preferences page for Synchronized projects includes setting defaults for sync 
+<a href="#file-filter">filtering</a>.
 <p><img src="images/sync-prefs.png">
 <p>See also <a href="07ptpPrefs.html">PTP Preferences</a>.
 <p>&nbsp;
