@@ -100,28 +100,31 @@
 
    <annotation>
       <appInfo>
-         <meta.section type="since"/>
+         <meta.section type="apiInfo"/>
       </appInfo>
       <documentation>
-         [Enter the first release in which this extension point appears.]
+         The value of the class attribute must implement &lt;samp&gt;org.eclipse.ptp.remote.core.IRemoteServicesFactory&lt;/samp&gt;.
       </documentation>
    </annotation>
+
 
    <annotation>
       <appInfo>
          <meta.section type="examples"/>
       </appInfo>
       <documentation>
-         [Enter extension point usage example here.]
-      </documentation>
-   </annotation>
-
-   <annotation>
-      <appInfo>
-         <meta.section type="apiInfo"/>
-      </appInfo>
-      <documentation>
-         [Enter API information here.]
+         &lt;pre&gt;
+   &lt;extension
+         point=&quot;org.eclipse.ptp.remote.core.remoteServices&quot;&gt;
+      &lt;remoteServices
+            class=&quot;org.eclipse.ptp.internal.remote.core.services.local.LocalServicesFactory&quot;
+            id=&quot;org.eclipse.ptp.remote.LocalServices&quot;
+            name=&quot;Local&quot;
+            newConnections=&quot;false&quot;
+            scheme=&quot;file&quot;&gt;
+      &lt;/remoteServices&gt;
+   &lt;/extension&gt;
+&lt;/pre&gt;
       </documentation>
    </annotation>
 
@@ -130,9 +133,17 @@
          <meta.section type="implementation"/>
       </appInfo>
       <documentation>
-         [Enter information about supplied implementation of this extension point.]
+         The remote package provides a remote services implementation for local services.
       </documentation>
    </annotation>
 
+   <annotation>
+      <appInfo>
+         <meta.section type="copyright"/>
+      </appInfo>
+      <documentation>
+         Copyright (c) 2013 IBM Corporation and others. All rights reserved. This program and the accompanying materials are made available under the terms of the Eclipse Public License v1.0 which accompanies this distribution, and is available at http://www.eclipse.org/legal/epl-v10.html
+      </documentation>
+   </annotation>
 
 </schema>

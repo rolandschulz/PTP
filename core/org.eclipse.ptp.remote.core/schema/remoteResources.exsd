@@ -6,7 +6,7 @@
          <meta.schema plugin="org.eclipse.ptp.remote.core" id="remoteResources" name="Remote Resources"/>
       </appInfo>
       <documentation>
-         [Enter description of this extension point.]
+         This extension point allows remote implementations to provide additional operations on a resource. The extension associates a project nature with the resource extension. Resources contained within a particular project can be adapted to obtain the additional operations.
       </documentation>
    </annotation>
 
@@ -52,38 +52,34 @@
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  the fully qualified name of a class that implements &lt;code&gt;org.eclipse.ptp.remote.core.IRemoteResource&lt;/code&gt;
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn=":org.eclipse.ptp.internal.remote.core.IRemoteResource"/>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.ptp.remote.core.IRemoteResource"/>
                </appInfo>
             </annotation>
          </attribute>
          <attribute name="nature" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  a project nature. Resources contained within a project with this nature can be adapted to obtain the &lt;code&gt;org.eclipse.ptp.remote.core.IRemoteResource&lt;/code&gt; interface.
                </documentation>
             </annotation>
          </attribute>
       </complexType>
    </element>
 
-   <annotation>
-      <appInfo>
-         <meta.section type="since"/>
-      </appInfo>
-      <documentation>
-         [Enter the first release in which this extension point appears.]
-      </documentation>
-   </annotation>
 
    <annotation>
       <appInfo>
          <meta.section type="examples"/>
       </appInfo>
       <documentation>
-         [Enter extension point usage example here.]
+         &lt;pre&gt;
+   &lt;extension point=&quot;org.eclipse.ptp.remote.core.remoteResource&quot;&gt; 
+      &lt;remoteResource class=&quot;MyRemoteResourceClass&quot; nature=&quot;MyProjectNature&quot;/&gt; 
+   &lt;/extension&gt; 
+&lt;/pre&gt;
       </documentation>
    </annotation>
 
@@ -92,7 +88,7 @@
          <meta.section type="apiinfo"/>
       </appInfo>
       <documentation>
-         [Enter API information here.]
+         The value of the class attribute must implement the interface &lt;code&gt;org.eclipse.ptp.remote.core.IRemoteResource&lt;/code&gt;
       </documentation>
    </annotation>
 
@@ -101,9 +97,17 @@
          <meta.section type="implementation"/>
       </appInfo>
       <documentation>
-         [Enter information about supplied implementation of this extension point.]
+         The remote package itself does not have any predefined remote resources.
       </documentation>
    </annotation>
 
+   <annotation>
+      <appInfo>
+         <meta.section type="copyright"/>
+      </appInfo>
+      <documentation>
+         Copyright (c) 2013 IBM Corporation and others. All rights reserved. This program and the accompanying materials are made available under the terms of the Eclipse Public License v1.0 which accompanies this distribution, and is available at http://www.eclipse.org/legal/epl-v10.html
+      </documentation>
+   </annotation>
 
 </schema>
