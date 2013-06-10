@@ -181,8 +181,8 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		FileOutputStream file = new FileOutputStream(exclude);
 		BufferedWriter out = new BufferedWriter(new OutputStreamWriter(file,Constants.CHARSET));
 		try {
-			for (int i=rules.size()-1;i>=0;i--) {
-				out.write(rules.get(i).toString());
+			for (AbstractIgnoreRule rule : rules) {
+				out.write(rule.toString());
 				out.newLine();
 			}
 		} finally {
@@ -212,8 +212,8 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 			try {
 				IgnoreNode node = new IgnoreNode();
 				node.parse(in);
-				for (int i=node.getRules().size()-1;i>=0;i--)
-					rules.add(0,new GitIgnoreRule(node.getRules().get(i)));
+				for (org.eclipse.jgit.ignore.IgnoreRule rule : node.getRules())
+					rules.add(new GitIgnoreRule(rule));
 			} finally {
 				in.close();
 			}

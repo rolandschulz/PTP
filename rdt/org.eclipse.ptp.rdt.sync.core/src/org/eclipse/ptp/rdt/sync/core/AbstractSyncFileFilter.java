@@ -43,16 +43,16 @@ public abstract class AbstractSyncFileFilter {
 		public abstract String getPattern(); 
 	}
 	
-	/* highest precedence is fist rule (reverse than Git) */
+	/* highest precedence is last rule (as for Git - reverse from PTP Juno) */
 	public List<AbstractIgnoreRule> rules = new ArrayList<AbstractIgnoreRule>();
 
 	public void addPattern(String pattern, boolean exclude) {
-		addPattern(pattern,exclude,0);
+		addPattern(pattern,exclude,rules.size());
 	}
 	
 	
 	public void addPattern(IResource resource, boolean exclude) {
-		addPattern(resource,exclude,0);
+		addPattern(resource,exclude,rules.size());
 	}
 	
 	/**
@@ -147,9 +147,9 @@ public abstract class AbstractSyncFileFilter {
 	 */
 	public boolean shouldIgnore(IResource r) {
 		//If there is a rule to ignore a folder all members are ignored
-		for (AbstractIgnoreRule rule : rules) {
-			if (rule.isMatch(r)) {
-				return rule.getResult();
+		for (int i = rules.size() - 1; i > -1; i--) {
+			if (rules.get(i).isMatch(r)) {
+				return rules.get(i).getResult();
 			}
 		}
 		return false;
@@ -164,9 +164,9 @@ public abstract class AbstractSyncFileFilter {
 	 */
 	public boolean shouldIgnore(String path, boolean isFolder) {
 		//If there is a rule to ignore a folder all members are ignored
-		for (AbstractIgnoreRule rule : rules) {
-			if (rule.isMatch(path, isFolder)) {
-				return rule.getResult();
+		for (int i = rules.size() - 1; i > -1; i--) {
+			if (rules.get(i).isMatch(path, isFolder)) {
+				return rules.get(i).getResult();
 			}
 		}
 		return false;

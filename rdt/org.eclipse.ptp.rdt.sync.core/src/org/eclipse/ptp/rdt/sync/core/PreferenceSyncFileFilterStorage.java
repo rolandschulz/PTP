@@ -118,7 +118,7 @@ public class PreferenceSyncFileFilterStorage extends AbstractSyncFileFilter  {
                 	rules.clear();
                     throw new NoSuchElementException(Messages.PathResourceMatcher_0);
                 }
-				addPattern(p);
+        		rules.add(new PreferenceIngoreRule(p));
 			}
 			return true;
 		} catch (BackingStoreException e) {
@@ -144,12 +144,10 @@ public class PreferenceSyncFileFilterStorage extends AbstractSyncFileFilter  {
         }
         Preferences prefPatternNode = prefRootNode.node(PATTERN_NODE_NAME);
         prefPatternNode.putInt(NUM_PATTERNS_KEY, rules.size());
-        int i = 0;
-        for (AbstractIgnoreRule rule : rules) {
+        for (int i = 0; i < rules.size(); i++) {
                 Preferences prefRuleNode = prefPatternNode.node(Integer.toString(i));
                 // Whether pattern is exclusive or inclusive
-                prefRuleNode.put(ATTR_RULE, rule.toString());
-                i++;
+                prefRuleNode.put(ATTR_RULE, rules.get(i).toString());
         }
 		SyncUtils.flushNode(prefRootNode);
 	}
@@ -162,10 +160,6 @@ public class PreferenceSyncFileFilterStorage extends AbstractSyncFileFilter  {
 	@Override
 	public void addPattern(IResource resource, boolean exclude, int index) {
 		rules.add(index, new PreferenceIngoreRule(resource.getProjectRelativePath().toString(), exclude));
-	}
-
-	private void addPattern(String rule) {
-		rules.add(new PreferenceIngoreRule(rule));
 	}
 
 	@Override
