@@ -12,6 +12,7 @@
 <li><a href="#sync">Creating a synchronized MPI project with a Makefile</a>
 <p>This is an example of a parallel program to be built and run on a remote machine.  Source files are edited
 on the local (Eclipse) machine and then it can be built and run on a remote target machine.
+
 </li>
 <li><a href="#local-helloMPI">Creating a local MPI project without an explicitly provided Makefile - a "Managed Build"  project</a>
 with "Hello MPI World"  sample source code
@@ -29,13 +30,12 @@ Actually this doesn't require a makefile - it means that the user provides a bui
 This can be easily changed for other build mechanisms.
 <p>It will cover the following steps:
 <ul>
-
-<li><a href="#sync-create">Create the project</a> from source code existing on the remote target machine. 
+<li><a href="#sync-create">Step 1: Create the Project</a> from source code existing on the remote target machine. 
 The files are copied to the local machine.
-</li>
-<li>(Optional) <a href="#sync-term">Open a Remote Terminal View</a> to the target system</li>
-<li><a href="#sync-build">Build the executable on the remote machine</a></li>
-<li><a href="#sync-launch">Launch the program</a></li>
+<li><a href="#sync-term">Step 2: (Optional) Open a Remote Terminal View on the remote machine</a>
+<li><a href="#sync-edit">Step 3: Edit Source Files</a> - and set up remote include files too
+<li><a href="#sync-build">Step 4: Build the executable on the remote machine</a>
+<li><a href="#sync-launch">Step 5: Launch the program</a>
 </ul>
 
 <h2 id="sync-create">Step 1: Create the project</h2>
@@ -56,7 +56,6 @@ See <a href="PLUGINS_ROOT/org.eclipse.photran.doc.user/html/toc.html">Photran</a
 on Eclipse features for Fortran.
 </li></ul>
 
-<!-- BRT FIXME using images from slides -- need to recapture them for improved resolution -->
 <p>
 <img src="images/01sync-newProj.png">
 <p>&nbsp;
@@ -112,7 +111,7 @@ For <b>Remote Toolchain</b>, choose the toolchain that most closely matches the 
 <ul>
 <li><i>Empty project</i> only indicates that Eclipse isn't adding any files to the project - it will use your files.
 <li>
-Note: toolchain information is only  used for scanner discovery (???) in determining the location
+Note: toolchain information is only  used for scanner discovery in determining the location
 of the include files, etc. that are used in your build - to help Eclipse find the same information
 to help with editor navigation, special features, etc.
 Actual build command information is taken from your Makefile.
@@ -131,8 +130,6 @@ By default all files are synchronized between the local and remote systems
 <p>For more details on synchronization, configurations, filters, Synchronization properties,
 etc. see <a href="sync.html">Synchronized Projects</a>.
 
-<!-- FIXME  Note sync.html already covers alot of this. screen shots need to be updated tho.???? -->
-
 <h2 id="sync-term">Step 2: (Optional) Open a remote terminal on the remote machine</h2>
 <p>Since this example describes how to create a synchronized project mirrored on a remote machine,
 it assumes a directory on the remote machine exists with source code and a Makefile already existing in it.
@@ -146,7 +143,7 @@ project.
 <p>This example shows the files in the remote directory that are mirrored in the synchronized
 project within Eclipse PTP.
 <br><img src="images/01sync-term.png">
-<h2 id="sync-build">Step 3: Edit source files</h2>
+<h2 id="sync-edit">Step 3: Edit source files</h2>
 <p>To edit a source file, double-click on a file in the Project explorer view.
 The editor opens on that file.
 
@@ -163,7 +160,7 @@ To tell Eclipse about remote include files see
 should go away:
 <p><img src="images/01edit-no-codanErrors.png"></p>
 <p>&nbsp
-<h2 id="sync-build">Step 3: Build the executable on the remote machine</h2>
+<h2 id="sync-build">Step 4: Build the executable on the remote machine</h2>
 <p></p>
 <ol>
 <li><p>Assuming that you have MPI installed on the remote 
@@ -196,7 +193,7 @@ corresponding source files will be flagged, and markers will be inserted into th
 </li>
 </ol>
 
-<h2 id="sync-launch">Step 4: Launch the program</h2>
+<h2 id="sync-launch">Step 5: Launch the program</h2>
 <p></p>
 <p>Once you have verified that the application has built correctly, you can then 
 <a href="03pRunConfig.html">create a run configuration and launch the parallel program.</a></p></li>
