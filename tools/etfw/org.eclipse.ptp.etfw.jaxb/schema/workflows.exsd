@@ -6,7 +6,8 @@
          <meta.schema plugin="org.eclipse.ptp.etfw.jaxb" id="workflows" name="Performance Workflow Definitions"/>
       </appinfo>
       <documentation>
-         [Enter description of this extension point.]
+         This extension point is used to add profiling tool workflows.
+
       </documentation>
    </annotation>
 
@@ -69,21 +70,21 @@
       </complexType>
    </element>
 
-   <annotation>
-      <appinfo>
-         <meta.section type="since"/>
-      </appinfo>
-      <documentation>
-         [Enter the first release in which this extension point appears.]
-      </documentation>
-   </annotation>
 
    <annotation>
       <appinfo>
          <meta.section type="examples"/>
       </appinfo>
       <documentation>
-         [Enter extension point usage example here.]
+         &lt;pre&gt;
+	&lt;extension
+         point=&quot;org.eclipse.ptp.etfw.jaxb.workflows&quot;&gt;
+      &lt;workflowDefinitionXML
+            file=&quot;contrib/perfsuite-tool.xml&quot;
+            name=&quot;PerfSuite&quot;&gt;
+      &lt;/workflowDefinitionXML&gt;
+   &lt;/extension&gt;
+&lt;/pre&gt;
       </documentation>
    </annotation>
 
@@ -92,7 +93,7 @@
          <meta.section type="apiinfo"/>
       </appinfo>
       <documentation>
-         [Enter API information here.]
+         Handles specifications of the sequential workflow steps to be performed in a perf/profile launch. Three sections: compile (&lt;buildTool&gt;), execute (&lt;execTool&gt;), and analyze (&lt;analysisTool&gt;). The workflow includes elements that specify UI components to show in the Launch UI.
       </documentation>
    </annotation>
 
@@ -101,9 +102,17 @@
          <meta.section type="implementation"/>
       </appinfo>
       <documentation>
-         [Enter information about supplied implementation of this extension point.]
+         The perfsuite example is a sample workflow for the perfsuite profiling tool.
       </documentation>
    </annotation>
 
+   <annotation>
+      <appinfo>
+         <meta.section type="copyright"/>
+      </appinfo>
+      <documentation>
+         Copyright (c) 2012 University of Illinois and others. All rights reserved. This program and the accompanying materials are made available under the terms of the Eclipse Public License v1.0 which accompanies this distribution, and is available at http://www.eclipse.org/legal/epl-v10.html 
+      </documentation>
+   </annotation>
 
 </schema>
