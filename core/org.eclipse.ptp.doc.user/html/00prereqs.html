@@ -14,17 +14,18 @@ http://wiki.eclipse.org/PTP/release_notes/7.0</a>
 <ul>
 <li>Java 1.6 or later</li>
 <li><a href="http://eclipse.org/downloads">Eclipse SDK</a> Kepler (version 4.3) or later</li>
-<li><a href="http://eclipse.org/cdt/">Eclipse C/C++ Development Tools (CDT)</a> version 8.1 or later</li>
-<li><a href="http://eclipse.org/dsdp/tm">Remote System Explorer (RSE)</a> version 3.3 or later</li>
+<li><a href="http://eclipse.org/cdt/">Eclipse C/C++ Development Tools (CDT)</a> version 8.2 or later</li>
+<li><a href="http://eclipse.org/tm">Remote System Explorer (RSE)</a> version 3.3 or later</li>
 </ul>
 
-<h2>PTP Client</h2>
+<h2 id="package">PTP Client</h2>
 <p>PTP is now available as a single download package called 
 <blockquote>
 <img src="images/epad.png"><a href="http://eclipse.org/downloads">Eclipse for Parallel Application Developers</a>
 </blockquote>
-that includes all the pre-requisite
-components (apart from Java). This is the preferred method for obtaining PTP. The PTP package is available for the following platforms:</p>
+often referred to as the <b><i>Parallel Package</i></b> - that includes all the pre-requisite
+components (apart from Java). This is the preferred method for obtaining PTP. 
+The Parallel package is available for the following platforms:</p>
 
 <table border="1">
    <tr>
@@ -47,7 +48,7 @@ components (apart from Java). This is the preferred method for obtaining PTP. Th
 
 <p>The Eclipse PTP client is also supported on any of the platforms that Eclipse supports, however installation is more complicated. More information on installing PTP from an
 update site can be found can be found <a href="http://wiki.eclipse.org/PTP/release_notes/7.0">here</a>. Information on Eclipse supported platforms can be found
-<a href="http://www.eclipse.org/projects/project-plan.php?planurl=/eclipse/development/plans/eclipse_project_plan_4_2.xml#target_environments">here</a>.</p>
+<a href="http://www.eclipse.org/projects/project-plan.php?planurl=/eclipse/development/plans/eclipse_project_plan_4_3.xml#target_environments">here</a>.</p>
 
 <h2>Target Systems</h2>
 
@@ -74,7 +75,8 @@ update site can be found can be found <a href="http://wiki.eclipse.org/PTP/relea
 <p>PTP also supports a number of parallel runtime systems and job schedulers. These need to be available on the target system prior to using PTP.
 <br>See <a href="03pRunConfig.html#ptp-tscs">PTP supported Target System Configurations</a> for a list of currently supported systems.
 </p>
-
+<p>In addition, for <a href="sync.html">Synchronized Projects</a>, PTP requires <a href="http://git-scm.com">Git</a>
+on the remote machine.
 
 
 <p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a>
