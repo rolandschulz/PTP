@@ -1,6 +1,11 @@
 org.eclipse.ptp.core
 org.eclipse.ptp.core.jobs
 org.eclipse.ptp.core.util
+org.eclipse.ptp.debug.core
+org.eclipse.ptp.debug.core.launch
+org.eclipse.ptp.debug.core.pdi
+org.eclipse.ptp.ems.core
+org.eclipse.ptp.ems.ui
 org.eclipse.ptp.launch
 org.eclipse.ptp.launch.ui
 org.eclipse.ptp.launch.ui.tabs
@@ -12,7 +17,5 @@ org.eclipse.ptp.remote.ui.widgets
 org.eclipse.ptp.services.core
 org.eclipse.ptp.services.ui
 org.eclipse.ptp.services.ui.dialogs
-org.eclipse.ptp.services.ui.preferences
-org.eclipse.ptp.services.ui.views
 org.eclipse.ptp.services.ui.widgets
 org.eclipse.ptp.services.ui.wizards

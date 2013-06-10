@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Debugger Configuration Pages</title>
+<style type="text/css">@import url("../../book.css");</style>
+<style type="text/css">@import url("../../schema.css");</style>
+</HEAD>
+<BODY>
+<H1 style="text-align:center">Debugger Configuration Pages</H1>
+<p></p>
+<h6 class="CaptionFigColumn SchemaHeader">Identifier: </h6>org.eclipse.ptp.debug.ui.debuggerConfigurations<p></p>
+<h6 class="CaptionFigColumn SchemaHeader">Since: </h6>2.0
+<p></p>
+
+<h6 class="CaptionFigColumn SchemaHeader">Description: </h6>This extension point provides a mechanism for contributing UI for org.eclipse.ptp.debug.ui.IPDebuggerConfigurationPage extensions.<p></p>
+<h6 class="CaptionFigColumn SchemaHeader">Configuration Markup:</h6>
+<p></p>
+<p class="code SchemaDtd">&lt;!ELEMENT <a name="e.extension">extension</a> (<a href="#e.debuggerConfiguration">debuggerConfiguration</a>*)&gt;</p>
+<p class="code SchemaDtd">&lt;!ATTLIST extension</p>
+<p class="code SchemaDtdAttlist">point&nbsp;CDATA #REQUIRED</p><p class="code SchemaDtdAttlist">id&nbsp;&nbsp;&nbsp;&nbsp;CDATA #IMPLIED</p><p class="code SchemaDtdAttlist">name&nbsp;&nbsp;CDATA #IMPLIED</p>&gt;</p>
+<p></p>
+<ul class="ConfigMarkupAttlistDesc">
+<li><b>point</b> - a fully qualified identifier of the target extension point</li>
+<li><b>id</b> - an optional identifier of the extension instance</li>
+<li><b>name</b> - an optional name of the extension instance</li>
+</ul>
+<br><p class="code SchemaDtd">&lt;!ELEMENT <a name="e.debuggerConfiguration">debuggerConfiguration</a> EMPTY&gt;</p>
+<p class="code SchemaDtd">&lt;!ATTLIST debuggerConfiguration</p>
+<p class="code SchemaDtdAttlist">id&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CDATA #IMPLIED</p><p class="code SchemaDtdAttlist">debuggerID&nbsp;CDATA #REQUIRED</p><p class="code SchemaDtdAttlist">class&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CDATA #REQUIRED</p>&gt;</p>
+<p></p>
+<ul class="ConfigMarkupAttlistDesc">
+<li><b>id</b> - specifies a unique identifier for this debugger page.</li>
+<li><b>debuggerID</b> - specifies the identifier of the debugger this page is associated with.</li>
+<li><b>class</b> - specifies a fully qualified name of a Java class that implements &lt;code&gt;IPDebuggerConfigurationPage&lt;/code&gt;</li>
+</ul>
+<br><h6 class="CaptionFigColumn SchemaHeader">Examples: </h6><extension point="org.eclipse.ptp.debug.ui.PDebuggerPage">
+      <debugPage
+            class="org.eclipse.ptp.debug.external.ui.SDMPage"
+            debuggerID="org.eclipse.ptp.debug.external.sdm"
+            id="org.eclipse.ptp.debug.external.ui.SDMPage">
+      </debugPage>
+</extension>
+In the above example, the contributed UI component (org.eclipse.ptp.debug.external.ui.SDMPage) will be used for the debuggers with the "org.eclipse.ptp.debug.external.sdm" debugger id.
+<p></p>
+
+<h6 class="CaptionFigColumn SchemaHeader">API Information: </h6>Value of the attribute class must be a fully qualified name of a Java class that implements the interface org.eclipse.ptp.debug.ui.IPDebuggerPage.
+<p></p>
+
+<br>
+<p class="note SchemaCopyright">
+Copyright (c) 2006 QNX Software Systems and others.
+All rights reserved. This program and the accompanying materials
+are made available under the terms of the Eclipse Public License v1.0
+which accompanies this distribution, and is available at
+http://www.eclipse.org/legal/epl-v10.html
+
+</p>
+</BODY>
+</HTML>

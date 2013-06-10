@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Remote Resources</title>
+<style type="text/css">@import url("../../book.css");</style>
+<style type="text/css">@import url("../../schema.css");</style>
+</HEAD>
+<BODY>
+<H1 style="text-align:center">Remote Resources</H1>
+<p></p>
+<h6 class="CaptionFigColumn SchemaHeader">Identifier: </h6>org.eclipse.ptp.remote.core.remoteResources<p></p>
+<h6 class="CaptionFigColumn SchemaHeader">Description: </h6>This extension point allows remote implementations to provide additional operations on a resource. The extension associates a project nature with the resource extension. Resources contained within a particular project can be adapted to obtain the additional operations.<p></p>
+<h6 class="CaptionFigColumn SchemaHeader">Configuration Markup:</h6>
+<p></p>
+<p class="code SchemaDtd">&lt;!ELEMENT <a name="e.extension">extension</a> (<a href="#e.remoteResource">remoteResource</a>)&gt;</p>
+<p class="code SchemaDtd">&lt;!ATTLIST extension</p>
+<p class="code SchemaDtdAttlist">point&nbsp;CDATA #REQUIRED</p><p class="code SchemaDtdAttlist">id&nbsp;&nbsp;&nbsp;&nbsp;CDATA #IMPLIED</p><p class="code SchemaDtdAttlist">name&nbsp;&nbsp;CDATA #IMPLIED</p>&gt;</p>
+<p></p>
+<ul class="ConfigMarkupAttlistDesc">
+</ul>
+<br><p class="code SchemaDtd">&lt;!ELEMENT <a name="e.remoteResource">remoteResource</a> EMPTY&gt;</p>
+<p class="code SchemaDtd">&lt;!ATTLIST remoteResource</p>
+<p class="code SchemaDtdAttlist">class&nbsp;&nbsp;CDATA #REQUIRED</p><p class="code SchemaDtdAttlist">nature&nbsp;CDATA #REQUIRED</p>&gt;</p>
+<p></p>
+<ul class="ConfigMarkupAttlistDesc">
+<li><b>class</b> - the fully qualified name of a class that implements <code>org.eclipse.ptp.remote.core.IRemoteResource</code></li>
+<li><b>nature</b> - a project nature. Resources contained within a project with this nature can be adapted to obtain the <code>org.eclipse.ptp.remote.core.IRemoteResource</code> interface.</li>
+</ul>
+<br><h6 class="CaptionFigColumn SchemaHeader">Examples: </h6><pre class="Example"><span class="code SchemaTag">
+   &lt;extension point=</span><span class="code SchemaCstring">&quot;org.eclipse.ptp.remote.core.remoteResource&quot;</span><span class="code SchemaTag">&gt; 
+      &lt;remoteResource class=</span><span class="code SchemaCstring">&quot;MyRemoteResourceClass&quot;</span><span class="code SchemaTag"> nature=</span><span class="code SchemaCstring">&quot;MyProjectNature&quot;</span><span class="code SchemaTag">/&gt; 
+   &lt;/extension&gt; 
+</span></pre>
+<p></p>
+
+<h6 class="CaptionFigColumn SchemaHeader">API Information: </h6>The value of the class attribute must implement the interface <code>org.eclipse.ptp.remote.core.IRemoteResource</code>
+<p></p>
+
+<h6 class="CaptionFigColumn SchemaHeader">Supplied Implementation: </h6>The remote package itself does not have any predefined remote resources.
+<p></p>
+
+<br>
+<p class="note SchemaCopyright">
+Copyright (c) 2013 IBM Corporation and others. All rights reserved. This program and the accompanying materials are made available under the terms of the Eclipse Public License v1.0 which accompanies this distribution, and is available at http://www.eclipse.org/legal/epl-v10.html
+
+</p>
+</BODY>
+</HTML>

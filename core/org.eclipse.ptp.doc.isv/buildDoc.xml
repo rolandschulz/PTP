@@ -87,8 +87,9 @@
 	<target name="convertSchemaToHtml" if="eclipse.running">
 		<property name="dest" value="reference/extension-points" />
 		<record name="${basedir}/temp.convert.txt" action="start" />
-		<pde.convertSchemaToHTML manifest="../org.eclipse.ptp.core/plugin.xml" destination="${dest}" />
-		<pde.convertSchemaToHTML manifest="../org.eclipse.ptp.launch/plugin.xml" destination="${dest}" />
+		<pde.convertSchemaToHTML manifest="../../debug/org.eclipse.ptp.debug.core/plugin.xml" destination="${dest}" />
+		<pde.convertSchemaToHTML manifest="../../debug/org.eclipse.ptp.debug.sdm.core/plugin.xml" destination="${dest}" />
+		<pde.convertSchemaToHTML manifest="../../debug/org.eclipse.ptp.debug.ui/plugin.xml" destination="${dest}" />
 		<pde.convertSchemaToHTML manifest="../org.eclipse.ptp.remote.core/plugin.xml" destination="${dest}" />
 		<pde.convertSchemaToHTML manifest="../org.eclipse.ptp.remote.ui/plugin.xml" destination="${dest}" />
 		<pde.convertSchemaToHTML manifest="../org.eclipse.ptp.services.core/plugin.xml" destination="${dest}" />
