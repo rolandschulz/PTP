@@ -14,10 +14,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Import-Package: org.eclipse.cdt.core.model,
- org.eclipse.cdt.managedbuilder.core,
  org.eclipse.jface.text,
- org.eclipse.ptp.internal.rdt.sync.core,
- org.eclipse.ptp.internal.remote.core,
  org.eclipse.ptp.rdt.core.resources,
  org.eclipse.ptp.rdt.sync.core,
  org.eclipse.ptp.rdt.sync.core.resources,
