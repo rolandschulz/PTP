@@ -49,7 +49,7 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	private String fWorkingDir;
 	private Map<String, String> fEnv;
 	private Map<String, String> fProperties;
-	private Map<Integer, IRemoteTunnel> fTunnels;
+	private final Map<Integer, IRemoteTunnel> fTunnels = new HashMap<Integer, IRemoteTunnel>();
 
 	private final String fConnName;
 	private final IRemoteServices fRemoteServices;

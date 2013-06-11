@@ -78,7 +78,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	private Bundle fBundle;
 	private boolean fContinuous = true;
 	private IStatus fStatus;
-	
+
 	/**
 	 * Save stderr output so if there is a nonzero exit code we can expose message to the user - Bug 395517
 	 */
@@ -619,8 +619,8 @@ public abstract class AbstractRemoteServerRunner extends Job {
 				local = EFS.getStore(URIUtil.toURI(jarURL));
 			}
 			if (local == null) {
-				throw new IOException(NLS.bind(Messages.AbstractRemoteServerRunner_unableToLocatePayload,
-						new Object[] { getPayload(), fBundle.getSymbolicName() }));
+				throw new IOException(NLS.bind(Messages.AbstractRemoteServerRunner_unableToLocatePayload, new Object[] {
+						getPayload(), fBundle.getSymbolicName() }));
 			}
 			IFileInfo localInfo = local.fetchInfo(EFS.NONE, subMon.newChild(10));
 			if (!serverInfo.exists() || serverInfo.getLength() != localInfo.getLength()) {
@@ -731,7 +731,8 @@ public abstract class AbstractRemoteServerRunner extends Job {
 			 * Now launch the server.
 			 */
 			if (!subMon.isCanceled()) {
-				return runCommand(getLaunchCommand(), Messages.AbstractRemoteServerRunner_launching, directory, false, subMon.newChild(50));
+				return runCommand(getLaunchCommand(), Messages.AbstractRemoteServerRunner_launching, directory, false,
+						subMon.newChild(50));
 			}
 
 			return null;
@@ -854,7 +855,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 */
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
-		stdErrOutput="";//reset output string //$NON-NLS-1$
+		stdErrOutput = "";//reset output string //$NON-NLS-1$
 		assert getLaunchCommand() != null;
 
 		final SubMonitor subMon = SubMonitor.convert(monitor, 100);
@@ -916,11 +917,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 								if (DebugUtil.SERVER_TRACING) {
 									System.out.println("SERVER: " + output); //$NON-NLS-1$
 								}
-								// this log item is possibly unnecessary but we include it to make sure something
-								// reaches the log if problems occur later
-								Activator.log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, fServerName
-												+ ": " + output)); //$NON-NLS-1$
-								stdErrOutput+=output;
+								stdErrOutput += output;
 							}
 						}
 						stderr.close();
@@ -971,9 +968,10 @@ public abstract class AbstractRemoteServerRunner extends Job {
 			if (fRemoteProcess.exitValue() != 0) {
 				if (!subMon.isCanceled()) {
 					// Create exception object so the details of the problem can be shown in the ErrorDialog's Details section
-					RemoteServerException exc=new RemoteServerException(stdErrOutput);
-					String msg=NLS.bind(Messages.AbstractRemoteServerRunner_serverFinishedWithExitCode, fRemoteProcess.exitValue());
-					fStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, msg, exc);			
+					RemoteServerException exc = new RemoteServerException(stdErrOutput);
+					String msg = NLS.bind(Messages.AbstractRemoteServerRunner_serverFinishedWithExitCode,
+							fRemoteProcess.exitValue());
+					fStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, msg, exc);
 				}
 			}
 		} catch (IOException e) {
@@ -993,8 +991,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 * is shown in the Error Log View, we make our own name here so as to not be a "java.lang.Exception"
 	 */
 	@SuppressWarnings("serial")
-	private class RemoteServerException extends 
-			Exception {
+	private class RemoteServerException extends Exception {
 		public RemoteServerException(String message) {
 			super(message);
 		}
