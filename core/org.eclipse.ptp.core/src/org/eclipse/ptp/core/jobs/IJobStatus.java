@@ -14,6 +14,8 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.debug.core.model.IStreamsProxy;
 
 /**
+ * Interface for obtaining status information about a job. Instances are normally obtained via the {@link JobManager} class.
+ * 
  * @since 6.0
  */
 public interface IJobStatus extends IAdaptable {

@@ -13,7 +13,7 @@ package org.eclipse.ptp.core.jobs;
 import java.util.BitSet;
 
 /**
- * Extends IJobStatus for parallel jobs.
+ * Extends {@link IJobStatus} for parallel jobs. Clients can obtain this interface by adapting an {@link IJobStatus} instance.
  * 
  * @since 7.0
  */

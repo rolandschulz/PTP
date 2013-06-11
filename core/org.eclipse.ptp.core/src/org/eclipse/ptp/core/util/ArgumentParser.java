@@ -18,6 +18,8 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * Utilitiy class for managing command line arguments.
+ * 
  * @since 7.0
  */
 public class ArgumentParser {

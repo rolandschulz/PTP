@@ -12,6 +12,8 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 
 /**
+ * Utility methods for managing launch configuration attributes.
+ * 
  * @since 6.0
  * 
  */
@@ -21,7 +23,7 @@ public class LaunchUtils {
 	 * Get the program arguments specified in the Arguments tab
 	 * 
 	 * @param configuration
-	 * @return
+	 * @return program arguments string
 	 * @throws CoreException
 	 */
 	public static String getArguments(ILaunchConfiguration configuration) throws CoreException {
@@ -29,6 +31,10 @@ public class LaunchUtils {
 	}
 
 	/**
+	 * Get the connection name specified in the Resources tab
+	 * 
+	 * @param configuration
+	 * @return connection name
 	 * @since 6.0
 	 */
 	public static String getConnectionName(ILaunchConfiguration configuration) {
@@ -45,7 +51,7 @@ public class LaunchUtils {
 	 * Get if the executable shall be copied to remote target before launch.
 	 * 
 	 * @param configuration
-	 * @return
+	 * @return copy executable attribute
 	 * @throws CoreException
 	 */
 	public static boolean getCopyExecutable(ILaunchConfiguration configuration) throws CoreException {
@@ -56,7 +62,7 @@ public class LaunchUtils {
 	 * Get the debugger executable path
 	 * 
 	 * @param configuration
-	 * @return
+	 * @return debugger executable path
 	 * @throws CoreException
 	 */
 	public static String getDebuggerExePath(ILaunchConfiguration configuration) throws CoreException {
@@ -67,7 +73,7 @@ public class LaunchUtils {
 	 * Get the ID of the debugger for this launch
 	 * 
 	 * @param configuration
-	 * @return
+	 * @return debugger ID
 	 * @throws CoreException
 	 */
 	public static String getDebuggerID(ILaunchConfiguration configuration) throws CoreException {
@@ -89,7 +95,7 @@ public class LaunchUtils {
 	 * Get the working directory for this debug session
 	 * 
 	 * @param configuration
-	 * @return
+	 * @return working directory
 	 * @throws CoreException
 	 */
 	public static String getDebuggerWorkDirectory(ILaunchConfiguration configuration) throws CoreException {
@@ -101,7 +107,7 @@ public class LaunchUtils {
 	 * executable on that machine.
 	 * 
 	 * @param configuration
-	 * @return
+	 * @return executable path
 	 * @throws CoreException
 	 */
 	public static String getExecutablePath(ILaunchConfiguration configuration) throws CoreException {
@@ -132,7 +138,7 @@ public class LaunchUtils {
 	 * Get the name of the executable to launch
 	 * 
 	 * @param configuration
-	 * @return
+	 * @return program name
 	 * @throws CoreException
 	 */
 	public static String getProgramName(ILaunchConfiguration configuration) throws CoreException {
@@ -147,7 +153,7 @@ public class LaunchUtils {
 	 * Get the path component of the executable to launch.
 	 * 
 	 * @param configuration
-	 * @return
+	 * @return program path
 	 * @throws CoreException
 	 * @since 5.0
 	 */
@@ -174,7 +180,7 @@ public class LaunchUtils {
 	 * Get the name of the project
 	 * 
 	 * @param configuration
-	 * @return
+	 * @return project name specified in the Application tab
 	 * @throws CoreException
 	 */
 	public static String getProjectName(ILaunchConfiguration configuration) throws CoreException {
@@ -182,6 +188,10 @@ public class LaunchUtils {
 	}
 
 	/**
+	 * Get the remote services ID specified in the Resources tab (possibly implicitly)
+	 * 
+	 * @param configuration
+	 * @return remote services ID
 	 * @since 6.0
 	 */
 	public static String getRemoteServicesId(ILaunchConfiguration configuration) {
@@ -195,7 +205,7 @@ public class LaunchUtils {
 	}
 
 	/**
-	 * Get the resource manager to use for the launch
+	 * Get the target controller to use for the launch
 	 * 
 	 * @param configuration
 	 * @return
@@ -267,6 +277,11 @@ public class LaunchUtils {
 	}
 
 	/**
+	 * Set the connection name attribute
+	 * 
+	 * @param configuration
+	 * @param name
+	 *            connection name
 	 * @since 6.0
 	 */
 	public static void setConnectionName(ILaunchConfigurationWorkingCopy configuration, String name) {
@@ -274,6 +289,11 @@ public class LaunchUtils {
 	}
 
 	/**
+	 * Set the remote services ID attribute
+	 * 
+	 * @param configuration
+	 * @param id
+	 *            remote services ID
 	 * @since 6.0
 	 */
 	public static void setRemoteServicesId(ILaunchConfigurationWorkingCopy configuration, String id) {
@@ -281,13 +301,22 @@ public class LaunchUtils {
 	}
 
 	/**
+	 * Set the target controller used for the launch
+	 * 
+	 * @param configuration
+	 * @name id controller ID
 	 * @since 6.0
 	 */
-	public static void setResourceManagerUniqueName(ILaunchConfigurationWorkingCopy configuration, String name) {
-		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, name);
+	public static void setResourceManagerUniqueName(ILaunchConfigurationWorkingCopy configuration, String id) {
+		configuration.setAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME, id);
 	}
 
 	/**
+	 * Set the target system type used for the launch
+	 * 
+	 * @param configuration
+	 * @param type
+	 *            target system type
 	 * @since 6.0
 	 */
 	public static void setSystemType(ILaunchConfigurationWorkingCopy configuration, String type) {
@@ -295,6 +324,11 @@ public class LaunchUtils {
 	}
 
 	/**
+	 * Set the name of the launch configuration
+	 * 
+	 * @param configuration
+	 * @param name
+	 *            configuration name
 	 * @since 6.0
 	 */
 	public static void setConfigurationName(ILaunchConfigurationWorkingCopy configuration, String name) {

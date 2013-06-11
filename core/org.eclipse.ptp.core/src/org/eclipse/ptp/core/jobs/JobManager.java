@@ -42,6 +42,8 @@ public class JobManager {
 	}
 
 	/**
+	 * Add a listener for all job events
+	 * 
 	 * @param listener
 	 */
 	public void addListener(IJobListener listener) {
@@ -54,6 +56,8 @@ public class JobManager {
 	}
 
 	/**
+	 * Add a listener for jobs under the control of a controller identified by qualifier.
+	 * 
 	 * @param qualifier
 	 * @param listener
 	 */
@@ -152,6 +156,8 @@ public class JobManager {
 	}
 
 	/**
+	 * Remove the job listener.
+	 * 
 	 * @param listener
 	 */
 	public void removeListener(IJobListener listener) {
@@ -161,6 +167,8 @@ public class JobManager {
 	}
 
 	/**
+	 * Remove the job listener for jobs under the control of a controller identified by qualifier
+	 * 
 	 * @param qualifier
 	 * @param listener
 	 */

@@ -29,6 +29,8 @@ public class CoreExceptionUtils {
 	}
 
 	/**
+	 * Obtain an IStatus instance with the given message and throwable.
+	 * 
 	 * @param message
 	 * @param t
 	 * @return error status object
@@ -41,6 +43,8 @@ public class CoreExceptionUtils {
 	}
 
 	/**
+	 * Obtain a CoreException instance with the given message and throwable.
+	 * 
 	 * @param message
 	 * @param t
 	 * @return exception
@@ -50,6 +54,8 @@ public class CoreExceptionUtils {
 	}
 
 	/**
+	 * Obtain a CoreException instance with the given message.
+	 * 
 	 * @param message
 	 * @return exception
 	 * @since 7.0

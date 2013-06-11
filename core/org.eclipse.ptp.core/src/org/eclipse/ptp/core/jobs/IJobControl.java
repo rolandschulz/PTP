@@ -15,6 +15,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 
 /**
+ * Interface for performing control operations on jobs (including submitting jobs). Clients can obtain instances of this interface
+ * from the launch delegate.
+ * 
  * @since 6.0
  */
 public interface IJobControl {
