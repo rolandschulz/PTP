@@ -60,7 +60,7 @@
 			</path>
 		</pathconvert>
 		<echo level="info" message="Done computing classpath."/>
-		<echo level="info" message="Bootclasspath is: ${bootclasspath}"/>
+		<echo level="debug" message="Bootclasspath is: ${bootclasspath}"/>
 		<echo level="debug" message="Classpath is: ${javadoc.classpath}"/>
 	</target>
 
@@ -98,30 +98,7 @@
 		<available file="${java.home}/../bin/javadoc" property="javadoc" value="${java.home}/../bin/javadoc" />
 	</target>
 
-	<!--target name="generateJavadoc" depends="getJavadocPath,extractLinks,computeClasspath" if="javadoc">
-		<property name="optionsFile" value="temp.options.txt" />
-		<copy file="options.txt" tofile="${optionsFile}" overwrite="true" />
-		
-		<replaceregexp file="${basedir}/${optionsFile}" flags="g" match="(\r\n?|\n);" replace="${argsListDelimiter}" />
-		<replace file="${basedir}/${optionsFile}" token="@rt@" value="${bootclasspath}" />
-		<replace file="${basedir}/${optionsFile}" token="@cp@" value="${javadoc.classpath}" />
-		<replace file="${basedir}/${optionsFile}" token="@baseLocation@" value="${safeBaseLocation}" />
-		<replace file="${basedir}/${optionsFile}" token="@javadoc.link.location@" value="${javadoc.link.location}" />
-
-		<delete dir="reference/api" />
-		<mkdir dir="reference/api" />
-
-		<echo message="sep = ${argsListDelimiter}"/>
-		<echo message="javadoc = ${javadoc}"/>
-		<exec dir="." executable="${javadoc}" output="temp.bin.log" resultproperty="javadocResult">
-			<arg line="@${basedir}/${optionsFile} -J-Xmx1000M" />
-		</exec>
-		<echo message="javadoc result = ${javadocResult}"/>
-	</target-->
-	
 	<target name="generateJavadoc" depends="getJavadocPath,computeClasspath">
-		<property name="javadoc16" value="${javadoc}" />
-
 		<!-- replace "\n;" with platform-dependent list entry delimiter -->
 		<property name="optionsFile" value="options.tmp.txt" />
 		<copy file="options.txt" tofile="${optionsFile}" overwrite="true">
@@ -145,7 +122,7 @@
 		<delete dir="reference/api"/>
 		<mkdir dir="reference/api"/>
 
-		<exec dir="." executable="${javadoc16}" output="doc.bin.log">
+		<exec dir="." executable="${javadoc}" output="doc.bin.log">
 			<arg line="@${basedir}/${optionsFile} -J-Xmx1000M" />
 		</exec>
 		

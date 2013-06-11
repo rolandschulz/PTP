@@ -16,13 +16,14 @@
 		<topic label="org.eclipse.ptp.debug.core.pdi" href="reference/api/org/eclipse/ptp/debug/core/pdi/package-summary.html" />
 		<topic label="org.eclipse.ptp.debug.core.pdi.event" href="reference/api/org/eclipse/ptp/debug/core/pdi/event/package-summary.html" />
 		<topic label="org.eclipse.ptp.debug.core.pdi.manager" href="reference/api/org/eclipse/ptp/debug/core/pdi/manager/package-summary.html" />
-		<topic label="org.eclipse.ptp.debug.core.pdi.model" href="reference/api/org/eclipse/ptp/debug/core/pdi/modelpackage-summary.html" />
-		<topic label="org.eclipse.ptp.debug.core.pdi.model.aif" href="reference/api/org/eclipse/ptp/debug/core/pdi/model/aifpackage-summary.html" />
+		<topic label="org.eclipse.ptp.debug.core.pdi.model" href="reference/api/org/eclipse/ptp/debug/core/pdi/model/package-summary.html" />
+		<topic label="org.eclipse.ptp.debug.core.pdi.model.aif" href="reference/api/org/eclipse/ptp/debug/core/pdi/model/aif/package-summary.html" />
 		<topic label="org.eclipse.ptp.debug.core.pdi.request" href="reference/api/org/eclipse/ptp/debug/core/pdi/request/package-summary.html" />
 		<topic label="org.eclipse.ptp.ems.core" href="reference/api/org/eclipse/ptp/ems/core/package-summary.html" />
 		<topic label="org.eclipse.ptp.ems.ui" href="reference/api/org/eclipse/ptp/ems/ui/package-summary.html" />
-		<topic label="org.eclipse.ptp.etfw.core" href="reference/api/org/eclipse/ptp/etfw/core/package-summary.html" />
+		<topic label="org.eclipse.ptp.etfw" href="reference/api/org/eclipse/ptp/etfw/package-summary.html" />
 		<topic label="org.eclipse.ptp.etfw.feedback" href="reference/api/org/eclipse/ptp/etfw/feedback/package-summary.html" />
+		<topic label="org.eclipse.ptp.etfw.toolopts" href="reference/api/org/eclipse/ptp/etfw/toolopts/package-summary.html" />
 		<topic label="org.eclipse.ptp.etfw.ui" href="reference/api/org/eclipse/ptp/etfw/ui/package-summary.html" />
 		<topic label="org.eclipse.ptp.launch" href="reference/api/org/eclipse/ptp/launch/package-summary.html" />
 		<topic label="org.eclipse.ptp.launch.ui" href="reference/api/org/eclipse/ptp/launch/ui/package-summary.html" />

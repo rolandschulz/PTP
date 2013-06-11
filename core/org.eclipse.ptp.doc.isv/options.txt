@@ -3,12 +3,13 @@
 -charset "iso-8859-1"
 -sourcepath "
 ;../../core/org.eclipse.ptp.core/src
-;../../core/org.eclipse.ptp.debug.core/src
+;../../debug/org.eclipse.ptp.debug.core/src
+;../../debug/org.eclipse.ptp.debug.core/pdi
 ;../../core/org.eclipse.ptp.ems.core/src
 ;../../core/org.eclipse.ptp.ems.ui/src
-;../../core/org.eclipse.ptp.etfw/src
-;../../core/org.eclipse.ptp.etfw.feedback/src
-;../../core/org.eclipse.ptp.etfw.toolopts/src
+;../../tools/etfw/org.eclipse.ptp.etfw/src
+;../../tools/etfw/org.eclipse.ptp.etfw.feedback/src
+;../../tools/etfw/org.eclipse.ptp.etfw.toolopts/src
 ;../../core/org.eclipse.ptp.launch/src
 ;../../core/org.eclipse.ptp.remote.core/src
 ;../../core/org.eclipse.ptp.remote.ui/src
@@ -51,6 +52,10 @@ org.eclipse.ptp.debug.core.pdi.model.aif
 org.eclipse.ptp.debug.core.pdi.request
 org.eclipse.ptp.ems.core
 org.eclipse.ptp.ems.ui
+org.eclipse.ptp.etfw
+org.eclipse.ptp.etfw.feedback
+org.eclipse.ptp.etfw.toolopts
+org.eclipse.ptp.etfw.ui
 org.eclipse.ptp.launch
 org.eclipse.ptp.launch.ui
 org.eclipse.ptp.launch.ui.tabs
