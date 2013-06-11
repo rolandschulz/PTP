@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Changes</title>
+<link rel="stylesheet" type="text/css" href="help.css">
+</head>
+<body>
+	<h2>
+		<a name="PTP600">PTP 6.0.0 Changes</a>
+	</h2>
+
+	<p>A number of new
+		features and changes have been included in the 6.0.0 release.</p>
+	<ol>
+		<li>The <code>property</code> element has been removed completely. Since properties and attributes
+			were essentially identical, removing the <code>property</code> element reduces confusion as to when they should be
+			used.</li>
+		<li>The <code>buttonId</code> attribute on a <a href="#Widget"><code>widget</code></a> is now global. In the previous version
+                       button IDs were local to each tab. This allows a button on one tab to change the state
+                       of a control on a different tab;</li>
+		<li>The <a href="#ControlState"><code>control-state</code></a> element now supports obtaining state by comparing
+                       an <a href="#AttributeType"><code>attribute</code></a> value to a string;</li>
+		<li>The <code>saveValueTo</code> attribute on a <a href="#Widget">widget</a> has been renamed to simply
+                       <code>attribute</code>. This is to reflect the fact that an widget can read from and
+                       save to an <a href="#AttributeType"><code>attribute</code></a>.</li>
+        <li>The <a href="#LineArg"><code>arg</code></a> element now has an <a href="#AttributeType"><code>attribute</code></a> attribute. If
+        				supplied, this will be compared to the <code>isUndefIfMatches</code> string rather than the element content in
+        				order to determine if the argument is defined or not.
+	</ol>
+	
+	<h2>
+		<a name="PTP501">PTP 5.0.1 Changes</a>
+	</h2>
+
+	<p>Aside from some significant bug fixes, there are a number of new
+		features with the 5.0.1 release.</p>
+	<ol>
+		<li>The <code>widget</code> component has been split up into
+			three components: <a href="#Widget"><code>widget</code> </a>, <a
+			href="#ButtonGroup"><code>button-group</code> </a>, and <a
+			href="#Browse"><code>browse</code> </a>;</li>
+		<li><a href="#Action"><code>action</code> </a> push-button
+			functionality has been added;</li>
+		<li><a href="#ControlState"><code>control-state</code> </a>
+			elements have been added to all UI control descriptors;</li>
+		<li>The launch tab <a href="#LaunchTab"><code>import</code> </a>
+			controller type has been modified (largely for maintaining uniformity
+			of implementation) to subclass the <code>dynamic</code> controller;</li>
+		<li>Ability to inspect invisible discovered (excluded) properties
+			and attributes via a "View" button (see <a href="#TabController">note</a>)
+			has been added;</li>
+		<li><a href="#Preferences">Preferences</a> have been added to
+			help with the debugging of <a href="#StreamParsers">stream
+				tokenizers</a>;</li>
+		<li>Resource Manager "environment" handling has been totally
+			rewritten in order to support the exclusion of properties associated
+			with invisible or disabled widgets, and to allow for the restoration
+			of their values when re-enabled.</li>
+	</ol>
+
+	<p>In addition, some tweaking of the SWT "knobs" was necessary to
+		get the XML to reflect more closely the behavior of the Java classes
+		(especially in terms of defaults).</p>
+
+</body>
+</html>

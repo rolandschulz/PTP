@@ -1,0 +1,724 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>User Interface</title>
+<link rel="stylesheet" type="text/css" href="help.css">
+</head>
+<body>
+	<h2>
+		User Interface
+	</h2>
+	
+	<h3>
+		<a name="LaunchTab">The Resources Tab</a>
+	</h3>
+
+	<p>
+		The UI component which needs to be configured in conjunction with the
+		resource manager control is the <b>Launch Tab</b>, which is actually
+		the main area of the <b>Resources Tab</b>, one of the six tabs
+		comprising the <b>Run Configuration</b> wizard or the seven tabs
+		comprising the <b>Debug Configuration</b> wizard. The purpose of this
+		component is to allow the user to set up the job by providing values
+		relating to resource requirements or to the properties of the job in
+		general. In other words, it is in this component that the user can set
+		the values on the
+		<code>attribute</code>
+		elements making up the configurable environment as defined in the XML.
+	</p>
+
+	<p>
+		Specifying the composition and layout of this component can be tricky
+		and tedious because it deals with widgets defined by the Eclipse
+		<code>JFace</code>
+		library and with their underlying implementation in
+		<code>SWT</code>
+		. We intend in the near future to provide some standard "templates"
+		for typical widget groups that can be cut and pasted into the XML
+		definition. Some of this can already be achieved by importing into the
+		workspace a provided definition (such as for the PBS resource manager)
+		and modifying it or borrowing from it. This is, in fact, the approach
+		demostrated in the <a href="http://download.eclipse.org/tools/ptp/docs/JAXBDemo.pdf">tutorial</a>.
+	</p>
+
+	<p>
+		<b> Throughout the following, it may generally be assumed that
+			fields such as <i>style</i>, <i>foreground</i>, <i>background</i>,
+			etc., take string equivalents of the corresponding <code>SWT</code>
+			constants (e.g., "SWT.LEFT", "SWT.VERTICAL", "SWT.NONE") which can be
+			OR'd (using "|") wherever they would be in Java code. We will <i>not</i>
+			exhaustively specify here which constants pertain to which widgets,
+			because in most cases we have tried to reflect very closely the names
+			of the <code>SWT</code> object types and fields, and this information
+			can be found by consulting the Javadocs relative to the widgets in
+			question. </b>
+	</p>
+
+	<img alt="LaunchTabType" src="images/13launch-tab.jpeg" />
+
+	<p>
+		As seen from this top-level specification, the Launch Tab can have any
+		number of
+		<code>dynamic</code>
+		tab-controllers, "dynamic" meaning configurable from the XML, which
+		will discuss in more detail in the following paragraphs.
+	</p>
+	<p>
+		There is also a fixed
+		<code>import</code>
+		controller type (implemented as an extension/subclass of the dynamic
+		controller, in order to provide uniform handling of the environment);
+		this component allows you to browse the workspace to set a custom
+		script as the one to run. Its main text area widget is read-only; any
+		editing of the script must be done through the workspace editor. The
+		browse is local only, so remote scripts should first be imported into
+		a local project in the workspace (using the remote systems import
+		wizard), and then captured by this controller's browse button.
+	</p>
+
+	<p>
+		The configurable part of the import tab is an optional <a
+			href="#AttributeViewer">attribute viewer</a> for selecting the
+		variables from the environment which you wish to pass to the launch
+		command along with the script. <i>The values set here should
+			correspond to whatever the script contains; they are set for the
+			benefit of the internal consistency of the PTP client, and do not
+			override those hard-coded in script.</i> For an example, see the <a
+			href="PLUGINS_ROOT/org.eclipse.ptp.rm.jaxb.pbs.doc.user/html/PBSHelpPage.html#ImportTab">Import
+			PBS Script</a> tab.
+	</p>
+
+	<h3>
+		<a name="TabController">Tab Controller</a>
+	</h3>
+
+	<p>
+		The
+		<code>dynamic</code>
+		controllers belong to the
+		<code>tab-controller-type</code>, which contains an arbitrary number of
+		<code>tab-folder,</code>
+		<code>composite,</code>
+		<code>widget,</code>
+		<code>browse,</code>
+		<code>button-group,</code>
+		<code>action,</code>
+		or
+		<code>viewer</code>
+		elements; as will be seen shortly, the first two, which are
+		"containers", are potentially recursive elements, so that one can nest
+		widgets in the usual manner. For all intents and purposes, the
+		<code>tab-controller-type</code>
+		is the same as a
+		<code>composite</code>, but without the <i>group</i> attribute and with the extra field for
+		controlling shared widgets.
+	</p>
+
+	<img alt="TabController" src="images/14tab-controller.jpeg" />
+	<p>
+		The <i>includeWidgetValuesFrom</i> field is important. By default, it
+		is set to empty, meaning that the subset of the total resource manager
+		environment represented by the controller's widgets is all that will
+		be passed to the actual job configuration when the job is launched
+		from this tab. This behavior can be changed by giving a
+		comma-delimited list of the
+		<code>title</code>
+		values for other controllers. In this case, the configuration for the
+		job, when the "Run" button is pressed with this controller being the
+		visible one, will also include <i>all the attributes
+			valid for the listed but currently invisible controllers</i>.
+	</p>
+	
+	<blockquote>
+	<div style="border: 1px solid ;">
+	<h5>
+		<a name="Note3">ATTRIBUTE NAMES vs VALUES</a>
+	</h5>
+
+	<p>While this field controls the inclusion or exclusion of
+		attribute names in the configuration, their values are
+		always shared across the controllers (there is only one environment);
+		thus if a variable value is changed on one controller, and this
+		variable is also exposed on another, the value for that variable will
+		also change on the other controller when it becomes visible;
+		similarly, if the user switches off a controller to another having
+		only a subset of the first controller's variables, the variables not
+		represented on the second controller will become undefined or return
+		to their defaults.</p>
+	<p>
+		<b>Note</b> that the union of valid names is not transitively closed;
+		that is, if Tab1 has <i>includeWidgetValuesFrom</i>="Tab2", and Tab2
+		similarly has <i>includeWidgetValuesFrom</i>="Tab3", Tab1 will get
+		only the valid values local to Tab2. <b>Note</b> also, that if there
+		are names which intersect with strictly local widget targets, the
+		local settings (visibility, selection, enablement) still determine
+		whether they belong in the set of valid attribute names.
+	</p>
+	</div>
+	</blockquote>
+	
+	<p>
+		The <i>showViewConfig</i> and <i>showViewExcluded</i> fields allow
+		control over whether the "View Configuration" and "View Excluded"
+		buttons appear at the bottom of the tab (the "View Script" button
+		appears if the configuration contains a
+		<code>script</code>
+		element). <i>showViewConfig</i> is true by default; this button brings
+		up a scrolling dialog which allows you to inspect the current
+		configuration (that is, the one relevant to the visible controller). <i>showViewExcluded</i>
+		is by default false, and should only be set if the resource manager
+		processes attributes discovered by a command at run
+		time; this dialog allows you to see which ones have been marked
+		invisible; <b>unlike invisible predefined attributes</b>,
+		which are always <i>included</i>, invisible discovered
+		attributes are always <i>excluded</i> from the configuration and thus
+		do not persist across resource manager sessions.
+	</p>
+	<br>
+	<h3>
+		<a name="TabFolders">Tab Folders and Tab Items</a>
+	</h3>
+
+	<img alt="TabFolder" src="images/15tab-folder.jpeg" />
+	<p>
+		The
+		<code>tab-folder</code>
+		is a container which looks like a file-folder, with tabs running
+		across the top or bottom (<i>style</i> includes SWT.TOP, SWT.BOTTOM).
+		Each tab label corresponds to a
+		<code>tab-item</code>
+		which provides the actual visible content. The
+		<code>tooltip</code>
+		pertains to the entire folder.
+	</p>
+
+	<p>
+		The
+		<code>tab-item</code>
+		is another all-purpose "container" in which all widget types can be
+		embedded, but distinguished from the <a href="#Composite"><code>composite</code>
+		</a> in that it can only be the child of a
+		<code>tab-folder</code>
+		and that it can have a tooltip (which appears on the tab).
+	</p>
+
+	<p>
+		As with
+		<code>composite</code>
+		(see <a href="#Composite">below</a>), the tab folder and tab item take
+		<code>layout</code>
+		and
+		<code>layout-data</code>
+		elements; these closely reflect their
+		<code>SWT</code>
+		objects and types; for further explanation we refer the reader once
+		again to the relevant Javadocs.
+	</p>
+
+	<h3>
+		<a name="Layout">Layout</a>
+	</h3>
+	<img alt="Layout" src="images/17layout.jpeg" />
+	<h3>
+		<a name="LayoutData">Layout Data</a>
+	</h3>
+	<img alt="LayoutData" src="images/18layout-data.jpeg" />
+
+	<h3>
+		<a name="Composite">Composite/Group</a>
+	</h3>
+
+	<p>
+		The main container, of course, is the
+		<code>composite</code>
+		; its sub-type, the group (<i>group</i>="true"), allows for decoration
+		and a title, while the simple composite acts as a widget holder and
+		has no visible characteristics, though it does have a layout. As is
+		evident, composites can be contained in composites and tab-items, and
+		tab-folders can be contained in composites.
+	</p>
+
+	<img alt="Composite" src="images/16composite.jpeg" />
+	<br>
+
+	<h3>
+		<a name="ControlState">Control State Wiring</a>
+	</h3>
+
+	<p>
+		It should be evident that all the XML elements corresponding to UI SWT
+		<code>control</code>
+		types have been given
+		<code>control-state</code>
+		children.
+	</p>
+
+	<img alt="Composite" src="images/22control-state.png" />
+	<br>
+
+	<p>
+		The purpose of these elements is to provide an optional way of setting
+		the <b>enabled</b> and/or <b>visible</b> states of the control on the
+		basis of the state of button (checkbox/radio) selection or the value of an attribute. One can
+		define two such elements per control, using one of the show/hide or
+		enable/disable pairs. Each of these is associated with a
+		<code>control-state-rule:</code>
+	</p>
+
+	<img alt="Composite" src="images/23control-state-rule.png" />
+	<br>
+
+	<p>The basic rule is defined by its attributes. Rules can specify either:</p>
+
+	<ul>
+		<li>the id of the button control to check (<i>button</i>)</li>
+		<li>whether its selected state should be true or false (<i>selected</i>)</li>
+	</ul>
+	
+	<p>or</p>
+
+	<ul>
+		<li>the name of an attribute (<i>attribute</i>)</li>
+		<li>the value of the attribute (<i>value</i>).</li>
+	</ul>
+
+	<p>Only one combination of <i>button</i> and <i>selected</i> or <i>attribute</i> and <i>value</i> can be
+	specified in a rule. Rules can be nested to an arbitrary depth to form clauses
+		governed by the logical operators.</p>
+
+	<p>
+		When using a rule containing <i>button</i> and <i>selected</i>, the
+		"trigger" button control must have an id unique to the resource
+		manager configuration. This will be assigned via the <i>buttonId</i>
+		attribute on the
+		<code>widget</code>
+		corresponding to the button (true also for the buttons nested in a
+		<code>button-group</code>
+		). For these rules, a
+		<code>SelectionListener</code>
+		is created for this target which subscribes to all the controls in the
+		rule; when it receives an event, it evaluates the rule, and if the
+		result is true, takes the associated action on this target.
+	</p>
+	
+	<p>For rules that spectify <i>attribute</i> and <i>value</i>, the attribute value will be checked 
+	when the attribute or any control is updated.</p>
+
+	<p>Here is an example which sets the enabled and visible properties
+		of both a text field and a related checkbox:</p>
+
+	<pre>
+               &lt;widget type="checkbox" buttonId="002" title="Host list:" attribute="checked002"&gt;
+                  &lt;layout-data&gt;
+                     &lt;grid-data horizontalAlign="SWT.LEFT" verticalAlign="SWT.TOP"/&gt;
+                  &lt;/layout-data&gt;
+                  &lt;control-state&gt;
+                     &lt;show-if button="001" selected="true"/&gt;
+                  &lt;/control-state&gt;
+               &lt;/widget&gt;
+               &lt;widget type="text" style="SWT.V_SCROLL | SWT.BORDER" attribute="host_list"&gt;
+                  &lt;layout-data&gt;
+                     &lt;grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"
+                        grabExcessVertical="true"/&gt;
+                  &lt;/layout-data&gt;
+                  &lt;control-state&gt;
+                     &lt;show-if button="001" selected="true"/&gt;
+                     &lt;enable-if&gt;
+                        &lt;and&gt;
+                           &lt;rule button="001" selected="true"/&gt;
+                           &lt;rule button="002" selected="true"/&gt;
+                        &lt;/and&gt;
+                     &lt;/enable-if&gt;
+                  &lt;/control-state&gt;
+               &lt;/widget&gt; 
+   </pre>
+
+	<p>Note also that this implicit dependency graph is checked for
+		cycles; the building of the UI tab will be aborted if such a cycle is
+		discovered.</p>
+
+	<blockquote>
+	<div style="border: 1px solid ;">
+	<h5>
+		<a name="Note4">BEST PRACTICE: CONTROL STATE</a>
+	</h5>
+	<p>
+		An invisible property should be assigned to each checkbox which
+		controls the state of other widgets (e.g., <i>checked002</i> in the
+		example above); this will allow you to restore the state of the tab
+		correctly when it is rebuilt or re-initialized.
+	</p>
+	<br>
+	</div>
+	</blockquote>
+	
+	<h3>
+		<a name="Widget">Widget</a>
+	</h3>
+
+	<p>
+		We now come to the five non-container widget elements with functional
+		characteristics. The first of these is the
+		<code>widget</code>, which comprises a number of simple widget types.
+	<p>
+
+	<img alt="Widget" src="images/19widget.png" />
+
+	<p>
+		The <i>type</i> of the widget can be one of the following:
+	</p>
+
+	<br>
+	<table align="center" rules="all">
+		<tr>
+			<td><code>label</code></td>
+			<td>fixed text for display</td>
+		</tr>
+		<tr>
+			<td><code>text</code></td>
+			<td>area for entering/editing text</td>
+		</tr>
+		<tr>
+			<td><code>checkbox</code></td>
+			<td>corresponds to a boolean choice</td>
+		</tr>
+		<tr>
+			<td><code>radiobutton</code></td>
+			<td>usually used in connection with <code>button-group</code></td>
+		</tr>
+		<tr>
+			<td><code>spinner</code></td>
+			<td>provides a continuous range of integer values</td>
+		</tr>
+		<tr>
+			<td><code>combo</code></td>
+			<td>select from a list of items</td>
+		</tr>
+	</table>
+	<br>
+
+	<p>
+		Not all attributes and elements of the
+		<code>widget</code>
+		descriptor are applicable to all types.
+	</p>
+	<br>
+	<table align="center" rules="all">
+		<tr>
+			<td><i>title</i></td>
+			<td>used with <code>checkbox</code> and <code>radiobutton</code>
+				widgets for the button label.</td>
+		</tr>
+		<tr>
+			<td><i>style</i></td>
+			<td>carries the <code>SWT</code> style constants appropriate to
+				the widget type.</td>
+		</tr>
+		<tr>
+			<td><i>readOnly</i></td>
+			<td>applies to <code>text</code>, <code>spinner</code> and <code>combo</code>
+				widgets; the text area in this case is not editable.</td>
+		</tr>
+		<tr>
+			<td><i>attribute</i></td>
+			<td>applies to all widgets except <code>label</code>; the name
+				of the attribute whose value should be set on the basis
+				of the widget's "selected" value or text.<br> <b>Note:</b> use
+				of this attribute is mutually exclusive with the <code>fixed-</code>
+				and <code>dynamic-text</code> elements.</td>
+		</tr>
+		<tr>
+			<td><code>items-from</code></td>
+			<td>applies to the <code>combo</code> widget; indicates an
+				attribute <i>value</i> (of type <code>java.util.Collection</code>)
+				to use to populate the items.<br> <b>Note:</b> if a combo
+				widget saves its value to an attribute and the present element on
+				the widget descriptor is not set, the attribute will be checked for
+				non-empty <code>choice</code> or <code>items-from</code> values,
+				which then will be used to populate the combo items; the <code>items-from</code>
+				field on the widget is for added flexibility (for instance, linking
+				up a target attribute with another attribute providing the list of
+				choices).</td>
+		</tr>
+		<tr>
+			<td><code>fixed-text</code></td>
+			<td>applies to the <code>label</code> and (read-only) <code>text</code>
+				widgets; text is resolved once and remains constant thereafter.</td>
+		</tr>
+		<tr>
+			<td><code>dynamic-text</code></td>
+			<td>applies only to (read-only) <code>text</code> widgets; text
+				is resolved each time there is an update of a value from the Launch
+				Tab.</td>
+		</tr>
+	</table>
+	<br>
+
+	<p>Widget foreground, background (color) and font are in principle
+		configurable, though the font setting may not always work. The tooltip
+		will appear on the widget whereever it usually does.</p>
+	<br>
+
+	<h3>
+		<a name="ButtonGroup">Button Group</a>
+	</h3>
+
+	<img alt="ButtonGroup" src="images/20button-group.png" />
+
+	<p>
+		The button group provides an explicit selection of a single value
+		based on a mutually exclusive set of button labels. Just as with the
+		<code>widget</code>, one uses <i>attribute</i> to indicate what attribute
+		value to set. The
+		<code>button</code>
+		elements, which can be arranged horizontally or vertically using the <i>style</i>
+		attribute (SWT.HORIZONTAL, SWT.VERTICAL), will be
+		<code>widget</code>
+		elements whose type is either <i>checkbox</i> or <i>radiobutton</i>
+		(if a different widget type is given, an error will occur); the <i>attribute</i>
+		attribute on the individual button will be ignored. Radio buttons are
+		"sticky" in the sense that once they are selected, they cannot be
+		"unchecked" until a different button in the group is selected. It is
+		thus advisable always to provide a default value for the 
+		attribute associated with the group value if radio buttons are used.
+		If check boxes are used, they can be individually checked on and off
+		(one at a time), thus allowing for the value of the group to be
+		potentially empty.
+	</p>
+
+	<p>Below is an example of a button group using radio buttons,
+		disposed vertically.</p>
+	<br>
+	<img alt="ButtonGroupExample" src="images/ButtonGroup.jpeg" />
+	<br>
+	<br>
+
+	<h3>
+		<a name="Browse">Browse</a>
+	</h3>
+
+	<img alt="BrowseType" src="images/190browse.png" />
+
+	<p>
+		A special widget-pair -- a text widget followed by a push button --
+		allowing the user to browse directories or files from either the local
+		or remote file system. Aside from the fields shared with the
+		<code>widget</code>
+		type, we note the following:
+	</p>
+	<br>
+	<table align="center" rules="all">
+		<tr>
+			<td><i>directory</i></td>
+			<td>limit the <code>browse</code> widget to directories.</td>
+		</tr>
+		<tr>
+			<td><i>uri</i></td>
+			<td>have the <code>browse</code> widget set a URI as the text
+				(default is false, in which case the text is an absolute path).</td>
+		</tr>
+		<tr>
+			<td><i>localOnly</i></td>
+			<td>limit the <code>browse</code> widget to the local file
+				system (otherwise, the choice of local or remote is enabled).</td>
+		</tr>
+	</table>
+	<br>
+	<p>
+		Control ids,
+		<code>layout</code>
+		and
+		<code>control-state</code>
+		are specified as belonging to either the text or the button. Style
+		applies only to the text widget.
+	</p>
+	<br>
+
+	<h3>
+		<a name="Action">Action Button</a>
+	</h3>
+
+	<br>
+	<img alt="ActionType" src="images/191push-button.jpeg" />
+	<br>
+
+	<p>
+		A push button which is associated with a
+		<code>button-action</code>
+		command. The
+		<code>button-action</code>
+		specifies the name of a command (
+		<code>action</code>
+		) defined in the XML; this can be one of the
+		<code>start-up</code>
+		or
+		<code>shut-down</code>
+		commands, or a special
+		<code>button-action</code>
+		command (<b>note </b>that it cannot, however, be a <a href="#Note2"><b>(uu)id</b>
+		</a> command, as the Launch Tab is not coupled to any submitted jobs); the
+		<code>button-action-type</code>
+		also indicates whether the variable affected by the command should be
+		cleared prior to the command execution, and whether the launch tab
+		should be refreshed (default is true) afterward.
+	</p>
+	<br>
+
+	<h3>
+		<a name="AttributeViewer">Attribute Viewer</a>
+	</h3>
+
+	<img alt="AttributeViewerType" src="images/21attribute-viewer.jpeg" />
+
+	<p>
+		The last of the widget types, the
+		<code>attribute-viewer</code>, displays visible attributes in a table or tree
+		viewer, with the value columns as editable widgets. The type of cell
+		editor is determined implicitly here by the type of the
+		attribute; the presence of a combo editor is determined by an
+		attribute whose
+		<code>choice</code>
+		or
+		<code>items-from</code>
+		element is defined. (This is the only viable possibility for a combo
+		in the table, as there would also need to be a target to save the
+		selected item to, viz., the value of this same attribute.)
+	</p>
+
+	<p>Each entry in the viewer is provided with a checkbox to indicate
+		which attributes have been chosen (and thus marked valid). A checkbox
+		is also placed above the viewer to allow for filtering the unchecked
+		items. The viewer outputs its values to the environment. The name of
+		the viewer is also stored against a string of all selected values,
+		constructed from a template (further discussion at the end of this
+		section).</p>
+
+	<p>
+		The viewer <i>type</i> can be either "table" or "tree"; in the case of
+		the tree, the type, default, status and description fields of the
+		attribute are displayed as collapsible child rows hanging
+		off the main name entry. Either table or tree can have up to <b>six</b>
+		columns whose names/types are based on the following
+		attribute fields:
+	</p>
+
+	<table align="center" rules="all">
+		<tr>
+			<td><b>Name</b></td>
+		</tr>
+		<tr>
+			<td><b>Value</b></td>
+		</tr>
+		<tr>
+			<td><b>Type</b></td>
+		</tr>
+		<tr>
+			<td><b>Status</b></td>
+		</tr>
+		<tr>
+			<td><b>Default</b></td>
+		</tr>
+		<tr>
+			<td><b>Description</b></td>
+		</tr>
+	</table>
+	<br>
+	<p>
+		These can appear in any order. There is a slight difference in how
+		these columns are treated, depending upon whether <i>tree</i> or <i>table</i>
+		is chosen as type. For <b>table</b> type, the value of the field
+		simply appears in the corresponding column:
+	</p>
+	<br>
+	<img alt="Table" src="images/Table.jpg" />
+	<br>
+	<br>
+	<p>
+		In the <b>tree</b> type, the
+		<code>name</code>
+		field displays all fields except
+		<code>value</code>
+		as children;
+		<code>value</code>
+		always appears as a separate column on the same row as the name (it
+		contains the cell editor). If the viewer also has the column
+		corresponding to the child field, that field value appears in that
+		column;
+	</p>
+
+	<br>
+	<img alt="Tree1" src="images/Tree1.jpg" />
+	<br>
+	<br>
+
+	<p>
+		Otherwise, the child fields display their value in the value column
+		along with the actual
+		<code>value</code>
+		field:
+	</p>
+
+	<br>
+	<img alt="Tree2" src="images/Tree2.jpg" />
+	<br>
+	<br>
+
+	<p>
+		Tooltips for the column appear when hovering over the column header. (<i>A
+			caveat on the foreground and background settings for this type: they
+			are exposed here but may not work as expected: these are currently
+			applied to the column through the cell label provider; foreground
+			does not change the font color but applies the color to the entire
+			cell.</i>)
+	</p>
+
+	<p>
+		<i>sort</i> is done on the name field/column. This is a toggle sort,
+		such that alternate clicks reverse the sort direction. <i>headerVisible</i>
+		and <i>linesVisible</i> control the look of the table. <i>tooltipEnabled</i>
+		enables column-viewer label provider tooltip support. The tooltip
+		defined for an attribute will appear on the row of the table or the
+		parent node of the tree. The attribute description will also appear as
+		a tooltip on the description columns if they exist.
+	</p>
+
+	<p>
+		Control over the actual contents of the viewer is achieved through the
+		<code>viewer-items-type</code>
+		; one can here explicitly list attributes for inclusion
+		using the
+		<code>include</code>
+		element, or one can set one or both of the <i>all</i> attributes; in
+		the latter case, attributes can be excluded from the
+		set using
+		<code>exclude</code>. The <i>initialAllChecked</i> attribute, which defaults to true, indicates
+		that if the attribute is new or undefined from a previous
+		session, it will appear as checked; turn this off if you want new
+		attributes to appear at first as unchecked.
+	</p>
+
+	<p>
+		An attribute bearing the name given to this widget is written to the
+		environment at each update/refresh; the value of the attribute is a
+		string formed from the selected (checked) rows of the table using the
+		<code>template-type</code>
+		(the
+		<code>value</code>
+		element). The <i>pattern</i> can be any literal string embedding <i>@name</i>
+		and <i>@value</i> tags as placeholders for the row's name and value;
+		for instance, '@name="@value"' would generate a string of name-value
+		assignments. The default <i>separator</i> between patterned segments
+		is a single space.
+	</p>
+
+	<p>Below is a fuller example of the tree version of the attribute
+		viewer. The text area above it displays the current value of its
+		templated pattern string. The child rows reporting status, default,
+		etc., cannot be selected or unselected (only the parent row can).
+		Hovering over the name (here walltime) displays the tooltip.</p>
+	<br>
+	<img alt="AttributeViewerTree" src="images/AttribViewerTree.jpeg" />
+	<br>
+</body>
+</html>

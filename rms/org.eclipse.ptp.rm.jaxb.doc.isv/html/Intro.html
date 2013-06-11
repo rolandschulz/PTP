@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Introduction</title>
+<link rel="stylesheet" type="text/css" href="help.css">
+</head>
+<body>
+	<h2>
+		<a name="Introduction">Introduction</a>
+	</h2>
+
+	<p>
+		PTP allows you to launch and monitor
+		applications on local or remote resources using systems
+		which are configured from an XML file via JAXB (
+		<code>javax.xml.bind</code>
+		) technology.<br>
+	</p>
+
+	<p>The target system configuration files:</p>
+	<ol>
+		<li>Allow for maximum adaptability. Often job schedulers (PBS,
+			LSF, LoadLeveler, etc.) or interactive runtime systems (OpenMPI, PE,
+			SLURM, etc.) are set up by system administrators in special or
+			non-standard ways which make it difficult to use a generic tool. The
+			configuration file allows a user or community of users to fit the
+			resource manager to a class of systems, to a single host, or even to
+			special application usage.</li>
+		<li>Simplify adding support for new systems. Building the resource manager 
+			control system and its UI presentation from an
+			XML configuration means that in most cases no special Java coding is
+			necessary. Users should be able to accommodate new systems, at least
+			on the client-end, without writing and loading additional Eclipse
+			plugins. (The only qualification here is that the monitoring
+			component also support that type of scheduler or runtime; see the
+			following paragraphs.)</li>
+	</ol>
+
+	<p>
+		A target system configuration consist of two components, a
+		"control" component, which governs the configuration, launch and cancellation of
+		individual jobs entirely from the client end, and a "monitoring" component, which
+		displays job status as well as global information about the HPC
+		resource. The monitoring system uses built-in types provided
+		by the PTP distribution which support most standard scheduler types. Adding
+		a new configuration will normally entail only the specification of
+		its control part. The default mode of usage is that
+		the client stages the necessary components (mostly Perl
+		scripts) automatically, but in a future release, the monitor will also
+		be capable of connecting directly to a system-wide (web-based)
+		deployment.
+	</p>
+	
+	<p>
+		The "control" component of the target configuration is associated with a remote connection
+		when the user configures a "Parallel Application" run configuration using the standard Eclipse launch
+		configuration mechanism. This remote connection is the used whenever the control system 
+		needs to send or receive data, such as when running a command, or copying a file.
+	</p>
+	
+	<p>
+		The "monitor" component of the target configuration is associated with a remote connection
+		via the "Monitors" view in the "System Monitoring" perspective. This connection is used for
+		sending and receiving data required to perform the monitoring activities. Note that the
+		"control" and "monitor" component's remote connections are independent, although they can
+		both share the same connection (which is the normal case).
+	</p>
+		
+	<p>
+		<b>The following is a guide to the target system configuration XML
+			definition. Those interested only in using configurations
+			already provided with the PTP distribution should consult the User
+			Guide under the relevant scheduler section.</b>
+	</p>
+</body>
+</html>

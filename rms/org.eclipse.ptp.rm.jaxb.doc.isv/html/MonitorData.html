@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Monitor Data Element</title>
+<link rel="stylesheet" type="text/css" href="help.css">
+</head>
+<body>
+	<h2>
+		<a name="MonitorType">Monitor Data Element</a>
+	</h2>
+
+	<p>At present, the monitor component has less elements to define;
+		this may change in future releases, when certain hard-coded features
+		of the driver may be handed over to the client for configuration.</p>
+
+	<img alt="MonitorType" src="images/24monitor.jpeg" />
+
+	<p>
+		This component can be furnished with its own set of attributes
+		(currently unused). What is necessary to set at present is only the <i>schedulerType</i>
+		attribute (e.g., "PBS"). <i>refreshFrequencyInSeconds</i> defaults to
+		60, but this can be changed according to the needs of the user. Be
+		aware that too low a setting will probably not work, as the command on
+		an average sized system will take upwards of five seconds to complete
+		(XML is being streamed to the driver and a
+		<code>diff</code>
+		is sent back to the client ).
+	</p>
+
+	<p>
+		If the
+		<code>driver</code>
+		element is configured, then the default behavior, which is to stage
+		over the necessary driver scripts to the <i>.eclipsesettings</i>
+		directory in the user's home, is overridden by connecting to a
+		pre-existent installation. This can be specified either using the
+		<code>url</code>, or a combination of the
+		<code>name</code>,
+		<code>path</code>
+		and
+		<code>args</code>
+		elements.
+	</p>
+</body>
+</html>

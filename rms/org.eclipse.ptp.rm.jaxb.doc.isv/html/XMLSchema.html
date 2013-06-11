@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>XML Schema</title>
+<link rel="stylesheet" type="text/css" href="help.css">
+</head>
+<body>
+	<h2>
+		<a name="XSD"></a>XML Schema<br>
+	</h2>
+
+	<p>
+		PTP is <b><i>model-driven</i> </b>; this means
+		that its functioning and appearance are determined by a set of
+		definitions provided via an XML file. What follows is a detailed
+		explanation of the schema governing the resource manager XML
+		definition. The latest version of the target configuration schema is available at the URL <a href="http://eclipse.org/ptp/schemas/rm">http://eclipse.org/ptp/schemas/rm</a>.
+	</p>
+
+	<p>
+		The top level of the XML configuration is the <code>resource-manager-data</code> type as shown in the diagram below.
+		This type specifies all the information needed in order to submit, control, and monitor jobs on a target system.
+	</p>
+	
+	<img alt="ResourceManagerData" src="images/01rm-data.png" />
+
+	<p>
+		The <code>resource-manager-data</code> comprises three elements: <code>site-data</code>,
+		<code>control-data</code> and <code>monitor-data</code>. In addition, a configuration name 
+		is specified using the <i>name</i> property. This name must be unique.
+	</p>
+
+	<p>
+		The <code>site-data</code> element is reserved for future use. It provides an optional place to set fixed
+		or default remote site information. The connection strings are URIs
+		which are specific to the PTP RemoteServices definitions. The scheme
+		for these URIs will usually name the specific remote service (e.g,
+		<code>rse:</code>
+		or
+		<code>remotetools:</code>
+		; local is simply
+		<code>file:</code>
+		). The host name and port given here will appear as defaults in the
+		resource manager selection wizard when you create a new connection.
+	</p>
+
+	<p>
+		The principal section of the schema is devoted to defining the
+		target system <code>control-data</code> part. The top-level control elements
+		include attributes, files to be staged, job script to
+		be generated (if any), commands specific to the resource manager, and
+		the layout of the launch configuration Resources tab.
+	</p>
+	
+	<p>
+		The <code>monitor-data</code> section of the schema specifies the type of monitoring
+		to be used for the target system, and any monitoring system specific information
+		that might be necessary. If the <code>monitor-data</code> section is omitted, monitoring
+		for the target system will be disabled. This is typically the case when 
+		configuring direct access to runtime systems such as MPICH2 or Open MPI.
+	</p>
+
+</body>
+</html>

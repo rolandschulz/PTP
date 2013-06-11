@@ -5,5 +5,23 @@
 <!-- ============================================================================= -->
 
 <toc label="Configuring the JAXB Resource Manager" link_to="../org.eclipse.ptp.doc.isv/toc.xml#ptpJAXB" topic="html/toc.html">
-	 <topic href="html/toc.html" label="Contents"/>
+	 <topic href="html/Changes.html" label="Changes"/>
+  <topic href="html/Intro.html" label="Introduction">
+  </topic>
+  <topic href="html/GettingStarted.html" label="Getting Started">
+  </topic>
+  <topic href="html/XMLSchema.html" label="XML Schema">
+     <topic href="html/ControlData.html" label="Control Data Element">
+        <topic href="html/AttributeDefinitions.html" label="Attribute Definitions">
+        </topic>
+        <topic href="html/FilesAndScripts.html" label="Files and Scripts">
+        </topic>
+        <topic href="html/Commands.html" label="Commands and Stream Parsers">
+        </topic>
+        <topic href="html/UserInterface.html" label="User Interface">
+        </topic>
+     </topic>
+     <topic href="html/MonitorData.html" label="Monitor Data Element">
+     </topic>
+  </topic>
 </toc>

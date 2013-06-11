@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="PTP ISV Doc Build" default="all" basedir=".">
-	<target name="init">
-		<available file="${basedir}/index" property="index.present"/>
-	</target>
-
-	<target name="all" depends="init" unless="index.present">
+	<target name="all">
 		<antcall target="convertSchemaToHtml" />
 		<antcall target="generateJavadoc" />
 		<antcall target="build.index" />

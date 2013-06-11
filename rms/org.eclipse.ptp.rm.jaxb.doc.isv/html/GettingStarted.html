@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Getting Started</title>
+<link rel="stylesheet" type="text/css" href="help.css">
+</head>
+<body>
+	<h2>
+		<a name="GettingStarted"></a>Getting Started</a>
+	</h2>
+
+	<p>
+		We provide <a href="http://download.eclipse.org/tools/ptp/docs/JAXBDemo.pdf">an introductory tutorial slide set</a> demonstrating some
+		simple additions to a pre-existing configuration file.
+		For some example XML illustrating various aspects of the schema
+		(particularly UI features), we also provide a <a
+			href="http://download.eclipse.org/tools/ptp/docs/JAXBExamples_5.0.1.1.zip">.zip file (for PTP release 5.0.1)</a>.
+	</p>
+
+	<h3>
+		<a name="Preferences"></a>Preferences
+	</h3>
+
+	<p>The preference options are aids for debugging configuration
+		changes. The first turns off configuration file caching. This will ensure
+		that when you make changes to the configuration, they will automatically be
+		picked up by PTP.</p>
+
+	<p>The other options are useful if you are writing a new stream
+		tokenizer for a command; checking all four options usually produces
+		quite a bit of output, so in that case it may be advisable to log the
+		results to a file rather than stdout (at any rate the latter would be
+		available only if PTP were running as an application within the
+		Eclipse IDE platform, which is not the case for those modifying the
+		XML simply from within the PTP package installation workspace).</p>
+	<br>
+	<div style="margin-left: 40px;">
+		<img alt="Preferences" src="images/00Preferences.png"><br>
+	</div>
+</body>
+</html>

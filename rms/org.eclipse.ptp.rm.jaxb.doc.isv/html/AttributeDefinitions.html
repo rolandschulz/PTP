@@ -1,0 +1,321 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Attribute Definitions</title>
+<link rel="stylesheet" type="text/css" href="help.css">
+</head>
+<body>
+	<h2>
+		<a name="AttributeType">Attribute Definitions</a>
+	</h2>
+	<p>
+		An attribute is a variable that contains specific information used to control
+		the target system. Attributes are often (but not necessarily)
+		visible in the user interface. The value of an attribute can be any Java primitive type, a list of strings,
+		or a map of strings.
+	</p>
+
+	<p>
+		[TODO: Check if this is still correct]
+		If
+		<code>stdout</code>
+		and
+		<code>stderr</code>
+		from a scheduled job is to be delivered to the client, the attributes
+		<i>stdout_remote_path</i> and <i>stderr_remote_path</i> should be
+		included in the resource manager attribute set. Similarly, the native
+		designation for the selected queue, if used, should be linked to <i>control.queue.name</i>.
+	</p>
+
+	<img alt="Attribute" src="images/040attribute.jpeg" />
+
+	<h3>
+		<a name="AttributeMap">Attribute Map</a>
+	</h3>
+	<p>
+		Each target system configuration constructs an "attribute map" which contains all the
+		attributes known by the system. Attributes are either defined in the configuration file or
+		are created dynamically as the result of processing the output from commands.
+		Other configuration elements reference attributes by obtaining a
+		string representation of attribute fields using the Eclipse variable resolver syntax:
+		<code>
+			${ptp_rm:name#element}
+		</code> where <i>name</i> is the name of the attribute and <i>element</i>
+		is the name of an attribute element
+		(see further <a href="#AttributeType">below</a> on the
+		specific elements for attributes.) 
+	</p>
+	<p>
+		All attributes defined in the configuration are included in the map.
+		The following pre-defined attributes are also added at runtime: <br>
+		<br>
+		<code>control.user.name</code>
+		<br>
+		<code>control.address</code>
+		<br>
+		<code>control.working.dir</code>
+		<br>
+		<code>executablePath</code>
+		<br>
+		<code>progArgs</code>
+		<br>
+		<code>directory</code>
+		<br> <br> In addition, the following attributes may be linked (see <a
+			href="#AttributeType">below</a>) to other attributes to
+		provide an implementation-independent
+		mechanism for referencing the queue and for any remote output files produced in
+		connection with the job submission. <br> <br>
+		<code>control.queue.name</code>
+		<br>
+		<code>stdout_remote_path</code>
+		<br>
+		<code>stderr_remote_path</code>
+		<br>
+	</p>
+
+
+	<h3>
+		Attribute Properties
+	</h3>
+	<p>
+		The following properties are available when defining new attributes:
+	</p>
+	<table cellpadding="5" border="1" rules="all">
+		<tr>
+			<th>Property</th>
+			<th>Description</th>
+			<th>Default</th>
+		</tr>
+		<tr>
+			<td><i>name</i></td>
+			<td>
+				Used to specify the name of an attribute. This name
+				can then be used to look up the values of the attribute's elements.
+			</td>
+			<td>none</td>
+		</tr>
+		<tr>
+			<td><i>type</i></td>
+			<td>
+				Specifies the type of the attribute value. The type is primarily used by the user
+				interface elements to determine how values are to be input. Values can always be accessed as strings
+				regardless of their type.
+			</td>
+			<td>String</td>
+		</tr>
+		<tr>
+			<td><i>visible</i></td>
+			<td>
+				Indicates that the user will not be directly changing the value of the
+				attribute via the user interface. Certain widgets (such as
+				the
+				<code>attribute viewer</code>
+				) check this to see if the attribute should be included
+				automatically in its list.
+				<br>
+				Always mark attributes which are the targets of <i>attribute</i>
+				(see <a href="#Widget">below</a>) as <i>visible</i>="true"; if this
+				value is false, the attribute will <i>always</i> be passed to the
+				configuration/environment of the resource manager; selection/exclusion
+				of sets of attributes pertains only to those marked
+				visible.			
+			</td>
+			<td>true</td>
+		</tr>
+		<tr>
+			<td><i>status</i></td>
+			<td>
+				An optional property for capturing the validity of the
+				attribute at runtime or for a particular installation, if such
+				information is made available by the system.
+			</td>
+			<td>true</td>
+		</tr>
+		<tr>
+			<td><i>readOnly</i></td>
+			<td>
+				Used to mark the attribute as read-only. The value of a read-only attribute
+				will always remain the default value.
+			</td>
+			<td>true</td>
+		</tr>
+		<tr>
+			<td><i>translateBooleanAs</i></td>
+			<td>
+				Can be applied to
+				boolean values which should be represented as strings rather than
+				"true" and "false". A comma-delimited pair is used to indicate the string
+				equivalent to the boolean value. e.g., "YES,NO" would mean true yields the
+				string "YES" and false the string "NO".
+			</td>
+			<td>null</td>
+		</tr>
+		<tr>
+			<td><i>min</i> and <i>max</i></td>
+			<td>
+				Used to give the upper and lower bounds for integer attributes. UI
+				elements such as the spinner widget will use this information. 
+			</td>
+			<td>null</td>
+		</tr>
+	</table>
+	
+	<h3>
+		Attribute Elements
+	</h3>
+	
+	<p>
+		Attributes are structured objects that carry more information than just a value. This information
+		is specified using elements in the XML specification. Elements can be accessed using the Eclipse variable
+		syntax described in the <a href="#AttributeMap">Attribute Map</a> section.
+	</p>
+
+	<table cellpadding="5" border="1" rules="all">
+		<tr>
+			<th>Element</th>
+			<th>Description</th>
+		</tr>
+		<tr>
+			<td><code>description</code></td>
+			<td>
+				Provides a brief one-sentence definition of the attribute. This information
+				is displayed by the user interface.
+			</td>
+		</tr>
+		<tr>
+			<td><code>tooltip</code></td>
+			<td>
+				Provides a string that will be displayed when
+				the mouse hovers over the attribute in the user interface.
+			</td>
+		</tr>
+		<tr>
+			<td><code>choice</code></td>
+			<td>
+				Provides a predetermined, fixed set of values to choose from. These are
+				specified as a comma-delimited string and will appear as the items of a combo-box.
+			</td>
+		</tr>
+		<tr>
+			<td><code>items-from</code></td>
+			<td>
+				Links the combo items specified in a <code>choice</code> element to another
+				attribute value (whose type must be
+				<code>java.util.Collection</code>).
+			</td>
+		</tr>
+		<tr>
+			<td><code>default</code></td>
+			<td>
+				Specifies a default value for the attribute. Default values
+				must be primitive types. If no default value is specified, then the
+				value of the attribute will be <code>null</code>.
+			</td>
+		</tr>
+		<tr>
+			<td><code>value</code></td>
+			<td>
+				Represents the current value of the attribute. Only used to fetch
+				the value of an attribute.
+			</td>
+		</tr>
+		<tr>
+			<td><code>link-value-to</code></td>
+			<td>
+				If provided, the attribute gets its value from the
+				attribute specified, unless that attribute has
+				an undefined (empty) value. In this case, any default defined on
+				the present attribute will be used. This feature is
+				primarily intended for defining dependent attributes
+				whose values are not directly modified by the user.
+			</td>
+		</tr>
+		<tr>
+			<td><code>validator</code></td>
+			<td>
+				Specifies a validator for the attribute. Used to enforce semantics of the attribute value.
+			</td>
+		</tr>
+	</table>
+	
+	<h3>
+		<a name="Regex">Validators</a>
+	</h3>
+
+	<p>
+		Attributes carry optional validators which allow you to
+		enforce syntactic rules, numerical ranges (each with one or both
+		boundaries; these are OR'd) or file-system semantics on the value when
+		the user enters text.</p>
+
+	<img alt="Validator" src="images/041validator.jpeg" />
+
+	<p>
+		The validator makes use of the
+		<code>regex</code>
+		type (also used in the parser or tokenizer; see <a
+			href="#StreamParsers">below</a>), along with a special
+		<code>file-match</code>
+		type. A regex can be used to match by setting the <i>expression</i>
+		property. To split the segment into tokens on the basis of the
+		expression, set the <i>split</i> property to true (this applies only to
+		the
+		<code>match</code>
+		type discussed <a href="#MatchType">below</a>). The expression should
+		follow the grammar in
+		<code>java.util.regex</code>
+		; the <i>flags</i> are those made available in the
+		<code>java.util.regex.Pattern</code>
+		class (consult the Javadoc for explanations):
+	</p>
+	<ul>
+		<li>CASE_INSENSITIVE</li>
+		<li>MULTILINE</li>
+		<li>DOTALL</li>
+		<li>UNICODE_CASE</li>
+		<li>CANON_EQ</li>
+		<li>LITERAL</li>
+		<li>COMMENTS</li>
+		<li>UNIX_LINES</li>
+	</ul>
+
+	<p>
+		These can be OR'd in the usual manner. <b>NOTE:</b> when using the
+		regex on the <a href="#MatchType"><code>match</code> </a> type, the
+		expression can contain variable references to be resolved in the
+		environment.
+	</p>
+
+	<p>
+		The <code>file-match</code> type
+		specifies the attributes pertaining to
+		<code>org.eclipse.core.filesystem.IFileInfo</code>. The
+		<i>efsAttributes</i> property is an OR'd string of the EFS constants:
+	</p>
+
+	<ul>
+		<li>ATTRIBUTE_READ_ONLY</li>
+		<li>ATTRIBUTE_IMMUTABLE</li>
+		<li>ATTRIBUTE_OWNER_READ</li>
+		<li>ATTRIBUTE_OWNER_WRITE</li>
+		<li>ATTRIBUTE_OWNER_EXECUTE</li>
+		<li>ATTRIBUTE_GROUP_READ</li>
+		<li>ATTRIBUTE_GROUP_WRITE</li>
+		<li>ATTRIBUTE_GROUP_EXECUTE</li>
+		<li>ATTRIBUTE_OTHER_READ</li>
+		<li>ATTRIBUTE_OTHER_WRITE</li>
+		<li>ATTRIBUTE_OTHER_EXECUTE</li>
+		<li>ATTRIBUTE_EXECUTABLE</li>
+		<li>ATTRIBUTE_ARCHIVE</li>
+		<li>ATTRIBUTE_HIDDEN</li>
+		<li>ATTRIBUTE_SYMLINK</li>
+		<li>ATTRIBUTE_LINK_TARGET</li>
+	</ul>
+
+	<p>
+		The <i>lastModifiedBefore</i> and <i>lastModifiedAfter</i> properties are specified using the format
+		<code>yyyy/MM/dd HH:mm:ss</code>.
+	</p>
+</body>
+</html>
