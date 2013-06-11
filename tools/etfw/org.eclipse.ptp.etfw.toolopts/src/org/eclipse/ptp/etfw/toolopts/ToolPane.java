@@ -179,6 +179,7 @@ public class ToolPane implements IAppInput, IToolUITab {
 	}
 
 	/**
+	 * Creates a new tool pane
 	 * @since 5.0
 	 */
 	public ToolPane(boolean virtual) {
@@ -191,6 +192,9 @@ public class ToolPane implements IAppInput, IToolUITab {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.etfw.toolopts.IAppInput#getArgument(org.eclipse.debug.core.ILaunchConfiguration)
+	 */
 	public String getArgument(ILaunchConfiguration configuration) {
 		try {
 			return configuration.getAttribute(configID, "");//$NON-NLS-1$
@@ -214,6 +218,9 @@ public class ToolPane implements IAppInput, IToolUITab {
 		return configVarID;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.etfw.toolopts.IAppInput#getEnvVars(org.eclipse.debug.core.ILaunchConfiguration)
+	 */
 	@SuppressWarnings("unchecked")
 	public Map<String, String> getEnvVars(ILaunchConfiguration configuration) {
 		final Map<String, String> nullmap = null;
@@ -265,6 +272,9 @@ public class ToolPane implements IAppInput, IToolUITab {
 		return toolName;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.etfw.toolopts.IToolUITab#getVarMap()
+	 */
 	public Map<String, String> getVarMap() {
 		return varMap;
 	}

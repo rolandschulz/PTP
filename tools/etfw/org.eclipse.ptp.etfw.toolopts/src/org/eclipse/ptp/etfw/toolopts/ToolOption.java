@@ -255,6 +255,7 @@ public class ToolOption {
 	}
 
 	/**
+	 * @return the value for the argument set in this widget
 	 * @since 4.0
 	 */
 	public String getArg() {
@@ -268,14 +269,23 @@ public class ToolOption {
 		return null;
 	}
 
+	/**
+	 * @return the id for this option
+	 */
 	public String getID() {
 		return optID;
 	}
 
+	/**
+	 * @return the name of this widget
+	 */
 	public String getName() {
 		return optName;
 	}
 
+	/**
+	 * @return true if this widget has an associated checkbox, otherwise false
+	 */
 	public boolean getSelected() {
 		if (unitCheck == null) {
 			return false;
@@ -284,6 +294,7 @@ public class ToolOption {
 	}
 
 	/**
+	 * Sets the arg widgt's value with a numerical input, if valid
 	 * @since 4.0
 	 */
 	public void setArg(int arg) {
@@ -298,6 +309,10 @@ public class ToolOption {
 		}
 	}
 
+	/**
+	 * Set's the arg widget's value with a string input, if valid
+	 * @param arg
+	 */
 	public void setArg(String arg) {
 		if (argbox != null) {
 			final boolean isOn = argbox.getEnabled();
@@ -311,6 +326,10 @@ public class ToolOption {
 		}
 	}
 
+	/**
+	 * Sets the tool option's widget to the enabled condition of the boolean input
+	 * @param set
+	 */
 	public void setEnabled(boolean set) {
 		if (unitCheck != null) {
 			unitCheck.setEnabled(set);

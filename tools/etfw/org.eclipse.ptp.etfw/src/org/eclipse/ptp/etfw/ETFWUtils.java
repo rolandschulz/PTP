@@ -53,6 +53,15 @@ import org.eclipse.ptp.internal.etfw.toolopts.ToolMaker;
  * 
  * @since 7.0
  */
+/**
+ * @author wspear
+ *
+ */
+/**
+ * @author wspear
+ * @since 7.0
+ *
+ */
 public class ETFWUtils {
 
 	private static ExternalToolProcess[] tools = null;
@@ -98,6 +107,10 @@ public class ETFWUtils {
 		return workflowList;
 	}
 
+	/**
+	 * Initializes the list of user defined performance data managers if necessary and returns the list.
+	 * @return
+	 */
 	public static ArrayList<AbstractToolDataManager> getPerfConfManagers() {
 		if (perfConfManagers != null) {
 			return perfConfManagers;
@@ -127,6 +140,11 @@ public class ETFWUtils {
 		return perfConfManagers;
 	}
 
+	/**
+	 * Given the name of a user defined performance data manager, returns the associatd AbstractToolDataManager object, or null if it is not found
+	 * @param name of the performance data manager
+	 * @return selected performance data manager
+	 */
 	public static AbstractToolDataManager getPerfDataManager(String name) {
 		if (name == null) {
 			return null;
@@ -142,6 +160,10 @@ public class ETFWUtils {
 		return null;
 	}
 
+	/**
+	 * Returns the list of user defined performance tool configuration tab objects. Initializes the list first if necessary.
+	 * @return
+	 */
 	public static ArrayList<AbstractToolConfigurationTab> getPerfTabs() {
 		if (perfConfTabs != null) {
 			return perfConfTabs;
@@ -253,11 +275,16 @@ public class ETFWUtils {
 		return panes;
 	}
 
+	/**
+	 * Returns an array of the ETFw tool objects defined in plugins or loaded from xml by the user
+	 * @return
+	 */
 	public static ExternalToolProcess[] getTools() {
 		return tools;
 	}
 
 	/**
+	 * Returns a list of the tool UI tab objects defined by available tool workflows. Initializes the list if necessary.
 	 * @since 7.0
 	 */
 	public static ArrayList<IToolUITab> getToolUITabs() {

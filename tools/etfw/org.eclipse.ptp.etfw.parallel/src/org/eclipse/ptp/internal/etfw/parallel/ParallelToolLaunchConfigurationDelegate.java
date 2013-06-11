@@ -48,7 +48,10 @@ public class ParallelToolLaunchConfigurationDelegate extends ParallelLaunchConfi
 		IToolLaunchConfigurationConstants, IToolLaunchConfigurationDelegate {
 
 	private boolean initialized = false;
-
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.internal.etfw.IToolLaunchConfigurationDelegate#getInitialized()
+	 */
 	public boolean getInitialized() {
 		return initialized;
 	}
@@ -124,12 +127,18 @@ public class ParallelToolLaunchConfigurationDelegate extends ParallelLaunchConfi
 			}
 		}
 	}
-
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.internal.etfw.IToolLaunchConfigurationDelegate#setInitialized(boolean)
+	 */
 	public void setInitialized(boolean init) {
 		initialized = init;
 
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.launch.AbstractParallelLaunchConfigurationDelegate#verifyLaunchAttributes(org.eclipse.debug.core.ILaunchConfiguration, java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
 	protected boolean verifyLaunchAttributes(final ILaunchConfiguration configuration, String mode, final IProgressMonitor monitor)
 			throws CoreException {
@@ -148,6 +157,11 @@ public class ParallelToolLaunchConfigurationDelegate extends ParallelLaunchConfi
 
 	}
 
+	/**
+	 * @param configuration
+	 * @return If there is an ETFw version (JAXB or SAX) and ETFw tool selected return true. Otherwise throw an exception.
+	 * @throws CoreException
+	 */
 	protected boolean verifyProfilingTool(ILaunchConfiguration configuration) throws CoreException {
 		final String whichParser = configuration.getAttribute(IToolLaunchConfigurationConstants.ETFW_VERSION,
 				IToolLaunchConfigurationConstants.EMPTY_STRING);

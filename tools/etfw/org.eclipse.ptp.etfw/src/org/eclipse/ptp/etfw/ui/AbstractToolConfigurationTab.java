@@ -58,6 +58,9 @@ public abstract class AbstractToolConfigurationTab extends AbstractLaunchConfigu
 		return text;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#getName()
+	 */
 	public String getName() {
 		return null;
 	}

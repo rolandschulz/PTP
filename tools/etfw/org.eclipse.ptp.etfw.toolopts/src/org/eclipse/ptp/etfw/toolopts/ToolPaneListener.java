@@ -49,6 +49,9 @@ public class ToolPaneListener extends SelectionAdapter implements ModifyListener
 		// updateLaunchConfigurationDialog();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.swt.events.ModifyEvent)
+	 */
 	public void modifyText(ModifyEvent evt) {
 		// Object source = evt.getSource();
 		// if (thisTool.updateOptField(source))
@@ -56,6 +59,9 @@ public class ToolPaneListener extends SelectionAdapter implements ModifyListener
 		// TODO: This should only be set off once per reload. For now, don't use it at all.
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+	 */
 	@Override
 	public void widgetSelected(SelectionEvent e) {
 		thisTool.OptUpdate();

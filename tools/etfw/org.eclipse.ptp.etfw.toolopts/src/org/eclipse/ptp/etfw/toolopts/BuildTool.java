@@ -16,6 +16,9 @@ public class BuildTool extends ExternalTool {
 	protected ToolApp allCompilers = null;
 	protected ToolApp upcCompiler = null;
 
+	/**
+	 * @return a list of the ui pane objects, if any, for all compilers associated with this tool
+	 */
 	public ArrayList<IToolUITab> getAllCompilerPanes() {
 
 		final ArrayList<IToolUITab> allPanes = new ArrayList<IToolUITab>();
@@ -39,6 +42,9 @@ public class BuildTool extends ExternalTool {
 		return allPanes;
 	}
 
+	/**
+	 * @return the cc compiler application or the one for all compilers if none are cc specific
+	 */
 	public ToolApp getCcCompiler() {
 		if (ccCompiler != null) {
 			return ccCompiler;
@@ -46,6 +52,9 @@ public class BuildTool extends ExternalTool {
 		return allCompilers;
 	}
 
+	/**
+	 * @return the cxx compiler application or the one for all compilers if none are cxx specific
+	 */
 	public ToolApp getCxxCompiler() {
 		if (cxxCompiler != null) {
 			return cxxCompiler;
@@ -53,6 +62,9 @@ public class BuildTool extends ExternalTool {
 		return allCompilers;
 	}
 
+	/**
+	 * @return the f90 compiler application or the one for all compilers if none are f90 specific
+	 */
 	public ToolApp getF90Compiler() {
 		if (f90Compiler != null) {
 			return f90Compiler;
@@ -60,10 +72,16 @@ public class BuildTool extends ExternalTool {
 		return allCompilers;
 	}
 
+	/**
+	 * @return the compiler application for all compilers
+	 */
 	public ToolApp getGlobalCompiler() {
 		return allCompilers;
 	}
 
+	/**
+	 * @return the upc compiler application or the one for all compilers if none are upc specific
+	 */
 	public ToolApp getUPCCompiler() {
 		if (upcCompiler != null) {
 			return upcCompiler;
@@ -72,6 +90,7 @@ public class BuildTool extends ExternalTool {
 	}
 
 	/**
+	 * Associate the input ToolApp with all compilers
 	 * @since 5.0
 	 */
 	public void setAllCompilers(ToolApp allCompilers) {
@@ -79,6 +98,7 @@ public class BuildTool extends ExternalTool {
 	}
 
 	/**
+	 * Associate the input ToolApp with the cc compiler
 	 * @since 5.0
 	 */
 	public void setCcCompiler(ToolApp ccCompiler) {
@@ -86,6 +106,7 @@ public class BuildTool extends ExternalTool {
 	}
 
 	/**
+	 * Associate the input ToolApp with the cxx compiler
 	 * @since 5.0
 	 */
 	public void setCxxCompiler(ToolApp cxxCompiler) {
@@ -93,6 +114,7 @@ public class BuildTool extends ExternalTool {
 	}
 
 	/**
+	 * Associate the input ToolApp with the f90 compiler
 	 * @since 5.0
 	 */
 	public void setF90Compiler(ToolApp f90Compiler) {
@@ -100,6 +122,7 @@ public class BuildTool extends ExternalTool {
 	}
 
 	/**
+	 * Associate the input ToolApp with the upc compiler
 	 * @since 5.0
 	 */
 	public void setUpcCompiler(ToolApp upcCompiler) {

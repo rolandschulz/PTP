@@ -19,5 +19,9 @@ public interface IAppInput {
 	 */
 	public String getArgument(ILaunchConfiguration configuration);
 
+	/**
+	 * @param configuration
+	 * @return The map of environment variables defined for this tool's launch
+	 */
 	public Map<String, String> getEnvVars(ILaunchConfiguration configuration);
 }

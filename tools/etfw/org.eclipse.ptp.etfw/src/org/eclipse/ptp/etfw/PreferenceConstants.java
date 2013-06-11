@@ -20,6 +20,9 @@ import org.eclipse.ptp.internal.etfw.Activator;
 public class PreferenceConstants {
 	public static final String ETFW_VERSION = "ETFW_VERSION"; //$NON-NLS-1$
 
+	/**
+	 * @return the etfw version stored in preferences
+	 */
 	public static String getVersion() {
 		return Preferences.getString(Activator.PLUGIN_ID, ETFW_VERSION);
 	}

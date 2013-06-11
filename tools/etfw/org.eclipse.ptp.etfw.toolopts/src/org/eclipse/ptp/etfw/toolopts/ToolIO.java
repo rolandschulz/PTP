@@ -26,10 +26,16 @@ public class ToolIO implements IAppInput {
 	// public int outputType=0;
 	// public String fileName=null;
 
+	/**
+	 * Provide the io link for this object (not yet implemented)
+	 */
 	public ToolIO() {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.etfw.toolopts.IAppInput#getArgument(org.eclipse.debug.core.ILaunchConfiguration)
+	 */
 	public String getArgument(ILaunchConfiguration configuration) {// TODO: What is this doing?
 	// String arg = "";
 	// if(pathFlag!=null){
@@ -39,6 +45,9 @@ public class ToolIO implements IAppInput {
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.etfw.toolopts.IAppInput#getEnvVars(org.eclipse.debug.core.ILaunchConfiguration)
+	 */
 	public Map<String, String> getEnvVars(ILaunchConfiguration configuration) {// TODO: What about this?
 		// TODO Auto-generated method stub
 		return null;

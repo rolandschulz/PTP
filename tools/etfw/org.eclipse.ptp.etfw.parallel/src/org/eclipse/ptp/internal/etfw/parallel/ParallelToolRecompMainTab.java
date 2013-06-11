@@ -89,6 +89,9 @@ public class ParallelToolRecompMainTab extends ApplicationTab {
 		buildConfCombo.addModifyListener(listener);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.launch.ui.tabs.ApplicationTab#createControl(org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
 	public void createControl(Composite parent) {
 
@@ -182,6 +185,9 @@ public class ParallelToolRecompMainTab extends ApplicationTab {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.launch.ui.tabs.ApplicationTab#initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
+	 */
 	@Override
 	public void initializeFrom(ILaunchConfiguration configuration) {
 
@@ -190,6 +196,9 @@ public class ParallelToolRecompMainTab extends ApplicationTab {
 		initializeConfCombo(configuration);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.launch.ui.tabs.ApplicationTab#isValid(org.eclipse.debug.core.ILaunchConfiguration)
+	 */
 	@Override
 	public boolean isValid(ILaunchConfiguration config) {
 
@@ -219,6 +228,9 @@ public class ParallelToolRecompMainTab extends ApplicationTab {
 		return status;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.launch.ui.tabs.ApplicationTab#performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
+	 */
 	@Override
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 		super.performApply(configuration);

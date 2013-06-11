@@ -33,6 +33,11 @@ import org.eclipse.debug.core.ILaunchConfiguration;
  */
 public class ExternalToolProcess {
 
+	/**
+	 * Fields define the parameters that may be iterated over when running a parametric workflow
+	 * @author wspear
+	 *
+	 */
 	public static class Parametric {
 		public boolean runParametric = false;
 		public boolean weakScaling = false;
@@ -91,6 +96,7 @@ public class ExternalToolProcess {
 	}
 
 	/**
+	 * Returns the first analysis tool defined in this process
 	 * @since 5.0
 	 */
 	public PostProcTool getFirstAnalyzer(ILaunchConfiguration configuration) {
@@ -104,6 +110,7 @@ public class ExternalToolProcess {
 	}
 
 	/**
+	 * Returns the first build tool defined in this process
 	 * @since 5.0
 	 */
 	public BuildTool getFirstBuilder(ILaunchConfiguration configuration) {
@@ -117,6 +124,7 @@ public class ExternalToolProcess {
 	}
 
 	/**
+	 * Returns the first exec tool defined in this execution process
 	 * @since 5.0
 	 */
 	public ExecTool getFirstRunner(ILaunchConfiguration configuration) {

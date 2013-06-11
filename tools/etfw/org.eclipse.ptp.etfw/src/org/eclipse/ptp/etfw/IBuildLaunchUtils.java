@@ -24,6 +24,14 @@ public interface IBuildLaunchUtils {
 	 * */
 	public String askToolPath(String archpath, String toolText, String toolMessage);
 
+	/**
+	 * This locates the directory containing the given tool.
+	 * 
+	 * @param The
+	 *            name of the tool whose directory is being located
+	 * @return The uri of the location of the tool's containing directory, or null if it is not found or if the architecture is windows
+	 * 
+	 */
 	public String checkToolEnvPath(String toolname);
 
 	/**
@@ -70,6 +78,11 @@ public interface IBuildLaunchUtils {
 	 */
 	public void getAllToolPaths(ExternalToolProcess[] tools, boolean force);
 
+	/**
+	 * Convenience method to return the the given file as located by the IBuildLaunch object's file store
+	 * @param path
+	 * @return
+	 */
 	public IFileStore getFile(String path);
 
 	/**
@@ -81,9 +94,14 @@ public interface IBuildLaunchUtils {
 	 */
 	public String getToolPath(String toolID);
 
+	/**
+	 * Returns the working directory associated with this object's remote connection, if any.
+	 * @return
+	 */
 	public String getWorkingDirectory();
 
 	/**
+	 * Returns true if this object is configured with a remote connection, false if it is using a local connection.
 	 * @since 7.0
 	 */
 	public boolean isRemote();
@@ -114,15 +132,36 @@ public interface IBuildLaunchUtils {
 	 */
 	public boolean runTool(List<String> tool, Map<String, String> env, String directory, String output);
 
+	/**
+	 * 
+	 * @param tool The command to be run, including arguments
+	 * @param env A list of environment variables to associate with the tool
+	 * @param directory The directory where the tool is invoked
+	 * @return byte array representing the output of the program executed
+	 */
 	public byte[] runToolGetOutput(List<String> tool, Map<String, String> env, String directory);
 
 	/**
 	 * @since 7.0
+
+	 * @param showErr set to true if the stderr from the program should be included in the output, otherwise false
+	 * @return byte array representing the output of the program executed
 	 */
 	public byte[] runToolGetOutput(List<String> tool, Map<String, String> env, String directory, boolean showErr);
 
+	/**
+	 * Attempt to launch a UI based application.
+	 * @param tool The command to be run, including arguments
+	 * @param env A list of environment variables to associate with the tool
+	 * @param directory The directory where the tool is invoked
+	 */
 	public void runVis(List<String> tool, Map<String, String> env, String directory);
 
+	/**
+	 * Associate the filesystem location of this tool's executable with its group
+	 * @param tool The object containing the tool to be located
+	 * @param force if true proceed with the check and association even if there is already a path associated with the group
+	 */
 	public void verifyRequestToolPath(ExternalToolProcess tool, boolean force);
 
 }
