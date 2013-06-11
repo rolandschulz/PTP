@@ -21,6 +21,7 @@ import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -164,14 +165,48 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 
 	@Override
 	public void addPattern(String pattern, boolean exclude, int index) {
-		rules.add(index, new GitIgnoreRule(pattern, exclude));
+		GitIgnoreRule newRule = new GitIgnoreRule(pattern, exclude);
 
+		// Remove duplicate rules
+		int nextIndex = 0;
+		int numRulesRemoved = 0;
+		for (Iterator<AbstractIgnoreRule> it = rules.iterator(); it.hasNext() && nextIndex < index; nextIndex++) {
+			AbstractIgnoreRule existingRule = it.next();
+			if (pattern.equals(existingRule.getPattern())) {
+				it.remove();
+				numRulesRemoved++;
+			}
+		}
+
+		// Add new rule, adjusting index for removed rules.
+		rules.add(index-numRulesRemoved, newRule);
 	}
 
 	@Override
 	public void addPattern(IResource resource, boolean exclude, int index) {
-		rules.add(index, new GitIgnoreRule(resource, exclude));
+		GitIgnoreRule newRule = new GitIgnoreRule(resource, exclude);
 
+		// Remove duplicate rules
+		int nextIndex = 0;
+		int numRulesRemoved = 0;
+		for (Iterator<AbstractIgnoreRule> it = rules.iterator(); it.hasNext() && nextIndex < index; nextIndex++) {
+			AbstractIgnoreRule existingRule = it.next();
+			if (newRule.getPattern().equals(existingRule.getPattern())) {
+				it.remove();
+				numRulesRemoved++;
+			}
+		}
+
+		// Add new rule, adjusting index for removed rules.
+		// Do not add, however, if an existing rule was removed and the new rule has no effect.
+		if (numRulesRemoved == 0) {
+			rules.add(index-numRulesRemoved, newRule);
+		} else {
+			boolean resourceIgnored = this.shouldIgnore(resource);
+			if (resourceIgnored != exclude) {
+				rules.add(index-numRulesRemoved, newRule);
+			}
+		}
 	}
 
 	public void saveFilter() throws IOException  {
