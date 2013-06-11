@@ -28,6 +28,7 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.Path;
@@ -1469,14 +1470,19 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 			viewer.getControl().setFocus();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
+	 */
 	public void dispose() {
 		if (traceOn)
 			System.out.println("SimpleTableView.dispose()"); //$NON-NLS-1$
-		// BRT do we need to dispose of imageDescriptors we made? or just
-		// images?
-
 	}
 
+	
+	/**
+	 * Display marker information for debugging use
+	 * @param marker
+	 */
 	public void showMarker(IMarker marker) {
 		System.out.println("Marker-------  IMarker.LINE_NUMBER=" + IMarker.LINE_NUMBER); //$NON-NLS-1$
 		try {
@@ -1492,9 +1498,14 @@ public class SimpleTreeTableMarkerView extends ViewPart {
 		}
 
 	}
-
+	
+	/**
+	 * Create an ImageDescriptor for an image
+	 * @param iconName
+	 * @return
+	 */
 	public ImageDescriptor makeImageDescriptor(String iconName) {
-		URL url = thePlugin_.find(new Path(iconName));
+		URL url = FileLocator.find(thePlugin_.getBundle(), new Path(iconName), null);
 		ImageDescriptor id = ImageDescriptor.createFromURL(url);
 		return id;
 	}

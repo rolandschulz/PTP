@@ -16,6 +16,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
 /**
+ * Convenience class/method to activated a view given its id
  * @since 4.0
  * 
  */
@@ -35,6 +36,5 @@ public class ViewActivator
 		} catch (PartInitException e) {
 			e.printStackTrace();
 		}
-		// page.activate(page.findView(strViewId));
 	}
 }

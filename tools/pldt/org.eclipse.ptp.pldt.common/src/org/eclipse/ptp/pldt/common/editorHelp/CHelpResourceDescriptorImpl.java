@@ -21,6 +21,11 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.help.IHelpResource;
 import org.eclipse.ptp.pldt.common.CommonPlugin;
 
+/**
+ * Implementation of ICHelpResourceDescriptor, help information e.g. for an API  
+ * @author beth tibbitts
+ *
+ */
 public class CHelpResourceDescriptorImpl implements ICHelpResourceDescriptor {
 	ICHelpBook book;
 	String name;
@@ -71,14 +76,23 @@ public class CHelpResourceDescriptorImpl implements ICHelpResourceDescriptor {
 		};
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.cdt.ui.ICHelpResourceDescriptor#getCHelpBook()
+	 */
 	public ICHelpBook getCHelpBook() {
 		return book;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.cdt.ui.ICHelpResourceDescriptor#getHelpResources()
+	 */
 	public IHelpResource[] getHelpResources() {
 		return resources;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 		return name + " -> " + href; //$NON-NLS-1$

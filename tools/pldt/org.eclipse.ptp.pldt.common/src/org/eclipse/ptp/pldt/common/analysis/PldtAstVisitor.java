@@ -72,7 +72,11 @@ public abstract class PldtAstVisitor extends CASTVisitor {
 	public static String ARTIFACT_CONSTANT = "Artifact Constant"; //$NON-NLS-1$
 	protected static String ARTIFACT_NAME = "Artifact Name"; //$NON-NLS-1$
 	protected static String PREFIX = ""; //$NON-NLS-1$
-	private static/* final */boolean traceOn = false;
+	/**
+	 * Note that this is not final beause it can be dynamically modified by user-enabled tracing:
+	 * See CommonPlugin.getTraceOn();
+	 */
+	private static boolean traceOn = false;
 
 	private static boolean dontAskToModifyIncludePathAgain = false;
 	protected boolean allowPrefixOnlyMatch = true;
@@ -83,7 +87,7 @@ public abstract class PldtAstVisitor extends CASTVisitor {
 	 * to be a path from which definitions of "Artifacts" would be found. <br>
 	 * Note that this can now be dynamically modified during artifact analysis, thus no longer final
 	 */
-	private/* final */List<String> includes_;
+	private List<String> includes_;
 	private final String fileName;
 	private final ScanReturn scanReturn;
 
@@ -224,7 +228,7 @@ public abstract class PldtAstVisitor extends CASTVisitor {
 	}
 
 	/**
-	 * 
+	 * Look for artifacts in an IASTExpression
 	 * @param astExpr
 	 */
 	public void processExprWithConstant(IASTExpression astExpr) {
@@ -246,6 +250,7 @@ public abstract class PldtAstVisitor extends CASTVisitor {
 	 * Determines if the funcName is an instance of the type of artifact in
 	 * which we are interested. <br>
 	 * An artifact is a function name that was found in the include path (e.g. MPI or OpenMP),
+	 * (or identified by prefix-only match, which is now the default)
 	 * as defined in the PLDT preferences.
 	 * 
 	 * @param funcName
@@ -421,6 +426,10 @@ public abstract class PldtAstVisitor extends CASTVisitor {
 		return !location.equals(tuFilePath);
 	}
 
+	/**
+	 * Look for artifacts within a IASTIdExpression
+	 * @param expression
+	 */
 	public void processIdExprAsLiteral(IASTIdExpression expression) {
 		IASTName name = expression.getName();
 		String strName = name.toString();
@@ -452,6 +461,11 @@ public abstract class PldtAstVisitor extends CASTVisitor {
 		includes_ = convertToList(includes);
 	}
 
+	/**
+	 * Convert a string to a list with given delimiters
+	 * @param stringList
+	 * @return
+	 */
 	@SuppressWarnings({ "unchecked" })
 	public List convertToList(String stringList)
 	{
@@ -563,10 +577,15 @@ public abstract class PldtAstVisitor extends CASTVisitor {
 	}
 
 	/**
-	 * Dialog to ask a question in the UI thread
+	 * Dialog to ask a question in the UI thread, and return its answer plus a persistent
+	 * setting for not asking the same question again.  Users get tired of the same old question!
 	 * 
-	 * @author beth
+	 * @author beth tibbitts
 	 * 
+	 * @param title
+	 * @param message
+	 * @param dontAskAgain allows persistent setting to not ask this question again
+	 * @return
 	 */
 	public boolean[] askUI(final String title, final String message, boolean dontAskAgain) {
 		boolean[] twoAnswers = new boolean[2];

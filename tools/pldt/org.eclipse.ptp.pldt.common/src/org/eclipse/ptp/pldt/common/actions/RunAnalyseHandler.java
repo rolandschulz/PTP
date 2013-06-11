@@ -41,6 +41,9 @@ public abstract class RunAnalyseHandler extends AbstractHandler {
 	 */
 	protected IStructuredSelection selection;
 
+	/**
+	 * Constructor
+	 */
 	public RunAnalyseHandler() {
 	}
 

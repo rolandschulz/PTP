@@ -25,19 +25,26 @@ public abstract class CHelpProviderImpl implements ICHelpProvider
 {
 	protected CHelpBookImpl helpBook;
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.cdt.ui.ICHelpProvider#getCHelpBooks()
+	 */
 	public ICHelpBook[] getCHelpBooks()
 	{
 		return new ICHelpBook[] { helpBook };
 	}
 
 	/**
-	 * called on hover
+	 * Called on hover
+	 * @see org.eclipse.cdt.ui.ICHelpProvider#getFunctionInfo(org.eclipse.cdt.ui.text.ICHelpInvocationContext, org.eclipse.cdt.ui.ICHelpBook[], java.lang.String)
 	 */
 	public IFunctionSummary getFunctionInfo(ICHelpInvocationContext context, ICHelpBook[] helpBooks, String name)
 	{
 		return (helpBooks.length == 0) ? null : helpBook.getFunctionInfo(context, name);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.cdt.ui.ICHelpProvider#getMatchingFunctions(org.eclipse.cdt.ui.text.ICHelpInvocationContext, org.eclipse.cdt.ui.ICHelpBook[], java.lang.String)
+	 */
 	public IFunctionSummary[] getMatchingFunctions(ICHelpInvocationContext context, ICHelpBook[] helpBooks,
 			String prefix)
 	{
@@ -45,7 +52,8 @@ public abstract class CHelpProviderImpl implements ICHelpProvider
 	}
 
 	/**
-	 * called on F1
+	 * Called on F1
+	 * @see org.eclipse.cdt.ui.ICHelpProvider#getHelpResources(org.eclipse.cdt.ui.text.ICHelpInvocationContext, org.eclipse.cdt.ui.ICHelpBook[], java.lang.String)
 	 */
 	public ICHelpResourceDescriptor[] getHelpResources(ICHelpInvocationContext context, ICHelpBook[] helpBooks,
 			String name)

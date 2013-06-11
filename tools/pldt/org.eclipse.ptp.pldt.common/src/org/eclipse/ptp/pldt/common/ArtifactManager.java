@@ -43,6 +43,10 @@ public class ArtifactManager {
 	 */
 	public static HashMap registry = new HashMap();
 
+	/**
+	 * Create ArtifactManager from id
+	 * @param id
+	 */
 	public ArtifactManager(String id) {
 		this.id_ = id;
 		registry.put(id, this);
@@ -114,6 +118,10 @@ public class ArtifactManager {
 		return artifacts;
 	}
 
+	/**
+	 * get hashtable of artifact map
+	 * @return
+	 */
 	public HashMap getArtifactMap() {
 		return hashMap;
 	}
@@ -121,7 +129,7 @@ public class ArtifactManager {
 	/**
 	 * Remove artifact by artifact object
 	 * 
-	 * @param a
+	 * @param a the artifact to remove
 	 * @return true if it was removed
 	 */
 	public boolean removeArtifact(IArtifact a) {
@@ -150,6 +158,9 @@ public class ArtifactManager {
 		hashMap.clear();
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	public String toString() {
 		return "ArtifactManager for " + id_; //$NON-NLS-1$
 	}

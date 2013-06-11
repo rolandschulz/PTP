@@ -224,6 +224,15 @@ public class SimpleTableMarkerView extends ViewPart {
 
 	}
 
+	/**
+	 * Constructor with a single marker ID that is converted to a single element list
+	 * 
+	 * @param thePlugin
+	 * @param thingname
+	 * @param thingnames
+	 * @param columnName
+	 * @param markerID
+	 */
 	public SimpleTableMarkerView(AbstractUIPlugin thePlugin, String thingname,
 			String thingnames, String columnName, String markerID) {
 		this(thePlugin, thingname, thingnames, columnName, new String[] { markerID });
@@ -254,16 +263,6 @@ public class SimpleTableMarkerView extends ViewPart {
 		markerAttrNames_ = attrNames;
 
 	}
-
-	/**
-	 * Ctor that uses defaults for everything (testing? theoretically, this
-	 * should work, and should be reusable since info that must be unique is
-	 * read from from plugin.xml.)
-	 * 
-	 */
-	// public SimpleTableMarkerView() {
-	// this(null, null, null, null, null);
-	// }
 
 	/**
 	 * Find info from the view info in the manifest. This includes the icon
@@ -312,7 +311,6 @@ public class SimpleTableMarkerView extends ViewPart {
 	 * @return
 	 */
 	public boolean validForAnalysis(String filename) {
-		// return MpiUtil.validForAnalysis(filename);
 		return true;
 
 	}
@@ -355,6 +353,9 @@ public class SimpleTableMarkerView extends ViewPart {
 
 		}
 
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+		 */
 		public void dispose() {
 			if (traceOn)
 				System.out.println("ATV.ViewContentProvider.dispose()"); //$NON-NLS-1$
@@ -750,7 +751,6 @@ public class SimpleTableMarkerView extends ViewPart {
 		 * 
 		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
 		 */
-
 		public void dispose() {
 			if (traceOn)
 				System.out
@@ -1454,14 +1454,19 @@ public class SimpleTableMarkerView extends ViewPart {
 			viewer.getControl().setFocus();
 	}
 
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
+	 */
 	public void dispose() {
 		if (traceOn)
 			System.out.println("SimpleTableView.dispose()"); //$NON-NLS-1$
-		// BRT do we need to dispose of imageDescriptors we made? or just
-		// images?
-
 	}
 
+	/**
+	 * Used for debugging to expose marker information conveniently
+	 * @param marker
+	 */
 	public void showMarker(IMarker marker) {
 		System.out.println("Marker-------  IMarker.LINE_NUMBER=" //$NON-NLS-1$
 				+ IMarker.LINE_NUMBER);
@@ -1479,6 +1484,11 @@ public class SimpleTableMarkerView extends ViewPart {
 
 	}
 
+	/**
+	 * Create an ImageDescriptor for an image
+	 * @param iconName
+	 * @return
+	 */
 	public ImageDescriptor makeImageDescriptor(String iconName) {
 		URL url = FileLocator.find(thePlugin_.getBundle(), new Path(iconName), null);
 		ImageDescriptor id = ImageDescriptor.createFromURL(url);

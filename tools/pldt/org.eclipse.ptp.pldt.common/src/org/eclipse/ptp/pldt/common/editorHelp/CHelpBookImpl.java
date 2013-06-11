@@ -48,22 +48,41 @@ public class CHelpBookImpl implements ICHelpBook {
 	private CHelpBookImpl() {
 	}
 
+	/**
+	 * Constructor
+	 * @param pluginId
+	 */
 	public CHelpBookImpl(String pluginId) {
 		this.pluginId = pluginId;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.cdt.ui.ICHelpBook#getTitle()
+	 */
 	public String getTitle() {
 		return title;
 	}
 
+	/**
+	 * @param title
+	 */
 	protected void setTitle(String title) {
 		this.title = title;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.cdt.ui.ICHelpBook#getCHelpType()
+	 */
 	public int getCHelpType() {
 		return ICHelpBook.HELP_TYPE_C;
 	}
 
+	/**
+	 * Get available info on the give function by name
+	 * @param context
+	 * @param name
+	 * @return
+	 */
 	public IFunctionSummary getFunctionInfo(ICHelpInvocationContext context,
 			String name) {
 		IFunctionSummary fs = funcName2FuncInfo.get(name);
@@ -77,6 +96,12 @@ public class CHelpBookImpl implements ICHelpBook {
 		return fs;
 	}
 
+	/**
+	 * Return a list of functions that begin with the given prefix
+	 * @param context
+	 * @param prefix
+	 * @return
+	 */
 	public IFunctionSummary[] getMatchingFunctions(
 			ICHelpInvocationContext context, String prefix) {
 		List<IFunctionSummary> functionSummaryList = new ArrayList<IFunctionSummary>();
@@ -103,6 +128,12 @@ public class CHelpBookImpl implements ICHelpBook {
 		return functionSummaryArray;
 	}
 
+	/**
+	 * Get the HelpBook information for the given name (e.g. a function/API)
+	 * @param context
+	 * @param name
+	 * @return
+	 */
 	public ICHelpResourceDescriptor[] getHelpResources(
 			ICHelpInvocationContext context, String name) {
 		IFunctionSummary functionSummary = getFunctionInfo(context, name);

@@ -24,6 +24,10 @@ import org.eclipse.ptp.pldt.common.util.SourceInfo;
  * @author Beth Tibbitts
  * 
  */
+/**
+ * @author beth
+ *
+ */
 public class Artifact implements IArtifact
 {
 	/** Line number where the artifact occurs */
@@ -54,7 +58,6 @@ public class Artifact implements IArtifact
 	/** Object containing additional source information */
 	private SourceInfo sourceInfo_;
 	/** Constant used in marker to indicate type of artifact is unspecified */
-
 	public static final int NONE = 0;
 	/** Constant used in marker to indicate type of artifact is a function call */
 	public static final int FUNCTION_CALL = 1;
@@ -62,7 +65,7 @@ public class Artifact implements IArtifact
 	public static final int CONSTANT = 2;
 	/** Constant used in marker to indicate type of artifact is a pragma */
 	public static final int PRAGMA = 3;
-
+	/** List of construct names, used to index into for table headings */
 	public static final String[] CONSTRUCT_TYPE_NAMES = { Messages.Artifact_none, Messages.Artifact_function_call,
 			Messages.Artifact_constant, Messages.Artifact_pragma };
 
@@ -89,7 +92,8 @@ public class Artifact implements IArtifact
 	}
 
 	/**
-	 * Create an MPI Artifact to keep track of an MPI function call (or ???) in a file.
+	 * Create an Artifact to keep track of an MPI function call (or similar item) in a file,
+	 * including an object that may be an AST node for convenience.
 	 * 
 	 * @param fileName
 	 * @param line
@@ -112,6 +116,18 @@ public class Artifact implements IArtifact
 		setId();
 	}
 
+	/**
+	 * Create an artifact to keep track of something in a file, including file name
+	 * 
+	 * @param fileName
+	 * @param line
+	 * @param column
+	 * @param shortName
+	 * @param desc
+	 * @param ignore
+	 * @param primaryFileName
+	 * @param sourceInfo
+	 */
 	public Artifact(String fileName, int line, int column, String shortName, String desc, boolean ignore,
 			String primaryFileName, SourceInfo sourceInfo)
 	{
@@ -141,6 +157,9 @@ public class Artifact implements IArtifact
 		uniqueID_ = Long.toString(now_++, 36);
 	}
 
+	/**
+	 * Get unique ID
+	 */
 	public String getId()
 	{
 		return uniqueID_;
@@ -161,67 +180,106 @@ public class Artifact implements IArtifact
 		return buf.toString();
 	}
 
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.pldt.common.IArtifact#getColumn()
+	 */
 	public int getColumn()
 	{
 		return column_;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.pldt.common.IArtifact#setColumn(int)
+	 */
 	public void setColumn(int column_)
 	{
 		this.column_ = column_;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.pldt.common.IArtifact#getDescription()
+	 */
 	public String getDescription()
 	{
 		return description_;
 	}
 
+	/**
+	 * @param description_
+	 */
 	public void setDescription(String description_)
 	{
 		this.description_ = description_;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.pldt.common.IArtifact#getFileName()
+	 */
 	public String getFileName()
 	{
 		return fileName_;
 	}
 
+	/**
+	 * @param fileName_
+	 */
 	public void setFileName(String fileName_)
 	{
 		this.fileName_ = fileName_;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.pldt.common.IArtifact#getLine()
+	 */
 	public int getLine()
 	{
 		return line_;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.pldt.common.IArtifact#setLine(int)
+	 */
 	public void setLine(int line_)
 	{
 		this.line_ = line_;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.pldt.common.IArtifact#getPrimaryfileName()
+	 */
 	public String getPrimaryfileName()
 	{
 		return primaryfileName_;
 	}
-
-	public void setPrimaryfileName(String primaryfileName_)
+	/**
+	 * Which file-analysis-invocation gave rise to this artifact.<br>
+	 * (Analyzing one file may produce artifacts in another file. This is the first one)
+	 * @param primaryfileName
+	 */
+	public void setPrimaryfileName(String primaryfileName)
 	{
-		this.primaryfileName_ = primaryfileName_;
+		this.primaryfileName_ = primaryfileName;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.pldt.common.IArtifact#getShortName()
+	 */
 	public String getShortName()
 	{
 		return shortName_;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ptp.pldt.common.IArtifact#setShortName(java.lang.String)
+	 */
 	public void setShortName(String shortName_)
 	{
 		this.shortName_ = shortName_;
 	}
 
 	/**
+	 * Get detailed location info on where the artifact is located in the file (more than just line number, for example)
 	 * @return Returns the sourceInfo_.
 	 */
 	public SourceInfo getSourceInfo()
@@ -229,11 +287,19 @@ public class Artifact implements IArtifact
 		return sourceInfo_;
 	}
 
+	/**
+	 * Get new line (perhaps unused)
+	 * @return
+	 */
 	public int getNewline()
 	{
 		return newline_;
 	}
 
+	/**
+	 * Returns an object cached for assisting in artifact analysis, possibly an AST node
+	 * @return
+	 */
 	public Object getArtifactAssist()
 	{
 		return artifactAssist_;

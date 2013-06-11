@@ -13,6 +13,11 @@ package org.eclipse.ptp.pldt.common.messages;
 
 import org.eclipse.osgi.util.NLS;
 
+/**
+ * Messages for org.eclipse.ibm.pldt.common
+ * @author beth tibbitts
+ *
+ */
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.pldt.common.messages.messages"; //$NON-NLS-1$
 	public static String Artifact_artifact;

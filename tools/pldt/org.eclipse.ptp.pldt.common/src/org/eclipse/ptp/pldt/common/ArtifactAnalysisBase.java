@@ -21,8 +21,8 @@ import org.eclipse.core.runtime.IStatus;
  * Base class for implementations of {@link IArtifactAnalysis} that handle C and
  * C++.
  * <p>
- * This class contains the {@link #getAST(ITranslationUnit)} utility method,
- * which returns an {@link IASTTranslationUnit} for an {@link ITranslationUnit}.
+ * This class contains the {@link #getAST(ITranslationUnit)} utility method, which returns an {@link IASTTranslationUnit} for an
+ * {@link ITranslationUnit}.
  * 
  * @author Beth Tibbitts
  * @author Jeff Overbey
@@ -31,7 +31,7 @@ import org.eclipse.core.runtime.IStatus;
  */
 public abstract class ArtifactAnalysisBase implements IArtifactAnalysis {
 	/**
-	 * Get AST from index, not full tu
+	 * Get AST from index, not full translation unti
 	 * 
 	 * @param tu
 	 *            translation unit from which to get the AST
@@ -42,7 +42,9 @@ public abstract class ArtifactAnalysisBase implements IArtifactAnalysis {
 			IIndex index = CCorePlugin.getIndexManager().getIndex(tu.getCProject());
 			return tu.getAST(index, ITranslationUnit.AST_SKIP_ALL_HEADERS);
 		} catch (Exception e) {
-			CommonPlugin.log(IStatus.ERROR, "ArtifactAnalysisBase.getAST(): Error getting AST (from index) for project " + tu.getCProject() + " " + e.getMessage()); //$NON-NLS-1$
+			CommonPlugin
+					.log(IStatus.ERROR,
+							"ArtifactAnalysisBase.getAST(): Error getting AST (from index) for project " + tu.getCProject() + " " + e.getMessage()); //$NON-NLS-1$
 			return null;
 		}
 	}

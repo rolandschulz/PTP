@@ -104,6 +104,9 @@ public class AnalysisDropdownHandler extends AbstractHandler implements ISelecti
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		if (traceOn)
 			System.out.println("AnalysisDropdownHandler.execute()..."); //$NON-NLS-1$
@@ -143,6 +146,12 @@ public class AnalysisDropdownHandler extends AbstractHandler implements ISelecti
 
 	}
 
+	/**
+	 * For repeat analysis (clicking on the icon in the toolbar) returns the previous selection so that it
+	 * can be reused
+	 * 
+	 * @return
+	 */
 	public static IStructuredSelection getLastAnalysisSelection() {
 		return lastAnalysisSelection;
 	}
@@ -162,7 +171,7 @@ public class AnalysisDropdownHandler extends AbstractHandler implements ISelecti
 	}
 
 	/**
-	 * The last structured selection seen
+	 * The last structured selection seen (e.g. selection of a file, folder, or project within the Project Explorer)
 	 * 
 	 * @return
 	 */

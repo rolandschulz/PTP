@@ -119,6 +119,13 @@ public class ArtifactMarkingVisitor implements IResourceDeltaVisitor, IResourceV
 
 	}
 
+	/**
+	 * Put markers on a file where list of artifacts is a List<Artifact> instead of an array
+	 *
+	 * @param resource the resource, presumably a file, in which the artifacts (e.g. MPI calls) were found
+	 * @param artifacts found in the file, with type and location (line number etc.)
+	 * @return
+	 */
 	public boolean visitFile(IResource resource, List<Artifact> artifacts)
 	{
 		Artifact[] artifactArray = new Artifact[artifacts.size()];
@@ -325,8 +332,9 @@ public class ArtifactMarkingVisitor implements IResourceDeltaVisitor, IResourceV
 		return true; // carry on
 	}
 
-	/**
-	 * Implemented for IResourceVisitor
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.resources.IResourceVisitor#visit(org.eclipse.core.resources.IResource)
 	 */
 	public boolean visit(IResource resource)
 	{

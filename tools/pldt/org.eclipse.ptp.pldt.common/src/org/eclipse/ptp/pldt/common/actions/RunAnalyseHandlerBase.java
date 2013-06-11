@@ -69,7 +69,11 @@ import org.eclipse.ui.actions.WorkspaceModifyOperation;
  */
 
 public abstract class RunAnalyseHandlerBase extends RunAnalyseHandler {
-	protected static/* final */boolean traceOn = false;
+	/**
+	 * This is NOT final because constructor may change this dynamically
+	 * if tracing is enabled by user -- see  CommonPlugin.getTraceOn();
+	 */
+	protected static  boolean traceOn = false;
 
 	/**
 	 * indent amount for each level of nesting; useful when printing debug

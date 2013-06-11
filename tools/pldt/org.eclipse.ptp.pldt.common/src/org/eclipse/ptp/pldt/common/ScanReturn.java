@@ -28,25 +28,43 @@ public class ScanReturn
 
 	private List<Artifact> artifacts = new ArrayList<Artifact>();
 
+	/**
+	 * Create a ScanReturn objct
+	 */
 	public ScanReturn()
 	{
 	}
 
+	/**
+	 * was an error found during the artifact analysis? may be overridden
+	 * @return
+	 */
 	public boolean wasError()
 	{
 		return false;
 	}
 
+	/**
+	 * Get list of artifacts found
+	 * @return list of artifacts found
+	 */
 	public List<Artifact> getArtifactList()
 	{
 		return artifacts;
 	}
 
+	/**
+	 * Add an artifact to the accumulated list
+	 * @param a
+	 */
 	public void addArtifact(Artifact a)
 	{
 		artifacts.add(a);
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	public String toString() {
 		return "ScanReturn with " + artifacts.size() + " artifacts";
 	}

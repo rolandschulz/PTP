@@ -35,6 +35,5 @@ public class ViewActivater
 		} catch (PartInitException e) {
 			e.printStackTrace();
 		}
-		// page.activate(page.findView(strViewId));
 	}
 }
