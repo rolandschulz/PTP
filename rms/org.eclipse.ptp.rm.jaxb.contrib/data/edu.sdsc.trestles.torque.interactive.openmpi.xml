@@ -47,6 +47,9 @@
 			<description>Designation of the queue to which to submit the job.</description>
 			<tooltip>Format: queue[@server].</tooltip>
 		</attribute>
+		<attribute name="modules" type="string">
+			<description>Modules that will be loaded inside the job script.</description>
+		</attribute>
 		<attribute name="Resource_List.mem" type="string">
 			<description>Maximum amount of memory used by all concurrent processes in the job.</description>
 			<tooltip><![CDATA[Format: integer[suffix]; the suffix is a multiplier 
@@ -102,7 +105,7 @@ three processors on one red node: -l nodes=2:blue:ppn=2+red:ppn=3.]]></tooltip>
 			<arg>-l nodes=${ptp_rm:Resource_List.nodes#value},mem=${ptp_rm:Resource_List.mem#value},walltime=${ptp_rm:Resource_List.walltime#value}</arg>
 			<arg isUndefinedIfMatches="-A">-A ${ptp_rm:Account_Name#value}</arg>
 			<arg>-V</arg>
-			<input isUndefinedIfMatches=";">${ptp_rm:ems#value};</input>
+			<input isUndefinedIfMatches=";">${ptp_rm:modules#value};</input>
 			<input isUndefinedIfMatches=".+ -np">${ptp_rm:mpiPrefix#value}</input>
 			<input>${ptp_rm:executablePath#value} ${ptp_rm:progArgs#value}</input>
 			<stdout-parser delim="\n">
@@ -156,7 +159,7 @@ three processors on one red node: -l nodes=2:blue:ppn=2+red:ppn=3.]]></tooltip>
 			<arg>-l nodes=${ptp_rm:Resource_List.nodes#value},mem=${ptp_rm:Resource_List.mem#value},walltime=${ptp_rm:Resource_List.walltime#value}</arg>
 			<arg isUndefinedIfMatches="-A">-A ${ptp_rm:Account_Name#value}</arg>
 			<arg>-V</arg>
-			<input isUndefinedIfMatches=";">${ptp_rm:ems#value};</input>
+			<input isUndefinedIfMatches=";">${ptp_rm:modules#value};</input>
 			<input>cd ${ptp_rm:executableDirectory#value} &amp;&amp; perl ${ptp_rm:ptpDirectory#value}/rms/OPENMPI/start_job.pl</input>
 			<input>mpirun</input>
 			<input isUndefinedIfMatches="-np">-np ${ptp_rm:mpiNumberOfProcesses#value}</input>
@@ -443,6 +446,24 @@ three processors on one red node: -l nodes=2:blue:ppn=2+red:ppn=3.]]></tooltip>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:mpiNumberOfProcesses#description}</fixed-text>
+					</widget>
+						<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:modules#tooltip}</tooltip>
+						<fixed-text>Modules to Load: </fixed-text>
+					</widget>
+					<widget type="custom" typeId="envconfig" style="SWT.NONE" attribute="modules">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:modules#description}</fixed-text>
 					</widget>
 				</composite>
 			</dynamic>

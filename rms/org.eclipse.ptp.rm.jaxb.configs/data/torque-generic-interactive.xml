@@ -28,6 +28,9 @@
 			<description>Account to which to charge this job.</description>
 			<tooltip>Format: string</tooltip>
       	</attribute>
+		<attribute name="modules" type="string">
+			<description>Modules that will be loaded inside the job script.</description>
+		</attribute>
 		<attribute name="mpiCommand" type="choice">
 			<description>Which mpi command to use.</description>
 			<choice>,mpiexec,mpirun</choice>
@@ -78,6 +81,7 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 			<arg>-l nodes=1,mem=${ptp_rm:Resource_List.mem#value},walltime=${ptp_rm:Resource_List.walltime#value}</arg>
 			<arg isUndefinedIfMatches="-A">-A ${ptp_rm:Account_Name#value}</arg>
 			<arg>-V</arg>
+			<input isUndefinedIfMatches=";">${ptp_rm:modules#value};</input>
 			<input isUndefinedIfMatches=".+ -np">${ptp_rm:mpiPrefix#value}</input>
 			<input>${ptp_rm:executablePath#value} ${ptp_rm:progArgs#value}</input>
 			<stdout-parser delim="\n">
@@ -335,6 +339,24 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>${ptp_rm:mpiNumberOfProcesses#description}</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:modules#tooltip}</tooltip>
+						<fixed-text>Modules to Load: </fixed-text>
+					</widget>
+					<widget type="custom" typeId="envconfig" style="SWT.NONE" attribute="modules">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:modules#description}</fixed-text>
 					</widget>
 				</composite>
 			</dynamic>
