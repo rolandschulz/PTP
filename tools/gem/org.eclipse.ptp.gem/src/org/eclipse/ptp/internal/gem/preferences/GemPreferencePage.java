@@ -58,10 +58,11 @@ public class GemPreferencePage extends FieldEditorPreferencePage implements IWor
 		addField(new IntegerFieldEditor(PreferenceConstants.GEM_PREF_NUMPROCS, Messages.GemPreferencePage_1, prefGroup));
 		addField(new BooleanFieldEditor(PreferenceConstants.GEM_PREF_CLRCON, Messages.GemPreferencePage_3, prefGroup));
 		addField(new BooleanFieldEditor(PreferenceConstants.GEM_PREF_REQUEST_ARGS, Messages.GemPreferencePage_10, prefGroup));
-		addField(new RadioGroupFieldEditor(PreferenceConstants.GEM_ACTIVE_VIEW, Messages.GemPreferencePage_5, 3, new String[][] {
-				{ Messages.GemPreferencePage_7, PreferenceConstants.GEM_ANALYZER },
-				{ Messages.GemPreferencePage_8, PreferenceConstants.GEM_BROWSER },
-				{ Messages.GemPreferencePage_9, PreferenceConstants.GEM_CONSOLE } }, prefGroup, false));
+		addField(new RadioGroupFieldEditor(PreferenceConstants.GEM_ACTIVE_VIEW, Messages.GemPreferencePage_5, 3,
+				new String[][] { { Messages.GemPreferencePage_7, PreferenceConstants.GEM_ANALYZER },
+						{ Messages.GemPreferencePage_8, PreferenceConstants.GEM_BROWSER },
+						{ Messages.GemPreferencePage_9, PreferenceConstants.GEM_CONSOLE }
+				}, prefGroup, false));
 
 		// Do the grid layout work for each group.
 		doLayoutAndData(prefGroup, 3, 300);

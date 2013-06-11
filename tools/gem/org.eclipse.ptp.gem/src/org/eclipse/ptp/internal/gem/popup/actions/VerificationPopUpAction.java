@@ -20,6 +20,7 @@ import java.net.URI;
 
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelection;
@@ -31,6 +32,7 @@ import org.eclipse.ptp.internal.gem.util.GemUtilities;
 import org.eclipse.ptp.internal.gem.views.GemAnalyzer;
 import org.eclipse.ptp.internal.gem.views.GemBrowser;
 import org.eclipse.ptp.internal.gem.views.GemConsole;
+import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPage;
@@ -48,6 +50,7 @@ import org.eclipse.ui.PlatformUI;
  * 
  * @see org.eclipse.ui.IObjectActionDelegate
  */
+@SuppressWarnings("restriction")
 public class VerificationPopUpAction implements IObjectActionDelegate {
 
 	private IStructuredSelection selection;
@@ -104,7 +107,8 @@ public class VerificationPopUpAction implements IObjectActionDelegate {
 					page.showView(GemConsole.ID);
 
 					// if !isValidSourceFile, then its a .gem profiled executable
-					final boolean isValidSourceFile = id.equals("org.eclipse.ptp.gem.verificationPopupC") //$NON-NLS-1$
+					final boolean isValidSourceFile = id
+							.equals("org.eclipse.ptp.gem.verificationPopupC") //$NON-NLS-1$
 							|| id.equals("org.eclipse.ptp.gem.verificationPopupCpp") //$NON-NLS-1$
 							|| id.equals("org.eclipse.ptp.gem.verificationPopupC++") //$NON-NLS-1$
 							|| id.equals("org.eclipse.ptp.gem.verificationPopupCp") //$NON-NLS-1$
@@ -112,8 +116,17 @@ public class VerificationPopUpAction implements IObjectActionDelegate {
 
 					// Save the URI of the most recent project resource
 					// if (isValidSourceFile) {
-					URI resourceLocation = GemUtilities.getRemoteLocationURI(resource);
-
+					final boolean isSync = GemUtilities.isSynchronizedProject(resource);
+					URI resourceLocation = null;
+					try {
+						if (isSync) {
+							resourceLocation = SyncConfigManager.getActiveSyncLocationURI(resource);
+						} else {
+							resourceLocation = resource.getLocationURI();
+						}
+					} catch (final CoreException e) {
+						GemUtilities.logExceptionDetail(e);
+					}
 					GemUtilities.saveMostRecentURI(resourceLocation);
 
 					GemUtilities.initGemViews(resource, isValidSourceFile, true);

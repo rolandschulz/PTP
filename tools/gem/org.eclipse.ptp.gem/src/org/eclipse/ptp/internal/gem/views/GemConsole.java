@@ -50,7 +50,7 @@ import org.eclipse.ui.part.ViewPart;
 public class GemConsole extends ViewPart {
 
 	// The ID for this view
-	public static final String ID = ".gem.views.GemConsole"; //$NON-NLS-1$
+	public static final String ID = "org.eclipse.ptp.gem.views.GemConsole"; //$NON-NLS-1$
 
 	private Action clearConsoleAction;
 	private Action writeToLocalFileAction;
@@ -254,7 +254,7 @@ public class GemConsole extends ViewPart {
 		this.getHelpAction = new Action() {
 			@Override
 			public void run() {
-				PlatformUI.getWorkbench().getHelpSystem().displayHelpResource("/.gem.help/html/consoleView.html"); //$NON-NLS-1$
+				PlatformUI.getWorkbench().getHelpSystem().displayHelpResource("/org.eclipse.ptp.gem.help/html/consoleView.html"); //$NON-NLS-1$
 			}
 		};
 		this.getHelpAction.setToolTipText(Messages.GemConsole_10);

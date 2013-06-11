@@ -55,11 +55,15 @@ import org.eclipse.ptp.internal.gem.preferences.PreferenceConstants;
 import org.eclipse.ptp.internal.gem.views.GemAnalyzer;
 import org.eclipse.ptp.internal.gem.views.GemBrowser;
 import org.eclipse.ptp.internal.gem.views.GemConsole;
+import org.eclipse.ptp.rdt.core.resources.RemoteMakeNature;
+import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
+import org.eclipse.ptp.rdt.sync.core.SyncFlag;
+import org.eclipse.ptp.rdt.sync.core.SyncManager;
+import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
-import org.eclipse.ptp.remote.core.IRemoteResource;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.RemoteServices;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
@@ -71,9 +75,13 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
+@SuppressWarnings("restriction")
 public class GemUtilities {
+
 	public static enum TaskStatus {
-		IDLE, ACTIVE, ABORTED;
+		IDLE,
+		ACTIVE,
+		ABORTED;
 	}
 
 	private static Process process;
@@ -88,8 +96,6 @@ public class GemUtilities {
 	private static String consoleStdErrMessage;
 	private static IFile gemActiveResource;
 	private static IFile gemLogFile;
-
-	private static final String SYNC_NATURE_ID = "org.eclipse.ptp.rdt.sync.core.remoteSyncNature"; //$NON-NLS-1$
 
 	// This thread exists to update SWT components belonging to the UI thread.
 	private final static Thread updateGemConsoleThread = new Thread() {
@@ -201,7 +207,7 @@ public class GemUtilities {
 
 		// Get all the current preferences
 		final IPreferenceStore pstore = GemPlugin.getDefault().getPreferenceStore();
-		final boolean isRemote = isRemoteProject(resource);
+		final boolean isRemote = (isRemoteProject(resource) || (isSynchronizedProject(resource) && isRemoteBuildConfiguration()));
 
 		// Create GEM directory to hold the generated log file and executable
 		final IProject currentProject = resource.getProject();
@@ -214,9 +220,19 @@ public class GemUtilities {
 		String resourceLocation = null;
 		String logFileLocation = null;
 		if (resource.getFileExtension().equals("gem")) { //$NON-NLS-1$
-			resourceLocation = GemUtilities.getRemoteLocationURI(resource).getPath();
-			logFileLocation = GemUtilities.getRemoteLocationURI(gemFolder).getPath();
-			executablePath = new Path(resourceLocation);
+			if (isSynchronizedProject(resource)) {
+				try {
+					resourceLocation = SyncConfigManager.getActiveSyncLocationURI(resource).getPath();
+					logFileLocation = SyncConfigManager.getActiveSyncLocationURI(gemFolder).getPath();
+				} catch (final CoreException e) {
+					logExceptionDetail(e);
+				}
+				executablePath = new Path(resourceLocation);
+			} else {
+				resourceLocation = resource.getLocationURI().getPath();
+				executablePath = new Path(resourceLocation);
+				logFileLocation = gemFolder.getLocationURI().getPath();
+			}
 		} else {
 			logFileLocation = gemFolder.getLocationURI().getPath();
 			executablePath = new Path(gemFolder.getLocationURI().getPath());
@@ -314,7 +330,7 @@ public class GemUtilities {
 		// Create GEM folder to hold the generated log file and executable
 		final IProject currentProject = resource.getProject();
 		final IFolder gemFolder = currentProject.getFolder(new Path("gem")); //$NON-NLS-1$
-		final boolean isRemote = isRemoteProject(resource);
+		final boolean isRemote = (isRemoteProject(resource) || (isSynchronizedProject(resource) && isRemoteBuildConfiguration()));
 		if (!gemFolder.exists()) {
 			createGemFolder(isRemote, gemFolder);
 			refreshProject(currentProject);
@@ -346,9 +362,7 @@ public class GemUtilities {
 			final String ispccStr = stringBuffer.toString();
 			exitValue = runCommand(ispccStr, true);
 		} else { // Deal with C++ compile
-			final String ispCppPath = GemPlugin
-					.getDefault()
-					.getPreferenceStore()
+			final String ispCppPath = GemPlugin.getDefault().getPreferenceStore()
 					.getString(
 							(isRemoteProject(resource) ? PreferenceConstants.GEM_PREF_REMOTE_ISPCPP_PATH
 									: PreferenceConstants.GEM_PREF_ISPCPP_PATH));
@@ -421,7 +435,7 @@ public class GemUtilities {
 	 */
 	public static String getIspVersion() {
 		// Get the location of ISP
-		final boolean useRemoteISP = isRemoteProject(gemActiveResource);
+		final boolean useRemoteISP = (isRemoteProject(gemActiveResource) || (isSynchronizedProject(gemActiveResource) && isRemoteBuildConfiguration()));
 		String ispExePath = GemPlugin
 				.getDefault()
 				.getPreferenceStore()
@@ -469,7 +483,7 @@ public class GemUtilities {
 		final IPath gemFolderPath = new Path("gem"); //$NON-NLS-1$
 		final IFolder gemFolder = currentProject.getFolder(gemFolderPath);
 
-		final boolean isRemote = isRemoteProject(resource);
+		final boolean isRemote = (isRemoteProject(resource) || (isSynchronizedProject(resource) && isRemoteBuildConfiguration()));
 		if (!gemFolder.exists()) {
 			createGemFolder(isRemote, gemFolder);
 			refreshProject(currentProject);
@@ -548,11 +562,11 @@ public class GemUtilities {
 	public static IRemoteFileManager getRemoteFileManager(IFile projectResource) {
 		final URI projectURI = projectResource.getProject().getLocationURI();
 		final IRemoteServices services = RemoteServices.getRemoteServices(projectURI);
-		if (services != null) {
-			final IRemoteConnection connection = services.getConnectionManager().getConnection(projectURI);
-			return services.getFileManager(connection);
-		}
-		return null;
+		services.initialize(null);
+		final IRemoteConnection connection = services.getConnectionManager().getConnection(projectURI);
+		final IRemoteFileManager manager = services.getFileManager(connection);
+
+		return manager;
 	}
 
 	/**
@@ -568,9 +582,19 @@ public class GemUtilities {
 	 *         with the connection used by the specified remote project.
 	 */
 	public static IRemoteProcessBuilder getRemoteProcessBuilder(IProject currentProject, String[] args) {
-		URI projectURI = GemUtilities.getRemoteLocationURI(currentProject);
+		URI projectURI = null;
+		if (isSynchronizedProject(gemActiveResource)) {
+			try {
+				projectURI = SyncConfigManager.getActiveSyncLocationURI(currentProject);
+			} catch (final CoreException e) {
+				logExceptionDetail(e);
+			}
+		} else {
+			projectURI = currentProject.getLocationURI();
+		}
 
-		final IRemoteServices services = RemoteServices.getRemoteServices(projectURI); // FIXME: This can return null!
+		final IRemoteServices services = RemoteServices.getRemoteServices(projectURI);
+		services.initialize(null);
 		final IRemoteConnection connection = getRemoteConnection(services, projectURI);
 		final IRemoteProcessBuilder rpb = services.getProcessBuilder(connection, args);
 
@@ -593,7 +617,7 @@ public class GemUtilities {
 		final IProject currentProject = resource.getProject();
 
 		// if (true) {
-		if (!isRemoteProject(resource)) {
+		if (!isSynchronizedProject(currentProject) && !isRemoteProject(resource)) {
 			final String currentProjectPath = currentProject.getLocationURI().getPath();
 			IPath sourceFilePath = new Path(fullPath);
 			sourceFilePath = sourceFilePath.makeRelativeTo(new Path(currentProjectPath));
@@ -810,7 +834,8 @@ public class GemUtilities {
 						analyzer.activate();
 					} else if (activeView.equals(PreferenceConstants.GEM_BROWSER)) {
 						browser.activate();
-					} else {
+					}
+					else {
 						console.activate();
 					}
 				}
@@ -867,38 +892,57 @@ public class GemUtilities {
 		return gemActiveResource != null;
 	}
 
-	/**
-	 * Returns whether or not the current project being verified by GEM is
-	 * remote or builds remotely. Uses the specified resource.
-	 * 
-	 * @param resource
-	 *            The IResource object to check.
-	 * @return boolean True if the current project being verified by GEM is
-	 *         remote or builds remotely, false otherwise.
-	 */
-	public static boolean isRemoteProject(IResource resource) {
-		IProject project = resource.getProject();
-		IRemoteResource remProject = (IRemoteResource) project.getAdapter(IRemoteResource.class);
-		if (remProject != null) {
-			try {
-				if (project.hasNature(SYNC_NATURE_ID)) {
-					// Check that build location is remote also
-					return !remProject.getActiveLocationURI().equals(project.getLocationURI());
-				}
-				return true;
-			} catch (CoreException e) {
-				GemUtilities.logExceptionDetail(e);
-			}
+	//
+	private static boolean isRemoteBuildConfiguration() {
+
+		final IProject project = getCurrentProject(gemActiveResource);
+		URI buildLocation = null;
+		try {
+			buildLocation = SyncConfigManager.getActiveSyncLocationURI(project);
+		} catch (final CoreException e) {
+			GemUtilities.logExceptionDetail(e);
 		}
-		return false;
+		final URI projectLocation = project.getLocationURI();
+
+		return !buildLocation.equals(projectLocation);
 	}
 
-	public static URI getRemoteLocationURI(IResource resource) {
-		IRemoteResource rem = (IRemoteResource) resource.getAdapter(IRemoteResource.class);
-		if (rem != null) {
-			return rem.getActiveLocationURI();
+	/**
+	 * Returns whether or not the current project being verified by GEM is
+	 * remote. Uses the specified resource.
+	 * 
+	 * @param resource
+	 *            The IResource object for which to check the NATURE_ID.
+	 * @return boolean True if the current project being verified by GEM is
+	 *         remote, false otherwise.
+	 */
+	public static boolean isRemoteProject(IResource resource) {
+		boolean isRemote = false;
+		try {
+			isRemote = getCurrentProject().hasNature(RemoteMakeNature.NATURE_ID);
+		} catch (final CoreException e) {
+			GemUtilities.logExceptionDetail(e);
 		}
-		return resource.getLocationURI();
+		return isRemote;
+	}
+
+	/**
+	 * Returns whether or not the current project being verified by GEM is
+	 * synchronized. Uses the specified resource.
+	 * 
+	 * @param resource
+	 *            The current project member resource for which to get the enclosing project to check the NATURE_ID.
+	 * @return boolean True if the current project being verified by GEM is
+	 *         synchronized, false otherwise.
+	 */
+	public static boolean isSynchronizedProject(IResource resource) {
+		boolean isSync = false;
+		try {
+			isSync = getCurrentProject(resource).hasNature(RemoteSyncNature.NATURE_ID);
+		} catch (final CoreException e) {
+			GemUtilities.logExceptionDetail(e);
+		}
+		return isSync;
 	}
 
 	/*
@@ -911,7 +955,8 @@ public class GemUtilities {
 		final String processName = pstore.getString(PreferenceConstants.GEM_PREF_PROCESS_NAME);
 		final String command = "pkill " + processName; //$NON-NLS-1$
 		final IProject currentProject = getCurrentProject(gemActiveResource);
-		final boolean isRemote = isRemoteProject(gemActiveResource);
+		final boolean isRemote = isRemoteProject(gemActiveResource)
+				|| (isSynchronizedProject(gemActiveResource) && isRemoteBuildConfiguration());
 
 		if (isRemote) {
 			final String[] args = command.split(" ", -1); //$NON-NLS-1$
@@ -962,7 +1007,7 @@ public class GemUtilities {
 
 	/**
 	 * Logs the specified error using the Eclipse error logging mechanism. Log
-	 * entries are placed in the org.eclipse.ptp.internal.gem log file and will show up
+	 * entries are placed in the org.eclipse.ptp.gem log file and will show up
 	 * in the Eclipse Error Log View.
 	 * 
 	 * @param message
@@ -1038,7 +1083,8 @@ public class GemUtilities {
 
 		// Find out if the current project is local or remote
 		final IProject currentProject = getCurrentProject(gemActiveResource);
-		final boolean isRemote = isRemoteProject(gemActiveResource);
+		final boolean isRemote = isRemoteProject(gemActiveResource)
+				|| (isSynchronizedProject(gemActiveResource) && isRemoteBuildConfiguration());
 
 		try {
 			final IPreferenceStore pstore = GemPlugin.getDefault().getPreferenceStore();
@@ -1057,10 +1103,10 @@ public class GemUtilities {
 				process = Runtime.getRuntime().exec(command);
 			}
 
-			final BufferedReader stdOutReader = new BufferedReader(new InputStreamReader(isRemote ? remoteProcess.getInputStream()
-					: process.getInputStream()));
-			final BufferedReader stdErrReader = new BufferedReader(new InputStreamReader(isRemote ? remoteProcess.getErrorStream()
-					: process.getErrorStream()));
+			final BufferedReader stdOutReader = new BufferedReader(new InputStreamReader(
+					isRemote ? remoteProcess.getInputStream() : process.getInputStream()));
+			final BufferedReader stdErrReader = new BufferedReader(new InputStreamReader(
+					isRemote ? remoteProcess.getErrorStream() : process.getErrorStream()));
 			consoleStdOutMessage = ""; //$NON-NLS-1$
 			consoleStdErrMessage = ""; //$NON-NLS-1$
 
@@ -1300,13 +1346,10 @@ public class GemUtilities {
 	private static void sync() {
 		final IProgressMonitor monitor = new NullProgressMonitor();
 		final IProject project = getCurrentProject(gemActiveResource);
-		IRemoteResource remProject = (IRemoteResource) project.getAdapter(IRemoteResource.class);
-		if (remProject != null) {
-			try {
-				remProject.refresh(monitor);
-			} catch (CoreException e) {
-				logExceptionDetail(e);
-			}
+		try {
+			SyncManager.syncBlocking(null, project, SyncFlag.FORCE, monitor);
+		} catch (final CoreException e) {
+			logExceptionDetail(e);
 		}
 	}
 

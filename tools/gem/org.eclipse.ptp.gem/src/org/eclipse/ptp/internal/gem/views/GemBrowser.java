@@ -927,8 +927,9 @@ public class GemBrowser extends ViewPart {
 	 */
 	private void openEditor(int lineNumber, IFile sourceFile) {
 		try {
-			final IEditorPart editor = org.eclipse.ui.ide.IDE.openEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-					.getActivePage(), sourceFile, true);
+			final IEditorPart editor = org.eclipse.ui.ide.IDE.openEditor(PlatformUI
+					.getWorkbench().getActiveWorkbenchWindow().getActivePage(),
+					sourceFile, true);
 			final IMarker marker = sourceFile.createMarker(IMarker.MARKER);
 			marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
 			org.eclipse.ui.ide.IDE.gotoMarker(editor, marker);

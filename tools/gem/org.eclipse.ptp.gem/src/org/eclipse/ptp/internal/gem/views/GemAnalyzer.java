@@ -529,12 +529,13 @@ public class GemAnalyzer extends ViewPart {
 			}
 		});
 
-		this.previousTransitionButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				updatePreviousTransition();
-			}
-		});
+		this.previousTransitionButton
+				.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						updatePreviousTransition();
+					}
+				});
 
 		this.nextTransitionButton.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -577,82 +578,89 @@ public class GemAnalyzer extends ViewPart {
 		});
 
 		// SelectionListeners for interleavings group buttons
-		this.firstInterleavingButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				if (GemAnalyzer.this.transitions.hasPreviousInterleaving()) {
-					while (GemAnalyzer.this.transitions.setPreviousInterleaving()) {
-						// do nothing
-					}
-					updateTransitionLabels(true);
-				} else {
-					GemUtilities.showInformationDialog(Messages.GemAnalyzer_19);
-				}
-			}
-		});
-
-		this.previousInterleavingButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				if (GemAnalyzer.this.transitions.hasPreviousInterleaving()) {
-					GemAnalyzer.this.transitions.setPreviousInterleaving();
-					updateTransitionLabels(true);
-				} else {
-					GemUtilities.showInformationDialog(Messages.GemAnalyzer_20);
-				}
-			}
-		});
-
-		this.nextInterleavingButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				if (GemAnalyzer.this.transitions.hasNextInterleaving()) {
-					GemAnalyzer.this.transitions.setNextInterleaving();
-					updateTransitionLabels(true);
-				} else {
-					GemUtilities.showInformationDialog(Messages.GemAnalyzer_21);
-				}
-			}
-		});
-
-		this.lastInterleavingButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				while (GemAnalyzer.this.transitions.hasNextInterleaving()) {
-					GemAnalyzer.this.transitions.setNextInterleaving();
-				}
-				updateTransitionLabels(true);
-			}
-		});
-
-		this.deadlockInterleavingButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				GemAnalyzer.this.transitions.deadlockInterleaving();
-				updateTransitionLabels(true);
-			}
-		});
-
-		// Selection listeners for step order group
-		this.internalIssueOrderButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				if (GemAnalyzer.this.internalIssueOrderButton.getSelection()) {
-					if (GemAnalyzer.this.transitions != null) {
-						final ArrayList<ArrayList<Envelope>> tlists = GemAnalyzer.this.transitions.getTransitionList();
-						// Sort by internal issue order
-						final int size = tlists.size();
-						for (int i = 0; i < size; i++) {
-							Collections.sort(tlists.get(i), new InternalIssueOrderSorter());
+		this.firstInterleavingButton
+				.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						if (GemAnalyzer.this.transitions.hasPreviousInterleaving()) {
+							while (GemAnalyzer.this.transitions.setPreviousInterleaving()) {
+								// do nothing
+							}
+							updateTransitionLabels(true);
+						} else {
+							GemUtilities.showInformationDialog(Messages.GemAnalyzer_19);
 						}
 					}
+				});
 
-					// Reset preference store value for this preference
-					GemPlugin.getDefault().getPreferenceStore().setValue(PreferenceConstants.GEM_PREF_STEP_ORDER, "issueOrder"); //$NON-NLS-1$
-					reset();
-				}
-			}
-		});
+		this.previousInterleavingButton
+				.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						if (GemAnalyzer.this.transitions.hasPreviousInterleaving()) {
+							GemAnalyzer.this.transitions.setPreviousInterleaving();
+							updateTransitionLabels(true);
+						} else {
+							GemUtilities.showInformationDialog(Messages.GemAnalyzer_20);
+						}
+					}
+				});
+
+		this.nextInterleavingButton
+				.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						if (GemAnalyzer.this.transitions.hasNextInterleaving()) {
+							GemAnalyzer.this.transitions.setNextInterleaving();
+							updateTransitionLabels(true);
+						} else {
+							GemUtilities.showInformationDialog(Messages.GemAnalyzer_21);
+						}
+					}
+				});
+
+		this.lastInterleavingButton
+				.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						while (GemAnalyzer.this.transitions.hasNextInterleaving()) {
+							GemAnalyzer.this.transitions.setNextInterleaving();
+						}
+						updateTransitionLabels(true);
+					}
+				});
+
+		this.deadlockInterleavingButton
+				.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						GemAnalyzer.this.transitions.deadlockInterleaving();
+						updateTransitionLabels(true);
+					}
+				});
+
+		// Selection listeners for step order group
+		this.internalIssueOrderButton
+				.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						if (GemAnalyzer.this.internalIssueOrderButton.getSelection()) {
+							if (GemAnalyzer.this.transitions != null) {
+								final ArrayList<ArrayList<Envelope>> tlists = GemAnalyzer.this.transitions.getTransitionList();
+								// Sort by internal issue order
+								final int size = tlists.size();
+								for (int i = 0; i < size; i++) {
+									Collections.sort(tlists.get(i), new InternalIssueOrderSorter());
+								}
+							}
+
+							// Reset preference store value for this preference
+							GemPlugin.getDefault().getPreferenceStore()
+									.setValue(PreferenceConstants.GEM_PREF_STEP_ORDER, "issueOrder"); //$NON-NLS-1$
+							reset();
+						}
+					}
+				});
 
 		this.programOrderButton.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -668,7 +676,8 @@ public class GemAnalyzer extends ViewPart {
 					}
 
 					// Reset preference store value for this preference
-					GemPlugin.getDefault().getPreferenceStore().setValue(PreferenceConstants.GEM_PREF_STEP_ORDER, "programOrder"); //$NON-NLS-1$
+					GemPlugin.getDefault().getPreferenceStore()
+							.setValue(PreferenceConstants.GEM_PREF_STEP_ORDER, "programOrder"); //$NON-NLS-1$
 					reset();
 				}
 			}
@@ -777,7 +786,8 @@ public class GemAnalyzer extends ViewPart {
 				}
 
 				if (sourceFile != null) {
-					if (GemUtilities.isRemoteProject(GemAnalyzer.this.activeFile)) {
+					if (GemUtilities.isRemoteProject(GemAnalyzer.this.activeFile)
+							|| GemUtilities.isSynchronizedProject(GemAnalyzer.this.activeFile)) {
 						// GemUtilities.showInformationDialog(Messages.GemAnalyzer_23);
 						return;
 					}
@@ -1054,8 +1064,9 @@ public class GemAnalyzer extends ViewPart {
 
 				// Add the match to the right code view window
 				this.rightViewer.add(new ListElement(sourceFile, sourceFile.getName() + Messages.GemAnalyzer_40
-						+ currentMatchEnvelope.getLinenumber() + Messages.GemAnalyzer_41 + currentMatchEnvelope.getRank(),
-						currentMatchEnvelope.getLinenumber(), false));
+						+ currentMatchEnvelope.getLinenumber()
+						+ Messages.GemAnalyzer_41
+						+ currentMatchEnvelope.getRank(), currentMatchEnvelope.getLinenumber(), false));
 			}
 		}
 	}
