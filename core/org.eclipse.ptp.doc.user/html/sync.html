@@ -6,8 +6,6 @@
 </head> 
 <body>
 <h1 id="top">Synchronized Projects</h1>
-<!-- FIXME this isn't complete - partially updated for Kepler.  
-build config / sync config info is in build.html, perhaps some of this can be removed? -->
 <p>
 <ul>
 <li><a href="#prereq">Requirements for Synchronized Projects</a>
@@ -224,19 +222,7 @@ Select a connection (or <a href="remoteTools.html#create"></a>create a new conne
 <p>Select <b>Next></b> and in the next dialog, select the default Build Configurations for each Sync Configuration (only for C, C++, or Fortran projects).
 <p><img src="images/sync-conversionWizard2.png"><p>
 <p>Select <b>Finish</b> and the project is synchronized (copied) to the remote system specified by the connection.
-<!-- 
-The selected configurations are duplicated to create a local version and a remote version. 
-Unselected configurations remain as local configurations only. 
-After creating the project, you may want to change the toolchain for the remote configurations. 
-You can do this from <b>Project > Properties > C/C++ Build > Tool Chain Editor</b>. 
-<b>After selecting a toolchain, you must change the current builder back to the "Sync Builder" in order for builds to occur remotely.</b>
- -->
- 
-<!--  
-<p>Note that in order to have a project appear in the list of projects to convert to synchronized, the project must already be a C/C++ or Fortran project.
--->
 
-<!-- FIXME not changed after this. merge conflicts ok? -->
 <h2 id="merge-conflict">Resolving merge conflicts</h2>
 <p>
 A "merge conflict" can occur, in general, when merging two different versions of a file into a single version. There may be disagreement, for various reasons, on what the final version should be. For synchronized projects, merge conflicts do not occur during normal use, because the underlying system knows that local file changes are updates to older remote versions, or vice versa. Merge conflicts may occur, however, if files are changed both locally and remotely without an intervening sync, because the next sync may not know how to merge the two versions. (It is a good idea to sync after making remote changes before resuming work in Eclipse.) When a conflict is detected, the following dialog appears:
@@ -269,7 +255,7 @@ In addition, the build process may produce markers for compiler errors in the <b
 Codan uses an icon that resembles a bug, which distinguishes it from the more traditional icons used by the build system. (Due to the complexity of analyzing C++, it frequently occurs that programs will compile while still showing Codan markings. This can be due to problems in discovery, indexing, or code analysis.)
 <p>
 <h3>Setup</h3>
-<p>Note: this may be superceded by
+<p>Note: also related:
 <a href="includes.html">Include files for Synchronized Projects</a>
 <p>
 By default, a synchronized project uses the normal CDT discovery mechanism, which reads the local environment. To configure the new discovery elements, follow these instructions after creating a new synchronized project.
