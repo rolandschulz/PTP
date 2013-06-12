@@ -25,9 +25,12 @@
 		<topic label="org.eclipse.ptp.etfw.feedback" href="reference/api/org/eclipse/ptp/etfw/feedback/package-summary.html" />
 		<topic label="org.eclipse.ptp.etfw.toolopts" href="reference/api/org/eclipse/ptp/etfw/toolopts/package-summary.html" />
 		<topic label="org.eclipse.ptp.etfw.ui" href="reference/api/org/eclipse/ptp/etfw/ui/package-summary.html" />
-		<topic label="org.eclipse.ptp.launch" href="reference/api/org/eclipse/ptp/launch/package-summary.html" />
-		<topic label="org.eclipse.ptp.launch.ui" href="reference/api/org/eclipse/ptp/launch/ui/package-summary.html" />
-		<topic label="org.eclipse.ptp.launch.ui.tabs" href="reference/api/org/eclipse/ptp/launch/ui/tabs/package-summary.html" />
+		<topic label="org.eclipse.ptp.pldt.common" href="reference/api/org/eclipse/ptp/pldt/common/package-summary.html" />
+		<topic label="org.eclipse.ptp.pldt.common.actions" href="reference/api/org/eclipse/ptp/pldt/common/actions/package-summary.html" />
+		<topic label="org.eclipse.ptp.pldt.common.analysis" href="reference/api/org/eclipse/ptp/pldt/common/analysis/package-summary.html" />
+		<topic label="org.eclipse.ptp.pldt.common.editorHelp" href="reference/api/org/eclipse/ptp/pldt/common/editorHelp/package-summary.html" />
+		<topic label="org.eclipse.ptp.pldt.common.util" href="reference/api/org/eclipse/ptp/pldt/common/util/package-summary.html" />
+		<topic label="org.eclipse.ptp.pldt.common.viewa" href="reference/api/org/eclipse/ptp/pldt/common/views/package-summary.html" />
 		<topic label="org.eclipse.ptp.remote.core" href="reference/api/org/eclipse/ptp/remote/core/package-summary.html" />
 		<topic label="org.eclipse.ptp.remote.core.exception" href="reference/api/org/eclipse/ptp/remote/core/exception/package-summary.html" />
 		<topic label="org.eclipse.ptp.remote.ui" href="reference/api/org/eclipse/ptp/remote/ui/package-summary.html" />
