@@ -24,5 +24,5 @@ public interface IPDIEventRequestListener {
 	 * @param request
 	 *            - the event request
 	 */
-	void handleEventRequestChanged(IPDIEventRequest request);
+	public void handleEventRequestChanged(IPDIEventRequest request);
 }

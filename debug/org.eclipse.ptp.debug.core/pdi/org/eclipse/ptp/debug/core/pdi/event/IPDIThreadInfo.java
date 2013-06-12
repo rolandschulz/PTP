@@ -22,20 +22,23 @@ import org.eclipse.ptp.debug.core.pdi.IPDISessionObject;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIThread;
 
 /**
- * Represensts thread destroy info
+ * Represents thread destroy info
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIThreadInfo extends IPDISessionObject {
 	/**
 	 * Returns destroyed thread id
+	 * 
 	 * @return destroyed thread id
 	 */
-	int getThreadID();
-	
+	public int getThreadID();
+
 	/**
 	 * Returns destroyed thread
+	 * 
 	 * @return destroyed thread
 	 */
-	IPDIThread getThread();
+	public IPDIThread getThread();
 }

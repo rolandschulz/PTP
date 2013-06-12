@@ -20,9 +20,10 @@ package org.eclipse.ptp.debug.core.pdi.request;
 
 /**
  * Represents to request terminating
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDITerminateRequest extends IPDIEventRequest {
-
+	// Empty
 }

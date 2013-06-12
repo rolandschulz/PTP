@@ -22,14 +22,17 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
 
 /**
  * Represents local variable descriptor
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDILocalVariableDescriptor extends IPDIVariableDescriptor {
 	/**
 	 * Returns stackframe of this variable
+	 * 
 	 * @return stackframe of this variable
-	 * @throws PDIException on failure
+	 * @throws PDIException
+	 *             on failure
 	 */
-	IPDIStackFrame getStackFrame() throws PDIException;
+	public IPDIStackFrame getStackFrame() throws PDIException;
 }

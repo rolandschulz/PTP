@@ -20,7 +20,10 @@ package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
  * Represents string value in IAIFValue
+ * 
  * @author clement
- *
+ * 
  */
-public interface IAIFValueString extends IAIFValue {}
+public interface IAIFValueString extends IAIFValue {
+	// Empty
+}

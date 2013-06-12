@@ -23,8 +23,10 @@ import java.math.BigInteger;
 import org.eclipse.debug.core.DebugException;
 
 /**
+ * Provides the ability to resume a debug target at the given address
+ * 
  * @author clement
- *
+ * 
  */
 public interface IJumpToAddress {
 	/**
@@ -37,7 +39,8 @@ public interface IJumpToAddress {
 	/**
 	 * Causes this element to resume the execution at the specified address.
 	 * 
-	 * @exception DebugException on failure. Reasons include:
+	 * @exception DebugException
+	 *                on failure. Reasons include:
 	 */
 	public void jumpToAddress(BigInteger address) throws DebugException;
 }

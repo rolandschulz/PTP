@@ -21,21 +21,29 @@ package org.eclipse.ptp.debug.core.model;
 import org.eclipse.debug.core.DebugException;
 
 /**
+ * Interface for obtaining variable formatting information
+ * 
  * @author Clement chu
  * 
  */
 public interface IFormatSupport {
 	/**
+	 * Is formatting supported
+	 * 
 	 * @return
 	 */
 	public boolean supportsFormatting();
 
 	/**
+	 * Get the format
+	 * 
 	 * @return
 	 */
 	public PVariableFormat getFormat();
 
 	/**
+	 * Change the format
+	 * 
 	 * @param format
 	 * @throws DebugException
 	 */

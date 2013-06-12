@@ -20,9 +20,10 @@ package org.eclipse.ptp.debug.core.pdi.model;
 
 /**
  * Represents global variable
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIGlobalVariable extends IPDIVariable, IPDIGlobalVariableDescriptor {
-
+	// Empty
 }

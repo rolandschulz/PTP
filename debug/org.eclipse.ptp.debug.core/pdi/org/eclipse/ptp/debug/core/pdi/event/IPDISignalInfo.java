@@ -24,31 +24,36 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDISignal;
 
 /**
  * Represents signal info
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDISignalInfo extends IPDISessionObject {
 	/**
 	 * Returns signal name
+	 * 
 	 * @return signal name
 	 */
-	String getName();
-	
+	public String getName();
+
 	/**
 	 * Returns signal
+	 * 
 	 * @return signal - can be null
 	 */
-	IPDISignal getSignal();
-	
+	public IPDISignal getSignal();
+
 	/**
 	 * Returns signal description
+	 * 
 	 * @return String signal description
 	 */
-	String getDescription();
-	
+	public String getDescription();
+
 	/**
 	 * Returns the location of this signal
+	 * 
 	 * @return location of this signal - can be null
 	 */
-	IPDILocator getLocator();
+	public IPDILocator getLocator();
 }

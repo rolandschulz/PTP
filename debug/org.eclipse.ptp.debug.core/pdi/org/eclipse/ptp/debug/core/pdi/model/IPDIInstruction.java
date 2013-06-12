@@ -24,43 +24,50 @@ import org.eclipse.ptp.debug.core.pdi.IPDISessionObject;
 
 /**
  * Represents a machine instruction.
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIInstruction extends IPDISessionObject {
 	/**
 	 * Returns the Address.
+	 * 
 	 * @return the address.
 	 */
-	BigInteger getAdress();
-	
+	public BigInteger getAdress();
+
 	/**
 	 * Returns the function name
+	 * 
 	 * @return the function name.
 	 */
-	String getFuntionName();
-	
+	public String getFuntionName();
+
 	/**
 	 * Returns the instruction
+	 * 
 	 * @return the instruction.
 	 */
-	String getInstruction();
-  
+	public String getInstruction();
+
 	/**
 	 * Returns the opcode
+	 * 
 	 * @return the opcode
 	 */
-	String getOpcode();
+	public String getOpcode();
 
 	/**
 	 * Returns any arguments to the argument
+	 * 
 	 * @return any arguments to the argument
 	 */
-	String getArgs();
+	public String getArgs();
 
 	/**
 	 * Returns the instruction's offset.
+	 * 
 	 * @return the offset of this machine instruction
 	 */
-	long getOffset();
+	public long getOffset();
 }

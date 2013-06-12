@@ -24,43 +24,55 @@ import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
 /**
  * A register is special kind of variable that is contained in a register group.
  * Each register has a name and a AIF value
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIRegister extends IPDIVariable, IPDIRegisterDescriptor {
 	/**
 	 * Returns whether the value of this variable could be changed
+	 * 
 	 * @return true if the value of this variable could be changed
-	 * @throws PDIException on failure
+	 * @throws PDIException
+	 *             on failure
 	 */
-	boolean isEditable() throws PDIException;
-	
+	public boolean isEditable() throws PDIException;
+
 	/**
 	 * Returns AIF value of this variable
-	 * @param context StackFrame
-	 * @return AIF value of this variable 
-	 * @throws PDIException on failure
+	 * 
+	 * @param context
+	 *            StackFrame
+	 * @return AIF value of this variable
+	 * @throws PDIException
+	 *             on failure
 	 */
-	IAIF getAIF(IPDIStackFrame context) throws PDIException;
-	
+	public IAIF getAIF(IPDIStackFrame context) throws PDIException;
+
 	/**
 	 * Sets value of this variable by given expression
-	 * @param expression an expression to generate a new AIF value
-	 * @throws PDIException on failure
+	 * 
+	 * @param expression
+	 *            an expression to generate a new AIF value
+	 * @throws PDIException
+	 *             on failure
 	 */
-	void setValue(String expression) throws PDIException;
+	public void setValue(String expression) throws PDIException;
 
 	/**
 	 * Remove the variable from the manager list
-	 * @throws PDIException on failure
+	 * 
+	 * @throws PDIException
+	 *             on failure
 	 */
-	void dispose() throws PDIException;
-	
+	public void dispose() throws PDIException;
+
 	/**
 	 * Determines whether both variables are the same
-	 * @param variable IPDIVariable for comparing
+	 * 
+	 * @param variable
+	 *            IPDIVariable for comparing
 	 * @return true if given variable is same as the current variable
 	 */
-	boolean equals(IPDIVariable variable);
+	public boolean equals(IPDIVariable variable);
 }
-

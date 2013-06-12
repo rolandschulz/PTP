@@ -25,37 +25,44 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
 
 /**
  * Represents a shared library which has been loaded into the debug target.
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDISharedLibrary extends IPDISessionObject {
 	/**
 	 * Returns the name of shared library file
+	 * 
 	 * @return the name of shared library file
 	 */
-	String getFileName();
-	
+	public String getFileName();
+
 	/**
 	 * Returns the start address of this library
+	 * 
 	 * @return the start address of this library
 	 */
-	BigInteger getStartAddress();
+	public BigInteger getStartAddress();
 
 	/**
 	 * Returns the end address of this library
+	 * 
 	 * @return the end address of this library
 	 */
-	BigInteger getEndAddress();
+	public BigInteger getEndAddress();
 
 	/**
 	 * Returns whether the symbols of this library are read
+	 * 
 	 * @return whether the symbols of this library are read
 	 */
-	boolean areSymbolsLoaded();
-	
+	public boolean areSymbolsLoaded();
+
 	/**
 	 * Loads the library symbols.
-	 * @throws PDIException on failure
+	 * 
+	 * @throws PDIException
+	 *             on failure
 	 */
-	void loadSymbols() throws PDIException;
+	public void loadSymbols() throws PDIException;
 }

@@ -36,5 +36,5 @@ public interface IPDIEvent extends IPDISessionObject {
 	 * @return true if this event contains the given tasks
 	 * @since 4.0
 	 */
-	boolean contains(TaskSet tasks);
+	public boolean contains(TaskSet tasks);
 }

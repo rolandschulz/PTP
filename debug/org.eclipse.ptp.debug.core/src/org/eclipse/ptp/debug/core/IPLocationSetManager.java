@@ -13,12 +13,16 @@ package org.eclipse.ptp.debug.core;
 import org.eclipse.ptp.debug.core.model.IPLocationSet;
 
 /**
+ * Interface for managing location sets
+ * 
  * @since 5.0
  */
 public interface IPLocationSetManager {
 
 	/**
-	 * @return
+	 * Get all know location sets
+	 * 
+	 * @return array of location sets
 	 */
 	public IPLocationSet[] getLocationSets();
 

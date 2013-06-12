@@ -25,73 +25,88 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
 /**
  * A stack frame in a suspended thread.
  * A stack frame contains variables representing visible locals and arguments at the current execution location.
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIStackFrame extends IPDISessionObject {
 	/**
-	 * Returns the location of the instruction pointer in this  stack frame.
+	 * Returns the location of the instruction pointer in this stack frame.
+	 * 
 	 * @return the location of the instruction pointer
 	 */
-	IPDILocator getLocator();
-	
+	public IPDILocator getLocator();
+
 	/**
 	 * Returns the visible variables in this stack frame. An empty collection is returned if there are no visible variables.
-	 * @return a collection of visible variables 
-	 * @throws PDIException on failure
+	 * 
+	 * @return a collection of visible variables
+	 * @throws PDIException
+	 *             on failure
 	 */
-	IPDILocalVariableDescriptor[] getLocalVariableDescriptors() throws PDIException;
+	public IPDILocalVariableDescriptor[] getLocalVariableDescriptors() throws PDIException;
 
 	/**
-	 * Create a variable from the descriptor for evaluation.  A CreatedEvent will be trigger and
+	 * Create a variable from the descriptor for evaluation. A CreatedEvent will be trigger and
 	 * ChangedEvent will also be trigger when the variable is assign a new value.
 	 * DestroyedEvent is fired when the variable is out of scope and automatically removed from the manager list.
-	 * @param varDesc IPDIArgumentDescriptor
+	 * 
+	 * @param varDesc
+	 *            IPDIArgumentDescriptor
 	 * @return argument
-	 * @throws PDIException on failure
+	 * @throws PDIException
+	 *             on failure
 	 */
-	IPDIArgument createArgument(IPDIArgumentDescriptor varDesc) throws PDIException;
+	public IPDIArgument createArgument(IPDIArgumentDescriptor varDesc) throws PDIException;
 
 	/**
-	 * Create a variable from the descriptor for evaluation.  A CreatedEvent will be trigger and
+	 * Create a variable from the descriptor for evaluation. A CreatedEvent will be trigger and
 	 * ChangedEvent will also be trigger when the variable is assign a new value.
 	 * DestroyedEvent is fired when the variable is out of scope and automatically removed from the manager list.
-	 * @param varDesc IPDILocalVariableDescriptor
+	 * 
+	 * @param varDesc
+	 *            IPDILocalVariableDescriptor
 	 * @return local variable
-	 * @throws PDIException on failure
+	 * @throws PDIException
+	 *             on failure
 	 */
-	IPDILocalVariable createLocalVariable(IPDILocalVariableDescriptor varDesc) throws PDIException;
+	public IPDILocalVariable createLocalVariable(IPDILocalVariableDescriptor varDesc) throws PDIException;
 
 	/**
 	 * Returns the arguments in this stack frame. An empty collection is returned if there are no arguments.
-	 * @return a collection of arguments 
-	 * @throws PDIException on failure
+	 * 
+	 * @return a collection of arguments
+	 * @throws PDIException
+	 *             on failure
 	 */
-	IPDIArgumentDescriptor[] getArgumentDescriptors() throws PDIException;
+	public IPDIArgumentDescriptor[] getArgumentDescriptors() throws PDIException;
 
 	/**
 	 * Returns the thread this stackframe is contained in.
+	 * 
 	 * @return the thread
 	 */
-	IPDIThread getThread();
-	
+	public IPDIThread getThread();
+
 	/**
 	 * Returns the target this stackframe is contained in.
+	 * 
 	 * @return the target
 	 */
-	IPDITarget getTarget();
+	public IPDITarget getTarget();
 
 	/**
 	 * Returns the level of the stack frame, 1 based.
-	 * @return the level of the stack frame 
+	 * 
+	 * @return the level of the stack frame
 	 */
-	int getLevel();
-	
+	public int getLevel();
+
 	/**
 	 * Determines whether both stackframes are the same
+	 * 
 	 * @param stackframe
 	 * @return true if the frames are the same.
 	 */
-	boolean equals(IPDIStackFrame stackframe);
+	public boolean equals(IPDIStackFrame stackframe);
 }
-

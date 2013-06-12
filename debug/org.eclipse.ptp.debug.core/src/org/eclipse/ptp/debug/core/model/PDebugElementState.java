@@ -21,6 +21,8 @@ package org.eclipse.ptp.debug.core.model;
 import org.eclipse.ptp.internal.debug.core.messages.Messages;
 
 /**
+ * Debug element states
+ * 
  * @author clement
  * 
  */
@@ -45,7 +47,9 @@ public class PDebugElementState {
 		fName = name;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	@Override

@@ -22,14 +22,17 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
 
 /**
  * Manages the sharedLibraries in the target.
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDISharedLibraryManagement {
 	/**
 	 * Returns the array of shared libraries for this target.
+	 * 
 	 * @return IPDISharedLibrary[] array
-	 * @throws PDIException on failure.
+	 * @throws PDIException
+	 *             on failure.
 	 */
-	IPDISharedLibrary[] getSharedLibraries() throws PDIException;
+	public IPDISharedLibrary[] getSharedLibraries() throws PDIException;
 }

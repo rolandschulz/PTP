@@ -23,17 +23,23 @@ import org.eclipse.debug.core.model.IValue;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
 
 /**
+ * AIF formatted value
+ * 
  * @author Clement chu
  * 
  */
 public interface IPAIF extends IValue, IPDebugElement {
 	/**
+	 * Get AIF representation
+	 * 
 	 * @return
 	 * @throws DebugException
 	 */
 	public IAIF getAIF() throws DebugException;
 
 	/**
+	 * Evaluate as an expression
+	 * 
 	 * @param frame
 	 * @return
 	 */

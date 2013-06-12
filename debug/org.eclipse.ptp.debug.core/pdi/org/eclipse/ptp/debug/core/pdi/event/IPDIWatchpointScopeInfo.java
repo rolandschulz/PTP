@@ -23,13 +23,15 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIWatchpoint;
 
 /**
  * Represents an information provided by the session when a watchpoint is going out of scope.
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIWatchpointScopeInfo extends IPDISessionObject {
 	/**
 	 * Returns the out of scope watchpoint.
+	 * 
 	 * @return the watchpoint
 	 */
-	IPDIWatchpoint getWatchpoint();
+	public IPDIWatchpoint getWatchpoint();
 }

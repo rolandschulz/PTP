@@ -20,10 +20,10 @@ package org.eclipse.ptp.debug.core.pdi.model;
 
 /**
  * Represents local variable
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDILocalVariable extends IPDIVariable, IPDILocalVariableDescriptor {
-
+	// Empty
 }
-

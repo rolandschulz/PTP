@@ -26,16 +26,22 @@ import org.eclipse.debug.core.model.IValue;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrame;
 
 /**
+ * Represents a stack frame
+ * 
  * @author Clement chu
  * 
  */
 public interface IPStackFrame extends IRunToLine, IRunToAddress, IJumpToLine, IJumpToAddress, IPDebugElement, IStackFrame {
 	/**
+	 * Check if expressions can be evaluated in this stack frame
+	 * 
 	 * @return
 	 */
 	public boolean canEvaluate();
 
 	/**
+	 * Evaluate an expression in this stack frame
+	 * 
 	 * @param expression
 	 * @return
 	 * @throws DebugException
@@ -43,38 +49,51 @@ public interface IPStackFrame extends IRunToLine, IRunToAddress, IJumpToLine, IJ
 	public IValue evaluateExpression(String expression) throws DebugException;
 
 	/**
-	 * @param expression
+	 * Evaluate an expression in this stack frame. Return the result as a string
+	 * 
 	 * @return
 	 * @throws DebugException
 	 */
 	public String evaluateExpressionToString(String expression) throws DebugException;
 
 	/**
+	 * Get the address of this stack frame
+	 * 
 	 * @return
 	 */
 	public BigInteger getAddress();
 
 	/**
+	 * Get the file associated with this stack frame
+	 * 
 	 * @return
 	 */
 	public String getFile();
 
 	/**
+	 * Get the frame line number
+	 * 
 	 * @return
 	 */
 	public int getFrameLineNumber();
 
 	/**
+	 * Get the function
+	 * 
 	 * @return
 	 */
 	public String getFunction();
 
 	/**
+	 * Get the frame level
+	 * 
 	 * @return
 	 */
 	public int getLevel();
 
 	/**
+	 * Get the PDI stack frame
+	 * 
 	 * @return
 	 */
 	public IPDIStackFrame getPDIStackFrame();

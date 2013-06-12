@@ -23,27 +23,33 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
 
 /**
  * Represents a group of registers that are assigned to a target.
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIRegisterGroup extends IPDISessionObject {
 	/**
 	 * The name of the group
+	 * 
 	 * @return String name
 	 */
-	String getName();
+	public String getName();
 
 	/**
 	 * Returns the register descriptors in this register group.
+	 * 
 	 * @return IPDIRegisterDescriptor[] in this register group
-	 * @throws PDIException on failure
+	 * @throws PDIException
+	 *             on failure
 	 */
-	IPDIRegisterDescriptor[] getRegisterDescriptors() throws PDIException;
+	public IPDIRegisterDescriptor[] getRegisterDescriptors() throws PDIException;
 
 	/**
 	 * Returns whether this register group currently contains any registers.
+	 * 
 	 * @return whether this register group currently contains any registers
-	 * @throws PDIException on failure
+	 * @throws PDIException
+	 *             on failure
 	 */
-	public boolean hasRegisters() throws PDIException;	
+	public boolean hasRegisters() throws PDIException;
 }

@@ -20,9 +20,10 @@ package org.eclipse.ptp.debug.core.pdi.request;
 
 /**
  * Represents to request halting
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIHaltRequest extends IPDIEventRequest {
-
+	// Empty
 }

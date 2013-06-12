@@ -20,13 +20,15 @@ package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
  * Represents reference type in IAIFType
+ * 
  * @author clement
- *
+ * 
  */
 public interface IAIFTypeReference extends IAIFType {
 	/**
 	 * Returns the name of this type
+	 * 
 	 * @return the name of this type
 	 */
-	String getName();
+	public String getName();
 }

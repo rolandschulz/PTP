@@ -20,14 +20,15 @@ package org.eclipse.ptp.debug.core.pdi;
 
 /**
  * Represents an object associated with a debug session
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDISessionObject extends IPDISet {
 	/**
 	 * Returns debug session
+	 * 
 	 * @return the debug session
 	 */
-	IPDISession getSession();
+	public IPDISession getSession();
 }
-

@@ -30,6 +30,8 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrameDescriptor;
  */
 public interface IPDIListStackFramesRequest extends IPDIInternalEventRequest {
 	/**
+	 * Get stack frames
+	 * 
 	 * @param qTasks
 	 * @return
 	 * @throws PDIException

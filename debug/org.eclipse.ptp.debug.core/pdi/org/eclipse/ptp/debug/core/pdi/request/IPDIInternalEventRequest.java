@@ -30,6 +30,8 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
  */
 public interface IPDIInternalEventRequest extends IPDIEventRequest {
 	/**
+	 * Get result
+	 * 
 	 * @param qTasks
 	 * @return
 	 * @throws PDIException
@@ -38,6 +40,8 @@ public interface IPDIInternalEventRequest extends IPDIEventRequest {
 	public Object getResult(TaskSet qTasks) throws PDIException;
 
 	/**
+	 * Get result map
+	 * 
 	 * @param qTasks
 	 * @return
 	 * @throws PDIException
@@ -46,6 +50,8 @@ public interface IPDIInternalEventRequest extends IPDIEventRequest {
 	public Map<TaskSet, Object> getResultMap(TaskSet qTasks) throws PDIException;
 
 	/**
+	 * Wait until completed
+	 * 
 	 * @param qTasks
 	 * @throws PDIException
 	 * @since 4.0
@@ -53,6 +59,8 @@ public interface IPDIInternalEventRequest extends IPDIEventRequest {
 	public void waitUntilCompleted(TaskSet qTasks) throws PDIException;
 
 	/**
+	 * Wait until completed. Can be cancelled using progress monitor.
+	 * 
 	 * @param qTasks
 	 * @param monitor
 	 * @throws PDIException

@@ -22,6 +22,8 @@ package org.eclipse.ptp.debug.core.pdi.model.aif;
  * Represents a value for a derived type
  * 
  * @author clement
- *
+ * 
  */
-public interface IValueDerived extends IValueParent {}
+public interface IValueDerived extends IValueParent {
+	// Empty
+}

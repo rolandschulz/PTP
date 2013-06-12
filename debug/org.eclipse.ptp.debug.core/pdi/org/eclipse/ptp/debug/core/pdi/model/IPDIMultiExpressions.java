@@ -102,16 +102,20 @@ public interface IPDIMultiExpressions extends IPDISessionObject {
 	public void removeExpression(IPDIExpression expression);
 
 	/**
+	 * Set enabled
+	 * 
 	 * @param enabled
 	 */
 	public void setEnabled(boolean enabled);
 
 	/**
-	 * 
+	 * Clean up resources
 	 */
 	public void shutdown();
 
 	/**
+	 * Update expression value
+	 * 
 	 * @param tasks
 	 * @param monitor
 	 * @throws PDIException

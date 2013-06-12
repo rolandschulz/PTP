@@ -22,25 +22,29 @@ import org.eclipse.ptp.debug.core.pdi.IPDISessionObject;
 
 /**
  * Represents a machine instruction.
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIMixedInstruction extends IPDISessionObject {
 	/**
 	 * Returns the line number
+	 * 
 	 * @return the line Number
 	 */
-	int getLineNumber();
-	
+	public int getLineNumber();
+
 	/**
 	 * Returns the file name
+	 * 
 	 * @return the file name
 	 */
-	String getFileName();
-	
+	public String getFileName();
+
 	/**
 	 * Returns the array of instruction
+	 * 
 	 * @return the array of instruction
 	 */
-	IPDIInstruction[] getInstructions();
+	public IPDIInstruction[] getInstructions();
 }

@@ -20,9 +20,10 @@ package org.eclipse.ptp.debug.core.pdi.model;
 
 /**
  * Represents argument descriptor
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIArgumentDescriptor extends IPDIVariableDescriptor {
-
+	// Empty
 }

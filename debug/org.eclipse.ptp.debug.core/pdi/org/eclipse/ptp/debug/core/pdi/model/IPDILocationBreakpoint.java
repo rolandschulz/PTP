@@ -22,14 +22,15 @@ import org.eclipse.ptp.debug.core.pdi.IPDILocator;
 
 /**
  * Represents the location of breakpoint: file, line, function, address
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDILocationBreakpoint extends IPDIBreakpoint {
 	/**
 	 * Returns the location of the breakpoint
+	 * 
 	 * @return IPDILocator object
 	 */
-	IPDILocator getLocator();
+	public IPDILocator getLocator();
 }
-

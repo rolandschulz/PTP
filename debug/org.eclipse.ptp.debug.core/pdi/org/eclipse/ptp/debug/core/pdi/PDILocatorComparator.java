@@ -13,6 +13,8 @@ package org.eclipse.ptp.debug.core.pdi;
 import java.util.Comparator;
 
 /**
+ * Class for comparing locators
+ * 
  * @since 5.0
  */
 public class PDILocatorComparator implements Comparator<IPDILocator> {

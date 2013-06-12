@@ -20,9 +20,10 @@ package org.eclipse.ptp.debug.core.pdi.request;
 
 /**
  * Represents to request stepping
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIStepRequest extends IPDIEventRequest {
-
+	// Empty
 }

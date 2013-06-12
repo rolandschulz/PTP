@@ -23,6 +23,8 @@ import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.ptp.internal.debug.core.messages.Messages;
 
 /**
+ * Base interface for breakpoint implementations
+ * 
  * @author Clement chu
  * 
  */
@@ -37,141 +39,168 @@ public interface IPBreakpoint extends IBreakpoint {
 	public static final String JOB_NAME = "org.eclipse.ptp.debug.core.jobname"; //$NON-NLS-1$
 
 	/**
+	 * Decrement count of breakpoint instances
+	 * 
 	 * @return
 	 * @throws CoreException
 	 */
 	public int decrementInstallCount() throws CoreException;
 
 	/**
+	 * Get the condition on the breakpoint
+	 * 
 	 * @return
 	 * @throws CoreException
 	 */
 	public String getCondition() throws CoreException;
 
 	/**
+	 * Get the ID of the set this breakpoint applies to
+	 * 
 	 * @return
 	 * @throws CoreException
 	 */
 	public String getCurSetId() throws CoreException;
 
 	/**
+	 * Get the ignore count for the breakpoint
+	 * 
 	 * @return
 	 * @throws CoreException
 	 */
 	public int getIgnoreCount() throws CoreException;
 
 	/**
+	 * Get the ID of the job associated with this breakpoint
+	 * 
 	 * @return
 	 * @throws CoreException
 	 */
 	public String getJobId() throws CoreException;
 
 	/**
+	 * Get the name of the job associated with this breakpoint
+	 * 
 	 * @return
 	 * @throws CoreException
 	 */
 	public String getJobName() throws CoreException;
 
 	/**
+	 * Get the set ID of the breakpoint
+	 * 
 	 * @return
 	 * @throws CoreException
 	 */
 	public String getSetId() throws CoreException;
 
 	/**
+	 * Get the source handle for the breakpoint
+	 * 
 	 * @return
 	 * @throws CoreException
 	 */
 	public String getSourceHandle() throws CoreException;
 
 	/**
+	 * Increment the count of breakpoint instances
+	 * 
 	 * @return
 	 * @throws CoreException
 	 */
 	public int incrementInstallCount() throws CoreException;
 
 	/**
+	 * Check if this is a conditional breakpoint
+	 * 
 	 * @return
 	 * @throws CoreException
 	 */
 	public boolean isConditional() throws CoreException;
 
 	/**
+	 * Check if this is a global breakpoint
+	 * 
 	 * @return
 	 * @throws CoreException
 	 */
 	public boolean isGlobal() throws CoreException;
 
 	/**
+	 * Check if this breakpoint is installed
+	 * 
 	 * @return
 	 * @throws CoreException
 	 */
 	public boolean isInstalled() throws CoreException;
 
 	/**
+	 * Reset the breakpoint install count
+	 * 
 	 * @throws CoreException
 	 */
 	public void resetInstallCount() throws CoreException;
 
 	/**
+	 * Set a condition on the breakpoint
+	 * 
 	 * @param condition
 	 * @throws CoreException
 	 */
 	public void setCondition(String condition) throws CoreException;
 
 	/**
+	 * Set the current set ID
+	 * 
 	 * @param id
 	 * @throws CoreException
 	 */
 	public void setCurSetId(String id) throws CoreException;
 
 	/**
+	 * Set the breakpoint ignore count
+	 * 
 	 * @param ignoreCount
 	 * @throws CoreException
 	 */
 	public void setIgnoreCount(int ignoreCount) throws CoreException;
 
 	/**
+	 * Set the job ID
+	 * 
 	 * @param id
 	 * @throws CoreException
 	 */
 	public void setJobId(String id) throws CoreException;
 
 	/**
+	 * Set the job name
+	 * 
 	 * @param name
 	 * @throws CoreException
 	 */
 	public void setJobName(String name) throws CoreException;
 
 	/**
+	 * Set the breakpoint set ID
+	 * 
 	 * @param id
 	 * @throws CoreException
 	 */
 	public void setSetId(String id) throws CoreException;
 
 	/**
+	 * Set the source handle
+	 * 
 	 * @param sourceHandle
 	 * @throws CoreException
 	 */
 	public void setSourceHandle(String sourceHandle) throws CoreException;
 
 	/**
+	 * Update marker message
+	 * 
 	 * @throws CoreException
 	 */
 	public void updateMarkerMessage() throws CoreException;
-
-	/*
-	 * TODO - Not Implemented String getThreadId() throws CoreException; void
-	 * setThreadId(String threadId) throws CoreException;
-	 * 
-	 * String getModule() throws CoreException; void setModule(String module)
-	 * throws CoreException;
-	 * 
-	 * void setTargetFilter(IPDebugTarget target) throws CoreException; void
-	 * removeTargetFilter(IPDebugTarget target) throws CoreException; void
-	 * setThreadFilters(IPThread[] threads) throws CoreException; void
-	 * removeThreadFilters(IPThread[] threads) throws CoreException; IPThread[]
-	 * getThreadFilters(IPDebugTarget target) throws CoreException;
-	 * IPDebugTarget[] getTargetFilters() throws CoreException;
-	 */
 }

@@ -23,6 +23,8 @@ import org.eclipse.debug.core.model.IValue;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
 
 /**
+ * Represents the value of a target variable
+ * 
  * @author clement
  * 
  */

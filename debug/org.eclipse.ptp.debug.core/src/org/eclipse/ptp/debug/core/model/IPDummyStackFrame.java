@@ -19,8 +19,10 @@
 package org.eclipse.ptp.debug.core.model;
 
 /**
+ * Represents a dummy stack frame
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDummyStackFrame {
 

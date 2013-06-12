@@ -22,15 +22,16 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
 
 /**
  * Represents a watchpoint
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIWatchpoint extends IPDIBreakpoint {
 	/**
 	 * Write value
 	 */
 	public final static int WRITE = 0x1;
-	
+
 	/**
 	 * Read value
 	 */
@@ -38,21 +39,24 @@ public interface IPDIWatchpoint extends IPDIBreakpoint {
 
 	/**
 	 * Determines whether this watchpoint is a write watchpoint
+	 * 
 	 * @return true if this wwatchpoint is a write watchpoint
 	 */
-	boolean isWriteType();
-	
+	public boolean isWriteType();
+
 	/**
 	 * Determines whether this watchpoint is a read watchpoint
+	 * 
 	 * @return true if this watchpoint is a read watchpiont
 	 */
-	boolean isReadType();
-	
+	public boolean isReadType();
+
 	/**
 	 * Returns the expression of this watchpoint
+	 * 
 	 * @return the expression of this watchpoint
-	 * @throws PDIException on failure
+	 * @throws PDIException
+	 *             on failure
 	 */
-	String getWatchExpression() throws PDIException;
+	public String getWatchExpression() throws PDIException;
 }
-

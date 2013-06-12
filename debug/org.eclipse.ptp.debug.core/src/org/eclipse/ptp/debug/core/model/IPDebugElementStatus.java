@@ -19,6 +19,8 @@
 package org.eclipse.ptp.debug.core.model;
 
 /**
+ * Represents the status of a debug element
+ * 
  * @author Clement chu
  * 
  */
@@ -28,16 +30,22 @@ public interface IPDebugElementStatus {
 	public static final int WARNING = 1;
 
 	/**
+	 * Get the status message
+	 * 
 	 * @return
 	 */
 	public String getMessage();
 
 	/**
+	 * Get the severity
+	 * 
 	 * @return
 	 */
 	public int getSeverity();
 
 	/**
+	 * Check if the status is OK
+	 * 
 	 * @return
 	 */
 	public boolean isOK();

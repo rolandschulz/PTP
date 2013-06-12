@@ -20,14 +20,15 @@ package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
  * Represents char pointer type in IAIFType
+ * 
  * @author clement
- *
+ * 
  */
 public interface IAIFTypeCharPointer extends IAIFTypeString {
 	/**
 	 * Returns address type of this char point type
+	 * 
 	 * @return address type of this char point type
 	 */
-	IAIFTypeAddress getAddressType();	
+	public IAIFTypeAddress getAddressType();
 }
-

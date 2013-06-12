@@ -20,9 +20,10 @@ package org.eclipse.ptp.debug.core.pdi.request;
 
 /**
  * Represents to request disabling a breakpoint
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIDisableBreakpointRequest extends IPDIBreakpointRequest {
-
+	// Empty
 }

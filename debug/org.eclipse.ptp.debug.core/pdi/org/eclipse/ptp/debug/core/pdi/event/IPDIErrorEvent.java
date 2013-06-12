@@ -22,15 +22,17 @@ import org.eclipse.ptp.debug.core.pdi.IPDISessionObject;
 
 /**
  * Notifies that the originator has error
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIErrorEvent extends IPDIEvent {
 	/**
 	 * Returns the reason why got error
 	 * eg:
 	 * IPDIErrorInfo
+	 * 
 	 * @return the reason why got error
 	 */
-	IPDISessionObject getReason();
+	public IPDISessionObject getReason();
 }

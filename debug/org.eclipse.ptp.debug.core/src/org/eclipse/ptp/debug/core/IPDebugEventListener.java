@@ -29,14 +29,19 @@
 package org.eclipse.ptp.debug.core;
 
 import org.eclipse.ptp.debug.core.event.IPDebugEvent;
+
 /**
+ * Interface for listening to debug events
+ * 
  * @author Clement chu
- *
+ * 
  */
 public interface IPDebugEventListener {
 	/**
 	 * Handle debug event
-	 * @param event IPDebugEvent
+	 * 
+	 * @param event
+	 *            IPDebugEvent
 	 */
 	void handleDebugEvent(IPDebugEvent event);
 }

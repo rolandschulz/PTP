@@ -24,6 +24,8 @@ import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
 
 /**
+ * Represents a variable in the target
+ * 
  * @author Clement chu
  * 
  */

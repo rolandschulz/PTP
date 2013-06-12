@@ -20,9 +20,10 @@ package org.eclipse.ptp.debug.core.pdi.request;
 
 /**
  * Represents to request getting variable type
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIGetVariableTypeRequest extends IPDIEventRequest {
-
+	// Empty
 }

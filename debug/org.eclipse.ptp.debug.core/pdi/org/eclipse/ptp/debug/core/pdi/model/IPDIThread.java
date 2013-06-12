@@ -23,88 +23,106 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
 
 /**
  * A thread in a debug target.
- * A thread contains stack frames.  Stack frames are only available when the thread is suspended, and are returned in top-down order.
+ * A thread contains stack frames. Stack frames are only available when the thread is suspended, and are returned in top-down order.
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIThread extends IPDISessionObject {
 	final public static int STACKFRAME_DEFAULT_DEPTH = 200;
 
 	/**
-	 * Create a variable from the descriptor for evaluation.  A CreatedEvent will be trigger and
+	 * Create a variable from the descriptor for evaluation. A CreatedEvent will be trigger and
 	 * ChangedEvent will also be trigger when the variable is assign a new value.
 	 * DestroyedEvent is fired when the variable is out of scope and automatically removed from the manager list.
-	 * @param varDesc IPDThreadStorageDesc
+	 * 
+	 * @param varDesc
+	 *            IPDThreadStorageDesc
 	 * @return IPDIThreadStorage
-	 * @throws PDIException on failure
+	 * @throws PDIException
+	 *             on failure
 	 */
 	public IPDIThreadStorage createThreadStorage(IPDIThreadStorageDescriptor varDesc) throws PDIException;
-	
+
 	/**
 	 * Determines whether both threads are the same.
+	 * 
 	 * @param thead
 	 * @return true if the threads are the same.
 	 */
 	public boolean equals(IPDIThread thead);
-	
+
 	/**
+	 * Get current stack frame
+	 * 
 	 * @return
 	 * @throws PDIException
 	 */
 	public IPDIStackFrame getCurrentStackFrame() throws PDIException;
-	
+
 	/**
+	 * Get thread ID
+	 * 
 	 * @return
 	 */
 	public int getId();
 
 	/**
 	 * Returns the depth of the stack frames.
-	 * @return  depth of stack frames
-	 * @throws PDIException on failure
+	 * 
+	 * @return depth of stack frames
+	 * @throws PDIException
+	 *             on failure
 	 */
 	public int getStackFrameCount() throws PDIException;
 
 	/**
 	 * Returns the stack frames contained in this thread. An empty collection is returned if this thread contains
 	 * no stack frames, or is not currently suspended. Stack frames are returned in top down order.
-	 * @return  a collection of stack frames
-	 * @throws PDIException on failure
+	 * 
+	 * @return a collection of stack frames
+	 * @throws PDIException
+	 *             on failure
 	 */
 	public IPDIStackFrame[] getStackFrames() throws PDIException;
 
 	/**
-	 * Returns the stack frames contained in this thread between the specified
-     * <tt>fromIndex</tt>, inclusive, and <tt>toIndex</tt>, exclusive.
+	 * Returns the stack frames contained in this thread between the specified <tt>fromIndex</tt>, inclusive, and <tt>toIndex</tt>,
+	 * exclusive.
 	 * An empty collection is returned if this thread contains
 	 * no stack frames, or is not currently suspended. Stack frames are returned in top down order.
-	 * @return  a collection of stack frames
-	 * @throws PDIException on failure
-	 * @throws IndexOutOfBoundsException for an illegal endpoint index value
-     *     (fromIndex &lt; 0 || toIndex &gt; size || fromIndex &gt; toIndex).
- 
+	 * 
+	 * @return a collection of stack frames
+	 * @throws PDIException
+	 *             on failure
+	 * @throws IndexOutOfBoundsException
+	 *             for an illegal endpoint index value
+	 *             (fromIndex &lt; 0 || toIndex &gt; size || fromIndex &gt; toIndex).
 	 */
 	public IPDIStackFrame[] getStackFrames(int fromIndex, int len) throws PDIException;
 
 	/**
 	 * Returns pdi target in this thread
+	 * 
 	 * @return pdi target in this thread
 	 */
 	public IPDITarget getTarget();
 
 	/**
 	 * Return thread local storage variables descriptor.
+	 * 
 	 * @return IPDIThreadStorageDescriptor
-	 * @throws PDIException on failure
+	 * @throws PDIException
+	 *             on failure
 	 */
 	public IPDIThreadStorageDescriptor[] getThreadStorageDescriptors() throws PDIException;
-	
+
 	/**
 	 * @param stackframe
 	 * @throws PDIException
 	 */
 	public void setCurrentStackFrame(IPDIStackFrame stackframe) throws PDIException;
-	
+
 	/**
 	 * @param stackframe
 	 * @param doUpdate

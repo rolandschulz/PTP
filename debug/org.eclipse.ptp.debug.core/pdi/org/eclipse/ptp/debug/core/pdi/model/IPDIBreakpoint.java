@@ -144,5 +144,5 @@ public interface IPDIBreakpoint extends IPDISessionObject {
 	 * @throws PDIException
 	 *             on failure
 	 */
-	void setCondition(IPDICondition condition) throws PDIException;
+	public void setCondition(IPDICondition condition) throws PDIException;
 }

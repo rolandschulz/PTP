@@ -40,36 +40,104 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIVariableDescriptor;
  * 
  */
 public interface IPDIVariableManager extends IPDIManager {
+	/**
+	 * Create an argument
+	 * 
+	 * @param argDesc
+	 * @return
+	 * @throws PDIException
+	 */
 	public IPDIArgument createArgument(IPDIArgumentDescriptor argDesc) throws PDIException;
 
+	/**
+	 * Create a global variable
+	 * 
+	 * @param varDesc
+	 * @return
+	 * @throws PDIException
+	 */
 	public IPDIGlobalVariable createGlobalVariable(IPDIGlobalVariableDescriptor varDesc) throws PDIException;
 
+	/**
+	 * Create a local variable
+	 * 
+	 * @param varDesc
+	 * @return
+	 * @throws PDIException
+	 */
 	public IPDILocalVariable createLocalVariable(IPDILocalVariableDescriptor varDesc) throws PDIException;
 
+	/**
+	 * Get argument descriptors
+	 * 
+	 * @param frame
+	 * @return
+	 * @throws PDIException
+	 */
 	public IPDIArgumentDescriptor[] getArgumentDescriptors(IPDIStackFrame frame) throws PDIException;
 
+	/**
+	 * Get local variable descriptors
+	 * 
+	 * @param frame
+	 * @return
+	 * @throws PDIException
+	 */
 	public IPDILocalVariableDescriptor[] getLocalVariableDescriptors(IPDIStackFrame frame) throws PDIException;
 
 	/**
+	 * Get variable by name
+	 * 
 	 * @since 4.0
 	 */
 	public IPDIVariable getVariableByName(TaskSet tasks, String varname);
 
 	/**
+	 * Get global variable descriptor
+	 * 
 	 * @since 4.0
 	 */
 	public IPDIGlobalVariableDescriptor getGlobalVariableDescriptor(TaskSet tasks, String filename, String function, String name)
 			throws PDIException;
 
+	/**
+	 * Create thread storage
+	 * 
+	 * @param desc
+	 * @return
+	 * @throws PDIException
+	 */
 	public IPDIThreadStorage createThreadStorage(IPDIThreadStorageDescriptor desc) throws PDIException;
 
+	/**
+	 * Get thread storage descriptors
+	 * 
+	 * @param thread
+	 * @return
+	 * @throws PDIException
+	 */
 	public IPDIThreadStorageDescriptor[] getThreadStorageDescriptors(IPDIThread thread) throws PDIException;
 
+	/**
+	 * Destroy variable
+	 * 
+	 * @param variable
+	 * @throws PDIException
+	 */
 	public void destroyVariable(IPDIVariable variable) throws PDIException;
 
+	/**
+	 * Create variable
+	 * 
+	 * @param varDesc
+	 * @return
+	 * @throws PDIException
+	 */
 	public IPDIVariable createVariable(IPDIVariableDescriptor varDesc) throws PDIException;
 
 	/**
+	 * Get variable descriptor as array
+	 * 
 	 * @param varDesc
 	 * @param start
 	 * @param length
@@ -80,6 +148,8 @@ public interface IPDIVariableManager extends IPDIManager {
 			throws PDIException;
 
 	/**
+	 * Get variable descriptor as type
+	 * 
 	 * @param varDesc
 	 * @param type
 	 * @return
@@ -88,6 +158,8 @@ public interface IPDIVariableManager extends IPDIManager {
 	public IPDIVariableDescriptor getVariableDescriptorAsType(IPDIVariableDescriptor varDesc, String type) throws PDIException;
 
 	/**
+	 * Update variables
+	 * 
 	 * @param qTasks
 	 * @param vars
 	 * @throws PDIException

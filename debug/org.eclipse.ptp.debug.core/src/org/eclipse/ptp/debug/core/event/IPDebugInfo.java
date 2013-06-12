@@ -22,25 +22,35 @@ import org.eclipse.ptp.debug.core.TaskSet;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 
 /**
+ * Debugger information associated with an event
+ * 
  * @author Clement
  */
 public interface IPDebugInfo {
 	/**
+	 * Get all the registered tasks
+	 * 
 	 * @since 4.0
 	 */
 	public TaskSet getAllRegisteredTasks();
 
 	/**
+	 * Get all the tasks
+	 * 
 	 * @since 4.0
 	 */
 	public TaskSet getAllTasks();
 
 	/**
+	 * Get all the unregistered tasks
+	 * 
 	 * @since 4.0
 	 */
 	public TaskSet getAllUnregisteredTasks();
 
 	/**
+	 * Get the launch object for the debugger
+	 * 
 	 * @since 5.0
 	 */
 	public IPLaunch getLaunch();

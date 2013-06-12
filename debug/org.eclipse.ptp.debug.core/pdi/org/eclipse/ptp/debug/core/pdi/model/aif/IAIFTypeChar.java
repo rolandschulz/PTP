@@ -20,7 +20,10 @@ package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
  * Represents char type in IAIFType
+ * 
  * @author clement
- *
+ * 
  */
-public interface IAIFTypeChar extends ITypeIntegral {}
+public interface IAIFTypeChar extends ITypeIntegral {
+	// Empty
+}

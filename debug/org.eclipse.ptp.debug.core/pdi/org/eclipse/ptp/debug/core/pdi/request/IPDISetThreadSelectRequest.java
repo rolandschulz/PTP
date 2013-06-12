@@ -30,6 +30,8 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrameDescriptor;
  */
 public interface IPDISetThreadSelectRequest extends IPDIEventRequest {
 	/**
+	 * Get the current stack frame
+	 * 
 	 * @param qTasks
 	 * @return
 	 * @throws PDIException
@@ -38,6 +40,8 @@ public interface IPDISetThreadSelectRequest extends IPDIEventRequest {
 	public IPDIStackFrameDescriptor getStackFrame(TaskSet qTasks) throws PDIException;
 
 	/**
+	 * Get the thread ID
+	 * 
 	 * @param qTasks
 	 * @return
 	 * @throws PDIException

@@ -20,9 +20,10 @@ package org.eclipse.ptp.debug.core.pdi.model;
 
 /**
  * Represents thread Storage
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIThreadStorage extends IPDIVariable, IPDIThreadStorageDescriptor {
-
+	// Empty
 }

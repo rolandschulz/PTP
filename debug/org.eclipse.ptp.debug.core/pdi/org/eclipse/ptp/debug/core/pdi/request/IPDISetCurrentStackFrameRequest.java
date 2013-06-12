@@ -20,9 +20,10 @@ package org.eclipse.ptp.debug.core.pdi.request;
 
 /**
  * Represents to request setting current frame
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDISetCurrentStackFrameRequest extends IPDIInternalEventRequest {
-
+	// Empty
 }

@@ -42,6 +42,8 @@ public interface IPDISignalManager extends IPDIManager {
 	public IPDISignal[] getSignals(TaskSet tasks) throws PDIException;
 
 	/**
+	 * Handle signal
+	 * 
 	 * @param sig
 	 * @param isIgnore
 	 * @param isStop

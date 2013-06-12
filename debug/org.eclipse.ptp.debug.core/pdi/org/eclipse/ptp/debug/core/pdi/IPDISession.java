@@ -73,17 +73,23 @@ public interface IPDISession extends IPDISessionObject, IPDIExecuteManagement {
 	public static final int EXITED = 5;
 
 	/**
+	 * Process the running event for the given tasks
+	 * 
 	 * @param tasks
 	 * @since 4.0
 	 */
 	public void processRunningEvent(TaskSet tasks);
 
 	/**
+	 * Get the source manager
+	 * 
 	 * @return
 	 */
 	public IPDISourceManager getSourceManager();
 
 	/**
+	 * Process the suspended event for the given tasks
+	 * 
 	 * @param tasks
 	 * @param thread_id
 	 * @param vars
@@ -92,6 +98,8 @@ public interface IPDISession extends IPDISessionObject, IPDIExecuteManagement {
 	public void processSupsendedEvent(TaskSet tasks, final int thread_id, final String[] vars);
 
 	/**
+	 * Connect to the debugger
+	 * 
 	 * @param monitor
 	 * @param app
 	 * @param path
@@ -243,6 +251,8 @@ public interface IPDISession extends IPDISessionObject, IPDIExecuteManagement {
 	public IPDIThreadManager getThreadManager();
 
 	/**
+	 * Get the debugger timeout
+	 * 
 	 * @return
 	 */
 	public long getTimeout();

@@ -23,9 +23,15 @@ import org.eclipse.ptp.debug.core.pdi.IPDISessionObject;
 
 /**
  * Represents a location reached
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDILocationReachedInfo extends IPDISessionObject {
-	IPDILocator getLocator();
+	/**
+	 * Get locator
+	 * 
+	 * @return
+	 */
+	public IPDILocator getLocator();
 }

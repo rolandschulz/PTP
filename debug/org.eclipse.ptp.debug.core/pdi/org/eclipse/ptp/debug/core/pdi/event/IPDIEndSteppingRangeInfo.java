@@ -23,13 +23,15 @@ import org.eclipse.ptp.debug.core.pdi.IPDISessionObject;
 
 /**
  * Represents an information provided by the session when a step command is completed
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIEndSteppingRangeInfo extends IPDISessionObject {
 	/**
 	 * Returns locator
+	 * 
 	 * @return locator
 	 */
-	IPDILocator getLocator();
+	public IPDILocator getLocator();
 }

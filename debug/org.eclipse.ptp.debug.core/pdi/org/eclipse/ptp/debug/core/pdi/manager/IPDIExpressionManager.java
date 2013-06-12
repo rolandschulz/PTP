@@ -73,7 +73,7 @@ public interface IPDIExpressionManager extends IPDIManager {
 	public IPDITargetExpression createExpression(TaskSet qTasks, String expr) throws PDIException;
 
 	/**
-	 * Creates mutliple expression object for a number of processes with one
+	 * Creates multiple expression object for a number of processes with one
 	 * variable
 	 * 
 	 * @param tasks
@@ -87,6 +87,8 @@ public interface IPDIExpressionManager extends IPDIManager {
 	public void createMutliExpressions(TaskSet tasks, String exprText, boolean enabled);
 
 	/**
+	 * Create a variable
+	 * 
 	 * @param frame
 	 * @param expr
 	 * @return
@@ -95,12 +97,16 @@ public interface IPDIExpressionManager extends IPDIManager {
 	public IPDIVariable createVariable(IPDIStackFrame frame, String expr) throws PDIException;
 
 	/**
+	 * Delete a variable
+	 * 
 	 * @param variable
 	 * @throws PDIException
 	 */
 	public void deleteVariable(IPDIVariable variable) throws PDIException;
 
 	/**
+	 * Destroy expressions
+	 * 
 	 * @param qTasks
 	 * @param expressions
 	 * @throws PDIException
@@ -109,6 +115,8 @@ public interface IPDIExpressionManager extends IPDIManager {
 	public void destroyExpressions(TaskSet qTasks, IPDIExpression[] expressions) throws PDIException;
 
 	/**
+	 * Get the expression value
+	 * 
 	 * @param qTasks
 	 * @param expr
 	 * @return
@@ -162,6 +170,8 @@ public interface IPDIExpressionManager extends IPDIManager {
 	public void removeMutliExpressions(String exprText);
 
 	/**
+	 * Update the variables
+	 * 
 	 * @param qTasks
 	 * @param varList
 	 * @throws PDIException

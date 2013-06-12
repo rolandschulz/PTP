@@ -22,15 +22,19 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
 
 /**
  * An expression is a snippet of code that can be evaluated to produce a value for registered process
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDITargetExpression extends IPDIExpression {
 	/**
 	 * Returns the variable of this expression
-	 * @param IPDIStackFrame frame context
+	 * 
+	 * @param IPDIStackFrame
+	 *            frame context
 	 * @return the variable of this expression
-	 * @throws PDIException on failure
+	 * @throws PDIException
+	 *             on failure
 	 */
-	IPDIVariable getVariable(IPDIStackFrame context) throws PDIException;
+	public IPDIVariable getVariable(IPDIStackFrame context) throws PDIException;
 }

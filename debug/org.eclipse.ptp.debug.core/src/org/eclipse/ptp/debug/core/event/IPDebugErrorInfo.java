@@ -17,11 +17,24 @@
  * LA-CC 04-115
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.event;
+
 /**
+ * Interface for obtaining information about an error event
+ * 
  * @author Clement
  */
 public interface IPDebugErrorInfo extends IPDebugInfo {
-	String getDetailsMsg();
-	String getMsg();
-}
+	/**
+	 * Get the message detail for the event
+	 * 
+	 * @return
+	 */
+	public String getDetailsMsg();
 
+	/**
+	 * Get the message for the event
+	 * 
+	 * @return
+	 */
+	public String getMsg();
+}

@@ -16,7 +16,7 @@ import org.eclipse.debug.core.model.IMemoryBlockRetrievalExtension;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 
 /**
- * @author greg
+ * Interface for managing memory blocks
  * 
  */
 public interface IPMemoryManager {
@@ -45,6 +45,8 @@ public interface IPMemoryManager {
 	public IMemoryBlockRetrievalExtension getMemoryRetrieval(TaskSet qTasks);
 
 	/**
+	 * Initialize memory manager
+	 * 
 	 * @param qTasks
 	 * @param debugTarget
 	 * @since 5.0

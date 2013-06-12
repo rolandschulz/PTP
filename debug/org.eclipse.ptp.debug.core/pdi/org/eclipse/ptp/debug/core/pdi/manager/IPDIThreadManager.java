@@ -30,6 +30,8 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIThread;
  */
 public interface IPDIThreadManager extends IPDIManager {
 	/**
+	 * Get threads
+	 * 
 	 * @since 4.0
 	 */
 	public IPDIThread[] getThreads(TaskSet qTasks) throws PDIException;

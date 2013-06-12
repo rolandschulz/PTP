@@ -20,9 +20,10 @@ package org.eclipse.ptp.debug.core.pdi.request;
 
 /**
  * Represents to request special command
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDICommandRequest extends IPDIInternalEventRequest {
-
+	// Empty
 }

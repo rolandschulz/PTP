@@ -20,7 +20,10 @@ package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
  * Represents long type in IAIFType
+ * 
  * @author clement
- *
+ * 
  */
-public interface IAIFTypeLong extends ITypeIntegral {}
+public interface IAIFTypeLong extends ITypeIntegral {
+	// Empty
+}

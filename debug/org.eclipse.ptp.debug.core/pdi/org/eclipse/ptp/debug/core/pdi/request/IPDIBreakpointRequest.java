@@ -22,19 +22,22 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIBreakpoint;
 
 /**
  * Represents to request a breakpoint
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIBreakpointRequest extends IPDIEventRequest {
 	/**
 	 * Returns pdi breakpoint
+	 * 
 	 * @return pdi breakpoint
 	 */
-	IPDIBreakpoint getBreakpoint();
-	
+	public IPDIBreakpoint getBreakpoint();
+
 	/**
 	 * Whether send PDI event or not
+	 * 
 	 * @return false if don't event pdi event
 	 */
-	boolean isAllowUpdate();
+	public boolean isAllowUpdate();
 }

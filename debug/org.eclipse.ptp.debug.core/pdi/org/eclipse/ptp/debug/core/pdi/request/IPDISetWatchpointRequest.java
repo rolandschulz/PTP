@@ -20,9 +20,10 @@ package org.eclipse.ptp.debug.core.pdi.request;
 
 /**
  * Represents to request setting a watchpoint
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDISetWatchpointRequest extends IPDIBreakpointRequest {
-
+	// Empty
 }

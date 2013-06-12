@@ -30,6 +30,8 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
 public interface IPDIListArgumentsRequest extends IPDIEventRequest {
 
 	/**
+	 * Get arguments
+	 * 
 	 * @param tasks
 	 * @return
 	 * @since 4.0

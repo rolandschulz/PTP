@@ -21,6 +21,8 @@ package org.eclipse.ptp.debug.core.model;
 import org.eclipse.ptp.internal.debug.core.messages.Messages;
 
 /**
+ * Variable formats
+ * 
  * @author clement
  * 
  */
@@ -58,7 +60,9 @@ public class PVariableFormat {
 		fName = name;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	@Override

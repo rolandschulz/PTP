@@ -19,8 +19,10 @@
 package org.eclipse.ptp.debug.core.model;
 
 /**
+ * Address breakpoint
+ * 
  * @author Clement chu
- *
+ * 
  */
 public interface IPAddressBreakpoint extends IPLineBreakpoint {
 }

@@ -21,9 +21,10 @@ package org.eclipse.ptp.debug.core.pdi.event;
 import org.eclipse.ptp.debug.core.pdi.IPDISessionObject;
 
 /**
- * Notifies that the originator has been suspended. 
+ * Notifies that the originator has been suspended.
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDISuspendedEvent extends IPDIEvent {
 	/**
@@ -37,31 +38,36 @@ public interface IPDISuspendedEvent extends IPDIEvent {
 	 * IPDISharedLibraryInfo
 	 * IPDIWatchpointScopeInfo
 	 * IPDIWatchpointTriggerInfo
+	 * 
 	 * @return IPDISessionObject the session object that caused the suspension
 	 */
-	IPDISessionObject getReason();
-	
+	public IPDISessionObject getReason();
+
 	/**
 	 * Returns a list of variables that are changed
+	 * 
 	 * @return a list of variables
 	 */
-	String[] getUpdatedVariables();
-	
+	public String[] getUpdatedVariables();
+
 	/**
 	 * Returns thread ID
+	 * 
 	 * @return thread ID
 	 */
-	int getThreadID();
+	public int getThreadID();
 
 	/**
 	 * Returns level of current suspended frame
+	 * 
 	 * @return level of current suspended frame
 	 */
-	int getLevel();
-	
+	public int getLevel();
+
 	/**
 	 * Returns the maximum level of suspended frame
+	 * 
 	 * @return the maximum level of suspended frame
 	 */
-	int getDepth();
+	public int getDepth();
 }

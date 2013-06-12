@@ -29,6 +29,8 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
  */
 public interface IPDIGetInfoThreadsRequest extends IPDIEventRequest {
 	/**
+	 * Get thread IDs
+	 * 
 	 * @param qTasks
 	 * @return
 	 * @throws PDIException

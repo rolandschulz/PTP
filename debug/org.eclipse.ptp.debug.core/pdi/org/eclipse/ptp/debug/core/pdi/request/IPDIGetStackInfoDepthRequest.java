@@ -29,6 +29,8 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
  */
 public interface IPDIGetStackInfoDepthRequest extends IPDIEventRequest {
 	/**
+	 * Get stack depth
+	 * 
 	 * @param qTasks
 	 * @return
 	 * @throws PDIException

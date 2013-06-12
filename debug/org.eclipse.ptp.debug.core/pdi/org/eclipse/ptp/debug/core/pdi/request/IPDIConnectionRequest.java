@@ -20,9 +20,10 @@ package org.eclipse.ptp.debug.core.pdi.request;
 
 /**
  * Represents to request a connection to debugger
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIConnectionRequest extends IPDIEventRequest {
-
+	// Empty
 }

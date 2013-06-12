@@ -11,12 +11,14 @@
 package org.eclipse.ptp.debug.core;
 
 /**
- * @author greg
+ * Interface to manage task sets
  * 
  */
 public interface IPSetManager {
 
 	/**
+	 * Add tasks to the set identified by sid
+	 * 
 	 * @param sid
 	 * @param tasks
 	 * @since 4.0
@@ -24,6 +26,8 @@ public interface IPSetManager {
 	public void addTasks(String sid, TaskSet tasks);
 
 	/**
+	 * Create a new set containing the tasks
+	 * 
 	 * @param sid
 	 * @param tasks
 	 * @since 4.0
@@ -31,11 +35,15 @@ public interface IPSetManager {
 	public void createSet(String sid, TaskSet tasks);
 
 	/**
+	 * Delete the task set
+	 * 
 	 * @param sid
 	 */
 	public void deleteSets(String sid);
 
 	/**
+	 * Get the tasks in the set sid
+	 * 
 	 * @param sid
 	 * @return
 	 * @since 4.0
@@ -43,10 +51,11 @@ public interface IPSetManager {
 	public TaskSet getTasks(String sid);
 
 	/**
+	 * Remove the tasks from the set sid
+	 * 
 	 * @param sid
 	 * @param tasks
 	 * @since 4.0
 	 */
 	public void removeTasks(String sid, TaskSet tasks);
-
 }

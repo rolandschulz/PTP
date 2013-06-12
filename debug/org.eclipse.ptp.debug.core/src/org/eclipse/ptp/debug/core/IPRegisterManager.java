@@ -18,7 +18,7 @@ import org.eclipse.ptp.debug.core.model.IPRegisterDescriptor;
 import org.eclipse.ptp.debug.core.model.IPStackFrame;
 
 /**
- * @author greg
+ * Interface for managing registers
  * 
  */
 public interface IPRegisterManager {

@@ -23,13 +23,15 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIBreakpoint;
 
 /**
  * Represents an information provided by the session when the program stopped by a breakpoint
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIBreakpointInfo extends IPDISessionObject {
 	/**
 	 * Returns the breakpoint that stopped the program
+	 * 
 	 * @return the breakpoint that stopped the program
 	 */
-	IPDIBreakpoint getBreakpoint();
+	public IPDIBreakpoint getBreakpoint();
 }

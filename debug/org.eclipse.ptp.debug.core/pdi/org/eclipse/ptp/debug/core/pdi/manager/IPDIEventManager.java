@@ -40,21 +40,29 @@ public interface IPDIEventManager extends IPDIManager {
 	public void addEventListener(IPDIEventListener listener);
 
 	/**
+	 * Fire event
+	 * 
 	 * @param event
 	 */
 	public void fireEvent(IPDIEvent event);
 
 	/**
+	 * Fire multiple events
+	 * 
 	 * @param events
 	 */
 	public void fireEvents(final IPDIEvent[] events);
 
 	/**
+	 * Get the current reques
+	 * 
 	 * @return
 	 */
 	public IPDIEventRequest getCurrentRequest();
 
 	/**
+	 * Notify the event request
+	 * 
 	 * @param request
 	 */
 	public void notifyEventRequest(IPDIEventRequest request);
@@ -68,7 +76,7 @@ public interface IPDIEventManager extends IPDIManager {
 	public void registerEventRequest(IPDIEventRequest request);
 
 	/**
-	 * 
+	 * remove all registered event requests
 	 */
 	public void removeAllRegisteredEventRequests();
 

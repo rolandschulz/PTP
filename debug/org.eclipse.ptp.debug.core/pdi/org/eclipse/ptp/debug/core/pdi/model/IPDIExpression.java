@@ -23,40 +23,48 @@ import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
 
 /**
  * An expression is a snippet of code that can be evaluated to produce a value
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIExpression {
 	/**
 	 * Returns the expression snippet of code.
+	 * 
 	 * @return the expression
 	 */
-	String getExpressionText();
+	public String getExpressionText();
 
 	/**
 	 * Determines whether the variable Object are the same,
 	 * For example event if the name is the same because of casting this may return false;
+	 * 
 	 * @return true if the same
 	 */
-	boolean equals(IPDIExpression expr);
-	
+	public boolean equals(IPDIExpression expr);
+
 	/**
 	 * Remove the expression from the manager list
+	 * 
 	 * @param var
-	 * @throws PDIException on failure
+	 * @throws PDIException
+	 *             on failure
 	 */
-	void dispose() throws PDIException;
-	
+	public void dispose() throws PDIException;
+
 	/**
 	 * Returns AIF of this expression
+	 * 
 	 * @return aif
-	 * @throws PDIException on failure
+	 * @throws PDIException
+	 *             on failure
 	 */
-	IAIF getAIF() throws PDIException;
-	
+	public IAIF getAIF() throws PDIException;
+
 	/**
 	 * Set aif for this expression
+	 * 
 	 * @param aif
 	 */
-	void setAIF(IAIF aif);
+	public void setAIF(IAIF aif);
 }

@@ -20,15 +20,16 @@ package org.eclipse.ptp.debug.core.pdi.event;
 
 /**
  * An event listener registers with the event manager to receive event notification from the PDI model objects
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIEventListener {
 	/**
 	 * Notifies this listener of the given event.
-	 * @param events - the event
+	 * 
+	 * @param events
+	 *            - the event
 	 */
-	void handleDebugEvents(IPDIEvent[] events);
+	public void handleDebugEvents(IPDIEvent[] events);
 }
-
-

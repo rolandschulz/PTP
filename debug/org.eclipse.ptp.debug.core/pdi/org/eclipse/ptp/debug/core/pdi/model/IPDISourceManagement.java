@@ -24,66 +24,93 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
 
 /**
  * Maintains the list of directories to search for source files.
+ * 
  * @author clement
  * 
  */
 public interface IPDISourceManagement {
 	/**
 	 * Set the source search paths for the debug session.
-	 * @param String array of search paths
-	 * @throws PDIException on failure
+	 * 
+	 * @param String
+	 *            array of search paths
+	 * @throws PDIException
+	 *             on failure
 	 */
-	void setSourcePaths(String[] srcPaths) throws PDIException;
+	public void setSourcePaths(String[] srcPaths) throws PDIException;
 
 	/**
 	 * Return the array of source paths
+	 * 
 	 * @return String array of search paths.
-	 * @throws PDIException on failure
+	 * @throws PDIException
+	 *             on failure
 	 */
-	String[] getSourcePaths() throws PDIException;
+	public String[] getSourcePaths() throws PDIException;
 
 	/**
-	 * @param startAddress is the begining address
-	 * @param endAddress is the end address
-	 * @throws PDIException on failure.
+	 * @param startAddress
+	 *            is the begining address
+	 * @param endAddress
+	 *            is the end address
+	 * @throws PDIException
+	 *             on failure.
 	 */
-	IPDIInstruction[] getInstructions(BigInteger startAddress, BigInteger endAddress) throws PDIException;
+	public IPDIInstruction[] getInstructions(BigInteger startAddress, BigInteger endAddress) throws PDIException;
 
 	/**
-	 * @param filename is the name of the file to disassemble
-	 * @param linenum is the line number to disassemble around
-	 * @throws PDIException on failure.
+	 * @param filename
+	 *            is the name of the file to disassemble
+	 * @param linenum
+	 *            is the line number to disassemble around
+	 * @throws PDIException
+	 *             on failure.
 	 */
-	IPDIInstruction[] getInstructions(String filename, int linenum) throws PDIException;
+	public IPDIInstruction[] getInstructions(String filename, int linenum) throws PDIException;
 
 	/**
-	 * @param filename is the name of the file to disassemble
-	 * @param linenum is the line number to disassemble around
-	 * @param lines is the number of disassembly to produced
-	 * @throws PDIException on failure.
+	 * @param filename
+	 *            is the name of the file to disassemble
+	 * @param linenum
+	 *            is the line number to disassemble around
+	 * @param lines
+	 *            is the number of disassembly to produced
+	 * @throws PDIException
+	 *             on failure.
 	 */
-	IPDIInstruction[] getInstructions(String filename, int linenum, int lines) throws PDIException;
+	public IPDIInstruction[] getInstructions(String filename, int linenum, int lines) throws PDIException;
 
 	/**
-	 * @param startAddress is the begining address
-	 * @param endAddress is the end address
-	 * @throws PDIException on failure.
+	 * @param startAddress
+	 *            is the begining address
+	 * @param endAddress
+	 *            is the end address
+	 * @throws PDIException
+	 *             on failure.
 	 */
-	IPDIMixedInstruction[] getMixedInstructions(BigInteger startAddress, BigInteger endAddress) throws PDIException;
+	public IPDIMixedInstruction[] getMixedInstructions(BigInteger startAddress, BigInteger endAddress) throws PDIException;
 
 	/**
-	 * @param filename is the name of the file to disassemble
-	 * @param linenum is the line number to disassemble around
-	 * @param lines is the number of disassembly to produced
-	 * @throws PDIException on failure.
+	 * @param filename
+	 *            is the name of the file to disassemble
+	 * @param linenum
+	 *            is the line number to disassemble around
+	 * @param lines
+	 *            is the number of disassembly to produced
+	 * @throws PDIException
+	 *             on failure.
 	 */
-	IPDIMixedInstruction[] getMixedInstructions(String filename, int linenum) throws PDIException;
+	public IPDIMixedInstruction[] getMixedInstructions(String filename, int linenum) throws PDIException;
 
 	/**
-	 * @param filename is the name of the file to disassemble
-	 * @param linenum is the line number to disassemble around
-	 * @param lines is the number of disassembly to produced
-	 * @throws PDIException on failure.
+	 * @param filename
+	 *            is the name of the file to disassemble
+	 * @param linenum
+	 *            is the line number to disassemble around
+	 * @param lines
+	 *            is the number of disassembly to produced
+	 * @throws PDIException
+	 *             on failure.
 	 */
-	IPDIMixedInstruction[] getMixedInstructions(String filename, int linenum, int lines) throws PDIException;
+	public IPDIMixedInstruction[] getMixedInstructions(String filename, int linenum, int lines) throws PDIException;
 }

@@ -24,6 +24,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.debug.core.DebugException;
 
 /**
+ * Represents a module
+ * 
  * @author clement
  * 
  */
@@ -69,8 +71,8 @@ public interface IPModule extends IPDebugElement {
 	public IPath getSymbolsFileName();
 
 	/**
-	 * Associate the specified file as a symbol provider for this module. If
-	 * <code>null</code> is passed as a file name the internal symbols search
+	 * Associate the specified file as a symbol provider for this module. If <code>null</code> is passed as a file name the internal
+	 * symbols search
 	 * mechanism will be used.
 	 * 
 	 * @param symbolsFile
@@ -111,7 +113,8 @@ public interface IPModule extends IPDebugElement {
 	/**
 	 * Loads the module symbols from the specified file.
 	 * 
-	 * @throws DebugException if this method fails. Reasons include:
+	 * @throws DebugException
+	 *             if this method fails. Reasons include:
 	 */
 	public void loadSymbols() throws DebugException;
 

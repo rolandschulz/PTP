@@ -22,6 +22,8 @@ package org.eclipse.ptp.debug.core;
 import java.util.BitSet;
 
 /**
+ * Represents a set of tasks (processes) that can be controlled as a group by the debugger
+ * 
  * @since 4.0
  */
 public class TaskSet extends BitSet {
@@ -39,8 +41,8 @@ public class TaskSet extends BitSet {
 
 	/**
 	 * Creates a task set whose initial size is large enough to explicitly
-	 * represent tasks with indices in the range <code>0</code> through
-	 * <code>ntasks-1</code>. All tasks are initially <code>false</code>.
+	 * represent tasks with indices in the range <code>0</code> through <code>ntasks-1</code>. All tasks are initially
+	 * <code>false</code>.
 	 * 
 	 * @param ntasks
 	 *            the initial size of the task set.
@@ -75,8 +77,8 @@ public class TaskSet extends BitSet {
 	 *            array of indices to clear
 	 */
 	public void clear(int[] indices) throws IndexOutOfBoundsException {
-		for (int i = 0; i < indices.length; i++) {
-			clear(indices[i]);
+		for (int indice : indices) {
+			clear(indice);
 		}
 	}
 
@@ -106,8 +108,8 @@ public class TaskSet extends BitSet {
 	 *            array of indices to clear
 	 */
 	public void set(int[] indices) throws IndexOutOfBoundsException {
-		for (int i = 0; i < indices.length; i++) {
-			set(indices[i]);
+		for (int indice : indices) {
+			set(indice);
 		}
 	}
 
@@ -210,12 +212,15 @@ public class TaskSet extends BitSet {
 	 * @return byte
 	 */
 	private byte fromHex(byte b) {
-		if (b >= 48 && b <= 57)
+		if (b >= 48 && b <= 57) {
 			return (byte) (b - 48);
-		if (b >= 65 && b <= 70)
+		}
+		if (b >= 65 && b <= 70) {
 			return (byte) (b - 65 + 10);
-		if (b >= 97 && b <= 102)
+		}
+		if (b >= 97 && b <= 102) {
 			return (byte) (b - 97 + 10);
+		}
 
 		return (byte) 0;
 	}

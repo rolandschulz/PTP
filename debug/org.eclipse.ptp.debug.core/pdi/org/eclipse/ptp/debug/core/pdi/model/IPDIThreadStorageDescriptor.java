@@ -22,15 +22,17 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
 
 /**
  * Represents thread storage descriptor
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIThreadStorageDescriptor extends IPDIVariableDescriptor {
 	/**
 	 * Returns the thread
+	 * 
 	 * @return the thread
-	 * @throws PDIException on failure
+	 * @throws PDIException
+	 *             on failure
 	 */
-	IPDIThread getThread() throws PDIException;
+	public IPDIThread getThread() throws PDIException;
 }
-

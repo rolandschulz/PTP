@@ -21,16 +21,22 @@ package org.eclipse.ptp.debug.core.model;
 import org.eclipse.core.runtime.IPath;
 
 /**
+ * Additional information associated with a variable
+ * 
  * @author Clement chu
  * 
  */
 public interface IPGlobalVariableDescriptor {
 	/**
+	 * Get the name
+	 * 
 	 * @return
 	 */
 	public String getName();
 
 	/**
+	 * Get the path
+	 * 
 	 * @return
 	 */
 	public IPath getPath();

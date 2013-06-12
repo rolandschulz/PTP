@@ -23,8 +23,14 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDISignal;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIThread;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIVariable;
 
+/**
+ * Factory for creating debugger events
+ * 
+ */
 public interface IPDIEventFactory {
 	/**
+	 * Create breakpoint info
+	 * 
 	 * @param session
 	 * @param tasks
 	 * @param bpt
@@ -34,12 +40,16 @@ public interface IPDIEventFactory {
 	public IPDIBreakpointInfo newBreakpointInfo(IPDISession session, TaskSet tasks, IPDIBreakpoint bpt);
 
 	/**
+	 * Create a changed event
+	 * 
 	 * @param reason
 	 * @return
 	 */
 	public IPDIChangedEvent newChangedEvent(IPDISessionObject reason);
 
 	/**
+	 * Create a connected event
+	 * 
 	 * @param reason
 	 * @param tasks
 	 * @return
@@ -54,6 +64,8 @@ public interface IPDIEventFactory {
 	public IPDICreatedEvent newCreatedEvent(IPDISessionObject reason);
 
 	/**
+	 * Create data read memory
+	 * 
 	 * @param address
 	 * @param nextRow
 	 * @param prevRow
@@ -68,12 +80,16 @@ public interface IPDIEventFactory {
 			long totalBytes, IPDIMemory[] memories);
 
 	/**
+	 * Create destroyed event
+	 * 
 	 * @param reason
 	 * @return
 	 */
 	public IPDIDestroyedEvent newDestroyedEvent(IPDISessionObject reason);
 
 	/**
+	 * Create disconnected event
+	 * 
 	 * @param reason
 	 * @param tasks
 	 * @return
@@ -82,6 +98,8 @@ public interface IPDIEventFactory {
 	public IPDIDisconnectedEvent newDisconnectedEvent(IPDISessionObject reason, TaskSet tasks);
 
 	/**
+	 * Create end stepping range info
+	 * 
 	 * @param reason
 	 * @param tasks
 	 * @param locator
@@ -91,12 +109,16 @@ public interface IPDIEventFactory {
 	public IPDIEndSteppingRangeInfo newEndSteppingRangeInfo(IPDISession session, TaskSet tasks, IPDILocator locator);
 
 	/**
+	 * Create error event
+	 * 
 	 * @param reason
 	 * @return
 	 */
 	public IPDIErrorEvent newErrorEvent(IPDISessionObject reason);
 
 	/**
+	 * Create error info
+	 * 
 	 * @param session
 	 * @param tasks
 	 * @param code
@@ -108,6 +130,8 @@ public interface IPDIEventFactory {
 	public IPDIErrorInfo newErrorInfo(IPDISession session, TaskSet tasks, int code, String msg, String detailMsg);
 
 	/**
+	 * Create exit info
+	 * 
 	 * @param reason
 	 * @param tasks
 	 * @param code
@@ -117,6 +141,8 @@ public interface IPDIEventFactory {
 	public IPDIExitInfo newExitInfo(IPDISession session, TaskSet tasks, int code);
 
 	/**
+	 * Create location reached info
+	 * 
 	 * @param session
 	 * @param tasks
 	 * @param locator
@@ -126,6 +152,8 @@ public interface IPDIEventFactory {
 	public IPDILocationReachedInfo newLocationReachedInfo(IPDISession session, TaskSet tasks, IPDILocator locator);
 
 	/**
+	 * Create memory block info
+	 * 
 	 * @param session
 	 * @param tasks
 	 * @param bigIntegers
@@ -136,6 +164,8 @@ public interface IPDIEventFactory {
 	public IPDISessionObject newMemoryBlockInfo(IPDISession session, TaskSet tasks, BigInteger[] bigIntegers, IPDIMemoryBlock block);
 
 	/**
+	 * Create output event
+	 * 
 	 * @param session
 	 * @param tasks
 	 * @param output
@@ -145,6 +175,8 @@ public interface IPDIEventFactory {
 	public IPDIOutputEvent newOutputEvent(IPDISessionObject reason, TaskSet tasks, String output);
 
 	/**
+	 * Create resumed event
+	 * 
 	 * @param session
 	 * @param tasks
 	 * @param type
@@ -154,6 +186,8 @@ public interface IPDIEventFactory {
 	public IPDIResumedEvent newResumedEvent(IPDISessionObject reason, TaskSet tasks, int type);
 
 	/**
+	 * Create signal info
+	 * 
 	 * @param reason
 	 * @param tasks
 	 * @param name
@@ -167,6 +201,8 @@ public interface IPDIEventFactory {
 			IPDILocator locator);
 
 	/**
+	 * Create started event
+	 * 
 	 * @param session
 	 * @param tasks
 	 * @return
@@ -175,6 +211,8 @@ public interface IPDIEventFactory {
 	public IPDIStartedEvent newStartedEvent(IPDISessionObject reason, TaskSet tasks);
 
 	/**
+	 * Create suspend event
+	 * 
 	 * @param reason
 	 * @param vars
 	 * @param thread_id
@@ -185,6 +223,8 @@ public interface IPDIEventFactory {
 	public IPDISuspendedEvent newSuspendedEvent(IPDISessionObject reason, String[] vars, int thread_id, int level, int depth);
 
 	/**
+	 * Create thread info
+	 * 
 	 * @param session
 	 * @param tasks
 	 * @param id
@@ -195,6 +235,8 @@ public interface IPDIEventFactory {
 	public IPDISessionObject newThreadInfo(IPDISession session, TaskSet tasks, int id, IPDIThread thread);
 
 	/**
+	 * Create variable info
+	 * 
 	 * @param session
 	 * @param tasks
 	 * @param name

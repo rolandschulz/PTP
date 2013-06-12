@@ -22,8 +22,9 @@ import org.eclipse.ptp.debug.core.pdi.IPDISessionObject;
 
 /**
  * Notifies that the originator has been created.
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDICreatedEvent extends IPDIEvent {
 	/**
@@ -36,8 +37,8 @@ public interface IPDICreatedEvent extends IPDIEvent {
 	 * IPDISharedLibraryInfo
 	 * IPDISignalInfo
 	 * IPDIVariableInfo
+	 * 
 	 * @return the reason why created
 	 */
-	IPDISessionObject getReason();
+	public IPDISessionObject getReason();
 }
-

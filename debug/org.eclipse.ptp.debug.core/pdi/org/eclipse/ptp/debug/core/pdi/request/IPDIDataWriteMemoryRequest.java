@@ -20,9 +20,10 @@ package org.eclipse.ptp.debug.core.pdi.request;
 
 /**
  * Represents to request a data write memory
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIDataWriteMemoryRequest extends IPDIInternalEventRequest {
-
+	// Empty
 }

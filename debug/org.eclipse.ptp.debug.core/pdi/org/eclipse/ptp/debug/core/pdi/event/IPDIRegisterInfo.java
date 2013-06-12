@@ -23,19 +23,22 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIRegister;
 
 /**
  * Represents register info
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIRegisterInfo extends IPDISessionObject {
 	/**
 	 * Returns register name
+	 * 
 	 * @return register name
 	 */
-	String getName();
-	
+	public String getName();
+
 	/**
 	 * Returns register
+	 * 
 	 * @return register
 	 */
-	IPDIRegister getRegister();
+	public IPDIRegister getRegister();
 }

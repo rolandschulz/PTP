@@ -20,9 +20,10 @@ package org.eclipse.ptp.debug.core.pdi.model;
 
 /**
  * Represents a break condition
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIRegisterDescriptor extends IPDIVariableDescriptor {
-
+	// Empty
 }

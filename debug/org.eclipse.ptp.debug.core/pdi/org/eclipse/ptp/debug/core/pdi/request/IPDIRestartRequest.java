@@ -20,9 +20,10 @@ package org.eclipse.ptp.debug.core.pdi.request;
 
 /**
  * Represents to request restarting
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIRestartRequest extends IPDIEventRequest {
-
+	// Empty
 }

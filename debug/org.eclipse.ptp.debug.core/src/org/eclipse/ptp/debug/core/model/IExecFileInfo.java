@@ -21,6 +21,8 @@ package org.eclipse.ptp.debug.core.model;
 import org.eclipse.debug.core.DebugException;
 
 /**
+ * Interface for obtaining executable file information
+ * 
  * @author Clement chu
  * 
  */

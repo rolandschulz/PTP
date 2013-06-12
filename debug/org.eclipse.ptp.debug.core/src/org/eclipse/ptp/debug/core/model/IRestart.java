@@ -21,20 +21,23 @@ package org.eclipse.ptp.debug.core.model;
 import org.eclipse.debug.core.DebugException;
 
 /**
+ * Restart interface for a debugger element
+ * 
  * @author Clement chu
  */
 public interface IRestart {
 	/**
 	 * Returns whether this element can currently be restarted.
-	 *
+	 * 
 	 * @return whether this element can currently be restarted
 	 */
 	public boolean canRestart();
-	
+
 	/**
 	 * Causes this element to restart its execution.
-	 *
-	 * @exception DebugException on failure. Reasons include:
+	 * 
+	 * @exception DebugException
+	 *                on failure. Reasons include:
 	 */
 	public void restart() throws DebugException;
 }

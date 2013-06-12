@@ -18,26 +18,30 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
 /**
  * Base manager interfaces
  * 
- * @author greg
- * 
  */
 public interface IPDIManager extends IPDISessionObject {
 	/**
+	 * Test if auto update is set
+	 * 
 	 * @return
 	 */
 	public boolean isAutoUpdate();
 
 	/**
+	 * Set auto update
+	 * 
 	 * @param update
 	 */
 	public void setAutoUpdate(boolean update);
 
 	/**
-	 * 
+	 * Shut down the manager
 	 */
 	public void shutdown();
 
 	/**
+	 * Update the tasks
+	 * 
 	 * @param tasks
 	 * @throws PDIException
 	 * @since 4.0

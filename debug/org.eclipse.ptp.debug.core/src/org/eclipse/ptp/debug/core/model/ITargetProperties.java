@@ -21,6 +21,8 @@ package org.eclipse.ptp.debug.core.model;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 
 /**
+ * Interface for managing target properties
+ * 
  * @author clement
  * 
  */

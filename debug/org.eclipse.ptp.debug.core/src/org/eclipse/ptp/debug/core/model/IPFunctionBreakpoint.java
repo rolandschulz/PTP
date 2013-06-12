@@ -19,8 +19,10 @@
 package org.eclipse.ptp.debug.core.model;
 
 /**
+ * Represents a function breakpoint
+ * 
  * @author Clement chu
- *
+ * 
  */
 public interface IPFunctionBreakpoint extends IPLineBreakpoint {
 }

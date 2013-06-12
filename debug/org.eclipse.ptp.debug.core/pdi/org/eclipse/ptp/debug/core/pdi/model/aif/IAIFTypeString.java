@@ -26,6 +26,8 @@ package org.eclipse.ptp.debug.core.pdi.model.aif;
  * NOTE: See {@see IAIFCharPointer} for C/C++ string types.
  * 
  * @author clement
- *
+ * 
  */
-public interface IAIFTypeString extends IAIFType {}
+public interface IAIFTypeString extends IAIFType {
+	// Empty
+}

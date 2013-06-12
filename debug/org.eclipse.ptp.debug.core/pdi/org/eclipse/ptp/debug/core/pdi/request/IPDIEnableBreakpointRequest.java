@@ -20,9 +20,10 @@ package org.eclipse.ptp.debug.core.pdi.request;
 
 /**
  * Represents to request enabling a breakpoint
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIEnableBreakpointRequest extends IPDIBreakpointRequest {
-
+	// Empty
 }

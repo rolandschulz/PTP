@@ -24,76 +24,101 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
 
 /**
  * Defines a point in the program execution when the specified data to be collected.
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDITracepoint extends IPDISessionObject {
 	/**
 	 * Represents an action to be taken when the tracepoint is hit.
+	 * 
 	 * @author clement
-	 *
+	 * 
 	 */
-	public interface IAction {}
+	public interface IAction {
+		// Empty
+	}
 
 	/**
 	 * Returns the location of this tracepoint.
+	 * 
 	 * @return the location of this tracepoint
-	 * @throws PDIException on failure
+	 * @throws PDIException
+	 *             on failure
 	 */
-	IPDILocation getLocation() throws PDIException;
+	public IPDILocation getLocation() throws PDIException;
 
 	/**
 	 * Returns whether this tracepoint is enabled.
+	 * 
 	 * @return whether this tracepoint is enabled
-	 * @throws PDIException on failure
+	 * @throws PDIException
+	 *             on failure
 	 */
-	boolean isEnabled() throws PDIException;
+	public boolean isEnabled() throws PDIException;
 
 	/**
-	 * Sets the enabled state of this tracepoint. This has no effect 
+	 * Sets the enabled state of this tracepoint. This has no effect
 	 * if the current enabled state is the same as specified by the enabled parameter.
-	 * @param enabled - whether this tracepoint should be enabled 
-	 * @throws PDIException on failure
+	 * 
+	 * @param enabled
+	 *            - whether this tracepoint should be enabled
+	 * @throws PDIException
+	 *             on failure
 	 */
-	void setEnabled(boolean enabled) throws PDIException;
+	public void setEnabled(boolean enabled) throws PDIException;
 
 	/**
 	 * Returns the pass count of this tracepoint.
+	 * 
 	 * @return the pass count of this tracepoint
-	 * @throws PDIException on failure
+	 * @throws PDIException
+	 *             on failure
 	 */
-	int getPassCount() throws PDIException;
-	
+	public int getPassCount() throws PDIException;
+
 	/**
 	 * Sets the pass count of this tracepoint.
-	 * @param the pass count to set
-	 * @throws PDIException on failure
+	 * 
+	 * @param the
+	 *            pass count to set
+	 * @throws PDIException
+	 *             on failure
 	 */
-	void setPassCount(int passCount) throws PDIException;
+	public void setPassCount(int passCount) throws PDIException;
 
 	/**
 	 * Adds the given actions to the action list of this tracepoint.
-	 * @param actions to add
-	 * @throws PDIException on failure
+	 * 
+	 * @param actions
+	 *            to add
+	 * @throws PDIException
+	 *             on failure
 	 */
-	void addActions(IPDITracepoint.IAction[] actions) throws PDIException;
+	public void addActions(IPDITracepoint.IAction[] actions) throws PDIException;
 
 	/**
 	 * Removes the given actions from the action list of this tracepoint.
-	 * @param actions to remove
-	 * @throws PDIException on failure
+	 * 
+	 * @param actions
+	 *            to remove
+	 * @throws PDIException
+	 *             on failure
 	 */
-	void removeActions(IPDITracepoint.IAction[] actions) throws PDIException;
+	public void removeActions(IPDITracepoint.IAction[] actions) throws PDIException;
 
 	/**
 	 * Clears the action list of this tracepoint.
-	 * @throws PDIException on failure
+	 * 
+	 * @throws PDIException
+	 *             on failure
 	 */
-	void clearActions() throws PDIException;
+	public void clearActions() throws PDIException;
 
 	/**
 	 * Returns the actions assigned to this tracepoint.
+	 * 
 	 * @return the actions of this tracepoint
 	 */
-	IPDITracepoint.IAction[] getActions();
+	public IPDITracepoint.IAction[] getActions();
 }

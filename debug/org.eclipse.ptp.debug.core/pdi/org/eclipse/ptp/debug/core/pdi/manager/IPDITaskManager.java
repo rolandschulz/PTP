@@ -28,6 +28,8 @@ import org.eclipse.ptp.debug.core.TaskSet;
  */
 public interface IPDITaskManager extends IPDIManager {
 	/**
+	 * Check if all tasks can step return
+	 * 
 	 * @param tasks
 	 * @return
 	 * @since 4.0
@@ -35,6 +37,8 @@ public interface IPDITaskManager extends IPDIManager {
 	public boolean canAllStepReturn(TaskSet tasks);
 
 	/**
+	 * Get tasks that cannot step return
+	 * 
 	 * @param tasks
 	 * @return
 	 * @since 4.0
@@ -42,12 +46,16 @@ public interface IPDITaskManager extends IPDIManager {
 	public TaskSet getCannotStepReturnTasks(TaskSet tasks);
 
 	/**
+	 * Get tasks that can step return
+	 * 
 	 * @return
 	 * @since 4.0
 	 */
 	public TaskSet getCanStepReturnTasks();
 
 	/**
+	 * Get tasks that can step return from the supplied set
+	 * 
 	 * @param tasks
 	 * @return
 	 * @since 4.0
@@ -55,6 +63,8 @@ public interface IPDITaskManager extends IPDIManager {
 	public TaskSet getCanStepReturnTasks(TaskSet tasks);
 
 	/**
+	 * Get non pending tasks
+	 * 
 	 * @param tasks
 	 * @return
 	 * @since 4.0
@@ -95,6 +105,8 @@ public interface IPDITaskManager extends IPDIManager {
 	public TaskSet getPendingTasks();
 
 	/**
+	 * Get pending tasks
+	 * 
 	 * @param tasks
 	 * @return
 	 * @since 4.0
@@ -171,6 +183,8 @@ public interface IPDITaskManager extends IPDIManager {
 	public TaskSet getUnregisteredTasks(TaskSet tasks);
 
 	/**
+	 * Check if all tasks are pending
+	 * 
 	 * @param tasks
 	 * @return
 	 * @since 4.0
@@ -178,6 +192,8 @@ public interface IPDITaskManager extends IPDIManager {
 	public boolean isAllPending(TaskSet tasks);
 
 	/**
+	 * Check if all tasks are registered
+	 * 
 	 * @param tasks
 	 * @return
 	 * @since 4.0
@@ -185,6 +201,8 @@ public interface IPDITaskManager extends IPDIManager {
 	public boolean isAllRegistered(TaskSet tasks);
 
 	/**
+	 * Check if all tasks are running
+	 * 
 	 * @param tasks
 	 * @return
 	 * @since 4.0
@@ -192,6 +210,8 @@ public interface IPDITaskManager extends IPDIManager {
 	public boolean isAllRunning(TaskSet tasks);
 
 	/**
+	 * Check if all tasks are suspended
+	 * 
 	 * @param tasks
 	 * @return
 	 * @since 4.0
@@ -199,6 +219,8 @@ public interface IPDITaskManager extends IPDIManager {
 	public boolean isAllSuspended(TaskSet tasks);
 
 	/**
+	 * Check if all tasks are terminated
+	 * 
 	 * @param tasks
 	 * @return
 	 * @since 4.0
@@ -206,6 +228,8 @@ public interface IPDITaskManager extends IPDIManager {
 	public boolean isAllTerminated(TaskSet tasks);
 
 	/**
+	 * Set tasks that can step return
+	 * 
 	 * @param isAdd
 	 * @param tasks
 	 * @since 4.0
@@ -213,6 +237,8 @@ public interface IPDITaskManager extends IPDIManager {
 	public void setCanStepReturnTasks(boolean isAdd, TaskSet tasks);
 
 	/**
+	 * Set pending tasks
+	 * 
 	 * @param isAdd
 	 * @param tasks
 	 * @since 4.0
@@ -220,6 +246,8 @@ public interface IPDITaskManager extends IPDIManager {
 	public void setPendingTasks(boolean isAdd, TaskSet tasks);
 
 	/**
+	 * Set registered tasks
+	 * 
 	 * @param isAdd
 	 * @param tasks
 	 * @since 4.0
@@ -227,6 +255,8 @@ public interface IPDITaskManager extends IPDIManager {
 	public void setRegisterTasks(boolean isAdd, TaskSet tasks);
 
 	/**
+	 * Set suspended tasks
+	 * 
 	 * @param isAdd
 	 * @param tasks
 	 * @since 4.0
@@ -234,6 +264,8 @@ public interface IPDITaskManager extends IPDIManager {
 	public void setSuspendTasks(boolean isAdd, TaskSet tasks);
 
 	/**
+	 * Set terminated asks
+	 * 
 	 * @param isAdd
 	 * @param tasks
 	 * @since 4.0

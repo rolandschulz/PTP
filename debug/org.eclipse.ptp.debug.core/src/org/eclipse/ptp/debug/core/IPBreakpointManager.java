@@ -18,6 +18,9 @@ import org.eclipse.ptp.debug.core.model.IPLineBreakpoint;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIBreakpoint;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIWatchpoint;
 
+/**
+ * Interface for managing debugger breakpoints
+ */
 public interface IPBreakpointManager {
 
 	/**
@@ -53,23 +56,31 @@ public interface IPBreakpointManager {
 	public void deleteBreakpoint(IPBreakpoint breakpoint);
 
 	/**
+	 * Obtain the platform breakpoint interface from the PDI breakpoint.
+	 * 
 	 * @param pdiBpt
-	 * @return
+	 * @return breakpoint
 	 */
 	public IBreakpoint getBreakpoint(IPDIBreakpoint pdiBpt);
 
 	/**
+	 * Get the address defined by a line breakpoint
+	 * 
 	 * @param breakpoint
-	 * @return
+	 * @return breakpoint address
 	 */
 	public BigInteger getBreakpointAddress(IPLineBreakpoint breakpoint);
 
 	/**
+	 * Enable/disable breakpoint skipping.
+	 * 
 	 * @param enabled
 	 */
 	public void skipBreakpoints(boolean enabled);
 
 	/**
+	 * Notify that a watchpoint is out of scope
+	 * 
 	 * @param tasks
 	 * @param pdiWatchpoint
 	 * @since 4.0

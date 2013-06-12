@@ -19,18 +19,22 @@
 package org.eclipse.ptp.debug.core.model;
 
 /**
+ * Additional information associated with a register
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPRegisterDescriptor {
 	/**
 	 * Returns the regiser's name
+	 * 
 	 * @return the register's name
 	 */
 	public String getName();
 
 	/**
 	 * Returns the name of the hardware register group this register belongs to
+	 * 
 	 * @return the name of the hardware register group
 	 */
 	public String getGroupName();

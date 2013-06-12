@@ -20,9 +20,10 @@ package org.eclipse.ptp.debug.core.pdi.request;
 
 /**
  * Represents to request going
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIGoRequest extends IPDIEventRequest {
-
+	// Empty
 }

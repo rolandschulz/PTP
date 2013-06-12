@@ -20,9 +20,10 @@ package org.eclipse.ptp.debug.core.pdi.request;
 
 /**
  * Represents to request setting a function breakpoint
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDISetFunctionBreakpointRequest extends IPDIBreakpointRequest {
-
+	// Empty
 }

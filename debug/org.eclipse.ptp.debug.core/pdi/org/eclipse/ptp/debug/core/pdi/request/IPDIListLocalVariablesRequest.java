@@ -30,6 +30,8 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
 public interface IPDIListLocalVariablesRequest extends IPDIEventRequest {
 
 	/**
+	 * Get local variables
+	 * 
 	 * @param tasks
 	 * @return
 	 * @throws PDIException

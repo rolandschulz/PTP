@@ -21,8 +21,10 @@ package org.eclipse.ptp.debug.core.model;
 import org.eclipse.debug.core.model.IRegister;
 
 /**
+ * Represents a register
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPRegister extends IPVariable, IRegister {
 

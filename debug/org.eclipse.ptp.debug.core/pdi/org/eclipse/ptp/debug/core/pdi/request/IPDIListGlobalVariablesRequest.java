@@ -20,9 +20,10 @@ package org.eclipse.ptp.debug.core.pdi.request;
 
 /**
  * Represents to request a list of global variables
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIListGlobalVariablesRequest extends IPDIEventRequest {
-
+	// Empty
 }

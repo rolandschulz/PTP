@@ -32,6 +32,10 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 
+/**
+ * Main debugger interface used by debug launch delegate.
+ * 
+ */
 public interface IPDebugger {
 	/**
 	 * Clean up the debug session. Does whatever is necessary to shut down any

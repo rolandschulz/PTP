@@ -20,8 +20,9 @@ package org.eclipse.ptp.debug.core.pdi.event;
 
 /**
  * Notifies that the originator has been resumed.
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIResumedEvent extends IPDIEvent {
 	public final static int CONTINUE = 0;
@@ -33,7 +34,8 @@ public interface IPDIResumedEvent extends IPDIEvent {
 
 	/**
 	 * Returns the stepping type.
+	 * 
 	 * @return the stepping type
 	 */
-	int getType();
+	public int getType();
 }

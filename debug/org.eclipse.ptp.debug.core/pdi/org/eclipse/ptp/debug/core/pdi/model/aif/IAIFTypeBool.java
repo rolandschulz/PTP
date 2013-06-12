@@ -20,7 +20,10 @@ package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
  * Represents boolean type in IAIFType
+ * 
  * @author clement
- *
+ * 
  */
-public interface IAIFTypeBool extends ITypeIntegral {}
+public interface IAIFTypeBool extends ITypeIntegral {
+	// Empty
+}

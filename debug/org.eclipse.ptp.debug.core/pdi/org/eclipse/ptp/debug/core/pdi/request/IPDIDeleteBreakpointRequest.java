@@ -20,8 +20,10 @@ package org.eclipse.ptp.debug.core.pdi.request;
 
 /**
  * Represents to request deleting a breakpoint
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIDeleteBreakpointRequest extends IPDIBreakpointRequest {
+	// Empty
 }

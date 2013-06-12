@@ -245,8 +245,8 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 		if (getState().equals(PDebugElementState.RESUMED)) {
 			// only allow suspend if no threads are currently suspended
 			IThread[] threads = getThreads();
-			for (int i = 0; i < threads.length; i++) {
-				if (threads[i].isSuspended()) {
+			for (IThread thread : threads) {
+				if (thread.isSuspended()) {
 					return false;
 				}
 			}
@@ -354,22 +354,30 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 	@SuppressWarnings("rawtypes")
 	@Override
 	public Object getAdapter(Class adapter) {
-		if (adapter.equals(IPDebugElement.class))
+		if (adapter.equals(IPDebugElement.class)) {
 			return this;
-		if (adapter.equals(IDebugTarget.class))
+		}
+		if (adapter.equals(IDebugTarget.class)) {
 			return this;
-		if (adapter.equals(IPDebugTarget.class))
+		}
+		if (adapter.equals(IPDebugTarget.class)) {
 			return this;
-		if (adapter.equals(IPDITarget.class))
+		}
+		if (adapter.equals(IPDITarget.class)) {
 			return pdiTarget;
-		if (adapter.equals(IExecFileInfo.class))
+		}
+		if (adapter.equals(IExecFileInfo.class)) {
 			return this;
-		if (adapter.equals(IPDISession.class))
+		}
+		if (adapter.equals(IPDISession.class)) {
 			return getPDISession();
-		if (adapter.equals(IMemoryBlockRetrievalExtension.class))
+		}
+		if (adapter.equals(IMemoryBlockRetrievalExtension.class)) {
 			return fSession.getMemoryManager().getMemoryRetrieval(getTasks());
-		if (adapter.equals(IMemoryBlockRetrieval.class))
+		}
+		if (adapter.equals(IMemoryBlockRetrieval.class)) {
 			return fSession.getMemoryManager().getMemoryRetrieval(getTasks());
+		}
 		return super.getAdapter(adapter);
 	}
 
@@ -484,8 +492,9 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 	 */
 	public void handleDebugEvents(IPDIEvent[] events) {
 		for (IPDIEvent event : events) {
-			if (!event.contains(getTasks()))
+			if (!event.contains(getTasks())) {
 				continue;
+			}
 
 			if (event instanceof IPDIDestroyedEvent) {
 				handleTerminatedEvent((IPDIDestroyedEvent) event);
@@ -701,8 +710,9 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 	 * ()
 	 */
 	public void resumeWithoutSignal() throws DebugException {
-		if (!canResume())
+		if (!canResume()) {
 			return;
+		}
 		changeState(PDebugElementState.RESUMING);
 		try {
 			getPDISession().resume(getTasks(), false);
@@ -844,8 +854,9 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 		List<IThread> threads = getThreadList();
 		for (int i = 0; i < threads.size(); i++) {
 			PThread t = (PThread) threads.get(i);
-			if (t.getPDIThread().equals(pdiThread))
+			if (t.getPDIThread().equals(pdiThread)) {
 				return t;
+			}
 		}
 		return null;
 	}
@@ -858,8 +869,9 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 	private PThread findThread(List<IThread> threads, IPDIThread pdiThread) {
 		for (int i = 0; i < threads.size(); i++) {
 			PThread t = (PThread) threads.get(i);
-			if (t.getPDIThread().equals(pdiThread))
+			if (t.getPDIThread().equals(pdiThread)) {
 				return t;
+			}
 		}
 		return null;
 	}
@@ -869,27 +881,29 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 	 * @param containers
 	 */
 	private void getSourceLookupPath(List<String> list, ISourceContainer[] containers) {
-		for (int i = 0; i < containers.length; ++i) {
-			if (containers[i] instanceof ProjectSourceContainer) {
-				IProject project = ((ProjectSourceContainer) containers[i]).getProject();
-				if (project != null && project.exists())
+		for (ISourceContainer container2 : containers) {
+			if (container2 instanceof ProjectSourceContainer) {
+				IProject project = ((ProjectSourceContainer) container2).getProject();
+				if (project != null && project.exists()) {
 					list.add(project.getLocationURI().getPath());
+				}
 			}
-			if (containers[i] instanceof FolderSourceContainer) {
-				IContainer container = ((FolderSourceContainer) containers[i]).getContainer();
-				if (container != null && container.exists())
+			if (container2 instanceof FolderSourceContainer) {
+				IContainer container = ((FolderSourceContainer) container2).getContainer();
+				if (container != null && container.exists()) {
 					list.add(container.getLocationURI().getPath());
+				}
 			}
-			if (containers[i] instanceof DirectorySourceContainer) {
-				File dir = ((DirectorySourceContainer) containers[i]).getDirectory();
+			if (container2 instanceof DirectorySourceContainer) {
+				File dir = ((DirectorySourceContainer) container2).getDirectory();
 				if (dir != null && dir.exists()) {
 					IPath path = new Path(dir.getAbsolutePath());
 					list.add(path.toPortableString());
 				}
 			}
-			if (containers[i].isComposite()) {
+			if (container2.isComposite()) {
 				try {
-					getSourceLookupPath(list, containers[i].getSourceContainers());
+					getSourceLookupPath(list, container2.getSourceContainers());
 				} catch (CoreException e) {
 					PTPDebugCorePlugin.log(e.getStatus());
 				}
@@ -1152,9 +1166,9 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 		ISourceLocator locator = getLaunch().getSourceLocator();
 		if (locator instanceof ISourceLookupDirector) {
 			ISourceLookupParticipant[] participants = ((ISourceLookupDirector) locator).getParticipants();
-			for (int i = 0; i < participants.length; ++i) {
-				if (participants[i] instanceof PSourceLookupParticipant) {
-					((PSourceLookupParticipant) participants[i]).removeSourceLookupChangeListener(this);
+			for (ISourceLookupParticipant participant : participants) {
+				if (participant instanceof PSourceLookupParticipant) {
+					((PSourceLookupParticipant) participant).removeSourceLookupChangeListener(this);
 				}
 			}
 		}
@@ -1166,9 +1180,10 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 	 */
 	protected IThread getCurrentThread() throws DebugException {
 		IThread[] threads = getThreads();
-		for (int i = 0; i < threads.length; ++i) {
-			if (((PThread) threads[i]).isCurrent())
-				return threads[i];
+		for (IThread thread : threads) {
+			if (((PThread) thread).isCurrent()) {
+				return thread;
+			}
 		}
 		return null;
 	}
@@ -1231,17 +1246,18 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 	protected void initializeThreads(List<DebugEvent> debugEvents) {
 		IPDIThread[] pdiThreads = new IPDIThread[0];
 		try {
-			if (isSuspended())
+			if (isSuspended()) {
 				pdiThreads = getPDITarget().getThreads();
+			}
 		} catch (PDIException e) {
 			// ignore
 		}
 		DebugEvent suspendEvent = null;
-		for (int i = 0; i < pdiThreads.length; ++i) {
-			PThread thread = createThread(pdiThreads[i]);
+		for (IPDIThread pdiThread : pdiThreads) {
+			PThread thread = createThread(pdiThread);
 			debugEvents.add(thread.createCreateEvent());
 			try {
-				if (pdiThreads[i].equals(getPDITarget().getCurrentThread()) && thread.isSuspended()) {
+				if (pdiThread.equals(getPDITarget().getCurrentThread()) && thread.isSuspended()) {
 					// Use BREAKPOINT as a detail to force perspective switch
 					suspendEvent = thread.createSuspendEvent(DebugEvent.BREAKPOINT);
 				}
@@ -1291,15 +1307,15 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 			currentPDIThread = getPDITarget().getCurrentThread();
 		} catch (PDIException e) {
 		}
-		for (int i = 0; i < pdiThreads.length; ++i) {
-			PThread thread = findThread(oldList, pdiThreads[i]);
+		for (IPDIThread pdiThread : pdiThreads) {
+			PThread thread = findThread(oldList, pdiThread);
 			if (thread == null) {
-				thread = new PThread(this, pdiThreads[i]);
+				thread = new PThread(this, pdiThread);
 				newThreads.add(thread);
 			} else {
 				oldList.remove(thread);
 			}
-			thread.setCurrent(pdiThreads[i].equals(currentPDIThread));
+			thread.setCurrent(pdiThread.equals(currentPDIThread));
 			list.add(thread);
 		}
 		Iterator<IThread> it = oldList.iterator();
@@ -1313,8 +1329,9 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 		while (it.hasNext()) {
 			debugEvents.add(((PThread) it.next()).createCreateEvent());
 		}
-		if (debugEvents.size() > 0)
+		if (debugEvents.size() > 0) {
 			fireEventSet(debugEvents.toArray(new DebugEvent[debugEvents.size()]));
+		}
 		return newThreads;
 	}
 
@@ -1324,9 +1341,9 @@ public class PDebugTarget extends PDebugElement implements IPDebugTarget, IPDIEv
 	protected void removeAllExpressions() {
 		IExpressionManager em = DebugPlugin.getDefault().getExpressionManager();
 		IExpression[] expressions = em.getExpressions();
-		for (int i = 0; i < expressions.length; ++i) {
-			if (expressions[i] instanceof PExpression && expressions[i].getDebugTarget().equals(this)) {
-				em.removeExpression(expressions[i]);
+		for (IExpression expression : expressions) {
+			if (expression instanceof PExpression && expression.getDebugTarget().equals(this)) {
+				em.removeExpression(expression);
 			}
 		}
 	}

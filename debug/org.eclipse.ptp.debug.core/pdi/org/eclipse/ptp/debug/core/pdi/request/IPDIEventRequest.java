@@ -45,14 +45,14 @@ public interface IPDIEventRequest extends IPDISet {
 	 * 
 	 * @param status
 	 */
-	void setStatus(int status);
+	public void setStatus(int status);
 
 	/**
 	 * Returns the current status of this request
 	 * 
 	 * @return the current status of this request
 	 */
-	int getStatus();
+	public int getStatus();
 
 	/**
 	 * Indicates this request is complete. Clients must call this method whether
@@ -60,7 +60,7 @@ public interface IPDIEventRequest extends IPDISet {
 	 * is complete. Only clients fulfilling a request should call this method.
 	 * Clients making a request are not intended to call this method.
 	 */
-	void done();
+	public void done();
 
 	/**
 	 * Cancels this request. A request may be cancelled by the originator of
@@ -69,14 +69,14 @@ public interface IPDIEventRequest extends IPDISet {
 	 * request must still call <code>done()</code> to indicate the request is
 	 * complete.
 	 */
-	void cancel();
+	public void cancel();
 
 	/**
 	 * Indicates this request is executing.
 	 * 
 	 * @param debugger
 	 */
-	void execute(IPDIDebugger debugger);
+	public void execute(IPDIDebugger debugger);
 
 	/**
 	 * Indicates this request has an error.
@@ -84,21 +84,21 @@ public interface IPDIEventRequest extends IPDISet {
 	 * @param message
 	 *            error message
 	 */
-	void error(String message);
+	public void error(String message);
 
 	/**
 	 * Returns name of this request
 	 * 
 	 * @return name of this request
 	 */
-	String getName();
+	public String getName();
 
 	/**
 	 * Returns error message of this request
 	 * 
 	 * @return error message of this request
 	 */
-	String getErrorMessage();
+	public String getErrorMessage();
 
 	/**
 	 * Returns whether tasks are completed and set result
@@ -108,12 +108,12 @@ public interface IPDIEventRequest extends IPDISet {
 	 * @return true if the tasks are completed
 	 * @since 4.0
 	 */
-	boolean completed(TaskSet qTasks, Object result);
+	public boolean completed(TaskSet qTasks, Object result);
 
 	/**
 	 * Returns action type for action after completing this request
 	 * 
 	 * @return action type
 	 */
-	int getResponseAction();
+	public int getResponseAction();
 }

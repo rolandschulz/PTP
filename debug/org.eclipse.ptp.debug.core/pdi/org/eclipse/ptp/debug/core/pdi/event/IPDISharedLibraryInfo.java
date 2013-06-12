@@ -23,19 +23,22 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDISharedLibrary;
 
 /**
  * Represents shared library info
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDISharedLibraryInfo extends IPDISessionObject {
 	/**
 	 * Returns shared library name
+	 * 
 	 * @return shared library name
 	 */
-	String getName();
-	
+	public String getName();
+
 	/**
 	 * Returns shared library
+	 * 
 	 * @return shared library
 	 */
-	IPDISharedLibrary getSharedLibrary();
+	public IPDISharedLibrary getSharedLibrary();
 }

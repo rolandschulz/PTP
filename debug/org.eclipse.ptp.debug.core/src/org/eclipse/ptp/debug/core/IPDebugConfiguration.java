@@ -30,6 +30,10 @@ package org.eclipse.ptp.debug.core;
 
 import org.eclipse.core.runtime.CoreException;
 
+/**
+ * Interface used to represent a debugger configuration.
+ * 
+ */
 public interface IPDebugConfiguration {
 	public final static String CPU_NATIVE = "native"; //$NON-NLS-1$
 

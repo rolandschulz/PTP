@@ -27,8 +27,14 @@ import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 
+/**
+ * Interface for managing debugger session
+ * 
+ */
 public interface IPSession extends IAdaptable {
 	/**
+	 * Connection to the debugger
+	 * 
 	 * @param monitor
 	 * @param app
 	 * @param path
@@ -40,6 +46,8 @@ public interface IPSession extends IAdaptable {
 			throws CoreException;
 
 	/**
+	 * Create the debug target
+	 * 
 	 * @param tasks
 	 * @param refresh
 	 * @param register
@@ -48,6 +56,8 @@ public interface IPSession extends IAdaptable {
 	public void createDebugTarget(TaskSet tasks, boolean refresh, boolean register);
 
 	/**
+	 * Remove the debug target
+	 * 
 	 * @param tasks
 	 * @param refresh
 	 * @param register
@@ -56,16 +66,20 @@ public interface IPSession extends IAdaptable {
 	public void deleteDebugTarget(TaskSet tasks, boolean refresh, boolean register);
 
 	/**
+	 * Remove all debug targets
+	 * 
 	 * @param register
 	 */
 	public void deleteDebugTargets(boolean register);
 
 	/**
-	 * 
+	 * Called to dispose resources used by the session
 	 */
 	public void dispose();
 
 	/**
+	 * Find the debug target associated with the tasks
+	 * 
 	 * @param tasks
 	 * @return
 	 * @since 4.0
@@ -73,6 +87,8 @@ public interface IPSession extends IAdaptable {
 	public IPDebugTarget findDebugTarget(TaskSet tasks);
 
 	/**
+	 * Fire a debug event.
+	 * 
 	 * @param change
 	 * @param breakpoint
 	 * @param info
@@ -88,11 +104,15 @@ public interface IPSession extends IAdaptable {
 	public void forceStoppedDebugger(boolean isError);
 
 	/**
+	 * Get the breakpoint manager
+	 * 
 	 * @return
 	 */
 	public IPBreakpointManager getBreakpointManager();
 
 	/**
+	 * Get the debug info
+	 * 
 	 * @param tasks
 	 * @return
 	 * @since 4.0
@@ -100,6 +120,8 @@ public interface IPSession extends IAdaptable {
 	public IPDebugInfo getDebugInfo(TaskSet tasks);
 
 	/**
+	 * Get the launch instance used to launch this session
+	 * 
 	 * @return
 	 */
 	public IPLaunch getLaunch();
@@ -113,43 +135,59 @@ public interface IPSession extends IAdaptable {
 	public IPLocationSetManager getLocationSetManager();
 
 	/**
+	 * Get the memory manager
+	 * 
 	 * @return
 	 */
 	public IPMemoryManager getMemoryManager();
 
 	/**
+	 * Get the PDI session
+	 * 
 	 * @return
 	 */
 	public IPDISession getPDISession();
 
 	/**
+	 * Get the project
+	 * 
 	 * @return
 	 */
 	public IProject getProject();
 
 	/**
+	 * Get the register manager
+	 * 
 	 * @return
 	 */
 	public IPRegisterManager getRegisterManager();
 
 	/**
+	 * Get the set manager
+	 * 
 	 * @return
 	 */
 	public IPSetManager getSetManager();
 
 	/**
+	 * Get the signal manager
+	 * 
 	 * @return
 	 * @since 5.0
 	 */
 	public IPSignalManager getSignalManager();
 
 	/**
+	 * Get the tasks associated with this debug session
+	 * 
 	 * @return
 	 * @since 4.0
 	 */
 	public TaskSet getTasks();
 
 	/**
+	 * Get the task with supplied id
+	 * 
 	 * @param id
 	 * @return
 	 * @since 4.0
@@ -157,11 +195,15 @@ public interface IPSession extends IAdaptable {
 	public TaskSet getTasks(int id);
 
 	/**
+	 * Check if the debugger is ready
+	 * 
 	 * @return
 	 */
 	public boolean isReady();
 
 	/**
+	 * Reload debug targets
+	 * 
 	 * @param tasks
 	 * @param refresh
 	 * @param register

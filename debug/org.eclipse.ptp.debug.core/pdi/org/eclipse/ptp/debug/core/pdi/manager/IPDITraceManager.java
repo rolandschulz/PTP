@@ -19,7 +19,7 @@
 package org.eclipse.ptp.debug.core.pdi.manager;
 
 /**
- * TODO
+ * Trace manager
  * 
  * @author clement
  * 

@@ -23,14 +23,17 @@ import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
 
 /**
  * Represents a function finsihed
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIFunctionFinishedInfo extends IPDIEndSteppingRangeInfo {
 	/**
 	 * Return the AIF of the return value of the function.
+	 * 
 	 * @return IAIF return AIF value
-	 * @throws PDIException on failure
+	 * @throws PDIException
+	 *             on failure
 	 */
-	IAIF getReturnAIF() throws PDIException;
+	public IAIF getReturnAIF() throws PDIException;
 }

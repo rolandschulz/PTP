@@ -23,22 +23,27 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
 
 /**
  * Represents thread group
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIThreadGroup extends IPDISessionObject {
 	/**
-	 * Returns the threads contained in this target. 
+	 * Returns the threads contained in this target.
 	 * An empty collection is returned if this target contains no threads.
+	 * 
 	 * @return a collection of threads
-	 * @throws PDIException on failure
+	 * @throws PDIException
+	 *             on failure
 	 */
-	IPDIThread[] getThreads() throws PDIException;
+	public IPDIThread[] getThreads() throws PDIException;
 
 	/**
 	 * Returns the currently selected thread.
+	 * 
 	 * @return the currently selected thread
-	 * @throws PDIException on failure
+	 * @throws PDIException
+	 *             on failure
 	 */
-	IPDIThread getCurrentThread() throws PDIException;
+	public IPDIThread getCurrentThread() throws PDIException;
 }

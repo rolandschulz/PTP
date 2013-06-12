@@ -20,9 +20,10 @@ package org.eclipse.ptp.debug.core.pdi.model;
 
 /**
  * Represents a function breakpoint
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIFunctionBreakpoint extends IPDILocationBreakpoint {
-
+	// Empty
 }

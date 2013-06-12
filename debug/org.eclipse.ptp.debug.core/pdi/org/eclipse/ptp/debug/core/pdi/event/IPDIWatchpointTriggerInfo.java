@@ -23,25 +23,29 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIWatchpoint;
 
 /**
  * Represents an information provided by the session when a watchpoint is triggered
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIWatchpointTriggerInfo extends IPDISessionObject {
 	/**
 	 * Returns the triggered watchpoint
+	 * 
 	 * @return the triggered watchpoint
 	 */
-	IPDIWatchpoint getWatchpoint();
-	
+	public IPDIWatchpoint getWatchpoint();
+
 	/**
 	 * Returns the old value of the watching expression
+	 * 
 	 * @return the old value of the watching expression
 	 */
-	String getOldValue();
-	
+	public String getOldValue();
+
 	/**
 	 * Returns the new value of the watching expression
+	 * 
 	 * @return the new value of the watching expression
 	 */
-	String getNewValue();
+	public String getNewValue();
 }

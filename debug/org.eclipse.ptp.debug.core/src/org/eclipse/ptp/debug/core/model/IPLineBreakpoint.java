@@ -22,6 +22,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.model.ILineBreakpoint;
 
 /**
+ * Represents a line breakpoint
+ * 
  * @author Clement
  * 
  */
@@ -30,30 +32,40 @@ public interface IPLineBreakpoint extends IPBreakpoint, ILineBreakpoint {
 	public static final String FUNCTION = "org.eclipse.ptp.debug.core.function"; //$NON-NLS-1$
 
 	/**
+	 * Get the address associated with the breakpoint
+	 * 
 	 * @return
 	 * @throws CoreException
 	 */
 	public String getAddress() throws CoreException;
 
 	/**
+	 * Get the file name
+	 * 
 	 * @return
 	 * @throws CoreException
 	 */
 	public String getFileName() throws CoreException;
 
 	/**
+	 * Get the function
+	 * 
 	 * @return
 	 * @throws CoreException
 	 */
 	public String getFunction() throws CoreException;
 
 	/**
+	 * Set the breakpoint address
+	 * 
 	 * @param address
 	 * @throws CoreException
 	 */
 	public void setAddress(String address) throws CoreException;
 
 	/**
+	 * Set the breakpoint function
+	 * 
 	 * @param function
 	 * @throws CoreException
 	 */

@@ -20,13 +20,15 @@ package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
  * Represents integral type of IAIFType
+ * 
  * @author clement
- *
+ * 
  */
 public interface ITypeIntegral extends IAIFType {
 	/**
 	 * Determines whether this type is signed
+	 * 
 	 * @return true if this type is signed
 	 */
-	boolean isSigned();
+	public boolean isSigned();
 }

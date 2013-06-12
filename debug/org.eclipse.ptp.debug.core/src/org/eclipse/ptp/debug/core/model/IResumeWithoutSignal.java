@@ -21,11 +21,11 @@ package org.eclipse.ptp.debug.core.model;
 import org.eclipse.debug.core.DebugException;
 
 /**
+ * Provides the ability to resume execution without giving a signal. This is useful when the program stopped on account of a signal
+ * and would ordinary see the signal when resumed.
+ * 
  * @author Clement
  * 
- *         Provides the ability to resume execution without giving a signal.
- *         This is useful when the program stopped on account of a signal and
- *         would ordinary see the signal when resumed.
  */
 public interface IResumeWithoutSignal {
 	/**

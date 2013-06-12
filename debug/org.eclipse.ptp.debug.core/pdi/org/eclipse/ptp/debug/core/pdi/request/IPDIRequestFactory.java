@@ -27,11 +27,15 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDILineBreakpoint;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIWatchpoint;
 
 /**
+ * Factory for creating requests
+ * 
  * @author clement
  * 
  */
 public interface IPDIRequestFactory {
 	/**
+	 * Create command request
+	 * 
 	 * @param tasks
 	 * @param command
 	 * @return
@@ -40,6 +44,8 @@ public interface IPDIRequestFactory {
 	public IPDICommandRequest getCommandRequest(TaskSet tasks, String command);
 
 	/**
+	 * Create a data read memory request
+	 * 
 	 * @param session
 	 * @param tasks
 	 * @param offset
@@ -56,6 +62,8 @@ public interface IPDIRequestFactory {
 			int wordFormat, int wordSize, int rows, int cols, Character asChar);
 
 	/**
+	 * Create a data write memory request
+	 * 
 	 * @param tasks
 	 * @param offset
 	 * @param address
@@ -69,6 +77,8 @@ public interface IPDIRequestFactory {
 			int wordSize, String value);
 
 	/**
+	 * Create a delete breakpoint request
+	 * 
 	 * @param tasks
 	 * @param bpt
 	 * @param allowUpdate
@@ -78,6 +88,8 @@ public interface IPDIRequestFactory {
 	public IPDIDeleteBreakpointRequest getDeleteBreakpointRequest(TaskSet tasks, IPDIBreakpoint bpt, boolean allowUpdate);
 
 	/**
+	 * Create a delete partial expression request
+	 * 
 	 * @param tasks
 	 * @param varId
 	 * @return
@@ -86,6 +98,8 @@ public interface IPDIRequestFactory {
 	public IPDIDeleteVariableRequest getDeletePartialExpressionRequest(TaskSet tasks, String exprId);
 
 	/**
+	 * Create a disable breakpoint request
+	 * 
 	 * @param tasks
 	 * @param bpt
 	 * @return
@@ -102,6 +116,8 @@ public interface IPDIRequestFactory {
 	public IPDIEnableBreakpointRequest getEnableBreakpointRequest(TaskSet tasks, IPDIBreakpoint bpt);
 
 	/**
+	 * Create an evaluate expression request
+	 * 
 	 * @param tasks
 	 * @param expr
 	 * @return
@@ -110,6 +126,8 @@ public interface IPDIRequestFactory {
 	public IPDIEvaluateExpressionRequest getEvaluateExpressionRequest(TaskSet tasks, String expr);
 
 	/**
+	 * Create a get info threads request
+	 * 
 	 * @param tasks
 	 * @return
 	 * @since 4.0
@@ -117,6 +135,8 @@ public interface IPDIRequestFactory {
 	public IPDIGetInfoThreadsRequest getGetInfoThreadsRequest(TaskSet tasks);
 
 	/**
+	 * Create an evaluate partial expression request
+	 * 
 	 * @param tasks
 	 * @param expr
 	 * @param exprId
@@ -128,6 +148,8 @@ public interface IPDIRequestFactory {
 			boolean listChildren);
 
 	/**
+	 * Create a get stack info depth request
+	 * 
 	 * @param tasks
 	 * @return
 	 * @since 4.0
@@ -135,6 +157,8 @@ public interface IPDIRequestFactory {
 	public IPDIGetStackInfoDepthRequest getGetStackInfoDepthRequest(TaskSet tasks);
 
 	/**
+	 * Create a list arguments request
+	 * 
 	 * @param session
 	 * @param tasks
 	 * @param diff
@@ -145,6 +169,8 @@ public interface IPDIRequestFactory {
 	public IPDIListArgumentsRequest getListArgumentsRequest(TaskSet tasks, int diff, int diff2);
 
 	/**
+	 * Create a list local variables request
+	 * 
 	 * @param tasks
 	 * @return
 	 * @since 4.0
@@ -152,6 +178,8 @@ public interface IPDIRequestFactory {
 	public IPDIListLocalVariablesRequest getListLocalVariablesRequest(TaskSet tasks);
 
 	/**
+	 * Create a list signals request
+	 * 
 	 * @param session
 	 * @param tasks
 	 * @param name
@@ -161,6 +189,8 @@ public interface IPDIRequestFactory {
 	public IPDIListSignalsRequest getListSignalsRequest(IPDISession session, TaskSet tasks, String name);
 
 	/**
+	 * Create a list stack frames request
+	 * 
 	 * @param session
 	 * @param tasks
 	 * @return
@@ -169,6 +199,8 @@ public interface IPDIRequestFactory {
 	public IPDIListStackFramesRequest getListStackFramesRequest(IPDISession session, TaskSet tasks);
 
 	/**
+	 * Create a list stack frames request
+	 * 
 	 * @param session
 	 * @param tasks
 	 * @param low
@@ -179,6 +211,8 @@ public interface IPDIRequestFactory {
 	public IPDIListStackFramesRequest getListStackFramesRequest(IPDISession session, TaskSet tasks, int low, int high);
 
 	/**
+	 * Create a resume request
+	 * 
 	 * @param tasks
 	 * @param passSignal
 	 * @return
@@ -187,6 +221,8 @@ public interface IPDIRequestFactory {
 	public IPDIGoRequest getResumeRequest(TaskSet tasks, boolean passSignal);
 
 	/**
+	 * Create a set address breakpoint request
+	 * 
 	 * @param tasks
 	 * @param bpt
 	 * @param allowUpdate
@@ -197,6 +233,8 @@ public interface IPDIRequestFactory {
 			boolean allowUpdate);
 
 	/**
+	 * Create a request to set the current stack frame
+	 * 
 	 * @param tasks
 	 * @param level
 	 * @return
@@ -205,6 +243,8 @@ public interface IPDIRequestFactory {
 	public IPDISetCurrentStackFrameRequest getSetCurrentStackFrameRequest(TaskSet tasks, int level);
 
 	/**
+	 * Create a request to set a function breakpoint
+	 * 
 	 * @param tasks
 	 * @param bpt
 	 * @param allowUpdate
@@ -215,6 +255,8 @@ public interface IPDIRequestFactory {
 			boolean allowUpdate);
 
 	/**
+	 * Create a request to set a line breakpoint
+	 * 
 	 * @param tasks
 	 * @param bpt
 	 * @param allowUpdate
@@ -224,6 +266,8 @@ public interface IPDIRequestFactory {
 	public IPDISetLineBreakpointRequest getSetLineBreakpointRequest(TaskSet tasks, IPDILineBreakpoint bpt, boolean allowUpdate);
 
 	/**
+	 * Create a request to set the current thread
+	 * 
 	 * @param session
 	 * @param tasks
 	 * @param id
@@ -233,6 +277,8 @@ public interface IPDIRequestFactory {
 	public IPDISetThreadSelectRequest getSetThreadSelectRequest(IPDISession session, TaskSet tasks, int id);
 
 	/**
+	 * Create a request to set a watchpoint (expression breakpoint)
+	 * 
 	 * @param tasks
 	 * @param bpt
 	 * @param allowUpdate
@@ -242,6 +288,8 @@ public interface IPDIRequestFactory {
 	public IPDISetWatchpointRequest getSetWatchpointRequest(TaskSet tasks, IPDIWatchpoint bpt, boolean allowUpdate);
 
 	/**
+	 * Create a request to start the debugger session
+	 * 
 	 * @param tasks
 	 * @param app
 	 * @param path
@@ -253,6 +301,8 @@ public interface IPDIRequestFactory {
 	public IPDIStartDebuggerRequest getStartDebuggerRequest(TaskSet tasks, String app, String path, String dir, String[] args);
 
 	/**
+	 * Create a request to step to the end of a function
+	 * 
 	 * @param tasks
 	 * @param count
 	 * @return
@@ -261,6 +311,8 @@ public interface IPDIRequestFactory {
 	public IPDIStepFinishRequest getStepFinishRequest(TaskSet tasks, int count);
 
 	/**
+	 * Create a request to step into a function
+	 * 
 	 * @param tasks
 	 * @param count
 	 * @return
@@ -269,6 +321,8 @@ public interface IPDIRequestFactory {
 	public IPDIStepIntoRequest getStepIntoRequest(TaskSet tasks, int count);
 
 	/**
+	 * Create a request to set over a function
+	 * 
 	 * @param tasks
 	 * @param count
 	 * @return
@@ -277,6 +331,8 @@ public interface IPDIRequestFactory {
 	public IPDIStepOverRequest getStepOverRequest(TaskSet tasks, int count);
 
 	/**
+	 * Create a request to stop the debug session
+	 * 
 	 * @param tasks
 	 * @return
 	 * @since 4.0
@@ -284,6 +340,8 @@ public interface IPDIRequestFactory {
 	public IPDIStopDebuggerRequest getStopDebuggerRequest(TaskSet tasks);
 
 	/**
+	 * Create a request to suspend a running target
+	 * 
 	 * @param tasks
 	 * @return
 	 * @since 4.0
@@ -291,6 +349,8 @@ public interface IPDIRequestFactory {
 	public IPDIHaltRequest getSuspendRequest(TaskSet tasks);
 
 	/**
+	 * Create a request to suspend a running target
+	 * 
 	 * @param tasks
 	 * @param sendEvent
 	 * @return
@@ -299,6 +359,8 @@ public interface IPDIRequestFactory {
 	public IPDIHaltRequest getSuspendRequest(TaskSet tasks, boolean sendEvent);
 
 	/**
+	 * Create a request to terminate the target
+	 * 
 	 * @param tasks
 	 * @return
 	 * @since 4.0

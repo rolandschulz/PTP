@@ -20,9 +20,10 @@ package org.eclipse.ptp.debug.core.pdi.model;
 
 /**
  * Represents an argument in the stack frame
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIArgument extends IPDILocalVariable, IPDIArgumentDescriptor {
-
+	// Empty
 }

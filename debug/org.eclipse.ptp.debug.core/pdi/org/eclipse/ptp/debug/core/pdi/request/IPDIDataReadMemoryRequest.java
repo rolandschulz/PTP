@@ -30,6 +30,8 @@ import org.eclipse.ptp.debug.core.pdi.event.IPDIDataReadMemoryInfo;
  */
 public interface IPDIDataReadMemoryRequest extends IPDIEventRequest {
 	/**
+	 * Get data memory info
+	 * 
 	 * @param qTasks
 	 * @return
 	 * @throws PDIException

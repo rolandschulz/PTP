@@ -20,7 +20,10 @@ package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
  * Represents short type in IAIFType
+ * 
  * @author clement
- *
+ * 
  */
-public interface IAIFTypeShort extends ITypeIntegral {}
+public interface IAIFTypeShort extends ITypeIntegral {
+	// Empty
+}

@@ -22,13 +22,15 @@ import org.eclipse.ptp.debug.core.pdi.IPDISessionObject;
 
 /**
  * Represents an information provided by the session when the program exited
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIExitInfo extends IPDISessionObject {
 	/**
 	 * Returns an exit code.
+	 * 
 	 * @return an exit code
 	 */
-	int getCode();
+	public int getCode();
 }

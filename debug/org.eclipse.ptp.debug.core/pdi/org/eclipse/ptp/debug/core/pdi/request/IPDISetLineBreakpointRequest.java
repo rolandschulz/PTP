@@ -20,9 +20,10 @@ package org.eclipse.ptp.debug.core.pdi.request;
 
 /**
  * Represents to request setting a line breakpoint
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDISetLineBreakpointRequest extends IPDIBreakpointRequest {
-
+	// Empty
 }

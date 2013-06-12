@@ -21,9 +21,17 @@ package org.eclipse.ptp.debug.core.event;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
 
 /**
+ * Information associated with a value obtained from the debugger target (not used)
+ * 
  * @author Clement
+ * @deprecated
  */
+@Deprecated
 public interface IPDebugValueInfo extends IPDebugInfo {
-	IAIF getAIF();
+	/**
+	 * Get the AIF representation of the value
+	 * 
+	 * @return
+	 */
+	public IAIF getAIF();
 }
-

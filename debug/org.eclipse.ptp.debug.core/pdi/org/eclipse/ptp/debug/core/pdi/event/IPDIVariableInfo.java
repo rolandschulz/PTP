@@ -23,19 +23,22 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIVariable;
 
 /**
  * Represents variable info
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIVariableInfo extends IPDISessionObject {
 	/**
 	 * Returns variable name
+	 * 
 	 * @return variable name
 	 */
-	String getName();
-	
+	public String getName();
+
 	/**
 	 * Returns variable
+	 * 
 	 * @return variable
 	 */
-	IPDIVariable getVariable();
+	public IPDIVariable getVariable();
 }

@@ -19,19 +19,23 @@ import org.eclipse.ptp.internal.debug.core.pdi.LineLocation;
 import org.eclipse.ptp.internal.debug.core.pdi.Locator;
 
 /**
- * @author greg
- *
+ * Factory for creating debugger locations
+ * 
  */
 public class PDILocationFactory {
 	/**
+	 * Create an address location
+	 * 
 	 * @param addr
 	 * @return
 	 */
 	public static IPDIAddressLocation newAddressLocation(BigInteger addr) {
 		return new AddressLocation(addr);
 	}
-	
+
 	/**
+	 * Create a file location
+	 * 
 	 * @param file
 	 * @return
 	 */
@@ -40,6 +44,8 @@ public class PDILocationFactory {
 	}
 
 	/**
+	 * Create a function location
+	 * 
 	 * @param file
 	 * @param function
 	 * @return
@@ -49,6 +55,8 @@ public class PDILocationFactory {
 	}
 
 	/**
+	 * Create a line location
+	 * 
 	 * @param file
 	 * @param line
 	 * @return
@@ -58,6 +66,8 @@ public class PDILocationFactory {
 	}
 
 	/**
+	 * Create a locator
+	 * 
 	 * @param file
 	 * @param function
 	 * @param line
@@ -69,4 +79,3 @@ public class PDILocationFactory {
 	}
 
 }
-

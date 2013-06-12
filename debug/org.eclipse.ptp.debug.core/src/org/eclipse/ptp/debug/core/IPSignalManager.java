@@ -15,18 +15,22 @@ import org.eclipse.ptp.debug.core.model.IPSignal;
 import org.eclipse.ptp.debug.core.pdi.model.IPDISignal;
 
 /**
- * @author greg
+ * Interface for managing signal handling in the debugger
  * 
  */
 public interface IPSignalManager {
 
 	/**
+	 * Dispose of any resources
+	 * 
 	 * @param qTasks
 	 * @since 4.0
 	 */
 	public void dispose(TaskSet qTasks);
 
 	/**
+	 * Get the debugger signal handlers for the tasks
+	 * 
 	 * @param qTasks
 	 * @return
 	 * @throws DebugException
@@ -35,6 +39,8 @@ public interface IPSignalManager {
 	public IPSignal[] getSignals(TaskSet qTasks) throws DebugException;
 
 	/**
+	 * Notify tasks that a signal handler has changed
+	 * 
 	 * @param qTasks
 	 * @param pdiSignal
 	 * @since 4.0

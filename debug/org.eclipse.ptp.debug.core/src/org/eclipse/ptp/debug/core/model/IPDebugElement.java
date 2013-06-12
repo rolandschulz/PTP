@@ -22,26 +22,36 @@ import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.ptp.debug.core.IPSession;
 
 /**
+ * Represents an artifact in the program being debugged.
+ * 
  * @author Clement chu
  * 
  */
 public interface IPDebugElement extends IDebugElement {
 	/**
+	 * Get the current state info
+	 * 
 	 * @return
 	 */
 	public Object getCurrentStateInfo();
 
 	/**
+	 * Get the element ID
+	 * 
 	 * @return
 	 */
 	public int getID();
 
 	/**
+	 * Get the debug session
+	 * 
 	 * @return
 	 */
 	public IPSession getSession();
 
 	/**
+	 * Get the element state
+	 * 
 	 * @return
 	 */
 	public PDebugElementState getState();

@@ -22,29 +22,35 @@ import org.eclipse.ptp.debug.core.pdi.IPDISessionObject;
 
 /**
  * Represents an information provided by the session when the program exited
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIErrorInfo extends IPDISessionObject {
 	public static final int DBG_NORMAL = 0; // show in error log and pupup error dialog and no action
 	public static final int DBG_WARNING = 1; // show in error log and pupup error dialog and terminate error proceses
-	public static final int DBG_FATAL = 2; // show in error log and pupup error dialog and action - terminate all processes and stop debugger
-	public static final int DBG_IGNORE = 3; //ignore this error
+	public static final int DBG_FATAL = 2; // show in error log and pupup error dialog and action - terminate all processes and stop
+											// debugger
+	public static final int DBG_IGNORE = 3; // ignore this error
+
 	/**
 	 * Returns the error message
+	 * 
 	 * @return the error message
 	 */
-	String getMessage();
-	
+	public String getMessage();
+
 	/**
 	 * Returns a more verbatim error message (if any)
+	 * 
 	 * @return a more verbatim error message
 	 */
-	String getDetailMessage();
-	
+	public String getDetailMessage();
+
 	/**
 	 * Returns error code
+	 * 
 	 * @return error code
 	 */
-	int getCode();
+	public int getCode();
 }

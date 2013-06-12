@@ -19,8 +19,14 @@ import org.eclipse.ptp.debug.core.pdi.IPDILocator;
 import org.eclipse.ptp.debug.core.pdi.IPDISession;
 import org.eclipse.ptp.debug.core.pdi.event.IPDIDataReadMemoryInfo;
 
+/**
+ * Factory for create the PDI model elements
+ * 
+ */
 public interface IPDIModelFactory {
 	/**
+	 * Create an address breakpoint
+	 * 
 	 * @param session
 	 * @param tasks
 	 * @param type
@@ -34,6 +40,8 @@ public interface IPDIModelFactory {
 			IPDICondition condition, boolean enabled);
 
 	/**
+	 * Create an argument
+	 * 
 	 * @param session
 	 * @param argDesc
 	 * @param varId
@@ -42,6 +50,8 @@ public interface IPDIModelFactory {
 	public IPDIArgument newArgument(IPDISession session, IPDIArgumentDescriptor argDesc, String varId);
 
 	/**
+	 * Create an argument descriptor
+	 * 
 	 * @param session
 	 * @param tasks
 	 * @param thread
@@ -57,6 +67,8 @@ public interface IPDIModelFactory {
 			IPDIStackFrame frame, String name, String fullName, int pos, int depth);
 
 	/**
+	 * Create a condition
+	 * 
 	 * @param ignore
 	 * @param exp
 	 * @param ids
@@ -65,6 +77,8 @@ public interface IPDIModelFactory {
 	public IPDICondition newCondition(int ignore, String exp, String[] ids);
 
 	/**
+	 * Create an exception point
+	 * 
 	 * @param session
 	 * @param tasks
 	 * @param clazz
@@ -80,6 +94,8 @@ public interface IPDIModelFactory {
 			boolean stopOnCatch, IPDICondition condition, boolean enabled, IPDIFunctionBreakpoint[] funcBpts);
 
 	/**
+	 * Create an expression
+	 * 
 	 * @param session
 	 * @param tasks
 	 * @param ex
@@ -89,6 +105,8 @@ public interface IPDIModelFactory {
 	public IPDITargetExpression newExpression(IPDISession session, TaskSet tasks, String ex);
 
 	/**
+	 * Create a function breakpoint
+	 * 
 	 * @param session
 	 * @param tasks
 	 * @param type
@@ -102,6 +120,8 @@ public interface IPDIModelFactory {
 			IPDICondition condition, boolean enabled);
 
 	/**
+	 * Create a global variable
+	 * 
 	 * @param session
 	 * @param varDesc
 	 * @param varId
@@ -110,6 +130,8 @@ public interface IPDIModelFactory {
 	public IPDIGlobalVariable newGlobalVariable(IPDISession session, IPDIGlobalVariableDescriptor varDesc, String varId);
 
 	/**
+	 * Create a global variable descriptor
+	 * 
 	 * @param session
 	 * @param tasks
 	 * @param thread
@@ -125,6 +147,8 @@ public interface IPDIModelFactory {
 			IPDIStackFrame frame, String name, String fullName, int pos, int depth);
 
 	/**
+	 * Create a line breakpoint
+	 * 
 	 * @param session
 	 * @param tasks
 	 * @param type
@@ -138,6 +162,8 @@ public interface IPDIModelFactory {
 			IPDICondition condition, boolean enabled);
 
 	/**
+	 * Create a local variable
+	 * 
 	 * @param session
 	 * @param tasks
 	 * @param thread
@@ -153,6 +179,8 @@ public interface IPDIModelFactory {
 			String name, String fullName, int pos, int depth, String varid);
 
 	/**
+	 * Create a local variable
+	 * 
 	 * @param session
 	 * @param varDesc
 	 * @param varId
@@ -161,6 +189,8 @@ public interface IPDIModelFactory {
 	public IPDILocalVariable newLocalVariable(IPDISession session, IPDILocalVariableDescriptor varDesc, String varId);
 
 	/**
+	 * Create a local variable descriptor
+	 * 
 	 * @param session
 	 * @param tasks
 	 * @param thread
@@ -176,6 +206,8 @@ public interface IPDIModelFactory {
 			IPDIStackFrame frame, String name, String fullName, int pos, int depth);
 
 	/**
+	 * Create a memory block
+	 * 
 	 * @param address
 	 * @param ascii
 	 * @param data
@@ -184,6 +216,8 @@ public interface IPDIModelFactory {
 	public IPDIMemory newMemory(String address, String ascii, String[] data);
 
 	/**
+	 * Create a memory block
+	 * 
 	 * @param session
 	 * @param tasks
 	 * @param exp
@@ -197,6 +231,8 @@ public interface IPDIModelFactory {
 			IPDIDataReadMemoryInfo info);
 
 	/**
+	 * Create a multi expression
+	 * 
 	 * @param session
 	 * @param tasks
 	 * @param ex
@@ -207,6 +243,8 @@ public interface IPDIModelFactory {
 	public IPDIMultiExpressions newMultiExpressions(IPDISession session, TaskSet tasks, String ex, boolean enabled);
 
 	/**
+	 * Create a register descriptor
+	 * 
 	 * @param session
 	 * @param tasks
 	 * @param thread
@@ -222,6 +260,8 @@ public interface IPDIModelFactory {
 			IPDIStackFrame frame, String name, String fullName, int pos, int depth);
 
 	/**
+	 * Create a signal handler
+	 * 
 	 * @param session
 	 * @param tasks
 	 * @param signalDescriptor
@@ -231,6 +271,8 @@ public interface IPDIModelFactory {
 	public IPDISignal newSignal(IPDISession session, TaskSet tasks, IPDISignalDescriptor signalDescriptor);
 
 	/**
+	 * Create a signal descriptor
+	 * 
 	 * @param name
 	 * @param stop
 	 * @param pass
@@ -241,6 +283,8 @@ public interface IPDIModelFactory {
 	public IPDISignalDescriptor newSignalDescriptor(String name, boolean stop, boolean pass, boolean print, String description);
 
 	/**
+	 * Create a stack frame from a locator
+	 * 
 	 * @param session
 	 * @param pthread
 	 * @param i
@@ -250,6 +294,8 @@ public interface IPDIModelFactory {
 	public IPDIStackFrame newStackFrame(IPDISession session, IPDIThread pthread, int i, IPDILocator locator);
 
 	/**
+	 * Create a stack frame
+	 * 
 	 * @param session
 	 * @param thread
 	 * @param level
@@ -264,6 +310,8 @@ public interface IPDIModelFactory {
 			BigInteger addr);
 
 	/**
+	 * Create a stack frame descriptor
+	 * 
 	 * @param level
 	 * @param loc
 	 * @return
@@ -271,6 +319,8 @@ public interface IPDIModelFactory {
 	public IPDIStackFrameDescriptor newStackFrameDescriptor(int level, IPDILocator loc);
 
 	/**
+	 * Create a target
+	 * 
 	 * @param session
 	 * @param tasks
 	 * @return
@@ -279,6 +329,8 @@ public interface IPDIModelFactory {
 	public IPDITarget newTarget(IPDISession session, TaskSet tasks);
 
 	/**
+	 * Create a thread
+	 * 
 	 * @param session
 	 * @param target
 	 * @param parseInt
@@ -287,6 +339,8 @@ public interface IPDIModelFactory {
 	public IPDIThread newThread(IPDISession session, IPDITarget target, int parseInt);
 
 	/**
+	 * Create a thread storage descriptor
+	 * 
 	 * @param session
 	 * @param tasks
 	 * @param thread
@@ -302,6 +356,8 @@ public interface IPDIModelFactory {
 			IPDIStackFrame frame, String name, String fullName, int pos, int depth);
 
 	/**
+	 * Create a watchpoint
+	 * 
 	 * @param session
 	 * @param tasks
 	 * @param type

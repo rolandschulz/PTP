@@ -17,13 +17,38 @@
  * LA-CC 04-115
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.event;
+
 /**
+ * Information associated with a debugger suspend event
+ * 
  * @author Clement
  */
 public interface IPDebugSuspendInfo extends IPDebugInfo {
-	int getLevel();
-	String getFilename();
-	int getLineNumber();
-	int getDepth();
-}
+	/**
+	 * Get stack frame level
+	 * 
+	 * @return
+	 */
+	public int getLevel();
 
+	/**
+	 * Get the file name
+	 * 
+	 * @return
+	 */
+	public String getFilename();
+
+	/**
+	 * Get the line number
+	 * 
+	 * @return
+	 */
+	public int getLineNumber();
+
+	/**
+	 * Get the stack depth
+	 * 
+	 * @return
+	 */
+	public int getDepth();
+}

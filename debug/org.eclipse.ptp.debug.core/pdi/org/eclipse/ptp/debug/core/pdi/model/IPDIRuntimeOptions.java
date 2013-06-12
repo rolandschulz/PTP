@@ -25,28 +25,38 @@ import org.eclipse.ptp.debug.core.pdi.PDIException;
 
 /**
  * Describes the configuration of debug session.
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIRuntimeOptions extends IPDISessionObject {
 	/**
 	 * Program/Inferior arguments
-	 * @param args the string representing the arguments
-	 * @throws PDIException on failure
+	 * 
+	 * @param args
+	 *            the string representing the arguments
+	 * @throws PDIException
+	 *             on failure
 	 */
-	void setArguments(String[] args) throws PDIException;
+	public void setArguments(String[] args) throws PDIException;
 
 	/**
 	 * Program/Inferior environment settings
-	 * @param props the new environment variable to add
-	 * @throws PDIException on failure
+	 * 
+	 * @param props
+	 *            the new environment variable to add
+	 * @throws PDIException
+	 *             on failure
 	 */
-	void setEnvironment(Properties props) throws PDIException;
+	public void setEnvironment(Properties props) throws PDIException;
 
 	/**
 	 * Program/Inferior working directory
-	 * @param wd the working directory to start the program
-	 * @throws PDIException on failure
+	 * 
+	 * @param wd
+	 *            the working directory to start the program
+	 * @throws PDIException
+	 *             on failure
 	 */
-	void setWorkingDirectory(String wd) throws PDIException;
+	public void setWorkingDirectory(String wd) throws PDIException;
 }

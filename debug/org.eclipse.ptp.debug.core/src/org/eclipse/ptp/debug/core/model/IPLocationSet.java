@@ -13,6 +13,8 @@ package org.eclipse.ptp.debug.core.model;
 import org.eclipse.ptp.debug.core.TaskSet;
 
 /**
+ * A location set is used to provide information about a location (e.g. a breakpoint location)
+ * 
  * @since 5.0
  */
 public interface IPLocationSet {

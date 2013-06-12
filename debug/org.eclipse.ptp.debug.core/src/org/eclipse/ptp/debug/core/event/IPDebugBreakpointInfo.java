@@ -21,10 +21,14 @@ package org.eclipse.ptp.debug.core.event;
 import java.util.Map;
 
 /**
+ * Interface for obtaining information about a breakpoint event (not used)
+ * 
  * @author Clement
+ * @deprecated
  */
+@Deprecated
 public interface IPDebugBreakpointInfo extends IPDebugInfo {
-	int getBreakpointID();
-	Map<String,?> getInfo();
-}
+	public int getBreakpointID();
 
+	public Map<String, ?> getInfo();
+}

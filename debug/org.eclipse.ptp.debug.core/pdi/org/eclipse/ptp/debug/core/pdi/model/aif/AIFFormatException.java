@@ -11,6 +11,8 @@
 package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
+ * AIF Format Exception
+ * 
  * @since 4.0
  */
 public class AIFFormatException extends AIFException {

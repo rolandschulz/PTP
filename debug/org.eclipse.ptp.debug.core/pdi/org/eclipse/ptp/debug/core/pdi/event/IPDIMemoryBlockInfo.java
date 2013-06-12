@@ -25,19 +25,22 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIMemoryBlock;
 
 /**
  * Represents memory block info
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIMemoryBlockInfo extends IPDISessionObject {
 	/**
 	 * Returns the modified addresses.
+	 * 
 	 * @return the modified addresses.
 	 */
-	BigInteger[] getAddresses();
-	
+	public BigInteger[] getAddresses();
+
 	/**
 	 * Returns the modified memory block
+	 * 
 	 * @return the modified memory block
 	 */
-	IPDIMemoryBlock getMemoryBlock();
+	public IPDIMemoryBlock getMemoryBlock();
 }

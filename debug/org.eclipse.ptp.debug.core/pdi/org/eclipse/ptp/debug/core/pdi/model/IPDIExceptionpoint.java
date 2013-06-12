@@ -20,20 +20,22 @@ package org.eclipse.ptp.debug.core.pdi.model;
 
 /**
  * Represents a exception breakpoint
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIExceptionpoint extends IPDIBreakpoint {
 	/**
 	 * Determines if this exception point is stopped on throw
+	 * 
 	 * @return true if this exception point is stopped on throw
 	 */
-	boolean isStopOnThrow();
-	
+	public boolean isStopOnThrow();
+
 	/**
 	 * Determines if this exception point is stopped on catch
+	 * 
 	 * @return true if this exception point is stopped on catch
 	 */
-	boolean isStopOnCatch();
+	public boolean isStopOnCatch();
 }
-

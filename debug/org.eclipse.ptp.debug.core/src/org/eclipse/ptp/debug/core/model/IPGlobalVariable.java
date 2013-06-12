@@ -19,13 +19,16 @@
 package org.eclipse.ptp.debug.core.model;
 
 /**
+ * Represents a global variable
+ * 
  * @author Clement chu
  * 
  */
 public interface IPGlobalVariable extends IPVariable {
 	/**
+	 * Get the descriptor associated with the variable
+	 * 
 	 * @return
 	 */
 	public IPGlobalVariableDescriptor getDescriptor();
 }
-

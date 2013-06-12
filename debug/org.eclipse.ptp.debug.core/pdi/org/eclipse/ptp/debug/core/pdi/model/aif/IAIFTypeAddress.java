@@ -22,6 +22,8 @@ package org.eclipse.ptp.debug.core.pdi.model.aif;
  * Represents an address type
  * 
  * @author clement
- *
+ * 
  */
-public interface IAIFTypeAddress extends IAIFType {};
+public interface IAIFTypeAddress extends IAIFType {
+	// Empty
+};

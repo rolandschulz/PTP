@@ -22,33 +22,43 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.model.IRegisterGroup;
 
 /**
+ * Represents a register group that can be persisted
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPPersistableRegisterGroup extends IRegisterGroup {
 	/**
 	 * Returns a memento that can be used to reconstruct this group
+	 * 
 	 * @return a memento that can be used to reconstruct this group
-	 * @exception CoreException if unable to construct a memento
+	 * @exception CoreException
+	 *                if unable to construct a memento
 	 */
 	public String getMemento() throws CoreException;
-	
+
 	/**
 	 * Initializes this group based on the given memento.
-	 * @param memento a memento to initialize this group
-	 * @exception CoreException on failure to initialize 
+	 * 
+	 * @param memento
+	 *            a memento to initialize this group
+	 * @exception CoreException
+	 *                on failure to initialize
 	 */
 	public void initializeFromMemento(String memento) throws CoreException;
 
 	/**
 	 * Returns the array of group's register descriptors.
+	 * 
 	 * @return the array of group's register descriptors
 	 */
 	public IPRegisterDescriptor[] getRegisterDescriptors();
 
 	/**
 	 * Replaces the group register descriptors by the specified descriptors.
-	 * @param the array of register descriptors
+	 * 
+	 * @param the
+	 *            array of register descriptors
 	 */
 	public void setRegisterDescriptors(IPRegisterDescriptor[] registerDescriptors);
 }

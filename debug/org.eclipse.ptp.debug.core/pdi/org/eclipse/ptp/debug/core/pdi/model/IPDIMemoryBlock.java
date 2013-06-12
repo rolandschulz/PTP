@@ -27,13 +27,14 @@ import org.eclipse.ptp.debug.core.pdi.event.IPDIDataReadMemoryInfo;
 /**
  * A contiguous segment of memory in an execution context.
  * A memory block is represented by a starting memory address and a length.
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIMemoryBlock extends IPDISessionObject {
-    /**
-     * Bit mask used to indicate a byte is read-only
-     */
+	/**
+	 * Bit mask used to indicate a byte is read-only
+	 */
 	public static final byte READ_ONLY = 0x01;
 
 	/**
@@ -45,7 +46,7 @@ public interface IPDIMemoryBlock extends IPDISessionObject {
 	 * @return
 	 */
 	public IPDIDataReadMemoryInfo getDataReadMemoryInfo();
-	
+
 	/**
 	 * @return
 	 */
@@ -54,6 +55,7 @@ public interface IPDIMemoryBlock extends IPDISessionObject {
 	/**
 	 * Returns this memory byte's attribute as a bit mask.
 	 * The method throw IndexOutOfBoundsException if the offset is out of range of the block.
+	 * 
 	 * @return this memory byte's attribute as a bit mask
 	 */
 	public byte getFlags(int offset);
@@ -66,59 +68,76 @@ public interface IPDIMemoryBlock extends IPDISessionObject {
 	/**
 	 * Returns the values of the bytes currently contained in this this memory block.
 	 * Note: the number maybe greater or lower to what was requested.
+	 * 
 	 * @return the values of the bytes currently contained in this this memory block
-	 * throws PCDIException if this method fails.  Reasons include:
-	 * <ul><li>Failure communicating with the debug target.  The PDIException's status code contains the underlying exception responsible for the failure.</li></ul>
-	 */	
-	byte[] getBytes() throws PDIException;
+	 *         throws PCDIException if this method fails. Reasons include:
+	 *         <ul>
+	 *         <li>Failure communicating with the debug target. The PDIException's status code contains the underlying exception
+	 *         responsible for the failure.</li>
+	 *         </ul>
+	 */
+	public byte[] getBytes() throws PDIException;
 
 	/**
 	 * Returns the length of this memory block in bytes
+	 * 
 	 * @return the length of this memory block in bytes
-	 */	
-	long getLength();
+	 */
+	public long getLength();
 
 	/**
 	 * Returns the start address of this memory block
+	 * 
 	 * @return the start address of this memory block
 	 */
-	BigInteger getStartAddress();
+	public BigInteger getStartAddress();
 
 	/**
 	 * Returns the size of each memory word in bytes
+	 * 
 	 * @return The size of each memory word in bytes
 	 */
-	int getWordSize();
+	public int getWordSize();
 
 	/**
 	 * Determines whether the block does not update
+	 * 
 	 * @return true if the block does not update
 	 */
-	boolean isFrozen();
-	
+	public boolean isFrozen();
+
 	/**
 	 * Refresh the data, this may cause events to be trigger if the data values changed.
-	 * @throws PDIException on failure
+	 * 
+	 * @throws PDIException
+	 *             on failure
 	 */
-	void refresh() throws PDIException;
-	
+	public void refresh() throws PDIException;
+
 	/**
 	 * A memoryBlock set frozen means that the block will not update and check for new data
-	 * @param frozen the block is frozen by default
+	 * 
+	 * @param frozen
+	 *            the block is frozen by default
 	 */
-	void setFrozen(boolean frozen);
-	
+	public void setFrozen(boolean frozen);
+
 	/**
 	 * Sets the value of the bytes in this memory block at the specified offset within this memory block to the specified bytes.
 	 * The offset is zero based.
-	 * @param offset the offset at which to set the new values
-	 * @param bytes the new values
-	 * throws PDIException if this method fails.  Reasons include:
-	 * <ul>
-	 * <li>Failure communicating with the debug target.  The PDIException's status code contains the underlying exception responsible for the failure.</li>
-	 * <li>This memory block does not support value modification</li>
-	 * <li>The specified offset is greater than or equal to the length of this memory block, or the number of bytes specified goes beyond the end of this memory block (index of out of range)</li>
-	 * </ul>
+	 * 
+	 * @param offset
+	 *            the offset at which to set the new values
+	 * @param bytes
+	 *            the new values
+	 *            throws PDIException if this method fails. Reasons include:
+	 *            <ul>
+	 *            <li>Failure communicating with the debug target. The PDIException's status code contains the underlying exception
+	 *            responsible for the failure.</li>
+	 *            <li>This memory block does not support value modification</li>
+	 *            <li>The specified offset is greater than or equal to the length of this memory block, or the number of bytes
+	 *            specified goes beyond the end of this memory block (index of out of range)</li>
+	 *            </ul>
 	 */
-	void setValue(long offset, byte[] bytes) throws PDIException;
+	public void setValue(long offset, byte[] bytes) throws PDIException;
 }

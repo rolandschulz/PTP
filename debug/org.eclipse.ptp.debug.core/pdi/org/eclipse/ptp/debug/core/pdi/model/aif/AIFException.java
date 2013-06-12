@@ -17,15 +17,17 @@
  * LA-CC 04-115
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.pdi.model.aif;
+
 /**
+ * AIF Exception
+ * 
  * @author Clement chu
  * 
  */
 public class AIFException extends Exception {
-    static final long serialVersionUID = -3387516993124229949L;
-    
-    public AIFException(String msg) {
-    	super(msg);
-    }
-}
+	static final long serialVersionUID = -3387516993124229949L;
 
+	public AIFException(String msg) {
+		super(msg);
+	}
+}

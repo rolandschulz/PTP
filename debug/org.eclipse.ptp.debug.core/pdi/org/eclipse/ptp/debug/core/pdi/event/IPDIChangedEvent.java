@@ -22,8 +22,9 @@ import org.eclipse.ptp.debug.core.pdi.IPDISessionObject;
 
 /**
  * Notifies that the originator has changed. Can be originated by any PDI model object.
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIChangedEvent extends IPDIEvent {
 	/**
@@ -33,8 +34,8 @@ public interface IPDIChangedEvent extends IPDIEvent {
 	 * IPDIMemoryBlockInfo
 	 * IPDISignalInfo
 	 * IPDIVariableInfo
+	 * 
 	 * @return the reason why changed
 	 */
-	IPDISessionObject getReason();
+	public IPDISessionObject getReason();
 }
-

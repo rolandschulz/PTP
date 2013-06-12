@@ -19,6 +19,8 @@
 package org.eclipse.ptp.debug.core.event;
 
 /**
+ * Base interface for debugger events
+ * 
  * @author Clement
  */
 public interface IPDebugEvent {
@@ -128,8 +130,7 @@ public interface IPDebugEvent {
 
 	/**
 	 * Content change detail. Indicates the content of a debug element (and
-	 * potentially its children) has changed. Only valid for <code>CHANGE</code>
-	 * events.
+	 * potentially its children) has changed. Only valid for <code>CHANGE</code> events.
 	 * 
 	 * @since 2.0
 	 */
@@ -161,31 +162,43 @@ public interface IPDebugEvent {
 	public static final int ERR_FATAL = 0x0004;
 
 	/**
+	 * Get the event detail
+	 * 
 	 * @return
 	 */
 	public int getDetail();
 
 	/**
+	 * Get the event info
+	 * 
 	 * @return
 	 */
 	public IPDebugInfo getInfo();
 
 	/**
+	 * Get the event kind
+	 * 
 	 * @return
 	 */
 	public int getKind();
 
 	/**
+	 * Get the event source
+	 * 
 	 * @return
 	 */
 	public Object getSource();
 
 	/**
+	 * Check if this is an evaluation event
+	 * 
 	 * @return
 	 */
 	public boolean isEvaluation();
 
 	/**
+	 * Check if this is a step start event
+	 * 
 	 * @return
 	 */
 	public boolean isStepStart();

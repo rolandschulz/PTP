@@ -21,6 +21,8 @@ package org.eclipse.ptp.debug.core.model;
 import org.eclipse.debug.core.model.IThread;
 
 /**
+ * Represents a target thread
+ * 
  * @author Clement chu
  * 
  */
@@ -32,4 +34,3 @@ public interface IPThread extends IThread, IPDebugElement {
 	 */
 	public IPDebugTarget getDebugTarget();
 }
-

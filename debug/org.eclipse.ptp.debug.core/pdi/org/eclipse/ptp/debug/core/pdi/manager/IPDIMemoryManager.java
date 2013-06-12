@@ -27,7 +27,7 @@ import org.eclipse.ptp.debug.core.pdi.event.IPDIEvent;
 import org.eclipse.ptp.debug.core.pdi.model.IPDIMemoryBlock;
 
 /**
- * Represent memeory manager to manage memory
+ * Represent memory manager to manage memory
  * 
  * @author clement
  * 
@@ -91,6 +91,8 @@ public interface IPDIMemoryManager extends IPDIManager {
 	public void removeBlocks(TaskSet tasks, IPDIMemoryBlock[] memoryBlocks) throws PDIException;
 
 	/**
+	 * Update memory blocks
+	 * 
 	 * @param block
 	 * @param aList
 	 * @return

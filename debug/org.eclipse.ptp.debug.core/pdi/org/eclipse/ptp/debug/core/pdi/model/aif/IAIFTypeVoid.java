@@ -20,7 +20,10 @@ package org.eclipse.ptp.debug.core.pdi.model.aif;
 
 /**
  * Represents void type in IAIFType
+ * 
  * @author clement
- *
+ * 
  */
-public interface IAIFTypeVoid extends IAIFType {}
+public interface IAIFTypeVoid extends IAIFType {
+	// Empty
+}

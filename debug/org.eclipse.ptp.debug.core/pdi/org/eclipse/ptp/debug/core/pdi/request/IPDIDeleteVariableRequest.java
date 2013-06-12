@@ -20,9 +20,10 @@ package org.eclipse.ptp.debug.core.pdi.request;
 
 /**
  * Represents to request deleting a variable
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIDeleteVariableRequest extends IPDIInternalEventRequest {
-
+	// Empty
 }

@@ -20,9 +20,10 @@ package org.eclipse.ptp.debug.core.pdi.request;
 
 /**
  * Represents to request stopping debugger
+ * 
  * @author clement
- *
+ * 
  */
 public interface IPDIStopDebuggerRequest extends IPDIEventRequest {
-
+	// Empty
 }

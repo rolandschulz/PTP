@@ -17,11 +17,18 @@
  * LA-CC 04-115
  *******************************************************************************/
 package org.eclipse.ptp.debug.core.event;
+
 /**
+ * nterface for obtaining information about an exit event (not used)
+ * 
  * @author Clement
+ * @deprecated
  */
+@Deprecated
 public interface IPDebugExitInfo extends IPDebugInfo {
-	int getCode();
-	String getMessage();
-	String getName();
+	public int getCode();
+
+	public String getMessage();
+
+	public String getName();
 }
