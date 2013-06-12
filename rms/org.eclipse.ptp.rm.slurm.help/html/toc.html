@@ -17,22 +17,28 @@ In addition to running applications, you can monitor their status, control their
 output from within PTP. You can also debug a parallel application using the built in PTP parallel debugger. </p>
 <p>You can run and debug parallel applications either as local projects or as remote projects, using the remote development 
 environment support that is part of PTP.</p>
-<p>This plugin consists of two parts. The first is the Eclipse PTP plugin code which is responsible for the PTP views 
-presented to the user and the user's interaction with those views. The second part is a resource manager (proxy), which is
-responsible for communicating with the PTP SLURM plugin code, invoking the parallel application, and reporting application
-status to the PTP SLURM plugin.</p>
 
-<!----------- caveat for PTP 6.0 ------------>
-<p><b>Note:</b> PTP 6.0 does not require the creation of separate <i>Resource Managers</i>
-and instead, the target configuration is specified on the Run Configuration dialog.
+<p><b>Note:</b> this document describes the older legacy version of PTP launching,
+which includes a <i>resource manager.</i>  The current release of PTP (7.0, June 2013)
+no longer supports this.  
+<!----------- caveat for PTP 6.0 and later ------------>
 
 This document describes the legacy (proxy-based) Resource Managers supported in versions of PTP
 prior to PTP 6.0.  Target System Configurations replace Resource Managers in PTP 6.0 and beyond.
+The current release of PTP (7.0, June 2013)
+no longer supports resource managers. 
 <ul>
 <li>For more up-to-date information on launching PTP jobs with SLURM, see
       <a href="PLUGINS_ROOT/org.eclipse.ptp.doc.user/html/rms/slurm.html">Launching jobs with SLURM</a>
 </ul>
 <!--  ------------------------------------- -->
+
+<p>This plugin consists of two parts. The first is the Eclipse PTP plugin code which is responsible for the PTP views 
+presented to the user and the user's interaction with those views. The second part is a resource manager (proxy), which is
+responsible for communicating with the PTP SLURM plugin code, invoking the parallel application, and reporting application
+status to the PTP SLURM plugin.</p>
+
+
 
 <p>
 Table of Contents:
