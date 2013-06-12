@@ -13,11 +13,38 @@
 <li>For information about the legacy resource manager for SLURM from prior PTP releases,
 see
   <a href="PLUGINS_ROOT/org.eclipse.ptp.rm.slurm.help/html/toc.html">SLURM legacy resource manager.</a>
-  The current release no longer requires a resource manager, but the information above may be useful until
-  the current documentation is updated.
+  The current release no longer requires a resource manager.
   
 </ul>
-<p> --- TBD ---
+<p>When running a SLURM program from PTP, first create a C/C++/Fortran project, and build it.
+For more information, see
+<ul>
+<li><a href="../01buildMPIprog.html">Introduction to creating MPI projects</a>
+which includes information on building
+<li><a href="PLUGINS_ROOT/org.eclipse.ptp.pldt.doc.user/html/setup.html">Setting up an MPI project with PTP's PLDT</a>
+<li><a href="../sync.html">Synchronized Projects</a> - creating and building projects on remote machines
+</ul> 
+<p>As described in <a href="../03pRunConfig.html">Running Parallel Programs</a>, next create a run configuration
+via Run > Run Configurations ... and create a new <b>Parallel Application</b>.
+<p>The specifics for running an SLURM program with PTP are specified on
+the <b>Resources</b> tab of the run configuration.
+For <b>Target System Configuration</b>, select <b>SLURM-Generic-Batch</b>
+<p><img src="../images/rms-slurm1.png">
+<p>Then specify a connection.  If you have already specified a connection, e.g.
+for a <a href="../sync.html">Synchronized Project</a> or a remote project,
+it will be selected already.
+If you are launching a local application (on the same machine where Eclipse is running), 
+select <b>Local</b> for the <b>Connection Type</b>.
+<p><img src="../images/rms-slurm2.png">
+<blockquote>
+<p>See <a href="../remoteTools.html#create">Creating Remote Connections</a> and 
+<a href="../remoteTools.html#local">Local Connections</a>
+
+<p>Note: To edit connection information after a connection has been created, e.g. to change user name or password, see
+<a href="../remoteTools.html#edit">Editing Remote Connections</a> in Remote Tools.
+</blockquote>
+<p>Fill in the SLURM options, as appropriate for your system, in the <b>Basic/Advanced Settings</b> tab.
+<p><img src="../images/rms-slurm3.png">
 
 <p>&nbsp;
 <p>Now continue with the 

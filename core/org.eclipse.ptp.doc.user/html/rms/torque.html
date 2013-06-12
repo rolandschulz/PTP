@@ -1,23 +1,23 @@
 <html>
 <head>
-<title>PBS</title>
+<title>TORQUE</title>
 <link rel="stylesheet" type="text/css" href="../help.css">
 <script type="text/javascript" src="thumb.js"> </script>
 </head>
 <body>
 
-<h1 id="top">PBS</h1>
-<p>This section describes how to set up a run configuration using PBS as a PTP target system configuration
+<h1 id="top">TORQUE</h1>
+<p>This section describes how to set up a run configuration using TORQUE as a PTP target system configuration
 <ul>
 <!-- remove for PTP 7.0 -->
-<li>For information about the legacy resource manager for PBS from prior PTP releases,
+<li>For information about the legacy resource manager for TORQUE from prior PTP releases,
 see
   <a href="PLUGINS_ROOT/org.eclipse.ptp.rm.jaxb.doc.user/html/PBSHelpPage.html">PBS legacy resource manager.</a>
   The current release no longer requires a resource manager.
   
 </ul>
 
-<p>When running a PBS program from PTP, first create a C/C++/Fortran project, and build it.
+<p>When running a TORQUE program from PTP, first create a C/C++/Fortran project, and build it.
 For more information, see
 <ul>
 <li><a href="../01buildMPIprog.html">Introduction to creating MPI projects</a>
@@ -27,16 +27,16 @@ which includes information on building
 </ul> 
 <p>As described in <a href="../03pRunConfig.html">Running Parallel Programs</a>, next create a run configuration
 via Run > Run Configurations ... and create a new <b>Parallel Application</b>.
-<p>The specifics for running an PBS program with PTP are specified on
+<p>The specifics for running a TORQUE program with PTP are specified on
 the <b>Resources</b> tab of the run configuration.
-For <b>Target System Configuration</b>, select <b>PBS-Generic-Batch</b>
-<p><img src="../images/rms-pbs1.png">
+For <b>Target System Configuration</b>, select <b>Torque-Generic-Batch</b>
+<p><img src="../images/rms-torque1.png">
 <p>Then specify a connection.  If you have already specified a connection, e.g.
 for a <a href="../sync.html">Synchronized Project</a> or a remote project,
 it will be selected already.
 If you are launching a local application (on the same machine where Eclipse is running), 
 select <b>Local</b> for the <b>Connection Type</b>.
-<p><img src="../images/rms-pbs2.png">
+<p><img src="../images/rms-torque2.png">
 <blockquote>
 <p>See <a href="../remoteTools.html#create">Creating Remote Connections</a> and 
 <a href="../remoteTools.html#local">Local Connections</a>
@@ -44,8 +44,8 @@ select <b>Local</b> for the <b>Connection Type</b>.
 <p>Note: To edit connection information after a connection has been created, e.g. to change user name or password, see
 <a href="../remoteTools.html#edit">Editing Remote Connections</a> in Remote Tools.
 </blockquote>
-<p>Fill in the PBS options, as appropriate for your system, in the <b>Basic/Advanced Settings</b> tab.
-<p><img src="../images/rms-pbs3.png">
+<p>Fill in the TORQUE options, as appropriate for your system, in the <b>Basic/Advanced Settings</b> tab.
+<p><img src="../images/rms-torque3.png">
 
 <p>For an example of using Torque PBS when launching a PTP job, see the
 <a href="http://wiki.eclipse.org/PTP/tutorials/SC12">PTP SC12 tutorial slides</a>

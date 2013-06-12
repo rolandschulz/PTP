@@ -22,6 +22,7 @@
           <topic label="Running IBM LoadLeveler Jobs" href="html/rms/ibm-ll.html"/>
           <topic label="Running IBM Platform MPI Jobs" href="html/rms/ibm-pmpi.html"/>
           <topic label="Running PBS Jobs" href="html/rms/pbs.html"/>
+          <topic label="Running TORQUE Jobs" href="html/rms/torque.html"/>
           <!-- anchor point for general TSC help docs -->
           <anchor id="ptpRun"/>
           <topic label="Running Jobs on JSC JUDGE" href="html/rms/de.fz-juelich.judge.html"/>
