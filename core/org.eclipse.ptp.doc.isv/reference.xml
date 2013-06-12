@@ -30,7 +30,13 @@
 		<topic label="org.eclipse.ptp.pldt.common.analysis" href="reference/api/org/eclipse/ptp/pldt/common/analysis/package-summary.html" />
 		<topic label="org.eclipse.ptp.pldt.common.editorHelp" href="reference/api/org/eclipse/ptp/pldt/common/editorHelp/package-summary.html" />
 		<topic label="org.eclipse.ptp.pldt.common.util" href="reference/api/org/eclipse/ptp/pldt/common/util/package-summary.html" />
-		<topic label="org.eclipse.ptp.pldt.common.viewa" href="reference/api/org/eclipse/ptp/pldt/common/views/package-summary.html" />
+		<topic label="org.eclipse.ptp.pldt.common.views" href="reference/api/org/eclipse/ptp/pldt/common/views/package-summary.html" />
+		<topic label="org.eclipse.ptp.rdt.sync.core" href="reference/api/org/eclipse/ptp/rdt/sync/core/package-summary.html" />
+		<topic label="org.eclipse.ptp.rdt.sync.core.exceptions" href="reference/api/org/eclipse/ptp/rdt/sync/core/exceptions/package-summary.html" />
+		<topic label="org.eclipse.ptp.rdt.sync.core.handlers" href="reference/api/org/eclipse/ptp/rdt/sync/core/handlers/package-summary.html" />
+		<topic label="org.eclipse.ptp.rdt.sync.core.listeners" href="reference/api/org/eclipse/ptp/rdt/sync/core/listeners/package-summary.html" />
+		<topic label="org.eclipse.ptp.rdt.sync.core.resources" href="reference/api/org/eclipse/ptp/rdt/sync/core/resources/package-summary.html" />
+		<topic label="org.eclipse.ptp.rdt.sync.core.services" href="reference/api/org/eclipse/ptp/rdt/sync/core/services/package-summary.html" />
 		<topic label="org.eclipse.ptp.remote.core" href="reference/api/org/eclipse/ptp/remote/core/package-summary.html" />
 		<topic label="org.eclipse.ptp.remote.core.exception" href="reference/api/org/eclipse/ptp/remote/core/exception/package-summary.html" />
 		<topic label="org.eclipse.ptp.remote.ui" href="reference/api/org/eclipse/ptp/remote/ui/package-summary.html" />
@@ -46,7 +52,10 @@
 		<topic label="org.eclipse.ptp.debug.core.parallelDebuggers" href="reference/extension-points/org_eclipse_ptp_debug_core_parallelDebuggers.html" />
 		<topic label="org.eclipse.ptp.debug.sdm.core.SDMDebugger" href="reference/extension-points/org_eclipse_ptp_debug_sdm_core_SDMDebugger.html" />
 		<topic label="org.eclipse.ptp.debug.ui.debuggerConfigurations" href="reference/extension-points/org_eclipse_ptp_debug_ui_debuggerConfigurations.html" />
-		<topic label="org.eclipse.ptp.remote.core.remoteResources" href="reference/extension-points/org_eclipse_ptp_remote_core_remoteResources.html" />
+		<topic label="org.eclipse.ptp.rdt.sync.core.synchronizeService" href="reference/extension-points/org_eclipse_ptp_rdt_sync_core_synchronizeService.html" />
+		<topic label="org.eclipse.ptp.rdt.sync.ui.synchronizeParticipants" href="reference/extension-points/org_eclipse_ptp_rdt_sync_ui_synchronizeParticipants.html" />
+		<topic label="org.eclipse.ptp.rdt.sync.ui.synchronizeProperties" href="reference/extension-points/org_eclipse_ptp_rdt_sync_ui_synchronizeProperties.html" />
+		<topic label="org.eclipse.ptp.rdt.sync.ui.synchronizeWizardExtension" href="reference/extension-points/org_eclipse_ptp_rdt_sync_ui_synchronizeWizardExtension.html" />
 		<topic label="org.eclipse.ptp.remote.core.remoteServices" href="reference/extension-points/org_eclipse_ptp_remote_core_remoteServices.html" />
 		<topic label="org.eclipse.ptp.remote.ui.remoteUIServices" href="reference/extension-points/org_eclipse_ptp_remote_ui_remoteUIServices.html" />
 		<topic label="org.eclipse.ptp.services.core.providers" href="reference/extension-points/org_eclipse_ptp_services_core_providers.html" />

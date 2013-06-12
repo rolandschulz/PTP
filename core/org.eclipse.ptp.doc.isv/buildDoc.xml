@@ -86,6 +86,8 @@
 		<pde.convertSchemaToHTML manifest="../../debug/org.eclipse.ptp.debug.core/plugin.xml" destination="${dest}" />
 		<pde.convertSchemaToHTML manifest="../../debug/org.eclipse.ptp.debug.sdm.core/plugin.xml" destination="${dest}" />
 		<pde.convertSchemaToHTML manifest="../../debug/org.eclipse.ptp.debug.ui/plugin.xml" destination="${dest}" />
+		<pde.convertSchemaToHTML manifest="../../rdt/org.eclipse.ptp.rdt.sync.core/plugin.xml" destination="${dest}" />
+		<pde.convertSchemaToHTML manifest="../../rdt/org.eclipse.ptp.rdt.sync.ui/plugin.xml" destination="${dest}" />
 		<pde.convertSchemaToHTML manifest="../org.eclipse.ptp.remote.core/plugin.xml" destination="${dest}" />
 		<pde.convertSchemaToHTML manifest="../org.eclipse.ptp.remote.ui/plugin.xml" destination="${dest}" />
 		<pde.convertSchemaToHTML manifest="../org.eclipse.ptp.services.core/plugin.xml" destination="${dest}" />

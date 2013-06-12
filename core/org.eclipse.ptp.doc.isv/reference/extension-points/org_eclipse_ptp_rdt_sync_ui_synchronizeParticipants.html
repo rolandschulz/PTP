@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Synchronization Participant</title>
+<style type="text/css">@import url("../../book.css");</style>
+<style type="text/css">@import url("../../schema.css");</style>
+</HEAD>
+<BODY>
+<H1 style="text-align:center">Synchronization Participant</H1>
+<p></p>
+<h6 class="CaptionFigColumn SchemaHeader">Identifier: </h6>org.eclipse.ptp.rdt.sync.ui.syncParticipant<p></p>
+<h6 class="CaptionFigColumn SchemaHeader">Since: </h6>7.0
+<p></p>
+
+<h6 class="CaptionFigColumn SchemaHeader">Description: </h6>This extension point is for adding UI elements to configure a synchronization provider.<p></p>
+<h6 class="CaptionFigColumn SchemaHeader">Configuration Markup:</h6>
+<p></p>
+<p class="code SchemaDtd">&lt;!ELEMENT <a name="e.extension">extension</a> (<a href="#e.synchronizeParticipant">synchronizeParticipant</a>)+&gt;</p>
+<p class="code SchemaDtd">&lt;!ATTLIST extension</p>
+<p class="code SchemaDtdAttlist">point&nbsp;CDATA #REQUIRED</p>
+<p class="code SchemaDtdAttlist">id&nbsp;&nbsp;&nbsp;&nbsp;CDATA #IMPLIED</p>
+<p class="code SchemaDtdAttlist">name&nbsp;&nbsp;CDATA #IMPLIED&gt;</p>
+<p></p>
+<ul class="ConfigMarkupAttlistDesc">
+</ul>
+<br><p class="code SchemaDtd">&lt;!ELEMENT <a name="e.synchronizeParticipant">synchronizeParticipant</a> EMPTY&gt;</p>
+<p class="code SchemaDtd">&lt;!ATTLIST synchronizeParticipant</p>
+<p class="code SchemaDtdAttlist">class&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CDATA #REQUIRED</p>
+<p class="code SchemaDtdAttlist">id&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CDATA #REQUIRED</p>
+<p class="code SchemaDtdAttlist">name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CDATA #REQUIRED</p>
+<p class="code SchemaDtdAttlist">serviceId&nbsp;CDATA #REQUIRED&gt;</p>
+<p></p>
+<ul class="ConfigMarkupAttlistDesc">
+<li><b>class</b> - The fully qualified name of the Java class that extends org.eclipse.ptp.rdt.sync.ui.AbstractSynchronizeParticipant</li>
+<li><b>id</b> - A unique identifier for this participant</li>
+<li><b>name</b> - A human readable name for this participant's synchronization provider</li>
+<li><b>serviceId</b> - A unique identifier for the synchronization service</li>
+</ul>
+<br><h6 class="CaptionFigColumn SchemaHeader">Examples: </h6><extension
+         point="org.eclipse.ptp.rdt.sync.ui.synchronizeParticipants">
+      <synchronizeParticipant
+            class="org.eclipse.ptp.internal.rdt.sync.git.ui.GitParticipant"
+            id="org.eclipse.ptp.rdt.sync.git.ui.gitParticipant"
+            name="Git"
+            serviceId="org.eclipse.ptp.rdt.sync.git.core.synchronizeService">
+      </synchronizeParticipant>
+   </extension>
+<p></p>
+
+<h6 class="CaptionFigColumn SchemaHeader">API Information: </h6>The value of the class attribute should extend org.eclipse.ptp.rdt.sync.ui.AbstractSynchronizeParticipant
+<p></p>
+
+<h6 class="CaptionFigColumn SchemaHeader">Supplied Implementation: </h6>See org.eclipse.ptp.internal.rdt.sync.git.ui.GitParticipant
+<p></p>
+
+<br>
+<p class="note SchemaCopyright">
+Copyright (c) 2013 IBM Corporation and others. All rights reserved. This program and the accompanying materials are made available under the terms of the Eclipse Public License v1.0 which accompanies this distribution, and is available at http://www.eclipse.org/legal/epl-v10.html
+
+</p>
+</BODY>
+</HTML>

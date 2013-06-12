@@ -1,15 +1,18 @@
 #This is a generated file; do not edit.
-#Wed Jun 12 16:00:47 BST 2013
+#Wed Jun 12 19:57:09 BST 2013
 /org.eclipse.ptp.doc.isv/reference/extension-points/org_eclipse_ptp_debug_core_parallelDebuggers.html=0
 /org.eclipse.ptp.doc.isv/reference/extension-points/org_eclipse_ptp_services_ui_wizardExtensions.html=0
 /org.eclipse.ptp.doc.isv/reference/api/org/eclipse/ptp/debug/core/model/package-summary.html=0
 /org.eclipse.ptp.doc.isv/reference/api/org/eclipse/ptp/debug/core/pdi/model/package-summary.html=0
+/org.eclipse.ptp.doc.isv/reference/api/org/eclipse/ptp/rdt/sync/core/listeners/package-summary.html=0
 /org.eclipse.ptp.doc.isv/reference/api/org/eclipse/ptp/services/ui/widgets/package-summary.html=0
 /org.eclipse.ptp.doc.isv/reference/api/org/eclipse/ptp/pldt/common/util/package-summary.html=0
 /org.eclipse.ptp.doc.isv/reference/api/overview-summary.html=0
+/org.eclipse.ptp.doc.isv/reference/api/org/eclipse/ptp/rdt/sync/core/exceptions/package-summary.html=0
 /org.eclipse.ptp.doc.isv/reference/extension-points/org_eclipse_ptp_services_core_serviceCategories.html=0
 /org.eclipse.ptp.doc.isv/reference/api/org/eclipse/ptp/services/core/package-summary.html=0
 /org.eclipse.ptp.doc.isv/reference/extension-points/org_eclipse_ptp_services_core_services.html=0
+/org.eclipse.ptp.doc.isv/reference/api/org/eclipse/ptp/rdt/sync/core/package-summary.html=0
 /org.eclipse.ptp.doc.isv/reference/extension-points/org_eclipse_ptp_services_ui_serviceContributors.html=0
 /org.eclipse.ptp.doc.isv/reference/extension-points/org_eclipse_ptp_debug_ui_debuggerConfigurations.html=0
 /org.eclipse.ptp.doc.isv/reference/api/org/eclipse/ptp/debug/core/pdi/package-summary.html=0
@@ -20,13 +23,15 @@
 /org.eclipse.ptp.doc.isv/reference/api/org/eclipse/ptp/remote/ui/dialogs/package-summary.html=0
 /org.eclipse.ptp.doc.isv/reference/api/org/eclipse/ptp/debug/core/pdi/model/aif/package-summary.html=0
 /org.eclipse.ptp.doc.isv/reference/api/org/eclipse/ptp/etfw/toolopts/package-summary.html=0
+/org.eclipse.ptp.doc.isv/reference/api/org/eclipse/ptp/rdt/sync/core/resources/package-summary.html=0
 /org.eclipse.ptp.doc.isv/notices.html=0
-/org.eclipse.ptp.doc.isv/reference/extension-points/org_eclipse_ptp_remote_core_remoteResources.html=0
 /org.eclipse.ptp.doc.isv/reference/api/org/eclipse/ptp/debug/core/event/package-summary.html=0
 /org.eclipse.ptp.doc.isv/reference/api/org/eclipse/ptp/debug/core/pdi/event/package-summary.html=0
 /org.eclipse.ptp.doc.isv/reference/extension-points/index.html=0
+/org.eclipse.ptp.doc.isv/reference/api/org/eclipse/ptp/rdt/sync/core/handlers/package-summary.html=0
 /org.eclipse.ptp.doc.isv/reference/api/org/eclipse/ptp/etfw/ui/package-summary.html=0
 /org.eclipse.ptp.doc.isv/reference/api/org/eclipse/ptp/debug/core/launch/package-summary.html=0
+/org.eclipse.ptp.doc.isv/reference/extension-points/org_eclipse_ptp_rdt_sync_core_synchronizeService.html=0
 /org.eclipse.ptp.doc.isv/reference/api/org/eclipse/ptp/debug/core/pdi/manager/package-summary.html=0
 /org.eclipse.ptp.doc.isv/reference/api/org/eclipse/ptp/etfw/package-summary.html=0
 /org.eclipse.ptp.doc.isv/reference/api/org/eclipse/ptp/remote/ui/package-summary.html=0
@@ -38,14 +43,18 @@
 /org.eclipse.ptp.doc.isv/reference/api/org/eclipse/ptp/remote/core/package-summary.html=0
 /org.eclipse.ptp.doc.isv/reference/api/org/eclipse/ptp/etfw/feedback/package-summary.html=0
 /org.eclipse.ptp.doc.isv/reference/api/org/eclipse/ptp/pldt/common/analysis/package-summary.html=0
+/org.eclipse.ptp.doc.isv/reference/extension-points/org_eclipse_ptp_rdt_sync_ui_synchronizeParticipants.html=0
 /org.eclipse.ptp.doc.isv/reference/api/org/eclipse/ptp/remote/ui/widgets/package-summary.html=0
 /org.eclipse.ptp.doc.isv/reference/api/org/eclipse/ptp/services/ui/dialogs/package-summary.html=0
 /org.eclipse.ptp.doc.isv/reference/api/org/eclipse/ptp/services/ui/package-summary.html=0
 /org.eclipse.ptp.doc.isv/reference/api/org/eclipse/ptp/remote/core/exception/package-summary.html=0
 /org.eclipse.ptp.doc.isv/reference/extension-points/org_eclipse_ptp_services_core_providers.html=0
 /org.eclipse.ptp.doc.isv/reference/api/org/eclipse/ptp/pldt/common/actions/package-summary.html=0
+/org.eclipse.ptp.doc.isv/reference/api/org/eclipse/ptp/rdt/sync/core/services/package-summary.html=0
+/org.eclipse.ptp.doc.isv/reference/extension-points/org_eclipse_ptp_rdt_sync_ui_synchronizeWizardExtension.html=0
 /org.eclipse.ptp.doc.isv/reference/api/org/eclipse/ptp/ems/core/package-summary.html=0
 /org.eclipse.ptp.doc.isv/reference/extension-points/org_eclipse_ptp_remote_ui_remoteUIServices.html=0
 /org.eclipse.ptp.doc.isv/reference/api/org/eclipse/ptp/debug/core/package-summary.html=0
 /org.eclipse.ptp.doc.isv/reference/api/org/eclipse/ptp/pldt/common/package-summary.html=0
+/org.eclipse.ptp.doc.isv/reference/extension-points/org_eclipse_ptp_rdt_sync_ui_synchronizeProperties.html=0
 /org.eclipse.ptp.doc.isv/reference/api/org/eclipse/ptp/pldt/common/editorHelp/package-summary.html=0

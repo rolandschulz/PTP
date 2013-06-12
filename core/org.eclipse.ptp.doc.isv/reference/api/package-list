@@ -23,6 +23,12 @@ org.eclipse.ptp.pldt.common.analysis
 org.eclipse.ptp.pldt.common.editorHelp
 org.eclipse.ptp.pldt.common.util
 org.eclipse.ptp.pldt.common.views
+org.eclipse.ptp.rdt.sync.core
+org.eclipse.ptp.rdt.sync.core.exceptions
+org.eclipse.ptp.rdt.sync.core.handlers
+org.eclipse.ptp.rdt.sync.core.listeners
+org.eclipse.ptp.rdt.sync.core.resources
+org.eclipse.ptp.rdt.sync.core.services
 org.eclipse.ptp.remote.core
 org.eclipse.ptp.remote.core.exception
 org.eclipse.ptp.remote.ui
