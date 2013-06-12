@@ -911,6 +911,7 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 				hiddenTable.select(i);
 			}
 		}
+		h_selected.handleSelection();
 	}
 
 	/**
