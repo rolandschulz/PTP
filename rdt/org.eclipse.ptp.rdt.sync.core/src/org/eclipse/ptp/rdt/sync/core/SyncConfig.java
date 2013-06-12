@@ -160,6 +160,8 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	}
 
 	/**
+	 * Get the configuration name
+	 * 
 	 * @return config name
 	 */
 	public String getName() {
@@ -167,6 +169,8 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	}
 
 	/**
+	 * Get the synchronized project
+	 * 
 	 * @return
 	 */
 	public IProject getProject() {
@@ -221,6 +225,8 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	}
 
 	/**
+	 * Get the remote services ID
+	 * 
 	 * @return remote services ID
 	 */
 	public String getRemoteServicesId() {
@@ -237,6 +243,8 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	}
 
 	/**
+	 * Get the synchronize service
+	 * 
 	 * @return sync service
 	 */
 	public ISynchronizeService getSyncService() {
@@ -255,6 +263,8 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	}
 
 	/**
+	 * Check if syncs should occur on post-build
+	 * 
 	 * @return
 	 */
 	public boolean isSyncOnPostBuild() {
@@ -262,6 +272,8 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	}
 
 	/**
+	 * Check if syncs should occur on pre-build
+	 * 
 	 * @return
 	 */
 	public boolean isSyncOnPreBuild() {
@@ -269,6 +281,8 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	}
 
 	/**
+	 * Check if syncs should occur on saves
+	 * 
 	 * @return
 	 */
 	public boolean isSyncOnSave() {
@@ -276,12 +290,19 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	}
 
 	/**
+	 * Set the configuration name
+	 * 
 	 * @param configName
 	 */
 	public void setConfigName(String configName) {
 		fName = configName;
 	}
 
+	/**
+	 * Set the remote connection
+	 * 
+	 * @param connection
+	 */
 	public void setConnection(IRemoteConnection connection) {
 		fRemoteServices = connection.getRemoteServices();
 		fRemoteServicesId = connection.getRemoteServices().getId();
@@ -290,6 +311,8 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	}
 
 	/**
+	 * Set the connection name
+	 * 
 	 * @param connectionName
 	 */
 	public void setConnectionName(String connectionName) {
@@ -298,6 +321,8 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	}
 
 	/**
+	 * Set the sync location
+	 * 
 	 * @param location
 	 */
 	public void setLocation(String location) {
@@ -305,6 +330,8 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	}
 
 	/**
+	 * Set the synchronized project
+	 * 
 	 * @param project
 	 */
 	public void setProject(IProject project) {
@@ -322,6 +349,8 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	}
 
 	/**
+	 * Set the remote services ID
+	 * 
 	 * @param remoteServicesId
 	 */
 	public void setRemoteServicesId(String remoteServicesId) {
@@ -330,6 +359,8 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	}
 
 	/**
+	 * Set the sync on post-build flag
+	 * 
 	 * @param syncOnPostBuild
 	 */
 	public void setSyncOnPostBuild(boolean syncOnPostBuild) {
@@ -337,6 +368,8 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	}
 
 	/**
+	 * Set the sync on pre-build flag
+	 * 
 	 * @param syncOnPreBuild
 	 */
 	public void setSyncOnPreBuild(boolean syncOnPreBuild) {
@@ -344,6 +377,8 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	}
 
 	/**
+	 * Set the sync on save flag
+	 * 
 	 * @param syncOnSave
 	 */
 	public void setSyncOnSave(boolean syncOnSave) {
@@ -351,6 +386,8 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	}
 
 	/**
+	 * Set the sync provider ID
+	 * 
 	 * @param syncProvider
 	 */
 	public void setSyncProviderId(String syncProviderId) {

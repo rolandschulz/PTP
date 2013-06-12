@@ -45,6 +45,8 @@ import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
 /**
+ * Main class for managing sync configurations
+ * 
  * @since 3.0
  */
 public class SyncConfigManager {

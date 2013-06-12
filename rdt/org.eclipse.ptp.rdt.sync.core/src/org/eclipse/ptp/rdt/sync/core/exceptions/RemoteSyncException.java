@@ -23,19 +23,45 @@ public class RemoteSyncException extends CoreException {
 	private static final String pluginID = "org.eclipse.ptp.rdt.sync.git.core"; //$NON-NLS-1$
 	private static final long serialVersionUID = 1L;
 
-	public RemoteSyncException(String arg0) {
-		super(new Status(IStatus.ERROR, pluginID, arg0));
+	/**
+	 * Create a new instance of a RemoteSyncException
+	 * 
+	 * @param message
+	 *            detail message
+	 */
+	public RemoteSyncException(String message) {
+		super(new Status(IStatus.ERROR, pluginID, message));
 	}
 
-	public RemoteSyncException(String arg0, Throwable arg1) {
-		super(new Status(IStatus.ERROR, pluginID, arg0, arg1));
+	/**
+	 * Create a new instance of a RemoteSyncException
+	 * 
+	 * @param message
+	 *            detail message
+	 * @param cause
+	 *            the cause
+	 */
+	public RemoteSyncException(String message, Throwable cause) {
+		super(new Status(IStatus.ERROR, pluginID, message, cause));
 
 	}
 
-	public RemoteSyncException(Throwable arg0) {
-		super(new Status(IStatus.ERROR, pluginID, (arg0 == null ? null : arg0.toString()), arg0));
+	/**
+	 * Create a new instance of a RemoteSyncException
+	 * 
+	 * @param cause
+	 *            the cause
+	 */
+	public RemoteSyncException(Throwable cause) {
+		super(new Status(IStatus.ERROR, pluginID, (cause == null ? null : cause.toString()), cause));
 	}
 
+	/**
+	 * Create a new instance of a RemoteSyncException
+	 * 
+	 * @param status
+	 *            status object
+	 */
 	public RemoteSyncException(Status status) {
 		super(status);
 	}

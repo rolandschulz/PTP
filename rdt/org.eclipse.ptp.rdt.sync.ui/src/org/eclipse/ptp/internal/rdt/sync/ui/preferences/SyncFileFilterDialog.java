@@ -18,7 +18,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
@@ -31,9 +30,9 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ptp.internal.rdt.sync.ui.RDTSyncUIPlugin;
 import org.eclipse.ptp.internal.rdt.sync.ui.messages.Messages;
+import org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
-import org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
 import org.eclipse.swt.SWT;
@@ -209,7 +208,7 @@ public class SyncFileFilterDialog extends Dialog implements ISyncFilterWidgetPat
 			treeViewer.addCheckStateListener(new ICheckStateListener() {
 				@Override
 				public void checkStateChanged(CheckStateChangedEvent event) {
-					filter.addPattern((IResource)event.getElement(), !event.getChecked());
+					filter.addPattern((IResource) event.getElement(), !event.getChecked());
 					update();
 				}
 			});
@@ -246,11 +245,11 @@ public class SyncFileFilterDialog extends Dialog implements ISyncFilterWidgetPat
 	@Override
 	protected void okPressed() {
 		// Bug 407601 project is null during new project creation
-		if (project != null) { 
+		if (project != null) {
 			try {
 				SyncManager.saveFileFilter(project, filter);
 			} catch (IOException e) {
-				RDTSyncUIPlugin.getDefault().log(e);
+				RDTSyncUIPlugin.log(e);
 			}
 		}
 		setReturnCode(OK);

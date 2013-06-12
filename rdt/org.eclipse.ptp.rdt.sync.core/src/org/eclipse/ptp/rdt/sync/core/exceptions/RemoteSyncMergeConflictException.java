@@ -23,19 +23,45 @@ import org.eclipse.core.runtime.Status;
 public class RemoteSyncMergeConflictException extends RemoteSyncException {
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Create a new instance of a RemoteSyncMergeConflictException
+	 * 
+	 * @param status
+	 *            status object
+	 */
 	public RemoteSyncMergeConflictException(Status status) {
 		super(status);
 	}
 
-	public RemoteSyncMergeConflictException(String arg0, Throwable arg1) {
-		super(arg0, arg1);
+	/**
+	 * Create a new instance of a RemoteSyncMergeConflictException
+	 * 
+	 * @param message
+	 *            detail message
+	 * @param cause
+	 *            the cause
+	 */
+	public RemoteSyncMergeConflictException(String message, Throwable cause) {
+		super(message, cause);
 	}
 
-	public RemoteSyncMergeConflictException(String arg0) {
-		super(arg0);
+	/**
+	 * Create a new instance of a RemoteSyncMergeConflictException
+	 * 
+	 * @param message
+	 *            detail message
+	 */
+	public RemoteSyncMergeConflictException(String message) {
+		super(message);
 	}
 
-	public RemoteSyncMergeConflictException(Throwable arg0) {
-		super(arg0);
+	/**
+	 * Create a new instance of a RemoteSyncMergeConflictException
+	 * 
+	 * @param cause
+	 *            the cause
+	 */
+	public RemoteSyncMergeConflictException(Throwable cause) {
+		super(cause);
 	}
 }

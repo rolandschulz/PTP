@@ -20,5 +20,13 @@ import org.eclipse.core.runtime.CoreException;
  * @since 3.0
  */
 public interface ISyncExceptionHandler {
+	/**
+	 * Handler for sync exceptions
+	 * 
+	 * @param project
+	 *            synchronized project
+	 * @param e
+	 *            exception raised
+	 */
 	public void handle(final IProject project, final CoreException e);
 }

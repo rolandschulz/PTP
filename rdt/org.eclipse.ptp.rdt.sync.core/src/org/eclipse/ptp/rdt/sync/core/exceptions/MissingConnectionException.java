@@ -20,11 +20,25 @@ public class MissingConnectionException extends Exception {
 	private static final long serialVersionUID = 1L;
 	private final String connectionName;
 
+	/**
+	 * Create a new instance of a MissingConnectionException
+	 * 
+	 * @param name
+	 *            connection name
+	 */
 	public MissingConnectionException(String name) {
 		super();
 		connectionName = name;
 	}
 
+	/**
+	 * Create a new instance of a MissingConnectionException
+	 * 
+	 * @param name
+	 *            connection name
+	 * @param message
+	 *            exception message
+	 */
 	public MissingConnectionException(String name, String message) {
 		super(message);
 		connectionName = name;
@@ -33,7 +47,7 @@ public class MissingConnectionException extends Exception {
 	/**
 	 * Get connection name
 	 * 
-	 * @return
+	 * @return connection name
 	 */
 	public String getConnectionName() {
 		return connectionName;

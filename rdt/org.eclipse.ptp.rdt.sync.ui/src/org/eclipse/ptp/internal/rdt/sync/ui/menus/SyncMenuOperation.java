@@ -29,9 +29,9 @@ import org.eclipse.ptp.internal.rdt.sync.ui.handlers.CommonSyncExceptionHandler;
 import org.eclipse.ptp.internal.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.internal.rdt.sync.ui.preferences.SyncFileFilterDialog;
 import org.eclipse.ptp.internal.rdt.sync.ui.properties.ManageConfigurationDialog;
+import org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
-import org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.SyncManager.SyncMode;
@@ -119,7 +119,7 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 				try {
 					SyncManager.saveFileFilter(project, sff);
 				} catch (IOException e) {
-					RDTSyncUIPlugin.getDefault().log(e);
+					RDTSyncUIPlugin.log(e);
 				}
 			} else if (command.equals(syncFileList)) {
 				SyncFileFilterDialog.open(HandlerUtil.getActiveShell(event), project);

@@ -43,6 +43,8 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.osgi.service.prefs.Preferences;
 
 /**
+ * Main control class for managing synchronization
+ * 
  * @since 3.0
  */
 public class SyncManager {
@@ -149,12 +151,13 @@ public class SyncManager {
 	 *            project to convert
 	 * @param provider
 	 *            ISynchronizeService that has been correctly configured
-	 * @param fileFilter 
+	 * @param fileFilter
 	 *            synchronize filter, or null if no filter
 	 * @throws CoreException
 	 *             on problems adding sync nature
 	 */
-	public static void makeSyncProject(IProject project, String remoteSyncConfigName, ISynchronizeService provider, AbstractSyncFileFilter fileFilter) throws CoreException {
+	public static void makeSyncProject(IProject project, String remoteSyncConfigName, ISynchronizeService provider,
+			AbstractSyncFileFilter fileFilter) throws CoreException {
 		RemoteSyncNature.addNature(project, new NullProgressMonitor());
 
 		// Remote config
@@ -185,8 +188,9 @@ public class SyncManager {
 	public static PreferenceSyncFileFilterStorage getDefaultFileFilter() {
 
 		PreferenceSyncFileFilterStorage filter = new PreferenceSyncFileFilterStorage();
-		if (!filter.loadFilter())
+		if (!filter.loadFilter()) {
 			filter.loadBuiltInDefaultFilter();
+		}
 		return filter;
 	};
 
@@ -301,7 +305,6 @@ public class SyncManager {
 		}
 	}
 
-
 	/**
 	 * Save a new file filter for a project.
 	 * Use this in conjunction with "getFileFilter(IProject)" to modify the current file filtering for a project.
@@ -310,7 +313,7 @@ public class SyncManager {
 	 *            cannot be null
 	 * @param filter
 	 *            cannot be null
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public static void saveFileFilter(IProject project, AbstractSyncFileFilter filter) throws IOException {
 		SyncConfigManager.getActive(project).getSyncService().setSyncFileFilter(project, filter);

@@ -18,5 +18,11 @@ import org.eclipse.ptp.rdt.sync.core.SyncEvent;
  * @since 3.0
  */
 public interface ISyncListener {
-	void handleSyncEvent(SyncEvent event);
+	/**
+	 * Called to notify receiver of a sync event
+	 * 
+	 * @param event
+	 *            event being raised
+	 */
+	public void handleSyncEvent(SyncEvent event);
 }

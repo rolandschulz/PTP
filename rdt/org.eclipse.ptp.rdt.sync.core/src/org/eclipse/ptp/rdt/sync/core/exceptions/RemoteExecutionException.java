@@ -19,19 +19,42 @@ package org.eclipse.ptp.rdt.sync.core.exceptions;
 public class RemoteExecutionException extends Exception {
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Create a new instance of a RemoteExecutionException
+	 */
 	public RemoteExecutionException() {
 		super();
 	}
 
-	public RemoteExecutionException(String arg0) {
-		super(arg0);
+	/**
+	 * Create a new instance of a RemoteExecutionException
+	 * 
+	 * @param message
+	 *            detail message
+	 */
+	public RemoteExecutionException(String message) {
+		super(message);
 	}
 
-	public RemoteExecutionException(String arg0, Throwable arg1) {
-		super(arg0, arg1);
+	/**
+	 * Create a new instance of a RemoteExecutionException
+	 * 
+	 * @param message
+	 *            detail message
+	 * @param cause
+	 *            the cause
+	 */
+	public RemoteExecutionException(String message, Throwable cause) {
+		super(message, cause);
 	}
 
-	public RemoteExecutionException(Throwable arg0) {
-		super(arg0);
+	/**
+	 * Create a new instance of a RemoteExecutionException
+	 * 
+	 * @param cause
+	 *            the cause
+	 */
+	public RemoteExecutionException(Throwable cause) {
+		super(cause);
 	}
 }

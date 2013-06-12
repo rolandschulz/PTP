@@ -19,5 +19,13 @@ import org.eclipse.ptp.remote.core.IRemoteServices;
  * @since 3.0
  */
 public interface IMissingConnectionHandler {
+	/**
+	 * Handle missing connection
+	 * 
+	 * @param remoteServices
+	 *            remote services for the connection
+	 * @param connectionName
+	 *            connection name
+	 */
 	public void handle(IRemoteServices remoteServices, String connectionName);
 }
