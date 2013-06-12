@@ -1,5 +1,9 @@
 package org.eclipse.ptp.etfw.toolopts;
 
+/**
+ * @author wspear
+ *Encapsulates the commands, arguments and settings for execute/launch operations to be used in an ETFw workflow
+ */
 public class ExecTool extends ExternalTool {
 
 	/**

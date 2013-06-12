@@ -17,6 +17,10 @@
  ****************************************************************************/
 package org.eclipse.ptp.etfw;
 
+/**
+ * @author wspear
+ * Constants used in ETFw tool definitions
+ */
 public interface IToolLaunchConfigurationConstants {
 
 	public static final String ATTR_PERFORMANCEBUILD_CONFIGURATION_NAME = "ATTR_PERFORMANCEBUILD_CONFIGURATION_NAME"; //$NON-NLS-1$

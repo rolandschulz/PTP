@@ -9,6 +9,8 @@ import org.eclipse.swt.widgets.Composite;
 
 /**
  * @since 5.0
+ * @author wspear
+ *This defines the functions that must be implemented by a ETFw ui tab to display configuration options in a launch configuration
  */
 public interface IToolUITab extends IAppInput {
 

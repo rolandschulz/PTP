@@ -3,6 +3,10 @@ package org.eclipse.ptp.etfw.toolopts;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 
+/**
+ * @author wspear
+ *Represents a single tool command and relevant settings to be used by the ETFw workflow
+ */
 public abstract class ExternalTool {
 	public String toolID = null;
 	public String toolName = null;

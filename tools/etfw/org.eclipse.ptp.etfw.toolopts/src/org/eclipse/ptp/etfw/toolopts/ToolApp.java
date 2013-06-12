@@ -25,6 +25,10 @@ import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 
+/**
+ * @author wspear
+ *Represents a single executable application and the resources needed to obtain its launch parameters defined in the ETFw workflow and provided by the user in the launch configuration
+ */
 public class ToolApp {
 	/**
 	 * The unique ID associated with this tool

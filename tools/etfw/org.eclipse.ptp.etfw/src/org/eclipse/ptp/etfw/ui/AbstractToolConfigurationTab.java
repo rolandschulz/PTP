@@ -5,6 +5,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 
 /**
+ * This acts as the basis for new custom ETFw launch configuration tabs
  * @since 7.0
  */
 public abstract class AbstractToolConfigurationTab extends AbstractLaunchConfigurationTab {

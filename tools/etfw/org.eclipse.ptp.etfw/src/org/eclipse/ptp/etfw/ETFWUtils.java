@@ -50,14 +50,6 @@ import org.eclipse.ptp.internal.etfw.toolopts.ToolMaker;
 
 /**
  * Utilities for accessing ETFW tools
- * 
- * @since 7.0
- */
-/**
- * @author wspear
- *
- */
-/**
  * @author wspear
  * @since 7.0
  *

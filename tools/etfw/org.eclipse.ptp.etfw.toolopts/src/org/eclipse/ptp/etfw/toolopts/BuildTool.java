@@ -3,6 +3,10 @@ package org.eclipse.ptp.etfw.toolopts;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * @author wspear
+ *Encapsulates the commands, arguments and settings for compile operations to be used in an ETFw workflow
+ */
 public class BuildTool extends ExternalTool {
 
 	/**

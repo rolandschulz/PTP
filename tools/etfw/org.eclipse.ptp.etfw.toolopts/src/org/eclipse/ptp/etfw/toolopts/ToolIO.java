@@ -4,6 +4,10 @@ import java.util.Map;
 
 import org.eclipse.debug.core.ILaunchConfiguration;
 
+/**
+ * @author wspear
+ *Encapsulates the IO streams of an ETFw defined tool application
+ */
 public class ToolIO implements IAppInput {
 	/**
 	 * This value indicates an output object that specifies a directory for output data

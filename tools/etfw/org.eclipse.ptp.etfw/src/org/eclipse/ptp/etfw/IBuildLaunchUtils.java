@@ -10,6 +10,7 @@ import org.eclipse.ptp.etfw.toolopts.ExternalToolProcess;
 //import org.eclipse.core.filesystem.IFileStore;
 
 /**
+ * Interface defining a collection of operations relevant to filesystem or remote/local sensitive operations for use in ETFw workflows
  * @since 5.0
  */
 public interface IBuildLaunchUtils {

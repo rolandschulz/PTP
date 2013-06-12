@@ -1,5 +1,9 @@
 package org.eclipse.ptp.etfw.toolopts;
 
+/**
+ * @author wspear
+ *Encapsulates the commands, arguments and settings for data processing/analysis operations to be used in an ETFw workflow
+ */
 public class PostProcTool extends ExternalTool {
 	/**
 	 * The array of analysis commands to be invoked when execution is complete
