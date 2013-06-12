@@ -170,6 +170,13 @@ public class SyncFilterWidget extends Composite {
 		setLayout(new GridLayout(1, false));
 		setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
+		// Label for pattern table
+		Label patternTableLabel = new Label(this, SWT.WRAP);
+		patternTableLabel.setText(Messages.NewSyncFileFilterPage_Patterns_to_include);
+		GridData labelData = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
+		labelData.widthHint = 150;
+		patternTableLabel.setLayoutData(labelData);
+		
 		// Composite for pattern view - pattern table and buttons
 		Composite patternTableComposite = new Composite(this, SWT.NONE);
 		if (DEBUG) {
@@ -180,11 +187,6 @@ public class SyncFilterWidget extends Composite {
 		patternTableComposite.setLayout(patternTableLayout);
 
 		patternTableComposite.setLayoutData(new GridData(SWT.FILL, SWT.TOP, GRAB_EXCESS, GRAB_EXCESS));
-
-		// Label for pattern table
-		Label patternTableLabel = new Label(patternTableComposite, SWT.WRAP);
-		patternTableLabel.setText(Messages.NewSyncFileFilterPage_Patterns_to_include);
-		patternTableLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 4, 1));
 
 		// Pattern table
 		fPatternTable = new Table(patternTableComposite, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
