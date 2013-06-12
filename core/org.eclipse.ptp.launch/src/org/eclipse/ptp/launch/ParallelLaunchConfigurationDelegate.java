@@ -38,13 +38,15 @@ import org.eclipse.ptp.internal.debug.ui.IPTPDebugUIConstants;
 import org.eclipse.ptp.internal.ui.model.IElementHandler;
 import org.eclipse.ptp.launch.internal.RuntimeProcess;
 import org.eclipse.ptp.launch.internal.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 
 /**
- * A launch configuration delegate for launching jobs via the PTP resource manager mechanism.
+ * A launch configuration delegate for launching parallel jobs. Jobs are launched using the {@link ILaunchController#submitJob()}
+ * interface. Also supports launching debug jobs, provided the target configuration supports debug launches.
  */
 public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchConfigurationDelegate {
 	private class DebuggerSession implements IRunnableWithProgress {

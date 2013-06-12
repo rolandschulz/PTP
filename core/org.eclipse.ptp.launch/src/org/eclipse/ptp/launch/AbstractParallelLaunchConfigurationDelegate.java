@@ -75,7 +75,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 
 /**
- *
+ * Abstract base class for launch configuration delegates that launch parallel jobs
  */
 public abstract class AbstractParallelLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 

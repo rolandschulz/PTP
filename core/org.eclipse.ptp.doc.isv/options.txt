@@ -10,7 +10,7 @@
 ;../../tools/etfw/org.eclipse.ptp.etfw/src
 ;../../tools/etfw/org.eclipse.ptp.etfw.feedback/src
 ;../../tools/etfw/org.eclipse.ptp.etfw.toolopts/src
-;../../core/org.eclipse.ptp.launch/src
+;../../tools/pldt/org.eclipse.ptp.pldt.common/src
 ;../../core/org.eclipse.ptp.remote.core/src
 ;../../core/org.eclipse.ptp.remote.ui/src
 ;../../core/org.eclipse.ptp.services.core/src
@@ -56,9 +56,12 @@ org.eclipse.ptp.etfw
 org.eclipse.ptp.etfw.feedback
 org.eclipse.ptp.etfw.toolopts
 org.eclipse.ptp.etfw.ui
-org.eclipse.ptp.launch
-org.eclipse.ptp.launch.ui
-org.eclipse.ptp.launch.ui.tabs
+org.eclipse.ptp.pldt.common
+org.eclipse.ptp.pldt.common.actions
+org.eclipse.ptp.pldt.common.analysis
+org.eclipse.ptp.pldt.common.editorHelp
+org.eclipse.ptp.pldt.common.util
+org.eclipse.ptp.pldt.common.views
 org.eclipse.ptp.remote.core
 org.eclipse.ptp.remote.core.exception
 org.eclipse.ptp.remote.ui

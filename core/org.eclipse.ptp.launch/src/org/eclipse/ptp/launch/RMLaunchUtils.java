@@ -23,14 +23,18 @@ import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.core.LaunchControllerManager;
 
 /**
+ * Utility methods for managing launch configuration attributes.
+ * 
  * @since 7.0
  * 
  */
 public class RMLaunchUtils {
 
 	/**
+	 * Get the launch controller for this configuration
+	 * 
 	 * @param configuration
-	 * @return
+	 * @return launch controller or null if none is available
 	 * @throws CoreException
 	 */
 	public static ILaunchController getLaunchController(ILaunchConfiguration configuration) throws CoreException {
@@ -70,6 +74,13 @@ public class RMLaunchUtils {
 		return null;
 	}
 
+	/**
+	 * Get the local file manager
+	 * 
+	 * @param configuration
+	 * @return local file manager (always succeeds)
+	 * @throws CoreException
+	 */
 	public static IRemoteFileManager getLocalFileManager(ILaunchConfiguration configuration) throws CoreException {
 		IRemoteServices localServices = RemoteServices.getLocalServices();
 		IRemoteConnectionManager lconnMgr = localServices.getConnectionManager();
@@ -77,6 +88,14 @@ public class RMLaunchUtils {
 		return localServices.getFileManager(lconn);
 	}
 
+	/**
+	 * Get the remote file manager for the connection specified in the Resources tab
+	 * 
+	 * @param configuration
+	 * @param monitor
+	 * @return remote file manager or null if none is available
+	 * @throws CoreException
+	 */
 	public static IRemoteFileManager getRemoteFileManager(ILaunchConfiguration configuration, IProgressMonitor monitor)
 			throws CoreException {
 		IRemoteConnection conn = getRemoteConnection(configuration, monitor);
