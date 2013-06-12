@@ -41,8 +41,8 @@ Resources, Application, Arguments, Environment, Synchronize.
 </li>
 <li>If no debugger is visible in the <b>Debugger</b> drop-down,
 	select one. This is the debugger that will control the parallel debug
-	session. Currently only <b>SDM</b> is supported (SDM stands for
-	Scalable Debug Manager), so select this.
+	session. Currently only <b>SDM</b> (Scalable Debug Manager) is supported,
+	so select this.
 	<p><br></p>
 	</li>
 	<li>
@@ -55,8 +55,14 @@ Resources, Application, Arguments, Environment, Synchronize.
 	Under <b>Debugger Options</b>, make sure the <b>Debugger backend</b> is set to <code>gdb-mi</code>.
 	<p><br></p>
 	</li>
-	<li>Make sure that the <b>Path to SDM
-	executable</b> is correct for your target system.
+	<li>To use the built-in <b>SDM</b> in PTP, and have it copied to the remote
+	target and executed, leave <b>Use built-in SDM if available for the target platform</b> checked.
+	It uses the OS and architecture from the remote target to copy the correct SDM executable to the remote
+	system. 
+	<p><br></p>
+	<ul><li>
+	
+	<p>If instead you want to specify the path of the debugger, uncheck the <b>Use built-in SDM</b> box and  make sure that the <b>Path to SDM executable</b> is correct for your target system.
 	<p><br></p>
 	<p>If you are debugging on the local machine, this path should
 	point to the <code>sdm</code> executable in your Ecilpse installation's
@@ -72,6 +78,7 @@ Resources, Application, Arguments, Environment, Synchronize.
 	to where the <code>sdm</code> executable was installed on the remote
 	machine.</p>
 	<p><br></p>
+	</ul>
 	</li>
 	<li>
 	<p><b>(Optional) Advanced Options</b> are accessed by clicking on the twistie. The advanced options allow you to set the <b>Session address</b>
@@ -92,7 +99,7 @@ Resources, Application, Arguments, Environment, Synchronize.
 	<p>If you are launching onto a remote machine without using port
 	forwarding, then this should be the address of the local machine (the
 	one running Eclipse). <i>This address must be accessible from the
-	remote machine.</i>. If your local network configuration precludes the
+	remote machine</i>. If your local network configuration precludes the
 	remote machine accessing your local machine, you will need to
 	reconfigure the connection to use port forwarding.</p>
 	<p><br></p>
