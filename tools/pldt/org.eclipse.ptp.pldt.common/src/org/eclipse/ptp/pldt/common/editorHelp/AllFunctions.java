@@ -17,9 +17,10 @@ import java.util.List;
 import org.eclipse.cdt.ui.IFunctionSummary;
 
 /**
- * Unused???? 3/13/08
+ * @deprecated this is assumed to be unused
  * 
  */
+
 public class AllFunctions {
 	private List<IFunctionSummary> allFunctionList = new ArrayList<IFunctionSummary>();
 
