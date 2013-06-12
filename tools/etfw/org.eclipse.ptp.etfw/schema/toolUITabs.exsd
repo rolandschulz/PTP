@@ -62,21 +62,26 @@
       </complexType>
    </element>
 
-   <annotation>
-      <appInfo>
-         <meta.section type="since"/>
-      </appInfo>
-      <documentation>
-         [Enter the first release in which this extension point appears.]
-      </documentation>
-   </annotation>
 
    <annotation>
       <appInfo>
          <meta.section type="examples"/>
       </appInfo>
       <documentation>
-         [Enter extension point usage example here.]
+         &lt;pre&gt;
+&lt;extension
+         point=&quot;org.eclipse.ptp.etfw.toolUITabs&quot;&gt;
+      &lt;tooluitab
+            class=&quot;org.eclipse.ptp.etfw.tau.TAUMakefileTab&quot;&gt;
+      &lt;/tooluitab&gt;
+      &lt;tooluitab
+            class=&quot;org.eclipse.ptp.etfw.tau.TAUSelectiveTab&quot;&gt;
+      &lt;/tooluitab&gt;
+      &lt;tooluitab
+            class=&quot;org.eclipse.ptp.etfw.tau.TAUDataTab&quot;&gt;
+      &lt;/tooluitab&gt;
+   &lt;/extension&gt;
+&lt;/pre&gt;
       </documentation>
    </annotation>
 
@@ -85,7 +90,7 @@
          <meta.section type="apiinfo"/>
       </appInfo>
       <documentation>
-         [Enter API information here.]
+         The value of the class attribute must implement &lt;samp&gt;org.eclipse.ptp.etfw.toolopts.IToolUITab&lt;/samp&gt;
       </documentation>
    </annotation>
 
@@ -94,9 +99,17 @@
          <meta.section type="implementation"/>
       </appInfo>
       <documentation>
-         [Enter information about supplied implementation of this extension point.]
+         The etfw.tau package provides tooUITabs implementations for managing specialized TAU features
       </documentation>
    </annotation>
 
+   <annotation>
+      <appInfo>
+         <meta.section type="copyright"/>
+      </appInfo>
+      <documentation>
+         Copyright (c) 1997-2006 Department of Computer and Information Science, University of Oregon, Advanced Computing Laboratory, Los Alamos National Laboratory, Research Center Juelich, ZAM Germany All rights reserved. This program and the accompanying materials are made available under the terms of the Eclipse Public License v1.0 which accompanies this distribution, and is available at http://www.eclipse.org/legal/epl-v10.html
+      </documentation>
+   </annotation>
 
 </schema>

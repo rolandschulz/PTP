@@ -2,19 +2,19 @@
 <!-- Schema file written by PDE -->
 <schema targetNamespace="org.eclipse.ptp.etfw" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
-      <appinfo>
+      <appInfo>
          <meta.schema plugin="org.eclipse.ptp.etfw" id="configurationTabs" name="Performance Configuration Tabs"/>
-      </appinfo>
+      </appInfo>
       <documentation>
-         Handles additional tabs and UI features in the launch dialog, beyond what can be specified in XML in the workflows extenstion point.
+         Handles additional tabs and UI features in the launch dialog, beyond what can be specified in XML in the workflow extenstion point. This extension point is no longer in use.
       </documentation>
    </annotation>
 
    <element name="extension">
       <annotation>
-         <appinfo>
+         <appInfo>
             <meta.element />
-         </appinfo>
+         </appInfo>
       </annotation>
       <complexType>
          <sequence>
@@ -39,9 +39,9 @@
                <documentation>
                   
                </documentation>
-               <appinfo>
+               <appInfo>
                   <meta.attribute translatable="true"/>
-               </appinfo>
+               </appInfo>
             </annotation>
          </attribute>
       </complexType>
@@ -54,49 +54,41 @@
                <documentation>
                   
                </documentation>
-               <appinfo>
+               <appInfo>
                   <meta.attribute kind="java" basedOn="org.eclipse.ptp.etfw.ui.AbstractToolConfigurationTab:"/>
-               </appinfo>
+               </appInfo>
             </annotation>
          </attribute>
       </complexType>
    </element>
 
-   <annotation>
-      <appinfo>
-         <meta.section type="since"/>
-      </appinfo>
-      <documentation>
-         [Enter the first release in which this extension point appears.]
-      </documentation>
-   </annotation>
+
 
    <annotation>
-      <appinfo>
-         <meta.section type="examples"/>
-      </appinfo>
-      <documentation>
-         [Enter extension point usage example here.]
-      </documentation>
-   </annotation>
-
-   <annotation>
-      <appinfo>
-         <meta.section type="apiInfo"/>
-      </appinfo>
-      <documentation>
-         [Enter API information here.]
-      </documentation>
-   </annotation>
-
-   <annotation>
-      <appinfo>
+      <appInfo>
          <meta.section type="implementation"/>
-      </appinfo>
+      </appInfo>
       <documentation>
-         [Enter information about supplied implementation of this extension point.]
+         This extension point is no longer used
       </documentation>
    </annotation>
 
+   <annotation>
+      <appInfo>
+         <meta.section type="copyright"/>
+      </appInfo>
+      <documentation>
+         Copyright (c) 1997-2006 Department of Computer and Information Science, University of Oregon, Advanced Computing Laboratory, Los Alamos National Laboratory, Research Center Juelich, ZAM Germany All rights reserved. This program and the accompanying materials are made available under the terms of the Eclipse Public License v1.0 which accompanies this distribution, and is available at http://www.eclipse.org/legal/epl-v10.html
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="apiInfo"/>
+      </appInfo>
+      <documentation>
+         The value of the class attribute must implement &lt;samp&gt;org.eclipse.ptp.etfw.ui.AbstractToolConfigurationTab&lt;/samp&gt;
+      </documentation>
+   </annotation>
 
 </schema>

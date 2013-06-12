@@ -2,9 +2,9 @@
 <!-- Schema file written by PDE -->
 <schema targetNamespace="org.eclipse.ptp.etfw" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
-      <appinfo>
+      <appInfo>
          <meta.schema plugin="org.eclipse.ptp.etfw" id="workflows" name="Performance Workflow Definitions"/>
-      </appinfo>
+      </appInfo>
       <documentation>
          Handles specifications of the sequential workflow steps to be performed in a perf/profile launch.
 Three sections: compile, execute, and analyze.
@@ -14,9 +14,9 @@ Includes elements that specify UI components to show in the Launch UI.
 
    <element name="extension">
       <annotation>
-         <appinfo>
+         <appInfo>
             <meta.element />
-         </appinfo>
+         </appInfo>
       </annotation>
       <complexType>
          <sequence>
@@ -41,9 +41,9 @@ Includes elements that specify UI components to show in the Launch UI.
                <documentation>
                   
                </documentation>
-               <appinfo>
+               <appInfo>
                   <meta.attribute translatable="true"/>
-               </appinfo>
+               </appInfo>
             </annotation>
          </attribute>
       </complexType>
@@ -56,49 +56,56 @@ Includes elements that specify UI components to show in the Launch UI.
                <documentation>
                   
                </documentation>
-               <appinfo>
+               <appInfo>
                   <meta.attribute kind="resource"/>
-               </appinfo>
+               </appInfo>
             </annotation>
          </attribute>
       </complexType>
    </element>
 
-   <annotation>
-      <appinfo>
-         <meta.section type="since"/>
-      </appinfo>
-      <documentation>
-         [Enter the first release in which this extension point appears.]
-      </documentation>
-   </annotation>
 
    <annotation>
-      <appinfo>
+      <appInfo>
          <meta.section type="examples"/>
-      </appinfo>
+      </appInfo>
       <documentation>
-         [Enter extension point usage example here.]
+         &lt;pre&gt;
+&lt;extension
+         point=&quot;org.eclipse.ptp.etfw.workflows&quot;&gt;
+      &lt;workflowDefinitionXML
+            XMLFile=&quot;data/tau_tool.xml&quot;&gt;
+      &lt;/workflowDefinitionXML&gt;
+   &lt;/extension&gt;
+&lt;/pre&gt;
       </documentation>
    </annotation>
 
    <annotation>
-      <appinfo>
-         <meta.section type="apiInfo"/>
-      </appinfo>
-      <documentation>
-         [Enter API information here.]
-      </documentation>
-   </annotation>
-
-   <annotation>
-      <appinfo>
+      <appInfo>
          <meta.section type="implementation"/>
-      </appinfo>
+      </appInfo>
       <documentation>
-         [Enter information about supplied implementation of this extension point.]
+         The etfw.tau package provides a workflows implementation for defining the TAU performance analysis workflow.
       </documentation>
    </annotation>
 
+   <annotation>
+      <appInfo>
+         <meta.section type="copyright"/>
+      </appInfo>
+      <documentation>
+         Copyright (c) 1997-2006 Department of Computer and Information Science, University of Oregon, Advanced Computing Laboratory, Los Alamos National Laboratory, Research Center Juelich, ZAM Germany All rights reserved. This program and the accompanying materials are made available under the terms of the Eclipse Public License v1.0 which accompanies this distribution, and is available at http://www.eclipse.org/legal/epl-v10.html
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="apiInfo"/>
+      </appInfo>
+      <documentation>
+         The XMLFile attribute must specify a file in the plugin directory structure which implements a valid ETFw workflow.
+      </documentation>
+   </annotation>
 
 </schema>
