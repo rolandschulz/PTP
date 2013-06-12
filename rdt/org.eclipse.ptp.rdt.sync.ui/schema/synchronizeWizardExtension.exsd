@@ -6,7 +6,7 @@
          <meta.schema plugin="org.eclipse.ptp.rdt.sync.ui" id="synchronizeWizardExtension" name="Synchronize Wizard Extension"/>
       </appInfo>
       <documentation>
-         [Enter description of this extension point.]
+         This extension point is for adding a page to the synchronized project conversion wizard.
       </documentation>
    </annotation>
 
@@ -52,7 +52,7 @@
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  Clients must implement this interface to add a new page to the synchronized new project wizard and conversion wizard.
+                  The fully qualified name of the Java class that extends org.eclipse.ptp.rdt.sync.ui.AbstractSynchronizeWizardExtension
                </documentation>
                <appInfo>
                   <meta.attribute kind="java" basedOn=":org.eclipse.ptp.rdt.sync.ui.ISynchronizeWizardExtension"/>
@@ -62,7 +62,7 @@
          <attribute name="nature" type="string" use="required">
             <annotation>
                <documentation>
-                  Projects with this nature will have the page attached to the end of the synchronized new project wizard and conversion wizard.
+                  Projects with this nature will have the page attached to the end of the synchronized project conversion wizard.
                </documentation>
             </annotation>
          </attribute>
@@ -74,7 +74,7 @@
          <meta.section type="since"/>
       </appInfo>
       <documentation>
-         [Enter the first release in which this extension point appears.]
+         7.0
       </documentation>
    </annotation>
 
@@ -83,7 +83,13 @@
          <meta.section type="examples"/>
       </appInfo>
       <documentation>
-         [Enter extension point usage example here.]
+         &lt;extension
+           point=&quot;org.eclipse.ptp.rdt.sync.ui.synchronizeWizardExtension&quot;&gt;
+        &lt;synchronizeWizardExtension
+              class=&quot;org.eclipse.ptp.internal.rdt.sync.cdt.ui.wizards.SynchronizeWizardExtension&quot;
+              nature=&quot;org.eclipse.cdt.core.cnature&quot;&gt;
+        &lt;/synchronizeWizardExtension&gt;
+     &lt;/extension&gt;
       </documentation>
    </annotation>
 
@@ -92,7 +98,8 @@
          <meta.section type="apiinfo"/>
       </appInfo>
       <documentation>
-         [Enter API information here.]
+         The value of the class attribute should extend org.eclipse.ptp.rdt.sync.ui.AbstractSynchronizeWizardExtension.&lt;br&gt;
+The nature specifies the project type for which the page should be included.
       </documentation>
    </annotation>
 
@@ -101,9 +108,21 @@
          <meta.section type="implementation"/>
       </appInfo>
       <documentation>
-         [Enter information about supplied implementation of this extension point.]
+         See org.eclipse.ptp.internal.rdt.sync.cdt.ui.wizards.SynchronizeWizardExtension
       </documentation>
    </annotation>
 
+   <annotation>
+      <appInfo>
+         <meta.section type="copyright"/>
+      </appInfo>
+      <documentation>
+         Copyright (c) 2013 The University of Tennessee and others.
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+      </documentation>
+   </annotation>
 
 </schema>
