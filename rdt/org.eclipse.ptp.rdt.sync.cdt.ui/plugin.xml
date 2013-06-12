@@ -100,6 +100,9 @@
         <wizardPage
               ID="org.eclipse.ptp.internal.rdt.sync.cdt.ui.wizards.SyncConfigToBuildConfigWizardPage"
               pageClass="org.eclipse.ptp.internal.rdt.sync.cdt.ui.wizards.SyncConfigToBuildConfigWizardPageProxy">
+         <nature
+               natureID="org.eclipse.ptp.rdt.sync.core.remoteSyncNature">
+         </nature>
         </wizardPage>
      </extension>
 </plugin>
