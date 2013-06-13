@@ -14,3 +14,4 @@ Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.ptp.internal.remote.server.core;x-internal:=true,
  org.eclipse.ptp.internal.remote.server.core.messages;x-internal:=true,
  org.eclipse.ptp.remote.server.core
+Bundle-Localization: plugin
