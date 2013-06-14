@@ -5,4 +5,3 @@ Bundle-SymbolicName: org.eclipse.ptp.rm.ibm.ll.doc.user;singleton:=true
 Bundle-Version: 4.0.0.qualifier
 Bundle-Vendor: %pluginProvider
 Bundle-Localization: plugin
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
