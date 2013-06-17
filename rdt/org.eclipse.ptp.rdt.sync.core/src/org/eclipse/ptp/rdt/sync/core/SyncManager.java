@@ -333,6 +333,10 @@ public class SyncManager {
 		}
 		Job[] syncJobs = new Job[syncConfigs.length];
 		for (SyncConfig config : syncConfigs) {
+			// Bug 410806 - Do not invoke sync for the local (workspace) configuration
+			if (SyncConfigManager.isLocal(config)) {
+				continue;
+			}
 			SynchronizeJob job = null;
 			SyncRunner syncRunner = new SyncRunner(config.getSyncService());
 			if (syncRunner != null) {
