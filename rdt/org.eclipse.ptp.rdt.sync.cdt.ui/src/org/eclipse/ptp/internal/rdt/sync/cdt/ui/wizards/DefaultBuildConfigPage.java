@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Oak Ridge National Laboratory and others.
+ * Copyright (c) 2013 The University of Tennessee and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -47,7 +47,7 @@ import org.eclipse.swt.widgets.Label;
 /**
  * @noextend This class is not intended to be subclassed by clients.
  */
-public class SyncConfigToBuildConfigWizardPage extends WizardPage {
+public class DefaultBuildConfigPage extends WizardPage {
 	private static final String ConfigMapKey = "config-map"; //$NON-NLS-1$
 	private static final String ToolchainMapKey = "toolchain-map"; //$NON-NLS-1$
 	private static final String SyncConfigSetKey = "sync-config-set"; //$NON-NLS-1$
@@ -68,7 +68,7 @@ public class SyncConfigToBuildConfigWizardPage extends WizardPage {
 	}
 	private final WizardMode wizardMode;
 
-	public SyncConfigToBuildConfigWizardPage(WizardMode mode) {
+	public DefaultBuildConfigPage(WizardMode mode) {
 		super("CDT SyncConfigToBuildConfigWizardPage"); //$NON-NLS-1$
 		wizardMode = mode;
 		setTitle(Messages.SyncConfigToBuildConfigWizardPage_0); 
