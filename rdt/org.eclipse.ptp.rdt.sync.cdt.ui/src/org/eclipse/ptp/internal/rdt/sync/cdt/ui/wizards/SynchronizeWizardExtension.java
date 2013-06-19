@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Oak Ridge National Laboratory and others.
+ * Copyright (c) 2013 The University of Tennessee and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,7 +25,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.ptp.internal.rdt.sync.cdt.ui.Activator;
 import org.eclipse.ptp.internal.rdt.sync.cdt.ui.messages.Messages;
-import org.eclipse.ptp.internal.rdt.sync.cdt.ui.wizards.DefaultBuildConfigPage.WizardMode;
 import org.eclipse.ptp.internal.rdt.sync.ui.wizards.SyncWizardDataCache;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
@@ -41,7 +40,7 @@ public class SynchronizeWizardExtension extends AbstractSynchronizeWizardExtensi
 	private static final String ProjectNameKey = "project-name"; //$NON-NLS-1$
 	private static final String ConfigMapKey = "config-map"; //$NON-NLS-1$
 
-	private DefaultBuildConfigPage fWizardPage;
+	private SyncConfigToBuildConfigConvertWizardPage fWizardPage;
 
 	public SynchronizeWizardExtension(ISynchronizeWizardExtensionDescriptor descriptor) {
 		super(descriptor);
@@ -49,7 +48,7 @@ public class SynchronizeWizardExtension extends AbstractSynchronizeWizardExtensi
 
 	@Override
 	public WizardPage createConvertProjectWizardPage() {
-		fWizardPage = new DefaultBuildConfigPage(WizardMode.ADD_SYNC);
+		fWizardPage = new SyncConfigToBuildConfigConvertWizardPage();
 		return fWizardPage;
 	}
 
