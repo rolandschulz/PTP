@@ -10,6 +10,7 @@
 
       <topic label="Introduction to Creating MPI Projects" href="html/01buildMPIprog.html"/> 
       <topic label="Synchronized Projects" href="html/sync.html"/>
+      <topic label="Building Synchronized Projects" href="html/build.html"/>
       <topic label="Configuring Environment Modules" href="html/modules.html"/>
       <topic label="Recognizing Compiler Errors: Cray, PGI, and Open64" href="html/errorParsers.html"/>
       <topic label="Running Parallel Programs"  href="html/03pRunConfig.html"> 
