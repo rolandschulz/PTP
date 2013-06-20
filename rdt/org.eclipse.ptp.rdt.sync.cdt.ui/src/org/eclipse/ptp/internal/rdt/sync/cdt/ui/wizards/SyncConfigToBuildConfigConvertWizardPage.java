@@ -117,7 +117,9 @@ public class SyncConfigToBuildConfigConvertWizardPage extends WizardPage {
      */
 	@Override
 	public void setVisible(boolean isVisible) {
-		update();
+		if (isVisible) {
+			update();
+		}
 		super.setVisible(isVisible);
 	}
 	

@@ -18,19 +18,24 @@ import java.util.Set;
 import org.eclipse.cdt.managedbuilder.core.IToolChain;
 import org.eclipse.cdt.managedbuilder.ui.wizards.CDTConfigWizardPage;
 import org.eclipse.cdt.managedbuilder.ui.wizards.CfgHolder;
+import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPage;
+import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPageManager;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.IWizardPage;
-import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.ptp.internal.rdt.sync.cdt.core.Activator;
 import org.eclipse.ptp.internal.rdt.sync.cdt.ui.messages.Messages;
 import org.eclipse.ptp.internal.rdt.sync.ui.wizards.SyncWizardDataCache;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 
 /**
  * Page appended to the Synchronize C/C++ or Fortran new project wizard for selecting default build configurations.
  * This class and {@link #SyncConfigToBuildConfigConvertWizardPage} are similar.
  */
-public class SyncConfigToBuildConfigNewWizardPage extends WizardPage {
+public class SyncConfigToBuildConfigNewWizardPage extends MBSCustomPage {
+	private static final String PAGE_ID = "org.eclipse.ptp.internal.rdt.sync.cdt.ui.wizards.SyncConfigToBuildConfigNewWizardPage"; //$NON-NLS-1$
 	private static final String ToolchainMapKey = "toolchain-map"; //$NON-NLS-1$
 	private static final String SyncConfigSetKey = "sync-config-set"; //$NON-NLS-1$
 	public static final String CDT_CONFIG_PAGE_ID = "org.eclipse.cdt.managedbuilder.ui.wizard.CConfigWizardPage"; //$NON-NLS-1$
@@ -43,11 +48,15 @@ public class SyncConfigToBuildConfigNewWizardPage extends WizardPage {
 	private Composite parentComposite = null;
 	private DefaultBuildConfigWidget configWidget = null;
 
+	private String fTitle;
+	private String fDescription;
+	private ImageDescriptor fImageDescriptor;
+	private Image fImage;
+
 	public SyncConfigToBuildConfigNewWizardPage() {
-		super("CDT SyncConfigToBuildConfigWizardPage"); //$NON-NLS-1$
+		super(PAGE_ID);
 		setTitle(Messages.SyncConfigToBuildConfigWizardPage_0); 
 		setDescription(Messages.SyncConfigToBuildConfigWizardPage_1);
-		setPageComplete(true);
 	}
 
 	/*
@@ -62,9 +71,10 @@ public class SyncConfigToBuildConfigNewWizardPage extends WizardPage {
 	}
 
 	private CDTConfigWizardPage findCDTConfigPage() {
-		for (IWizardPage page = getPreviousPage(); page != null; page = page.getPreviousPage()) {
-			if (page instanceof CDTConfigWizardPage) {
-				return (CDTConfigWizardPage) page;
+		IWizardPage[] pages = MBSCustomPageManager.getPages();
+		for (IWizardPage p : pages) {
+			if (p instanceof CDTConfigWizardPage) {
+				return (CDTConfigWizardPage) p;
 			}
 		}
 		return null;
@@ -127,14 +137,18 @@ public class SyncConfigToBuildConfigNewWizardPage extends WizardPage {
 		}
 	}
 
-    /**
-     * Page rendering depends on state set in other pages, so we need to render the page just before it becomes visible:
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.IDialogPage#setVisible(boolean)
+	 *
+	 * Page rendering depends on state set in other pages, so we need to render the page just before it becomes visible:
      * http://stackoverflow.com/questions/10303123/how-to-catch-first-time-displaying-of-the-wizardpage
-     */
+	 */
 	@Override
 	public void setVisible(boolean isVisible) {
-		update();
-		super.setVisible(isVisible);
+		if (isVisible) {
+			update();
+		}
 	}
 	
 	private void update() {
@@ -144,7 +158,150 @@ public class SyncConfigToBuildConfigNewWizardPage extends WizardPage {
 		}
 		configWidget = new DefaultBuildConfigWidget(parentComposite, SWT.NONE, syncConfigNames, buildConfigNames,
 				syncConfigToBuildConfigMap);
-		setControl(configWidget);
 		parentComposite.layout(true, true);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.IDialogPage#dispose()
+	 */
+	@Override
+	public void dispose() {
+		configWidget.dispose();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.IDialogPage#getControl()
+	 */
+	@Override
+	public Control getControl() {
+		return configWidget;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.IDialogPage#getDescription()
+	 */
+	@Override
+	public String getDescription() {
+		if (fDescription == null) {
+			fDescription = Messages.SyncConfigToBuildConfigWizardPage_1;
+		}
+		return fDescription;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.IDialogPage#getErrorMessage()
+	 */
+	@Override
+	public String getErrorMessage() {
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.IDialogPage#getImage()
+	 */
+	@Override
+	public Image getImage() {
+		if (fImage == null && fImageDescriptor != null)
+			fImage = fImageDescriptor.createImage();
+
+		if (fImage == null && wizard != null) {
+			fImage = wizard.getDefaultPageImage();
+		}
+
+		return fImage;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.IDialogPage#getMessage()
+	 */
+	@Override
+	public String getMessage() {
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.IDialogPage#getTitle()
+	 */
+	@Override
+	public String getTitle() {
+		if (fTitle == null) {
+			fTitle = Messages.SyncConfigToBuildConfigWizardPage_0;
+		}
+		return fTitle;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.IDialogPage#performHelp()
+	 */
+	@Override
+	public void performHelp() {
+		// none
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.dialogs.IDialogPage#setDescription(java.lang.String)
+	 */
+	@Override
+	public void setDescription(String description) {
+		fDescription = description;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.dialogs.IDialogPage#setImageDescriptor(org.eclipse.
+	 * jface.resource.ImageDescriptor)
+	 */
+	@Override
+	public void setImageDescriptor(ImageDescriptor image) {
+		fImageDescriptor = image;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.IDialogPage#setTitle(java.lang.String)
+	 */
+	@Override
+	public void setTitle(String title) {
+		fTitle = title;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.wizard.IWizardPage#getName()
+	 */
+	@Override
+	public String getName() {
+		return Messages.SyncConfigToBuildConfigWizardPage_0;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPage#isCustomPageComplete()
+	 */
+	@Override
+	protected boolean isCustomPageComplete() {
+		return true;
 	}
 }
