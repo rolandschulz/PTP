@@ -149,6 +149,9 @@ public class SyncConfigToBuildConfigNewWizardPage extends MBSCustomPage {
 		if (isVisible) {
 			update();
 		}
+		if (configWidget != null) {
+			configWidget.setVisible(isVisible);
+		}
 	}
 	
 	private void update() {

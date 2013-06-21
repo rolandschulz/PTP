@@ -904,11 +904,14 @@ public class SyncMainWizardPage extends CDTMainWizardPage implements IWizardItem
 		}
 
 		Table hiddenTable = ((MBSWizardHandler) h_selected).getToolChainsTable();
-		hiddenTable.deselectAll();
 		for (int i = 0; i < hiddenTable.getItemCount(); i++) {
 			String toolChainName = hiddenTable.getItem(i).getText();
-			if (currentSelections.contains(toolChainName)) {
+			if ((currentSelections.contains(toolChainName)) && (!hiddenTable.isSelected(i))) {
 				hiddenTable.select(i);
+				hiddenTable.notifyListeners(SWT.Selection, new Event());
+			} else if ((!currentSelections.contains(toolChainName)) && (hiddenTable.isSelected(i))) {
+				hiddenTable.deselect(i);
+				hiddenTable.notifyListeners(SWT.Selection, new Event());
 			}
 		}
 		h_selected.handleSelection();
