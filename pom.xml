@@ -9,7 +9,7 @@
 
 	<groupId>org.eclipse.ptp</groupId>
 	<artifactId>ptp-parent</artifactId>
-	<version>7.0.0-SNAPSHOT</version>
+	<version>7.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>PTP Parent</name>
 
