@@ -17,9 +17,6 @@
 	<profiles>
 		<profile>
 			<id>production</id>
-			<properties>
-				<ptp-install>/home/data/httpd/download.eclipse.org/tools/ptp/builds/hudson/ptp-nightly</ptp-install>
-			</properties>
 			<build>
 				<plugins>
 					<plugin>
@@ -33,7 +30,7 @@
 								</goals>
 								<configuration>
 									<tasks>
-										<copy includeemptydirs="false" todir="${ptp-install}">
+										<copy includeemptydirs="false" todir="${ptp-build-dir}">
 											<fileset dir="${basedir}/../../releng/org.eclipse.ptp.rcp.sysmon.product/target/products">
 												<include name="org.eclipse.ptp.rcp.sysmon.product-*" />
 											</fileset>
