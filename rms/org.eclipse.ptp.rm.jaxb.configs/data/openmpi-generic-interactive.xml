@@ -12,10 +12,6 @@
 	xsi:schemaLocation="http://eclipse.org/ptp/rm http://eclipse.org/ptp/schemas/v1.1/rm.xsd" 
 	name="Open MPI-Generic-Interactive">
 	<control-data>
-		<!-- this is a necessary attribute for the functioning of LML; link it to the batch-specific variable name -->
-		<attribute name="control.queue.name" visible="false">
-			<link-value-to>destination</link-value-to>
-		</attribute>
 		<attribute name="ompi_minor_version" visible="false" type="integer"/>
 		<attribute name="local_prefix" visible="false" type="string">
 			<default></default>
@@ -31,7 +27,10 @@
 		<attribute name="hostFile" type="string"/>
 		<attribute name="hostListOption" type="boolean"/>
 		<attribute name="hostList" type="string"/>
-		<attribute name="useDefaultArguments" visible="false" type="boolean">
+		<attribute name="extraArgs" type="string"/>
+		
+		<!-- Constant attribute used to disable widgets -->
+		<attribute name="disabled" visible="false" readOnly="true" type="boolean">
 			<default>true</default>
 		</attribute>
 		
@@ -113,6 +112,8 @@
 			<arg attribute="prefixOption" isUndefinedIfMatches="false">--prefix ${ptp_rm:prefix#value}</arg>
 			<arg attribute="hostListOption" isUndefinedIfMatches="false">--host ${ptp_rm:hostList#value}</arg>
 			<arg attribute="hostFileOption" isUndefinedIfMatches="false">--hostfile ${ptp_rm:hostFile#value}</arg>
+			<arg>${ptp_rm:allAttributes#value}</arg>
+			<arg>${ptp_rm:extraArgs#value}</arg>
 			<arg>${ptp_rm:executablePath#value}</arg>
 			<arg>${ptp_rm:progArgs#value}</arg>
 			<environment name="PTP_JOBID" value="@jobId"/>
@@ -142,6 +143,8 @@
 			<arg attribute="prefixOption" isUndefinedIfMatches="false">--prefix ${ptp_rm:prefix#value}</arg>
 			<arg attribute="hostListOption" isUndefinedIfMatches="false">--host ${ptp_rm:hostList#value}</arg>
 			<arg attribute="hostFileOption" isUndefinedIfMatches="false">--hostfile ${ptp_rm:hostFile#value}</arg>
+			<arg>${ptp_rm:allAttributes#value}</arg>
+			<arg>${ptp_rm:extraArgs#value}</arg>
 			<environment name="PTP_JOBID" value="@jobId"/>
 			<environment name="PTP_LAUNCH_MODE" value="${ptp_rm:launchMode#value}" />
 			<environment name="PTP_DEBUGGER_EXECUTABLE_PATH" value="${ptp_rm:debuggerExecutablePath#value}"/>
@@ -264,11 +267,6 @@
 							<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" grabExcessVertical="false"/>
 						</layout-data>
 						<title>Launch Arguments</title>
-						<widget type="checkbox" title="Use default arguments" buttonId="defaultArguments" attribute="useDefaultArguments">
-							<layout-data>
-								<grid-data horizontalSpan="2"/>
-							</layout-data>
-						</widget>
 						<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 							<fixed-text>Arguments:</fixed-text>
 						</widget>
@@ -277,6 +275,7 @@
 								<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" grabExcessVertical="false" widthHint="400"/>
 							</layout-data>
 							<dynamic-text>
+								<arg>-np ${ptp_rm:mpiNumberOfProcesses#value}</arg>
 								<arg attribute="byNodeOption" isUndefinedIfMatches="false">-bynode</arg>
 								<arg attribute="bySlotOption" isUndefinedIfMatches="false">-byslot</arg>
 								<arg attribute="noOversubscribeOption" isUndefinedIfMatches="false">-nooversubscribe</arg>
@@ -285,10 +284,19 @@
 								<arg attribute="hostListOption" isUndefinedIfMatches="false">--host ${ptp_rm:hostList#value}</arg>
 								<arg attribute="hostFileOption" isUndefinedIfMatches="false">--hostfile ${ptp_rm:hostFile#value}</arg>
 								<arg>${ptp_rm:allAttributes#value}</arg>
+								<arg>${ptp_rm:extraArgs#value}</arg>
 							</dynamic-text>
 							<control-state>
-								<enable-if button="defaultArguments" selected="false"/>
+								<disable-if attribute="disabled" value="true"/>
 							</control-state>
+						</widget>
+						<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+							<fixed-text>Extra Arguments:</fixed-text>
+						</widget>
+						<widget type="text" style="SWT.BORDER" attribute="extraArgs">
+							<layout-data>
+								<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true"/>
+							</layout-data>
 						</widget>
 					</composite>
 					<!-- MCA group -->

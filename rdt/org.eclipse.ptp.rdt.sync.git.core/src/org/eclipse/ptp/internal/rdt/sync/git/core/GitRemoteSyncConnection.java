@@ -49,6 +49,7 @@ import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.lib.RepositoryState;
 import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevTree;
@@ -636,6 +637,9 @@ public class GitRemoteSyncConnection {
 
 		RevWalk walk = null;
 		try {
+			if (!git.getRepository().getRepositoryState().equals(RepositoryState.MERGING))
+				return;
+			
 			StatusCommand statusCommand = git.status();
 			Status status = statusCommand.call();
 			if (status.getConflicting().isEmpty()) {
@@ -654,6 +658,8 @@ public class GitRemoteSyncConnection {
 			RevCommit mergeBase = walk.next();
 
 			// For each merge-conflicted file, pull out and store its contents for each of the three commits
+			// Would be much faster to use a treewalk and check whether entry is conflicting instead of using
+			// status (which uses a treewalk) and then searching for those status found.
 			for (String s : status.getConflicting()) {
 				String localContents = ""; //$NON-NLS-1$
 				TreeWalk localTreeWalk = TreeWalk.forPath(git.getRepository(), s, head.getTree());
