@@ -74,7 +74,7 @@ main(int argc, char *argv[])
 
 	if (my_rank != 0) {
 		/* create message */
-		sprintf(message, "Greetings from process %d!", my_rank);
+		snprintf(message,26, "Greetings from process %d!", my_rank);
 		/* use strlen+1 so that '\0' get transmitted */
 		MPI_Send(message, strlen(message)+1, MPI_CHAR,
 				dest, tag, MPI_COMM_WORLD);
@@ -87,7 +87,7 @@ main(int argc, char *argv[])
 		}
 
 		/* now return the compliment */
-		sprintf(message, "Hi, how are you?");
+		snprintf(message, 26, "Hi, how are you?           ");
 	}
 
 	MPI_Bcast(message, strlen(message)+1, MPI_CHAR, dest, MPI_COMM_WORLD);
