@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.sync.cdt.ui.wizards;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -106,6 +107,9 @@ public class SynchronizeWizardExtension extends AbstractSynchronizeWizardExtensi
 
         // Set default build configs
         Map<String, String> configMap = SyncWizardDataCache.getMap(ConfigMapKey);
+        if (configMap == null) {
+        	configMap = new HashMap<String, String>();
+        }
         SyncConfig[] allSyncConfigs = SyncConfigManager.getConfigs(project);
         IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
         IConfiguration[] allBuildConfigs = buildInfo.getManagedProject().getConfigurations();
