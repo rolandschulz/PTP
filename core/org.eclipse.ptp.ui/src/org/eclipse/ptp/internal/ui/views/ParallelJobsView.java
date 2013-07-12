@@ -27,7 +27,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchManager;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -44,9 +43,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
-import org.eclipse.ptp.core.jobs.IJobListener;
 import org.eclipse.ptp.core.jobs.IJobStatus;
-import org.eclipse.ptp.core.jobs.JobManager;
 import org.eclipse.ptp.internal.ui.DebugUtil;
 import org.eclipse.ptp.internal.ui.IElementManager;
 import org.eclipse.ptp.internal.ui.IJobManager;
@@ -75,23 +72,6 @@ import org.eclipse.ui.progress.WorkbenchJob;
  * 
  */
 public class ParallelJobsView extends AbstractParallelSetView implements ISelectionProvider {
-
-	private final class JobListener implements IJobListener {
-		@Override
-		public void jobAdded(IJobStatus status) {
-			getJobManager().createElementHandler(status);
-			if (jobFocus) {
-				changeJobRefresh(status, true);
-			} else {
-				refreshJobView();
-			}
-		}
-
-		@Override
-		public void jobChanged(IJobStatus status) {
-			refreshJobView();
-		}
-	}
 
 	private class JobViewUpdateWorkbenchJob extends WorkbenchJob {
 		private final ReentrantLock waitLock = new ReentrantLock();
@@ -201,11 +181,6 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	private boolean jobFocus = true;
 
 	/*
-	 * Model listeners
-	 */
-	private final IJobListener jobListener = new JobListener();
-
-	/*
 	 * Debug flag
 	 */
 	private final boolean debug = DebugUtil.JOBS_VIEW_TRACING;
@@ -215,9 +190,8 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	 */
 	private ISelection selection = null;
 	private final ListenerList listeners = new ListenerList();
-	private final Action jobFocusAction = null;
-
 	protected String cur_selected_element_id = IElementManager.EMPTY_ID;
+
 	/*
 	 * UI components
 	 */
@@ -227,6 +201,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	protected Composite elementViewComposite = null;
 
 	protected JobViewUpdateWorkbenchJob jobViewUpdateJob = new JobViewUpdateWorkbenchJob();
+
 	/*
 	 * Actions
 	 */
@@ -238,6 +213,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 
 	public ParallelJobsView(IElementManager manager) {
 		super(manager);
+		// JobManager.getInstance().addListener(jobListener);
 	}
 
 	/*
@@ -293,7 +269,6 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	 */
 	@Override
 	public void dispose() {
-		JobManager.getInstance().removeListener(jobListener);
 		elementViewComposite.dispose();
 		super.dispose();
 	}
@@ -330,6 +305,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	 */
 	@Override
 	public void doubleClick(int element) {
+		// Nothing
 	}
 
 	/*
@@ -547,6 +523,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		jobTableViewer.setContentProvider(new IStructuredContentProvider() {
 			@Override
 			public void dispose() {
+				// Nothing
 			}
 
 			@Override
@@ -559,6 +536,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 
 			@Override
 			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+				// Nothing
 			}
 		});
 		jobTableViewer.setSorter(new ViewerSorter() {

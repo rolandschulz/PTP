@@ -337,6 +337,15 @@ public class CommandJobStatus implements ICommandJobStatus {
 			}
 			if (jobId != null && control != null) {
 				AttributeType nProcsAttr = fVarMap.get(JAXBControlConstants.MPI_PROCESSES);
+				/*
+				 * Bug 412887 - make sure to check for linked attribute
+				 */
+				if (nProcsAttr != null) {
+					String link = nProcsAttr.getLinkValueTo();
+					if (link != null) {
+						nProcsAttr = fVarMap.get(link);
+					}
+				}
 				if (nProcsAttr != null) {
 					int nProcs = 0;
 					try {

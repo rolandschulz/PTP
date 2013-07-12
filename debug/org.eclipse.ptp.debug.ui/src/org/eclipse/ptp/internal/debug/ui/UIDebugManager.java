@@ -86,12 +86,14 @@ public class UIDebugManager extends JobManager implements IBreakpointListener {
 
 		@Override
 		public boolean shouldRun() {
-			session = getDebugSession(job.getJobId());
-			if (session == null) {
-				return false;
-			}
-			if (!session.isReady()) {
-				return false;
+			if (job != null) {
+				session = getDebugSession(job.getJobId());
+				if (session == null) {
+					return false;
+				}
+				if (!session.isReady()) {
+					return false;
+				}
 			}
 			return super.shouldRun();
 		}
