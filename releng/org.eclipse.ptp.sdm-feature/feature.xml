@@ -26,7 +26,6 @@
 
    <plugin
          id="org.eclipse.ptp.linux"
-         os="linux"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -34,7 +33,6 @@
 
    <plugin
          id="org.eclipse.ptp.macosx"
-         os="macosx"
          download-size="0"
          install-size="0"
          version="0.0.0"
