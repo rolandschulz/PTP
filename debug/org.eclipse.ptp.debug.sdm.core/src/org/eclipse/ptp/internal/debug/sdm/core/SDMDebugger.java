@@ -118,7 +118,7 @@ public class SDMDebugger implements IPDebugger {
 	}
 
 	private String deploySDM(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
-		SubMonitor progress = SubMonitor.convert(monitor, 40);
+		SubMonitor progress = SubMonitor.convert(monitor, 100);
 		boolean useBuiltin = configuration.getAttribute(SDMLaunchConfigurationConstants.ATTR_DEBUGGER_USE_BUILTIN_SDM, false);
 		if (useBuiltin) {
 			String remoteId = LaunchUtils.getRemoteServicesId(configuration);
@@ -186,6 +186,20 @@ public class SDMDebugger implements IPDebugger {
 												progress.subTask(Messages.SDMDebugger_Copying_SDM_to_target_system);
 												local.copy(destPath, EFS.OVERWRITE, progress.newChild(70));
 											}
+
+											/*
+											 * Check if the sdm is executable. Make it executable if not.
+											 */
+											destInfo = destPath.fetchInfo(EFS.NONE, progress.newChild(10));
+											if (!destInfo.getAttribute(EFS.ATTRIBUTE_EXECUTABLE)) {
+												destInfo.setAttribute(EFS.ATTRIBUTE_EXECUTABLE, true);
+												/*
+												 * Make sure sdm is writeable to world
+												 */
+												destInfo.setAttribute(EFS.ATTRIBUTE_OTHER_WRITE, false);
+												destPath.putInfo(destInfo, EFS.SET_ATTRIBUTES, progress.newChild(10));
+											}
+
 											return destPath.toURI().getPath();
 										}
 									}
