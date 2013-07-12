@@ -16,12 +16,12 @@
 	<properties>
 		<eclipse-release>kepler</eclipse-release>
 		<tycho-version>0.17.0</tycho-version>
-		<platform-version>4.3milestones</platform-version>
+		<platform-version>4.3</platform-version>
 		<platform-site>http://download.eclipse.org/eclipse/updates/${platform-version}</platform-site>
-		<tm-version>3.5milestones</tm-version>
+		<tm-version>3.5</tm-version>
 		<tm-site>http://download.eclipse.org/tm/updates/${tm-version}</tm-site>
 		<cdt-version>kepler</cdt-version>
-		<cdt-site>http://download.eclipse.org/tools/cdt/builds/${cdt-version}/milestones</cdt-site>	
+		<cdt-site>http://download.eclipse.org/tools/cdt/releases/${cdt-version}</cdt-site>	
 		<egit-version>nightly</egit-version>
 		<egit-site>http://download.eclipse.org/egit/updates-${egit-version}</egit-site>
 		<photran-site>http://download.eclipse.org/tools/ptp/builds/hudson/ptp-release-photran</photran-site>
