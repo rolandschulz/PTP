@@ -184,7 +184,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		 */
 		@Override
 		public void jobChangedEvent(int type, String cur_job_id, String pre_job_id) {
-			if (cur_job_id == null) {
+			if (type == IJobChangedListener.REMOVED && cur_job_id == null) {
 				changeJobRefresh(null);
 			}
 		}
