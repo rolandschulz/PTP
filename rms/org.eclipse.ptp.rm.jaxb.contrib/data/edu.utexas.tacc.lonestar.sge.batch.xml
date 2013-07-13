@@ -35,7 +35,6 @@
 		<attribute name="bindir" visible="false"/>
 		<!-- List of queues.  Set by <start-up-command> below.  Invisible since the values are not modifiable. -->
 		<attribute name="queues" visible="false"/>
-
 		<attribute name="Output_Path" type="string"><!-- Linked to stdout_remote_path attribute above --><!-- Not in UI -->
 			<description>The final path name for the file containing the job's standard output stream.</description>
 			<tooltip><![CDATA[Format: "[hostname:]pathname". If the option
@@ -138,7 +137,6 @@ be a positive multiple of 12.)]]></tooltip>
 				<error-message>format must be hh:mm:ss</error-message>
 			</validator>
 		</attribute>
-
 		<!-- ========== -->
 		<!-- JOB SCRIPT -->
 		<!-- ========== -->
@@ -226,7 +224,6 @@ be a positive multiple of 12.)]]></tooltip>
 				</target>
 			</stdout-parser>
 		</start-up-command>
-
 		<!-- ============== -->
 		<!-- JOB SUBMISSION -->
 		<!-- ============== -->
@@ -296,7 +293,6 @@ be a positive multiple of 12.)]]></tooltip>
 				</target>
 			</stderr-parser>
 		</submit-batch>
-
 		<!-- ========== -->
 		<!-- JOB STATUS -->
 		<!-- ========== -->
@@ -395,7 +391,6 @@ be a positive multiple of 12.)]]></tooltip>
 				</target>
 			</stderr-parser>
 		</get-job-status>
-
 		<!-- =============== -->
 		<!-- JOB TERMINATION -->
 		<!-- =============== -->
@@ -403,7 +398,6 @@ be a positive multiple of 12.)]]></tooltip>
 			<arg>${ptp_rm:bindir#value}qdel</arg>
 			<arg>${ptp_rm:@jobId#name}</arg>
 		</terminate-job>
-
 		<!-- ========================= -->
 		<!-- USER INTERFACE/LAUNCH TAB -->
 		<!-- ========================= -->
@@ -651,6 +645,5 @@ be a positive multiple of 12.)]]></tooltip>
 			</import>
 		</launch-tab>
 	</control-data>
-
 	<monitor-data schedulerType="GridEngine" />
 </resource-manager-builder>

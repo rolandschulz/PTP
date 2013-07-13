@@ -1195,7 +1195,7 @@
 						</layout-data>
 						<fixed-text>${ptp_rm:LL_SOFT_LIMIT#description}</fixed-text>
 					</widget>
-
+													
                <!-- Wall clock limit -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
