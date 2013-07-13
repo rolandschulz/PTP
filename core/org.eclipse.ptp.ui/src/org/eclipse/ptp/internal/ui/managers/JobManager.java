@@ -274,7 +274,7 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 				jobList.remove(job.getJobId());
 			}
 		}
-		fireJobChangedEvent(IJobChangedListener.CHANGED, null, null);
+		fireJobChangedEvent(IJobChangedListener.REMOVED, null, null);
 	}
 
 	/*
