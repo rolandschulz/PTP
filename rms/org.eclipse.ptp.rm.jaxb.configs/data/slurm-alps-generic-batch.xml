@@ -31,7 +31,6 @@
             <default>${ptp_rm:workdir#value}/slurm-${ptp_rm:@jobId#default}.out</default>
             <link-value-to>error</link-value-to>
         </attribute>
-
         <attribute name="account" type="string">
             <description>Charge resources used by this job to specified account.</description>
             <tooltip><![CDATA[The account is an arbitrary string. The account name may be changed after

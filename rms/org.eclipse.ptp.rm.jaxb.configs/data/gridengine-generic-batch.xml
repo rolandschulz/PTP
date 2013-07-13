@@ -129,7 +129,6 @@ qsub's &quot;-pe&quot; option.  See your system documentation for more informati
 				<error-message>format must be hh:mm:ss</error-message>
 			</validator>
 		</attribute>
-
 		<!-- ========== -->
 		<!-- JOB SCRIPT -->
 		<!-- ========== -->
@@ -217,7 +216,6 @@ qsub's &quot;-pe&quot; option.  See your system documentation for more informati
 				</target>
 			</stdout-parser>
 		</start-up-command>
-
 		<!-- ============== -->
 		<!-- JOB SUBMISSION -->
 		<!-- ============== -->
@@ -287,7 +285,6 @@ qsub's &quot;-pe&quot; option.  See your system documentation for more informati
 				</target>
 			</stderr-parser>
 		</submit-batch>
-
 		<!-- ========== -->
 		<!-- JOB STATUS -->
 		<!-- ========== -->
@@ -386,7 +383,6 @@ qsub's &quot;-pe&quot; option.  See your system documentation for more informati
 				</target>
 			</stderr-parser>
 		</get-job-status>
-
 		<!-- =============== -->
 		<!-- JOB TERMINATION -->
 		<!-- =============== -->
@@ -394,7 +390,6 @@ qsub's &quot;-pe&quot; option.  See your system documentation for more informati
 			<arg>${ptp_rm:bindir#value}qdel</arg>
 			<arg>${ptp_rm:@jobId#name}</arg>
 		</terminate-job>
-
 		<!-- ========================= -->
 		<!-- USER INTERFACE/LAUNCH TAB -->
 		<!-- ========================= -->
@@ -642,6 +637,5 @@ qsub's &quot;-pe&quot; option.  See your system documentation for more informati
 			</import>
 		</launch-tab>
 	</control-data>
-
 	<monitor-data schedulerType="GridEngine" />
 </resource-manager-builder>
