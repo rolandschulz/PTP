@@ -51,6 +51,7 @@ import org.eclipse.ptp.internal.ui.IPTPUIConstants;
 import org.eclipse.ptp.internal.ui.PTPUIPlugin;
 import org.eclipse.ptp.internal.ui.actions.ParallelAction;
 import org.eclipse.ptp.internal.ui.actions.RemoveAllTerminatedAction;
+import org.eclipse.ptp.internal.ui.listeners.IJobChangedListener;
 import org.eclipse.ptp.internal.ui.messages.Messages;
 import org.eclipse.ptp.internal.ui.model.IElementHandler;
 import org.eclipse.ptp.internal.ui.model.IElementSet;
@@ -175,10 +176,19 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		}
 	}
 
-	/*
-	 * Job focus flag
-	 */
-	private boolean jobFocus = true;
+	private class JobListener implements IJobChangedListener {
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ptp.internal.ui.listeners.IJobChangedListener#jobChangedEvent(int, java.lang.String, java.lang.String)
+		 */
+		@Override
+		public void jobChangedEvent(int type, String cur_job_id, String pre_job_id) {
+			if (cur_job_id == null) {
+				changeJobRefresh(null);
+			}
+		}
+	}
 
 	/*
 	 * Debug flag
@@ -202,6 +212,8 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 
 	protected JobViewUpdateWorkbenchJob jobViewUpdateJob = new JobViewUpdateWorkbenchJob();
 
+	private final IJobChangedListener fJobListener = new JobListener();
+
 	/*
 	 * Actions
 	 */
@@ -211,9 +223,9 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		this(PTPUIPlugin.getDefault().getJobManager());
 	}
 
-	public ParallelJobsView(IElementManager manager) {
+	public ParallelJobsView(IJobManager manager) {
 		super(manager);
-		// JobManager.getInstance().addListener(jobListener);
+		manager.addJobChangedListener(fJobListener);
 	}
 
 	/*
@@ -269,6 +281,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	 */
 	@Override
 	public void dispose() {
+		getJobManager().removeJobChangedListener(fJobListener);
 		elementViewComposite.dispose();
 		super.dispose();
 	}
@@ -391,6 +404,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 			}
 		}
 		update();
+		refresh(true);
 	}
 
 	/*
@@ -417,16 +431,6 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		if (getJobManager().getJob() == null) {
 			changeJobRefresh(null);
 		}
-	}
-
-	/**
-	 * Set flag that determines if new jobs are give focus in the jobs view.
-	 * 
-	 * @param focus
-	 *            a value of true will cause new jobs to be displayed in the jobs view
-	 */
-	public void setJobFocus(boolean focus) {
-		jobFocus = focus;
 	}
 
 	/*

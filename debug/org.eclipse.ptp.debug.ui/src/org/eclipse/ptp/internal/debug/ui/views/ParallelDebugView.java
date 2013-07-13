@@ -61,7 +61,7 @@ import org.eclipse.ptp.internal.debug.ui.actions.SuspendAction;
 import org.eclipse.ptp.internal.debug.ui.actions.TerminateAction;
 import org.eclipse.ptp.internal.debug.ui.actions.UnregisterAction;
 import org.eclipse.ptp.internal.debug.ui.messages.Messages;
-import org.eclipse.ptp.internal.ui.IElementManager;
+import org.eclipse.ptp.internal.ui.IJobManager;
 import org.eclipse.ptp.internal.ui.actions.ParallelAction;
 import org.eclipse.ptp.internal.ui.model.IElementHandler;
 import org.eclipse.ptp.internal.ui.model.IElementSet;
@@ -115,7 +115,7 @@ public class ParallelDebugView extends ParallelJobsView {
 		}
 	};
 
-	public ParallelDebugView(IElementManager manager) {
+	public ParallelDebugView(IJobManager manager) {
 		super(manager);
 	}
 
