@@ -28,6 +28,10 @@
             name="edu.utexas.tacc.lonestar.sge.batch">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
+            configurationFile="data/edu.utexas.tacc.stampede.slurm.batch.xml"
+            name="edu.utexas.tacc.stampede.slurm.batch">
+      </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
             configurationFile="data/gov.anl.alcf.bgp.pbs.batch.xml"
         name="gov.anl.alcf.bgp.pbs.batch">
       </JAXBResourceManagerConfiguration>      
