@@ -245,7 +245,7 @@ errors will be displayed.]]></tooltip>
         </attribute>
         <attribute name="srun.command" type="choice">
             <description>Which srun command to use.</description>
-			<choice>,ibrun,ibrun tacc_affinity</choice>
+			<choice>,ibrun,ibrun tacc_affinity,ibrun.symm,ibrun.symm tacc_affinity</choice>
             <default>ibrun</default>
         </attribute>
         <attribute name="srun.epilog" type="string">
