@@ -51,7 +51,8 @@ public class ResourceChangeListener {
 					return;
 				}
 				SyncManager.setSyncMode(project, SyncMode.UNAVAILABLE);
-				SyncConfigManager.getActive(project).getSyncService().close(project);
+				String currentSyncServiceId = SyncConfigManager.getActive(project).getSyncProviderId();
+				SyncManager.getSyncService(currentSyncServiceId).close(project);
 				return;
 			}
 			for (IResourceDelta delta : event.getDelta().getAffectedChildren()) {

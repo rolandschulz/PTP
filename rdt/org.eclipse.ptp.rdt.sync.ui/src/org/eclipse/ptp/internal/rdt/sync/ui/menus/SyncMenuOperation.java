@@ -127,7 +127,8 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 				SyncFileFilterDialog.open(HandlerUtil.getActiveShell(event), null);
 			} else if (command.equals(checkoutCommand) || command.equals(resolveMergeCommand)
 					|| (command.equals(resolveAsRemoteCommand))) {
-				ISynchronizeService syncService = SyncConfigManager.getActive(project).getSyncService();
+				String currentSyncServiceId = SyncConfigManager.getActive(project).getSyncProviderId();
+				ISynchronizeService syncService = SyncManager.getSyncService(currentSyncServiceId);
 				SyncConfig syncConfig = SyncConfigManager.getActive(project);
 				IStructuredSelection sel = this.getSelectedElements();
 

@@ -15,10 +15,8 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IPathVariableManager;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.ptp.internal.rdt.sync.core.services.SynchronizeServiceRegistry;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
 import org.eclipse.ptp.rdt.sync.core.handlers.IMissingConnectionHandler;
-import org.eclipse.ptp.rdt.sync.core.services.ISynchronizeService;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.RemoteServices;
@@ -78,7 +76,6 @@ public class SyncConfig implements Comparable<SyncConfig> {
 
 	private IRemoteServices fRemoteServices;
 	private IRemoteConnection fRemoteConnection;
-	private ISynchronizeService fSyncService;
 
 	/**
 	 * Create a new sync configuration. Should not be called by clients directly. Use
@@ -242,21 +239,6 @@ public class SyncConfig implements Comparable<SyncConfig> {
 		return fSyncProviderId;
 	}
 
-	/**
-	 * Get the synchronize service
-	 * 
-	 * @return sync service
-	 */
-	public ISynchronizeService getSyncService() {
-		if (fSyncService == null) {
-			fSyncService = SynchronizeServiceRegistry.getSynchronizeServiceDescriptor(getSyncProviderId()).getService();
-			if (fSyncService == null) {
-				throw new RuntimeException("Unable to locate sync service"); //$NON-NLS-1$
-			}
-		}
-		return fSyncService;
-	}
-
 	@Override
 	public int hashCode() {
 		return fName.hashCode();
@@ -392,6 +374,5 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	 */
 	public void setSyncProviderId(String syncProviderId) {
 		fSyncProviderId = syncProviderId;
-		fSyncService = null;
 	}
 }

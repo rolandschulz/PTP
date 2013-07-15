@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 IBM Corporation and others.
+ * Copyright (c) 2008, 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,12 +23,11 @@ import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.exceptions.RemoteSyncException;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
 
 /**
  * Provides synchronization services.
  * 
- * @since 3.0
+ * @since 4.0
  */
 public interface ISynchronizeService extends ISynchronizeServiceDescriptor {
 
@@ -60,13 +59,6 @@ public interface ISynchronizeService extends ISynchronizeServiceDescriptor {
 	public void close(IProject project);
 
 	/**
-	 * Get the remote directory that will be used for synchronization
-	 * 
-	 * @return String
-	 */
-	public String getLocation();
-
-	/**
 	 * Get the current list of merge-conflicted files for the passed project and build scenario
 	 * 
 	 * @param project
@@ -90,23 +82,6 @@ public interface ISynchronizeService extends ISynchronizeServiceDescriptor {
 	public String[] getMergeConflictParts(IProject project, SyncConfig syncConfig, IFile file) throws CoreException;
 
 	/**
-	 * Get the remote connection used by this sync service provider.
-	 * 
-	 * @return connection
-	 */
-	public IRemoteConnection getRemoteConnection();
-
-	/**
-	 * Set the remote directory that will be used for synchronization
-	 * 
-	 * @param location
-	 *            directory path
-	 * @throws RuntimeException
-	 *             if already set. Changing these local parameters is not currently supported but should be possible.
-	 */
-	public void setLocation(String location);
-
-	/**
 	 * Set the given file paths as resolved (merge conflict does not exist)
 	 * 
 	 * @param project
@@ -116,16 +91,6 @@ public interface ISynchronizeService extends ISynchronizeServiceDescriptor {
 	 *             for system-level problems setting the state
 	 */
 	public void setMergeAsResolved(IProject project, SyncConfig syncConfig, IPath[] paths) throws CoreException;
-
-	/**
-	 * set the remote connection used for synchronization
-	 * 
-	 * @param conn
-	 *            remote connection
-	 * @throws RuntimeException
-	 *             if already set. Changing these local parameters is not currently supported but should be possible.
-	 */
-	public void setRemoteConnection(IRemoteConnection conn);
 
 	/**
 	 * Perform synchronization

@@ -180,8 +180,8 @@ public class SyncMergeFileTableViewer extends ViewPart {
 		// Get merge-conflicted files
 		Set<IPath> mergeConflictFiles = new HashSet<IPath>();
 		if (project != null) {
-			ISynchronizeService syncService = SyncConfigManager.getActive(project).getSyncService();
 			SyncConfig syncConfig = SyncConfigManager.getActive(project);
+			ISynchronizeService syncService = SyncManager.getSyncService(syncConfig.getSyncProviderId());
 			try {
 				mergeConflictFiles = syncService.getMergeConflictFiles(project, syncConfig);
 			} catch (CoreException e) {

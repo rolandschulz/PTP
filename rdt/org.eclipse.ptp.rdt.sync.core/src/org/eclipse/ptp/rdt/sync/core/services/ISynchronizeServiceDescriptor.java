@@ -31,7 +31,8 @@ public interface ISynchronizeServiceDescriptor {
 	public String getName();
 
 	/**
-	 * @return
+	 * This function returns an instance of the sync service. Only one such instance is ever created (constructor is only called one time).
+	 * @return sync service
 	 */
 	public ISynchronizeService getService();
 }

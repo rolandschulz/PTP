@@ -46,6 +46,8 @@ import org.eclipse.ptp.rdt.sync.core.services.AbstractSynchronizeService;
 import org.eclipse.ptp.rdt.sync.core.services.ISynchronizeServiceDescriptor;
 
 public class GitSyncService extends AbstractSynchronizeService {
+	private static boolean consCalled = false;
+
 	// Simple pair class for bundling a project and build scenario.
 	// Since we use this as a key, equality testing is important.
 	// Note that we use the project location in equality testing, as this can change even though the project object stays the same.
@@ -120,6 +122,10 @@ public class GitSyncService extends AbstractSynchronizeService {
 
 	public GitSyncService(ISynchronizeServiceDescriptor descriptor) {
 		super(descriptor);
+		// Constructor for each sync service should only be called once by design of synchronized projects
+		// See bug 410106
+		assert(!consCalled) : Messages.GitSyncService_1;
+		consCalled = true;
 	}
 
 	/*
