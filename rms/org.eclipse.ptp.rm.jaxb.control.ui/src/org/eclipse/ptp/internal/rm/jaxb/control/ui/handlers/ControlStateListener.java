@@ -17,7 +17,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.internal.rm.jaxb.control.ui.messages.Messages;
-import org.eclipse.ptp.internal.rm.jaxb.control.ui.utils.ControlStateRule;
+import org.eclipse.ptp.internal.rm.jaxb.control.ui.utils.ControlStateRuleUtil;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.ControlStateRuleType;
 import org.eclipse.swt.SWT;
@@ -42,9 +42,11 @@ public class ControlStateListener implements SelectionListener {
 		ENABLE, DISABLE, SHOW, HIDE, NONE;
 	};
 
-	private final ControlStateRule rule;
 	private final Control target;
+	private final ControlStateRuleType rule;
 	private final Action action;
+	private final Map<String, Button> map;
+	private final IVariableMap varMap;
 
 	/**
 	 * @param target
@@ -59,9 +61,12 @@ public class ControlStateListener implements SelectionListener {
 	public ControlStateListener(Control target, ControlStateRuleType rule, Action action, Map<String, Button> map,
 			IVariableMap varMap) throws CoreException {
 		this.target = target;
+		this.rule = rule;
 		this.action = action;
+		this.map = map;
+		this.varMap = varMap;
 		Set<Button> sources = new HashSet<Button>();
-		this.rule = new ControlStateRule(rule, map, sources, varMap);
+		ControlStateRuleUtil.addSources(rule, map, sources);
 		for (Button b : sources) {
 			b.addSelectionListener(this);
 		}
@@ -95,7 +100,7 @@ public class ControlStateListener implements SelectionListener {
 	 */
 	public void setState() {
 		synchronized (ControlStateListener.class) {
-			if (rule.evaluate()) {
+			if (ControlStateRuleUtil.evaluate(rule, map, varMap)) {
 				switch (action) {
 				case ENABLE:
 					target.setEnabled(true);
@@ -105,18 +110,22 @@ public class ControlStateListener implements SelectionListener {
 					break;
 				case SHOW:
 					target.setVisible(true);
-					/* Showing means that the control's area is used, that is, 
-					 * it is included by the layout manager */
+					/*
+					 * Showing means that the control's area is used, that is,
+					 * it is included by the layout manager
+					 */
 					if (target.getLayoutData() instanceof GridData) {
-						((GridData)target.getLayoutData()).exclude = false;
+						((GridData) target.getLayoutData()).exclude = false;
 					}
 					break;
 				case HIDE:
 					target.setVisible(false);
-					/* Hiding means that the control's area is not used, that is, 
-					 * it is excluded by the layout manager */
+					/*
+					 * Hiding means that the control's area is not used, that is,
+					 * it is excluded by the layout manager
+					 */
 					if (target.getLayoutData() instanceof GridData) {
-						((GridData)target.getLayoutData()).exclude = true;
+						((GridData) target.getLayoutData()).exclude = true;
 					}
 					break;
 				default:
@@ -132,18 +141,22 @@ public class ControlStateListener implements SelectionListener {
 					break;
 				case SHOW:
 					target.setVisible(false);
-					/* Hiding means that the control's area is not used, that is, 
-					 * it is excluded by the layout manager */
+					/*
+					 * Hiding means that the control's area is not used, that is,
+					 * it is excluded by the layout manager
+					 */
 					if (target.getLayoutData() instanceof GridData) {
-						((GridData)target.getLayoutData()).exclude = true;
+						((GridData) target.getLayoutData()).exclude = true;
 					}
 					break;
 				case HIDE:
 					target.setVisible(true);
-					/* Showing means that the control's area is used, that is, 
-					 * it is included by the layout manager */
+					/*
+					 * Showing means that the control's area is used, that is,
+					 * it is included by the layout manager
+					 */
 					if (target.getLayoutData() instanceof GridData) {
-						((GridData)target.getLayoutData()).exclude = false;
+						((GridData) target.getLayoutData()).exclude = false;
 					}
 					break;
 				default:
