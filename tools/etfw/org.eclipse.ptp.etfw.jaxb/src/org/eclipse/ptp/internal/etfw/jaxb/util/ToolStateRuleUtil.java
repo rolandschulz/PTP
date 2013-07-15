@@ -77,11 +77,6 @@ public class ToolStateRuleUtil {
 			 * the values are or are not equal
 			 */
 			try {
-				Map attrs = configuration.getAttributes();
-				for (Object key : attrs.keySet()) {
-					if (key instanceof String && ((String)key).endsWith("x")) {
-					}
-				}
 				String configurationValue = configuration.getAttribute(ruleAttribute, (String) null);
 				if (configurationValue != null) {
 					/* Check if the value does or does not match with the value in the launch configuration */
@@ -97,8 +92,8 @@ public class ToolStateRuleUtil {
 			 * is, if the attribute is or is not defined
 			 */
 			try {
-				String value = configuration.getAttribute(ruleAttribute, (String) null);
-				if (value != null) {
+				String configurationValue = configuration.getAttribute(ruleAttribute, (String) null);
+				if (configurationValue != null) {
 					/* Value is defined in the launch configuration, that is, the attribute is defined */
 					return true;
 				}
