@@ -694,7 +694,7 @@ public class LaunchTabBuilder {
 		Set<Button> dependSet = new HashSet<Button>();
 		for (ControlStateListener listener : listeners) {
 			dependSet.clear();
-			listener.findCyclicalDependecies(dependSet);
+			listener.findCyclicalDependencies(dependSet);
 		}
 
 		tab.setListeners(listeners);

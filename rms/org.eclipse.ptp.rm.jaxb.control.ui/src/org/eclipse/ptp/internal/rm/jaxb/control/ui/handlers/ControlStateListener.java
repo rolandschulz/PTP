@@ -71,7 +71,7 @@ public class ControlStateListener implements SelectionListener {
 	 * Checks for cyclical dependencies by looking at the targets getting their listeners. The check is only done for listeners
 	 * associated with buttons as targets.
 	 */
-	public void findCyclicalDependecies(Set<Button> buttons) throws CoreException {
+	public void findCyclicalDependencies(Set<Button> buttons) throws CoreException {
 		if (target instanceof Button) {
 			if (buttons.contains(target)) {
 				throw CoreExceptionUtils.newException(NLS.bind(Messages.ControlStateListener_0, target) + buttons);
@@ -83,7 +83,7 @@ public class ControlStateListener implements SelectionListener {
 				if (listener instanceof TypedListener) {
 					Object swtListener = ((TypedListener) listener).getEventListener();
 					if (swtListener instanceof ControlStateListener) {
-						((ControlStateListener) swtListener).findCyclicalDependecies(buttons);
+						((ControlStateListener) swtListener).findCyclicalDependencies(buttons);
 					}
 				}
 			}
