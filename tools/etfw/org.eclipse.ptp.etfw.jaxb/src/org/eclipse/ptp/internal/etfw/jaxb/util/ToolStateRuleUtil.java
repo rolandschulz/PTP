@@ -19,68 +19,68 @@ import org.eclipse.ptp.internal.etfw.jaxb.data.ToolStateRuleType;
 
 public class ToolStateRuleUtil {
 
-	public static boolean evaluate(ILaunchConfiguration configuration, ToolStateRuleType toolStateRuleType) {
+	public static boolean evaluate(ToolStateRuleType toolStateRuleType, ILaunchConfiguration configuration) {
 
 		if (toolStateRuleType.getNot() != null) {
-			boolean result = ToolStateRuleUtil.evaluate(configuration, toolStateRuleType.getNot());
+			boolean result = ToolStateRuleUtil.evaluate(toolStateRuleType.getNot(), configuration);
 			return result;
 		}
 
 		if (toolStateRuleType.getAnd() != null) {
-			boolean result = ToolStateRuleUtil.evaluate(configuration, toolStateRuleType.getAnd());
+			boolean result = ToolStateRuleUtil.evaluate(toolStateRuleType.getAnd(), configuration);
 			return result;
 		}
 
 		if (toolStateRuleType.getOr() != null) {
-			boolean result = ToolStateRuleUtil.evaluate(configuration, toolStateRuleType.getOr());
+			boolean result = ToolStateRuleUtil.evaluate(toolStateRuleType.getOr(), configuration);
 			return result;
 		}
 
 		if (toolStateRuleType.getAttribute() != null) {
-			boolean result = ToolStateRuleUtil.evaluate(configuration, toolStateRuleType.getAttribute(), toolStateRuleType.getValue());
+			boolean result = ToolStateRuleUtil.evaluate(toolStateRuleType.getAttribute(), configuration, toolStateRuleType.getValue());
 			return result;
 		}
 
 		return true;
 	}
 
-	public static boolean evaluate(ILaunchConfiguration configuration, ToolStateRuleType.Not toolStateRuleTypeNot) {
-		boolean result = !ToolStateRuleUtil.evaluate(configuration, toolStateRuleTypeNot.getRule());
+	public static boolean evaluate(ToolStateRuleType.Not toolStateRuleTypeNot, ILaunchConfiguration configuration) {
+		boolean result = !ToolStateRuleUtil.evaluate(toolStateRuleTypeNot.getRule(), configuration);
 		return result;
 	}
 
-	public static boolean evaluate(ILaunchConfiguration configuration, ToolStateRuleType.And toolStateRuleTypeAnd) {
+	public static boolean evaluate(ToolStateRuleType.And toolStateRuleTypeAnd, ILaunchConfiguration configuration) {
 		List<ToolStateRuleType> list = toolStateRuleTypeAnd.getRule();
 		for (ToolStateRuleType rule : list) {
-			if (!ToolStateRuleUtil.evaluate(configuration, rule)) {
+			if (!ToolStateRuleUtil.evaluate(rule, configuration)) {
 				return false;
 			}
 		}
 		return true;
 	}
 
-	public static boolean evaluate(ILaunchConfiguration configuration, ToolStateRuleType.Or toolStateRuleTypeOr) {
+	public static boolean evaluate(ToolStateRuleType.Or toolStateRuleTypeOr, ILaunchConfiguration configuration) {
 		List<ToolStateRuleType> list = toolStateRuleTypeOr.getRule();
 		for (ToolStateRuleType rule : list) {
-			if (ToolStateRuleUtil.evaluate(configuration, rule)) {
+			if (ToolStateRuleUtil.evaluate(rule, configuration)) {
 				return true;
 			}
 		}
 		return false;
 	}
 	
-	public static boolean evaluate(ILaunchConfiguration configuration, String ruleAttribute, String ruleValue) {
+	public static boolean evaluate(String attribute, ILaunchConfiguration configuration,  String value) {
 		/* Check if there is a value in the rule */
-		if (ruleValue != null) {
+		if (value != null) {
 			/*
 			 * There is a value in the rule, so check if there is a value in the launch configuration for this attribute and if
 			 * the values are or are not equal
 			 */
 			try {
-				String configurationValue = configuration.getAttribute(ruleAttribute, (String) null);
+				String configurationValue = configuration.getAttribute(attribute, (String) null);
 				if (configurationValue != null) {
 					/* Check if the value does or does not match with the value in the launch configuration */
-					boolean result = ruleValue.equals(configurationValue);
+					boolean result = value.equals(configurationValue);
 					return result;
 				}
 			} catch (CoreException e) {
@@ -92,7 +92,7 @@ public class ToolStateRuleUtil {
 			 * is, if the attribute is or is not defined
 			 */
 			try {
-				String configurationValue = configuration.getAttribute(ruleAttribute, (String) null);
+				String configurationValue = configuration.getAttribute(attribute, (String) null);
 				if (configurationValue != null) {
 					/* Value is defined in the launch configuration, that is, the attribute is defined */
 					return true;

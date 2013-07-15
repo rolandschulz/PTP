@@ -15,7 +15,7 @@ import org.eclipse.ptp.internal.etfw.jaxb.data.ToolStateType;
 
 public class ToolStateUtil {
 	
-	public static boolean evaluate(boolean globalState, ILaunchConfiguration configuration, ToolStateType toolStateType) {
+	public static boolean evaluate(ToolStateType toolStateType, ILaunchConfiguration configuration, boolean globalState) {
 		
 		
 		if (configuration == null || toolStateType == null) {
@@ -23,12 +23,12 @@ public class ToolStateUtil {
 		}
 		
 		if (toolStateType.getExecuteIf() != null) {
-			boolean result = ToolStateRuleUtil.evaluate(configuration, toolStateType.getExecuteIf());
+			boolean result = ToolStateRuleUtil.evaluate(toolStateType.getExecuteIf(), configuration);
 			return result;
 		}
 		
 		if (toolStateType.getDoNotExecuteIf() != null) {
-			boolean result = !ToolStateRuleUtil.evaluate(configuration, toolStateType.getDoNotExecuteIf());
+			boolean result = !ToolStateRuleUtil.evaluate(toolStateType.getDoNotExecuteIf(), configuration);
 			return result;
 		}
 		

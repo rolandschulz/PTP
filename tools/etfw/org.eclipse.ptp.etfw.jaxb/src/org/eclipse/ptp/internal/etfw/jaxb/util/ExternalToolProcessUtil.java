@@ -109,21 +109,21 @@ public class ExternalToolProcessUtil {
 	public static boolean canRun(boolean globalState, AnalysisToolType tool, ILaunchConfiguration configuration) {
 		boolean result = true;
 		if (result) result &= ExternalToolProcessUtil.evaluate(configuration, tool.getRequireTrue());
-		if (result) result &= ToolStateUtil.evaluate(globalState, configuration, tool.getToolState());
+		if (result) result &= ToolStateUtil.evaluate(tool.getToolState(), configuration, globalState);
 		return result;
 	}
 
 	public static boolean canRun(boolean globalState, ExecToolType tool, ILaunchConfiguration configuration) {
 		boolean result = true;
 		if (result) result &= ExternalToolProcessUtil.evaluate(configuration, tool.getRequireTrue());
-		if (result) result &= ToolStateUtil.evaluate(globalState, configuration, tool.getToolState());
+		if (result) result &= ToolStateUtil.evaluate(tool.getToolState(), configuration, globalState);
 		return result;
 	}
 
 	public static boolean canRun(boolean globalState, BuildToolType tool, ILaunchConfiguration configuration) {
 		boolean result = true;
 		if (result) result &= ExternalToolProcessUtil.evaluate(configuration, tool.getRequireTrue());
-		if (result) result &= ToolStateUtil.evaluate(globalState, configuration, tool.getToolState());
+		if (result) result &= ToolStateUtil.evaluate(tool.getToolState(), configuration, globalState);
 		return result;
 	}
 }
