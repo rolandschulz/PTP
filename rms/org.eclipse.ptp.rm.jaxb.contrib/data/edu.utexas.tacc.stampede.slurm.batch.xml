@@ -595,13 +595,16 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip></a
         <terminate-job name="cancel" ignoreExitStatus="true">
             <arg>scancel</arg>
             <arg>${ptp_rm:@jobId#name}</arg>
-        </terminate-job><hold-job name="hold" ignoreExitStatus="true">
-    <arg>scontrol</arg><arg>hold</arg>
-    <arg>${ptp_rm:@jobId#name}</arg></hold-job>
+        </terminate-job>
+        <hold-job name="hold" ignoreExitStatus="true">
+            <arg>scontrol</arg><arg>hold</arg>
+            <arg>${ptp_rm:@jobId#name}</arg>
+        </hold-job>
         <release-job name="release" ignoreExitStatus="true">
             <arg>scontrol</arg>
             <arg>release</arg>
-            <arg>${ptp_rm:@jobId#name}</arg></release-job>
+            <arg>${ptp_rm:@jobId#name}</arg>
+        </release-job>
         <launch-tab>
             <dynamic>
                 <title>Basic Settings</title>
