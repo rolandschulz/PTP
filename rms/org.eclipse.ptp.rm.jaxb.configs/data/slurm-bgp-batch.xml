@@ -468,7 +468,6 @@ Default from "blugene.conf" if not set.]]></tooltip>
                         <expression>^Submitted batch job ([\d]+)</expression>
                         <set field="name">
                             <entry valueGroup="1"></entry></set>
-                        
                         <set field="default">
                             <entry valueGroup="1"></entry></set>
                         <set field="value">
@@ -580,11 +579,6 @@ Default from "blugene.conf" if not set.]]></tooltip>
                             <entry value="SYSTEM_SUSPENDED" />
                         </set>
                         </test>
-                        
-                        
-                        
-                        
-                        
                     </test>
                     <test op="EQ">
                         <value>#value</value>
@@ -658,20 +652,20 @@ Default from "blugene.conf" if not set.]]></tooltip>
                     </match>
                 </target>
             </stderr-parser>
-            
         </get-job-status>
         <terminate-job name="cancel" ignoreExitStatus="true">
             <arg>scancel</arg>
             <arg>${ptp_rm:@jobId#name}</arg>
-        </terminate-job><hold-job name="hold" ignoreExitStatus="true">
-    <arg>scontrol</arg><arg>hold</arg>
-    <arg>${ptp_rm:@jobId#name}</arg></hold-job>
+        </terminate-job>
+        <hold-job name="hold" ignoreExitStatus="true">
+            <arg>scontrol</arg><arg>hold</arg>
+            <arg>${ptp_rm:@jobId#name}</arg>
+        </hold-job>
         <release-job name="release" ignoreExitStatus="true">
             <arg>scontrol</arg>
             <arg>release</arg>
-            <arg>${ptp_rm:@jobId#name}</arg></release-job>
-        
-        
+            <arg>${ptp_rm:@jobId#name}</arg>
+        </release-job>
         <launch-tab>
             <dynamic>
                 <title>Basic Settings</title>

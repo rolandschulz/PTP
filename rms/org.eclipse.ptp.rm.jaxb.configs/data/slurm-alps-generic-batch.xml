@@ -282,7 +282,6 @@ job to each node of a pre-existing allocation as one step in a larger job script
             <tooltip><![CDATA[The command line arguments for executable will be the command and 
 arguments of the job step.  If executable is "none", then no prolog will be run.
 This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip></attribute>
-        
         <script insertEnvironmentAfter="30" deleteAfterSubmit="true">
             <!-- <file-staging-location>${ptp_rm:directory#value}</file-staging-location> -->
             <line>
@@ -371,7 +370,6 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip></a
                 <arg isUndefinedIfMatches='NTASKS_PER_NODE="--ntasks-per-node="'>NTASKS_PER_NODE="--ntasks-per-node=${ptp_rm:srun.ntasks_per_node#value}"</arg></line>
             <line>
                 <arg isUndefinedIfMatches='PROLOG="--prolog="'>PROLOG="--prolog=${ptp_rm:srun.prolog#value}"</arg></line>
-            
             <line>
                 <arg resolve="false">SRUN_ARGS="${EPILOG} ${LABEL} ${NTASKS} ${NTASKS_PER_NODE} ${PROLOG}"</arg>
             </line>
@@ -410,7 +408,6 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip></a
                         <expression>^Submitted batch job ([\d]+)</expression>
                         <set field="name">
                             <entry valueGroup="1"></entry></set>
-                        
                         <set field="default">
                             <entry valueGroup="1"></entry></set>
                         <set field="value">
@@ -522,11 +519,6 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip></a
                             <entry value="SYSTEM_SUSPENDED" />
                         </set>
                         </test>
-                        
-                        
-                        
-                        
-                        
                     </test>
                     <test op="EQ">
                         <value>#value</value>
@@ -600,20 +592,20 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip></a
                     </match>
                 </target>
             </stderr-parser>
-            
         </get-job-status>
         <terminate-job name="cancel" ignoreExitStatus="true">
             <arg>scancel</arg>
             <arg>${ptp_rm:@jobId#name}</arg>
-        </terminate-job><hold-job name="hold" ignoreExitStatus="true">
-    <arg>scontrol</arg><arg>hold</arg>
-    <arg>${ptp_rm:@jobId#name}</arg></hold-job>
+        </terminate-job>
+        <hold-job name="hold" ignoreExitStatus="true">
+            <arg>scontrol</arg><arg>hold</arg>
+            <arg>${ptp_rm:@jobId#name}</arg>
+        </hold-job>
         <release-job name="release" ignoreExitStatus="true">
             <arg>scontrol</arg>
             <arg>release</arg>
-            <arg>${ptp_rm:@jobId#name}</arg></release-job>
-        
-        
+            <arg>${ptp_rm:@jobId#name}</arg>
+        </release-job>
         <launch-tab>
             <dynamic>
                 <title>Basic Settings</title>
