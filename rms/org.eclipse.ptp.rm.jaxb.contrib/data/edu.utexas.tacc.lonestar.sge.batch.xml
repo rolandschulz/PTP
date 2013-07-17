@@ -206,7 +206,6 @@ be a positive multiple of 12.)]]></tooltip>
 				<arg resolve="false">${COMMAND}</arg>
 			</line>
 		</script>
-		
 		<!-- ================= -->
 		<!-- START-UP COMMANDS -->
 		<!-- ================= -->
