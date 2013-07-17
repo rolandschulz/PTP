@@ -73,6 +73,7 @@ public class Messages extends NLS {
 	public static String CommandRunner_1;
 	public static String CommandRunner_3;
 	public static String CommandRunner_4;
+	public static String JGitRepo_0;
 
 	static {
 		// initialize resource bundle

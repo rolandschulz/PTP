@@ -13,13 +13,9 @@ package org.eclipse.ptp.rdt.sync.core;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.core.resources.IPathVariableManager;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
-import org.eclipse.ptp.rdt.sync.core.handlers.IMissingConnectionHandler;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.RemoteServices;
 
 /**
  * Class to encapsulate information about syncing a project
@@ -27,55 +23,16 @@ import org.eclipse.ptp.remote.core.RemoteServices;
  * @since 3.0
  */
 public class SyncConfig implements Comparable<SyncConfig> {
-	/**
-	 * Utility function to resolve a string based on path variables for a certain project. Unless string is in the form:
-	 * ${path_variable:/remainder}, where "path_variable" is a path variable defined for the project, the original string
-	 * is returned unchanged.
-	 * 
-	 * The Eclipse platform should provide a standard mechanism for doing this, but various combinations of URIUtil and
-	 * PathVariableManager methods failed.
-	 * 
-	 * @param project
-	 * @param path
-	 * @return resolved string
-	 */
-	public static String resolveString(IProject project, String path) {
-		// Check basic syntax
-		if (!path.startsWith("${") || !path.endsWith("}")) { //$NON-NLS-1$ //$NON-NLS-2$
-			return path;
-		}
 
-		String newPath = path.substring(2, path.length() - 1);
-
-		// Extract variable's value
-		String variable = newPath.split(":")[0]; //$NON-NLS-1$
-		IPathVariableManager pvm = project.getPathVariableManager();
-		String value = pvm.getURIValue(variable.toUpperCase()).toString();
-		if (value == null) {
-			return path;
-		}
-
-		// Build and return new path
-		value = value.replaceFirst("file:", ""); //$NON-NLS-1$ //$NON-NLS-2$
-		if (value.endsWith("/") || value.endsWith("\\")) { //$NON-NLS-1$ //$NON-NLS-2$
-			value = value.substring(0, path.length() - 1);
-		}
-		return newPath.replaceFirst(variable + ":*", value); //$NON-NLS-1$
-	}
 
 	private String fName;
 	private String fSyncProviderId;
-	private String fConnectionName;
-	private String fRemoteServicesId;
-	private String fLocation;
+	private RemoteLocation remoteLocation;
 	private IProject fProject;
 	private boolean fSyncOnPreBuild = true;
 	private boolean fSyncOnPostBuild = true;
 	private boolean fSyncOnSave = true;
 	private final Map<String, String> fProperties = new HashMap<String, String>();
-
-	private IRemoteServices fRemoteServices;
-	private IRemoteConnection fRemoteConnection;
 
 	/**
 	 * Create a new sync configuration. Should not be called by clients directly. Use
@@ -122,10 +79,10 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	}
 
 	/**
-	 * @return remote services ID
+	 * @return connection name
 	 */
 	public String getConnectionName() {
-		return fConnectionName;
+		return remoteLocation.getConnectionName();
 	}
 
 	/**
@@ -138,22 +95,24 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	}
 
 	/**
-	 * Get the remote fLocation
-	 * 
-	 * @return fLocation
+	 * Get the raw remote location unresolved
+	 * @return remote directory
 	 */
 	public String getLocation() {
-		return fLocation;
+		return remoteLocation.getDirectory();
 	}
 
 	/**
-	 * Get fLocation (directory), resolved in terms of the passed project
+	 * Get location (directory), resolved in terms of the passed project
+	 * TODO: Legacy code. It doesn't make sense to pass in a project different from the one stored. For now, add an assertion to
+	 * see if this ever occurs.
 	 * 
 	 * @param project
-	 * @return fLocation
+	 * @return remote directory
 	 */
 	public String getLocation(IProject project) {
-		return resolveString(project, fLocation);
+		assert fProject == project;
+		return remoteLocation.getDirectory(project);
 	}
 
 	/**
@@ -198,27 +157,7 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	 *             3) The connection never existed, such as when a project is imported to a different workspace
 	 */
 	public IRemoteConnection getRemoteConnection() throws MissingConnectionException {
-		if (fRemoteServices == null) {
-			fRemoteServices = RemoteServices.getRemoteServices(fRemoteServicesId);
-			fRemoteConnection = null;
-		}
-
-		if (fRemoteConnection == null) {
-			fRemoteConnection = fRemoteServices.getConnectionManager().getConnection(fConnectionName);
-			if (fRemoteConnection == null) {
-				IMissingConnectionHandler mcHandler = SyncManager.getDefaultMissingConnectionHandler();
-				if (mcHandler != null) {
-					mcHandler.handle(fRemoteServices, fConnectionName);
-					fRemoteConnection = fRemoteServices.getConnectionManager().getConnection(fConnectionName);
-				}
-			}
-		}
-
-		if (fRemoteConnection == null) {
-			throw new MissingConnectionException(fConnectionName);
-		}
-
-		return fRemoteConnection;
+		return remoteLocation.getConnection();
 	}
 
 	/**
@@ -227,7 +166,7 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	 * @return remote services ID
 	 */
 	public String getRemoteServicesId() {
-		return fRemoteServicesId;
+		return remoteLocation.getRemoteServicesId();
 	}
 
 	/**
@@ -286,10 +225,7 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	 * @param connection
 	 */
 	public void setConnection(IRemoteConnection connection) {
-		fRemoteServices = connection.getRemoteServices();
-		fRemoteServicesId = connection.getRemoteServices().getId();
-		fConnectionName = connection.getName();
-		fRemoteConnection = connection;
+		remoteLocation.setConnection(connection);
 	}
 
 	/**
@@ -298,8 +234,7 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	 * @param connectionName
 	 */
 	public void setConnectionName(String connectionName) {
-		fConnectionName = connectionName;
-		fRemoteConnection = null;
+		remoteLocation.setConnectionName(connectionName);
 	}
 
 	/**
@@ -308,7 +243,7 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	 * @param location
 	 */
 	public void setLocation(String location) {
-		fLocation = location;
+		remoteLocation.setLocation(location);
 	}
 
 	/**
@@ -336,8 +271,7 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	 * @param remoteServicesId
 	 */
 	public void setRemoteServicesId(String remoteServicesId) {
-		fRemoteServicesId = remoteServicesId;
-		fRemoteServices = null;
+		remoteLocation.setRemoteServicesId(remoteServicesId);
 	}
 
 	/**

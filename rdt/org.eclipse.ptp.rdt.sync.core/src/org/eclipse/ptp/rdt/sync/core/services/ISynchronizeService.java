@@ -19,7 +19,7 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.rdt.sync.core.SyncConfig;
+import org.eclipse.ptp.rdt.sync.core.RemoteLocation;
 import org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.exceptions.RemoteSyncException;
@@ -35,22 +35,24 @@ public interface ISynchronizeService extends ISynchronizeServiceDescriptor {
 	 * Replace the current contents of the given paths with the previous versions in the repository
 	 * 
 	 * @param project
-	 * @param syncConfig
+	 * @param remoteLoc
 	 * @param path
 	 * @throws CoreException
+	 * @since 4.0
 	 */
-	public void checkout(IProject project, SyncConfig syncConfig, IPath[] paths) throws CoreException;
+	public void checkout(IProject project, RemoteLocation remoteLoc, IPath[] paths) throws CoreException;
 
 	/**
 	 * Replace the current contents of the given paths with the current local copies of the remote (not necessarily the same as what
 	 * is on the remote site). This is useful in merge-conflict resolution.
 	 * 
 	 * @param project
-	 * @param syncConfig
+	 * @param remoteLoc
 	 * @param path
 	 * @throws CoreException
+	 * @since 4.0
 	 */
-	public void checkoutRemoteCopy(IProject project, SyncConfig syncConfig, IPath[] paths) throws CoreException;
+	public void checkoutRemoteCopy(IProject project, RemoteLocation remoteLoc, IPath[] paths) throws CoreException;
 
 	/**
 	 * Close any resources (files, sockets) that were open by the sync provider for the given project. Resources not open by the
@@ -62,35 +64,38 @@ public interface ISynchronizeService extends ISynchronizeServiceDescriptor {
 	 * Get the current list of merge-conflicted files for the passed project and build scenario
 	 * 
 	 * @param project
-	 * @param syncConfig
+	 * @param remoteLoc
 	 * @return set of files as project-relative IPaths. This may be an empty set but never null.
 	 * @throws CoreException
 	 *             for system-level problems retrieving merge information
+	 * @since 4.0
 	 */
-	public Set<IPath> getMergeConflictFiles(IProject project, SyncConfig syncConfig) throws CoreException;
+	public Set<IPath> getMergeConflictFiles(IProject project, RemoteLocation remoteLoc) throws CoreException;
 
 	/**
 	 * Get the three parts of the merge-conflicted file (left, right, and ancestor, respectively)
 	 * 
 	 * @param project
-	 * @param syncConfig
+	 * @param remoteLoc
 	 * @param file
 	 * @return the three parts as strings. Either three strings (some may be empty) or null if file is not merge-conflicted.
 	 * @throws CoreException
 	 *             for system-level problems retrieving merge information
+	 * @since 4.0
 	 */
-	public String[] getMergeConflictParts(IProject project, SyncConfig syncConfig, IFile file) throws CoreException;
+	public String[] getMergeConflictParts(IProject project, RemoteLocation remoteLoc, IFile file) throws CoreException;
 
 	/**
 	 * Set the given file paths as resolved (merge conflict does not exist)
 	 * 
 	 * @param project
-	 * @param syncConfig
+	 * @param remoteLoc
 	 * @param path
 	 * @throws CoreException
 	 *             for system-level problems setting the state
+	 * @since 4.0
 	 */
-	public void setMergeAsResolved(IProject project, SyncConfig syncConfig, IPath[] paths) throws CoreException;
+	public void setMergeAsResolved(IProject project, RemoteLocation remoteLoc, IPath[] paths) throws CoreException;
 
 	/**
 	 * Perform synchronization
@@ -108,8 +113,9 @@ public interface ISynchronizeService extends ISynchronizeServiceDescriptor {
 	 *            returning. Otherwise, it may happen at any time.
 	 * @throws CoreException
 	 *             if synchronization fails
+	 * @since 4.0
 	 */
-	public void synchronize(IProject project, SyncConfig syncConfig, IResourceDelta delta,
+	public void synchronize(IProject project, RemoteLocation remoteLoc, IResourceDelta delta,
 			IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException;
 	
 	/**
