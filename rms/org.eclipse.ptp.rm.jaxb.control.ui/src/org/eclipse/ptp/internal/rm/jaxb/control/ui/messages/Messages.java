@@ -34,9 +34,9 @@ public class Messages extends NLS {
 	public static String IllegalVariableValueType;
 	public static String TabInitialization;
 	public static String ControlStateListener_0;
-	public static String ControlStateRule_0;
-	public static String ControlStateRule_1;
-	public static String ControlStateRule_2;
+	public static String ControlStateRuleUtil_0;
+	public static String ControlStateRuleUtil_1;
+	public static String ControlStateRuleUtil_2;
 	public static String WidgetInstantiationError;
 	public static String JAXBRMPreferencesPage_Preferences_options;
 	public static String JAXBRMPreferencesPage_ParserDebug_options;

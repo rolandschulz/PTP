@@ -38,6 +38,8 @@ import org.eclipse.swt.widgets.TypedListener;
  */
 public class ControlStateListener implements SelectionListener {
 
+	private static final boolean DEBUG = false;
+
 	public enum Action {
 		ENABLE, DISABLE, SHOW, HIDE, NONE;
 	};
@@ -60,16 +62,25 @@ public class ControlStateListener implements SelectionListener {
 	 */
 	public ControlStateListener(Control target, ControlStateRuleType rule, Action action, Map<String, Button> map,
 			IVariableMap varMap) throws CoreException {
+
+		if (DEBUG)
+			System.out.println("Enter ControlStateListener.ControlStateListener target=" + target + " rule=" + rule + " action=" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					+ action + " map=" + map + " varMap=" + varMap); //$NON-NLS-1$ //$NON-NLS-2$
+
 		this.target = target;
 		this.rule = rule;
 		this.action = action;
 		this.map = map;
 		this.varMap = varMap;
-		Set<Button> sources = new HashSet<Button>();
-		ControlStateRuleUtil.addSources(rule, map, sources);
-		for (Button b : sources) {
-			b.addSelectionListener(this);
+		Set<Button> buttonSources = new HashSet<Button>();
+		ControlStateRuleUtil.addSources(rule, map, buttonSources);
+		for (Button button : buttonSources) {
+			button.addSelectionListener(this);
 		}
+
+		if (DEBUG)
+			System.out.println("Exit1 ControlStateListener.ControlStateListener"); //$NON-NLS-1$
+
 	}
 
 	/**
@@ -77,6 +88,10 @@ public class ControlStateListener implements SelectionListener {
 	 * associated with buttons as targets.
 	 */
 	public void findCyclicalDependencies(Set<Button> buttons) throws CoreException {
+
+		if (DEBUG)
+			System.out.println("Enter ControlStateListener.findCyclicalDependencies buttons=" + buttons); //$NON-NLS-1$
+
 		if (target instanceof Button) {
 			if (buttons.contains(target)) {
 				throw CoreExceptionUtils.newException(NLS.bind(Messages.ControlStateListener_0, target) + buttons);
@@ -93,12 +108,20 @@ public class ControlStateListener implements SelectionListener {
 				}
 			}
 		}
+
+		if (DEBUG)
+			System.out.println("Exit1 ControlStateListener.findCyclicalDependencies"); //$NON-NLS-1$
+
 	}
 
 	/**
 	 * State of the controls in the rule is reevaluated and the state of the target is set accordingly.
 	 */
 	public void setState() {
+
+		if (DEBUG)
+			System.out.println("Enter ControlStateListener.setState"); //$NON-NLS-1$
+
 		synchronized (ControlStateListener.class) {
 			if (ControlStateRuleUtil.evaluate(rule, map, varMap)) {
 				switch (action) {
@@ -164,6 +187,10 @@ public class ControlStateListener implements SelectionListener {
 				}
 			}
 		}
+
+		if (DEBUG)
+			System.out.println("Exit1 ControlStateListener.setState"); //$NON-NLS-1$
+
 	}
 
 	/*
@@ -172,7 +199,15 @@ public class ControlStateListener implements SelectionListener {
 	 * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse .swt.events.SelectionEvent)
 	 */
 	public void widgetDefaultSelected(SelectionEvent e) {
+
+		if (DEBUG)
+			System.out.println("Enter ControlStateListener.widgetDefaultSelected e=" + e); //$NON-NLS-1$
+
 		setState();
+
+		if (DEBUG)
+			System.out.println("Exit1 ControlStateListener.widgetDefaultSelected"); //$NON-NLS-1$
+
 	}
 
 	/*
@@ -181,6 +216,14 @@ public class ControlStateListener implements SelectionListener {
 	 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt .events.SelectionEvent)
 	 */
 	public void widgetSelected(SelectionEvent e) {
+
+		if (DEBUG)
+			System.out.println("Enter ControlStateListener.widgetSelected e=" + e); //$NON-NLS-1$
+
 		setState();
+
+		if (DEBUG)
+			System.out.println("Exit1 ControlStateListener.widgetSelected"); //$NON-NLS-1$
+
 	}
 }
