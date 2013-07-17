@@ -22,13 +22,11 @@
 		<attribute name="classes" visible="false"/>
 		<!-- Needed by RM internals for fetch; name is fixed by convention -->
 		<attribute name="stdout_remote_path" visible="false">
-			<default>${ptp_rm:directory#value}/${ptp_rm:Job_Name#value}.o${ptp_rm:@jobId#default}</default>
-			<link-value-to>LL_STDOUT</link-value-to>
+			<default>${ptp_rm:control.working.dir#value}/${ptp_rm:@jobId#default}.out</default>
 		</attribute>
 		<!-- Needed by RM internals for fetch; name is fixed by convention -->
 		<attribute name="stderr_remote_path" visible="false">
-			<default>${ptp_rm:directory#value}/${ptp_rm:Job_Name#value}.e${ptp_rm:@jobId#default}</default>
-			<link-value-to>LL_STDERR</link-value-to>
+			<default>${ptp_rm:control.working.dir#value}/${ptp_rm:@jobId#default}.err</default>
 		</attribute>
 		<attribute name="mpiCommand" type="choice">
 			<description>Optional MPI command to run job.</description>
@@ -105,8 +103,8 @@
 		</attribute>
 				
 		<attribute name="LL_STDERR" type="string">
-			<description>Specify a file to use for stderr output.</description>
-			<default>$(host).$(jobid).$(stepid).err</default>
+			<description>Format of the file to use for stderr output (read-only).</description>
+			<default>$(host).$(domain).$(jobid).$(stepid).err</default>
 		</attribute>
 												
 		<attribute name="LL_STDIN" type="string">
@@ -114,8 +112,8 @@
 		</attribute>
 												
 		<attribute name="LL_STDOUT" type="string">
-			<description>Specify a file to use for stdout output.</description>
-			<default>$(host).$(jobid).$(stepid).out</default>
+			<description>Format of the file to use for stdout output (read-only).</description>
+			<default>$(host).$(domain).$(jobid).$(stepid).out</default>
 		</attribute>	
 												
 		<attribute name="LL_TASK_GEOMETRY" type="string">
@@ -136,7 +134,7 @@
 		</attribute>		
 
 		<script insertEnvironmentAfter="0">
-			<file-staging-location>${ptp_rm:directory#value}</file-staging-location>
+			<file-staging-location>${ptp_rm:control.working.dir#value}</file-staging-location>
 				<!--  If the substituted value of the statement following the '>' in the following <arg> 
 				      specifications evaluates to the value specified for isUndefinedIfMatches then the 
 				      statement is suppressed. Regular expressions are allowed in 'isUndefinedIfMatches' -->
@@ -612,15 +610,11 @@
 						</layout-data>
 						<fixed-text>STDOUT:</fixed-text>
 					</widget>
-					<browse textStyle="SWT.BORDER" attribute="LL_STDOUT"
-						title="Browse" directory="false">
-						<text-layout-data>
-							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
-						</text-layout-data>
-						<button-layout-data>
-							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
-						</button-layout-data>
-					</browse>
+					<widget type="text" style="SWT.BORDER" attribute="LL_STDOUT" readOnly="true">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"/>
+						</layout-data>
+					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
@@ -635,15 +629,11 @@
 						</layout-data>
 						<fixed-text>STDERR:</fixed-text>
 					</widget>
-					<browse textStyle="SWT.BORDER" attribute="LL_STDERR"
-						title="Browse" directory="false">
-						<text-layout-data>
-							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
-						</text-layout-data>
-						<button-layout-data>
-							<grid-data widthHint="200" verticalAlign="SWT.CENTER"/>
-						</button-layout-data>
-					</browse>
+					<widget type="text" style="SWT.BORDER" attribute="LL_STDERR" readOnly="true">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"/>
+						</layout-data>
+					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
