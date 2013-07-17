@@ -63,6 +63,5 @@
             configurationFile="data/ibm-platform-mpi-interactive.xml"
             name="IBM Platform MPI">
       </JAXBResourceManagerConfiguration>
-      
    </extension>
 </plugin>
