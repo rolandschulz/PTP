@@ -184,7 +184,7 @@ public interface ILMLCoreConstants {
 	public static final String MONITOR_USER_VAR = "monitor.user.name";//$NON-NLS-1$
 	public static final String MONITOR_ADDRESS_VAR = "monitor.address";//$NON-NLS-1$
 	public static final String ARPA = ".in-addr.arpa";//$NON-NLS-1$
-	public static final String ECLIPSESETTINGS = ".eclipsesettings";//$NON-NLS-1$
+	//	public static final String ECLIPSESETTINGS = ".eclipsesettings";//$NON-NLS-1$
 	public static final String DEBUG_PACKAGE = "org.eclipse.debug";//$NON-NLS-1$
 	public static final String PTP_PACKAGE = "org.eclipse.ptp";//$NON-NLS-1$
 
