@@ -22,11 +22,11 @@
 		<attribute name="classes" visible="false"/>
 		<!-- Needed by RM internals for fetch; name is fixed by convention -->
 		<attribute name="stdout_remote_path" visible="false">
-			<default>${ptp_rm:control.working.dir#value}/${ptp_rm:@jobId#default}.out</default>
+			<default>${ptp_rm:control.working.dir#value}/${ptp_rm:@jobId#name}.out</default>
 		</attribute>
 		<!-- Needed by RM internals for fetch; name is fixed by convention -->
 		<attribute name="stderr_remote_path" visible="false">
-			<default>${ptp_rm:control.working.dir#value}/${ptp_rm:@jobId#default}.err</default>
+			<default>${ptp_rm:control.working.dir#value}/${ptp_rm:@jobId#name}.err</default>
 		</attribute>
 		<attribute name="mpiCommand" type="choice">
 			<description>Optional MPI command to run job.</description>
@@ -236,7 +236,7 @@
 				</target>
 			</stdout-parser>
 		</start-up-command>
-		<submit-batch name="submit-batch" directory="${ptp_rm:directory#value}" waitForId="true">
+		<submit-batch name="submit-batch" directory="${ptp_rm:control.working.dir#value}" waitForId="true">
 			<arg>${ptp_rm:bindir#value}llsubmit</arg>
 			<arg>${ptp_rm:managed_file_for_script#value}</arg>
 			<environment name="MP_RESD" value="yes" />

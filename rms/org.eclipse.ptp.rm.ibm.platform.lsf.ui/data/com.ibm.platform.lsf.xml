@@ -17,13 +17,11 @@
 		</attribute>
 		<!-- Needed by RM internals for fetch; name is fixed by convention -->
 		<attribute name="stdout_remote_path" visible="false">
-			<default>${ptp_rm:directory#value}/${ptp_rm:Job_Name#value}.o${ptp_rm:@jobId#default}</default>
-			<link-value-to>LSF_STDOUT_PATH_NEW</link-value-to>
+			<default>${ptp_rm:control.working.dir#value}/stdout.${ptp_rm:@jobId#name}.txt</default>
 		</attribute>
 		<!-- Needed by RM internals for fetch; name is fixed by convention -->
 		<attribute name="stderr_remote_path" visible="false">
-			<default>${ptp_rm:directory#value}/${ptp_rm:Job_Name#value}.e${ptp_rm:@jobId#default}</default>
-			<link-value-to>LSF_STDERR_PATH_NEW</link-value-to>
+			<default>${ptp_rm:control.working.dir#value}/stderr.${ptp_rm:@jobId#name}.txt</default>
 		</attribute>
 		<attribute name="mpiCommand" type="choice">
 			<description>Optional MPI command to run job:</description>
@@ -169,8 +167,8 @@
 		<!-- -eo option -->
 		<attribute name="LSF_STDERR_PATH_NEW" type="string">
 			<description>STDERR Path (New):</description>
-			<tooltip>Specifies that standard error (STDERR) application output is written to the file specified by this option. (-eo)</tooltip>
-			<default>stderr.%J.%I.txt</default>
+			<tooltip>Format of the standard error (STDERR) file (-eo). This should not be changed.</tooltip>
+			<default>stderr.%J.txt</default>
 		</attribute>
 
 		<!-- -F option -->
@@ -301,8 +299,8 @@
 		<!-- -oo option -->
 		<attribute name="LSF_STDOUT_PATH_NEW" type="string">
 			<description>STDOUT Path (New):</description>
-			<tooltip>Writes standard output (STDOUT) output to the specified file. (-oo)</tooltip>
-			<default>stdout.%J.%I.txt</default>
+			<tooltip>Format of the standard output (STDOUT) file (-oo). This should not be changed.</tooltip>
+			<default>stdout.%J.txt</default>
 		</attribute>
 
 		<!-- -P option -->
@@ -481,7 +479,7 @@
 		</attribute>
 
 		<script insertEnvironmentAfter="0" deleteAfterSubmit="true">
-			<file-staging-location>${ptp_rm:directory#value}</file-staging-location>
+			<file-staging-location>${ptp_rm:control.working.dir#value}</file-staging-location>
 				<!--  If the substituted value of the statement following the '>' in the following <arg> 
 				      specifications evaluates to the value specified for isUndefinedIfMatches then the 
 				      statement is suppressed. Regular expressions are allowed in 'isUndefinedIfMatches'
@@ -667,7 +665,7 @@
 
 		<!-- Invocation command definition -->
 		<submit-batch name="LSF job submission" waitForId="true"
-			directory="${ptp_rm:directory#value}">
+			directory="${ptp_rm:control.working.dir#value}">
 			<arg>perl</arg>
 			<arg>${ptp_rm:ptpDirectory#value}/rms/LSF/run_lsf_app.pl</arg>
 			<arg>${ptp_rm:managed_file_for_script#value}</arg>
@@ -1799,16 +1797,12 @@
 						<fixed-text>${ptp_rm:LSF_STDOUT_PATH_NEW#description}</fixed-text>
 					</widget>
 
-					<browse textStyle="SWT.BORDER" attribute="LSF_STDOUT_PATH_NEW"
-						title="Browse">
-						<text-layout-data>
-							<grid-data widthHint="300" verticalAlign="SWT.CENTER" />
-						</text-layout-data>
-						<button-layout-data>
-							<grid-data widthHint="300" verticalAlign="SWT.CENTER" />
-						</button-layout-data>
+					<widget type="text" style="SWT.BORDER" attribute="LSF_STDOUT_PATH_NEW" readOnly="true">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"/>
+						</layout-data>
 						<tooltip>${ptp_rm:LSF_STDOUT_PATH_NEW#tooltip}</tooltip>
-					</browse>
+					</widget>
 
 					<!-- LSF_STDOUT_PATH_APPEND STDOUT appendable path -->
 					<widget type="label" style="SWT.LEFT">
@@ -1837,16 +1831,12 @@
 						<fixed-text>${ptp_rm:LSF_STDERR_PATH_NEW#description}</fixed-text>
 					</widget>
 
-					<browse textStyle="SWT.BORDER" attribute="LSF_STDERR_PATH_NEW"
-						title="Browse">
-						<text-layout-data>
-							<grid-data widthHint="300" verticalAlign="SWT.CENTER" />
-						</text-layout-data>
-						<button-layout-data>
-							<grid-data widthHint="300" verticalAlign="SWT.CENTER" />
-						</button-layout-data>
+					<widget type="text" style="SWT.BORDER" attribute="LSF_STDERR_PATH_NEW" readOnly="true">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="true"/>
+						</layout-data>
 						<tooltip>${ptp_rm:LSF_STDERR_PATH_NEW#tooltip}</tooltip>
-					</browse>
+					</widget>
 
 					<!-- LSF_STDERR_PATH_APPEND STDERR appendable path -->
 					<widget type="label" style="SWT.LEFT">
