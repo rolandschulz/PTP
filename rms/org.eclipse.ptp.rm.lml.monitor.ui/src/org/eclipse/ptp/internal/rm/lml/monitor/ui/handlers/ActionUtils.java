@@ -166,11 +166,13 @@ public class ActionUtils {
 		String controlId = status.getString(JobStatusData.CONTROL_ID_ATTR);
 		if (controlId != null) {
 			ILaunchController control = LaunchControllerManager.getInstance().getLaunchController(controlId);
-			IRemoteServices services = RemoteServices.getRemoteServices(control.getRemoteServicesId());
-			if (services != null) {
-				IRemoteConnection connection = services.getConnectionManager().getConnection(control.getConnectionName());
-				if (connection != null && connection.getUsername().equals(status.getString(JobStatusData.OWNER_ATTR))) {
-					return true;
+			if (control != null) {
+				IRemoteServices services = RemoteServices.getRemoteServices(control.getRemoteServicesId());
+				if (services != null) {
+					IRemoteConnection connection = services.getConnectionManager().getConnection(control.getConnectionName());
+					if (connection != null && connection.getUsername().equals(status.getString(JobStatusData.OWNER_ATTR))) {
+						return true;
+					}
 				}
 			}
 		}
