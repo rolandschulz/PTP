@@ -71,11 +71,13 @@ public class ControlStateRuleUtil {
 		if (controlStateRuleType.getAttribute() != null) {
 			String attribute = controlStateRuleType.getAttribute();
 			if (attribute == null) {
-				throw CoreExceptionUtils.newException(NLS.bind(Messages.ControlStateRuleUtil_1, controlStateRuleType.getAttribute()));
+				throw CoreExceptionUtils
+						.newException(NLS.bind(Messages.ControlStateRuleUtil_1, controlStateRuleType.getAttribute()));
 			}
 			String value = controlStateRuleType.getValue();
 			if (value == null) {
-				throw CoreExceptionUtils.newException(NLS.bind(Messages.ControlStateRuleUtil_2, controlStateRuleType.getAttribute()));
+				throw CoreExceptionUtils
+						.newException(NLS.bind(Messages.ControlStateRuleUtil_2, controlStateRuleType.getAttribute()));
 			}
 		}
 

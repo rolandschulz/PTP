@@ -121,17 +121,32 @@ public class ControlStateListener implements SelectionListener {
 
 		if (DEBUG)
 			System.out.println("Enter ControlStateListener.setState"); //$NON-NLS-1$
+		if (DEBUG)
+			System.out.println("In ControlStateListener.setState target=" + target + " rule=" + rule + " action=" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					+ action + " map=" + map + " varMap=" + varMap); //$NON-NLS-1$ //$NON-NLS-2$
 
 		synchronized (ControlStateListener.class) {
 			if (ControlStateRuleUtil.evaluate(rule, map, varMap)) {
 				switch (action) {
 				case ENABLE:
+
+					if (DEBUG)
+						System.out.println("In ControlStateListener.setState target=" + target + " setEnabled(true)"); //$NON-NLS-1$ //$NON-NLS-2$
+
 					target.setEnabled(true);
 					break;
 				case DISABLE:
+
+					if (DEBUG)
+						System.out.println("In ControlStateListener.setState target=" + target + " setEnabled(false)"); //$NON-NLS-1$ //$NON-NLS-2$
+
 					target.setEnabled(false);
 					break;
 				case SHOW:
+
+					if (DEBUG)
+						System.out.println("In ControlStateListener.setState target=" + target + " setVisible(true)"); //$NON-NLS-1$ //$NON-NLS-2$
+
 					target.setVisible(true);
 					/*
 					 * Showing means that the control's area is used, that is,
@@ -142,6 +157,10 @@ public class ControlStateListener implements SelectionListener {
 					}
 					break;
 				case HIDE:
+
+					if (DEBUG)
+						System.out.println("In ControlStateListener.setState target=" + target + " setVisible(false)"); //$NON-NLS-1$ //$NON-NLS-2$
+
 					target.setVisible(false);
 					/*
 					 * Hiding means that the control's area is not used, that is,
@@ -157,12 +176,24 @@ public class ControlStateListener implements SelectionListener {
 			} else {
 				switch (action) {
 				case ENABLE:
+
+					if (DEBUG)
+						System.out.println("In ControlStateListener.setState target=" + target + " setEnabled(false)"); //$NON-NLS-1$ //$NON-NLS-2$
+
 					target.setEnabled(false);
 					break;
 				case DISABLE:
+
+					if (DEBUG)
+						System.out.println("In ControlStateListener.setState target=" + target + " setEnabled(true)"); //$NON-NLS-1$ //$NON-NLS-2$
+
 					target.setEnabled(true);
 					break;
 				case SHOW:
+
+					if (DEBUG)
+						System.out.println("In ControlStateListener.setState target=" + target + " setVisible(false)"); //$NON-NLS-1$ //$NON-NLS-2$
+
 					target.setVisible(false);
 					/*
 					 * Hiding means that the control's area is not used, that is,
@@ -173,6 +204,10 @@ public class ControlStateListener implements SelectionListener {
 					}
 					break;
 				case HIDE:
+
+					if (DEBUG)
+						System.out.println("In ControlStateListener.setState target=" + target + " setVisible(true)"); //$NON-NLS-1$ //$NON-NLS-2$
+
 					target.setVisible(true);
 					/*
 					 * Showing means that the control's area is used, that is,
