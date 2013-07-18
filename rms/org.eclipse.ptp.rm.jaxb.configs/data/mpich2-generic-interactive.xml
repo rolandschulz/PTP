@@ -26,6 +26,7 @@
 			<default></default>
 		</attribute>
 		<attribute name="mpiNumberOfProcesses" min="1" type="integer"/>
+		<attribute name="noLocalOption" type="boolean"/>
 		<attribute name="prefixOption" type="boolean"/>
 		<attribute name="prefix" type="string"/>
 		<attribute name="useHostFile" type="boolean"/>
