@@ -46,6 +46,7 @@ import org.eclipse.ptp.ems.core.IEnvManagerConfig;
 import org.eclipse.ptp.etfw.IBuildLaunchUtils;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.toolopts.ExternalToolProcess;
+import org.eclipse.ptp.internal.etfw.jaxb.ETFWCoreConstants;
 import org.eclipse.ptp.internal.etfw.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
@@ -151,6 +152,34 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 
 		// this.selshell=PlatformUI.getWorkbench().getDisplay().getActiveShell();
 	}
+	
+	/**
+	 * 
+	 * @return the ILaunchConfiguration set in this object or null if not set
+	 */
+	public ILaunchConfiguration getConfig() {
+		return config;
+	}
+
+	/**
+	 * Sets the ILaunchConfiguration object to be used by the remote connection utility functions provided if not already set, otherwise does nothing.
+	 * @param config 
+	 */
+	public void setConfig(ILaunchConfiguration config) {
+		//if(this.config==null && config!=null){
+		this.config = config;
+		envMgrConfig = getEnvManagerConfig(config);
+		if (envMgrConfig != null) {
+			envManager = EnvManagerRegistry.getEnvManager(null, conn);
+			//System.out.println(envManager);
+			// if (envManager != null) {
+			// //moduleSetup = envManager.getBashConcatenation(";", false, envMgrConfig, null);
+			// moduleSetup = envManager.createBashScript(null, false, config, commandToExecuteAfterward)
+			//
+			// }
+		}
+		//}
+	}
 
 	public RemoteBuildLaunchUtils(IRemoteConnection conn) {
 		this.conn = conn;
@@ -216,6 +245,7 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 			final IRemoteProcessBuilder rpb = remoteServices.getProcessBuilder(conn);
 			if (envManager != null) {
 				String com = EMPTY_STRING;
+				
 				try {
 					com = envManager.createBashScript(null, false, envMgrConfig, "which " + toolname); //$NON-NLS-1$
 					final IFileStore envScript = fileManager.getResource(com);
@@ -232,6 +262,7 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 					e.printStackTrace();
 				}
 				rpb.command(com);
+				
 			} else {
 				rpb.command("which", toolname);//$NON-NLS-1$
 			}
@@ -379,6 +410,14 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 	private IEnvManagerConfig getEnvManagerConfig(ILaunchConfiguration configuration) {
 		try {
 			String emsConfigAttr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EMS_CONFIG, (String) null);
+			if(emsConfigAttr==null)
+			{
+				String moduleLine=configuration.getAttribute(ETFWCoreConstants.RM_NAME, (String) null);
+				if(moduleLine!=null){
+					emsConfigAttr = configuration.getAttribute(moduleLine+".modules", (String) null);
+				}
+			}
+			
 			if (emsConfigAttr != null) {
 				final EnvManagerConfigString config = new EnvManagerConfigString(emsConfigAttr);
 				if (config.isEnvMgmtEnabled()) {

@@ -88,6 +88,8 @@ public class MakefileComboUpdateModel extends AbstractUpdateModel implements Sel
 			makefileCombo.setSelectedMakefile(val);
 		}
 		
+		makefileCombo.setConfiguration(configuration);
+		
 		super.initialize(configuration, rmMap, lcMap);
 	}
 

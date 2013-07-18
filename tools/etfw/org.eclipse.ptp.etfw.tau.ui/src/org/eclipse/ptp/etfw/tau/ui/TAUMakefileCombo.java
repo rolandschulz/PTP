@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.etfw.tau.ui.messages.Messages;
 import org.eclipse.ptp.internal.etfw.RemoteBuildLaunchUtils;
 import org.eclipse.ptp.internal.rm.jaxb.core.JAXBCoreConstants;
@@ -93,6 +94,25 @@ public class TAUMakefileCombo extends AbstractWidget {
 	private IFileStore taulib = null;
 	private LinkedHashSet<String> allmakefiles = null;;
 	boolean refreshing = false;
+	
+	final Job job = new Job(Messages.TAUMakefileCombo_UpdatingMakefileList) {
+		@Override
+		protected IStatus run(IProgressMonitor monitor) {
+			refreshing = true;
+			initMakefiles();
+			Display.getDefault().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					updateMakefileCombo();
+					if (combo != null && !combo.isDisposed())
+						combo.getParent().layout();
+					refreshing = false;
+				}
+			});
+
+			return Status.OK_STATUS;
+		}
+	};
 
 	public TAUMakefileCombo(Composite parent, IWidgetDescriptor wd) {
 		super(parent, wd);
@@ -115,24 +135,7 @@ public class TAUMakefileCombo extends AbstractWidget {
 		combo.select(0);
 		combo.setEnabled(false);
 
-		final Job job = new Job(Messages.TAUMakefileCombo_UpdatingMakefileList) {
-			@Override
-			protected IStatus run(IProgressMonitor monitor) {
-				refreshing = true;
-				initMakefiles();
-				Display.getDefault().asyncExec(new Runnable() {
-					@Override
-					public void run() {
-						updateMakefileCombo();
-						if (combo != null && !combo.isDisposed())
-							combo.getParent().layout();
-						refreshing = false;
-					}
-				});
-
-				return Status.OK_STATUS;
-			}
-		};
+		
 
 		combo.addDisposeListener(new DisposeListener() {
 
@@ -316,6 +319,14 @@ public class TAUMakefileCombo extends AbstractWidget {
 		String selection = this.combo.getItem(combo.getSelectionIndex());
 		String makefilePath = taulib.toURI().getPath() + JAXBCoreConstants.REMOTE_PATH_SEP + selection;
 		return makefilePath;
+	}
+	
+	public void setConfiguration(ILaunchConfiguration configuration){
+		if(blt!=null&&blt.getConfig()==null){
+			blt.setConfig(configuration);
+			job.setUser(true);
+			job.schedule();
+		}
 	}
 
 	public void setVariableMap(IVariableMap map) {
