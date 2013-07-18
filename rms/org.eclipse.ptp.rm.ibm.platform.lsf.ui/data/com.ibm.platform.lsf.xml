@@ -17,11 +17,11 @@
 		</attribute>
 		<!-- Needed by RM internals for fetch; name is fixed by convention -->
 		<attribute name="stdout_remote_path" visible="false">
-			<default>${ptp_rm:control.working.dir#value}/stdout.${ptp_rm:@jobId#name}.txt</default>
+			<default>${ptp_rm:working.directory#value}/stdout.${ptp_rm:@jobId#name}.txt</default>
 		</attribute>
 		<!-- Needed by RM internals for fetch; name is fixed by convention -->
 		<attribute name="stderr_remote_path" visible="false">
-			<default>${ptp_rm:control.working.dir#value}/stderr.${ptp_rm:@jobId#name}.txt</default>
+			<default>${ptp_rm:working.directory#value}/stderr.${ptp_rm:@jobId#name}.txt</default>
 		</attribute>
 		<attribute name="mpiCommand" type="choice">
 			<description>Optional MPI command to run job:</description>
@@ -479,7 +479,7 @@
 		</attribute>
 
 		<script insertEnvironmentAfter="0" deleteAfterSubmit="true">
-			<file-staging-location>${ptp_rm:control.working.dir#value}</file-staging-location>
+			<file-staging-location>${ptp_rm:working.directory#value}</file-staging-location>
 				<!--  If the substituted value of the statement following the '>' in the following <arg> 
 				      specifications evaluates to the value specified for isUndefinedIfMatches then the 
 				      statement is suppressed. Regular expressions are allowed in 'isUndefinedIfMatches'
@@ -665,7 +665,7 @@
 
 		<!-- Invocation command definition -->
 		<submit-batch name="LSF job submission" waitForId="true"
-			directory="${ptp_rm:control.working.dir#value}">
+			directory="${ptp_rm:working.directory#value}">
 			<arg>perl</arg>
 			<arg>${ptp_rm:ptpDirectory#value}/rms/LSF/run_lsf_app.pl</arg>
 			<arg>${ptp_rm:managed_file_for_script#value}</arg>

@@ -130,7 +130,7 @@ public class ETFWVariableMap implements IVariableMap {
 				|| name.equals(JAXBControlConstants.PROG_ARGS) || name.equals(JAXBControlConstants.DEBUGGER_EXEC_PATH)
 				|| name.equals(JAXBControlConstants.DEBUGGER_ARGS) || name.equals(JAXBControlConstants.DEBUGGER_ID)
 				|| name.equals(JAXBControlConstants.STDOUT_REMOTE_FILE) || name.equals(JAXBControlConstants.STDERR_REMOTE_FILE)
-				|| name.equals(JAXBControlConstants.PTP_DIRECTORY);
+				|| name.equals(JAXBControlConstants.PTP_DIRECTORY) || name.equals(JAXBControlConstants.WORKING_DIRECTORY);
 	}
 
 	private final Map<String, AttributeType> variables;
