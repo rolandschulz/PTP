@@ -76,6 +76,7 @@ public class JAXBControlConstants extends JAXBCoreConstants {
 	public static final String EXEC_DIR = "executableDirectory";//$NON-NLS-1$
 	public static final String PROG_ARGS = "progArgs";//$NON-NLS-1$
 	public static final String DIRECTORY = "directory";//$NON-NLS-1$
+	public static final String WORKING_DIRECTORY = "working.directory";//$NON-NLS-1$
 	public static final String MPI_CMD = "mpiCommand";//$NON-NLS-1$
 	public static final String MPI_ARGS = "mpiArgs";//$NON-NLS-1$
 	public static final String MPI_PROCESSES = "mpiNumberOfProcesses";//$NON-NLS-1$

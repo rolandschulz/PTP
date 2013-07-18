@@ -1001,7 +1001,7 @@ public class LaunchController implements ILaunchController {
 			getRMVariableMap().maybeAddAttribute(JAXBControlConstants.CONTROL_USER_VAR, rc.getUsername(), false);
 			getRMVariableMap().maybeAddAttribute(JAXBControlConstants.CONTROL_ADDRESS_VAR, rc.getAddress(), false);
 			getRMVariableMap().maybeAddAttribute(JAXBControlConstants.CONTROL_WORKING_DIR_VAR, rc.getWorkingDirectory(), false);
-			getRMVariableMap().maybeAddAttribute(JAXBControlConstants.DIRECTORY, rc.getWorkingDirectory(), false);
+			getRMVariableMap().maybeAddAttribute(JAXBControlConstants.WORKING_DIRECTORY, rc.getWorkingDirectory(), false);
 			getRMVariableMap().maybeAddAttribute(JAXBControlConstants.PTP_DIRECTORY,
 					new Path(rc.getWorkingDirectory()).append(JAXBControlConstants.ECLIPSESETTINGS).toString(), false);
 		}
@@ -1265,12 +1265,23 @@ public class LaunchController implements ILaunchController {
 			a.setValue(attr);
 		}
 
+		/*
+		 * Set the following attributes:
+		 * 
+		 * WORKING_DIRECTORY - Set to the ATTR_WORKING_DIR attribute from the Arguments tab. Default value is the connection
+		 * working directory.
+		 * DIRECTORY - Set to the ATTR_WORKING_DIR attribute from the Arguments tab. Default value is the executable working
+		 * directory, or if not executable has been set, the connection working directory.
+		 */
 		attr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, (String) null);
 		if (attr == null) {
 			AttributeType a = getEnvironment().get(JAXBControlConstants.EXEC_DIR);
 			if (a != null) {
 				attr = (String) a.getValue();
 			}
+		} else {
+			AttributeType a = getEnvironment().get(JAXBControlConstants.WORKING_DIRECTORY);
+			a.setValue(attr);
 		}
 		if (attr != null) {
 			AttributeType a = getEnvironment().get(JAXBControlConstants.DIRECTORY);
