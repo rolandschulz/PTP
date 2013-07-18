@@ -38,10 +38,10 @@
 					<products>
 						<product>
 							<id>ptp</id>
-							<rootFolder>eclipse</rootFolder>
+							<!--rootFolder>eclipse</rootFolder>
 							<rootFolders>
 								<macosx>Eclipse.app</macosx>
-							</rootFolders>
+							</rootFolders-->
 						</product>
 					</products>
 				</configuration>
