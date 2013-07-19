@@ -29,7 +29,7 @@
 		<mylyn-version>kepler</mylyn-version>
 		<mylyn-site>http://download.eclipse.org/mylyn/releases/${mylyn-version}</mylyn-site>
 		<webtools-version>kepler</webtools-version>
-		<webtools-site>http://download.eclipse.org/webtools/releases/${webtools-version}</webtools-site>
+		<webtools-site>http://download.eclipse.org/webtools/repository/${webtools-version}</webtools-site>
 		<egit-version>nightly</egit-version>
 		<egit-site>http://download.eclipse.org/egit/updates-${egit-version}</egit-site>
 		<photran-site>http://download.eclipse.org/tools/ptp/builds/hudson/ptp-release-photran</photran-site>
