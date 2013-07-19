@@ -18,6 +18,8 @@
 		<tycho-version>0.17.0</tycho-version>
 		<eclipse-version>kepler</eclipse-version>
 		<eclipse-site>http://download.eclipse.org/releases/${eclipse-version}</eclipse-site>
+		<egit-version>nightly</egit-version>
+		<egit-site>http://download.eclipse.org/egit/updates-${egit-version}</egit-site>
 		<photran-site>http://download.eclipse.org/tools/ptp/builds/hudson/ptp-release-photran</photran-site>
 		<ptp-build-dir>/home/data/httpd/download.eclipse.org/tools/ptp/builds/hudson/ptp-release-build</ptp-build-dir>
 	</properties>
@@ -188,6 +190,11 @@
 		<repository>
 			<id>photran</id>
 			<url>${photran-site}</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>egit-${egit-version}</id>
+			<url>${egit-site}</url>
 			<layout>p2</layout>
 		</repository>
 		<repository>
