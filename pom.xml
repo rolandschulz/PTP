@@ -18,6 +18,8 @@
 		<tycho-version>0.17.0</tycho-version>
 		<eclipse-version>kepler</eclipse-version>
 		<eclipse-site>http://download.eclipse.org/releases/${eclipse-version}</eclipse-site>
+		<platform-version>4.3</platform-version>
+		<platform-site>http://download.eclipse.org/eclipse/updates/${platform-version}</platform-site>
 		<linuxtools-version>kepler</linuxtools-version>
 		<linuxtools-site>http://download.eclipse.org/linuxtools/update-${linuxtools-version}</linuxtools-site>
 		<orbit-version>R20130118183705</orbit-version>
@@ -192,6 +194,11 @@
 	</modules>
 
 	<repositories>
+		<repository>
+			<id>platform-${platform-version}</id>
+			<url>${platform-site}</url>
+			<layout>p2</layout>
+		</repository>
 		<repository>
 			<id>photran</id>
 			<url>${photran-site}</url>
