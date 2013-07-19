@@ -26,6 +26,10 @@
 		<linuxtools-site>http://download.eclipse.org/linuxtools/update-${linuxtools-version}</linuxtools-site>
 		<orbit-version>R20130118183705</orbit-version>
 		<orbit-site>http://download.eclipse.org/tools/orbit/downloads/drops/${orbit-version}/repository</orbit-site>
+		<mylyn-version>kepler</mylyn-version>
+		<mylyn-site>http://download.eclipse.org/mylyn/releases/${mylyn-version}</mylyn-site>
+		<webtools-version>kepler</webtools-version>
+		<webtools-site>http://download.eclipse.org/webtools/releases/${webtools-version}</webtools-site>
 		<egit-version>nightly</egit-version>
 		<egit-site>http://download.eclipse.org/egit/updates-${egit-version}</egit-site>
 		<photran-site>http://download.eclipse.org/tools/ptp/builds/hudson/ptp-release-photran</photran-site>
@@ -66,14 +70,14 @@
 		<module>core/org.eclipse.ptp.ui</module>
 		<module>core/org.eclipse.ptp.utils</module>
 		<module>core/org.eclipse.ptp.doc.user</module>
-		<!--module>core/org.eclipse.ptp.doc.isv</module-->
+		<module>core/org.eclipse.ptp.doc.isv</module>
 		<module>debug/org.eclipse.ptp.debug.core</module>
 		<module>debug/org.eclipse.ptp.debug.sdm</module>
 		<module>debug/org.eclipse.ptp.debug.sdm.core</module>
 		<module>debug/org.eclipse.ptp.debug.sdm.ui</module>
 		<module>debug/org.eclipse.ptp.debug.ui</module>
 		<module>rdt/org.eclipse.ptp.rdt.core</module>
-		<!--module>rdt/org.eclipse.ptp.rdt.core.remotejars</module-->
+		<module>rdt/org.eclipse.ptp.rdt.core.remotejars</module>
 		<module>rdt/org.eclipse.ptp.rdt.core.stubs</module>
 		<module>rdt/org.eclipse.ptp.rdt.doc.user</module>
 		<module>rdt/org.eclipse.ptp.rdt.editor</module>
@@ -81,7 +85,7 @@
 		<module>rdt/org.eclipse.ptp.rdt.managedbuilder.gnu.ui</module>
 		<module>rdt/org.eclipse.ptp.rdt.managedbuilder.xlc.ui</module>
 		<module>rdt/org.eclipse.ptp.rdt.managedbuilder.xlupc.ui</module>
-		<!--module>rdt/org.eclipse.ptp.rdt.server.dstore</module-->
+		<module>rdt/org.eclipse.ptp.rdt.server.dstore</module>
 		<module>rdt/org.eclipse.ptp.rdt.sync.cdt.core</module>
 		<module>rdt/org.eclipse.ptp.rdt.sync.cdt.ui</module>
 		<module>rdt/org.eclipse.ptp.rdt.sync.core</module>
@@ -225,6 +229,16 @@
 		<repository>
 			<id>linuxtools-${linuxtools-version}</id>
 			<url>${linuxtools-site}</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>webtools-${webtools-version}</id>
+			<url>${webtools-site}</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>mylyn-${mylyn-version}</id>
+			<url>${mylyn-site}</url>
 			<layout>p2</layout>
 		</repository>
 		<repository>
