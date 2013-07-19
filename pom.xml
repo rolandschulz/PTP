@@ -26,7 +26,7 @@
 		<egit-site>http://download.eclipse.org/egit/updates-${egit-version}</egit-site>
 		<mylyn-version>kepler</mylyn-version>
 		<mylyn-site>http://download.eclipse.org/mylyn/releases/${mylyn-version}</mylyn-site>
-		<linuxtools-version>nightly</linuxtools-version>
+		<linuxtools-version>kepler</linuxtools-version>
 		<linuxtools-site>http://download.eclipse.org/linuxtools/update-${linuxtools-version}</linuxtools-site>
 		<egit-version>nightly</egit-version>
 		<egit-site>http://download.eclipse.org/egit/updates-${egit-version}</egit-site>
