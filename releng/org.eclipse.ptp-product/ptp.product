@@ -13,6 +13,7 @@
    </configIni>
 
    <launcherArgs>
+      <programArgs>-product org.eclipse.ptp.product
       <programArgsWin>--launcher.XXMaxPermSize
 256M</programArgsWin>
       <vmArgs>-Dosgi.requiredJavaVersion=1.6
@@ -31,7 +32,6 @@
    <windowImages i16="/org.eclipse.ptp/ptp_logo_icon16.png" i32="/org.eclipse.ptp/ptp_logo_icon32.png" i48="/org.eclipse.ptp/ptp_logo_icon48.png"/>
 
    <splash
-      location="org.eclipse.ptp"
       startupProgressRect="5,310,445,15"
       startupMessageRect="7,280,445,20"
       startupForegroundColor="FEFFFE" />
