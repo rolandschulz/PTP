@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="%productName" uid="ptp" id="org.eclipse.ptp.product" application="org.eclipse.ui.ide.workbench" version="7.0.2" useFeatures="true" includeLaunchers="true">
+<product name="Eclipse for Parallel Application Developers" uid="ptp" id="org.eclipse.ptp.product" application="org.eclipse.ui.ide.workbench" version="7.0.2" useFeatures="true" includeLaunchers="true">
 
    <aboutInfo>
       <text>
@@ -31,11 +31,11 @@
    <windowImages i16="/org.eclipse.ptp/ptp_logo_icon16.png" i32="/org.eclipse.ptp/ptp_logo_icon32.png" i48="/org.eclipse.ptp/ptp_logo_icon48.png"/>
 
    <splash
+      location="org.eclipse.ptp"
       startupProgressRect="5,310,445,15"
       startupMessageRect="7,280,445,20"
       startupForegroundColor="FEFFFE" />
    <launcher name="eclipse">
-      <macosx icon="/icons/icon.icns"/>
       <solaris/>
       <win useIco="false">
          <bmp/>
@@ -46,16 +46,51 @@
 
    <vm>
       <linux include="false">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6</linux>
-      <macos include="false">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6</macos>
+      <macos include="true">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6</macos>
       <solaris include="false">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6</solaris>
       <windows include="false">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6</windows>
    </vm>
 
    <plugins>
+      <plugin id="org.eclipse.ptp"/>
    </plugins>
 
    <features>
-      <feature id="org.eclipse.ptp" version="7.0.2.qualifier"/>
+      <feature id="org.eclipse.ptp"/>
+      <feature id="org.eclipse.cvs"/>
+      <feature id="org.eclipse.equinox.p2.user.ui"/>
+      <feature id="org.eclipse.help"/>
+      <feature id="org.eclipse.platform"/>
+      <feature id="org.eclipse.rcp"/>
+      <feature id="org.eclipse.cdt.platform"/>
+      <feature id="org.eclipse.cdt"/>
+      <feature id="org.eclipse.cdt.autotools"/>
+      <feature id="org.eclipse.cdt.debug.ui.memory"/>
+      <feature id="org.eclipse.cdt.core.parser.upc.feature"/>
+      <feature id="org.eclipse.cdt.xlc.feature"/>
+      <feature id="org.eclipse.cdt.bupc"/>
+      <feature id="org.eclipse.mylyn_feature"/>
+      <feature id="org.eclipse.mylyn.context_feature"/>
+      <feature id="org.eclipse.mylyn.team_feature"/>
+      <feature id="org.eclipse.mylyn.ide_feature"/>
+      <feature id="org.eclipse.mylyn.bugzilla_feature"/>
+      <feature id="org.eclipse.mylyn.wikitext_feature"/>
+      <feature id="org.eclipse.rse"/>
+      <feature id="org.eclipse.jgit"/>
+      <feature id="org.eclipse.wst.xml_ui.feature"/>
+      <feature id="org.eclipse.egit"/>
+      <feature id="org.eclipse.egit.feature"/>
+      <feature id="org.eclipse.linuxtools.cdt.libhover.feature"/>
+	  <feature id="org.eclipse.linuxtools.changelog.c"/>
+	  <feature id="org.eclipse.linuxtools.gprof.feature"/>
+	  <feature id="org.eclipse.linuxtools.oprofile.feature"/>
+	  <feature id="org.eclipse.linuxtools.rpm"/>
+	  <feature id="org.eclipse.linuxtools.rpm.ui.editor.feature"/>
+	  <feature id="org.eclipse.linuxtools.systemtap"/>
+	  <feature id="org.eclipse.linuxtools.callgraph.feature"/>
+	  <feature id="org.eclipse.linuxtools.valgrind"/>
+	  <feature id="org.eclipse.linuxtools.gcov"/>
+	  <feature id="org.eclipse.linuxtools.lttng2"/>
    </features>
 
    <configurations>
