@@ -77,6 +77,77 @@
          id="org.eclipse.ptp.rdt.sync.cdt"
          version="0.0.0"/>
 
+   <includes
+         id="org.eclipse.platform"
+         version="0.0.0"
+         search-location="both"/>
+
+   <includes
+         id="org.eclipse.linuxtools.cdt.libhover.feature"
+         version="0.0.0"
+         optional="true"
+         search-location="both"/>
+
+   <includes
+         id="org.eclipse.linuxtools.changelog.c"
+         version="0.0.0"
+         optional="true"
+         search-location="both"/>
+
+   <includes
+         id="org.eclipse.linuxtools.gprof.feature"
+         version="0.0.0"
+         optional="true"
+         search-location="both"/>
+
+   <includes
+         id="org.eclipse.linuxtools.oprofile.feature"
+         version="0.0.0"
+         optional="true"
+         search-location="both"/>
+
+   <includes
+         id="org.eclipse.linuxtools.rpm"
+         version="0.0.0"
+         optional="true"
+         search-location="both"/>
+
+   <includes
+         id="org.eclipse.linuxtools.rpm.ui.editor.feature"
+         version="0.0.0"
+         optional="true"
+         search-location="both"/>
+
+   <includes
+         id="org.eclipse.linuxtools.systemtap"
+         version="0.0.0"
+         optional="true"
+         search-location="both"/>
+
+   <includes
+         id="org.eclipse.linuxtools.callgraph.feature"
+         version="0.0.0"
+         optional="true"
+         search-location="both"/>
+
+   <includes
+         id="org.eclipse.linuxtools.valgrind"
+         version="0.0.0"
+         optional="true"
+         search-location="both"/>
+
+   <includes
+         id="org.eclipse.linuxtools.gcov"
+         version="0.0.0"
+         optional="true"
+         search-location="both"/>
+
+   <includes
+         id="org.eclipse.linuxtools.lttng2"
+         version="0.0.0"
+         optional="true"
+         search-location="both"/>
+
    <plugin
          id="org.eclipse.ptp"
          download-size="0"
