@@ -56,41 +56,7 @@
    </plugins>
 
    <features>
-      <feature id="org.eclipse.ptp"/>
-      <feature id="org.eclipse.cvs"/>
-      <feature id="org.eclipse.equinox.p2.user.ui"/>
-      <feature id="org.eclipse.help"/>
-      <feature id="org.eclipse.platform"/>
-      <feature id="org.eclipse.rcp"/>
-      <feature id="org.eclipse.cdt.platform"/>
-      <feature id="org.eclipse.cdt"/>
-      <feature id="org.eclipse.cdt.autotools"/>
-      <feature id="org.eclipse.cdt.debug.ui.memory"/>
-      <feature id="org.eclipse.cdt.core.parser.upc.feature"/>
-      <feature id="org.eclipse.cdt.xlc.feature"/>
-      <feature id="org.eclipse.cdt.bupc"/>
-      <feature id="org.eclipse.mylyn_feature"/>
-      <feature id="org.eclipse.mylyn.context_feature"/>
-      <feature id="org.eclipse.mylyn.team_feature"/>
-      <feature id="org.eclipse.mylyn.ide_feature"/>
-      <feature id="org.eclipse.mylyn.bugzilla_feature"/>
-      <feature id="org.eclipse.mylyn.wikitext_feature"/>
-      <feature id="org.eclipse.rse"/>
-      <feature id="org.eclipse.jgit"/>
-      <feature id="org.eclipse.wst.xml_ui.feature"/>
-      <feature id="org.eclipse.egit"/>
-      <feature id="org.eclipse.egit.feature"/>
-      <feature id="org.eclipse.linuxtools.cdt.libhover.feature"/>
-	  <feature id="org.eclipse.linuxtools.changelog.c"/>
-	  <feature id="org.eclipse.linuxtools.gprof.feature"/>
-	  <feature id="org.eclipse.linuxtools.oprofile.feature"/>
-	  <feature id="org.eclipse.linuxtools.rpm"/>
-	  <feature id="org.eclipse.linuxtools.rpm.ui.editor.feature"/>
-	  <feature id="org.eclipse.linuxtools.systemtap"/>
-	  <feature id="org.eclipse.linuxtools.callgraph.feature"/>
-	  <feature id="org.eclipse.linuxtools.valgrind"/>
-	  <feature id="org.eclipse.linuxtools.gcov"/>
-	  <feature id="org.eclipse.linuxtools.lttng2"/>
+      <feature id="org.eclipse.ptp.product" version="7.0.2.qualifier"/>
    </features>
 
    <configurations>
