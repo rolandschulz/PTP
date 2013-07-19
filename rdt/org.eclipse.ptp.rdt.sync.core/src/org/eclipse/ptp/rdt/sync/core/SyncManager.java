@@ -50,7 +50,7 @@ import org.osgi.service.prefs.Preferences;
 public class SyncManager {
 	private static class SynchronizeJob extends Job {
 		private final IProject fProject;
-		private final SyncConfig fBuildScenario;
+		private final SyncConfig fSyncConfig;
 		private final IResourceDelta fDelta;
 		private final ISynchronizeService fSyncService;
 		private final EnumSet<SyncFlag> fSyncFlags;
@@ -60,7 +60,7 @@ public class SyncManager {
 				EnumSet<SyncFlag> syncFlags, ISyncExceptionHandler seHandler) {
 			super(Messages.SyncManager_4);
 			fProject = project;
-			fBuildScenario = syncConfig;
+			fSyncConfig = syncConfig;
 			fDelta = delta;
 			fSyncService = syncService;
 			fSyncFlags = syncFlags;
@@ -76,7 +76,7 @@ public class SyncManager {
 		protected IStatus run(IProgressMonitor monitor) {
 			RecursiveSubMonitor subMonitor = RecursiveSubMonitor.convert(monitor);
 			try {
-				fSyncService.synchronize(fProject, fBuildScenario, fDelta, subMonitor, fSyncFlags);
+				fSyncService.synchronize(fProject, fSyncConfig.getRemoteLocation(), fDelta, subMonitor, fSyncFlags);
 			} catch (CoreException e) {
 				if (fSyncExceptionHandler == null) {
 					defaultSyncExceptionHandler.handle(fProject, e);
@@ -225,7 +225,14 @@ public class SyncManager {
 	 */
 	public static AbstractSyncFileFilter getFileFilter(IProject project) {
 		String currentSyncServiceId = SyncConfigManager.getActive(project).getSyncProviderId();
-		return SyncManager.getSyncService(currentSyncServiceId).getSyncFileFilter(project);
+		AbstractSyncFileFilter filter = null;
+		try {
+			filter = SyncManager.getSyncService(currentSyncServiceId).getSyncFileFilter(project);
+		} catch (CoreException e) {
+			RDTSyncCorePlugin.log(e);
+			return getDefaultFileFilter();
+		}
+		return filter;
 	}
 
 	/**
@@ -327,9 +334,10 @@ public class SyncManager {
 	 *            cannot be null
 	 * @param filter
 	 *            cannot be null
+	 * @throws CoreException 
 	 * @throws IOException
 	 */
-	public static void saveFileFilter(IProject project, AbstractSyncFileFilter filter) throws IOException {
+	public static void saveFileFilter(IProject project, AbstractSyncFileFilter filter) throws CoreException {
 		String currentSyncServiceId = SyncConfigManager.getActive(project).getSyncProviderId();
 		SyncManager.getSyncService(currentSyncServiceId).setSyncFileFilter(project, filter);
 	}
@@ -358,7 +366,7 @@ public class SyncManager {
 			if (syncService != null) {
 				if (isBlocking) {
 					try {
-						syncService.synchronize(project, config, delta, monitor, syncFlags);
+						syncService.synchronize(project, config.getRemoteLocation(), delta, monitor, syncFlags);
 					} catch (CoreException e) {
 						if (!useExceptionHandler) {
 							throw e;

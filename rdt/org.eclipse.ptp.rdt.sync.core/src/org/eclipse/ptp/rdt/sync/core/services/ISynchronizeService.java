@@ -22,7 +22,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.rdt.sync.core.RemoteLocation;
 import org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
-import org.eclipse.ptp.rdt.sync.core.exceptions.RemoteSyncException;
 
 /**
  * Provides synchronization services.
@@ -40,7 +39,7 @@ public interface ISynchronizeService extends ISynchronizeServiceDescriptor {
 	 * @throws CoreException
 	 * @since 4.0
 	 */
-	public void checkout(IProject project, RemoteLocation remoteLoc, IPath[] paths) throws CoreException;
+	public void checkout(IProject project, IPath[] paths) throws CoreException;
 
 	/**
 	 * Replace the current contents of the given paths with the current local copies of the remote (not necessarily the same as what
@@ -52,50 +51,49 @@ public interface ISynchronizeService extends ISynchronizeServiceDescriptor {
 	 * @throws CoreException
 	 * @since 4.0
 	 */
-	public void checkoutRemoteCopy(IProject project, RemoteLocation remoteLoc, IPath[] paths) throws CoreException;
+	public void checkoutRemoteCopy(IProject project, IPath[] paths) throws CoreException;
 
 	/**
 	 * Close any resources (files, sockets) that were open by the sync provider for the given project. Resources not open by the
 	 * provider should not be touched. This is called, for example, when a project is about to be deleted.
+	 * 
+	 * @throws CoreException
 	 */
-	public void close(IProject project);
+	public void close(IProject project) throws CoreException;
 
 	/**
 	 * Get the current list of merge-conflicted files for the passed project and build scenario
 	 * 
 	 * @param project
-	 * @param remoteLoc
 	 * @return set of files as project-relative IPaths. This may be an empty set but never null.
 	 * @throws CoreException
 	 *             for system-level problems retrieving merge information
 	 * @since 4.0
 	 */
-	public Set<IPath> getMergeConflictFiles(IProject project, RemoteLocation remoteLoc) throws CoreException;
+	public Set<IPath> getMergeConflictFiles(IProject project) throws CoreException;
 
 	/**
 	 * Get the three parts of the merge-conflicted file (left, right, and ancestor, respectively)
 	 * 
 	 * @param project
-	 * @param remoteLoc
 	 * @param file
 	 * @return the three parts as strings. Either three strings (some may be empty) or null if file is not merge-conflicted.
 	 * @throws CoreException
 	 *             for system-level problems retrieving merge information
 	 * @since 4.0
 	 */
-	public String[] getMergeConflictParts(IProject project, RemoteLocation remoteLoc, IFile file) throws CoreException;
+	public String[] getMergeConflictParts(IProject project, IFile file) throws CoreException;
 
 	/**
 	 * Set the given file paths as resolved (merge conflict does not exist)
 	 * 
 	 * @param project
-	 * @param remoteLoc
 	 * @param path
 	 * @throws CoreException
 	 *             for system-level problems setting the state
 	 * @since 4.0
 	 */
-	public void setMergeAsResolved(IProject project, RemoteLocation remoteLoc, IPath[] paths) throws CoreException;
+	public void setMergeAsResolved(IProject project, IPath[] paths) throws CoreException;
 
 	/**
 	 * Perform synchronization
@@ -119,14 +117,14 @@ public interface ISynchronizeService extends ISynchronizeServiceDescriptor {
 			IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException;
 	
 	/**
-	 * Get SyncFileFilter. Empty if not initialized before
+	 * Get SyncFileFilter for given project
 	 *
 	 * @param project
 	 *
 	 * @return file filter
-	 * @throws RemoteSyncException 
+	 * @throws CoreException 
 	 */
-	public AbstractSyncFileFilter getSyncFileFilter(IProject project);
+	public AbstractSyncFileFilter getSyncFileFilter(IProject project) throws CoreException;
 
 	/**
 	 * Set sync file filter for the given project
@@ -134,6 +132,7 @@ public interface ISynchronizeService extends ISynchronizeServiceDescriptor {
 	 * @param project - cannot be null
 	 * @param filter
 	 *          generic file filter  - cannot be null
+	 * @throws CoreException
 	 */
-	public void setSyncFileFilter(IProject project, AbstractSyncFileFilter filter);
+	public void setSyncFileFilter(IProject project, AbstractSyncFileFilter filter) throws CoreException;
 }

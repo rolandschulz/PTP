@@ -21,7 +21,6 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
@@ -46,6 +45,7 @@ import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
 public class GitRepo {
+	public static final String gitArgs = "--git-dir=" + GitSyncService.gitDir + " --work-tree=."; //$NON-NLS-1$ //$NON-NLS-2$
 	private static final String instanceScopeSyncNode = "org.eclipse.ptp.rdt.sync.core"; //$NON-NLS-1$
 	private static final String GIT_LOCATION_NODE_NAME = "git-location"; //$NON-NLS-1$
 	private final int MAX_FILES = 100;
@@ -71,7 +71,7 @@ public class GitRepo {
 	 *             when connection missing. In this case, the instance is
 	 *             also invalid.
 	 */
-	public GitRepo(IProject project, RemoteLocation rl, IProgressMonitor monitor)
+	public GitRepo(JGitRepo localRepo, RemoteLocation rl, IProgressMonitor monitor)
 			throws RemoteSyncException, MissingConnectionException {
 		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
 		try {
@@ -82,7 +82,7 @@ public class GitRepo {
 				subMon.subTask(Messages.GitRemoteSyncConnection_21);
 				remoteGitVersion = getRemoteGitVersion(subMon.newChild(10));
 				subMon.subTask(Messages.GitRemoteSyncConnection_20);
-				buildRepo(project, subMon.newChild(80));
+				buildRepo(localRepo, subMon.newChild(80));
 			} catch (final IOException e) {
 				throw new RemoteSyncException(e);
 			} catch (final RemoteExecutionException e) {
@@ -114,19 +114,14 @@ public class GitRepo {
 	 * @throws MissingConnectionException
 	 *             on missing connection.
 	 */
-	private void buildRepo(IProject project, IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException,
-			MissingConnectionException {
+	private void buildRepo(JGitRepo localRepo, IProgressMonitor monitor) throws IOException, RemoteExecutionException,
+	RemoteSyncException, MissingConnectionException {
 		final RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
 		try {
-			subMon.subTask(Messages.GitRemoteSyncConnection_1);
-			
-            // An initial commit to create the master branch.
-            subMon.subTask(Messages.GitRemoteSyncConnection_22);
-
 			// Create remote directory if necessary.
 			try {
 				subMon.subTask(Messages.GitRemoteSyncConnection_24);
-				CommandRunner.createRemoteDirectory(remoteLoc.getConnection(), remoteLoc.getDirectory(project),
+				CommandRunner.createRemoteDirectory(remoteLoc.getConnection(), remoteLoc.getDirectory(),
 						subMon.newChild(5));
 			} catch (final CoreException e) {
 				throw new RemoteSyncException(e);
@@ -137,7 +132,6 @@ public class GitRepo {
 			doInit(subMon.newChild(5));
 
 			subMon.subTask(Messages.GitRemoteSyncConnection_27);
-			JGitRepo localRepo = GitSyncService.getLocalJGitRepo(project.getLocation().toOSString());
 			commitRemoteFiles(localRepo, subMon.newChild(5));
 		} finally {
 			if (monitor != null) {
@@ -306,6 +300,20 @@ public class GitRepo {
     	}
     }
 
+    public void merge(IProgressMonitor monitor) throws RemoteSyncException, IOException, InterruptedException,
+    RemoteConnectionException, MissingConnectionException {
+		CommandResults mergeResults;
+		// ff-only prevents accidental corruption of the remote repository but is supported only in recent Git versions.
+		// final String command = gitCommand + " merge --ff-only " + remotePushBranch; //$NON-NLS-1$
+		final String command = gitCommand() + " merge " + GitSyncService.remotePushBranch; //$NON-NLS-1$
+
+		mergeResults = this.executeRemoteCommand(command, monitor);
+		if (mergeResults.getExitCode() != 0) {
+			throw new RemoteSyncException(new RemoteExecutionException(Messages.GRSC_GitMergeFailure
+					+ mergeResults.getStderr()));
+		}
+    }
+
     private List<String> stringToList(String command) {
     	return new ArrayList<String>(Arrays.asList(command.split(" "))); //$NON-NLS-1$
     }
@@ -331,7 +339,11 @@ public class GitRepo {
 			}
 		}
 
-		return gitBinary + " " + GitSyncService.gitArgs; //$NON-NLS-1$
+		return gitBinary + " " + gitArgs; //$NON-NLS-1$
+	}
+
+	public RemoteLocation getRemoteLocation() {
+		return remoteLoc;
 	}
 
 	public int getRemoteGitVersion(IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException,

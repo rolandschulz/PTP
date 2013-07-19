@@ -11,7 +11,6 @@
 package org.eclipse.ptp.internal.rdt.sync.git.core;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,12 +28,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jgit.api.MergeCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.TransportException;
-import org.eclipse.jgit.lib.Ref;
-import org.eclipse.jgit.lib.Repository;
-import org.eclipse.ptp.internal.rdt.sync.git.core.CommandRunner.CommandResults;
 import org.eclipse.ptp.internal.rdt.sync.git.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.RecursiveSubMonitor;
@@ -42,7 +37,6 @@ import org.eclipse.ptp.rdt.sync.core.RemoteLocation;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
-import org.eclipse.ptp.rdt.sync.core.exceptions.RemoteExecutionException;
 import org.eclipse.ptp.rdt.sync.core.exceptions.RemoteSyncException;
 import org.eclipse.ptp.rdt.sync.core.exceptions.RemoteSyncMergeConflictException;
 import org.eclipse.ptp.rdt.sync.core.services.AbstractSynchronizeService;
@@ -51,29 +45,75 @@ import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
 public class GitSyncService extends AbstractSynchronizeService {
 	public static final String gitDir = ".ptp-sync"; //$NON-NLS-1$
-	public static final String gitArgs = "--git-dir=" + gitDir + " --work-tree=."; //$NON-NLS-1$ //$NON-NLS-2$
-	public static final String remoteProjectName = "eclipse_auto"; //$NON-NLS-1$
 	public static final String commitMessage = Messages.GRSC_CommitMessage;
 	public static final String remotePushBranch = "ptp-push"; //$NON-NLS-1$
 
 	// Implement storage of local JGit repositories and Git repositories.
-	private static final Map<String, JGitRepo> localDirectoryToJGitRepoMap = new HashMap<String, JGitRepo>();
+	private static final Map<IProject, JGitRepo> projectToJGitRepoMap = new HashMap<IProject, JGitRepo>();
 	private static final Map<RemoteLocation, GitRepo> remoteLocationToGitRepoMap = new HashMap<RemoteLocation, GitRepo>();
 
-	public static JGitRepo getLocalJGitRepo(String localDirectory) {
-		return localDirectoryToJGitRepoMap.get(localDirectory);
+	/**
+	 * Get JGit repository instance for the given project, creating it if necessary.
+	 * @param project
+	 *
+	 * @return JGit repository instance - never null
+	 * @throws RemoteSyncException
+	 * 				on problems creating the repository
+	 */
+	public static JGitRepo getLocalJGitRepo(IProject project, IProgressMonitor monitor) throws RemoteSyncException {
+		JGitRepo repo = projectToJGitRepoMap.get(project);
+		try {
+			if (repo == null) {
+				try {
+					repo = new JGitRepo(project, monitor);
+					projectToJGitRepoMap.put(project, repo);
+				} catch (GitAPIException e) {
+					throw new RemoteSyncException(e);
+				} catch (IOException e) {
+					throw new RemoteSyncException(e);
+				}
+			}
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
+		}
+		return repo;
 	}
 
-	private static void setLocalJGitRepo(String localDirectory, JGitRepo repo) {
-		localDirectoryToJGitRepoMap.put(localDirectory, repo);
-	}
-
-	public static GitRepo getGitRepo(RemoteLocation rl) {
-		return remoteLocationToGitRepoMap.get(rl);
-	}
-
-	private static void setGitRepo(RemoteLocation rl, GitRepo repo) {
-		remoteLocationToGitRepoMap.put(rl, repo);
+	/**
+	 * Get Git repository instance for given remote location, creating it if necessary.
+	 *
+	 * @param project
+	 * 			For initializing remote repository if necessary.
+	 * @param rl
+	 * 			remote location
+	 * @param monitor
+	 * @return Git repo instance - is null only if connection could not be resolved.
+	 * @throws RemoteSyncException
+	 * 			on problems creating the repository
+	 */
+	public static GitRepo getGitRepo(IProject project, RemoteLocation rl, IProgressMonitor monitor) throws RemoteSyncException {
+		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
+		GitRepo repo = remoteLocationToGitRepoMap.get(rl);
+		try {
+			if (repo == null) {
+				subMon.subTask("Accessing local JGit repository");
+				JGitRepo localRepo = getLocalJGitRepo(project, subMon.newChild(25));
+				try {
+					subMon.subTask("Creating Git repository");
+					repo = new GitRepo(localRepo, rl, subMon.newChild(75));
+					remoteLocationToGitRepoMap.put(rl, repo);
+				} catch (MissingConnectionException e) {
+					return null;
+				}
+			}
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
+		}
+		return repo;
 	}
 
 	private static final ReentrantLock syncLock = new ReentrantLock();
@@ -82,6 +122,11 @@ public class GitSyncService extends AbstractSynchronizeService {
 	private int finishedSyncTaskId = -1; // all synchronizations up to this ID (including it) have finished
 
 	private static boolean consCalled = false;
+	/**
+	 * Create a new instance of the GitSyncService
+	 * @param descriptor
+	 * 				service descriptor
+	 */
 	public GitSyncService(ISynchronizeServiceDescriptor descriptor) {
 		super(descriptor);
 		// Constructor for each sync service should only be called once by design of synchronized projects
@@ -97,8 +142,8 @@ public class GitSyncService extends AbstractSynchronizeService {
 	 * org.eclipse.ptp.rdt.sync.core.RemoteLocation, org.eclipse.core.runtime.IPath)
 	 */
 	@Override
-	public void checkout(IProject project, RemoteLocation remoteLoc, IPath[] paths) throws RemoteSyncException {
-		JGitRepo repo = getLocalJGitRepo(project.getLocation().toOSString());
+	public void checkout(IProject project, IPath[] paths) throws RemoteSyncException {
+		JGitRepo repo = getLocalJGitRepo(project, null);
 		if (repo != null) {
 			repo.checkout(paths);
 		}
@@ -111,8 +156,8 @@ public class GitSyncService extends AbstractSynchronizeService {
 	 * org.eclipse.ptp.rdt.sync.core.RemoteLocation, org.eclipse.core.runtime.IPath)
 	 */
 	@Override
-	public void checkoutRemoteCopy(IProject project, RemoteLocation remoteLoc, IPath[] paths) throws RemoteSyncException {
-		JGitRepo repo = getLocalJGitRepo(project.getLocation().toOSString());
+	public void checkoutRemoteCopy(IProject project, IPath[] paths) throws RemoteSyncException {
+		JGitRepo repo = getLocalJGitRepo(project, null);
 		if (repo != null) {
 			repo.checkoutRemoteCopy(paths);
 		}
@@ -124,8 +169,8 @@ public class GitSyncService extends AbstractSynchronizeService {
 	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#close(org.eclipse.core.resources.IProject)
 	 */
 	@Override
-	public void close(IProject project) {
-		JGitRepo repo = getLocalJGitRepo(project.getLocation().toOSString());
+	public void close(IProject project) throws RemoteSyncException {
+		JGitRepo repo = getLocalJGitRepo(project, null);
 		if (repo != null) {
 			repo.close();
 		}
@@ -133,12 +178,12 @@ public class GitSyncService extends AbstractSynchronizeService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#getMergeConflictFiles()
+	 * @see org.eclipse.ptp.rdt.sync.core.services.ISynchronizeService#getMergeConflictFiles(org.eclipse.core.resources.IProject,
+	 * org.eclipse.ptp.rdt.sync.core.RemoteLocation)
 	 */
 	@Override
-	public Set<IPath> getMergeConflictFiles(IProject project, RemoteLocation remoteLoc) throws RemoteSyncException {
-		JGitRepo repo = getLocalJGitRepo(project.getLocation().toOSString());
+	public Set<IPath> getMergeConflictFiles(IProject project) throws RemoteSyncException {
+		JGitRepo repo = getLocalJGitRepo(project, null);
 		if (repo == null) {
 			return new HashSet<IPath>();
 		} else {
@@ -148,13 +193,12 @@ public class GitSyncService extends AbstractSynchronizeService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rdt.sync.core.serviceproviders.ISyncServiceProvider#getMergeConflictParts(org.eclipse.core.resources.IFile)
+	 * @see org.eclipse.ptp.rdt.sync.core.services.ISynchronizeService#getMergeConflictParts(org.eclipse.core.resources.IProject,
+	 * org.eclipse.ptp.rdt.sync.core.RemoteLocation, org.eclipse.core.resources.IFile)
 	 */
 	@Override
-	public String[] getMergeConflictParts(IProject project, RemoteLocation remoteLoc, IFile file) throws RemoteSyncException {
-		JGitRepo repo = getLocalJGitRepo(project.getLocation().toOSString());
+	public String[] getMergeConflictParts(IProject project, IFile file) throws RemoteSyncException {
+		JGitRepo repo = getLocalJGitRepo(project, null);
 		if (repo == null) {
 			return null;
 		} else {
@@ -169,8 +213,8 @@ public class GitSyncService extends AbstractSynchronizeService {
 	 * org.eclipse.ptp.rdt.sync.core.RemoteLocation, org.eclipse.core.runtime.IPath)
 	 */
 	@Override
-	public void setMergeAsResolved(IProject project, RemoteLocation remoteLoc, IPath[] paths) throws RemoteSyncException {
-		JGitRepo repo = getLocalJGitRepo(project.getLocation().toOSString());
+	public void setMergeAsResolved(IProject project, IPath[] paths) throws RemoteSyncException {
+		JGitRepo repo = getLocalJGitRepo(project, null);
 		if (repo != null) {
 			repo.setMergeAsResolved(paths);
 		}
@@ -241,10 +285,17 @@ public class GitSyncService extends AbstractSynchronizeService {
 			}
 
 			try {
+				subMon.subTask(Messages.GitServiceProvider_7);
+				JGitRepo localRepo = getLocalJGitRepo(project, null);
+				GitRepo remoteRepo = getGitRepo(project, remoteLoc, null);
+				if (remoteRepo == null) {
+					return;
+				}
+
 				// Do not sync if there are merge conflicts.
 				// This check must be done after acquiring the sync lock. Otherwise, the merge may trigger a sync that sees no
 				// conflicting files and proceeds to sync again - depending on how quickly the first sync records the data.
-				if (!(this.getMergeConflictFiles(project, remoteLoc).isEmpty())) {
+				if (!(localRepo.getMergeConflictFiles().isEmpty())) {
 					throw new RemoteSyncMergeConflictException(Messages.GitServiceProvider_4);
 				}
 
@@ -255,11 +306,6 @@ public class GitSyncService extends AbstractSynchronizeService {
 				if (remoteLoc == null) {
 					throw new RuntimeException(Messages.GitServiceProvider_3 + project.getName());
 				}
-
-				subMon.subTask(Messages.GitServiceProvider_7);
-				// TODO: Null checking
-				JGitRepo localRepo = getLocalJGitRepo(project.getLocation().toOSString());
-				GitRepo remoteRepo = getGitRepo(remoteLoc);
 
 				// This synchronization operation will include all tasks up to current syncTaskId
 				// syncTaskId can be larger than mySyncTaskId (than we do also the work for other threads)
@@ -273,7 +319,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 
 				try {
 					subMon.subTask(Messages.GitServiceProvider_8);
-					sync(localRepo, remoteRepo, subMon.newChild(900), true);
+					doSync(localRepo, remoteRepo, subMon.newChild(900), true);
 					// Unlike other exceptions, we need to do some post-sync activities after a merge exception.
 					// TODO: Refactor code to get rid of duplication of post-sync activities.
 				} catch (RemoteSyncMergeConflictException e) {
@@ -302,46 +348,37 @@ public class GitSyncService extends AbstractSynchronizeService {
 	}
 
 	/**
-	 * Synchronize local and remote repositories. Currently, this function just interleaves the work of "syncLocalToRemote" and
-	 * "syncRemoteToLocal". Doing both simultaneously, though, gives room for more efficient code later. (See "syncInternal"
-	 * for the actual implementation.)
-	 * 
+	 * Synchronize the given local and remote repositories. Currently both directions are always synchronized.
 	 * Note that the remote is fetched and merged first. This is on purpose so that merge conflicts will occur locally, where
-	 * they can be more easily managed. Previously, "syncLocalToRemote" was called first in "AbstractSynchronizeService", which
-	 * would
-	 * cause merge conflicts to occur remotely.
+	 * they can be more easily managed.
 	 * 
-	 * 
+	 * @param localRepo
+	 * 				A local JGit repository
+	 * @param remoteRepo
+	 * 				A remote Git repository
 	 * @param monitor
 	 * @param includeUntrackedFiles
 	 *            Should currently untracked remote files be added to the repository?
 	 * @throws RemoteSyncException
-	 *             for various problems sync'ing. The specific exception is
-	 *             nested within the RemoteSyncException. Many of the listed
-	 *             exceptions appear to be unrecoverable, caused by errors in
-	 *             the initial setup. It is vital, though, that failed syncs are
-	 *             reported and handled. So all exceptions are checked
-	 *             exceptions, embedded in a RemoteSyncException.
+	 *             for various problems sync'ing. All exceptions are wrapped in a RemoteSyncException and thrown, so that clients
+	 *             can always detect when a sync fails and why.
 	 */
-	public void sync(JGitRepo localRepo, GitRepo remoteRepo, IProgressMonitor monitor, boolean includeUntrackedFiles) throws RemoteSyncException {
+	private void doSync(JGitRepo localRepo, GitRepo remoteRepo, IProgressMonitor monitor, boolean includeUntrackedFiles) throws RemoteSyncException {
 		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
 		try {
 			// Commit local and remote changes
 			subMon.subTask(Messages.GitRemoteSyncConnection_12);
-			localRepo.doCommit(subMon.newChild(5));
+			localRepo.commit(subMon.newChild(5));
 			subMon.subTask(Messages.GitRemoteSyncConnection_14);
 			remoteRepo.commitRemoteFiles(localRepo, subMon.newChild(18));
 
 			try {
 				// Fetch the remote repository
 				subMon.subTask(Messages.GitRemoteSyncConnection_15);
-				transport.fetch(new EclipseGitProgressTransformer(subMon.newChild(18)), null);
+				localRepo.fetch(remoteRepo.getRemoteLocation(), subMon.newChild(18));
 
 				// Merge it with local
-				subMon.subTask(Messages.GitRemoteSyncConnection_16);
-				Ref remoteMasterRef = git.getRepository().getRef("refs/remotes/" + remoteProjectName + "/master"); //$NON-NLS-1$ //$NON-NLS-2$
-				final MergeCommand mergeCommand = git.merge().include(remoteMasterRef);
-				mergeCommand.call();
+				localRepo.merge(subMon.newChild(2));
 
 				// Handle merge conflict. Read in data needed to resolve the conflict, and then reset the repo.
 				if (localRepo.readMergeConflictFiles()) {
@@ -365,20 +402,8 @@ public class GitSyncService extends AbstractSynchronizeService {
 			// Push local repository to remote
 			if (localRepo.getGit().branchList().call().size() > 0) { // check whether master was already created
 				subMon.subTask(Messages.GitRemoteSyncConnection_17);
-				transport.push(new EclipseGitProgressTransformer(subMon.newChild(18)), null);
-
-				// Now remotely merge changes with master branch
-				CommandResults mergeResults;
-				// ff-only prevents accidental corruption of the remote repository but is supported only in recent Git versions.
-				// final String command = gitCommand + " merge --ff-only " + remotePushBranch; //$NON-NLS-1$
-				final String command = gitCommand() + " merge " + remotePushBranch; //$NON-NLS-1$
-
-				subMon.subTask(Messages.GitRemoteSyncConnection_18);
-				mergeResults = this.executeRemoteCommand(command, subMon.newChild(18));
-				if (mergeResults.getExitCode() != 0) {
-					throw new RemoteSyncException(new RemoteExecutionException(Messages.GRSC_GitMergeFailure
-							+ mergeResults.getStderr()));
-				}
+				localRepo.push(remoteRepo.getRemoteLocation(), subMon.newChild(18));
+				remoteRepo.merge(subMon.newChild(18));
 			}
 		} catch (final IOException e) {
 			throw new RemoteSyncException(e);
@@ -397,13 +422,22 @@ public class GitSyncService extends AbstractSynchronizeService {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ptp.rdt.sync.core.services.ISynchronizeService#getSyncFileFilter(org.eclipse.core.resources.IProject)
+	 */
 	@Override
-	public AbstractSyncFileFilter getSyncFileFilter(IProject project) {
-		return getLocalJGitRepo(project.getLocation().toOSString()).getFilter();
+	public AbstractSyncFileFilter getSyncFileFilter(IProject project) throws RemoteSyncException {
+		return getLocalJGitRepo(project, null).getFilter();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ptp.rdt.sync.core.services.ISynchronizeService#setSyncFileFilter(org.eclipse.core.resources.IProject,
+	 * org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter)
+	 */
 	@Override
-	public void setSyncFileFilter(IProject project, AbstractSyncFileFilter filter) {
-		getLocalJGitRepo(project.getLocation().toOSString()).setFilter(filter);
+	public void setSyncFileFilter(IProject project, AbstractSyncFileFilter filter) throws RemoteSyncException {
+		getLocalJGitRepo(project, null).setFilter(filter);
 	}
 }

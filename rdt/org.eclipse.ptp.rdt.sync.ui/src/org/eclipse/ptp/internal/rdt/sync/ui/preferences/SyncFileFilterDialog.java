@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.sync.ui.preferences;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -248,7 +247,7 @@ public class SyncFileFilterDialog extends Dialog implements ISyncFilterWidgetPat
 		if (project != null) {
 			try {
 				SyncManager.saveFileFilter(project, filter);
-			} catch (IOException e) {
+			} catch (CoreException e) {
 				RDTSyncUIPlugin.log(e);
 			}
 		}

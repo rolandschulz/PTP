@@ -183,7 +183,7 @@ public class SyncMergeFileTableViewer extends ViewPart {
 			SyncConfig syncConfig = SyncConfigManager.getActive(project);
 			ISynchronizeService syncService = SyncManager.getSyncService(syncConfig.getSyncProviderId());
 			try {
-				mergeConflictFiles = syncService.getMergeConflictFiles(project, syncConfig);
+				mergeConflictFiles = syncService.getMergeConflictFiles(project);
 			} catch (CoreException e) {
 				RDTSyncUIPlugin.log(e);
 			}

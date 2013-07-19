@@ -23,7 +23,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.NoFilepatternException;
@@ -50,7 +49,7 @@ import org.eclipse.ptp.rdt.sync.core.SyncManager;
 public class GitSyncFileFilter extends AbstractSyncFileFilter {
 	public static final String REMOTE_FILTER_IS_DIRTY = "remote_filter_is_dirty"; //$NON-NLS-1$
 
-	private final IProject project;
+	private final JGitRepo jgitRepo;
 
 	private static Set<Character> escapifyCharSet = new HashSet<Character>();
 	static {
@@ -128,13 +127,13 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		}
 	}
 
-	GitSyncFileFilter(IProject project) {
-		this.project = project;
+	GitSyncFileFilter(JGitRepo repo) {
+		this.jgitRepo = repo;
 	}
 
-	public GitSyncFileFilter(GitSyncFileFilter filter) {
-		this.project = filter.project;
-		rules.addAll(filter.rules);
+	public GitSyncFileFilter(JGitRepo repo, AbstractSyncFileFilter filter) {
+		this.jgitRepo = repo;
+		rules.addAll(filter.getRules());
 	}
 
 	@Override
@@ -185,8 +184,8 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 
 	@Override
 	public void saveFilter() throws IOException {
-		Repository repository = GitSyncService.getLocalJGitRepo(project.getLocation().toOSString()).getRepository();
-		File exclude = repository.getFS().resolve(repository.getDirectory(), Constants.INFO_EXCLUDE);
+		Repository repo = jgitRepo.getRepository();
+		File exclude = repo.getFS().resolve(repo.getDirectory(), Constants.INFO_EXCLUDE);
 		exclude.getParentFile().mkdirs();
 		FileOutputStream file = new FileOutputStream(exclude);
 		BufferedWriter out = new BufferedWriter(new OutputStreamWriter(file, Constants.CHARSET));
@@ -198,7 +197,7 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		} finally {
 			out.close();
 		}
-		final RmCommandCached rmCommand = new RmCommandCached(repository);
+		final RmCommandCached rmCommand = new RmCommandCached(repo);
 		for (String fileName : getIgnoredFiles(null)) {
 			rmCommand.addFilepattern(fileName);
 		}
@@ -210,14 +209,14 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 			new IOException(e);
 		}
 
-		for (SyncConfig config : SyncConfigManager.getConfigs(project)) {
+		for (SyncConfig config : SyncConfigManager.getConfigs(jgitRepo.getProject())) {
 			config.setProperty(REMOTE_FILTER_IS_DIRTY, "TRUE"); //$NON-NLS-1$
 		}
 	}
 
 	public void loadFilter() throws IOException {
-		Repository repository = GitSyncService.getLocalJGitRepo(project.getLocation().toOSString()).getRepository();
-		File exclude = repository.getFS().resolve(repository.getDirectory(), Constants.INFO_EXCLUDE);
+		Repository repo = jgitRepo.getRepository();
+		File exclude = repo.getFS().resolve(repo.getDirectory(), Constants.INFO_EXCLUDE);
 		if (exclude.exists()) {
 			FileInputStream in = new FileInputStream(exclude);
 			try {
@@ -257,10 +256,10 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 	 * @param ref reference to compute list of files for. If null use index.
 	 */
 	public Set<String> getIgnoredFiles(RevTree ref) throws IOException {
-		Repository repository = GitSyncService.getLocalJGitRepo(project.getLocation().toOSString()).getRepository();
-		TreeWalk treeWalk = new TreeWalk(repository);
+		Repository repo = jgitRepo.getRepository();
+		TreeWalk treeWalk = new TreeWalk(repo);
 		if (ref == null) {
-			DirCache dirCache = repository.readDirCache();
+			DirCache dirCache = repo.readDirCache();
 			treeWalk.addTree(new DirCacheIterator(dirCache));
 		} else {
 			treeWalk.addTree(ref);
@@ -295,6 +294,10 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		return ignoredFiles;
 	}
 
+	public JGitRepo getRepo() {
+		return jgitRepo;
+	}
+
 	public class DiffFiles {
 		public Set<String> added = new HashSet<String>(); // modified and added
 		public Set<String> removed = new HashSet<String>();
@@ -309,10 +312,10 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		final int INDEX = 0;
 		final int WORKDIR = 1;
 
-		Repository repository = GitSyncService.getLocalJGitRepo(project.getLocation().toOSString()).getRepository();
-		TreeWalk treeWalk = new TreeWalk(repository);
-		treeWalk.addTree(new DirCacheIterator(repository.readDirCache()));
-		treeWalk.addTree(new FileTreeIterator(repository));
+		Repository repo = jgitRepo.getRepository();
+		TreeWalk treeWalk = new TreeWalk(repo);
+		treeWalk.addTree(new DirCacheIterator(repo.readDirCache()));
+		treeWalk.addTree(new FileTreeIterator(repo));
 
 		// don't honor ignores - we do it manual instead. Doing it all with the filter
 		// would require a WorkingTreeIteraotr which does the ignore handing correct
@@ -366,6 +369,6 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 
 	@Override
 	public AbstractSyncFileFilter clone() {
-		return new GitSyncFileFilter(this);
+		return new GitSyncFileFilter(jgitRepo, this);
 	}
 }

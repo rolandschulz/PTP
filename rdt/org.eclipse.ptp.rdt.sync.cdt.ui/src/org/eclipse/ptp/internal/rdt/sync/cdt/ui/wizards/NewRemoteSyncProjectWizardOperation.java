@@ -139,7 +139,7 @@ public class NewRemoteSyncProjectWizardOperation implements Runnable {
 		if (customFileFilter != null) {
 			try {
 				SyncManager.saveFileFilter(project, customFileFilter);
-			} catch (IOException e) {
+			} catch (CoreException e) {
 				RDTSyncCorePlugin.log(e);
 			}
 		}

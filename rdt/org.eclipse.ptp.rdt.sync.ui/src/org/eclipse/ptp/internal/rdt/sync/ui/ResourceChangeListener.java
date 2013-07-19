@@ -52,7 +52,11 @@ public class ResourceChangeListener {
 				}
 				SyncManager.setSyncMode(project, SyncMode.UNAVAILABLE);
 				String currentSyncServiceId = SyncConfigManager.getActive(project).getSyncProviderId();
-				SyncManager.getSyncService(currentSyncServiceId).close(project);
+				try {
+					SyncManager.getSyncService(currentSyncServiceId).close(project);
+				} catch (CoreException e) {
+					RDTSyncUIPlugin.log(e);
+				}
 				return;
 			}
 			for (IResourceDelta delta : event.getDelta().getAffectedChildren()) {

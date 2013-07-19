@@ -161,8 +161,16 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	}
 
 	/**
+	 * Get remote location
+	 * @return remote location
+	 * @since 4.0
+	 */
+	public RemoteLocation getRemoteLocation() {
+		return remoteLocation;
+	}
+
+	/**
 	 * Get the remote services ID
-	 * 
 	 * @return remote services ID
 	 */
 	public String getRemoteServicesId() {

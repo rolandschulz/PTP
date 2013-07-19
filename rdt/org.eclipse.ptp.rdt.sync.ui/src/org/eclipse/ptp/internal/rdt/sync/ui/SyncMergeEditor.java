@@ -86,7 +86,7 @@ public class SyncMergeEditor {
 			String[] mergeParts = null;
 
 			try {
-				mergeParts = syncService.getMergeConflictParts(project, syncConfig, file);
+				mergeParts = syncService.getMergeConflictParts(project, file);
 			} catch (CoreException e) {
 				RDTSyncUIPlugin.log(e);
 				return new DiffNode(null, Differencer.CONFLICTING, new SyncMergeItem(Messages.SyncMergeEditor_1),
