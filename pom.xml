@@ -18,6 +18,10 @@
 		<tycho-version>0.17.0</tycho-version>
 		<eclipse-version>kepler</eclipse-version>
 		<eclipse-site>http://download.eclipse.org/releases/${eclipse-version}</eclipse-site>
+		<linuxtools-version>kepler</linuxtools-version>
+		<linuxtools-site>http://download.eclipse.org/linuxtools/update-${linuxtools-version}</linuxtools-site>
+		<orbit-version>R20130118183705</orbit-version>
+		<orbit-site>http://download.eclipse.org/tools/orbit/downloads/drops/${orbit-version}/repository</linuxtools-site>
 		<egit-version>nightly</egit-version>
 		<egit-site>http://download.eclipse.org/egit/updates-${egit-version}</egit-site>
 		<photran-site>http://download.eclipse.org/tools/ptp/builds/hudson/ptp-release-photran</photran-site>
@@ -195,6 +199,16 @@
 		<repository>
 			<id>egit-${egit-version}</id>
 			<url>${egit-site}</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>linuxtools-${linuxtools-version}</id>
+			<url>${linuxtools-site}</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>orbit-${orbit-version}</id>
+			<url>${orbit-site}</url>
 			<layout>p2</layout>
 		</repository>
 		<repository>
