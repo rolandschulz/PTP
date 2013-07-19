@@ -22,20 +22,13 @@
 		<tm-site>http://download.eclipse.org/tm/updates/${tm-version}</tm-site>
 		<cdt-version>kepler</cdt-version>
 		<cdt-site>http://download.eclipse.org/tools/cdt/releases/${cdt-version}</cdt-site>	
-		<linuxtools-version>kepler</linuxtools-version>
-		<linuxtools-site>http://download.eclipse.org/linuxtools/update-${linuxtools-version}</linuxtools-site>
-		<orbit-version>R20130118183705</orbit-version>
-		<orbit-site>http://download.eclipse.org/tools/orbit/downloads/drops/${orbit-version}/repository</orbit-site>
-		<mylyn-version>kepler</mylyn-version>
-		<mylyn-site>http://download.eclipse.org/mylyn/releases/${mylyn-version}</mylyn-site>
-		<webtools-version>kepler</webtools-version>
-		<webtools-site>http://download.eclipse.org/webtools/repository/${webtools-version}</webtools-site>
-		<emf-version>kepler</emf-version>
-		<emf-site>http://download.eclipse.org/modeling/emf/emf/updates/releases</emf-site>
 		<egit-version>nightly</egit-version>
 		<egit-site>http://download.eclipse.org/egit/updates-${egit-version}</egit-site>
 		<photran-site>http://download.eclipse.org/tools/ptp/builds/hudson/ptp-release-photran</photran-site>
 		<ptp-build-dir>/home/data/httpd/download.eclipse.org/tools/ptp/builds/hudson/ptp-release-build</ptp-build-dir>
+		<!-- repositories below here are required for PTP product -->
+		<eclipse-version>kepler</eclipse-version>
+		<eclipse-site>http://download.eclipse.org/releases/${eclipse-version}</eclipse-site>
 	</properties>
 	
 	<licenses>
@@ -229,28 +222,8 @@
 		</repository>
 		<!-- repositories below here are required for PTP product -->
 		<repository>
-			<id>linuxtools-${linuxtools-version}</id>
-			<url>${linuxtools-site}</url>
-			<layout>p2</layout>
-		</repository>
-		<repository>
-			<id>webtools-${webtools-version}</id>
-			<url>${webtools-site}</url>
-			<layout>p2</layout>
-		</repository>
-		<repository>
-			<id>emf-${emf-version}</id>
-			<url>${emf-site}</url>
-			<layout>p2</layout>
-		</repository>
-		<repository>
-			<id>mylyn-${mylyn-version}</id>
-			<url>${mylyn-site}</url>
-			<layout>p2</layout>
-		</repository>
-		<repository>
-			<id>orbit-${orbit-version}</id>
-			<url>${orbit-site}</url>
+			<id>eclipse-${eclipse-version}</id>
+			<url>${eclipse-site}</url>
 			<layout>p2</layout>
 		</repository>
 	</repositories>
