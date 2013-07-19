@@ -16,7 +16,7 @@
 	<properties>
 		<eclipse-release>kepler</eclipse-release>
 		<tycho-version>0.17.0</tycho-version>
-		<eclipse-version>4.3</eclipse-version>
+		<eclipse-version>kepler</eclipse-version>
 		<eclipse-site>http://download.eclipse.org/releases/${eclipse-version}</eclipse-site>
 		<photran-site>http://download.eclipse.org/tools/ptp/builds/hudson/ptp-release-photran</photran-site>
 		<ptp-build-dir>/home/data/httpd/download.eclipse.org/tools/ptp/builds/hudson/ptp-release-build</ptp-build-dir>
