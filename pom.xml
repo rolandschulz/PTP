@@ -24,6 +24,12 @@
 		<cdt-site>http://download.eclipse.org/tools/cdt/releases/${cdt-version}</cdt-site>	
 		<egit-version>nightly</egit-version>
 		<egit-site>http://download.eclipse.org/egit/updates-${egit-version}</egit-site>
+		<mylyn-version>kepler</mylyn-version>
+		<mylyn-site>http://download.eclipse.org/mylyn/releases/${mylyn-version}</mylyn-site>
+		<linuxtools-version>nightly</linuxtools-version>
+		<linuxtools-site>http://download.eclipse.org/linuxtools/update-${linuxtools-version}</linuxtools-site>
+		<egit-version>nightly</egit-version>
+		<egit-site>http://download.eclipse.org/egit/updates-${egit-version}</egit-site>
 		<photran-site>http://download.eclipse.org/tools/ptp/builds/hudson/ptp-release-photran</photran-site>
 		<ptp-build-dir>/home/data/httpd/download.eclipse.org/tools/ptp/builds/hudson/ptp-release-build</ptp-build-dir>
 	</properties>
@@ -204,6 +210,16 @@
 		<repository>
 			<id>cdt-${cdt-version}</id>
 			<url>${cdt-site}</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>mylyn-${mylyn-version}</id>
+			<url>${mylyn-site}</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>linuxtools-${linuxtools-version}</id>
+			<url>${linuxtools-site}</url>
 			<layout>p2</layout>
 		</repository>
 		<repository>
