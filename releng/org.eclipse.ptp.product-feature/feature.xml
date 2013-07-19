@@ -130,10 +130,6 @@
          version="0.0.0"/>
 
    <includes
-         id="org.eclipse.ptp.pldt.openacc"
-         version="0.0.0"/>
-
-   <includes
          id="org.eclipse.ptp.pldt.upc"
          version="0.0.0"/>
 
