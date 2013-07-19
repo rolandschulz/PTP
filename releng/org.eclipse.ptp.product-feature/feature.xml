@@ -77,65 +77,6 @@
          id="org.eclipse.ptp.rdt.sync.cdt"
          version="0.0.0"/>
 
-   <includes
-         id="org.eclipse.platform"
-         version="0.0.0"
-         search-location="both"/>
-
-   <includes
-         id="org.eclipse.linuxtools.cdt.libhover.feature"
-         version="0.0.0"
-         optional="true"
-         search-location="both"/>
-
-   <includes
-         id="org.eclipse.linuxtools.changelog.c"
-         version="0.0.0"
-         optional="true"
-         search-location="both"/>
-
-   <includes
-         id="org.eclipse.linuxtools.gprof.feature"
-         version="0.0.0"
-         optional="true"
-         search-location="both"/>
-
-   <includes
-         id="org.eclipse.linuxtools.rpm"
-         version="0.0.0"
-         optional="true"
-         search-location="both"/>
-
-   <includes
-         id="org.eclipse.linuxtools.systemtap"
-         version="0.0.0"
-         optional="true"
-         search-location="both"/>
-
-   <includes
-         id="org.eclipse.linuxtools.callgraph.feature"
-         version="0.0.0"
-         optional="true"
-         search-location="both"/>
-
-   <includes
-         id="org.eclipse.linuxtools.valgrind"
-         version="0.0.0"
-         optional="true"
-         search-location="both"/>
-
-   <includes
-         id="org.eclipse.linuxtools.gcov"
-         version="0.0.0"
-         optional="true"
-         search-location="both"/>
-
-   <includes
-         id="org.eclipse.linuxtools.lttng2"
-         version="0.0.0"
-         optional="true"
-         search-location="both"/>
-
    <requires>
       <import feature="org.eclipse.cvs"/>
       <import feature="org.eclipse.equinox.p2.user.ui"/>
@@ -161,6 +102,15 @@
       <import feature="org.eclipse.wst.xml_ui.feature"/>
       <import feature="org.eclipse.egit"/>
       <import feature="org.eclipse.egit.import"/>
+	  <import feature="org.eclipse.linuxtools.cdt.libhover.feature"/>
+	  <import feature="org.eclipse.linuxtools.changelog.c"/>
+	  <import feature="org.eclipse.linuxtools.gprof.feature"/>
+	  <import feature="org.eclipse.linuxtools.rpm"/>
+	  <import feature="org.eclipse.linuxtools.systemtap"/>
+	  <import feature="org.eclipse.linuxtools.callgraph.feature"/>
+	  <import feature="org.eclipse.linuxtools.valgrind"/>
+	  <import feature="org.eclipse.linuxtools.gcov"/>
+	  <import feature="org.eclipse.linuxtools.lttng2"/>
    </requires>
 
    <plugin
