@@ -16,20 +16,8 @@
 	<properties>
 		<eclipse-release>kepler</eclipse-release>
 		<tycho-version>0.17.0</tycho-version>
-		<platform-version>4.3</platform-version>
-		<platform-site>http://download.eclipse.org/eclipse/updates/${platform-version}</platform-site>
-		<tm-version>3.5</tm-version>
-		<tm-site>http://download.eclipse.org/tm/updates/${tm-version}</tm-site>
-		<cdt-version>kepler</cdt-version>
-		<cdt-site>http://download.eclipse.org/tools/cdt/releases/${cdt-version}</cdt-site>	
-		<egit-version>nightly</egit-version>
-		<egit-site>http://download.eclipse.org/egit/updates-${egit-version}</egit-site>
-		<mylyn-version>kepler</mylyn-version>
-		<mylyn-site>http://download.eclipse.org/mylyn/releases/${mylyn-version}</mylyn-site>
-		<linuxtools-version>kepler</linuxtools-version>
-		<linuxtools-site>http://download.eclipse.org/linuxtools/update-${linuxtools-version}</linuxtools-site>
-		<egit-version>nightly</egit-version>
-		<egit-site>http://download.eclipse.org/egit/updates-${egit-version}</egit-site>
+		<eclipse-version>4.3</eclipse-version>
+		<eclipse-site>http://download.eclipse.org/releases/${eclipse-version}</eclipse-site>
 		<photran-site>http://download.eclipse.org/tools/ptp/builds/hudson/ptp-release-photran</photran-site>
 		<ptp-build-dir>/home/data/httpd/download.eclipse.org/tools/ptp/builds/hudson/ptp-release-build</ptp-build-dir>
 	</properties>
@@ -198,38 +186,13 @@
 
 	<repositories>
 		<repository>
-			<id>platform-${platform-version}</id>
-			<url>${platform-site}</url>
-			<layout>p2</layout>
-		</repository>
-		<repository>
-			<id>tm-${tm-version}</id>
-			<url>${tm-site}</url>
-			<layout>p2</layout>
-		</repository>
-		<repository>
-			<id>cdt-${cdt-version}</id>
-			<url>${cdt-site}</url>
-			<layout>p2</layout>
-		</repository>
-		<repository>
-			<id>mylyn-${mylyn-version}</id>
-			<url>${mylyn-site}</url>
-			<layout>p2</layout>
-		</repository>
-		<repository>
-			<id>linuxtools-${linuxtools-version}</id>
-			<url>${linuxtools-site}</url>
-			<layout>p2</layout>
-		</repository>
-		<repository>
-			<id>egit-${egit-version}</id>
-			<url>${egit-site}</url>
-			<layout>p2</layout>
-		</repository>
-		<repository>
 			<id>photran</id>
 			<url>${photran-site}</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>eclipse-${eclipse-version}</id>
+			<url>${eclipse-site}</url>
 			<layout>p2</layout>
 		</repository>
 	</repositories>
