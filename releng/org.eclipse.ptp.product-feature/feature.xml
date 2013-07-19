@@ -3,7 +3,8 @@
       id="org.eclipse.ptp.product"
       label="%featureName"
       version="7.0.2.qualifier"
-      provider-name="%providerName">
+      provider-name="%providerName"
+      plugin="org.eclipse.ptp">
 
    <description url="http://eclipse.org/ptp">
       %description
