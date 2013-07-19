@@ -21,7 +21,7 @@
 		<linuxtools-version>kepler</linuxtools-version>
 		<linuxtools-site>http://download.eclipse.org/linuxtools/update-${linuxtools-version}</linuxtools-site>
 		<orbit-version>R20130118183705</orbit-version>
-		<orbit-site>http://download.eclipse.org/tools/orbit/downloads/drops/${orbit-version}/repository</linuxtools-site>
+		<orbit-site>http://download.eclipse.org/tools/orbit/downloads/drops/${orbit-version}/repository</orbit-site>
 		<egit-version>nightly</egit-version>
 		<egit-site>http://download.eclipse.org/egit/updates-${egit-version}</egit-site>
 		<photran-site>http://download.eclipse.org/tools/ptp/builds/hudson/ptp-release-photran</photran-site>
