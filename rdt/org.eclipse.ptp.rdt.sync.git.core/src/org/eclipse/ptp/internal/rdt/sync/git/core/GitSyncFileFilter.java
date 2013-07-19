@@ -37,8 +37,6 @@ import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.treewalk.WorkingTreeIterator;
 import org.eclipse.jgit.treewalk.filter.IndexDiffFilter;
 import org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter;
-import org.eclipse.ptp.rdt.sync.core.SyncConfig;
-import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 
 /**
@@ -47,8 +45,6 @@ import org.eclipse.ptp.rdt.sync.core.SyncManager;
  * 
  */
 public class GitSyncFileFilter extends AbstractSyncFileFilter {
-	public static final String REMOTE_FILTER_IS_DIRTY = "remote_filter_is_dirty"; //$NON-NLS-1$
-
 	private final JGitRepo jgitRepo;
 
 	private static Set<Character> escapifyCharSet = new HashSet<Character>();
@@ -207,10 +203,6 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 			new IOException(e); // TODO: a bit ugly to wrap it into IOExcpetion
 		} catch (GitAPIException e) {
 			new IOException(e);
-		}
-
-		for (SyncConfig config : SyncConfigManager.getConfigs(jgitRepo.getProject())) {
-			config.setProperty(REMOTE_FILTER_IS_DIRTY, "TRUE"); //$NON-NLS-1$
 		}
 	}
 

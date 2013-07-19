@@ -63,12 +63,13 @@ import org.eclipse.ptp.rdt.sync.core.RecursiveSubMonitor;
 import org.eclipse.ptp.rdt.sync.core.RemoteLocation;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
-import org.eclipse.ptp.rdt.sync.core.exceptions.RemoteExecutionException;
-import org.eclipse.ptp.rdt.sync.core.exceptions.RemoteSyncException;
 import org.eclipse.ptp.remote.core.AbstractRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
+/**
+ * Class for a local Git repository for a particular project and managed by JGit
+ */
 public class JGitRepo {
 	public static final String remoteProjectName = "eclipse_auto"; //$NON-NLS-1$
 
@@ -76,29 +77,22 @@ public class JGitRepo {
 	private Git git;
 	private GitSyncFileFilter fileFilter = null;
 	private boolean mergeMapInitialized = false; // Call "readMergeConflictFiles" at least once before using the map.
-	private final Map<IPath, String[]> FileToMergePartsMap = new HashMap<IPath, String[]>();
-	private final Map<RemoteLocation, TransportGitSsh> RemoteToTransportMap = new HashMap<RemoteLocation, TransportGitSsh>();
+	private final Map<IPath, String[]> fileToMergePartsMap = new HashMap<IPath, String[]>();
+	private final Map<RemoteLocation, TransportGitSsh> remoteToTransportMap = new HashMap<RemoteLocation, TransportGitSsh>();
 
 	/**
-	 * Create a remote sync connection using git. Assumes that the local
-	 * directory exists but not necessarily the remote directory. It is created
-	 * if not.
+	 * Create a new JGit repository instance for the given project - creating resources, such as Git-specific files, if necessary.
 	 * 
-	 * @param conn
-	 * @param localDir
-	 * @param remoteDir
-	 * @throws RemoteSyncException
-	 *             on problems building the remote repository. Specific
-	 *             exception nested. Upon such an exception, the instance is
-	 *             invalid and should not be used.
-	 * @throws MissingConnectionException
-	 *             when connection missing. In this case, the instance is
-	 *             also invalid.
+	 * @param project
+	 *
+	 * @throws GitAPIException
+	 * 				on JGit-specific problems - instance should be considered invalid
+	 * @throws IOException
+	 * 				on file system problems - instance should be considered invalid
 	 */
 	public JGitRepo(IProject proj, IProgressMonitor monitor) throws GitAPIException, IOException {
 		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
 		project = proj;
-		// Build repo, creating it if it is not already present.
 		try {
 			subMon.subTask(Messages.GitRemoteSyncConnection_20);
 			buildRepo(project.getLocation().toOSString(), subMon.newChild(80));
@@ -110,23 +104,16 @@ public class JGitRepo {
 	}
 
 	/**
-	 * 
-	 * @param monitor
+	 * Build the JGit repository - creating resources, such as Git-specific files, if necessary.
+	 *
 	 * @param localDirectory
-	 * @param remoteHost
-	 * @return the repository
+	 * 			Repository location
+	 * @param monitor
+	 * @return
+	 * @throws GitAPIException
+	 * 			on JGit-specific problems
 	 * @throws IOException
-	 *             on problems writing to the file system.
-	 * @throws RemoteExecutionException
-	 *             on failure to run remote commands.
-	 * @throws RemoteSyncException
-	 *             on problems with initial local commit. 
-	 *             TODO: Consider the consequences of exceptions that occur at various points,
-	 *             which can leave the repo in a partial state. For example, if
-	 *             the repo is created but the initial commit fails.
-	 *             TODO: Consider evaluating the output of "git init".
-	 * @throws MissingConnectionException
-	 *             on missing connection.
+	 * 			on file system problems
 	 */
 	private Git buildRepo(String localDirectory, IProgressMonitor monitor) throws GitAPIException, IOException {
 		final RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
@@ -211,56 +198,51 @@ public class JGitRepo {
 	}
 
 	/**
-	 * Replace given file with the most recent version in the repository
+	 * Replace given files with the most recent versions in the repository
 	 * 
-	 * @param path
-	 * @throws RemoteSyncException
+	 * @param paths
+	 * 			Array of paths to checkout
+	 * @throws GitAPIException
+	 * 			on JGit-specific problems
 	 */
-	public void checkout(IPath[] paths) throws RemoteSyncException {
+	public void checkout(IPath[] paths) throws GitAPIException  {
 		CheckoutCommand checkoutCommand = git.checkout();
 		for (IPath p : paths) {
 			checkoutCommand.addPath(p.toString());
 		}
 		checkoutCommand.setStartPoint("HEAD"); //$NON-NLS-1$
-		try {
-			checkoutCommand.call();
-		} catch (GitAPIException e) {
-			throw new RemoteSyncException(e);
-		}
-
+		checkoutCommand.call();
 		doRefresh(project, null);
 	}
 
 	/**
-	 * Replace given file with the most recent local copy of the remote (not necessarily the same as the current remote)
+	 * Replace given files with the most recent local copies from the remote (not necessarily the same as the current remote since
+	 * no transferring of files is done)
 	 * 
-	 * @param path
-	 * @throws RemoteSyncException
+	 * @param paths
+	 * 			Array of paths to replace
+	 * @throws GitAPIException
 	 */
-	public void checkoutRemoteCopy(IPath[] paths) throws RemoteSyncException {
+	public void checkoutRemoteCopy(IPath[] paths) throws GitAPIException {
 		CheckoutCommand checkoutCommand = git.checkout();
 		for (IPath p : paths) {
 			checkoutCommand.addPath(p.toString());
 		}
 		checkoutCommand.setStartPoint("refs/remotes/" + remoteProjectName + "/master"); //$NON-NLS-1$ //$NON-NLS-2$
-		try {
-			checkoutCommand.call();
-		} catch (GitAPIException e) {
-			throw new RemoteSyncException(e);
-		}
-
+		checkoutCommand.call();
 		doRefresh(project, null);
 	}
+
 	/**
-	 * Commit files in working directory. Get the files to be added or removed, call the add and remove command
-ds, and then commit
-	 * if needed.
-	 * 
-	 * @throws RemoteSyncException
-	 *             on problems committing.
+	 * Commit files in working directory.
+	 *
+	 * @param monitor
+	 *
 	 * @return whether any changes were committed
 	 * @throws GitAPIException
+	 * 			on JGit-specific problems
 	 * @throws IOException
+	 * 			on file system problems
 	 */
 	public boolean commit(IProgressMonitor monitor) throws GitAPIException, IOException {
 		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
@@ -312,24 +294,52 @@ ds, and then commit
 		}
 	}
 
-	public void fetch(RemoteLocation remoteLoc, IProgressMonitor monitor) throws NotSupportedException, TransportException {
+	/**
+	 * Fetch files from the given remote. This only transmits the files. It does not update the local repository.
+	 *
+	 * @param remoteLoc
+	 * 			remote location
+	 * @param monitor
+	 *
+	 * @throws TransportException
+	 * 			on problem transferring files
+	 */
+	public void fetch(RemoteLocation remoteLoc, IProgressMonitor monitor) throws TransportException {
 		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
-		TransportGitSsh transport = RemoteToTransportMap.get(remoteLoc);
+		TransportGitSsh transport = remoteToTransportMap.get(remoteLoc);
 		if (transport == null) {
 			transport = this.buildTransport(remoteLoc, subMon.newChild(18));
-			RemoteToTransportMap.put(remoteLoc, transport);
+			remoteToTransportMap.put(remoteLoc, transport);
 		}
-		transport.fetch(new EclipseGitProgressTransformer(subMon.newChild(18)), null);
+		try {
+			transport.fetch(new EclipseGitProgressTransformer(subMon.newChild(18)), null);
+		} catch (NotSupportedException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	public void push(RemoteLocation remoteLoc, IProgressMonitor monitor) throws NotSupportedException, TransportException {
+	/**
+	 * Push local repository changes to remote. (Only committed changes are pushed). Does not update the remote repository.
+	 *
+	 * @param remoteLoc
+	 * 			remote location
+	 * @param monitor
+	 *
+	 * @throws TransportException
+	 *			on problem transferring files
+	 */
+	public void push(RemoteLocation remoteLoc, IProgressMonitor monitor) throws TransportException {
 		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
-		TransportGitSsh transport = RemoteToTransportMap.get(remoteLoc);
+		TransportGitSsh transport = remoteToTransportMap.get(remoteLoc);
 		if (transport == null) {
 			transport = this.buildTransport(remoteLoc, subMon.newChild(18));
-			RemoteToTransportMap.put(remoteLoc, transport);
+			remoteToTransportMap.put(remoteLoc, transport);
 		}
-		transport.push(new EclipseGitProgressTransformer(subMon.newChild(18)), null);
+		try {
+			transport.push(new EclipseGitProgressTransformer(subMon.newChild(18)), null);
+		} catch (NotSupportedException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	// Is the repository currently in a merge state?
@@ -347,14 +357,22 @@ ds, and then commit
 		}
 	}
 
-	// Get the list of merge-conflicted files from jgit and parse each one, storing result in the cache.
-	public boolean readMergeConflictFiles() throws RemoteSyncException {
+	/**
+	 * Find and parse each merge-conflicted file, storing local, remote, and ancestor versions of each file in a cache.
+	 * 
+	 * @return whether any merge conflicts were found
+	 * @throws GitAPIException
+	 * 			on JGit-specific problems
+	 * @throws IOException
+	 * 			on file system problems
+	 */
+	public boolean readMergeConflictFiles() throws GitAPIException, IOException {
 		String repoPath = git.getRepository().getWorkTree().getAbsolutePath();
 		if (!repoPath.endsWith(java.io.File.separator)) { // The documentation does not say if the separator is added...
 			repoPath += java.io.File.separator;
 		}
 
-		FileToMergePartsMap.clear();
+		fileToMergePartsMap.clear();
 		mergeMapInitialized = true;
 
 		RevWalk walk = null;
@@ -407,18 +425,14 @@ ds, and then commit
 				}
 
 				String[] mergeParts = { localContents, remoteContents, ancestorContents };
-				FileToMergePartsMap.put(new Path(s), mergeParts);
+				fileToMergePartsMap.put(new Path(s), mergeParts);
 			}
-		} catch (IOException e) {
-			throw new RemoteSyncException(e);
-		} catch (GitAPIException e) {
-			throw new RemoteSyncException(e);
 		} finally {
 			if (walk != null) {
 				walk.dispose();
 			}
 		}
-		return FileToMergePartsMap.isEmpty();
+		return fileToMergePartsMap.isEmpty();
 	}
 
 	/**
@@ -454,36 +468,48 @@ ds, and then commit
 	}
 
 	/**
-	 * Get the merge-conflicted files
+	 * Get the set of merge-conflicted files
 	 * 
 	 * @return set of project-relative paths of merge-conflicted files.
-	 * @throws RemoteSyncException
-	 *             on problems accessing repository
+	 * @throws GitAPIException
+	 * 			on JGit-specific problems
+	 * @throws IOException
+	 * 			on file system problems 
 	 */
-	public Set<IPath> getMergeConflictFiles() throws RemoteSyncException {
+	public Set<IPath> getMergeConflictFiles() throws GitAPIException, IOException {
 		if (!mergeMapInitialized) {
 			this.readMergeConflictFiles();
 		}
-		return FileToMergePartsMap.keySet();
+		return fileToMergePartsMap.keySet();
 	}
 
 	/**
 	 * Return three strings representing the three parts of the given merge-conflicted file (local, remote, and ancestor,
-	 * respectively)
-	 * or null if the given file is not in a merge conflict.
+	 * respectively) or null if the given file is not in a merge conflict.
 	 * 
 	 * @param localFile
 	 * @return the three parts or null
-	 * @throws RemoteSyncException
-	 *             on problems accessing repository
+	 * @throws GitAPIException
+	 * 			on JGit-specific problems
+	 * @throws IOException
+	 * 			on file system problems 
 	 */
-	public String[] getMergeConflictParts(IFile localFile) throws RemoteSyncException {
+	public String[] getMergeConflictParts(IFile localFile) throws GitAPIException, IOException {
 		if (!mergeMapInitialized) {
 			this.readMergeConflictFiles();
 		}
-		return FileToMergePartsMap.get(localFile.getProjectRelativePath());
+		return fileToMergePartsMap.get(localFile.getProjectRelativePath());
 	}
 
+	/**
+	 * Merge changes previously fetched from a remote repository
+	 *
+	 * @param monitor
+	 * @throws GitAPIException
+	 * 			on JGit-specific problems
+	 * @throws IOException
+	 * 			on file system problems 
+	 */
 	public void merge(IProgressMonitor monitor) throws IOException, GitAPIException {
 		Ref remoteMasterRef = git.getRepository().
 				getRef("refs/remotes/" + remoteProjectName + "/master"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -491,9 +517,14 @@ ds, and then commit
 		mergeCommand.call();
 	}
 
-	public void setFilter(AbstractSyncFileFilter f) {
+	/**
+	 * Set filter for this repository
+	 *
+	 * @param filter
+	 */
+	public void setFilter(AbstractSyncFileFilter filter) {
         fileFilter = new GitSyncFileFilter(this);
-        fileFilter.initialize(f);
+        fileFilter.initialize(filter);
         try {
                 fileFilter.saveFilter();
         } catch (IOException e) {
@@ -502,42 +533,47 @@ ds, and then commit
 	}
 
 	/**
-	 * Add the path to the repository, resolving the merge conflict (if any)
+	 * Add the given path to the repository, resolving the merge conflict (if any)
 	 * 
 	 * @param path
+	 * @throws GitAPIException
+	 * 			on JGit-specific problems
 	 */
-	public void setMergeAsResolved(IPath[] paths) throws RemoteSyncException {
+	public void setMergeAsResolved(IPath[] paths) throws GitAPIException {
 		AddCommand addCommand = git.add();
 		for (IPath p : paths) {
 			addCommand.addFilepattern(p.toString());
 		}
-		try {
-			addCommand.call();
-			// Make sure each file is no longer conflicted before marking as resolved.
-			// Sometimes JGit will silently fail to add.
-			StatusCommand statusCommand = git.status();
-			Status status = statusCommand.call();
-			for (IPath p : paths) {
-				if (!(status.getConflicting().contains(p.toString()))) {
-					FileToMergePartsMap.remove(p);
-				}
+		addCommand.call();
+		// Make sure each file is no longer conflicted before marking as resolved.
+		// Sometimes JGit will silently fail to add.
+		StatusCommand statusCommand = git.status();
+		Status status = statusCommand.call();
+		for (IPath p : paths) {
+			if (!(status.getConflicting().contains(p.toString()))) {
+				fileToMergePartsMap.remove(p);
 			}
-		} catch (GitAPIException e) {
-			throw new RemoteSyncException(e);
 		}
 	}
 
-	// Subclass JGit's generic RemoteSession to set up running of remote
-	// commands using the available process builder.
-	public class PTPSession implements RemoteSession {
+	// Subclass JGit's generic RemoteSession to run commands using the remote location's process builder
+	private class PTPSession implements RemoteSession {
 		private final RemoteLocation remoteLoc;
 		private final URIish uri;
 
+		/**
+		 * Build new session instance for the given remote location
+		 * @param remoteLoc
+		 */
 		public PTPSession(RemoteLocation remoteLoc) {
 			this.remoteLoc = remoteLoc;
 			this.uri = buildURI(remoteLoc.getDirectory());
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.jgit.transport.RemoteSession#exec(java.lang.String, int)
+		 */
 		@Override
 		public Process exec(String command, int timeout) throws TransportException {
 			// TODO: Use a library for command splitting.
@@ -559,9 +595,12 @@ ds, and then commit
 			} catch (MissingConnectionException e) {
 				throw new TransportException(uri, Messages.GitRemoteSyncConnection_3 + e.getConnectionName(), e);
 			}
-
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.jgit.transport.RemoteSession#disconnect()
+		 */
 		@Override
 		public void disconnect() {
 			// Nothing to do
@@ -572,15 +611,15 @@ ds, and then commit
 	 * Creates a new transport object for executing commands at the given remote location.
 	 * 
 	 * @param remoteLocation
-	 *            the remote location
+	 *				the remote location
 	 *            
 	 * @return new transport instance - never null.
+	 * @throws TransportException
+	 *				on problem creating transport
 	 * @throws RuntimeException
-	 *             if the requested transport is not supported by JGit.
+	 *				if the requested transport is not supported by JGit.
 	 */
-	// TODO: Update exception handling = should probably throw TransportException.
-	// See how it is handled in other places.
-	private TransportGitSsh buildTransport(final RemoteLocation remoteLoc, IProgressMonitor monitor) {
+	private TransportGitSsh buildTransport(final RemoteLocation remoteLoc, IProgressMonitor monitor) throws TransportException {
 		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 10);
 		RemoteConfig remoteConfig = buildRemoteConfig(git.getRepository().getConfig());
 		subMon.subTask(Messages.GitRemoteSyncConnection_4);
@@ -590,8 +629,6 @@ ds, and then commit
 			subMon.subTask(Messages.GitRemoteSyncConnection_8);
 			transport = (TransportGitSsh) Transport.open(git.getRepository(), uri);
 		} catch (NotSupportedException e) {
-			throw new RuntimeException(e);
-		} catch (TransportException e) {
 			throw new RuntimeException(e);
 		} finally {
 			if (monitor != null) {
@@ -631,12 +668,19 @@ ds, and then commit
 		                                                                          // 315720 has to be fixed
 	}
 
+	/**
+	 * Releases all resources allocated by this JGit repository instance, including closing all transport objects and closing the
+	 * repository itself. Instance should not be used after calling this method.
+	 */
 	public void close() {
-		for (TransportGitSsh t : RemoteToTransportMap.values()) {
+		for (TransportGitSsh t : remoteToTransportMap.values()) {
 			t.close();
 		}
-		RemoteToTransportMap.clear();
+		remoteToTransportMap.clear();
 		git.getRepository().close();
+		git = null;
+		fileFilter = null;
+		fileToMergePartsMap.clear();
 	}
 
 	// Refresh the workspace after creating new local files

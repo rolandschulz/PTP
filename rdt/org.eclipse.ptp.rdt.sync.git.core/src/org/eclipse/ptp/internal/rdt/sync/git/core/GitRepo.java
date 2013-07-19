@@ -44,6 +44,10 @@ import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
+/**
+ * Class for a "remote" (external) Git repository - a repository synchronized to a local Eclipse project and handled by executing
+ * C git commands on the host.
+ */
 public class GitRepo {
 	public static final String gitArgs = "--git-dir=" + GitSyncService.gitDir + " --work-tree=."; //$NON-NLS-1$ //$NON-NLS-2$
 	private static final String instanceScopeSyncNode = "org.eclipse.ptp.rdt.sync.core"; //$NON-NLS-1$
@@ -54,22 +58,18 @@ public class GitRepo {
 	private int remoteGitVersion;
 
 	/**
-	 * Create a remote sync connection using git. Assumes that the local
-	 * directory exists but not necessarily the remote directory. It is created
-	 * if not.
-	 * 
-	 * @param project
-	 * 				Not stored - only needed for initializing remote file filtering.
+	 * Create a new Git repository to the specified host, initialized with the given local JGit repository.
+	 * See {@code buildRepo} for more details.
+	 *
+	 * @param localRepo
+	 * 				not stored and only needed for initializing file filtering.
 	 * @param rl
 	 * 				remote location information
-	 * @param IProgressMonitor
+	 * @param monitor
 	 * @throws RemoteSyncException
-	 *             on problems building the remote repository. Specific
-	 *             exception nested. Upon such an exception, the instance is
-	 *             invalid and should not be used.
+	 *             on problems building the remote repository (specific exception is nested). The instance is invalid.
 	 * @throws MissingConnectionException
-	 *             when connection missing. In this case, the instance is
-	 *             also invalid.
+	 *             when connection missing. The instance is invalid.
 	 */
 	public GitRepo(JGitRepo localRepo, RemoteLocation rl, IProgressMonitor monitor)
 			throws RemoteSyncException, MissingConnectionException {
@@ -96,11 +96,12 @@ public class GitRepo {
 	}
 
 	/**
-	 * 
+	 * Create the Git repository - creating directories, Git-specific files, and other resources as needed.
+	 *
+	 * @param localRepo
+	 *				The local JGit repository used only for initializing file filtering.
 	 * @param monitor
-	 * @param localDirectory
-	 * @param remoteHost
-	 * @return the repository
+	 *
 	 * @throws IOException
 	 *             on problems writing to the file system.
 	 * @throws RemoteExecutionException
@@ -132,7 +133,8 @@ public class GitRepo {
 			doInit(subMon.newChild(5));
 
 			subMon.subTask(Messages.GitRemoteSyncConnection_27);
-			commitRemoteFiles(localRepo, subMon.newChild(5));
+			uploadFilter(localRepo, subMon.newChild(5));
+			commitRemoteFiles(subMon.newChild(5));
 		} finally {
 			if (monitor != null) {
 				monitor.done();
@@ -141,9 +143,8 @@ public class GitRepo {
 	}
 
 	/**
-	 * Create and configure repository if it is not already present. Note
-	 * that "git init" is "safe" on a repo already created, so we can simply
-	 * rerun it each time.
+	 * Create and configure repository if it is not already present. Note that "git init" is "safe" on a repo already created, so
+	 * we can simply rerun it each time.
 	 * 
 	 * @param monitor
 	 * @throws IOException
@@ -152,7 +153,7 @@ public class GitRepo {
 	 * @throws MissingConnectionException
 	 * @return whether this repo already existed
 	 */
-	private boolean doInit(IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException,
+	private void doInit(IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException,
 			MissingConnectionException {
 		try {
 			String commands = "git --git-dir=" + GitSyncService.gitDir + " init && " + //$NON-NLS-1$ //$NON-NLS-2$
@@ -170,17 +171,6 @@ public class GitRepo {
 			if (commandResults.getExitCode() != 0) {
 				throw new RemoteExecutionException(Messages.GRSC_GitInitFailure + commandResults.getStderr());
 			}
-
-			// Pattern matching is error prone, of course, so make this more
-			// likely to return false. This will cause all files to be
-			// added, which is better than leaving all files untracked. This is
-			// better for users without knowledge of git, who would
-			// likely not be connecting to a previous git repo.
-			if (commandResults.getStdout().contains("existing")) { //$NON-NLS-1$
-				return true;
-			} else {
-				return false;
-			}
 		} finally {
 			if (monitor != null) {
 				monitor.done();
@@ -188,58 +178,84 @@ public class GitRepo {
 		}
 	}
 
-	/*
-	 * Do a "git commit" on the remote host
+	/**
+	 * Upload the file filter from the given JGit repository
+	 *
+	 * @param localJGitRepo
+	 * @param monitor
+	 *
+	 * @throws MissingConnectionException
+	 * 			on missing connection
+	 * @throws RemoteSyncException
+	 * 			on problems executing remote commands
 	 */
-	public void commitRemoteFiles(JGitRepo localJGitRepo, IProgressMonitor monitor) throws RemoteSyncException, MissingConnectionException {
+	public void uploadFilter(JGitRepo localJGitRepo, IProgressMonitor monitor) throws MissingConnectionException, RemoteSyncException {
+		IRemoteConnection conn = remoteLoc.getConnection();
+		IRemoteServices remoteServices = conn.getRemoteServices();
+		Repository repository = localJGitRepo.getRepository();
+
 		try {
-			// TODO: Fix loss of filter storage area.
-			String property = null;
-			// String property = remoteLoc.getProperty(GitSyncFileFilter.REMOTE_FILTER_IS_DIRTY);
-			if (property==null || property.equals("TRUE")) { //$NON-NLS-1$
-				IRemoteConnection conn = remoteLoc.getConnection();
-				IRemoteServices remoteServices = conn.getRemoteServices();
-				Repository repository = localJGitRepo.getRepository();
-				
-				//copy info/exclude to remote
-				File exclude = repository.getFS().resolve(repository.getDirectory(),
-						Constants.INFO_EXCLUDE);
-				IFileStore local = EFS.getLocalFileSystem().getStore(new Path(exclude.getAbsolutePath()));
-				String remoteExclude = remoteLoc.getDirectory() + "/" + GitSyncService.gitDir + "/" + Constants.INFO_EXCLUDE;  //$NON-NLS-1$ //$NON-NLS-2$
-				IFileStore remote = remoteServices.getFileManager(conn).getResource(remoteExclude);
-				local.copy(remote, EFS.OVERWRITE, monitor);
-				
-				//remove ignored files from index
-				if (remoteGitVersion>=1080102) {
-					final String  command = gitCommand() + " ls-files -X " + GitSyncService.gitDir + "/" + Constants.INFO_EXCLUDE + " -i | " + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-							gitCommand() + " update-index --force-remove --stdin ; " + //$NON-NLS-1$
-							gitCommand() + " commit --allow-empty -m \"" + GitSyncService.commitMessage + "\""; //$NON-NLS-1$ //$NON-NLS-2$
-					CommandResults commandResults = this.executeRemoteCommand(command, monitor);
-					if (commandResults.getExitCode() != 0) {
-						throw new RemoteSyncException(Messages.GRSC_GitRemoveFilteredFailure1 + commandResults.getStderr());
-					}
-				} else {
-					final String  command = gitCommand() + " rev-parse HEAD"; //$NON-NLS-1$
-					CommandResults commandResults = this.executeRemoteCommand(command, monitor); 
-					ObjectId objectId = null;
-					if (commandResults.getExitCode()==0)
-						objectId = repository.resolve(commandResults.getStdout().trim());
-					RevTree ref=null;
-					try {
-						if (objectId!=null)
-							ref = new RevWalk(repository).parseTree(objectId);
-					} catch (Exception e){
-						//ignore. Can happen if the local repo doesn't yet have the remote commit
-					}
-					if (ref!=null) {
-						Set<String> filesToRemove = localJGitRepo.getFilter().getIgnoredFiles(ref);
-						deleteRemoteFiles(filesToRemove,monitor);
-					}
+			//copy info/exclude to remote
+			File exclude = repository.getFS().resolve(repository.getDirectory(),
+					Constants.INFO_EXCLUDE);
+			IFileStore local = EFS.getLocalFileSystem().getStore(new Path(exclude.getAbsolutePath()));
+			String remoteExclude = remoteLoc.getDirectory() + "/" + GitSyncService.gitDir + "/" + Constants.INFO_EXCLUDE;  //$NON-NLS-1$ //$NON-NLS-2$
+			IFileStore remote = remoteServices.getFileManager(conn).getResource(remoteExclude);
+			local.copy(remote, EFS.OVERWRITE, monitor);
+
+			//remove ignored files from index
+			if (remoteGitVersion>=1080102) {
+				final String  command = gitCommand() + " ls-files -X " + GitSyncService.gitDir + "/" + Constants.INFO_EXCLUDE + " -i | " + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						gitCommand() + " update-index --force-remove --stdin ; " + //$NON-NLS-1$
+						gitCommand() + " commit --allow-empty -m \"" + GitSyncService.commitMessage + "\""; //$NON-NLS-1$ //$NON-NLS-2$
+				CommandResults commandResults = this.executeRemoteCommand(command, monitor);
+				if (commandResults.getExitCode() != 0) {
+					throw new RemoteSyncException(Messages.GRSC_GitRemoveFilteredFailure1 + commandResults.getStderr());
 				}
-				// remoteLoc.setProperty(GitSyncFileFilter.REMOTE_FILTER_IS_DIRTY, "FALSE"); //$NON-NLS-1$
+			} else {
+				final String  command = gitCommand() + " rev-parse HEAD"; //$NON-NLS-1$
+				CommandResults commandResults = this.executeRemoteCommand(command, monitor); 
+				ObjectId objectId = null;
+				if (commandResults.getExitCode()==0)
+					objectId = repository.resolve(commandResults.getStdout().trim());
+				RevTree ref=null;
+				try {
+					if (objectId!=null)
+						ref = new RevWalk(repository).parseTree(objectId);
+				} catch (Exception e){
+					//ignore. Can happen if the local repo doesn't yet have the remote commit
+				}
+				if (ref!=null) {
+					Set<String> filesToRemove = localJGitRepo.getFilter().getIgnoredFiles(ref);
+					deleteRemoteFiles(filesToRemove,monitor);
+				}
 			}
-			
-		    final String command = gitCommand() + " ls-files -X " + GitSyncService.gitDir + "/" + Constants.INFO_EXCLUDE + " -o -m | " + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		} catch(RemoteConnectionException e) {
+			throw new RemoteSyncException(e);
+		} catch (CoreException e) {
+			throw new RemoteSyncException(e);
+		} catch (IOException e) {
+			throw new RemoteSyncException(e);
+		} catch (InterruptedException e) {
+			throw new RemoteSyncException(e);
+		} catch (RemoteExecutionException e) {
+			throw new RemoteSyncException(e);
+		}
+	}
+
+	/**
+	 * Commit changed files on the remote to the remote Git repository
+	 *
+	 * @param monitor
+	 *
+	 * @throws MissingConnectionException
+	 * 			if the connection is unresolved
+	 * @throws RemoteSyncException
+	 * 			on problems executing the necessary remote commands.
+	 */
+	public void commitRemoteFiles(IProgressMonitor monitor) throws MissingConnectionException, RemoteSyncException {
+		try {
+			final String command = gitCommand() + " ls-files -X " + GitSyncService.gitDir + "/" + Constants.INFO_EXCLUDE + " -o -m | " + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					gitCommand() + " update-index --add --remove --stdin ; " + //$NON-NLS-1$
 					gitCommand() + " commit -m \"" + GitSyncService.commitMessage + "\""; //$NON-NLS-1$ //$NON-NLS-2$
 			CommandResults commandResults = this.executeRemoteCommand(command, monitor);
@@ -253,8 +269,6 @@ public class GitRepo {
 		} catch (IOException e) {
 			throw new RemoteSyncException(e);
 		} catch (CoreException e) {
-			throw new RemoteSyncException(e);
-		} catch (RemoteExecutionException e) {
 			throw new RemoteSyncException(e);
 		} finally {
 			if (monitor != null) {
@@ -300,17 +314,33 @@ public class GitRepo {
     	}
     }
 
-    public void merge(IProgressMonitor monitor) throws RemoteSyncException, IOException, InterruptedException,
-    RemoteConnectionException, MissingConnectionException {
+    /**
+     * Merge files that have been pushed to the remote
+     *
+     * @param monitor
+     *
+     * @throws RemoteSyncException
+	 * 			on problems executing the necessary remote commands.
+	 * @throws MissingConnectionException
+	 * 			if the connection is unresolved
+     */
+    public void merge(IProgressMonitor monitor) throws RemoteSyncException, MissingConnectionException {
 		CommandResults mergeResults;
 		// ff-only prevents accidental corruption of the remote repository but is supported only in recent Git versions.
 		// final String command = gitCommand + " merge --ff-only " + remotePushBranch; //$NON-NLS-1$
 		final String command = gitCommand() + " merge " + GitSyncService.remotePushBranch; //$NON-NLS-1$
 
-		mergeResults = this.executeRemoteCommand(command, monitor);
-		if (mergeResults.getExitCode() != 0) {
-			throw new RemoteSyncException(new RemoteExecutionException(Messages.GRSC_GitMergeFailure
-					+ mergeResults.getStderr()));
+		try {
+			mergeResults = this.executeRemoteCommand(command, monitor);
+			if (mergeResults.getExitCode() != 0) {
+				throw new RemoteSyncException(new RemoteExecutionException(Messages.GRSC_GitMergeFailure + mergeResults.getStderr()));
+			}
+		} catch (IOException e) {
+			throw new RemoteSyncException(e);
+		} catch (InterruptedException e) {
+			throw new RemoteSyncException(e);
+		} catch (RemoteConnectionException e) {
+			throw new RemoteSyncException(e);
 		}
     }
 
@@ -342,12 +372,26 @@ public class GitRepo {
 		return gitBinary + " " + gitArgs; //$NON-NLS-1$
 	}
 
+	/**
+	 * Get the remote location of this repository
+	 * @return remote location
+	 */
 	public RemoteLocation getRemoteLocation() {
 		return remoteLoc;
 	}
 
-	public int getRemoteGitVersion(IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException,
-	MissingConnectionException {
+	/**
+	 * Return the Git version used for this repository
+	 *
+	 * @param monitor
+	 * @return Git version as a single int in the format: MMMmmmrrr (Major, minor, and revision)
+	 *
+	 * @throws IOException
+	 * @throws RemoteExecutionException
+	 * @throws RemoteSyncException
+	 * @throws MissingConnectionException
+	 */
+	public int getRemoteGitVersion(IProgressMonitor monitor) throws RemoteSyncException, MissingConnectionException {
 		String command = gitCommand() + " --version"; //$NON-NLS-1$
 		CommandResults commandResults = null;
 
@@ -357,9 +401,11 @@ public class GitRepo {
 			IRemoteConnection conn = remoteLoc.getConnection();
 			commandResults = CommandRunner.executeRemoteCommand(conn, command, null, monitor);
 		} catch (final InterruptedException e) {
-			throw new RemoteExecutionException(e);
+			throw new RemoteSyncException(new RemoteExecutionException(e));
 		} catch (RemoteConnectionException e) {
-			throw new RemoteExecutionException(e);
+			throw new RemoteSyncException(new RemoteExecutionException(e));
+		} catch (IOException e) {
+			throw new RemoteSyncException(e);
 		} finally {
 			if (monitor != null) {
 				monitor.done();
@@ -367,7 +413,7 @@ public class GitRepo {
 		}
 
 		if (commandResults.getExitCode() != 0) {
-			throw new RemoteExecutionException(Messages.GRSC_GitInitFailure + commandResults.getStderr());
+			throw new RemoteSyncException(new RemoteExecutionException(Messages.GRSC_GitInitFailure + commandResults.getStderr()));
 		}
 
 		Matcher m = Pattern.compile("git version ([0-9]+)\\.([0-9]+)\\.([0-9]+)\\.?([0-9]*)").matcher(commandResults.getStdout().trim()); //$NON-NLS-1$

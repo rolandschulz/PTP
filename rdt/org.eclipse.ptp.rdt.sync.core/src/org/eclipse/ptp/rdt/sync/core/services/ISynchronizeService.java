@@ -99,7 +99,9 @@ public interface ISynchronizeService extends ISynchronizeServiceDescriptor {
 	 * Perform synchronization
 	 * 
 	 * @param project
-	 *            project to sync
+	 *            project to sync - cannot be null
+	 * @param remoteLoc
+	 *			  remote sync target - cannot be null
 	 * @param delta
 	 *            resources requiring synchronization
 	 * @param monitor
