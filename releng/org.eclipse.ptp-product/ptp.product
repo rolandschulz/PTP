@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="%productName" uid="ptp" id="org.eclipse.ptp.product" application="org.eclipse.ui.ide.workbench" version="7.0.2" useFeatures="true" includeLaunchers="true">
+<product name="Eclipse for Parallel Application Developers" uid="ptp" id="org.eclipse.ptp.product" application="org.eclipse.ui.ide.workbench" version="7.0.2" useFeatures="true" includeLaunchers="true">
 
    <aboutInfo>
       <image path="/org.eclipse.ptp/ptp_logo_icon32.png"/>
@@ -14,7 +14,7 @@
    </configIni>
 
    <launcherArgs>
-      <programArgs>-product org.eclipse.epp.package.parallel.product
+      <programArgs>-product org.eclipse.ptp.product
 --launcher.defaultAction openFile</programArgs>
       <programArgsWin>--launcher.XXMaxPermSize
 256M</programArgsWin>
@@ -38,7 +38,7 @@
       startupProgressRect="0,280,455,15"
       startupMessageRect="7,220,441,20"
       startupForegroundColor="C8D5EA" />
-   <launcher name="Eclipse">
+   <launcher name="eclipse">
       <macosx icon="/icons/icon.icns"/>
       <solaris/>
       <win useIco="false">
@@ -69,6 +69,7 @@
       <plugin id="org.eclipse.equinox.ds" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.update.configurator" autoStart="true" startLevel="3" />
       <property name="osgi.instance.area.default" value="@user.home/Documents/workspace" />
+      <property name="osgi.splashPath" value="platform:/base/plugins/org.eclipse.platform" />
    </configurations>
 
 </product>

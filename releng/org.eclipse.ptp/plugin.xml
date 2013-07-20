@@ -7,10 +7,10 @@
          point="org.eclipse.core.runtime.products">
       <product
             application="org.eclipse.ui.ide.workbench"
-            name="%productName">
+            name="Eclipse">
          <property
                name="appName"
-               value="%productName">
+               value="Eclipse">
          </property>
          <property
                name="aboutText"

@@ -53,7 +53,7 @@
 				<version>${tycho-version}</version>
 				<configuration>
 					<createArtifactRepository>false</createArtifactRepository>
-					<!--includeAllDependencies>true</includeAllDependencies-->
+					<includeAllDependencies>true</includeAllDependencies>
 				</configuration>
 			</plugin>
 			<plugin>
