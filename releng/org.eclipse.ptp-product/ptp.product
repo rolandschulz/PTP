@@ -1,26 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="Eclipse for Parallel Application Developers" uid="ptp" id="org.eclipse.ptp.product" application="org.eclipse.ui.ide.workbench" version="7.0.2" useFeatures="true" includeLaunchers="true">
+<product name="%productName" uid="ptp" id="org.eclipse.ptp.product" application="org.eclipse.ui.ide.workbench" version="7.0.2" useFeatures="true" includeLaunchers="true">
 
    <aboutInfo>
       <image path="/org.eclipse.ptp/ptp_logo_icon32.png"/>
       <text>
-         Eclipse for Parallel Application Developers
-
-Version: Kepler Release
-Build id: {0}
-
-(c) Copyright Eclipse contributors and others 2000, 2013.  All rights reserved.
-Visit http://eclipse.org/
-
-This product includes software developed by the
-Apache Software Foundation http://apache.org/
+         %aboutText
       </text>
    </aboutInfo>
 
    <configIni use="default">
-      <macosx>/org.eclipse.ptp-product/configs/macosx/config.ini</macosx>
    </configIni>
 
    <launcherArgs>
@@ -64,6 +54,7 @@ Apache Software Foundation http://apache.org/
       <solaris include="true">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6</solaris>
       <windows include="true">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6</windows>
    </vm>
+
 
    <plugins>
    </plugins>

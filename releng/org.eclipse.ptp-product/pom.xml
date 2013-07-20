@@ -69,8 +69,8 @@
 					<products>
 						<product>
 							<id>ptp</id>
-							<!--rootFolder>eclipse</rootFolder>
-							<rootFolders>
+							<rootFolder>eclipse</rootFolder>
+							<!--rootFolders>
 								<macosx>Eclipse.app</macosx>
 							</rootFolders-->
 						</product>

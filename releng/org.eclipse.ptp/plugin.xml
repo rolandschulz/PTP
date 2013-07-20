@@ -7,26 +7,26 @@
          point="org.eclipse.core.runtime.products">
       <product
             application="org.eclipse.ui.ide.workbench"
-            name="Eclipse for Parallel Application Developers">
+            name="%productName">
          <property
                name="appName"
-               value="Eclipse for Parallel Application Developers">
+               value="%productName">
          </property>
          <property
                name="aboutText"
-               value="Specified in the plugin.xml of the branding plugin.">
+               value="%aboutText">
          </property>
          <property
                name="startupForegroundColor"
-               value="FEFFFE">
+               value="C8D5EA">
          </property>
          <property
                name="startupProgressRect"
-               value="5,310,445,15">
+               value="0,280,455,15">
          </property>
          <property
                name="startupMessageRect"
-               value="7,280,445,20">
+               value="7,220,441,20">
          </property>
          <property
                name="preferenceCustomization"
@@ -41,7 +41,7 @@
               value="product:intro-eclipse.png"/>
          <property
                name="introTitle"
-               value="Welcome to Eclipse for Parallel Application Developers">
+               value="%productIntroTitle">
          </property>
          <property
                name="introBrandingImageText"
@@ -55,7 +55,18 @@
                name="applicationCSSResources" 
                value="platform:/plugin/org.eclipse.platform/images/"> 
          </property>
+         <property
+               name="aboutImage"
+               value="ptp_logo_icon32.png">
+         </property>
       </product>
+   </extension>
+   <extension
+         point="org.eclipse.ui.intro">
+      <introProductBinding
+            introId="org.eclipse.ui.intro.universal"
+            productId="org.eclipse.ptp.product">
+      </introProductBinding>
    </extension>
 
 </plugin>
