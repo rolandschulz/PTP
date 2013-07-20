@@ -3,8 +3,7 @@
       id="org.eclipse.ptp.remote.rse"
       label="%featureName"
       version="7.0.2.qualifier"
-      provider-name="%providerName"
-      plugin="org.eclipse.ptp.remote.rse.core">
+      provider-name="%providerName">
 
    <description url="http://eclipse.org/ptp">
       %description

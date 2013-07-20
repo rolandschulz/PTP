@@ -732,7 +732,6 @@ public class LaunchController implements ILaunchController {
 	 * @return whether the script target should be deleted
 	 */
 	private boolean maybeHandleScript(String uuid, ScriptType script, IProgressMonitor monitor) {
-		SubMonitor progress = SubMonitor.convert(monitor, 10);
 		AttributeType a = getRMVariableMap().get(JAXBControlConstants.SCRIPT_PATH);
 		if (a != null && a.getValue() != null) {
 			return false;
@@ -740,19 +739,14 @@ public class LaunchController implements ILaunchController {
 		if (script == null) {
 			return false;
 		}
-		IRemoteConnection conn = getRemoteConnection(progress.newChild(5));
-		if (conn != null) {
-			getRMVariableMap().setEnvManagerFromConnection(conn);
-			ScriptHandler job = new ScriptHandler(uuid, script, getRMVariableMap(), launchEnv, false);
-			job.schedule();
-			try {
-				job.join();
-			} catch (InterruptedException ignored) {
-				// Ignore
-			}
-			return script.isDeleteAfterSubmit();
+		ScriptHandler job = new ScriptHandler(uuid, script, getRMVariableMap(), launchEnv, false);
+		job.schedule();
+		try {
+			job.join();
+		} catch (InterruptedException ignored) {
+			// Ignore
 		}
-		return false;
+		return script.isDeleteAfterSubmit();
 	}
 
 	/**
@@ -1049,6 +1043,7 @@ public class LaunchController implements ILaunchController {
 				conn.addConnectionChangeListener(connectionListener);
 			}
 
+			getRMVariableMap().setEnvManagerFromConnection(conn);
 			setFixedConfigurationProperties(conn);
 			setConnectionPropertyAttributes(conn);
 

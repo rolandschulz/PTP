@@ -3,8 +3,7 @@
       id="org.eclipse.ptp.pldt"
       label="%featureName"
       version="7.0.2.qualifier"
-      provider-name="%providerName"
-      plugin="org.eclipse.ptp.pldt.common">
+      provider-name="%providerName">
 
    <description>
       %description
