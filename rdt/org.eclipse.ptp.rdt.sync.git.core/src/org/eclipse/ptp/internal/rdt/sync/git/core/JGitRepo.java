@@ -57,7 +57,6 @@ import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.util.FS;
 import org.eclipse.ptp.internal.rdt.sync.git.core.GitSyncFileFilter.DiffFiles;
-import org.eclipse.ptp.internal.rdt.sync.git.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.RecursiveSubMonitor;
 import org.eclipse.ptp.rdt.sync.core.RemoteLocation;
@@ -91,11 +90,9 @@ public class JGitRepo {
 	 * 				on file system problems - instance should be considered invalid
 	 */
 	public JGitRepo(IProject proj, IProgressMonitor monitor) throws GitAPIException, IOException {
-		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
 		project = proj;
 		try {
-			subMon.subTask(Messages.GitRemoteSyncConnection_20);
-			buildRepo(project.getLocation().toOSString(), subMon.newChild(80));
+			buildRepo(project.getLocation().toOSString(), monitor);
 		} finally {
 			if (monitor != null) {
 				monitor.done();
@@ -116,10 +113,8 @@ public class JGitRepo {
 	 * 			on file system problems
 	 */
 	private Git buildRepo(String localDirectory, IProgressMonitor monitor) throws GitAPIException, IOException {
-		final RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
+		final RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 10);
 		try {
-			subMon.subTask(Messages.GitRemoteSyncConnection_1);
-
 			// Get local Git repository, creating it if necessary.
 			File localDir = new File(localDirectory);
 			FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
@@ -134,13 +129,14 @@ public class JGitRepo {
 				fileFilter.loadFilter();
 			}
 			git = new Git(repository);
+			subMon.worked(5);
 			
             // An initial commit to create the master branch.
-            subMon.subTask(Messages.GitRemoteSyncConnection_22);
+            subMon.subTask("Initial commit of local files");
             commit(subMon.newChild(4));
 
 			// Refresh project
-			subMon.subTask(Messages.GitRemoteSyncConnection_23);
+			subMon.subTask("Refreshing workspace");
 			final Thread refreshThread = doRefresh(project, subMon.newChild(1));
 
 			// Set git repo as derived, which can only be done after refresh completes.
@@ -245,14 +241,14 @@ public class JGitRepo {
 	 * 			on file system problems
 	 */
 	public boolean commit(IProgressMonitor monitor) throws GitAPIException, IOException {
-		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
+		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 10);
 		
 		boolean addedOrRemovedFiles = false;
 
 		try {
 			DiffFiles diffFiles = fileFilter.getDiffFiles();
 			
-			subMon.subTask(Messages.GitRemoteSyncConnection_9);
+			subMon.subTask("Adding files");
 			if (!diffFiles.added.isEmpty()) {
 				final AddCommand addCommand = git.add();
 				//Bug 401161 doesn't matter here because files are already filtered anyhow. It would be OK
@@ -264,9 +260,9 @@ public class JGitRepo {
 				addCommand.call();
 				addedOrRemovedFiles = true;
 			}
-			subMon.worked(10);
+			subMon.worked(3);
 
-			subMon.subTask(Messages.GitRemoteSyncConnection_10);
+			subMon.subTask("Removing files");
 			if (!diffFiles.removed.isEmpty()) {
 				final RmCommandCached rmCommand = new RmCommandCached(git.getRepository());
 				for (String fileName : diffFiles.removed) {
@@ -275,10 +271,10 @@ public class JGitRepo {
 				rmCommand.call();
 				addedOrRemovedFiles = true;
 			}
-			subMon.worked(10);
+			subMon.worked(3);
 
 			// Check if a commit is required.
-			subMon.subTask(Messages.GitRemoteSyncConnection_11);
+			subMon.subTask("Committing changes");
 			if (addedOrRemovedFiles || inMergeState()) {
 				final CommitCommand commitCommand = git.commit();
 				commitCommand.setMessage(GitSyncService.commitMessage);
@@ -305,14 +301,19 @@ public class JGitRepo {
 	 * 			on problem transferring files
 	 */
 	public void fetch(RemoteLocation remoteLoc, IProgressMonitor monitor) throws TransportException {
-		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
+		int work = 10;
+		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, work);
 		TransportGitSsh transport = remoteToTransportMap.get(remoteLoc);
 		if (transport == null) {
-			transport = this.buildTransport(remoteLoc, subMon.newChild(18));
+			work /= 2;
+			subMon.subTask("Building connection to remote");
+			transport = this.buildTransport(remoteLoc, subMon.newChild(work));
 			remoteToTransportMap.put(remoteLoc, transport);
 		}
+
 		try {
-			transport.fetch(new EclipseGitProgressTransformer(subMon.newChild(18)), null);
+			subMon.subTask("Fetching remote changes");
+			transport.fetch(new EclipseGitProgressTransformer(subMon.newChild(work)), null);
 		} catch (NotSupportedException e) {
 			throw new RuntimeException(e);
 		}
@@ -329,14 +330,18 @@ public class JGitRepo {
 	 *			on problem transferring files
 	 */
 	public void push(RemoteLocation remoteLoc, IProgressMonitor monitor) throws TransportException {
-		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
+		int work = 10;
+		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, work);
 		TransportGitSsh transport = remoteToTransportMap.get(remoteLoc);
 		if (transport == null) {
-			transport = this.buildTransport(remoteLoc, subMon.newChild(18));
+			work /= 2;
+			subMon.subTask("Building connection to remote");
+			transport = this.buildTransport(remoteLoc, subMon.newChild(work));
 			remoteToTransportMap.put(remoteLoc, transport);
 		}
 		try {
-			transport.push(new EclipseGitProgressTransformer(subMon.newChild(18)), null);
+			subMon.subTask("Pushing local changes to remote");
+			transport.push(new EclipseGitProgressTransformer(subMon.newChild(work)), null);
 		} catch (NotSupportedException e) {
 			throw new RuntimeException(e);
 		}
@@ -511,10 +516,18 @@ public class JGitRepo {
 	 * 			on file system problems 
 	 */
 	public void merge(IProgressMonitor monitor) throws IOException, GitAPIException {
+		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 10);
+		try {
 		Ref remoteMasterRef = git.getRepository().
 				getRef("refs/remotes/" + remoteProjectName + "/master"); //$NON-NLS-1$ //$NON-NLS-2$
 		final MergeCommand mergeCommand = git.merge().include(remoteMasterRef);
+		subMon.subTask("Merging remote changes");
 		mergeCommand.call();
+		} finally {
+			if (monitor != null) {
+				monitor.done();
+			}
+		}
 	}
 
 	/**
@@ -528,7 +541,7 @@ public class JGitRepo {
         try {
                 fileFilter.saveFilter();
         } catch (IOException e) {
-                Activator.log(Messages.JGitRepo_0 + project.getName(), e);
+                Activator.log("Unable to save file filter for project: " + project.getName(), e);
         }
 	}
 
@@ -593,7 +606,7 @@ public class JGitRepo {
 			} catch (RemoteConnectionException e) {
 				throw new TransportException(uri, e.getMessage(), e);
 			} catch (MissingConnectionException e) {
-				throw new TransportException(uri, Messages.GitRemoteSyncConnection_3 + e.getConnectionName(), e);
+				throw new TransportException(uri, "Missing connection: " + e.getConnectionName(), e);
 			}
 		}
 
@@ -622,11 +635,10 @@ public class JGitRepo {
 	private TransportGitSsh buildTransport(final RemoteLocation remoteLoc, IProgressMonitor monitor) throws TransportException {
 		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 10);
 		RemoteConfig remoteConfig = buildRemoteConfig(git.getRepository().getConfig());
-		subMon.subTask(Messages.GitRemoteSyncConnection_4);
 		final URIish uri = buildURI(remoteLoc.getDirectory());
 		TransportGitSsh transport;
 		try {
-			subMon.subTask(Messages.GitRemoteSyncConnection_8);
+			subMon.subTask("Opening transport mechanism");
 			transport = (TransportGitSsh) Transport.open(git.getRepository(), uri);
 		} catch (NotSupportedException e) {
 			throw new RuntimeException(e);
@@ -686,14 +698,14 @@ public class JGitRepo {
 	// Refresh the workspace after creating new local files
 	// Bug 374409 - run refresh in a separate thread to avoid possible deadlock from locking both the sync lock and the
 	// workspace lock.
-	private static Thread doRefresh(final IProject project, final IProgressMonitor subMon) {
+	private static Thread doRefresh(final IProject project, final IProgressMonitor monitor) {
 		Thread refreshWorkspaceThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				try {
-					project.refreshLocal(IResource.DEPTH_INFINITE, subMon);
+					project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 				} catch (CoreException e) {
-					Activator.log(Messages.GitRemoteSyncConnection_0, e);
+					Activator.log("Unable to refresh workspace", e);
 				}
 			}
 		}, "Refresh workspace thread"); //$NON-NLS-1$

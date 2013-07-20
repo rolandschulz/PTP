@@ -31,7 +31,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.TransportException;
-import org.eclipse.ptp.internal.rdt.sync.git.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.RecursiveSubMonitor;
 import org.eclipse.ptp.rdt.sync.core.RemoteLocation;
@@ -47,7 +46,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 	public static final String gitDir = ".ptp-sync"; //$NON-NLS-1$
 	// Name of file placed in empty directories to force sync'ing of those directories.
 	public static final String emptyDirectoryFileName = ".ptp-sync-folder"; //$NON-NLS-1$
-	public static final String commitMessage = Messages.GRSC_CommitMessage;
+	public static final String commitMessage = "Eclipse Automatic Commit";
 	public static final String remotePushBranch = "ptp-push"; //$NON-NLS-1$
 
 	// Implement storage of local JGit repositories and Git repositories.
@@ -168,15 +167,15 @@ public class GitSyncService extends AbstractSynchronizeService {
 		if (project == null || rl == null) {
 			throw new NullPointerException();
 		}
-		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
 		GitRepo repo = remoteLocationToGitRepoMap.get(rl);
 		try {
 			if (repo == null) {
+				RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
 				subMon.subTask("Accessing local JGit repository");
-				JGitRepo localRepo = getLocalJGitRepo(project, subMon.newChild(25));
+				JGitRepo localRepo = getLocalJGitRepo(project, subMon.newChild(10));
 				try {
-					subMon.subTask("Creating Git repository");
-					repo = new GitRepo(localRepo, rl, subMon.newChild(75));
+					subMon.subTask("Creating remote Git repository");
+					repo = new GitRepo(localRepo, rl, subMon.newChild(90));
 					remoteLocationToGitRepoMap.put(rl, repo);
 				} catch (MissingConnectionException e) {
 					return null;
@@ -205,7 +204,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 		super(descriptor);
 		// Constructor for each sync service should only be called once by design of synchronized projects
 		// See bug 410106
-		assert(!consCalled) : Messages.GitSyncService_1;
+		assert(!consCalled) : "Internal error - Git sync service constructor called more than once";
 		consCalled = true;
 	}
 
@@ -326,7 +325,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 		if (project == null || remoteLoc == null) {
 			throw new NullPointerException();
 		}
-		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 1000);
+		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
 
 		try {
 			/*
@@ -365,11 +364,11 @@ public class GitSyncService extends AbstractSynchronizeService {
 			try {
 				while (!syncLock.tryLock(50, TimeUnit.MILLISECONDS)) {
 					if (subMon.isCanceled()) {
-						throw new CoreException(new Status(IStatus.CANCEL, Activator.PLUGIN_ID, Messages.GitServiceProvider_1));
+						throw new CoreException(new Status(IStatus.CANCEL, Activator.PLUGIN_ID, "Synchronization canceled"));
 					}
 				}
 			} catch (InterruptedException e1) {
-				throw new CoreException(new Status(IStatus.CANCEL, Activator.PLUGIN_ID, Messages.GitServiceProvider_2));
+				throw new CoreException(new Status(IStatus.CANCEL, Activator.PLUGIN_ID, "Synchronization interrupted"));
 			} finally {
 				synchronized (fWaitingThreadsCount) {
 					fWaitingThreadsCount--;
@@ -377,9 +376,11 @@ public class GitSyncService extends AbstractSynchronizeService {
 			}
 
 			try {
-				subMon.subTask(Messages.GitServiceProvider_7);
-				JGitRepo localRepo = getLocalJGitRepo(project, null);
-				GitRepo remoteRepo = getGitRepo(project, remoteLoc, null);
+				subMon.subTask("Creating local JGit repository");
+				JGitRepo localRepo = getLocalJGitRepo(project, subMon.newChild(5));
+
+				subMon.subTask("Creating remote Git repository");
+				GitRepo remoteRepo = getGitRepo(project, remoteLoc, subMon.newChild(10));
 				// Unresolved connection - abort
 				if (remoteRepo == null) {
 					return;
@@ -395,7 +396,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 					throw new RemoteSyncException(e);
 				}
 				if (!(conflictedFiles.isEmpty())) {
-					throw new RemoteSyncMergeConflictException(Messages.GitServiceProvider_4);
+					throw new RemoteSyncMergeConflictException("Merge conflict");
 				}
 
 				if (mySyncTaskId <= finishedSyncTaskId) { // some other thread has already done the work for us
@@ -413,12 +414,12 @@ public class GitSyncService extends AbstractSynchronizeService {
 				}
 
 				try {
-					subMon.subTask(Messages.GitServiceProvider_8);
-					doSync(localRepo, remoteRepo, syncFlags, subMon.newChild(900));
+					subMon.subTask("Synchronizing");
+					doSync(localRepo, remoteRepo, syncFlags, subMon.newChild(80));
 				} catch (RemoteSyncMergeConflictException e) {
-					subMon.subTask(Messages.GitServiceProvider_9);
+					subMon.subTask("Refreshing workspace");
 					// Refresh after merge conflict since conflicted files are altered with markup.
-					project.refreshLocal(IResource.DEPTH_INFINITE, subMon.newChild(1));
+					project.refreshLocal(IResource.DEPTH_INFINITE, subMon.newChild(5));
 					throw e;
 				}
 				finishedSyncTaskId = willFinishTaskId;
@@ -431,8 +432,8 @@ public class GitSyncService extends AbstractSynchronizeService {
 			SyncManager.setShowErrors(project, true);
 
 			// Refresh after sync to display changes
-			subMon.subTask(Messages.GitServiceProvider_10);
-			project.refreshLocal(IResource.DEPTH_INFINITE, subMon.newChild(1));
+			subMon.subTask("Refreshing workspace");
+			project.refreshLocal(IResource.DEPTH_INFINITE, subMon.newChild(5));
 		} finally {
 			if (monitor != null) {
 				monitor.done();
@@ -460,30 +461,32 @@ public class GitSyncService extends AbstractSynchronizeService {
 		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
 		try {
 			// Commit local and remote changes
-			subMon.subTask(Messages.GitRemoteSyncConnection_12);
+			subMon.subTask("Committing local changes");
 			boolean hasChanges = localRepo.commit(subMon.newChild(5));
 			if ((!hasChanges) && (syncFlags == SyncFlag.NO_FORCE)) {
 				return;
 			}
-			subMon.subTask(Messages.GitRemoteSyncConnection_14);
+			subMon.subTask("Committing remote changes");
 			ProjectAndRemotePair parp = new ProjectAndRemotePair(localRepo.getProject(), remoteRepo.getRemoteLocation());
+			int commitWork = 25;
 			if (!cleanFileFilterMap.contains(parp)) {
-				remoteRepo.uploadFilter(localRepo, subMon.newChild(9));
+				commitWork -= 12;
+				remoteRepo.uploadFilter(localRepo, subMon.newChild(12));
 				cleanFileFilterMap.add(parp);
 			}
-			remoteRepo.commitRemoteFiles(subMon.newChild(18));
+			remoteRepo.commitRemoteFiles(subMon.newChild(commitWork));
 
 			try {
 				// Fetch the remote repository
-				subMon.subTask(Messages.GitRemoteSyncConnection_15);
-				localRepo.fetch(remoteRepo.getRemoteLocation(), subMon.newChild(18));
+				subMon.subTask("Fetching remote changes");
+				localRepo.fetch(remoteRepo.getRemoteLocation(), subMon.newChild(25));
 
 				// Merge it with local
-				localRepo.merge(subMon.newChild(2));
+				localRepo.merge(subMon.newChild(5));
 
 				// Handle merge conflict. Read in data needed to resolve the conflict, and then reset the repo.
 				if (localRepo.readMergeConflictFiles()) {
-					throw new RemoteSyncMergeConflictException(Messages.GitRemoteSyncConnection_2);
+					throw new RemoteSyncMergeConflictException("Merge conflict");
 					// Even if we later decide not to throw an exception, it is important not to proceed after a merge conflict.
 					// return;
 				}
@@ -497,14 +500,14 @@ public class GitSyncService extends AbstractSynchronizeService {
 					throw new RemoteSyncException(e);
 				}
 			} finally {
-				subMon.setWorkRemaining(100 - 64);
+				subMon.setWorkRemaining(100 - 60);
 			}
 
 			// Push local repository to remote
 			if (localRepo.getGit().branchList().call().size() > 0) { // check whether master was already created
-				subMon.subTask(Messages.GitRemoteSyncConnection_17);
-				localRepo.push(remoteRepo.getRemoteLocation(), subMon.newChild(18));
-				remoteRepo.merge(subMon.newChild(18));
+				subMon.subTask("Pushing local changes to remote");
+				localRepo.push(remoteRepo.getRemoteLocation(), subMon.newChild(25));
+				remoteRepo.merge(subMon.newChild(15));
 			}
 		} catch (final IOException e) {
 			throw new RemoteSyncException(e);

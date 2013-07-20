@@ -32,7 +32,6 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.ptp.internal.rdt.sync.git.core.CommandRunner.CommandResults;
-import org.eclipse.ptp.internal.rdt.sync.git.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.RecursiveSubMonitor;
 import org.eclipse.ptp.rdt.sync.core.RemoteLocation;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
@@ -73,16 +72,16 @@ public class GitRepo {
 	 */
 	public GitRepo(JGitRepo localRepo, RemoteLocation rl, IProgressMonitor monitor)
 			throws RemoteSyncException, MissingConnectionException {
-		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
+		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 10);
 		try {
 			remoteLoc = rl;
 
 			// Build repo, creating it if it is not already present.
 			try {
-				subMon.subTask(Messages.GitRemoteSyncConnection_21);
-				remoteGitVersion = getRemoteGitVersion(subMon.newChild(10));
-				subMon.subTask(Messages.GitRemoteSyncConnection_20);
-				buildRepo(localRepo, subMon.newChild(80));
+				subMon.subTask("Reading remote Git version");
+				remoteGitVersion = getRemoteGitVersion(subMon.newChild(2));
+				subMon.subTask("Building remote repository");
+				buildRepo(localRepo, subMon.newChild(8));
 			} catch (final IOException e) {
 				throw new RemoteSyncException(e);
 			} catch (final RemoteExecutionException e) {
@@ -117,24 +116,24 @@ public class GitRepo {
 	 */
 	private void buildRepo(JGitRepo localRepo, IProgressMonitor monitor) throws IOException, RemoteExecutionException,
 	RemoteSyncException, MissingConnectionException {
-		final RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
+		final RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 10);
 		try {
 			// Create remote directory if necessary.
 			try {
-				subMon.subTask(Messages.GitRemoteSyncConnection_24);
+				subMon.subTask("Creating remote directory");
 				CommandRunner.createRemoteDirectory(remoteLoc.getConnection(), remoteLoc.getDirectory(),
-						subMon.newChild(5));
+						subMon.newChild(1));
 			} catch (final CoreException e) {
 				throw new RemoteSyncException(e);
 			}
 
 			// Initialize remote directory if necessary
-			subMon.subTask(Messages.GitRemoteSyncConnection_25);
-			doInit(subMon.newChild(5));
+			subMon.subTask("Initializing remote");
+			doInit(subMon.newChild(1));
 
-			subMon.subTask(Messages.GitRemoteSyncConnection_27);
-			uploadFilter(localRepo, subMon.newChild(5));
-			commitRemoteFiles(subMon.newChild(5));
+			subMon.subTask("Committing remote files");
+			uploadFilter(localRepo, subMon.newChild(4));
+			commitRemoteFiles(subMon.newChild(4));
 		} finally {
 			if (monitor != null) {
 				monitor.done();
@@ -169,7 +168,7 @@ public class GitRepo {
 			}
 
 			if (commandResults.getExitCode() != 0) {
-				throw new RemoteExecutionException(Messages.GRSC_GitInitFailure + commandResults.getStderr());
+				throw new RemoteExecutionException("Remote Git init failed with message: " + commandResults.getStderr());
 			}
 		} finally {
 			if (monitor != null) {
@@ -190,6 +189,7 @@ public class GitRepo {
 	 * 			on problems executing remote commands
 	 */
 	public void uploadFilter(JGitRepo localJGitRepo, IProgressMonitor monitor) throws MissingConnectionException, RemoteSyncException {
+		final RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 10);
 		IRemoteConnection conn = remoteLoc.getConnection();
 		IRemoteServices remoteServices = conn.getRemoteServices();
 		Repository repository = localJGitRepo.getRepository();
@@ -201,20 +201,23 @@ public class GitRepo {
 			IFileStore local = EFS.getLocalFileSystem().getStore(new Path(exclude.getAbsolutePath()));
 			String remoteExclude = remoteLoc.getDirectory() + "/" + GitSyncService.gitDir + "/" + Constants.INFO_EXCLUDE;  //$NON-NLS-1$ //$NON-NLS-2$
 			IFileStore remote = remoteServices.getFileManager(conn).getResource(remoteExclude);
-			local.copy(remote, EFS.OVERWRITE, monitor);
+			subMon.subTask("Copy file filtering information to remote");
+			local.copy(remote, EFS.OVERWRITE, subMon.newChild(3));
 
 			//remove ignored files from index
 			if (remoteGitVersion>=1080102) {
 				final String  command = gitCommand() + " ls-files -X " + GitSyncService.gitDir + "/" + Constants.INFO_EXCLUDE + " -i | " + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						gitCommand() + " update-index --force-remove --stdin ; " + //$NON-NLS-1$
 						gitCommand() + " commit --allow-empty -m \"" + GitSyncService.commitMessage + "\""; //$NON-NLS-1$ //$NON-NLS-2$
-				CommandResults commandResults = this.executeRemoteCommand(command, monitor);
+				subMon.subTask("Updating remote file filtering");
+				CommandResults commandResults = this.executeRemoteCommand(command, subMon.newChild(7));
 				if (commandResults.getExitCode() != 0) {
-					throw new RemoteSyncException(Messages.GRSC_GitRemoveFilteredFailure1 + commandResults.getStderr());
+					throw new RemoteSyncException("Remote Git failed to remove filtered files with message: " + commandResults.getStderr());
 				}
 			} else {
 				final String  command = gitCommand() + " rev-parse HEAD"; //$NON-NLS-1$
-				CommandResults commandResults = this.executeRemoteCommand(command, monitor); 
+				subMon.subTask("Retrieving remote Git revision ID");
+				CommandResults commandResults = this.executeRemoteCommand(command, subMon.newChild(2)); 
 				ObjectId objectId = null;
 				if (commandResults.getExitCode()==0)
 					objectId = repository.resolve(commandResults.getStdout().trim());
@@ -227,7 +230,8 @@ public class GitRepo {
 				}
 				if (ref!=null) {
 					Set<String> filesToRemove = localJGitRepo.getFilter().getIgnoredFiles(ref);
-					deleteRemoteFiles(filesToRemove,monitor);
+					subMon.subTask("Updating remote file filtering");
+					deleteRemoteFiles(filesToRemove,subMon.newChild(8));
 				}
 			}
 		} catch(RemoteConnectionException e) {
@@ -260,7 +264,7 @@ public class GitRepo {
 					gitCommand() + " commit -m \"" + GitSyncService.commitMessage + "\""; //$NON-NLS-1$ //$NON-NLS-2$
 			CommandResults commandResults = this.executeRemoteCommand(command, monitor);
 			if (commandResults.getExitCode() != 0 && !commandResults.getStdout().contains("nothing to commit")) { //$NON-NLS-1$
-				throw new RemoteSyncException(Messages.GRSC_GitCommitFailure + commandResults.getStderr());
+				throw new RemoteSyncException("Remote Git commit failed with message: " + commandResults.getStderr());
 			}
 		} catch (final InterruptedException e) {
 			throw new RemoteSyncException(e);
@@ -304,7 +308,7 @@ public class GitRepo {
     				throw new RemoteExecutionException(e);
     			}
     			if (commandResults.getExitCode() != 0) {
-    				throw new RemoteExecutionException(Messages.GRSC_GitRmFailure + commandResults.getStderr());
+    				throw new RemoteExecutionException("Remote Git rm failed with message: " + commandResults.getStderr());
     			}
     		}
     	} finally {
@@ -333,7 +337,7 @@ public class GitRepo {
 		try {
 			mergeResults = this.executeRemoteCommand(command, monitor);
 			if (mergeResults.getExitCode() != 0) {
-				throw new RemoteSyncException(new RemoteExecutionException(Messages.GRSC_GitMergeFailure + mergeResults.getStderr()));
+				throw new RemoteSyncException(new RemoteExecutionException("Remote merge failed with message: " + mergeResults.getStderr()));
 			}
 		} catch (IOException e) {
 			throw new RemoteSyncException(e);
@@ -354,7 +358,7 @@ public class GitRepo {
 		IScopeContext context = InstanceScope.INSTANCE;
 		Preferences prefSyncNode = context.getNode(instanceScopeSyncNode);
 		if (prefSyncNode == null) {
-			Activator.log(Messages.GitRemoteSyncConnection_28);
+			Activator.log("Unable to access node for storing instance-specific settings");
 		} else {
 			try {
 				// Avoid creating node if it doesn't exist
@@ -363,7 +367,7 @@ public class GitRepo {
 					gitBinary = prefGitNode.get(remoteLoc.getConnection().getName(), "git"); //$NON-NLS-1$
 				}
 			} catch (BackingStoreException e) {
-				Activator.log(Messages.GitRemoteSyncConnection_29, e);
+				Activator.log("Unable to load Git location settings", e);
 			} catch (MissingConnectionException e) {
 				// nothing to do
 			}
@@ -413,7 +417,7 @@ public class GitRepo {
 		}
 
 		if (commandResults.getExitCode() != 0) {
-			throw new RemoteSyncException(new RemoteExecutionException(Messages.GRSC_GitInitFailure + commandResults.getStderr()));
+			throw new RemoteSyncException(new RemoteExecutionException("Remote Git init failed with message: " + commandResults.getStderr()));
 		}
 
 		Matcher m = Pattern.compile("git version ([0-9]+)\\.([0-9]+)\\.([0-9]+)\\.?([0-9]*)").matcher(commandResults.getStdout().trim()); //$NON-NLS-1$
