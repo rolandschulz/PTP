@@ -381,6 +381,19 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.ptp.internal.ui.views.IContentProvider#getElement(int)
+	 */
+	@Override
+	public int getElement(int index) {
+		if (canvas != null && manager != null) {
+			return canvas.getElement(index);
+		}
+		return -1;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.ui.views.IToolTipProvider#toolTipText(int)
 	 */
 	/**
