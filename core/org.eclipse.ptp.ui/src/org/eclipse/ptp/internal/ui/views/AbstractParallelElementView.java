@@ -459,8 +459,8 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	 */
 	@Override
 	public void handleAction(int type, int index) {
-		if (index > -1 && type == IIconCanvasActionListener.DOUBLE_CLICK_ACTION) {
-			doubleClick(index);
+		if (index > -1 && type == IIconCanvasActionListener.DOUBLE_CLICK_ACTION && cur_element_set != null) {
+			doubleClick(cur_element_set.getElement(index));
 		}
 	}
 
