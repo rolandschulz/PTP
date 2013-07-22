@@ -296,7 +296,7 @@ job to each node of a pre-existing allocation as one step in a larger job script
 arguments of the job step.  If executable is "none", then no prolog is run.
 This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip>
         </attribute>
-        <script insertEnvironmentAfter="30" deleteAfterSubmit="false">
+        <script insertEnvironmentAfter="30" deleteAfterSubmit="true">
             <file-staging-location>${ptp_rm:directory#value}</file-staging-location>
             <line><arg>#!/bin/bash</arg></line>
             <line><arg isUndefinedIfMatches="#SBATCH --account=">#SBATCH --account=${ptp_rm:account#value}</arg></line>
