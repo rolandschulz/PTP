@@ -176,7 +176,7 @@
 								<arg>${ptp_rm:extraArgs#value}</arg>
 							</dynamic-text>
 							<control-state>
-								<enable-if button="defaultArguments" selected="false"/>
+								<disable-if attribute="disabled" value="true"/>
 							</control-state>
 						</widget>
 						<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
