@@ -15,69 +15,74 @@
 	<version>7.0.2-SNAPSHOT</version>
 	<packaging>eclipse-repository</packaging>
 
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>deploy</id>
-						<phase>deploy</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<tasks>
-								<mkdir dir="${ptp-build-dir}" />
-								<delete includeemptydirs="true">
-									<fileset dir="${ptp-build-dir}">
-										<include name="**/*" />
-									</fileset>
-								</delete>
-								<copy includeemptydirs="false" todir="${ptp-build-dir}">
-									<fileset
-										dir="${basedir}/../../rdt/org.eclipse.ptp.rdt.core.remotejars">
-										<include name="rdt-server-*" />
-									</fileset>
-								</copy>
-								<unzip
-									src="${project.build.directory}/${project.build.finalName}.zip"
-									dest="${ptp-build-dir}" />
-								<unzip
-									src="${basedir}/../../releng/org.eclipse.ptp.aix/target/org.eclipse.ptp.aix-${project.version}.jar"
-									dest="${ptp-build-dir}/sdm/org.eclipse.ptp.aix_${unqualifiedVersion}.${buildQualifier}" />
-								<chmod perm="a+x"
-									file="${ptp-build-dir}/sdm/org.eclipse.ptp.aix_${unqualifiedVersion}.${buildQualifier}/os/aix/ppc64/sdm" />
-								<unzip
-									src="${basedir}/../../releng/org.eclipse.ptp.linux/target/org.eclipse.ptp.linux-${project.version}.jar"
-									dest="${ptp-build-dir}/sdm/org.eclipse.ptp.linux_${unqualifiedVersion}.${buildQualifier}" />
-								<chmod perm="a+x"
-									file="${ptp-build-dir}/sdm/org.eclipse.ptp.linux_${unqualifiedVersion}.${buildQualifier}/os/linux/ppc64/sdm" />
-								<chmod perm="a+x"
-									file="${ptp-build-dir}/sdm/org.eclipse.ptp.linux_${unqualifiedVersion}.${buildQualifier}/os/linux/x86_64/sdm" />
-								<unzip
-									src="${basedir}/../../releng/org.eclipse.ptp.macosx/target/org.eclipse.ptp.macosx-${project.version}.jar"
-									dest="${ptp-build-dir}/sdm/org.eclipse.ptp.macosx_${unqualifiedVersion}.${buildQualifier}" />
-								<chmod perm="a+x"
-									file="${ptp-build-dir}/sdm/org.eclipse.ptp.macosx_${unqualifiedVersion}.${buildQualifier}/os/macosx/x86_64/sdm" />
-								<unzip
-									src="${basedir}/../../debug/org.eclipse.ptp.debug.sdm/target/org.eclipse.ptp.debug.sdm-${project.version}.jar"
-									dest="${ptp-build-dir}/sdm/org.eclipse.ptp.debug.sdm_${unqualifiedVersion}.${buildQualifier}" />
-								<unzip
-									src="${basedir}/../../core/org.eclipse.ptp.proxy/target/org.eclipse.ptp.proxy-${project.version}.jar"
-									dest="${ptp-build-dir}/sdm/org.eclipse.ptp.proxy_${unqualifiedVersion}.${buildQualifier}" />
-								<unzip
-									src="${basedir}/../../core/org.eclipse.ptp.utils/target/org.eclipse.ptp.utils-${project.version}.jar"
-									dest="${ptp-build-dir}/sdm/org.eclipse.ptp.utils_${unqualifiedVersion}.${buildQualifier}" />
-								<exec executable="zip" spawn="true" dir="${ptp-build-dir}">
-									<arg
-										line="-r ${ptp-build-dir}/ptp-sdm-${unqualifiedVersion}.zip sdm" />
-								</exec>
-							</tasks>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+	<profiles>
+		<profile>
+			<id>production</id>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>deploy</id>
+								<phase>install</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<tasks>
+										<mkdir dir="${ptp-build-dir}" />
+										<delete includeemptydirs="true">
+											<fileset dir="${ptp-build-dir}">
+												<include name="**/*" />
+											</fileset>
+										</delete>
+										<copy includeemptydirs="false" todir="${ptp-build-dir}">
+											<fileset
+												dir="${basedir}/../../rdt/org.eclipse.ptp.rdt.core.remotejars">
+												<include name="rdt-server-*" />
+											</fileset>
+										</copy>
+										<unzip
+											src="${project.build.directory}/${project.build.finalName}.zip"
+											dest="${ptp-build-dir}" />
+										<unzip
+											src="${basedir}/../../releng/org.eclipse.ptp.aix/target/org.eclipse.ptp.aix-${project.version}.jar"
+											dest="${ptp-build-dir}/sdm/org.eclipse.ptp.aix_${unqualifiedVersion}.${buildQualifier}" />
+										<chmod perm="a+x"
+											file="${ptp-build-dir}/sdm/org.eclipse.ptp.aix_${unqualifiedVersion}.${buildQualifier}/os/aix/ppc64/sdm" />
+										<unzip
+											src="${basedir}/../../releng/org.eclipse.ptp.linux/target/org.eclipse.ptp.linux-${project.version}.jar"
+											dest="${ptp-build-dir}/sdm/org.eclipse.ptp.linux_${unqualifiedVersion}.${buildQualifier}" />
+										<chmod perm="a+x"
+											file="${ptp-build-dir}/sdm/org.eclipse.ptp.linux_${unqualifiedVersion}.${buildQualifier}/os/linux/ppc64/sdm" />
+										<chmod perm="a+x"
+											file="${ptp-build-dir}/sdm/org.eclipse.ptp.linux_${unqualifiedVersion}.${buildQualifier}/os/linux/x86_64/sdm" />
+										<unzip
+											src="${basedir}/../../releng/org.eclipse.ptp.macosx/target/org.eclipse.ptp.macosx-${project.version}.jar"
+											dest="${ptp-build-dir}/sdm/org.eclipse.ptp.macosx_${unqualifiedVersion}.${buildQualifier}" />
+										<chmod perm="a+x"
+											file="${ptp-build-dir}/sdm/org.eclipse.ptp.macosx_${unqualifiedVersion}.${buildQualifier}/os/macosx/x86_64/sdm" />
+										<unzip
+											src="${basedir}/../../debug/org.eclipse.ptp.debug.sdm/target/org.eclipse.ptp.debug.sdm-${project.version}.jar"
+											dest="${ptp-build-dir}/sdm/org.eclipse.ptp.debug.sdm_${unqualifiedVersion}.${buildQualifier}" />
+										<unzip
+											src="${basedir}/../../core/org.eclipse.ptp.proxy/target/org.eclipse.ptp.proxy-${project.version}.jar"
+											dest="${ptp-build-dir}/sdm/org.eclipse.ptp.proxy_${unqualifiedVersion}.${buildQualifier}" />
+										<unzip
+											src="${basedir}/../../core/org.eclipse.ptp.utils/target/org.eclipse.ptp.utils-${project.version}.jar"
+											dest="${ptp-build-dir}/sdm/org.eclipse.ptp.utils_${unqualifiedVersion}.${buildQualifier}" />
+										<exec executable="zip" spawn="true" dir="${ptp-build-dir}">
+											<arg
+												line="-r ${ptp-build-dir}/ptp-sdm-${unqualifiedVersion}.zip sdm" />
+										</exec>
+									</tasks>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
