@@ -371,10 +371,13 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		if (sets.length > 1) {
 			buffer.append(Messages.ParallelJobsView_4);
 		}
-		for (int i = 1; i < sets.length; i++) {
-			buffer.append(sets[i].getID());
-			if (i < sets.length - 1) {
-				buffer.append(","); //$NON-NLS-1$
+		for (int i = 0, c = 0; i < sets.length; i++) {
+			String id = sets[i].getID();
+			if (!id.equals(IElementHandler.SET_ROOT_ID)) {
+				buffer.append(sets[i].getID());
+				if (c++ < sets.length - 2) {
+					buffer.append(","); //$NON-NLS-1$
+				}
 			}
 		}
 		return new String[] { buffer.toString() };

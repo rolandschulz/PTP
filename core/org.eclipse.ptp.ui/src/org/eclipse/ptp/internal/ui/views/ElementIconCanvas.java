@@ -164,6 +164,17 @@ public class ElementIconCanvas extends IconCanvas implements ISelectionProvider 
 		return element;
 	}
 
+	/**
+	 * @param index
+	 * @return
+	 */
+	public int getElement(int index) {
+		if (cur_element_set == null) {
+			return -1;
+		}
+		return cur_element_set.getElement(index);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 

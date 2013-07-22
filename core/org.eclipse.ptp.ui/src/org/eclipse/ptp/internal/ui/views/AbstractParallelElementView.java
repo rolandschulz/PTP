@@ -381,6 +381,19 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.ptp.internal.ui.views.IContentProvider#getElement(int)
+	 */
+	@Override
+	public int getElement(int index) {
+		if (canvas != null && manager != null) {
+			return canvas.getElement(index);
+		}
+		return -1;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.ui.views.IToolTipProvider#toolTipText(int)
 	 */
 	/**
@@ -415,7 +428,10 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	@Override
 	public Image getStatusIcon(int index, boolean isSelected) {
 		if (cur_element_set != null) {
-			return manager.getImage(index, isSelected);
+			int element = cur_element_set.getElement(index);
+			if (element >= 0) {
+				return manager.getImage(element, isSelected);
+			}
 		}
 		return null;
 	}
@@ -431,7 +447,8 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	@Override
 	public void drawSpecial(int index, GC gc, int x_loc, int y_loc, int width, int height) {
 		if (cur_element_set != null) {
-			if (getCurrentElementHandler().isRegistered(index)) {
+			int element = cur_element_set.getElement(index);
+			if (element >= 0 && getCurrentElementHandler().isRegistered(element)) {
 				gc.setForeground(registerColor);
 				gc.drawRectangle(x_loc, y_loc, width, height);
 				gc.setForeground(canvas.getForeground());
@@ -446,8 +463,8 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	 */
 	@Override
 	public void handleAction(int type, int index) {
-		if (index > -1 && type == IIconCanvasActionListener.DOUBLE_CLICK_ACTION) {
-			doubleClick(index);
+		if (index > -1 && type == IIconCanvasActionListener.DOUBLE_CLICK_ACTION && cur_element_set != null) {
+			doubleClick(cur_element_set.getElement(index));
 		}
 	}
 

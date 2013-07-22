@@ -2014,7 +2014,7 @@ public class IconCanvas extends Canvas {
 	 * @since 7.0
 	 */
 	protected void drawIndex(GC gc, int index, int y_loc) {
-		String text = String.valueOf(index);
+		String text = Integer.toString(contentProvider.getElement(index));
 		Point text_size = gc.stringExtent(text);
 		int align = e_offset_x - e_spacing_x - text_size.x;
 		int valign = y_loc + e_height / 2 - text_size.y / 2;
@@ -2638,7 +2638,7 @@ public class IconCanvas extends Canvas {
 		if (toolTipProvider == null) {
 			return IToolTipProvider.NO_TOOLTIP;
 		}
-		return toolTipProvider.toolTipText(index);
+		return toolTipProvider.toolTipText(contentProvider.getElement(index));
 	}
 
 	/**
@@ -2742,12 +2742,12 @@ public class IconCanvas extends Canvas {
 		iconCanvas.setFontSize(10);
 		iconCanvas.setIconSpace(1, 4);
 		iconCanvas.setTooltipWrap(true);
-		iconCanvas.setContentProvider(new IContentProvider() {
-			@Override
-			public boolean hasElement(int index) {
-				return true;
-			}
-		});
+		// iconCanvas.setContentProvider(new IContentProvider() {
+		// @Override
+		// public boolean hasElement(int index) {
+		// return true;
+		// }
+		// });
 		iconCanvas.setImageProvider(new IImageProvider() {
 			@Override
 			public Image getStatusIcon(int index, boolean isSelected) {

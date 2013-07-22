@@ -32,4 +32,14 @@ public interface IContentProvider {
 	 * @since 7.0
 	 */
 	public boolean hasElement(int index);
+
+	/**
+	 * Get the target element at index
+	 * 
+	 * @param index
+	 *            element index
+	 * @return element ID
+	 */
+	public int getElement(int index);
+
 }

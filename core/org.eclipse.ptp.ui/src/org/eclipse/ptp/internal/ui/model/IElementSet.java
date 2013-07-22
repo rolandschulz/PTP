@@ -27,16 +27,6 @@ import java.util.BitSet;
 public interface IElementSet {
 
 	/**
-	 * @since 7.0
-	 */
-	public String getID();
-
-	/**
-	 * @since 7.0
-	 */
-	public String getName();
-
-	/**
 	 * Adds given elements to this set
 	 * 
 	 * @param elements
@@ -54,6 +44,13 @@ public interface IElementSet {
 	public void addMatchSet(String setID);
 
 	/**
+	 * Returns the set of elements contained in this set
+	 * 
+	 * @since 7.0
+	 */
+	public BitSet contains(BitSet elements);
+
+	/**
 	 * Returns whether this set contains given element
 	 * 
 	 * @param element
@@ -61,13 +58,6 @@ public interface IElementSet {
 	 * @since 7.0
 	 */
 	public boolean contains(int element);
-
-	/**
-	 * Returns the set of elements contained in this set
-	 * 
-	 * @since 7.0
-	 */
-	public BitSet contains(BitSet elements);
 
 	/**
 	 * Returns whether given set id contains in match list
@@ -78,11 +68,31 @@ public interface IElementSet {
 	public boolean containsMatchSet(String setID);
 
 	/**
+	 * Get the element at the given position
+	 */
+	public int getElement(int index);
+
+	/**
+	 * @since 7.0
+	 */
+	public String getID();
+
+	/**
 	 * Returns an array of match set id
 	 * 
 	 * @return an array of match set id
 	 */
 	public String[] getMatchSetIDs();
+
+	/**
+	 * @since 7.0
+	 */
+	public String getName();
+
+	/**
+	 * @since 7.0
+	 */
+	public BitSet getSelected();
 
 	/**
 	 * Returns whether this set is root or not
@@ -98,11 +108,6 @@ public interface IElementSet {
 	 * @since 7.0
 	 */
 	public boolean isSelected(int index);
-
-	/**
-	 * @since 7.0
-	 */
-	public BitSet getSelected();
 
 	/**
 	 * Removes Element from this set

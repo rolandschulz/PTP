@@ -45,11 +45,21 @@ public class ElementSet implements IElementSet {
 	/**
 	 * @since 7.0
 	 */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.internal.ui.model.IElementSet#addElements(java.util.BitSet)
+	 */
 	@Override
 	public void addElements(BitSet elements) {
 		fElements.or(elements);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.internal.ui.model.IElementSet#addMatchSet(java.lang.String)
+	 */
 	@Override
 	public void addMatchSet(String setID) {
 		if (!containsMatchSet(setID)) {
@@ -59,6 +69,11 @@ public class ElementSet implements IElementSet {
 
 	/**
 	 * @since 7.0
+	 */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.internal.ui.model.IElementSet#contains(java.util.BitSet)
 	 */
 	@Override
 	public BitSet contains(BitSet elements) {
@@ -70,24 +85,58 @@ public class ElementSet implements IElementSet {
 	/**
 	 * @since 7.0
 	 */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.internal.ui.model.IElementSet#contains(int)
+	 */
 	@Override
 	public boolean contains(int element) {
 		return fElements.get(element);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.internal.ui.model.IElementSet#containsMatchSet(java.lang.String)
+	 */
 	@Override
 	public boolean containsMatchSet(String setID) {
 		return matchSetList.contains(setID);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.internal.ui.model.IElementSet#getElement(int)
+	 */
+	@Override
+	public int getElement(int index) {
+		int pos = -1;
+		while (index-- >= 0) {
+			pos = fElements.nextSetBit(pos + 1);
+		}
+		return pos;
+	}
+
 	/**
 	 * @since 7.0
+	 */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.internal.ui.model.IElementSet#getID()
 	 */
 	@Override
 	public String getID() {
 		return fId;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.internal.ui.model.IElementSet#getMatchSetIDs()
+	 */
 	@Override
 	public String[] getMatchSetIDs() {
 		return matchSetList.toArray(new String[0]);
@@ -96,6 +145,11 @@ public class ElementSet implements IElementSet {
 	/**
 	 * @since 7.0
 	 */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.internal.ui.model.IElementSet#getName()
+	 */
 	@Override
 	public String getName() {
 		return fName;
@@ -103,6 +157,11 @@ public class ElementSet implements IElementSet {
 
 	/**
 	 * @since 7.0
+	 */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.internal.ui.model.IElementSet#getSelected()
 	 */
 	@Override
 	public BitSet getSelected() {
@@ -122,6 +181,11 @@ public class ElementSet implements IElementSet {
 	/**
 	 * @since 7.0
 	 */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.internal.ui.model.IElementSet#isSelected(int)
+	 */
 	@Override
 	public boolean isSelected(int index) {
 		return fSelectedElements.get(index);
@@ -129,6 +193,11 @@ public class ElementSet implements IElementSet {
 
 	/**
 	 * @since 7.0
+	 */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.internal.ui.model.IElementSet#removeElement(int)
 	 */
 	@Override
 	public void removeElement(int index) {
@@ -139,12 +208,22 @@ public class ElementSet implements IElementSet {
 	/**
 	 * @since 7.0
 	 */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.internal.ui.model.IElementSet#removeElements(java.util.BitSet)
+	 */
 	@Override
 	public void removeElements(BitSet elements) {
 		fElements.andNot(elements);
 		fSelectedElements.andNot(elements);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.internal.ui.model.IElementSet#removeMatchSet(java.lang.String)
+	 */
 	@Override
 	public void removeMatchSet(String setID) {
 		matchSetList.remove(setID);
@@ -152,6 +231,11 @@ public class ElementSet implements IElementSet {
 
 	/**
 	 * @since 7.0
+	 */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.internal.ui.model.IElementSet#setSelected(int, boolean)
 	 */
 	@Override
 	public void setSelected(int index, boolean selected) {
@@ -164,6 +248,11 @@ public class ElementSet implements IElementSet {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.internal.ui.model.IElementSet#size()
+	 */
 	@Override
 	public int size() {
 		return fElements.cardinality();
