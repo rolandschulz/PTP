@@ -428,7 +428,10 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	@Override
 	public Image getStatusIcon(int index, boolean isSelected) {
 		if (cur_element_set != null) {
-			return manager.getImage(index, isSelected);
+			int element = cur_element_set.getElement(index);
+			if (element >= 0) {
+				return manager.getImage(element, isSelected);
+			}
 		}
 		return null;
 	}
