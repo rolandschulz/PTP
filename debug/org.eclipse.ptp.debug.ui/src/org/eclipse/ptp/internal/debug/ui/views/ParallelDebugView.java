@@ -65,7 +65,6 @@ import org.eclipse.ptp.internal.ui.IJobManager;
 import org.eclipse.ptp.internal.ui.actions.ParallelAction;
 import org.eclipse.ptp.internal.ui.model.IElementHandler;
 import org.eclipse.ptp.internal.ui.model.IElementSet;
-import org.eclipse.ptp.internal.ui.views.IIconCanvasActionListener;
 import org.eclipse.ptp.internal.ui.views.ParallelJobsView;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
@@ -274,21 +273,6 @@ public class ParallelDebugView extends ParallelJobsView {
 		IActionBars actionBars = getViewSite().getActionBars();
 		IMenuManager viewMenu = actionBars.getMenuManager();
 		viewMenu.add(new Separator());
-	}
-
-	/*******************************************************************************************************************************************************************************************************************************************************************************************************
-	 * IIconCanvasActionListener
-	 ******************************************************************************************************************************************************************************************************************************************************************************************************/
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.ui.views.IIconCanvasActionListener#handleAction(int, int)
-	 */
-	@Override
-	public void handleAction(int type, int index) {
-		if (type == IIconCanvasActionListener.DOUBLE_CLICK_ACTION) {
-			doubleClick(index);
-		}
 	}
 
 	/*

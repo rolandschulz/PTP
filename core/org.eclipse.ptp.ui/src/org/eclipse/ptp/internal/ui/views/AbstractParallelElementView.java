@@ -444,7 +444,8 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	@Override
 	public void drawSpecial(int index, GC gc, int x_loc, int y_loc, int width, int height) {
 		if (cur_element_set != null) {
-			if (getCurrentElementHandler().isRegistered(index)) {
+			int element = cur_element_set.getElement(index);
+			if (element >= 0 && getCurrentElementHandler().isRegistered(element)) {
 				gc.setForeground(registerColor);
 				gc.drawRectangle(x_loc, y_loc, width, height);
 				gc.setForeground(canvas.getForeground());
