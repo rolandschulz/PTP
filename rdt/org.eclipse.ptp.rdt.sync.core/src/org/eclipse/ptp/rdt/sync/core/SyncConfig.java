@@ -43,6 +43,7 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	 */
 	public SyncConfig(String name) {
 		fName = name;
+		remoteLocation = new RemoteLocation();
 	}
 
 	/*

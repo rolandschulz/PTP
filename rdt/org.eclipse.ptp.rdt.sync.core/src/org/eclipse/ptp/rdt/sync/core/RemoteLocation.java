@@ -67,7 +67,25 @@ public class RemoteLocation {
 
 	private IRemoteServices fRemoteServices;
 	private IRemoteConnection fConnection;
-	
+
+	/**
+	 * Create new RemoteLocation object with all values set to null. Clients should use setters to finish creating object.
+	 */
+	public RemoteLocation() {
+	}
+	/**
+	 * Copy constructor
+	 * @param rl
+	 * 			remote location to copy - cannot be null
+	 */
+	public RemoteLocation(RemoteLocation rl) {
+		fRemoteServicesId = rl.fRemoteServicesId;
+		fConnectionName = rl.fConnectionName;
+		fDirectory = rl.fDirectory;
+		fRemoteServices = rl.fRemoteServices;
+		fConnection = rl.fConnection;
+	}
+
 	/**
 	 * Get name of connection to remote
 	 * @return connection name

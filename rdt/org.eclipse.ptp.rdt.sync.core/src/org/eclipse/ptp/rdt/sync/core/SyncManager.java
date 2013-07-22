@@ -76,7 +76,8 @@ public class SyncManager {
 		protected IStatus run(IProgressMonitor monitor) {
 			RecursiveSubMonitor subMonitor = RecursiveSubMonitor.convert(monitor);
 			try {
-				fSyncService.synchronize(fProject, fSyncConfig.getRemoteLocation(), fDelta, subMonitor, fSyncFlags);
+				RemoteLocation rl = new RemoteLocation(fSyncConfig.getRemoteLocation());
+				fSyncService.synchronize(fProject, rl, fDelta, subMonitor, fSyncFlags);
 			} catch (CoreException e) {
 				if (fSyncExceptionHandler == null) {
 					defaultSyncExceptionHandler.handle(fProject, e);
@@ -366,7 +367,8 @@ public class SyncManager {
 			if (syncService != null) {
 				if (isBlocking) {
 					try {
-						syncService.synchronize(project, config.getRemoteLocation(), delta, monitor, syncFlags);
+						RemoteLocation rl = new RemoteLocation(config.getRemoteLocation());
+						syncService.synchronize(project, rl, delta, monitor, syncFlags);
 					} catch (CoreException e) {
 						if (!useExceptionHandler) {
 							throw e;

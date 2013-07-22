@@ -57,6 +57,7 @@ import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.util.FS;
 import org.eclipse.ptp.internal.rdt.sync.git.core.GitSyncFileFilter.DiffFiles;
+import org.eclipse.ptp.internal.rdt.sync.git.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter;
 import org.eclipse.ptp.rdt.sync.core.RecursiveSubMonitor;
 import org.eclipse.ptp.rdt.sync.core.RemoteLocation;
@@ -120,23 +121,27 @@ public class JGitRepo {
 			FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
 			File gitDirFile = new File(localDirectory + File.separator + GitSyncService.gitDir);
 			Repository repository = repoBuilder.setWorkTree(localDir).setGitDir(gitDirFile).build();
-			if (!(gitDirFile.exists())) {
+			boolean repoExists = gitDirFile.exists();
+			if (!repoExists) {
 				repository.create(false);
+			}
+			git = new Git(repository);
+			
+			if (!repoExists) {
 				fileFilter = new GitSyncFileFilter(this, SyncManager.getDefaultFileFilter());
 				fileFilter.saveFilter();
 			} else {
 				fileFilter = new GitSyncFileFilter(this);
 				fileFilter.loadFilter();
 			}
-			git = new Git(repository);
 			subMon.worked(5);
 			
             // An initial commit to create the master branch.
-            subMon.subTask("Initial commit of local files");
+            subMon.subTask(Messages.JGitRepo_0);
             commit(subMon.newChild(4));
 
 			// Refresh project
-			subMon.subTask("Refreshing workspace");
+			subMon.subTask(Messages.JGitRepo_1);
 			final Thread refreshThread = doRefresh(project, subMon.newChild(1));
 
 			// Set git repo as derived, which can only be done after refresh completes.
@@ -231,6 +236,8 @@ public class JGitRepo {
 
 	/**
 	 * Commit files in working directory.
+	 * 
+	 * assumes that no files are in conflict (do not call during merge)
 	 *
 	 * @param monitor
 	 *
@@ -245,10 +252,11 @@ public class JGitRepo {
 		
 		boolean addedOrRemovedFiles = false;
 
+		assert(!inMergeState());
 		try {
 			DiffFiles diffFiles = fileFilter.getDiffFiles();
 			
-			subMon.subTask("Adding files");
+			subMon.subTask(Messages.JGitRepo_2);
 			if (!diffFiles.added.isEmpty()) {
 				final AddCommand addCommand = git.add();
 				//Bug 401161 doesn't matter here because files are already filtered anyhow. It would be OK
@@ -262,7 +270,7 @@ public class JGitRepo {
 			}
 			subMon.worked(3);
 
-			subMon.subTask("Removing files");
+			subMon.subTask(Messages.JGitRepo_3);
 			if (!diffFiles.removed.isEmpty()) {
 				final RmCommandCached rmCommand = new RmCommandCached(git.getRepository());
 				for (String fileName : diffFiles.removed) {
@@ -274,7 +282,7 @@ public class JGitRepo {
 			subMon.worked(3);
 
 			// Check if a commit is required.
-			subMon.subTask("Committing changes");
+			subMon.subTask(Messages.JGitRepo_4);
 			if (addedOrRemovedFiles || inMergeState()) {
 				final CommitCommand commitCommand = git.commit();
 				commitCommand.setMessage(GitSyncService.commitMessage);
@@ -306,13 +314,13 @@ public class JGitRepo {
 		TransportGitSsh transport = remoteToTransportMap.get(remoteLoc);
 		if (transport == null) {
 			work /= 2;
-			subMon.subTask("Building connection to remote");
+			subMon.subTask(Messages.JGitRepo_5);
 			transport = this.buildTransport(remoteLoc, subMon.newChild(work));
 			remoteToTransportMap.put(remoteLoc, transport);
 		}
 
 		try {
-			subMon.subTask("Fetching remote changes");
+			subMon.subTask(Messages.JGitRepo_6);
 			transport.fetch(new EclipseGitProgressTransformer(subMon.newChild(work)), null);
 		} catch (NotSupportedException e) {
 			throw new RuntimeException(e);
@@ -335,20 +343,25 @@ public class JGitRepo {
 		TransportGitSsh transport = remoteToTransportMap.get(remoteLoc);
 		if (transport == null) {
 			work /= 2;
-			subMon.subTask("Building connection to remote");
+			subMon.subTask(Messages.JGitRepo_5);
 			transport = this.buildTransport(remoteLoc, subMon.newChild(work));
 			remoteToTransportMap.put(remoteLoc, transport);
 		}
 		try {
-			subMon.subTask("Pushing local changes to remote");
+			subMon.subTask(Messages.JGitRepo_8);
 			transport.push(new EclipseGitProgressTransformer(subMon.newChild(work)), null);
 		} catch (NotSupportedException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	// Is the repository currently in a merge state?
-	private boolean inMergeState() throws IOException {
+	/**
+	 * Is repository currently in a merge state?
+	 *
+	 * @return
+	 * @throws IOException
+	 */
+	public boolean inMergeState() throws IOException {
 		try {
 			if (git.getRepository().resolve("MERGE_HEAD") == null) { //$NON-NLS-1$
 				return false;
@@ -371,7 +384,9 @@ public class JGitRepo {
 	 * @throws IOException
 	 * 			on file system problems
 	 */
-	public boolean readMergeConflictFiles() throws GitAPIException, IOException {
+	public boolean readMergeConflictFiles(IProgressMonitor monitor) throws GitAPIException, IOException {
+		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
+
 		String repoPath = git.getRepository().getWorkTree().getAbsolutePath();
 		if (!repoPath.endsWith(java.io.File.separator)) { // The documentation does not say if the separator is added...
 			repoPath += java.io.File.separator;
@@ -384,13 +399,16 @@ public class JGitRepo {
 		try {
 			if (!git.getRepository().getRepositoryState().equals(RepositoryState.MERGING))
 				return false;
-			
+
+			subMon.subTask(Messages.JGitRepo_9);
 			StatusCommand statusCommand = git.status();
 			Status status = statusCommand.call();
 			if (status.getConflicting().isEmpty()) {
 				return false;
 			}
+			subMon.worked(30);
 
+			subMon.subTask(Messages.JGitRepo_10);
 			walk = new RevWalk(git.getRepository());
 			// Get the head, merge head, and merge base commits
 			walk.setRevFilter(RevFilter.MERGE_BASE);
@@ -401,10 +419,12 @@ public class JGitRepo {
 			walk.markStart(head);
 			walk.markStart(mergeHead);
 			RevCommit mergeBase = walk.next();
+			subMon.worked(30);
 
 			// For each merge-conflicted file, pull out and store its contents for each of the three commits
 			// Would be much faster to use a treewalk and check whether entry is conflicting instead of using
 			// status (which uses a treewalk) and then searching for those status found.
+			subMon.subTask(Messages.JGitRepo_11);
 			for (String s : status.getConflicting()) {
 				String localContents = ""; //$NON-NLS-1$
 				TreeWalk localTreeWalk = TreeWalk.forPath(git.getRepository(), s, head.getTree());
@@ -432,9 +452,13 @@ public class JGitRepo {
 				String[] mergeParts = { localContents, remoteContents, ancestorContents };
 				fileToMergePartsMap.put(new Path(s), mergeParts);
 			}
+			subMon.worked(40);
 		} finally {
 			if (walk != null) {
 				walk.dispose();
+			}
+			if (monitor != null) {
+				monitor.done();
 			}
 		}
 		return fileToMergePartsMap.isEmpty();
@@ -483,7 +507,7 @@ public class JGitRepo {
 	 */
 	public Set<IPath> getMergeConflictFiles() throws GitAPIException, IOException {
 		if (!mergeMapInitialized) {
-			this.readMergeConflictFiles();
+			this.readMergeConflictFiles(null);
 		}
 		return fileToMergePartsMap.keySet();
 	}
@@ -501,7 +525,7 @@ public class JGitRepo {
 	 */
 	public String[] getMergeConflictParts(IFile localFile) throws GitAPIException, IOException {
 		if (!mergeMapInitialized) {
-			this.readMergeConflictFiles();
+			this.readMergeConflictFiles(null);
 		}
 		return fileToMergePartsMap.get(localFile.getProjectRelativePath());
 	}
@@ -521,7 +545,7 @@ public class JGitRepo {
 		Ref remoteMasterRef = git.getRepository().
 				getRef("refs/remotes/" + remoteProjectName + "/master"); //$NON-NLS-1$ //$NON-NLS-2$
 		final MergeCommand mergeCommand = git.merge().include(remoteMasterRef);
-		subMon.subTask("Merging remote changes");
+		subMon.subTask(Messages.JGitRepo_12);
 		mergeCommand.call();
 		} finally {
 			if (monitor != null) {
@@ -541,7 +565,7 @@ public class JGitRepo {
         try {
                 fileFilter.saveFilter();
         } catch (IOException e) {
-                Activator.log("Unable to save file filter for project: " + project.getName(), e);
+                Activator.log(Messages.JGitRepo_13 + project.getName(), e);
         }
 	}
 
@@ -606,7 +630,7 @@ public class JGitRepo {
 			} catch (RemoteConnectionException e) {
 				throw new TransportException(uri, e.getMessage(), e);
 			} catch (MissingConnectionException e) {
-				throw new TransportException(uri, "Missing connection: " + e.getConnectionName(), e);
+				throw new TransportException(uri, Messages.JGitRepo_14 + e.getConnectionName(), e);
 			}
 		}
 
@@ -638,7 +662,7 @@ public class JGitRepo {
 		final URIish uri = buildURI(remoteLoc.getDirectory());
 		TransportGitSsh transport;
 		try {
-			subMon.subTask("Opening transport mechanism");
+			subMon.subTask(Messages.JGitRepo_15);
 			transport = (TransportGitSsh) Transport.open(git.getRepository(), uri);
 		} catch (NotSupportedException e) {
 			throw new RuntimeException(e);
@@ -705,7 +729,7 @@ public class JGitRepo {
 				try {
 					project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 				} catch (CoreException e) {
-					Activator.log("Unable to refresh workspace", e);
+					Activator.log(Messages.JGitRepo_16, e);
 				}
 			}
 		}, "Refresh workspace thread"); //$NON-NLS-1$
