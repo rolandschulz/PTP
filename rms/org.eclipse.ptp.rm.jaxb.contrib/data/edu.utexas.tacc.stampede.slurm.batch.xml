@@ -30,13 +30,22 @@
             <default>${ptp_rm:workdir#value}/slurm-${ptp_rm:@jobId#default}.out</default>
             <link-value-to>error</link-value-to>
         </attribute>
+        <!-- ============================================================================================= -->
+        <!-- SBATCH COMMAND ARGUMENTS                                                                      -->
+        <!-- ============================================================================================= -->
         <attribute name="account" type="string">
-            <description>Charge resources used by this job to specified account.</description>
+            <description>Charge resources used by this job to specified account. (-A, --account=)</description>
             <tooltip><![CDATA[The account is an arbitrary string. The account name may be changed after
 job submission using the scontrol command.]]></tooltip>
         </attribute>
+        <attribute name="acctg_freq" type="string">
+            <description>Define the job accounting sampling interval. (--acctg-freq)</description>
+            <tooltip><![CDATA[This can be used to override the JobAcctGatherFrequency parameter in SLURM's
+configuration file, slurm.conf. A value of zero disables the periodic job sampling and provides
+accounting information only on job termination (reducing SLURM interference with the job).]]></tooltip>
+        </attribute>
         <attribute name="begin" type="string">
-            <description>Defer the allocation of the job until the specified time.</description>
+            <description>Defer the allocation of the job until the specified time. (--begin)</description>
             <tooltip><![CDATA[Submit the batch script to the SLURM controller immediately, like normal, 
 but tell the controller to defer the allocation of the job until the specified time. 
 Time may be of the form HH:MM:SS to run a job at a specific time of day 
@@ -52,33 +61,23 @@ SLURM to run the job today with the keyword "today" and to run the job
 tomorrow with the keyword "tomorrow". 
 The value may be changed after job submission using the scontrol command.]]></tooltip></attribute>
         <attribute name="checkpoint" type="string">
-            <description>Specifies the interval between creating checkpoints of the job step.</description>
+            <description>Specifies the interval between creating checkpoints of the job step. (--checkpoint)</description>
             <tooltip><![CDATA[By default, the job step has no checkpoints created.
 Acceptable time formats include "minutes", "minutes:seconds", "hours:minutes:seconds",
 "days-hours", "days-hours:minutes" and "days-hours:minutes:seconds".]]></tooltip>
         </attribute>
         <attribute name="checkpoint_dir" type="string">
-            <description>Specifies the directory into which the job or job step's checkpoint should be written.</description>
+            <description>Specifies the directory into which the job or job step's checkpoint should be written. (--checkpint_dir)</description>
             <tooltip><![CDATA[The default value is the current working directory. Checkpoint files
 of the form "<job_id>.ckpt" for jobs and "<job_id>.<step_id>.ckpt" for job steps.]]></tooltip></attribute>
         <attribute name="dependency" type="string">
-            <description>Defer the start of this job until the specified dependencies have been satisfied completed.</description>
+            <description>Defer the start of this job until the specified dependencies have been satisfied completed. (--dependency)</description>
             <tooltip><![CDATA[Format is of the form "type:job_id[:job_id][,type:job_id[:job_id]].
 Many jobs can share the same dependency and these jobs may even belong to different
 users. The value may be changed after job submission using the scontrol command.]]></tooltip>
         </attribute>
-        <attribute name="workdir" type="string">
-            <description>Set the working directory of the batch script to "directory" before it it executed.</description>
-            <tooltip>Must use absolute path on scheduled system, or "${ptp_rm:directory#value}".</tooltip>
-            <default>${ptp_rm:directory#value}</default>
-            <link-value-to>directory</link-value-to>
-            <validator>
-                <regex expression="/.*|\$\{ptp_rm\:directory\#value\}"></regex>
-                <error-message>"workdir" field: Must use absolute path on scheduled system, or "${ptp_rm:directory#value}".</error-message>
-            </validator>
-        </attribute>
         <attribute name="error" type="string">
-            <description>Instruct SLURM to connect the batch script's standard error directly to the file name specified in the "filename pattern".</description>
+            <description>Instruct SLURM to connect the batch script's standard error directly to the file name specified in the "filename pattern". (--error)</description>
             <tooltip><![CDATA[By default both standard output and standard error are directed to a file
 of the name "slurm-%j.out", where the "%j" is replaced with the job allocation number.
 See the "--input" option for filename specification options.
@@ -89,7 +88,7 @@ Use absolute path or "${ptp_rm:workdir#value}" prefix to be relative to working 
             </validator>
         </attribute>
         <attribute name="export" type="string">
-            <description>Identify which environment variables are propagated to the batch job.</description>
+            <description>Identify which environment variables are propagated to the batch job. (--export)</description>
             <tooltip><![CDATA[Format: <environment variables | ALL | NONE >.
 Multiple environment variable names should be comma separated.
 Environment variable names may be specified to propagate the current 
@@ -102,7 +101,7 @@ specific environment variable names, then the --get-user-env
 option is implicitly set to load other environment variables based upon
 the user's configuration on the cluster which executes the job.]]></tooltip></attribute>
         <attribute name="get_user_env" type="string">
-            <description>Tell sbatch to retrieve the login environment variables for the user.</description>
+            <description>Tell sbatch to retrieve the login environment variables for the user. (--get_user_env)</description>
             <tooltip><![CDATA[This option tells sbatch to retrieve the
 login environment variables for the user specified in the --uid option.
 The environment variables are retrieved by running something of this sort
@@ -121,15 +120,14 @@ is used.
 Example of use include "--get-user-env", "--get-user-env=10"
 "--get-user-env=10L", and "--get-user-env=S".
 This option was originally created for use by Moab.]]></tooltip></attribute>
-        <attribute name="hold" type="boolean"
-            translateBooleanAs='--hold, '>
-            <description>Specify the job is to be submitted in a held state (priority of zero).</description>
+        <attribute name="hold" type="boolean" translateBooleanAs='--hold, '>
+            <description>Specify the job is to be submitted in a held state (priority of zero). (--hold)</description>
             <tooltip><![CDATA[A held job can now be released using scontrol to reset its priority
 (e.g. "scontrol update jobid=<id> priority=1").]]></tooltip>
         </attribute>
         <attribute name="immediate" type="boolean" translateBooleanAs="--immediate, ">
             <description>The batch script is only submitted to the controller if the resources
-necessary to grant its job allocation are immediately available.</description>
+necessary to grant its job allocation are immediately available. (--immediate)</description>
             <tooltip><![CDATA[If the job allocation has to wait in a queue of pending jobs,
 the batch script is not submitted.]]></tooltip></attribute>
         <attribute name="job_name" type="string">
@@ -145,17 +143,26 @@ read on sbatch's standard input.]]></tooltip>
             </validator>
         </attribute>
         <attribute name="mail_type" type="choice">
-            <description>Notify user by email when certain event types occur.</description>
+            <description>Notify user by email when certain event types occur. (--mail-type)</description>
             <tooltip><![CDATA[Valid type values are BEGIN, END, FAIL, REQUEUE, and ALL (any state
 change). The user to be notified is indicated with --mail-user.]]></tooltip>
             <choice>BEGIN,END,FAIL,REQUEUE,ALL</choice>
-        </attribute><attribute name="mail_user" type="string">
-            <description>User to receive email notification of state changes.</description>
+        </attribute>
+        <attribute name="mail_user" type="string">
+            <description>User to receive email notification of state changes. (--mail_user)</description>
             <tooltip>As defined by --mail-type.
 The default value is the submitting user.</tooltip>
         </attribute>
+        <attribute name="nice" type="string">
+            <description>Run the job with an adjusted scheduling priority within SLURM. (--nice)</description>
+            <tooltip><![CDATA[With no adjustment value the scheduling priority is decreased
+by 100. The adjustment range is from -10000 (highest priority)
+to 10000 (lowest priority). Only privileged users can specify
+a negative adjustment. NOTE: This option is presently
+ignored if SchedulerType=sched/wiki or
+SchedulerType=sched/wiki2.]]></tooltip></attribute>
         <attribute name="nodes" type="string">
-            <description>Request that a minimum of "minnodes" nodes be allocated to this job.</description>
+            <description>Request that a minimum of "minnodes" nodes be allocated to this job. (--nodes)</description>
             <tooltip><![CDATA[The scheduler may decide to launch the job on more than "minnodes" nodes.
 A limit on the maximum node count may be specified with "maxnodes"
 (e.g. "--nodes=2-4").  The minimum and maximum node count may be the
@@ -176,16 +183,13 @@ the "-n" and "-c" options.
 The job is allocated as many nodes as possible within the range specified
 and without delaying the initiation of the job.]]></tooltip>
         </attribute>
-        <attribute name="nice" type="string">
-            <description>Run the job with an adjusted scheduling priority within SLURM.</description>
-            <tooltip><![CDATA[With no adjustment value the scheduling priority is decreased
-by 100. The adjustment range is from -10000 (highest priority)
-to 10000 (lowest priority). Only privileged users can specify
-a negative adjustment. NOTE: This option is presently
-ignored if SchedulerType=sched/wiki or
-SchedulerType=sched/wiki2.]]></tooltip></attribute>
+        <attribute name="open_mode" type="choice">
+            <description>Open the output and error files using append or truncate mode as specified. (--open_mode)</description>
+            <tooltip>The default value is specified by the system configuration parameter JobFileAppend.</tooltip>
+            <choice>append,truncate</choice>
+        </attribute>
         <attribute name="output" type="string">
-            <description>Instruct SLURM to connect the batch script's standard output directly to the file name specified in the "filename pattern".</description>
+            <description>Instruct SLURM to connect the batch script's standard output directly to the file name specified in the "filename pattern". (--output)</description>
             <tooltip><![CDATA[By default both standard output and standard error are directed to a file of
 the name "slurm-%j.out", where the "%j" is replaced with the job allocation number.
 See the --input option for filename specification options.
@@ -194,28 +198,24 @@ Use absolute path or "${ptp_rm:workdir#value}" prefix to be relative to working 
                 <regex expression="/.+|\$\{ptp_rm\:workdir\#value\}/.+"></regex>
                 <error-message>"output" field: Use absolute path or "${ptp_rm:workdir#value}" prefix to be relative to working directory.</error-message>
             </validator>
-        </attribute><attribute name="open_mode" type="choice">
-            <description>Open the output and error files using append or truncate mode as specified.</description>
-            <tooltip>The default value is specified by the system configuration parameter JobFileAppend.</tooltip>
-            <choice>append,truncate</choice>
         </attribute>
         <attribute name="partition" type="string">
-            <description>Request a specific partition for the resource allocation.</description>
+            <description>Request a specific partition for the resource allocation. (--partition)</description>
             <tooltip><![CDATA[If not specified, the default behaviour is to allow the slurm controller to select the default
 partition as designated by the system administrator. If the job can use more
 than one partition, specify their names in a comma separate list and the one
 offering earliest initiation is used.]]></tooltip>
         </attribute>
         <attribute name="quiet" type="boolean" translateBooleanAs="--quiet, ">
-            <description>Suppress informational messages from sbatch.</description>
+            <description>Suppress informational messages from sbatch. (--quiet)</description>
             <tooltip>Errors are still displayed.</tooltip>
         </attribute>
         <attribute name="reservation" type="string">
-            <description>Allocate resources for the job from the named reservation.</description>
+            <description>Allocate resources for the job from the named reservation. (--reservation)</description>
         </attribute>
         <attribute name="signal" type="string">
             <description>When a job is within "sig_time" seconds of its end time,
-send it the signal "sig_num".</description>
+send it the signal "sig_num". (--signal)</description>
             <tooltip><![CDATA[Format: <sig_num>[@<sig_time>].
 Due to the resolution of event handling by SLURM, the signal may
 be sent up to 60 seconds earlier than specified.
@@ -226,7 +226,7 @@ If a "sig_num" is specified without any sig_time,
 the default time is 60 seconds.]]></tooltip>
         </attribute>
         <attribute name="time" type="string">
-            <description>Set a limit on the total run time of the job allocation.</description>
+            <description>Set a limit on the total run time of the job allocation. (--time)</description>
             <tooltip><![CDATA[If the requested time limit exceeds the partition's time limit, the job is
 left in a PENDING state (possibly indefinitely).  The default time
 limit is the partition's time limit.  When the time limit is reached,
@@ -237,15 +237,27 @@ limit be imposed.  Acceptable time formats include "minutes",
 "minutes:seconds", "hours:minutes:seconds", "days-hours",
 "days-hours:minutes" and "days-hours:minutes:seconds".]]></tooltip>
         </attribute>
-        <attribute name="verbose" type="boolean"
-            translateBooleanAs="--verbose, ">
-            <description>Increase the verbosity of sbatch's informational messages.</description>
+        <attribute name="verbose" type="boolean" translateBooleanAs="--verbose, ">
+            <description>Increase the verbosity of sbatch's informational messages. (--verbose)</description>
             <tooltip><![CDATA[Multiple -v's further increase sbatch's verbosity.  By default only
 errors are displayed.]]></tooltip>
         </attribute>
+        <attribute name="workdir" type="string">
+            <description>Set the working directory of the batch script to "directory" before it it executed. (-- workdir)</description>
+            <tooltip>Must use absolute path on scheduled system, or "${ptp_rm:directory#value}".</tooltip>
+            <default>${ptp_rm:directory#value}</default>
+            <link-value-to>directory</link-value-to>
+            <validator>
+                <regex expression="/.*|\$\{ptp_rm\:directory\#value\}"></regex>
+                <error-message>"workdir" field: Must use absolute path on scheduled system, or "${ptp_rm:directory#value}".</error-message>
+            </validator>
+        </attribute>
+        <!-- ============================================================================================= -->
+        <!-- SBATCH RUN OPTIONS                                                                            -->
+        <!-- ============================================================================================= -->
         <attribute name="run.command" type="choice">
             <description>Which prefix command to use. Specify no prefix command for serial, OpenMP (host only or MIC only), or offload code.</description>
-			<choice>,ibrun,ibrun tacc_affinity,ibrun.symm</choice>
+            <choice>,ibrun,ibrun tacc_affinity,ibrun.symm</choice>
             <default>ibrun</default>
         </attribute>
         <attribute name="run.epilog" type="string">
@@ -258,10 +270,12 @@ This parameter overrides the SrunEpilog parameter in slurm.conf.]]></tooltip></a
             <tooltip><![CDATA[Normally, stdout and stderr from remote tasks is line-buffered directly
 to stdout and stderr.  The --label option prepends lines of output
 with the remote task id.]]></tooltip>
-        </attribute><attribute name="run.ntasks" type="integer" min="1">
+        </attribute>
+        <attribute name="run.ntasks" type="integer" min="1">
             <description>Specify the number of tasks to run.</description>
             <tooltip><![CDATA[Allocate resources for ntasks tasks.  The default
 is one task per node, but note that the --ntasks-per-node option changes this default.]]></tooltip>
+            <default>1</default>
         </attribute>
         <attribute name="run.ntasks_per_node" type="choice">
             <description>Request the maximum ntasks be invoked on each node.</description>
@@ -274,114 +288,48 @@ be assigned to each node while allowing the OpenMP portion to utilize all of the
 parallelism present in  the node, or submitting a single setup/cleanup/monitoring
 job to each node of a pre-existing allocation as one step in a larger job script.]]></tooltip>
             <choice>1,2,4,8,16,32,64</choice>
-            <default>1</default>            
+            <default>1</default>
         </attribute>
         <attribute name="run.prolog" type="string">
             <description>Run this executable before launching the job step.</description>
             <tooltip><![CDATA[The command line arguments for this executable are the command and 
 arguments of the job step.  If executable is "none", then no prolog is run.
-This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip></attribute>        
+This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip>
+        </attribute>
         <script insertEnvironmentAfter="30" deleteAfterSubmit="false">
             <file-staging-location>${ptp_rm:directory#value}</file-staging-location>
-            <line>
-                <arg>#!/bin/bash</arg>
-            </line>
-            <line>
-                <arg isUndefinedIfMatches="#SBATCH --account=">#SBATCH --account=${ptp_rm:account#value}</arg>
-            </line>
-            <line>
-                <arg isUndefinedIfMatches="#SBATCH --begin=">#SBATCH --begin=${ptp_rm:begin#value}</arg>
-            </line>
-            <line>
-                <arg isUndefinedIfMatches="#SBATCH --checkpoint=">#SBATCH --checkpoint=${ptp_rm:checkpoint#value}</arg>
-            </line>
-            <line>
-                <arg isUndefinedIfMatches="#SBATCH --checkpoint-dir=">#SBATCH --checkpoint-dir=${ptp_rm:checkpoint_dir#value}</arg>
-            </line>
-            <line>
-                <arg isUndefinedIfMatches="#SBATCH --dependency=">#SBATCH --dependency=${ptp_rm:dependency#value}</arg>
-            </line>
-            <line>
-                <arg isUndefinedIfMatches="#SBATCH --workdir=">#SBATCH --workdir=${ptp_rm:workdir#value}</arg>
-            </line>
-            <line>
-                <arg isUndefinedIfMatches="#SBATCH --error=">#SBATCH --error=${ptp_rm:error#value}</arg>
-            </line>
-            <line>
-                <arg isUndefinedIfMatches="#SBATCH --export=">#SBATCH --export=${ptp_rm:export#value}</arg>
-            </line>
-            <line>
-                <arg isUndefinedIfMatches="#SBATCH --get-user-env=">#SBATCH --get-user-env=${ptp_rm:get_user_env#value}</arg>
-            </line>
-            <line>
-                <arg isUndefinedIfMatches="#SBATCH">#SBATCH ${ptp_rm:hold#value}</arg>
-            </line>
-            <line>
-                <arg isUndefinedIfMatches="#SBATCH">#SBATCH ${ptp_rm:immediate#value}</arg>
-            </line>
-            <line>
-                <arg isUndefinedIfMatches="#SBATCH --job-name=">#SBATCH --job-name=${ptp_rm:job_name#value}</arg>
-            </line>
-            <line>
-                <arg isUndefinedIfMatches="#SBATCH --mail-type=">#SBATCH --mail-type=${ptp_rm:mail_type#value}</arg>
-            </line>
-            <line>
-                <arg isUndefinedIfMatches="#SBATCH --mail-user=">#SBATCH --mail-user=${ptp_rm:mail_user#value}</arg>
-            </line>
-            <line>
-                <arg isUndefinedIfMatches="#SBATCH --nodes=">#SBATCH --nodes=${ptp_rm:nodes#value}</arg>
-            </line>
-            <line>
-                <arg isUndefinedIfMatches="#SBATCH --nice=">#SBATCH --nice=${ptp_rm:nice#value}</arg>
-            </line>
-            <line>
-                <arg isUndefinedIfMatches="#SBATCH --output=">#SBATCH --output=${ptp_rm:output#value}</arg>
-            </line>
-            <line>
-                <arg isUndefinedIfMatches="#SBATCH --open-mode=">#SBATCH --open-mode=${ptp_rm:open_mode#value}</arg>
-            </line>
-            <line>
-                <arg isUndefinedIfMatches="#SBATCH --partition=">#SBATCH --partition=${ptp_rm:partition#value}</arg>
-            </line>
-            <line>
-                <arg isUndefinedIfMatches="#SBATCH">#SBATCH ${ptp_rm:quiet#value}</arg>
-            </line>
-            <line>
-                <arg isUndefinedIfMatches="#SBATCH --reservation=">#SBATCH --reservation=${ptp_rm:reservation#value}</arg>
-            </line>
-            <line>
-                <arg isUndefinedIfMatches="#SBATCH --signal=">#SBATCH --signal=${ptp_rm:signal#value}</arg>
-            </line>
-            <line>
-                <arg isUndefinedIfMatches="#SBATCH --time=">#SBATCH --time=${ptp_rm:time#value}</arg>
-            </line>
-            <line>
-                <arg isUndefinedIfMatches="#SBATCH">#SBATCH ${ptp_rm:verbose#value}</arg>
-            </line>
-            <line>
-                <arg># Set arguments</arg></line>
-            <line>
-                <arg isUndefinedIfMatches='EPILOG="--epilog="'>EPILOG="--epilog=${ptp_rm:run.epilog#value}"</arg></line>
-            <line>
-                <arg isUndefinedIfMatches='LABEL=""'>LABEL="${ptp_rm:run.label#value}"</arg></line><line>
-                <arg isUndefinedIfMatches='NTASKS="--ntasks="'>NTASKS="--ntasks=${ptp_rm:run.ntasks#value}"</arg></line>
-            <line>
-                <arg isUndefinedIfMatches='NTASKS_PER_NODE="--ntasks-per-node="'>NTASKS_PER_NODE="--ntasks-per-node=${ptp_rm:run.ntasks_per_node#value}"</arg></line>
-            <line>
-                <arg isUndefinedIfMatches='PROLOG="--prolog="'>PROLOG="--prolog=${ptp_rm:run.prolog#value}"</arg></line>
-            <line>
-                <arg resolve="false">RUN_ARGS="${EPILOG} ${LABEL} ${NTASKS} ${NTASKS_PER_NODE} ${PROLOG}"</arg>
-            </line>
-            <line>
-                <arg>COMMAND="${ptp_rm:run.command#value}</arg>
-                <arg resolve="false">${RUN_ARGS}</arg>
-                <arg resolve="true">${ptp_rm:executablePath#value} ${ptp_rm:progArgs#value}"</arg>
-            </line>
-            <line>
-                <arg isUndefinedIfMatches="cd">cd ${ptp_rm:workdir#value}</arg></line>
-            <line>
-                <arg resolve="false">${COMMAND}</arg>
-            </line>
+            <line><arg>#!/bin/bash</arg></line>
+            <line><arg isUndefinedIfMatches="#SBATCH --account=">#SBATCH --account=${ptp_rm:account#value}</arg></line>
+            <line><arg isUndefinedIfMatches="#SBATCH --acctg-freq=">#SBATCH --acctg-freq=${ptp_rm:acctg_freq#value}</arg></line>
+            <line><arg isUndefinedIfMatches="#SBATCH --begin=">#SBATCH --begin=${ptp_rm:begin#value}</arg></line>
+            <line><arg isUndefinedIfMatches="#SBATCH --checkpoint=">#SBATCH --checkpoint=${ptp_rm:checkpoint#value}</arg></line>
+            <line><arg isUndefinedIfMatches="#SBATCH --checkpoint-dir=">#SBATCH --checkpoint-dir=${ptp_rm:checkpoint_dir#value}</arg></line>
+            <line><arg isUndefinedIfMatches="#SBATCH --dependency=">#SBATCH --dependency=${ptp_rm:dependency#value}</arg></line>
+            <line><arg isUndefinedIfMatches="#SBATCH --error=">#SBATCH --error=${ptp_rm:error#value}</arg></line>
+            <line><arg isUndefinedIfMatches="#SBATCH --export=">#SBATCH --export=${ptp_rm:export#value}</arg></line>
+            <line><arg isUndefinedIfMatches="#SBATCH --get-user-env=">#SBATCH --get-user-env=${ptp_rm:get_user_env#value}</arg></line>
+            <line><arg isUndefinedIfMatches="#SBATCH">#SBATCH ${ptp_rm:hold#value}</arg></line>
+            <line><arg isUndefinedIfMatches="#SBATCH">#SBATCH ${ptp_rm:immediate#value}</arg></line>
+            <line><arg isUndefinedIfMatches="#SBATCH --job-name=">#SBATCH --job-name=${ptp_rm:job_name#value}</arg></line>
+            <line><arg isUndefinedIfMatches="#SBATCH --mail-type=">#SBATCH --mail-type=${ptp_rm:mail_type#value}</arg></line>
+            <line><arg isUndefinedIfMatches="#SBATCH --mail-user=">#SBATCH --mail-user=${ptp_rm:mail_user#value}</arg></line>
+            <line><arg isUndefinedIfMatches="#SBATCH --nice=">#SBATCH --nice=${ptp_rm:nice#value}</arg></line>
+            <line><arg isUndefinedIfMatches="#SBATCH --nodes=">#SBATCH --nodes=${ptp_rm:nodes#value}</arg></line>
+            <line><arg isUndefinedIfMatches="#SBATCH --open-mode=">#SBATCH --open-mode=${ptp_rm:open_mode#value}</arg></line>
+            <line><arg isUndefinedIfMatches="#SBATCH --output=">#SBATCH --output=${ptp_rm:output#value}</arg></line>
+            <line><arg isUndefinedIfMatches="#SBATCH --partition=">#SBATCH --partition=${ptp_rm:partition#value}</arg></line>
+            <line><arg isUndefinedIfMatches="#SBATCH">#SBATCH ${ptp_rm:quiet#value}</arg></line>
+            <line><arg isUndefinedIfMatches="#SBATCH --reservation=">#SBATCH --reservation=${ptp_rm:reservation#value}</arg></line>
+            <line><arg isUndefinedIfMatches="#SBATCH --epilog=">#SBATCH --epilog=${ptp_rm:run.epilog#value}</arg></line>
+            <line><arg isUndefinedIfMatches="#SBATCH">#SBATCH ${ptp_rm:run.label#value}</arg></line>
+            <line><arg isUndefinedIfMatches="#SBATCH --ntasks=">#SBATCH --ntasks=${ptp_rm:run.ntasks#value}</arg></line>
+            <line><arg isUndefinedIfMatches="#SBATCH --ntasks-per-node=">#SBATCH --ntasks-per-node=${ptp_rm:run.ntasks_per_node#value}</arg></line>
+            <line><arg isUndefinedIfMatches="#SBATCH --prolog=">#SBATCH --prolog=${ptp_rm:run.prolog#value}</arg></line>
+            <line><arg isUndefinedIfMatches="#SBATCH --signal=">#SBATCH --signal=${ptp_rm:signal#value}</arg></line>
+            <line><arg isUndefinedIfMatches="#SBATCH --time=">#SBATCH --time=${ptp_rm:time#value}</arg></line>
+            <line><arg isUndefinedIfMatches="#SBATCH">#SBATCH ${ptp_rm:verbose#value}</arg></line>
+            <line><arg isUndefinedIfMatches="cd">cd ${ptp_rm:workdir#value}</arg></line>
+            <line><arg>${ptp_rm:run.command#value} ${ptp_rm:executablePath#value} ${ptp_rm:progArgs#value}</arg></line>
         </script>
         <start-up-command name="get-queues">
             <arg>scontrol</arg>
@@ -400,18 +348,25 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip></a
         </start-up-command>
         <submit-batch name="submit-batch" directory="${ptp_rm:directory#value}" waitForId="true">
             <arg>sbatch</arg>
-            <arg isUndefinedIfMatches='-n '>-n ${ptp_rm:run.ntasks#value}"</arg>
             <arg>${ptp_rm:managed_file_for_script#value}</arg>
             <stdout-parser delim="\n">
                 <target ref="@jobId">
                     <match>
                         <expression>^Submitted batch job ([\d]+)</expression>
                         <set field="name">
-                            <entry valueGroup="1"></entry></set>
+                            <entry valueGroup="1"/></set>
                         <set field="default">
-                            <entry valueGroup="1"></entry></set>
+                            <entry valueGroup="1"/></set>
                         <set field="value">
-                            <entry value="SUBMITTED"></entry></set>
+                            <entry value="SUBMITTED"/></set>
+                    </match>
+                </target>
+                <target ref="@jobId">
+                    <match>
+                        <expression flags="DOTALL|UNIX_LINES">.*Submission error: (.*)</expression>
+                        <set field="value">
+                            <entry valueGroup="1"/></set>
+                        <throw message="Job Submit Failed: ${ptp_rm:@jobId#value}"/>
                     </match>
                 </target>
             </stdout-parser>
@@ -420,7 +375,7 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip></a
                     <match>
                         <expression>.+</expression>
                         <set field="value">
-                            <entry value="FAILED"></entry></set>
+                            <entry value="FAILED"/></set>
                         <throw message="Job Submit Failed"/>
                     </match>
                 </target>
@@ -438,7 +393,7 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip></a
                             <entry valueGroup="1"/>
                         </set>
                         <set field="default">
-                            <entry valueGroup="2"></entry></set>
+                            <entry valueGroup="2"/></set>
                     </match>
                     <test op="OR">
                         <test op="AND">
@@ -524,12 +479,12 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip></a
                         <value>#value</value>
                         <value>PENDING</value>
                         <set field="value">
-                            <entry value="QUEUED_ACTIVE"></entry></set></test>
+                            <entry value="QUEUED_ACTIVE"/></set></test>
                     <test op="EQ">
                         <value>#value</value>
                         <value>CONFIGURING</value>
                         <set field="value">
-                            <entry value="SUBMITTED"></entry></set></test>
+                            <entry value="SUBMITTED"/></set></test>
                     <test op="EQ">
                         <value>#value</value>
                         <value>RUNNING</value>
@@ -569,17 +524,17 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip></a
                         <value>#value</value>
                         <value>FAILED</value>
                         <set field="value">
-                            <entry value="FAILED"></entry></set></test>
+                            <entry value="FAILED"/></set></test>
                     <test op="EQ">
                         <value>#value</value>
                         <value>NODE_FAIL</value>
                         <set field="value">
-                            <entry value="FAILED"></entry></set></test>
+                            <entry value="FAILED"/></set></test>
                     <test op="EQ">
                         <value>#value</value>
                         <value>TIMEOUT</value>
                         <set field="value">
-                            <entry value="FAILED"></entry></set></test>
+                            <entry value="FAILED"/></set></test>
                 </target>
             </stdout-parser>
             <stderr-parser delim="\n">
@@ -771,6 +726,7 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip></a
                         <layout-data>
                             <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
                         </layout-data>
+                        <tooltip>${ptp_rm:run.ntasks#tooltip}</tooltip>
                         <fixed-text>MPI Number of Tasks:</fixed-text>
                     </widget>
                     <widget type="text" style="SWT.BORDER" attribute="run.ntasks">
@@ -792,11 +748,9 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip></a
                         <tooltip>${ptp_rm:run.ntasks_per_node#tooltip}</tooltip>
                         <fixed-text>MPI Ranks per Node:</fixed-text>
                     </widget>
-                    <widget type="combo" style="SWT.BORDER"
-                        attribute="run.ntasks_per_node" readOnly="true">
+                    <widget type="combo" style="SWT.BORDER" attribute="run.ntasks_per_node" readOnly="true">
                         <layout-data>
-                            <grid-data horizontalAlign="SWT.FILL"
-                                horizontalSpan="2" grabExcessHorizontal="false" />
+                            <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" />
                         </layout-data>
                     </widget>
                     <widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
@@ -855,8 +809,37 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip></a
                         <column-data name="Value" width="200" resizable="true">
                             <tooltip>Click to activate value widget.</tooltip>
                         </column-data>
-                        <items allPredefined="true">
-                            <exclude>destination</exclude>
+                        <items>
+                            <include>account</include>
+                            <include>acctg_freq</include>
+                            <include>begin</include>
+                            <include>checkpoint</include>
+                            <include>checkpoint_dir</include>
+                            <include>dependency</include>
+                            <include>error</include>
+                            <include>export</include>
+                            <include>get_user_env</include>
+                            <include>hold</include>
+                            <include>immediate</include>
+                            <include>job_name</include>
+                            <include>mail_type</include>
+                            <include>mail_user</include>
+                            <include>nice</include>
+                            <include>nodes</include>
+                            <include>open_mode</include>
+                            <include>output</include>
+                            <include>partition</include>
+                            <include>quiet</include>
+                            <include>reservation</include>
+                            <include>run.epilog</include>
+                            <include>run.label</include>
+                            <include>run.ntasks</include>
+                            <include>run.ntasks_per_node</include>
+                            <include>run.prolog</include>
+                            <include>signal</include>
+                            <include>time</include>
+                            <include>verbose</include>
+                            <include>workdir</include>
                         </items>
                         <value pattern="@name='@value'"/>
                     </viewer>
