@@ -14,15 +14,34 @@
 	<artifactId>org.eclipse.ptp.repo</artifactId>
 	<version>7.0.2-SNAPSHOT</version>
 	<packaging>eclipse-repository</packaging>
-
 	<profiles>
 		<profile>
 			<id>production</id>
+			
+			<properties>
+				<mirror-repo-name>updates/${eclipse-release}</mirror-repo-name>
+			</properties>
+			
 			<build>
 				<plugins>
 					<plugin>
 						<artifactId>maven-antrun-plugin</artifactId>
 						<executions>
+							<execution>
+								<id>prepare-promotion</id>
+								<phase>package</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<target>
+										<!-- copy scripts to build directory and execute -->
+										<copy file="p2.xsl" todir="${project.build.directory}" />
+										<copy file="promoter.xml" todir="${project.build.directory}" />
+										<ant antfile="${project.build.directory}/promoter.xml" />
+									</target>
+								</configuration>
+							</execution>
 							<execution>
 								<id>deploy</id>
 								<phase>install</phase>
@@ -40,7 +59,9 @@
 										<unzip
 											src="${project.build.directory}/${project.build.finalName}.zip"
 											dest="${ptp-install-dir}" />
-										<copy file="${project.build.directory}/${project.build.finalName}.zip" tofile="${ptp-install-dir}/ptp-master-${unqualifiedVersion}.${buildQualifier}.zip"/>
+										<copy
+											file="${project.build.directory}/${project.build.finalName}.zip"
+											tofile="${ptp-install-dir}/ptp-master-${unqualifiedVersion}.${buildQualifier}.zip" />
 										<copy includeemptydirs="false" todir="${ptp-install-dir}">
 											<fileset
 												dir="${basedir}/../../rdt/org.eclipse.ptp.rdt.core.remotejars">
@@ -78,17 +99,17 @@
 												line="-r ${ptp-install-dir}/ptp-sdm-${unqualifiedVersion}.zip sdm" />
 										</exec>
 										<delete dir="${ptp-install-dir}/sdm">
-										<copy file="${basedir}/index.html"
-											tofile="${ptp-install-dir}/index.html"/>
-										<replace file="${ptp-install-dir}/index.html">
-											<replacefilter token="@unqualifiedVersion@" value="${unqualifiedVersion}"/>
-											<replacefilter token="@buildQualifier@" value="${buildQualifier}"/>
-										</replace>
-										<chmod perm="g+w">
-											<fileset dir="${ptp-install-dir}">
-												<include name="**"/>
-											</fileset>
-										</chmod>
+											<copy file="${basedir}/index.html" tofile="${ptp-install-dir}/index.html" />
+											<replace file="${ptp-install-dir}/index.html">
+												<replacefilter token="@unqualifiedVersion@"
+													value="${unqualifiedVersion}" />
+												<replacefilter token="@buildQualifier@" value="${buildQualifier}" />
+											</replace>
+											<chmod perm="g+w">
+												<fileset dir="${ptp-install-dir}">
+													<include name="**" />
+												</fileset>
+											</chmod>
 									</tasks>
 								</configuration>
 							</execution>
