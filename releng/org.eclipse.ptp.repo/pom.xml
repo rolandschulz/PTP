@@ -31,51 +31,68 @@
 								</goals>
 								<configuration>
 									<tasks>
-										<mkdir dir="${ptp-build-dir}" />
+										<mkdir dir="${ptp-install-dir}" />
 										<delete includeemptydirs="true">
-											<fileset dir="${ptp-build-dir}">
+											<fileset dir="${ptp-install-dir}">
 												<include name="**/*" />
 											</fileset>
 										</delete>
-										<copy includeemptydirs="false" todir="${ptp-build-dir}">
+										<unzip
+											src="${project.build.directory}/${project.build.finalName}.zip"
+											dest="${ptp-install-dir}" />
+										<copy file="${project.build.directory}/${project.build.finalName}.zip" tofile="${ptp-install-dir}/ptp-master-${unqualifiedVersion}.${buildQualifier}.zip"/>
+										<copy includeemptydirs="false" todir="${ptp-install-dir}">
 											<fileset
 												dir="${basedir}/../../rdt/org.eclipse.ptp.rdt.core.remotejars">
 												<include name="rdt-server-*" />
 											</fileset>
 										</copy>
 										<unzip
-											src="${project.build.directory}/${project.build.finalName}.zip"
-											dest="${ptp-build-dir}" />
-										<unzip
 											src="${basedir}/../../releng/org.eclipse.ptp.aix/target/org.eclipse.ptp.aix-${project.version}.jar"
-											dest="${ptp-build-dir}/sdm/org.eclipse.ptp.aix_${unqualifiedVersion}.${buildQualifier}" />
+											dest="${ptp-install-dir}/sdm/org.eclipse.ptp.aix_${unqualifiedVersion}.${buildQualifier}" />
 										<chmod perm="a+x"
-											file="${ptp-build-dir}/sdm/org.eclipse.ptp.aix_${unqualifiedVersion}.${buildQualifier}/os/aix/ppc64/sdm" />
+											file="${ptp-install-dir}/sdm/org.eclipse.ptp.aix_${unqualifiedVersion}.${buildQualifier}/os/aix/ppc64/sdm" />
 										<unzip
 											src="${basedir}/../../releng/org.eclipse.ptp.linux/target/org.eclipse.ptp.linux-${project.version}.jar"
-											dest="${ptp-build-dir}/sdm/org.eclipse.ptp.linux_${unqualifiedVersion}.${buildQualifier}" />
+											dest="${ptp-install-dir}/sdm/org.eclipse.ptp.linux_${unqualifiedVersion}.${buildQualifier}" />
 										<chmod perm="a+x"
-											file="${ptp-build-dir}/sdm/org.eclipse.ptp.linux_${unqualifiedVersion}.${buildQualifier}/os/linux/ppc64/sdm" />
+											file="${ptp-install-dir}/sdm/org.eclipse.ptp.linux_${unqualifiedVersion}.${buildQualifier}/os/linux/ppc64/sdm" />
 										<chmod perm="a+x"
-											file="${ptp-build-dir}/sdm/org.eclipse.ptp.linux_${unqualifiedVersion}.${buildQualifier}/os/linux/x86_64/sdm" />
+											file="${ptp-install-dir}/sdm/org.eclipse.ptp.linux_${unqualifiedVersion}.${buildQualifier}/os/linux/x86_64/sdm" />
 										<unzip
 											src="${basedir}/../../releng/org.eclipse.ptp.macosx/target/org.eclipse.ptp.macosx-${project.version}.jar"
-											dest="${ptp-build-dir}/sdm/org.eclipse.ptp.macosx_${unqualifiedVersion}.${buildQualifier}" />
+											dest="${ptp-install-dir}/sdm/org.eclipse.ptp.macosx_${unqualifiedVersion}.${buildQualifier}" />
 										<chmod perm="a+x"
-											file="${ptp-build-dir}/sdm/org.eclipse.ptp.macosx_${unqualifiedVersion}.${buildQualifier}/os/macosx/x86_64/sdm" />
+											file="${ptp-install-dir}/sdm/org.eclipse.ptp.macosx_${unqualifiedVersion}.${buildQualifier}/os/macosx/x86_64/sdm" />
 										<unzip
 											src="${basedir}/../../debug/org.eclipse.ptp.debug.sdm/target/org.eclipse.ptp.debug.sdm-${project.version}.jar"
-											dest="${ptp-build-dir}/sdm/org.eclipse.ptp.debug.sdm_${unqualifiedVersion}.${buildQualifier}" />
+											dest="${ptp-install-dir}/sdm/org.eclipse.ptp.debug.sdm_${unqualifiedVersion}.${buildQualifier}" />
 										<unzip
 											src="${basedir}/../../core/org.eclipse.ptp.proxy/target/org.eclipse.ptp.proxy-${project.version}.jar"
-											dest="${ptp-build-dir}/sdm/org.eclipse.ptp.proxy_${unqualifiedVersion}.${buildQualifier}" />
+											dest="${ptp-install-dir}/sdm/org.eclipse.ptp.proxy_${unqualifiedVersion}.${buildQualifier}" />
 										<unzip
 											src="${basedir}/../../core/org.eclipse.ptp.utils/target/org.eclipse.ptp.utils-${project.version}.jar"
-											dest="${ptp-build-dir}/sdm/org.eclipse.ptp.utils_${unqualifiedVersion}.${buildQualifier}" />
-										<exec executable="zip" spawn="true" dir="${ptp-build-dir}">
+											dest="${ptp-install-dir}/sdm/org.eclipse.ptp.utils_${unqualifiedVersion}.${buildQualifier}" />
+										<exec executable="zip" spawn="true" dir="${ptp-install-dir}">
 											<arg
-												line="-r ${ptp-build-dir}/ptp-sdm-${unqualifiedVersion}.zip sdm" />
+												line="-r ${ptp-install-dir}/ptp-sdm-${unqualifiedVersion}.zip sdm" />
 										</exec>
+										<delete includeemptydirs="true">
+											<fileset dir="${ptp-install-dir}/sdm">
+												<include name="**/*" />
+											</fileset>
+										</delete>
+										<copy file="${project.build.directory}/index.html"
+											tofile="${ptp-install-dir}/index.html"/>
+										<replace file="${ptp-install-dir}/index.html">
+											<replacefilter token="@unqualifiedVersion@" value="${unqualifiedVersion}"/>
+											<replacefilter token="@buildQualifier@" value="${buildQualifier}"/>
+										</replace>
+										<chmod perm="g+w">
+											<fileset dir="${ptp-install-dir}">
+												<include name="**"/>
+											</fileset>
+										</chmod>
 									</tasks>
 								</configuration>
 							</execution>
