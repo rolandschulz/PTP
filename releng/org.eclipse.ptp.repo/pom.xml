@@ -17,11 +17,11 @@
 	<profiles>
 		<profile>
 			<id>production</id>
-			
+
 			<properties>
 				<mirror-repo-name>updates/${eclipse-release}</mirror-repo-name>
 			</properties>
-			
+
 			<build>
 				<plugins>
 					<plugin>
@@ -98,18 +98,18 @@
 											<arg
 												line="-r ${ptp-install-dir}/ptp-sdm-${unqualifiedVersion}.zip sdm" />
 										</exec>
-										<delete dir="${ptp-install-dir}/sdm">
-											<copy file="${basedir}/index.html" tofile="${ptp-install-dir}/index.html" />
-											<replace file="${ptp-install-dir}/index.html">
-												<replacefilter token="@unqualifiedVersion@"
-													value="${unqualifiedVersion}" />
-												<replacefilter token="@buildQualifier@" value="${buildQualifier}" />
-											</replace>
-											<chmod perm="g+w">
-												<fileset dir="${ptp-install-dir}">
-													<include name="**" />
-												</fileset>
-											</chmod>
+										<delete dir="${ptp-install-dir}/sdm" />
+										<copy file="${basedir}/index.html" tofile="${ptp-install-dir}/index.html" />
+										<replace file="${ptp-install-dir}/index.html">
+											<replacefilter token="@unqualifiedVersion@"
+												value="${unqualifiedVersion}" />
+											<replacefilter token="@buildQualifier@" value="${buildQualifier}" />
+										</replace>
+										<chmod perm="g+w">
+											<fileset dir="${ptp-install-dir}">
+												<include name="**" />
+											</fileset>
+										</chmod>
 									</tasks>
 								</configuration>
 							</execution>
