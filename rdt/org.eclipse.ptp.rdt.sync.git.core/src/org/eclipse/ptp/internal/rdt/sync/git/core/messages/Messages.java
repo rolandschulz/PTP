@@ -35,11 +35,11 @@ public class Messages extends NLS {
 	public static String GitSyncService_0;
 	public static String GitSyncService_1;
 	public static String GitSyncService_10;
+	public static String GitSyncService_11;
 	public static String GitSyncService_12;
 	public static String GitSyncService_13;
 	public static String GitSyncService_14;
 	public static String GitSyncService_15;
-	public static String GitSyncService_16;
 	public static String GitSyncService_18;
 	public static String GitSyncService_2;
 	public static String GitSyncService_3;

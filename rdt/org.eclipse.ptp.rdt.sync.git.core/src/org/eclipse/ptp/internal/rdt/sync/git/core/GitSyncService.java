@@ -383,29 +383,6 @@ public class GitSyncService extends AbstractSynchronizeService {
 					return;
 				}
 
-				subMon.subTask(Messages.GitSyncService_6);
-				JGitRepo localRepo = getLocalJGitRepo(project, subMon.newChild(5));
-
-				subMon.subTask(Messages.GitSyncService_7);
-				GitRepo remoteRepo = getGitRepo(project, remoteLoc, subMon.newChild(10));
-				// Unresolved connection - abort
-				if (remoteRepo == null) {
-					return;
-				}
-
-				// Do not sync if there are merge conflicts.
-				Set<IPath> conflictedFiles;
-				try {
-					conflictedFiles = localRepo.getMergeConflictFiles();
-				} catch (GitAPIException e) {
-					throw new RemoteSyncException(e);
-				} catch (IOException e) {
-					throw new RemoteSyncException(e);
-				}
-				if (!(conflictedFiles.isEmpty())) {
-					throw new RemoteSyncMergeConflictException(Messages.GitSyncService_8);
-				}
-
 				// This synchronization operation will include all tasks up to current syncTaskId
 				// syncTaskId can be larger than mySyncTaskId (than we do also the work for other threads)
 				// we might synchronize even more than that if a file is already saved but syncTaskId wasn't increased yet
@@ -418,7 +395,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 
 				try {
 					subMon.subTask(Messages.GitSyncService_9);
-					doSync(localRepo, remoteRepo, syncFlags, subMon.newChild(80));
+					doSync(project, remoteLoc, syncFlags, subMon.newChild(95));
 				} catch (RemoteSyncMergeConflictException e) {
 					subMon.subTask(Messages.GitSyncService_10);
 					// Refresh after merge conflict since conflicted files are altered with markup.
@@ -445,56 +422,72 @@ public class GitSyncService extends AbstractSynchronizeService {
 	}
 
 	/**
-	 * Synchronize the given local and remote repositories. Currently both directions are always synchronized.
-	 * Note that the remote is fetched and merged first. This is on purpose so that merge conflicts will occur locally, where
-	 * they can be more easily managed.
-	 * 
-	 * assumes that there are no merge conflicts
-	 * 
-	 * @param localRepo
-	 * 				A local JGit repository
-	 * @param remoteRepo
-	 * 				A remote Git repository
+	 * Synchronize the given project to the given remote. Currently both directions are always synchronized.
+	 * The sync strategy follows these three high-level steps:
+	 * 1) Commit local and remote changes. These are independent operations.
+	 * 2) Fetch remote changes and merge them locally. Thus, all merge conflicts should occur locally and thus easily managed.
+	 * 3) Push local changes to remote and merge them remotely. This final merge should never fail assuming files are
+	 *    unchanged during the sync.
+	 *
+	 * @param project
+	 * 				the local project
+	 * @param remoteLoc
+	 * 				the remote location
+	 * @param syncFlags
+	 * 				flags to modify sync behavior
 	 * @param monitor
-	 * @param includeUntrackedFiles
-	 *            Should currently untracked remote files be added to the repository?
 	 * @throws RemoteSyncException
 	 *             for various problems sync'ing. All exceptions are wrapped in a RemoteSyncException and thrown, so that clients
 	 *             can always detect when a sync fails and why.
 	 */
-	private void doSync(JGitRepo localRepo, GitRepo remoteRepo, EnumSet<SyncFlag> syncFlags, IProgressMonitor monitor) throws RemoteSyncException {
+	private void doSync(IProject project, RemoteLocation remoteLoc, EnumSet<SyncFlag> syncFlags, IProgressMonitor monitor)
+			throws RemoteSyncException {
 		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
 		try {
-			assert(!localRepo.inMergeState());
+			subMon.subTask(Messages.GitSyncService_6);
+			JGitRepo localRepo = getLocalJGitRepo(project, subMon.newChild(5));
 
-			// Commit local and remote changes
+			if (localRepo.inMergeState()) {
+				throw new RemoteSyncMergeConflictException(Messages.GitSyncService_8);
+			}
+
+			// Commit local changes
 			subMon.subTask(Messages.GitSyncService_12);
 			boolean hasChanges = localRepo.commit(subMon.newChild(5));
 			if ((!hasChanges) && (syncFlags == SyncFlag.NO_FORCE)) {
 				return;
 			}
-			subMon.subTask(Messages.GitSyncService_13);
+
+			// Get remote repository. creating it if necessary
+			subMon.subTask(Messages.GitSyncService_7);
+			GitRepo remoteRepo = getGitRepo(project, remoteLoc, subMon.newChild(15));
+			// Unresolved connection - abort
+			if (remoteRepo == null) {
+				return;
+			}
+
+			// Update remote file filter
 			ProjectAndRemotePair parp = new ProjectAndRemotePair(localRepo.getProject(), remoteRepo.getRemoteLocation());
-			int commitWork = 25;
+			int commitWork = 20;
 			if (!cleanFileFilterMap.contains(parp)) {
-				commitWork -= 12;
-				remoteRepo.uploadFilter(localRepo, subMon.newChild(12));
+				commitWork -= 10;
+				subMon.subTask(Messages.GitSyncService_11);
+				remoteRepo.uploadFilter(localRepo, subMon.newChild(10));
 				cleanFileFilterMap.add(parp);
 			}
+
+			subMon.subTask(Messages.GitSyncService_13);
 			remoteRepo.commitRemoteFiles(subMon.newChild(commitWork));
 
 			try {
 				// Fetch the remote repository
 				subMon.subTask(Messages.GitSyncService_14);
-				localRepo.fetch(remoteRepo.getRemoteLocation(), subMon.newChild(25));
+				localRepo.fetch(remoteRepo.getRemoteLocation(), subMon.newChild(20));
 
 				// Merge it with local
 				subMon.subTask(Messages.GitSyncService_15);
-				localRepo.merge(subMon.newChild(2));
-
-				// Handle merge conflict. Read in data needed to resolve the conflict, and then reset the repo.
-				subMon.subTask(Messages.GitSyncService_16);
-				if (localRepo.readMergeConflictFiles(subMon.newChild(3))) {
+				localRepo.merge(subMon.newChild(5));
+				if (localRepo.inMergeState()) {
 					throw new RemoteSyncMergeConflictException(Messages.GitSyncService_8);
 					// Even if we later decide not to throw an exception, it is important not to proceed after a merge conflict.
 					// return;
@@ -509,14 +502,14 @@ public class GitSyncService extends AbstractSynchronizeService {
 					throw new RemoteSyncException(e);
 				}
 			} finally {
-				subMon.setWorkRemaining(100 - 60);
+				subMon.setWorkRemaining(100 - 70);
 			}
 
 			// Push local repository to remote
 			if (localRepo.getGit().branchList().call().size() > 0) { // check whether master was already created
 				subMon.subTask(Messages.GitSyncService_18);
-				localRepo.push(remoteRepo.getRemoteLocation(), subMon.newChild(25));
-				remoteRepo.merge(subMon.newChild(15));
+				localRepo.push(remoteRepo.getRemoteLocation(), subMon.newChild(20));
+				remoteRepo.merge(subMon.newChild(10));
 			}
 		} catch (final IOException e) {
 			throw new RemoteSyncException(e);

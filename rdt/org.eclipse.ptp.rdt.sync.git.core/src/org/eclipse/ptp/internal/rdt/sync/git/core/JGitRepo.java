@@ -138,7 +138,11 @@ public class JGitRepo {
 			
             // An initial commit to create the master branch.
             subMon.subTask(Messages.JGitRepo_0);
-            commit(subMon.newChild(4));
+            if (!repoExists) {
+            	commit(subMon.newChild(4));
+            } else {
+            	subMon.worked(4);
+            }
 
 			// Refresh project
 			subMon.subTask(Messages.JGitRepo_1);
