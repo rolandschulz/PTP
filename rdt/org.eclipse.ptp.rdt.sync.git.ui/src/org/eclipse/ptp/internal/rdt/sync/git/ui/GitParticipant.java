@@ -13,13 +13,11 @@ package org.eclipse.ptp.internal.rdt.sync.git.ui;
 
 import java.net.URI;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.ptp.internal.rdt.sync.git.ui.messages.Messages;
-import org.eclipse.ptp.rdt.sync.core.services.ISynchronizeService;
 import org.eclipse.ptp.rdt.sync.ui.AbstractSynchronizeParticipant;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipantDescriptor;
@@ -211,16 +209,20 @@ public class GitParticipant extends AbstractSynchronizeParticipant {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant#getProvider(org.eclipse.core.resources.IProject)
+	 * @see org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant#getConnection()
 	 */
 	@Override
-	public ISynchronizeService getProvider(IProject project) {
-		ISynchronizeService service = super.getProvider(project);
-		service.setLocation(fLocationText.getText());
-		service.setRemoteConnection(fSelectedConnection);
-		return service;
+	public IRemoteConnection getConnection() {
+		return fSelectedConnection;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant#getLocation()
+	 */
+	@Override
+	public String getLocation() {
+		return fLocationText.getText();
 	}
 
 	@Override

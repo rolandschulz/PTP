@@ -38,6 +38,7 @@ import org.eclipse.ptp.internal.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.internal.rdt.sync.ui.wizards.AddSyncConfigWizard;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
+import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeProperties;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -80,9 +81,10 @@ public class ManageConfigurationWidget extends Composite {
 		public Object[] getChildren(Object parentElement) {
 			if (parentElement instanceof SyncConfig) {
 				SyncConfig config = (SyncConfig) parentElement;
+				String syncServiceName = SyncManager.getSyncService(config.getSyncProviderId()).getName();
 				String[] children = new String[] { Messages.ManageConfigurationWidget_Connection_name + config.getConnectionName(),
 						Messages.ManageConfigurationWidget_Project_location + config.getLocation(),
-						Messages.ManageConfigurationWidget_Sync_provider + config.getSyncService().getName() };
+						Messages.ManageConfigurationWidget_Sync_provider + syncServiceName };
 				return children;
 			}
 			return null;

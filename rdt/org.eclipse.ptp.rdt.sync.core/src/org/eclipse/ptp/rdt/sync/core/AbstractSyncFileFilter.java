@@ -52,7 +52,7 @@ public abstract class AbstractSyncFileFilter {
 		@Override
 		public abstract String toString();
 
-		/** @return String without encoding of extra flags which are querryable separately (currently only exclude) */
+		/** @return String without encoding of extra flags which are queryable separately (currently only exclude) */
 		public abstract String getPattern();
 	}
 

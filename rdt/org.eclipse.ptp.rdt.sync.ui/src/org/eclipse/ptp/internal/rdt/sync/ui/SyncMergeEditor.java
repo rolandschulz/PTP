@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.internal.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
+import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.services.ISynchronizeService;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.team.ui.synchronize.SaveableCompareEditorInput;
@@ -79,12 +80,13 @@ public class SyncMergeEditor {
 		protected ICompareInput prepareCompareInput(IProgressMonitor monitor) throws InvocationTargetException,
 				InterruptedException {
 			IProject project = file.getProject();
-			ISynchronizeService syncService = SyncConfigManager.getActive(project).getSyncService();
+			String currentSyncServiceId = SyncConfigManager.getActive(project).getSyncProviderId();
+			ISynchronizeService syncService = SyncManager.getSyncService(currentSyncServiceId);
 			SyncConfig syncConfig = SyncConfigManager.getActive(project);
 			String[] mergeParts = null;
 
 			try {
-				mergeParts = syncService.getMergeConflictParts(project, syncConfig, file);
+				mergeParts = syncService.getMergeConflictParts(project, file);
 			} catch (CoreException e) {
 				RDTSyncUIPlugin.log(e);
 				return new DiffNode(null, Differencer.CONFLICTING, new SyncMergeItem(Messages.SyncMergeEditor_1),
