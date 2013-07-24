@@ -98,7 +98,9 @@
 											<arg
 												line="-r ${ptp-install-dir}/ptp-sdm-${unqualifiedVersion}.zip sdm" />
 										</exec>
-										<delete dir="${ptp-install-dir}/sdm" />
+										<delete includeEmptyDirs="true">
+											<fileset dir="${ptp-install-dir}/sdm" />
+										</delete>
 										<copy file="${basedir}/index.html" tofile="${ptp-install-dir}/index.html" />
 										<replace file="${ptp-install-dir}/index.html">
 											<replacefilter token="@unqualifiedVersion@"
