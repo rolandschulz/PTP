@@ -19,13 +19,10 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.NoFilepatternException;
@@ -35,15 +32,11 @@ import org.eclipse.jgit.ignore.IgnoreNode;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevTree;
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.treewalk.FileTreeIterator;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.treewalk.WorkingTreeIterator;
 import org.eclipse.jgit.treewalk.filter.IndexDiffFilter;
-import org.eclipse.ptp.internal.rdt.sync.git.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter;
-import org.eclipse.ptp.rdt.sync.core.SyncConfig;
-import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 
 /**
@@ -52,38 +45,7 @@ import org.eclipse.ptp.rdt.sync.core.SyncManager;
  * 
  */
 public class GitSyncFileFilter extends AbstractSyncFileFilter {
-	public static final String REMOTE_FILTER_IS_DIRTY = "remote_filter_is_dirty"; //$NON-NLS-1$
-	// Map of projects to file filters along with basic getter and setter methods. These static data and methods operate
-	// independently of the rest of the class and could be moved into a separate class if desired.
-	private static Map<IProject, GitSyncFileFilter> projectToFilterMap = new HashMap<IProject, GitSyncFileFilter>();
-
-	public static GitSyncFileFilter getFilter(IProject project) {
-		GitSyncFileFilter filter = projectToFilterMap.get(project);
-		if (filter == null) {
-			try {
-				filter = new GitSyncFileFilter(GitRemoteSyncConnection.getLocalRepo(project.getLocation().toString()), project);
-				filter.loadFilter();
-				projectToFilterMap.put(project, filter);
-			} catch (IOException e) {
-				Activator.log(Messages.GitSyncFileFilter_UnableToLoad + project.getName(), e);
-			}
-		}
-		return filter;
-	}
-
-	public static void setFilter(IProject project, AbstractSyncFileFilter filter, Repository repository) {
-		GitSyncFileFilter newGitFilter = new GitSyncFileFilter(repository, project);
-		newGitFilter.initialize(filter);
-		try {
-			newGitFilter.saveFilter();
-		} catch (IOException e) {
-			Activator.log(Messages.GitSyncFileFilter_UnableToSave + project.getName(), e);
-		}
-		projectToFilterMap.put(project, newGitFilter);
-	}
-
-	private final Repository repository;
-	private final IProject project;
+	private final JGitRepo jgitRepo;
 
 	private static Set<Character> escapifyCharSet = new HashSet<Character>();
 	static {
@@ -161,17 +123,32 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		}
 	}
 
-	GitSyncFileFilter(Repository repository, IProject project) {
-		this.repository = repository;
-		this.project = project;
+	/**
+	 * Construct a new Git file filter for the given JGit repository
+	 * @param repo
+	 * 			the JGit repository
+	 */
+	GitSyncFileFilter(JGitRepo repo) {
+		this.jgitRepo = repo;
 	}
 
-	public GitSyncFileFilter(GitSyncFileFilter filter) {
-		this.repository = filter.repository;
-		this.project = filter.project;
-		rules.addAll(filter.rules);
+	/**
+	 * Construct a new Git file filter for the given JGit repository, adding the rules from the given filter.
+	 *
+	 * @param repo
+	 * 			the JGit repository
+	 * @param filter
+	 * 			an abstract file filter 
+	 */
+	public GitSyncFileFilter(JGitRepo repo, AbstractSyncFileFilter filter) {
+		this.jgitRepo = repo;
+		this.initialize(filter);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter#addPattern(java.lang.String, boolean, int)
+	 */
 	@Override
 	public void addPattern(String pattern, boolean exclude, int index) {
 		GitIgnoreRule newRule = new GitIgnoreRule(pattern, exclude);
@@ -191,6 +168,10 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		rules.add(index - numRulesRemoved, newRule);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter#addPattern(org.eclipse.core.resources.IResource, boolean, int)
+	 */
 	@Override
 	public void addPattern(IResource resource, boolean exclude, int index) {
 		GitIgnoreRule newRule = new GitIgnoreRule(resource, exclude);
@@ -218,9 +199,14 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter#saveFilter()
+	 */
 	@Override
 	public void saveFilter() throws IOException {
-		File exclude = repository.getFS().resolve(repository.getDirectory(), Constants.INFO_EXCLUDE);
+		Repository repo = jgitRepo.getRepository();
+		File exclude = repo.getFS().resolve(repo.getDirectory(), Constants.INFO_EXCLUDE);
 		exclude.getParentFile().mkdirs();
 		FileOutputStream file = new FileOutputStream(exclude);
 		BufferedWriter out = new BufferedWriter(new OutputStreamWriter(file, Constants.CHARSET));
@@ -232,7 +218,7 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		} finally {
 			out.close();
 		}
-		final RmCommandCached rmCommand = new RmCommandCached(repository);
+		final RmCommandCached rmCommand = new RmCommandCached(repo);
 		for (String fileName : getIgnoredFiles(null)) {
 			rmCommand.addFilepattern(fileName);
 		}
@@ -243,14 +229,16 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		} catch (GitAPIException e) {
 			new IOException(e);
 		}
-
-		for (SyncConfig config : SyncConfigManager.getConfigs(project)) {
-			config.setProperty(REMOTE_FILTER_IS_DIRTY, "TRUE"); //$NON-NLS-1$
-		}
 	}
 
+	/**
+	 * Load filtering rules from the file system
+	 * @throws IOException
+	 * 			on problems reading from the file system
+	 */
 	public void loadFilter() throws IOException {
-		File exclude = repository.getFS().resolve(repository.getDirectory(), Constants.INFO_EXCLUDE);
+		Repository repo = jgitRepo.getRepository();
+		File exclude = repo.getFS().resolve(repo.getDirectory(), Constants.INFO_EXCLUDE);
 		if (exclude.exists()) {
 			FileInputStream in = new FileInputStream(exclude);
 			try {
@@ -290,9 +278,10 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 	 * @param ref reference to compute list of files for. If null use index.
 	 */
 	public Set<String> getIgnoredFiles(RevTree ref) throws IOException {
-		TreeWalk treeWalk = new TreeWalk(repository);
+		Repository repo = jgitRepo.getRepository();
+		TreeWalk treeWalk = new TreeWalk(repo);
 		if (ref == null) {
-			DirCache dirCache = repository.readDirCache();
+			DirCache dirCache = repo.readDirCache();
 			treeWalk.addTree(new DirCacheIterator(dirCache));
 		} else {
 			treeWalk.addTree(ref);
@@ -327,13 +316,24 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		return ignoredFiles;
 	}
 
+	/**
+	 * Return the JGit repository for this filter
+	 * @return JGit repository
+	 */
+	public JGitRepo getRepo() {
+		return jgitRepo;
+	}
+
+	/**
+	 * Class for storing names of files that have changed
+	 */
 	public class DiffFiles {
 		public Set<String> added = new HashSet<String>(); // modified and added
 		public Set<String> removed = new HashSet<String>();
 	}
 
-	/*
-	 * get all different files (modified/changed, missing/removed, untracked/added)
+	/**
+	 * Get all different files (modified/changed, missing/removed, untracked/added)
 	 * 
 	 * assumes that no files are in conflict (don't call during merge)
 	 */
@@ -341,17 +341,20 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		final int INDEX = 0;
 		final int WORKDIR = 1;
 
-		TreeWalk treeWalk = new TreeWalk(repository);
-		treeWalk.addTree(new DirCacheIterator(repository.readDirCache()));
-		treeWalk.addTree(new FileTreeIterator(repository));
+		assert(!jgitRepo.inUnresolvedMergeState());
 
-		// don't honor ignores - we do it manual instead. Doing it all with the filter
-		// would require a WorkingTreeIteraotr which does the ignore handing correct
-		// (both directory including bugs 401161 and only using info/exclude not .gitignore)
+		Repository repo = jgitRepo.getRepository();
+		TreeWalk treeWalk = new TreeWalk(repo);
+		treeWalk.addTree(new DirCacheIterator(repo.readDirCache()));
+		treeWalk.addTree(new FileTreeIterator(repo));
+
+		// don't honor ignores - we do it manually instead. Doing it all with the filter
+		// would require a WorkingTreeIterator that does the ignore handling correctly
+		// (both directory including bugs 401161 and only using info/exclude, not .gitignore)
 		treeWalk.setFilter(new IndexDiffFilter(INDEX, WORKDIR, false));
 		DiffFiles diffFiles = new DiffFiles();
-		int ignoreDepth = Integer.MAX_VALUE; // if the current subtree is ignored - than this is the depth at which to ignoring
-												// starts
+		int ignoreDepth = Integer.MAX_VALUE; // if the current subtree is ignored - than this is the depth at which ignoring
+											 // starts
 		while (treeWalk.next()) {
 			DirCacheIterator dirCacheIterator = treeWalk.getTree(INDEX, DirCacheIterator.class);
 			String path = treeWalk.getPathString();
@@ -380,23 +383,29 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		return diffFiles;
 	}
 
+	// TODO: Fix: Main problem is that filter now needs a JGitRepo object, which needs an Eclipse project and thus makes this
+	// class Eclipse-dependent.
 	// for testing. args: work folder, git folder
-	public static void main(String[] args) throws IOException {
-		final File localDir = new File(args[0]);
-		final FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
-		File gitDirFile = new File(localDir + File.separator + args[1]);
-		Repository repository = repoBuilder.setWorkTree(localDir).setGitDir(gitDirFile).build();
-		GitSyncFileFilter filter = new GitSyncFileFilter(repository, null);
-		filter.loadFilter();
-		// List<String> files = filter.getIgnoredFiles();
-		Set<String> files = filter.getDiffFiles().added;
-		for (String path : files) {
-			System.out.println(path);
-		}
-	}
+//	public static void main(String[] args) throws IOException {
+//		final File localDir = new File(args[0]);
+//		final FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
+//		File gitDirFile = new File(localDir + File.separator + args[1]);
+//		Repository repository = repoBuilder.setWorkTree(localDir).setGitDir(gitDirFile).build();
+//		GitSyncFileFilter filter = new GitSyncFileFilter(repository, null);
+//		filter.loadFilter();
+//		// List<String> files = filter.getIgnoredFiles();
+//		Set<String> files = filter.getDiffFiles().added;
+//		for (String path : files) {
+//			System.out.println(path);
+//		}
+//	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter#clone()
+	 */
 	@Override
 	public AbstractSyncFileFilter clone() {
-		return new GitSyncFileFilter(this);
+		return new GitSyncFileFilter(jgitRepo, this);
 	}
 }

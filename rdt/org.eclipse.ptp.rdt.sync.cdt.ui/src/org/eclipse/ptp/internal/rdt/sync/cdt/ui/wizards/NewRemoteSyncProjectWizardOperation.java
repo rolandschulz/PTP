@@ -95,8 +95,8 @@ public class NewRemoteSyncProjectWizardOperation implements Runnable {
 		// Add elements for a sync project
 		if (!isSyncProject(project)) {
 			try {
-				SyncManager.makeSyncProject(project, participant.getSyncConfigName(), participant.getProvider(project),
-						customFileFilter);
+				SyncManager.makeSyncProject(project, participant.getSyncConfigName(), participant.getServiceId(),
+						participant.getConnection(), participant.getLocation(), customFileFilter);
 			} catch (CoreException e) {
 				Activator.log(e);
 				return;
@@ -139,7 +139,7 @@ public class NewRemoteSyncProjectWizardOperation implements Runnable {
 		if (customFileFilter != null) {
 			try {
 				SyncManager.saveFileFilter(project, customFileFilter);
-			} catch (IOException e) {
+			} catch (CoreException e) {
 				RDTSyncCorePlugin.log(e);
 			}
 		}

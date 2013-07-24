@@ -30,9 +30,9 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.ptp.internal.rdt.sync.core.RDTSyncCorePlugin;
-import org.eclipse.ptp.internal.rdt.sync.core.SyncRunner;
 import org.eclipse.ptp.internal.rdt.sync.core.SyncUtils;
 import org.eclipse.ptp.internal.rdt.sync.core.messages.Messages;
+import org.eclipse.ptp.internal.rdt.sync.core.services.SynchronizeServiceRegistry;
 import org.eclipse.ptp.rdt.sync.core.handlers.IMissingConnectionHandler;
 import org.eclipse.ptp.rdt.sync.core.handlers.ISyncExceptionHandler;
 import org.eclipse.ptp.rdt.sync.core.listeners.ISyncListener;
@@ -50,19 +50,19 @@ import org.osgi.service.prefs.Preferences;
 public class SyncManager {
 	private static class SynchronizeJob extends Job {
 		private final IProject fProject;
-		private final SyncConfig fBuildScenario;
+		private final SyncConfig fSyncConfig;
 		private final IResourceDelta fDelta;
-		private final SyncRunner fSyncRunner;
+		private final ISynchronizeService fSyncService;
 		private final EnumSet<SyncFlag> fSyncFlags;
 		private final ISyncExceptionHandler fSyncExceptionHandler;
 
-		public SynchronizeJob(IProject project, SyncConfig syncConfig, IResourceDelta delta, SyncRunner runner,
+		public SynchronizeJob(IProject project, SyncConfig syncConfig, IResourceDelta delta, ISynchronizeService syncService,
 				EnumSet<SyncFlag> syncFlags, ISyncExceptionHandler seHandler) {
 			super(Messages.SyncManager_4);
 			fProject = project;
-			fBuildScenario = syncConfig;
+			fSyncConfig = syncConfig;
 			fDelta = delta;
-			fSyncRunner = runner;
+			fSyncService = syncService;
 			fSyncFlags = syncFlags;
 			fSyncExceptionHandler = seHandler;
 		}
@@ -76,7 +76,8 @@ public class SyncManager {
 		protected IStatus run(IProgressMonitor monitor) {
 			RecursiveSubMonitor subMonitor = RecursiveSubMonitor.convert(monitor);
 			try {
-				fSyncRunner.synchronize(fProject, fBuildScenario, fDelta, subMonitor, fSyncFlags);
+				RemoteLocation rl = new RemoteLocation(fSyncConfig.getRemoteLocation());
+				fSyncService.synchronize(fProject, rl, fDelta, subMonitor, fSyncFlags);
 			} catch (CoreException e) {
 				if (fSyncExceptionHandler == null) {
 					defaultSyncExceptionHandler.handle(fProject, e);
@@ -155,24 +156,25 @@ public class SyncManager {
 	 *            synchronize filter, or null if no filter
 	 * @throws CoreException
 	 *             on problems adding sync nature
+	 * @since 4.0
 	 */
-	public static void makeSyncProject(IProject project, String remoteSyncConfigName, ISynchronizeService provider,
-			AbstractSyncFileFilter fileFilter) throws CoreException {
+	public static void makeSyncProject(IProject project, String remoteSyncConfigName, String syncServiceId,
+			IRemoteConnection conn, String location, AbstractSyncFileFilter fileFilter) throws CoreException {
 		RemoteSyncNature.addNature(project, new NullProgressMonitor());
 
 		// Remote config
-		IRemoteConnection conn = provider.getRemoteConnection();
-		SyncConfig config = SyncConfigManager.newConfig(remoteSyncConfigName, provider.getId(), conn, provider.getLocation());
+		SyncConfig config = SyncConfigManager.newConfig(remoteSyncConfigName, syncServiceId, conn, location);
 		SyncConfigManager.addConfig(project, config);
 		SyncConfigManager.setActive(project, config);
 		if (fileFilter == null) {
 			fileFilter = SyncManager.getDefaultFileFilter();
 		}
-		provider.setSyncFileFilter(project, fileFilter);
+		ISynchronizeService syncService = getSyncService(syncServiceId);
+		syncService.setSyncFileFilter(project, fileFilter);
 
 		// Local config
 		try {
-			config = SyncConfigManager.getLocalConfig(provider);
+			config = SyncConfigManager.getLocalConfig(syncServiceId);
 			SyncConfigManager.addConfig(project, config);
 		} catch (CoreException e) {
 			RDTSyncCorePlugin.log(Messages.SyncManager_0, e);
@@ -223,7 +225,15 @@ public class SyncManager {
 	 * @return the file filter. This is never null.
 	 */
 	public static AbstractSyncFileFilter getFileFilter(IProject project) {
-		return SyncConfigManager.getActive(project).getSyncService().getSyncFileFilter(project);
+		String currentSyncServiceId = SyncConfigManager.getActive(project).getSyncProviderId();
+		AbstractSyncFileFilter filter = null;
+		try {
+			filter = SyncManager.getSyncService(currentSyncServiceId).getSyncFileFilter(project);
+		} catch (CoreException e) {
+			RDTSyncCorePlugin.log(e);
+			return getDefaultFileFilter();
+		}
+		return filter;
 	}
 
 	/**
@@ -281,6 +291,18 @@ public class SyncManager {
 		return SyncMode.valueOf(node.get(SYNC_MODE_KEY, DEFAULT_SYNC_MODE.name()));
 	}
 
+	/**
+	 * Get the synchronize service for the given sync service id
+	 * 
+	 * @param syncServiceId
+	 *
+	 * @return sync service or null if service not found
+	 * @since 4.0
+	 */
+	public static ISynchronizeService getSyncService(String syncServiceId) {
+		return SynchronizeServiceRegistry.getSynchronizeServiceDescriptor(syncServiceId).getService();
+	}
+
 	private static void notifySyncListeners(IProject project) {
 		Set<ISyncListener> listenerSet = fProjectToSyncListenersMap.get(project);
 		if (listenerSet == null) {
@@ -313,10 +335,12 @@ public class SyncManager {
 	 *            cannot be null
 	 * @param filter
 	 *            cannot be null
+	 * @throws CoreException 
 	 * @throws IOException
 	 */
-	public static void saveFileFilter(IProject project, AbstractSyncFileFilter filter) throws IOException {
-		SyncConfigManager.getActive(project).getSyncService().setSyncFileFilter(project, filter);
+	public static void saveFileFilter(IProject project, AbstractSyncFileFilter filter) throws CoreException {
+		String currentSyncServiceId = SyncConfigManager.getActive(project).getSyncProviderId();
+		SyncManager.getSyncService(currentSyncServiceId).setSyncFileFilter(project, filter);
 	}
 
 	// Note that the monitor is ignored for non-blocking jobs since SynchronizeJob creates its own monitor
@@ -338,11 +362,13 @@ public class SyncManager {
 				continue;
 			}
 			SynchronizeJob job = null;
-			SyncRunner syncRunner = new SyncRunner(config.getSyncService());
-			if (syncRunner != null) {
+			String currentSyncServiceId = config.getSyncProviderId();
+			ISynchronizeService syncService = SyncManager.getSyncService(currentSyncServiceId);
+			if (syncService != null) {
 				if (isBlocking) {
 					try {
-						syncRunner.synchronize(project, config, delta, monitor, syncFlags);
+						RemoteLocation rl = new RemoteLocation(config.getRemoteLocation());
+						syncService.synchronize(project, rl, delta, monitor, syncFlags);
 					} catch (CoreException e) {
 						if (!useExceptionHandler) {
 							throw e;
@@ -355,7 +381,7 @@ public class SyncManager {
 						SyncManager.notifySyncListeners(project);
 					}
 				} else {
-					job = new SynchronizeJob(project, config, delta, syncRunner, syncFlags, seHandler);
+					job = new SynchronizeJob(project, config, delta, syncService, syncFlags, seHandler);
 					job.schedule();
 				}
 			}
