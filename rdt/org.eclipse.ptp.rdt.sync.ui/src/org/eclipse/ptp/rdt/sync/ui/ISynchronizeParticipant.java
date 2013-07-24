@@ -10,19 +10,17 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.ui;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.operation.IRunnableContext;
-import org.eclipse.ptp.rdt.sync.core.services.ISynchronizeService;
+import org.eclipse.remote.core.IRemoteConnection;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * Must be implemented by extensions to the syncronizeParticipant extension
+ * Must be implemented by extensions to the synchronizeParticipant extension
  * point.
- * 
  */
 public interface ISynchronizeParticipant extends ISynchronizeParticipantDescriptor {
 	/**
-	 * Create a control to configure a synchronize provider
+	 * Create a control to configure a remote location
 	 * 
 	 * @param parent
 	 *            parent composite that contains the configuration area
@@ -37,14 +35,16 @@ public interface ISynchronizeParticipant extends ISynchronizeParticipantDescript
 	public String getErrorMessage();
 
 	/**
-	 * Get the configured sync service provider for the supplied project. Only
-	 * valid if {@link isConfigComplete()} is true.
-	 * 
-	 * @param project
-	 *            project that will be synchronized by this provider
-	 * @return configured sync service provider
+	 * Get connection to a remote host
+	 * @return connection
 	 */
-	public ISynchronizeService getProvider(IProject project);
+	public IRemoteConnection getConnection();
+
+	/**
+	 * Get directory on remote host
+	 * @return directory
+	 */
+	public String getLocation();
 
 	/**
 	 * Get the name of the sync config to create for this participant. Only

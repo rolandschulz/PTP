@@ -75,7 +75,8 @@ public class SynchronizeServiceDescriptor implements ISynchronizeServiceDescript
 								Class<?> cls = Platform.getBundle(configElement.getDeclaringExtension().getContributor().getName())
 										.loadClass(serviceClass);
 								Constructor<?> cons = cls.getConstructor(ISynchronizeServiceDescriptor.class);
-								return (ISynchronizeService) cons.newInstance(this);
+								fService = (ISynchronizeService) cons.newInstance(this);
+								return fService;
 							} catch (Exception e) {
 								String className = configElement.getAttribute(SynchronizeServiceRegistry.ATTR_CLASS);
 								RDTSyncCorePlugin.log(NLS.bind(Messages.SynchronizeServiceDescriptor_Invalid_class, new String[] {

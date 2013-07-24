@@ -49,6 +49,7 @@ import org.eclipse.ptp.internal.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.SyncManager.SyncMode;
+import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeWizardExtension;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IPerspectiveDescriptor;
@@ -391,8 +392,9 @@ public class NewSyncProjectWizard extends Wizard implements INewWizard, IExecuta
 		}
 		// Add sync-specific elements to project
 		try {
-			SyncManager.makeSyncProject(project, mainPage.getSynchronizeParticipant().getSyncConfigName(),
-					mainPage.getSynchronizeParticipant().getProvider(project), mainPage.getCustomFileFilter());
+			ISynchronizeParticipant part = mainPage.getSynchronizeParticipant();
+			SyncManager.makeSyncProject(project, part.getSyncConfigName(), part.getServiceId(), part.getConnection(),
+					part.getLocation(), mainPage.getCustomFileFilter());
 		} catch (CoreException e) {
 			return false;
 		}
