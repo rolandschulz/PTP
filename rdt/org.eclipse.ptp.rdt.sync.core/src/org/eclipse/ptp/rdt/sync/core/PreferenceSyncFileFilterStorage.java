@@ -28,16 +28,16 @@ import org.osgi.service.prefs.Preferences;
  * @since 3.0
  */
 public class PreferenceSyncFileFilterStorage extends AbstractSyncFileFilter {
-	private class PreferenceIngoreRule extends AbstractIgnoreRule {
+	private class PreferenceIgnoreRule extends AbstractIgnoreRule {
 		String pattern;
 		boolean exclude;
 
-		PreferenceIngoreRule(String p, boolean e) {
+		PreferenceIgnoreRule(String p, boolean e) {
 			pattern = p;
 			exclude = e;
 		}
 
-		PreferenceIngoreRule(String r) {
+		PreferenceIgnoreRule(String r) {
 			pattern = r.substring(1);
 			exclude = r.charAt(0) == '-';
 		}
@@ -135,7 +135,7 @@ public class PreferenceSyncFileFilterStorage extends AbstractSyncFileFilter {
 					rules.clear();
 					throw new NoSuchElementException(Messages.PathResourceMatcher_0);
 				}
-				rules.add(new PreferenceIngoreRule(p));
+				rules.add(new PreferenceIgnoreRule(p));
 			}
 			return true;
 		} catch (BackingStoreException e) {
@@ -182,7 +182,7 @@ public class PreferenceSyncFileFilterStorage extends AbstractSyncFileFilter {
 	 */
 	@Override
 	public void addPattern(String pattern, boolean exclude, int index) {
-		rules.add(index, new PreferenceIngoreRule(pattern, exclude));
+		rules.add(index, new PreferenceIgnoreRule(pattern, exclude));
 	}
 
 	/*
@@ -192,7 +192,7 @@ public class PreferenceSyncFileFilterStorage extends AbstractSyncFileFilter {
 	 */
 	@Override
 	public void addPattern(IResource resource, boolean exclude, int index) {
-		rules.add(index, new PreferenceIngoreRule(resource.getProjectRelativePath().toString(), exclude));
+		rules.add(index, new PreferenceIgnoreRule(resource.getProjectRelativePath().toString(), exclude));
 	}
 
 	/*

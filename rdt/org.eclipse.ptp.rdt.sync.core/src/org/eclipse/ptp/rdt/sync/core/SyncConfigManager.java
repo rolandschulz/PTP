@@ -33,7 +33,6 @@ import org.eclipse.ptp.internal.rdt.sync.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
 import org.eclipse.ptp.rdt.sync.core.listeners.ISyncConfigListener;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
-import org.eclipse.ptp.rdt.sync.core.services.ISynchronizeService;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteFileManager;
@@ -252,8 +251,9 @@ public class SyncConfigManager {
 	 * @return a local config
 	 * @throws CoreException
 	 *             on problems retrieving local service elements
+	 * @since 4.0
 	 */
-	public static SyncConfig getLocalConfig(ISynchronizeService syncService) throws CoreException {
+	public static SyncConfig getLocalConfig(String syncServiceId) throws CoreException {
 		IRemoteServices localService = RemoteServices.getLocalServices();
 		if (localService == null) {
 			throw new CoreException(new Status(IStatus.ERROR, RDTSyncCorePlugin.PLUGIN_ID, Messages.SyncConfigManager_0));
@@ -265,7 +265,7 @@ public class SyncConfigManager {
 			throw new CoreException(new Status(IStatus.ERROR, RDTSyncCorePlugin.PLUGIN_ID, Messages.SyncConfigManager_1));
 		}
 
-		return SyncConfigManager.newConfig(LOCAL_SYNC_CONFIG_NAME, syncService.getId(), localConnection, PROJECT_LOCAL_PATH);
+		return SyncConfigManager.newConfig(LOCAL_SYNC_CONFIG_NAME, syncServiceId, localConnection, PROJECT_LOCAL_PATH);
 	}
 
 	/**
