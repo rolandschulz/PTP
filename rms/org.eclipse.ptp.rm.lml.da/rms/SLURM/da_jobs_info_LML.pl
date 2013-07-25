@@ -464,6 +464,8 @@ sub modify {
         $ret =~ s/-[\d]+//;
     }
 
+    $ret=~s/\&/\&amp;/gs;
+
     return ($ret);
 }
 
