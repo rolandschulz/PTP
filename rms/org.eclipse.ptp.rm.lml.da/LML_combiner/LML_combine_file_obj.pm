@@ -222,7 +222,8 @@ sub write_lml {
 	}
 	printf(OUT ">\n");
 	foreach $k (sort keys %{$self->{DATA}->{INFODATA}->{$id}}) {
-	    printf(OUT "<data key=\"%s\" value=\"%s\"/>\n",$k,$self->{DATA}->{INFODATA}->{$id}->{$k});
+	    my $value = escapeForXML($self->{DATA}->{INFODATA}->{$id}->{$k});
+	    printf(OUT "<data key=\"%s\" value=\"%s\"/>\n",$k,$value);
 	}
 	printf(OUT "</info>\n");
     }
@@ -237,6 +238,33 @@ sub write_lml {
 
     return($rc);
 
+}
+
+#***************************************************************************
+# Takes a string and escapes all special characters for usage in XML data.
+# The returned string can be used as attribute value in a valid XML file.
+#
+# @param $_[0] string with special characters
+#
+# @return passed string with escaped XML special characters
+#***************************************************************************
+sub escapeForXML{
+	my $result = shift;
+	#Unescape characters, which were escaped in a previous step
+	#This makes sure, that &amp; is not replaced by &amp;amp;
+	$result =~ s/&amp;/&/g;
+	$result =~ s/&lt;/</g;
+	$result =~ s/&gt;/>/g;
+	$result =~ s/&quot;/"/g;
+	$result =~ s/&apos;/'/g;
+	#Now escape all special characters in the result string
+	$result =~ s/&/&amp;/g;
+	$result =~ s/</&lt;/g;
+	$result =~ s/>/&gt;/g;
+	$result =~ s/"/&quot;/g;
+	$result =~ s/'/&apos;/g;
+	
+	return $result;
 }
 
 1;
