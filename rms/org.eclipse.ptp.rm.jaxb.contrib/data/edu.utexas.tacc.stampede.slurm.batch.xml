@@ -13,40 +13,40 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://eclipse.org/ptp/rm http://eclipse.org/ptp/schemas/v1.1/rm.xsd" 
 	name="edu.utexas.tacc.stampede.slurm.batch">
-    <control-data>
-        <!-- this is a necessary attribute for the functioning of LML; link it to the batch-specific variable name -->
-        <attribute name="control.queue.name" visible="false">
-            <link-value-to>partition</link-value-to>
-        </attribute>
-        <!-- we set this to invisible because the values are not really modifiable -->
-        <attribute name="queues" visible="false"/>
-        <!-- needed by RM internals for fetch; name is fixed by convention -->
-        <attribute name="stdout_remote_path" visible="false">
-            <default>${ptp_rm:workdir#value}/slurm-${ptp_rm:@jobId#default}.out</default>
-            <link-value-to>output</link-value-to>
-        </attribute>
-        <!-- needed by RM internals for fetch; name is fixed by convention -->
-        <attribute name="stderr_remote_path" visible="false">
-            <default>${ptp_rm:workdir#value}/slurm-${ptp_rm:@jobId#default}.out</default>
-            <link-value-to>error</link-value-to>
-        </attribute>
-        <!-- ============================================================================================= -->
-        <!-- SBATCH COMMAND ARGUMENTS                                                                      -->
-        <!-- ============================================================================================= -->
-        <attribute name="account" type="string">
-            <description>Charge resources used by this job to specified account. (-A, --account=)</description>
-            <tooltip><![CDATA[The account is an arbitrary string. The account name may be changed after
+	<control-data>
+		<!-- this is a necessary attribute for the functioning of LML; link it to the batch-specific variable name -->
+		<attribute name="control.queue.name" visible="false">
+			<link-value-to>partition</link-value-to>
+		</attribute>
+		<!-- we set this to invisible because the values are not really modifiable -->
+		<attribute name="queues" visible="false"/>
+		<!-- needed by RM internals for fetch; name is fixed by convention -->
+		<attribute name="stdout_remote_path" visible="false">
+			<default>${ptp_rm:workdir#value}/slurm-${ptp_rm:@jobId#default}.out</default>
+			<link-value-to>output</link-value-to>
+		</attribute>
+		<!-- needed by RM internals for fetch; name is fixed by convention -->
+		<attribute name="stderr_remote_path" visible="false">
+			<default>${ptp_rm:workdir#value}/slurm-${ptp_rm:@jobId#default}.out</default>
+			<link-value-to>error</link-value-to>
+		</attribute>
+		<!-- ========================================================================================== -->
+		<!-- SBATCH COMMAND ARGUMENTS																	-->
+		<!-- ========================================================================================== -->
+		<attribute name="account" type="string">
+			<description>Charge resources used by this job to specified account. (-A, --account=&lt;account&gt;)</description>
+			<tooltip><![CDATA[The account is an arbitrary string. The account name may be changed after
 job submission using the scontrol command.]]></tooltip>
-        </attribute>
-        <attribute name="acctg_freq" type="string">
-            <description>Define the job accounting sampling interval. (--acctg-freq)</description>
-            <tooltip><![CDATA[This can be used to override the JobAcctGatherFrequency parameter in SLURM's
+		</attribute>
+		<attribute name="acctg_freq" type="string">
+			<description>Define the job accounting sampling interval. (--acctg-freq=&lt;seconds&gt;)</description>
+			<tooltip><![CDATA[This can be used to override the JobAcctGatherFrequency parameter in SLURM's
 configuration file, slurm.conf. A value of zero disables the periodic job sampling and provides
 accounting information only on job termination (reducing SLURM interference with the job).]]></tooltip>
-        </attribute>
-        <attribute name="begin" type="string">
-            <description>Defer the allocation of the job until the specified time. (--begin)</description>
-            <tooltip><![CDATA[Submit the batch script to the SLURM controller immediately, like normal, 
+		</attribute>
+		<attribute name="begin" type="string">
+			<description>Defer the allocation of the job until the specified time. (--begin&lt;time&gt;)</description>
+			<tooltip><![CDATA[Submit the batch script to the SLURM controller immediately, like normal, 
 but tell the controller to defer the allocation of the job until the specified time. 
 Time may be of the form HH:MM:SS to run a job at a specific time of day 
 (seconds are optional). (If that time is already past, the next day is assumed.) 
@@ -59,37 +59,90 @@ You can also give times like "now" + count time-units, where the time-units
 can be seconds (default), minutes, hours, days, or weeks and you can tell 
 SLURM to run the job today with the keyword "today" and to run the job 
 tomorrow with the keyword "tomorrow". 
-The value may be changed after job submission using the scontrol command.]]></tooltip></attribute>
-        <attribute name="checkpoint" type="string">
-            <description>Specifies the interval between creating checkpoints of the job step. (--checkpoint)</description>
-            <tooltip><![CDATA[By default, the job step has no checkpoints created.
+The value may be changed after job submission using the scontrol command.]]></tooltip>
+		</attribute>
+		<attribute name="checkpoint" type="string">
+			<description>Specifies the interval between creating checkpoints of the job step. (--checkpoint=&lt;time&gt;)</description>
+			<tooltip><![CDATA[By default, the job step has no checkpoints created.
 Acceptable time formats include "minutes", "minutes:seconds", "hours:minutes:seconds",
 "days-hours", "days-hours:minutes" and "days-hours:minutes:seconds".]]></tooltip>
-        </attribute>
-        <attribute name="checkpoint_dir" type="string">
-            <description>Specifies the directory into which the job or job step's checkpoint should be written. (--checkpint_dir)</description>
-            <tooltip><![CDATA[The default value is the current working directory. Checkpoint files
-of the form "<job_id>.ckpt" for jobs and "<job_id>.<step_id>.ckpt" for job steps.]]></tooltip></attribute>
-        <attribute name="dependency" type="string">
-            <description>Defer the start of this job until the specified dependencies have been satisfied completed. (--dependency)</description>
-            <tooltip><![CDATA[Format is of the form "type:job_id[:job_id][,type:job_id[:job_id]].
+		</attribute>
+		<attribute name="checkpoint_dir" type="string">
+			<description>Specifies the directory into which the job or job step's checkpoint should be written. (--checkpint_dir=&lt;directory&gt;)</description>
+			<tooltip><![CDATA[The default value is the current working directory. Checkpoint files
+of the form "<job_id>.ckpt" for jobs and "<job_id>.<step_id>.ckpt" for job steps.]]></tooltip>
+		</attribute>
+		<attribute name="comment" type="string">
+			<description>An arbitrary comment. (--comment&lt;string&gt;)</description>
+			<tooltip><![CDATA[An arbitrary comment enclosed in double quotes if using spaces
+or some special characters.]]></tooltip>
+		</attribute>
+		<attribute name="constraint" type="string">
+			<description>Specify which features are required. (--constraint=&lt;list&gt;)</description>
+			<tooltip><![CDATA[Nodes can have features assigned to them by the SLURM administrator.
+Users can specify which of these features are required
+by their job using the constraint option. Only nodes having
+features matching the job constraints will be used to satisfy
+the request. Multiple constraints may be specified with AND,
+OR, exclusive OR, resource counts, etc. ]]></tooltip>
+		</attribute>
+		<attribute name="contiguous" type="boolean" translateBooleanAs='--contiguous, '>
+			<description>Specify run on a contiguous set of nodes. (--contiguous)</description>
+			<tooltip><![CDATA[If set, then the allocated nodes must form a contiguous set.
+Not honored with the topology/tree or topology//3d_torus plugins,
+both of which can modify the node ordering.]]></tooltip>
+		</attribute>
+		<attribute name="cores_per_socket" type="string">
+			<description>Select nodes with at least the specified number of cores per socket. (--cores-per-socket=&lt;cores&gt;)</description>
+			<tooltip><![CDATA[Restrict node selection to nodes with at least the specified
+number of cores per socket. See additional information under -B
+option above when task/affinity plugin is enabled.]]></tooltip>
+		</attribute>
+		<attribute name="cpu_bind" type="string">
+			<description>Bind tasks to CPUs. (--cpu_bind=[{quiet,verbose},]type)</description>
+			<tooltip><![CDATA[Bind tasks to CPUs. Used only when the task/affinity plugin is
+enabled. The configuration parameter TaskPluginParam may override
+these options. For example, if TaskPluginParam is configured
+to bind to cores, your job will not be able to bind tasks
+to sockets. NOTE: To have SLURM always report on the selected
+CPU binding for all commands executed in a shell, you can enable
+verbose mode by setting the SLURM_CPU_BIND environment variable
+value to "verbose".]]></tooltip>
+		</attribute>
+		<attribute name="cpus_per_task" type="string">
+			<description>Bind tasks to CPUs. (--cpus-per-task=&lt;ncpus&gt;)</description>
+			<tooltip><![CDATA[Advise the SLURM controller that ensuing job steps will require
+ncpus number of processors per task. Without this option, the
+controller will just try to allocate one processor per task.]]></tooltip>
+		</attribute>
+		<attribute name="dependency" type="string">
+			<description>Defer the start of this job until the specified dependencies have been satisfied completed. (--dependency=&lt;dependency_list&gt;)</description>
+			<tooltip><![CDATA[Format is of the form "type:job_id[:job_id][,type:job_id[:job_id]].
 Many jobs can share the same dependency and these jobs may even belong to different
 users. The value may be changed after job submission using the scontrol command.]]></tooltip>
-        </attribute>
-        <attribute name="error" type="string">
-            <description>Instruct SLURM to connect the batch script's standard error directly to the file name specified in the "filename pattern". (--error)</description>
-            <tooltip><![CDATA[By default both standard output and standard error are directed to a file
+		</attribute>
+		<attribute name="error" type="string">
+			<description>Instruct SLURM to connect the batch script's standard error directly to the file name specified in the "filename pattern". (--error=&lt;filename_pattern&gt;)</description>
+			<tooltip><![CDATA[By default both standard output and standard error are directed to a file
 of the name "slurm-%j.out", where the "%j" is replaced with the job allocation number.
 See the "--input" option for filename specification options.
 Use absolute path or "${ptp_rm:workdir#value}" prefix to be relative to working directory.]]></tooltip>
-            <validator>
-                <regex expression="/.+|\$\{ptp_rm\:workdir\#value\}/.+"></regex>
-                <error-message>"error" field: Use absolute path or "${ptp_rm:workdir#value}" prefix to be relative to working directory.</error-message>
-            </validator>
-        </attribute>
-        <attribute name="export" type="string">
-            <description>Identify which environment variables are propagated to the batch job. (--export)</description>
-            <tooltip><![CDATA[Format: <environment variables | ALL | NONE >.
+			<validator>
+				<regex expression="/.+|\$\{ptp_rm\:workdir\#value\}/.+"></regex>
+				<error-message>"error" field: Use absolute path or "${ptp_rm:workdir#value}" prefix to be relative to working directory.</error-message>
+			</validator>
+		</attribute>
+		<attribute name="exclusive" type="boolean" translateBooleanAs='--exclusive, '>
+			<description>Do not share nodes with other running jobs. (--exclusive)</description>
+			<tooltip><![CDATA[The job allocation can not share nodes with other running jobs.
+This is the opposite of --share, whichever option is seen last
+on the command line will be used. The default shared/exclusive
+behavior depends on system configuration and the partition’s
+Shared option takes precedence over the job’s option.]]></tooltip>
+		</attribute>
+		<attribute name="export" type="string">
+			<description>Identify which environment variables are propagated to the batch job. (--export=&lt;environment variables|ALL|NONE&gt;)</description>
+			<tooltip><![CDATA[Format: <environment variables | ALL | NONE >.
 Multiple environment variable names should be comma separated.
 Environment variable names may be specified to propagate the current 
 value of those variables (e.g. "--export=EDITOR") or specific values
@@ -99,10 +152,49 @@ and execute on a different cluster (e.g. with different paths). By default all
 environment variables are propagaged. If the argument is NONE or
 specific environment variable names, then the --get-user-env
 option is implicitly set to load other environment variables based upon
-the user's configuration on the cluster which executes the job.]]></tooltip></attribute>
-        <attribute name="get_user_env" type="string">
-            <description>Tell sbatch to retrieve the login environment variables for the user. (--get_user_env)</description>
-            <tooltip><![CDATA[This option tells sbatch to retrieve the
+the user's configuration on the cluster which executes the job.]]></tooltip>
+		</attribute>
+		<attribute name="export_file" type="string">
+			<description> (--export-file=&lt;filename|fd&gt;)</description>
+			<tooltip><![CDATA[If a number between 3 and OPEN_MAX is specified as the argument
+to this option, a readable file descriptor will be assumed
+(STDIN and STDOUT are not supported as valid arguments). Otherwise
+a filename is assumed. Export environment variables
+defined in <filename> or read from <fd> to the job’s execution
+environment. The content is one or more environment variable
+definitions of the form NAME=value, each separated by a null
+character. This allows the use of special characters in environment
+definitions.]]></tooltip>
+		</attribute>
+		<attribute name="extra_node_info" type="string">
+			<description>Request specific allocation of resources. (--extra-node-info=&lt;socket[:cores[:threads]]&gt;).</description>
+			<tooltip><![CDATA[Request a specific allocation of resources with details as to
+the number and type of computational resources within a cluster:
+number of sockets (or physical processors) per node, cores per
+socket, and threads per core. The total amount of resources
+being requested is the product of all of the terms. Each value
+specified is considered a minimum. An asterisk (*) can be used
+as a placeholder indicating that all available resources of that
+type are to be utilized. As with nodes, the individual levels
+can also be specified in separate options if desired:
+--sockets-per-node=<sockets>
+--cores-per-socket=<cores>
+--threads-per-core=<threads>
+If task/affinity plugin is enabled, then specifying an allocation
+in this manner also sets a default --cpu_bind option of
+threads if the -B option specifies a thread count, otherwise an
+option of cores if a core count is specified, otherwise an
+option of sockets. If SelectType is configured to
+select/cons_res, it must have a parameter of CR_Core,
+CR_Core_Memory, CR_Socket, or CR_Socket_Memory for this option
+to be honored. This option is not supported on BlueGene systems
+(select/bluegene plugin is configured). If not specified, the
+scontrol show job will display ’ReqS:C:T=*:*:*’.
+]]></tooltip>
+		</attribute>
+		<attribute name="get_user_env" type="string">
+			<description>Tell sbatch to retrieve the login environment variables for the user. (--get_user_env[=timeout][mode])</description>
+			<tooltip><![CDATA[This option tells sbatch to retrieve the
 login environment variables for the user specified in the --uid option.
 The environment variables are retrieved by running something of this sort
 "su - <username> -c /usr/bin/env" and parsing the output.
@@ -119,53 +211,56 @@ If "mode" not specified, the mode established at SLURM build time
 is used.
 Example of use include "--get-user-env", "--get-user-env=10"
 "--get-user-env=10L", and "--get-user-env=S".
-This option was originally created for use by Moab.]]></tooltip></attribute>
-        <attribute name="hold" type="boolean" translateBooleanAs='--hold, '>
-            <description>Specify the job is to be submitted in a held state (priority of zero). (--hold)</description>
-            <tooltip><![CDATA[A held job can now be released using scontrol to reset its priority
+This option was originally created for use by Moab.]]></tooltip>
+		</attribute>
+		<attribute name="hold" type="boolean" translateBooleanAs='--hold, '>
+			<description>Specify the job is to be submitted in a held state (priority of zero). (--hold)</description>
+			<tooltip><![CDATA[A held job can now be released using scontrol to reset its priority
 (e.g. "scontrol update jobid=<id> priority=1").]]></tooltip>
-        </attribute>
-        <attribute name="immediate" type="boolean" translateBooleanAs="--immediate, ">
-            <description>The batch script is only submitted to the controller if the resources
+		</attribute>
+		<attribute name="immediate" type="boolean" translateBooleanAs="--immediate, ">
+			<description>The batch script is only submitted to the controller if the resources
 necessary to grant its job allocation are immediately available. (--immediate)</description>
-            <tooltip><![CDATA[If the job allocation has to wait in a queue of pending jobs,
-the batch script is not submitted.]]></tooltip></attribute>
-        <attribute name="job_name" type="string">
-            <description>Specify a name for the job allocation.</description>
-            <tooltip><![CDATA[The specified name appears along with
+			<tooltip><![CDATA[If the job allocation has to wait in a queue of pending jobs,
+the batch script is not submitted.]]></tooltip>
+		</attribute>
+		<attribute name="job_name" type="string">
+			<description>Specify a name for the job allocation. (--job-name=&lt;jobname&gt;)</description>
+			<tooltip><![CDATA[The specified name appears along with
 the job id number when querying running jobs on the system. The default
 is the name of the batch script, or just "sbatch" if the script is
 read on sbatch's standard input.]]></tooltip>
-            <default>ptp_sbatch</default>
-            <validator>
-                <regex expression="[a-zA-Z_][0-9a-zA-Z_]*"/>
-                <error-message>"job_name" field: Must be at least one alphanumeric character</error-message>
-            </validator>
-        </attribute>
-        <attribute name="mail_type" type="choice">
-            <description>Notify user by email when certain event types occur. (--mail-type)</description>
-            <tooltip><![CDATA[Valid type values are BEGIN, END, FAIL, REQUEUE, and ALL (any state
+			<default>ptp_sbatch</default>
+			<validator>
+				<regex expression="[a-zA-Z_][0-9a-zA-Z_]*"/>
+				<error-message>"job_name" field: Must be at least one alphanumeric character</error-message>
+			</validator>
+		</attribute>
+		<attribute name="mail_type" type="choice">
+			<description>Notify user by email when certain event types occur. (--mail-type=&lt;type&gt;)</description>
+			<tooltip><![CDATA[Valid type values are BEGIN, END, FAIL, REQUEUE, and ALL (any state
 change). The user to be notified is indicated with --mail-user.]]></tooltip>
-            <choice>BEGIN,END,FAIL,REQUEUE,ALL</choice>
-        </attribute>
-        <attribute name="mail_user" type="string">
-            <description>User to receive email notification of state changes. (--mail_user)</description>
-            <tooltip>As defined by --mail-type.
+			<choice>BEGIN,END,FAIL,REQUEUE,ALL</choice>
+		</attribute>
+		<attribute name="mail_user" type="string">
+			<description>User to receive email notification of state changes. (--mail_user=&lt;user&gt;)</description>
+			<tooltip>As defined by --mail-type.
 The default value is the submitting user.</tooltip>
-        </attribute>
-        <attribute name="nice" type="string">
-            <description>Run the job with an adjusted scheduling priority within SLURM. (--nice)</description>
-            <tooltip><![CDATA[With no adjustment value the scheduling priority is decreased
+		</attribute>
+		<attribute name="nice" type="string">
+			<description>Run the job with an adjusted scheduling priority within SLURM. (--nice[=adjustment])</description>
+			<tooltip><![CDATA[With no adjustment value the scheduling priority is decreased
 by 100. The adjustment range is from -10000 (highest priority)
 to 10000 (lowest priority). Only privileged users can specify
 a negative adjustment. NOTE: This option is presently
 ignored if SchedulerType=sched/wiki or
-SchedulerType=sched/wiki2.]]></tooltip></attribute>
-        <attribute name="nodes" type="string">
-            <description>Request that a minimum of "minnodes" nodes be allocated to this job. (--nodes)</description>
-            <tooltip><![CDATA[The scheduler may decide to launch the job on more than "minnodes" nodes.
+SchedulerType=sched/wiki2.]]></tooltip>
+		</attribute>
+		<attribute name="nodes" type="string">
+			<description>Request that a minimum of "minnodes" nodes be allocated to this job. (--nodes=&lt;minnodes[-maxnodes]&gt;)</description>
+			<tooltip><![CDATA[The scheduler may decide to launch the job on more than "minnodes" nodes.
 A limit on the maximum node count may be specified with "maxnodes"
-(e.g. "--nodes=2-4").  The minimum and maximum node count may be the
+(e.g. "--nodes=2-4"). The minimum and maximum node count may be the
 same to specify a specific number of nodes (e.g. "--nodes=2-2" asks
 for two and ONLY two nodes).
 The partition's node limits supersede those of the job.
@@ -177,46 +272,46 @@ If a job node limit exceeds the number of nodes configured in the
 partition, the job is rejected.
 Note that the environment variable SLURM_NNODES are set to the
 count of nodes actually allocated to the job. See the ENVIRONMENT VARIABLES
-section for more information.  If "-N" is not specified, the default
+section for more information. If "-N" is not specified, the default
 behavior is to allocate enough nodes to satisfy the requirements of
 the "-n" and "-c" options.
 The job is allocated as many nodes as possible within the range specified
 and without delaying the initiation of the job.]]></tooltip>
-        </attribute>
-        <attribute name="open_mode" type="choice">
-            <description>Open the output and error files using append or truncate mode as specified. (--open_mode)</description>
-            <tooltip>The default value is specified by the system configuration parameter JobFileAppend.</tooltip>
-            <choice>append,truncate</choice>
-        </attribute>
-        <attribute name="output" type="string">
-            <description>Instruct SLURM to connect the batch script's standard output directly to the file name specified in the "filename pattern". (--output)</description>
-            <tooltip><![CDATA[By default both standard output and standard error are directed to a file of
+		</attribute>
+		<attribute name="open_mode" type="choice">
+			<description>Open the output and error files using append or truncate mode as specified. (--open_mode=append|truncate)</description>
+			<tooltip>The default value is specified by the system configuration parameter JobFileAppend.</tooltip>
+			<choice>append,truncate</choice>
+		</attribute>
+		<attribute name="output" type="string">
+			<description>Instruct SLURM to connect the batch script's standard output directly to the file name specified in the "filename pattern". (--output=&lt;filename_pattern&gt;)</description>
+			<tooltip><![CDATA[By default both standard output and standard error are directed to a file of
 the name "slurm-%j.out", where the "%j" is replaced with the job allocation number.
 See the --input option for filename specification options.
 Use absolute path or "${ptp_rm:workdir#value}" prefix to be relative to working directory.]]></tooltip>
-            <validator>
-                <regex expression="/.+|\$\{ptp_rm\:workdir\#value\}/.+"></regex>
-                <error-message>"output" field: Use absolute path or "${ptp_rm:workdir#value}" prefix to be relative to working directory.</error-message>
-            </validator>
-        </attribute>
-        <attribute name="partition" type="string">
-            <description>Request a specific partition for the resource allocation. (--partition)</description>
-            <tooltip><![CDATA[If not specified, the default behaviour is to allow the slurm controller to select the default
+			<validator>
+				<regex expression="/.+|\$\{ptp_rm\:workdir\#value\}/.+"></regex>
+				<error-message>"output" field: Use absolute path or "${ptp_rm:workdir#value}" prefix to be relative to working directory.</error-message>
+			</validator>
+		</attribute>
+		<attribute name="partition" type="string">
+			<description>Request a specific partition for the resource allocation. (--partition=&lt;partition_names&gt;)</description>
+			<tooltip><![CDATA[If not specified, the default behaviour is to allow the slurm controller to select the default
 partition as designated by the system administrator. If the job can use more
 than one partition, specify their names in a comma separate list and the one
 offering earliest initiation is used.]]></tooltip>
-        </attribute>
-        <attribute name="quiet" type="boolean" translateBooleanAs="--quiet, ">
-            <description>Suppress informational messages from sbatch. (--quiet)</description>
-            <tooltip>Errors are still displayed.</tooltip>
-        </attribute>
-        <attribute name="reservation" type="string">
-            <description>Allocate resources for the job from the named reservation. (--reservation)</description>
-        </attribute>
-        <attribute name="signal" type="string">
-            <description>When a job is within "sig_time" seconds of its end time,
-send it the signal "sig_num". (--signal)</description>
-            <tooltip><![CDATA[Format: <sig_num>[@<sig_time>].
+		</attribute>
+		<attribute name="quiet" type="boolean" translateBooleanAs="--quiet, ">
+			<description>Suppress informational messages from sbatch. (--quiet)</description>
+			<tooltip>Errors are still displayed.</tooltip>
+		</attribute>
+		<attribute name="reservation" type="string">
+			<description>Allocate resources for the job from the named reservation. (--reservation=&lt;name&gt;)</description>
+		</attribute>
+		<attribute name="signal" type="string">
+			<description>When a job is within "sig_time" seconds of its end time,
+send it the signal "sig_num". (--signal=&lt;sig_num&gt;[@&lt;sig_time&gt;])</description>
+			<tooltip><![CDATA[Format: <sig_num>[@<sig_time>].
 Due to the resolution of event handling by SLURM, the signal may
 be sent up to 60 seconds earlier than specified.
 "sig_num" may either be a signal number or name (e.g. "10" or "USR1").
@@ -224,650 +319,888 @@ be sent up to 60 seconds earlier than specified.
 By default, no signal is sent before the job's end time.
 If a "sig_num" is specified without any sig_time,
 the default time is 60 seconds.]]></tooltip>
-        </attribute>
-        <attribute name="time" type="string">
-            <description>Set a limit on the total run time of the job allocation. (--time)</description>
-            <tooltip><![CDATA[If the requested time limit exceeds the partition's time limit, the job is
-left in a PENDING state (possibly indefinitely).  The default time
-limit is the partition's time limit.  When the time limit is reached,
-each task in each job step is sent SIGTERM followed by SIGKILL.  The
+		</attribute>
+		<attribute name="time" type="string">
+			<description>Set a limit on the total run time of the job allocation. (--time=&lt;time&gt;)</description>
+			<tooltip><![CDATA[If the requested time limit exceeds the partition's time limit, the job is
+left in a PENDING state (possibly indefinitely). The default time
+limit is the partition's time limit. When the time limit is reached,
+each task in each job step is sent SIGTERM followed by SIGKILL. The
 interval between signals is specified by the SLURM configuration
-parameter "KillWait".  A time limit of zero requests that no time
-limit be imposed.  Acceptable time formats include "minutes",
+parameter "KillWait". A time limit of zero requests that no time
+limit be imposed. Acceptable time formats include "minutes",
 "minutes:seconds", "hours:minutes:seconds", "days-hours",
 "days-hours:minutes" and "days-hours:minutes:seconds".]]></tooltip>
-        </attribute>
-        <attribute name="verbose" type="boolean" translateBooleanAs="--verbose, ">
-            <description>Increase the verbosity of sbatch's informational messages. (--verbose)</description>
-            <tooltip><![CDATA[Multiple -v's further increase sbatch's verbosity.  By default only
+		</attribute>
+		<attribute name="verbose" type="boolean" translateBooleanAs="--verbose, ">
+			<description>Increase the verbosity of sbatch's informational messages. (--verbose)</description>
+			<tooltip><![CDATA[Multiple -v's further increase sbatch's verbosity. By default only
 errors are displayed.]]></tooltip>
-        </attribute>
-        <attribute name="workdir" type="string">
-            <description>Set the working directory of the batch script to "directory" before it it executed. (-- workdir)</description>
-            <tooltip>Must use absolute path on scheduled system, or "${ptp_rm:directory#value}".</tooltip>
-            <default>${ptp_rm:directory#value}</default>
-            <link-value-to>directory</link-value-to>
-            <validator>
-                <regex expression="/.*|\$\{ptp_rm\:directory\#value\}"></regex>
-                <error-message>"workdir" field: Must use absolute path on scheduled system, or "${ptp_rm:directory#value}".</error-message>
-            </validator>
-        </attribute>
-        <!-- ============================================================================================= -->
-        <!-- SBATCH RUN OPTIONS                                                                            -->
-        <!-- ============================================================================================= -->
-        <attribute name="run.command" type="choice">
-            <description>Which prefix command to use. Specify no prefix command for serial, OpenMP (host only or MIC only), or offload code.</description>
-            <choice>,ibrun,ibrun tacc_affinity,ibrun.symm</choice>
-            <default>ibrun</default>
-        </attribute>
-        <attribute name="run.epilog" type="string">
-            <description> run this executable just after the job step completes.</description>
-            <tooltip><![CDATA[The command line arguments for this executable are the command and
-arguments of the job step.  If executable is "none", then no epilog is run.
-This parameter overrides the SrunEpilog parameter in slurm.conf.]]></tooltip></attribute>
-        <attribute name="run.label" type="boolean" translateBooleanAs="--label, ">
-            <description>Prepend task number to lines of stdout/err.</description>
-            <tooltip><![CDATA[Normally, stdout and stderr from remote tasks is line-buffered directly
-to stdout and stderr.  The --label option prepends lines of output
+		</attribute>
+		<attribute name="workdir" type="string">
+			<description>Set the working directory of the batch script to "directory" before it it executed. (-- workdir=&lt;directory&gt;)</description>
+			<tooltip>Must use absolute path on scheduled system, or "${ptp_rm:directory#value}".</tooltip>
+			<default>${ptp_rm:directory#value}</default>
+			<link-value-to>directory</link-value-to>
+			<validator>
+				<regex expression="/.*|\$\{ptp_rm\:directory\#value\}"></regex>
+				<error-message>"workdir" field: Must use absolute path on scheduled system, or "${ptp_rm:directory#value}".</error-message>
+			</validator>
+		</attribute>
+		<!-- ========================================================================================== -->
+		<!-- SBATCH RUN OPTIONS																			-->
+		<!-- ========================================================================================== -->
+		<attribute name="run.command" type="choice">
+			<description>Which prefix command to use.</description>
+			<tooltip><![CDATA[The prefix command to use with this executable. Specify no
+prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></tooltip>
+			<choice>,ibrun,ibrun tacc_affinity,ibrun.symm</choice>
+			<default>ibrun</default>
+		</attribute>
+		<attribute name="run.epilog" type="string">
+			<description> run this executable just after the job step completes. (--epilog)</description>
+			<tooltip><![CDATA[The command line arguments for this executable are the command and
+arguments of the job step. If executable is "none", then no epilog is run.
+This parameter overrides the SrunEpilog parameter in slurm.conf.]]></tooltip>
+		</attribute>
+		<attribute name="run.label" type="boolean" translateBooleanAs="--label, ">
+			<description>Prepend task number to lines of stdout/err. (--label)</description>
+			<tooltip><![CDATA[Normally, stdout and stderr from remote tasks is line-buffered directly
+to stdout and stderr. The --label option prepends lines of output
 with the remote task id.]]></tooltip>
-        </attribute>
-        <attribute name="run.ntasks" type="integer" min="1">
-            <description>Specify the number of tasks to run.</description>
-            <tooltip><![CDATA[Allocate resources for ntasks tasks.  The default
+		</attribute>
+		<attribute name="run.ntasks" type="integer" min="1">
+			<description>Specify the number of tasks to run. (--ntasks=&lt;number&gt;)</description>
+			<tooltip><![CDATA[Allocate resources for ntasks tasks. The default
 is one task per node, but note that the --ntasks-per-node option changes this default.]]></tooltip>
-            <default>1</default>
-        </attribute>
-        <attribute name="run.ntasks_per_node" type="choice">
-            <description>Request the maximum ntasks be invoked on each node.</description>
-            <tooltip><![CDATA[Meant to be used  with the --nodes option.  This is related to
---cpus-per-task=ncpus, but does not require  knowledge of the actual number of
-cpus on each node.  In some cases, it is more convenient to be able to request that no 
-more than a specific number of tasks be invoked on each node.  Examples of this
+			<default>1</default>
+		</attribute>
+		<attribute name="run.ntasks_per_node" type="choice">
+			<description>Request the maximum ntasks be invoked on each node. (--ntasks-per-node=&lt;ntasks&gt;)</description>
+			<tooltip><![CDATA[Meant to be used with the --nodes option. This is related to
+--cpus-per-task=ncpus, but does not require knowledge of the actual number of
+cpus on each node. In some cases, it is more convenient to be able to request that no 
+more than a specific number of tasks be invoked on each node. Examples of this
 include submitting a hybrid MPI/OpenMP app where only one MPI "task/rank" should
 be assigned to each node while allowing the OpenMP portion to utilize all of the
-parallelism present in  the node, or submitting a single setup/cleanup/monitoring
+parallelism present in the node, or submitting a single setup/cleanup/monitoring
 job to each node of a pre-existing allocation as one step in a larger job script.]]></tooltip>
-            <choice>1,2,4,8,16,32,64</choice>
-            <default>1</default>
-        </attribute>
-        <attribute name="run.prolog" type="string">
-            <description>Run this executable before launching the job step.</description>
-            <tooltip><![CDATA[The command line arguments for this executable are the command and 
-arguments of the job step.  If executable is "none", then no prolog is run.
+			<choice>1,2,4,8,16,32,64</choice>
+			<default>1</default>
+		</attribute>
+		<attribute name="run.prolog" type="string">
+			<description>Run this executable before launching the job step. (--prolog)</description>
+			<tooltip><![CDATA[The command line arguments for this executable are the command and 
+arguments of the job step. If executable is "none", then no prolog is run.
 This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip>
-        </attribute>
-        <script insertEnvironmentAfter="30" deleteAfterSubmit="true">
-            <file-staging-location>${ptp_rm:directory#value}</file-staging-location>
-            <line><arg>#!/bin/bash</arg></line>
-            <line><arg isUndefinedIfMatches="#SBATCH --account=">#SBATCH --account=${ptp_rm:account#value}</arg></line>
-            <line><arg isUndefinedIfMatches="#SBATCH --acctg-freq=">#SBATCH --acctg-freq=${ptp_rm:acctg_freq#value}</arg></line>
-            <line><arg isUndefinedIfMatches="#SBATCH --begin=">#SBATCH --begin=${ptp_rm:begin#value}</arg></line>
-            <line><arg isUndefinedIfMatches="#SBATCH --checkpoint=">#SBATCH --checkpoint=${ptp_rm:checkpoint#value}</arg></line>
-            <line><arg isUndefinedIfMatches="#SBATCH --checkpoint-dir=">#SBATCH --checkpoint-dir=${ptp_rm:checkpoint_dir#value}</arg></line>
-            <line><arg isUndefinedIfMatches="#SBATCH --dependency=">#SBATCH --dependency=${ptp_rm:dependency#value}</arg></line>
-            <line><arg isUndefinedIfMatches="#SBATCH --error=">#SBATCH --error=${ptp_rm:error#value}</arg></line>
-            <line><arg isUndefinedIfMatches="#SBATCH --export=">#SBATCH --export=${ptp_rm:export#value}</arg></line>
-            <line><arg isUndefinedIfMatches="#SBATCH --get-user-env=">#SBATCH --get-user-env=${ptp_rm:get_user_env#value}</arg></line>
-            <line><arg isUndefinedIfMatches="#SBATCH">#SBATCH ${ptp_rm:hold#value}</arg></line>
-            <line><arg isUndefinedIfMatches="#SBATCH">#SBATCH ${ptp_rm:immediate#value}</arg></line>
-            <line><arg isUndefinedIfMatches="#SBATCH --job-name=">#SBATCH --job-name=${ptp_rm:job_name#value}</arg></line>
-            <line><arg isUndefinedIfMatches="#SBATCH --mail-type=">#SBATCH --mail-type=${ptp_rm:mail_type#value}</arg></line>
-            <line><arg isUndefinedIfMatches="#SBATCH --mail-user=">#SBATCH --mail-user=${ptp_rm:mail_user#value}</arg></line>
-            <line><arg isUndefinedIfMatches="#SBATCH --nice=">#SBATCH --nice=${ptp_rm:nice#value}</arg></line>
-            <line><arg isUndefinedIfMatches="#SBATCH --nodes=">#SBATCH --nodes=${ptp_rm:nodes#value}</arg></line>
-            <line><arg isUndefinedIfMatches="#SBATCH --open-mode=">#SBATCH --open-mode=${ptp_rm:open_mode#value}</arg></line>
-            <line><arg isUndefinedIfMatches="#SBATCH --output=">#SBATCH --output=${ptp_rm:output#value}</arg></line>
-            <line><arg isUndefinedIfMatches="#SBATCH --partition=">#SBATCH --partition=${ptp_rm:partition#value}</arg></line>
-            <line><arg isUndefinedIfMatches="#SBATCH">#SBATCH ${ptp_rm:quiet#value}</arg></line>
-            <line><arg isUndefinedIfMatches="#SBATCH --reservation=">#SBATCH --reservation=${ptp_rm:reservation#value}</arg></line>
-            <line><arg isUndefinedIfMatches="#SBATCH --epilog=">#SBATCH --epilog=${ptp_rm:run.epilog#value}</arg></line>
-            <line><arg isUndefinedIfMatches="#SBATCH">#SBATCH ${ptp_rm:run.label#value}</arg></line>
-            <line><arg isUndefinedIfMatches="#SBATCH --ntasks=">#SBATCH --ntasks=${ptp_rm:run.ntasks#value}</arg></line>
-            <line><arg isUndefinedIfMatches="#SBATCH --ntasks-per-node=">#SBATCH --ntasks-per-node=${ptp_rm:run.ntasks_per_node#value}</arg></line>
-            <line><arg isUndefinedIfMatches="#SBATCH --prolog=">#SBATCH --prolog=${ptp_rm:run.prolog#value}</arg></line>
-            <line><arg isUndefinedIfMatches="#SBATCH --signal=">#SBATCH --signal=${ptp_rm:signal#value}</arg></line>
-            <line><arg isUndefinedIfMatches="#SBATCH --time=">#SBATCH --time=${ptp_rm:time#value}</arg></line>
-            <line><arg isUndefinedIfMatches="#SBATCH">#SBATCH ${ptp_rm:verbose#value}</arg></line>
-            <line><arg isUndefinedIfMatches="cd">cd ${ptp_rm:workdir#value}</arg></line>
-            <line><arg>${ptp_rm:run.command#value} ${ptp_rm:executablePath#value} ${ptp_rm:progArgs#value}</arg></line>
-        </script>
-        <start-up-command name="get-queues">
-            <arg>scontrol</arg>
-            <arg>show</arg>
-            <arg>partition</arg>
-            <stdout-parser delim="\n">
-                <target ref="queues">
-                    <match>
-                        <expression>^PartitionName=([\w\d]+)</expression>
-                        <add field="value">
-                            <entry valueGroup="1"/>
-                        </add>
-                    </match>
-                </target>
-            </stdout-parser>
-        </start-up-command>
-        <submit-batch name="submit-batch" directory="${ptp_rm:directory#value}" waitForId="true">
-            <arg>sbatch</arg>
-            <arg>${ptp_rm:managed_file_for_script#value}</arg>
-            <stdout-parser delim="\n">
-                <target ref="@jobId">
-                    <match>
-                        <expression>^Submitted batch job ([\d]+)</expression>
-                        <set field="name">
-                            <entry valueGroup="1"/></set>
-                        <set field="default">
-                            <entry valueGroup="1"/></set>
-                        <set field="value">
-                            <entry value="SUBMITTED"/></set>
-                    </match>
-                </target>
-                <target ref="@jobId">
-                    <match>
-                        <expression flags="DOTALL|UNIX_LINES">.*Submission error: (.*)</expression>
-                        <set field="value">
-                            <entry valueGroup="1"/></set>
-                        <throw message="Job Submit Failed: ${ptp_rm:@jobId#value}"/>
-                    </match>
-                </target>
-            </stdout-parser>
-            <stderr-parser delim="\n">
-                <target ref="@jobId">
-                    <match>
-                        <expression>.+</expression>
-                        <set field="value">
-                            <entry value="FAILED"/></set>
-                        <throw message="Job Submit Failed"/>
-                    </match>
-                </target>
-            </stderr-parser>
-        </submit-batch>
-        <get-job-status name="get-job-status" ignoreExitStatus="true">
-            <arg>scontrol</arg>
-            <arg>show</arg>
-            <arg>job</arg><arg>${ptp_rm:@jobId#name}</arg>
-            <stdout-parser delim="\n">
-                <target ref="@jobId">
-                    <match>
-                        <expression>^[\s]*JobState=([\w]+)[\s]+Reason=([\w]+)[\s]+.*</expression>
-                        <set field="value">
-                            <entry valueGroup="1"/>
-                        </set>
-                        <set field="default">
-                            <entry valueGroup="2"/></set>
-                    </match>
-                    <test op="OR">
-                        <test op="AND">
-                        <test op="EQ">
-                            <value>#value</value>
-                            <value>PENDING</value>
-                        </test>
-                        <test op="EQ">
-                            <value>#default</value>
-                            <value>JobHeldUser</value>
-                        </test>
-                        <set field="value">
-                            <entry value="USER_ON_HOLD" />
-                        </set>
-                        </test>
-                        <test op="AND">
-                        <test op="EQ">
-                            <value>#value</value>
-                            <value>PENDING</value>
-                        </test>
-                        <test op="EQ">
-                            <value>#default</value>
-                            <value>JobHeldAdmin</value>
-                        </test>
-                        <set field="value">
-                            <entry value="SYSTEM_ON_HOLD" />
-                        </set>
-                        </test>
-                        <test op="AND">
-                        <test op="EQ">
-                            <value>#value</value>
-                            <value>PENDING</value>
-                        </test>
-                        <test op="EQ">
-                            <value>#default</value>
-                            <value>PartitionDown</value>
-                        </test>
-                        <set field="value">
-                            <entry value="SYSTEM_SUSPENDED" />
-                        </set>
-                        </test>
-                        <test op="AND">
-                        <test op="EQ">
-                            <value>#value</value>
-                            <value>PENDING</value>
-                        </test>
-                        <test op="EQ">
-                            <value>#default</value>
-                            <value>PartitionInactive</value>
-                        </test>
-                        <set field="value">
-                            <entry value="SYSTEM_ON_HOLD" />
-                        </set>
-                        </test>
-                        <test op="AND">
-                        <test op="EQ">
-                            <value>#value</value>
-                            <value>PENDING</value>
-                        </test>
-                        <test op="EQ">
-                            <value>#default</value>
-                            <value>NodeDown</value>
-                        </test>
-                        <set field="value">
-                            <entry value="SYSTEM_SUSPENDED" />
-                        </set>
-                        </test>
-                        <test op="AND">
-                        <test op="EQ">
-                            <value>#value</value>
-                            <value>PENDING</value>
-                        </test>
-                        <test op="EQ">
-                            <value>#default</value>
-                            <value>SystemFailure</value>
-                        </test>
-                        <set field="value">
-                            <entry value="SYSTEM_SUSPENDED" />
-                        </set>
-                        </test>
-                    </test>
-                    <test op="EQ">
-                        <value>#value</value>
-                        <value>PENDING</value>
-                        <set field="value">
-                            <entry value="QUEUED_ACTIVE"/></set></test>
-                    <test op="EQ">
-                        <value>#value</value>
-                        <value>CONFIGURING</value>
-                        <set field="value">
-                            <entry value="SUBMITTED"/></set></test>
-                    <test op="EQ">
-                        <value>#value</value>
-                        <value>RUNNING</value>
-                        <set field="value">
-                            <entry value="RUNNING"/>
-                        </set>
-                    </test>
-                    <test op="EQ">
-                        <value>#value</value>
-                        <value>SUSPENDED</value>
-                        <set field="value">
-                            <entry value="SUSPENDED"/>
-                        </set>
-                    </test>
-                    <test op="EQ">
-                        <value>#value</value>
-                        <value>COMPLETED</value>
-                        <set field="value">
-                            <entry value="COMPLETED"/>
-                        </set>
-                    </test>
-                    <test op="EQ">
-                        <value>#value</value>
-                        <value>COMPLETING</value>
-                        <set field="value">
-                            <entry value="COMPLETED"/>
-                        </set>
-                    </test>
-                    <test op="EQ">
-                        <value>#value</value>
-                        <value>CANCELLED</value>
-                        <set field="value">
-                            <entry value="CANCELED"/>
-                        </set>
-                    </test>
-                    <test op="EQ">
-                        <value>#value</value>
-                        <value>FAILED</value>
-                        <set field="value">
-                            <entry value="FAILED"/></set></test>
-                    <test op="EQ">
-                        <value>#value</value>
-                        <value>NODE_FAIL</value>
-                        <set field="value">
-                            <entry value="FAILED"/></set></test>
-                    <test op="EQ">
-                        <value>#value</value>
-                        <value>TIMEOUT</value>
-                        <set field="value">
-                            <entry value="FAILED"/></set></test>
-                </target>
-            </stdout-parser>
-            <stderr-parser delim="\n">
-                <target ref="@jobId">
-                    <match>
-                        <expression>.+</expression>
-                        <set field="value">
-                            <entry value="COMPLETED"/>
-                        </set>
-                    </match>
-                </target>
-            </stderr-parser>
-        </get-job-status>
-        <terminate-job name="cancel" ignoreExitStatus="true">
-            <arg>scancel</arg>
-            <arg>${ptp_rm:@jobId#name}</arg>
-        </terminate-job>
-        <hold-job name="hold" ignoreExitStatus="true">
-            <arg>scontrol</arg><arg>hold</arg>
-            <arg>${ptp_rm:@jobId#name}</arg>
-        </hold-job>
-        <release-job name="release" ignoreExitStatus="true">
-            <arg>scontrol</arg>
-            <arg>release</arg>
-            <arg>${ptp_rm:@jobId#name}</arg>
-        </release-job>
-        <launch-tab>
-            <dynamic>
-                <title>Basic Settings</title>
-                <layout>
-                    <grid-layout/>
-                </layout>
-                <!-- ATTRIBUTES group -->
-                <composite group="true">
-                    <layout>
-                        <grid-layout numColumns="4" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
-                    </layout>
-                    <!-- HEADER -->
-                    <widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
-                        <layout-data>
-                            <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-                        </layout-data>
-                        <fixed-text>Name</fixed-text>
-                    </widget>
-                    <widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
-                        <layout-data>
-                            <grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false"/>
-                        </layout-data>
-                        <fixed-text>Value</fixed-text>
-                    </widget>
-                    <widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
-                        <layout-data>
-                            <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-                        </layout-data>
-                        <fixed-text>Description</fixed-text>
-                    </widget>
-                    <!-- row 1 -->
-                    <widget type="label" style="SWT.LEFT">
-                        <layout-data>
-                            <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-                        </layout-data>
-                        <tooltip>${ptp_rm:job_name#tooltip}</tooltip>
-                        <fixed-text>Job Name: </fixed-text>
-                    </widget>
-                    <widget type="text" style="SWT.BORDER" attribute="job_name">
-                        <layout-data>
-                            <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
-                        </layout-data>
-                    </widget>
-                    <widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
-                        <layout-data>
-                            <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-                        </layout-data>
-                        <fixed-text>${ptp_rm:job_name#description}</fixed-text>
-                    </widget>
-                    <!-- row 2 -->
-                    <widget type="label" style="SWT.LEFT">
-                        <layout-data>
-                            <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-                        </layout-data>
-                        <tooltip>${ptp_rm:partition#tooltip}</tooltip>
-                        <fixed-text>Queue: </fixed-text>
-                    </widget>
-                    <widget type="combo" style="SWT.BORDER" readOnly="true" attribute="partition">
-                        <layout-data>
-                            <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"/>
-                        </layout-data>
-                        <items-from>queues</items-from>
-                    </widget>
-                    <widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
-                        <layout-data>
-                            <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-                        </layout-data>
-                        <fixed-text>${ptp_rm:partition#description}</fixed-text>
-                    </widget>
-                    <!-- row 3 -->
-                    <widget type="label" style="SWT.LEFT">
-                        <layout-data>
-                            <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-                        </layout-data>
-                        <tooltip>${ptp_rm:workdir#tooltip}</tooltip>
-                        <fixed-text>Working Directory: </fixed-text>
-                    </widget>
-                    <browse title="Browse" textStyle="SWT.BORDER" attribute="workdir" readOnly="true" directory="true">
-                        <text-layout-data>
-                            <grid-data horizontalAlign="SWT.FILL"
-                                horizontalSpan="1" grabExcessHorizontal="true"
-                                widthHint="150" />
-                        </text-layout-data>
-                        <button-layout-data>
-                            <grid-data horizontalAlign="SWT.FILL"
-                                horizontalSpan="1" grabExcessHorizontal="false"
-                                widthHint="50"/>
-                        </button-layout-data>
-                        <tooltip>Clear text box if "Browse" button does not work.</tooltip>
-                    </browse>
-                    <!-- <widget type="text" style="SWT.BORDER"
-                        attribute="workdir">
-                        <layout-data>
-                            <grid-data horizontalAlign="SWT.FILL"
-                                horizontalSpan="2" grabExcessHorizontal="false"
-                                widthHint="150" />
-                        </layout-data>
-                    </widget> -->
-                    <widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
-                        <layout-data>
-                            <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-                        </layout-data>
-                        <fixed-text>${ptp_rm:workdir#description}</fixed-text>
-                    </widget>
-                    <!-- row 4 -->
-                    <widget type="label" style="SWT.LEFT">
-                        <layout-data>
-                            <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-                        </layout-data>
-                        <tooltip>${ptp_rm:nodes#tooltip}</tooltip>
-                        <fixed-text>Number of nodes: </fixed-text>
-                    </widget>
-                    <widget type="text" style="SWT.BORDER" attribute="nodes">
-                        <layout-data>
-                            <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
-                        </layout-data>
-                    </widget>
-                    <widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
-                        <layout-data>
-                            <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-                        </layout-data>
-                        <fixed-text>${ptp_rm:nodes#description}</fixed-text>
-                    </widget>
-                    <!-- row 5 -->
-                    <widget type="label" style="SWT.LEFT">
-                        <layout-data>
-                            <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-                        </layout-data>
-                        <tooltip>${ptp_rm:time#tooltip}</tooltip>
-                        <fixed-text>Wallclock Time: </fixed-text>
-                    </widget>
-                    <widget type="text" style="SWT.BORDER" attribute="time">
-                        <layout-data>
-                            <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
-                        </layout-data>
-                    </widget>
-                    <widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
-                        <layout-data>
-                            <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-                        </layout-data>
-                        <fixed-text>${ptp_rm:time#description}</fixed-text>
-                    </widget>
-                    <!-- row 6 -->
-                    <widget type="label" style="SWT.LEFT">
-                        <layout-data>
-                            <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-                        </layout-data>
-                        <fixed-text>MPI Command: </fixed-text>
-                    </widget>
-                    <widget type="combo" style="SWT.BORDER" readOnly="true" attribute="run.command">
-                        <layout-data>
-                            <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"/>
-                        </layout-data>
-                    </widget>
-                    <widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
-                        <layout-data>
-                            <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-                        </layout-data>
-                        <fixed-text>${ptp_rm:run.command#description}</fixed-text>
-                    </widget>
-                    <!-- row 7 -->
-                    <widget type="label" style="SWT.LEFT">
-                        <layout-data>
-                            <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-                        </layout-data>
-                        <tooltip>${ptp_rm:run.ntasks#tooltip}</tooltip>
-                        <fixed-text>MPI Number of Tasks:</fixed-text>
-                    </widget>
-                    <widget type="text" style="SWT.BORDER" attribute="run.ntasks">
-                        <layout-data>
-                            <grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
-                        </layout-data>
-                    </widget>
-                    <widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
-                        <layout-data>
-                            <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-                        </layout-data>
-                        <fixed-text>${ptp_rm:run.ntasks#description}</fixed-text>
-                    </widget>
-                    <!--row 8 -->
-                    <widget type="label" style="SWT.LEFT">
-                        <layout-data>
-                            <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-                        </layout-data>
-                        <tooltip>${ptp_rm:run.ntasks_per_node#tooltip}</tooltip>
-                        <fixed-text>MPI Ranks per Node:</fixed-text>
-                    </widget>
-                    <widget type="combo" style="SWT.BORDER" attribute="run.ntasks_per_node" readOnly="true">
-                        <layout-data>
-                            <grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" />
-                        </layout-data>
-                    </widget>
-                    <widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
-                        <layout-data>
-                            <grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-                        </layout-data>
-                        <fixed-text>${ptp_rm:run.ntasks_per_node#description}</fixed-text>
-                    </widget>
-                </composite>
-            </dynamic>
-            <dynamic>
-                <title>Advanced Settings</title>
-                <layout>
-                    <grid-layout/>
-                </layout>
-                <!-- QUEUES remote path group -->
-                <composite group="true">
-                    <layout>
-                        <grid-layout numColumns="3"/>
-                    </layout>
-                    <widget type="label" style="SWT.LEFT">
-                        <tooltip>${ptp_rm:partition#tooltip}</tooltip>
-                        <fixed-text>Queue: </fixed-text>
-                    </widget>
-                    <widget type="combo" style="SWT.BORDER" readOnly="true" attribute="partition">
-                        <layout-data>
-                            <grid-data widthHint="150" horizontalAlign="SWT.FILL" horizontalSpan="2"/>
-                        </layout-data>
-                        <items-from>queues</items-from>
-                    </widget>
-                </composite>
-                <!-- VIEWER group -->
-                <composite group="true">
-                    <layout>
-                        <grid-layout/>
-                    </layout>
-                    <layout-data>
-                        <grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true"/>
-                    </layout-data>
-                    <widget type="text" readOnly="true" style="SWT.BORDER | SWT.WRAP | SWT.V_SCROLL">
-                        <layout-data>
-                            <grid-data heightHint="75" horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true"/>
-                        </layout-data>
-                        <dynamic-text>
-                            <arg>${ptp_rm:allAttributes#value}</arg>
-                            <arg isUndefinedIfMatches="partition=''">partition='${ptp_rm:partition#value}'</arg>
-                        </dynamic-text>
-                    </widget>
-                    <viewer name="allAttributes" style="SWT.BORDER | SWT.MULTI | SWT.V_SCROLL" sort="true" type="table" initialAllChecked="false">
-                        <layout-data>
-                            <grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true"/>
-                        </layout-data>
-                        <column-data name="Name" width="175" resizable="true">
-                            <tooltip>Multi-select and click checkbox to apply change to all rows.</tooltip>
-                        </column-data>
-                        <column-data name="Value" width="200" resizable="true">
-                            <tooltip>Click to activate value widget.</tooltip>
-                        </column-data>
-                        <items>
-                            <include>account</include>
-                            <include>acctg_freq</include>
-                            <include>begin</include>
-                            <include>checkpoint</include>
-                            <include>checkpoint_dir</include>
-                            <include>dependency</include>
-                            <include>error</include>
-                            <include>export</include>
-                            <include>get_user_env</include>
-                            <include>hold</include>
-                            <include>immediate</include>
-                            <include>job_name</include>
-                            <include>mail_type</include>
-                            <include>mail_user</include>
-                            <include>nice</include>
-                            <include>nodes</include>
-                            <include>open_mode</include>
-                            <include>output</include>
-                            <include>partition</include>
-                            <include>quiet</include>
-                            <include>reservation</include>
-                            <include>run.epilog</include>
-                            <include>run.label</include>
-                            <include>run.ntasks</include>
-                            <include>run.ntasks_per_node</include>
-                            <include>run.prolog</include>
-                            <include>signal</include>
-                            <include>time</include>
-                            <include>verbose</include>
-                            <include>workdir</include>
-                        </items>
-                        <value pattern="@name='@value'"/>
-                    </viewer>
-                </composite>
-            </dynamic>
-            <import title="Import SLURM Script">
-                <export-for-override name="exportedEnv" style="SWT.BORDER | SWT.MULTI | SWT.V_SCROLL" sort="true" type="table"
-                    initialAllChecked="true" tooltipEnabled="true">
-                    <layout-data>
-                        <grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true" heightHint="80"/>
-                    </layout-data>
-                    <column-data name="Name" width="175" resizable="true">
-                        <tooltip>Multi-select and click checkbox to apply change to all rows.</tooltip>
-                    </column-data>
-                    <column-data name="Value" width="200" resizable="true">
-                        <tooltip>Click to activate value widget.</tooltip>
-                    </column-data>
-                    <items>
-                        <include>partition</include>
-                        <include>job_name</include>
-                        <include>output</include>
-                        <include>error</include>
-                        <include>workdir</include>
-                    </items>
-                </export-for-override>
-            </import>
-        </launch-tab>
-    </control-data>
-    <monitor-data schedulerType="SLURM">
-    </monitor-data>
+		</attribute>
+		<script insertEnvironmentAfter="30" deleteAfterSubmit="true">
+			<file-staging-location>${ptp_rm:directory#value}</file-staging-location>
+			<line><arg>#!/bin/bash</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --account='>#SBATCH --account=${ptp_rm:account#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --acctg-freq='>#SBATCH --acctg-freq=${ptp_rm:acctg_freq#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --begin='>#SBATCH --begin=${ptp_rm:begin#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --checkpoint='>#SBATCH --checkpoint=${ptp_rm:checkpoint#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --checkpoint-dir='>#SBATCH --checkpoint-dir=${ptp_rm:checkpoint_dir#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --comment=""'>#SBATCH --comment="${ptp_rm:comment#value}"</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --constraint=""'>#SBATCH --constraint="${ptp_rm:constraint#value}"</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH'>#SBATCH ${ptp_rm:contiguous#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --cores-per-socket='>#SBATCH --cores-per-socket=${ptp_rm:cores_per_socket#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --cpu_bind='>#SBATCH --cpu_bind=${ptp_rm:cpu_bind#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --cpus-per-task='>#SBATCH --cpus-per-task=${ptp_rm:cpus-per-task#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --dependency='>#SBATCH --dependency=${ptp_rm:dependency#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --error='>#SBATCH --error=${ptp_rm:error#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH'>#SBATCH ${ptp_rm:exclusive#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --export='>#SBATCH --export=${ptp_rm:export#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --export-file='>#SBATCH --export-file=${ptp_rm:export_file#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --extra-node-info='>#SBATCH --extra-node-info=${ptp_rm:extra_node_info#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --get-user-env='>#SBATCH --get-user-env=${ptp_rm:get_user_env#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH'>#SBATCH ${ptp_rm:hold#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH'>#SBATCH ${ptp_rm:immediate#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --job-name='>#SBATCH --job-name=${ptp_rm:job_name#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --mail-type='>#SBATCH --mail-type=${ptp_rm:mail_type#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --mail-user='>#SBATCH --mail-user=${ptp_rm:mail_user#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --nice='>#SBATCH --nice=${ptp_rm:nice#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --nodes='>#SBATCH --nodes=${ptp_rm:nodes#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --open-mode='>#SBATCH --open-mode=${ptp_rm:open_mode#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --output='>#SBATCH --output=${ptp_rm:output#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --partition='>#SBATCH --partition=${ptp_rm:partition#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH'>#SBATCH ${ptp_rm:quiet#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --reservation='>#SBATCH --reservation=${ptp_rm:reservation#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --epilog='>#SBATCH --epilog=${ptp_rm:run.epilog#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH'>#SBATCH ${ptp_rm:run.label#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --ntasks='>#SBATCH --ntasks=${ptp_rm:run.ntasks#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --ntasks-per-node='>#SBATCH --ntasks-per-node=${ptp_rm:run.ntasks_per_node#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --prolog='>#SBATCH --prolog=${ptp_rm:run.prolog#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --signal='>#SBATCH --signal=${ptp_rm:signal#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --time='>#SBATCH --time=${ptp_rm:time#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH'>#SBATCH ${ptp_rm:verbose#value}</arg></line>
+			<line><arg isUndefinedIfMatches='cd'>cd ${ptp_rm:workdir#value}</arg></line>
+			<line><arg>${ptp_rm:run.command#value} ${ptp_rm:executablePath#value} ${ptp_rm:progArgs#value}</arg></line>
+		</script>
+		<start-up-command name="get-queues">
+			<arg>scontrol</arg>
+			<arg>show</arg>
+			<arg>partition</arg>
+			<stdout-parser delim="\n">
+				<target ref="queues">
+					<match>
+						<expression>^PartitionName=([\w\d]+)</expression>
+						<add field="value">
+							<entry valueGroup="1"/>
+						</add>
+					</match>
+				</target>
+			</stdout-parser>
+		</start-up-command>
+		<submit-batch name="submit-batch" directory="${ptp_rm:directory#value}" waitForId="true">
+			<arg>sbatch</arg>
+			<arg>${ptp_rm:managed_file_for_script#value}</arg>
+			<stdout-parser delim="\n">
+				<target ref="@jobId">
+					<match>
+						<expression>^Submitted batch job ([\d]+)</expression>
+						<set field="name">
+							<entry valueGroup="1"/></set>
+						<set field="default">
+							<entry valueGroup="1"/></set>
+						<set field="value">
+							<entry value="SUBMITTED"/></set>
+					</match>
+				</target>
+				<target ref="@jobId">
+					<match>
+						<expression flags="DOTALL|UNIX_LINES">.*Submission error: (.*)</expression>
+						<set field="value">
+							<entry valueGroup="1"/></set>
+						<throw message="Job Submit Failed: ${ptp_rm:@jobId#value}"/>
+					</match>
+				</target>
+			</stdout-parser>
+			<stderr-parser delim="\n">
+				<target ref="@jobId">
+					<match>
+						<expression>.+</expression>
+						<set field="value">
+							<entry value="FAILED"/></set>
+						<throw message="Job Submit Failed"/>
+					</match>
+				</target>
+			</stderr-parser>
+		</submit-batch>
+		<get-job-status name="get-job-status" ignoreExitStatus="true">
+			<arg>scontrol</arg>
+			<arg>show</arg>
+			<arg>job</arg><arg>${ptp_rm:@jobId#name}</arg>
+			<stdout-parser delim="\n">
+				<target ref="@jobId">
+					<match>
+						<expression>^[\s]*JobState=([\w]+)[\s]+Reason=([\w]+)[\s]+.*</expression>
+						<set field="value">
+							<entry valueGroup="1"/>
+						</set>
+						<set field="default">
+							<entry valueGroup="2"/></set>
+					</match>
+					<test op="OR">
+						<test op="AND">
+						<test op="EQ">
+							<value>#value</value>
+							<value>PENDING</value>
+						</test>
+						<test op="EQ">
+							<value>#default</value>
+							<value>JobHeldUser</value>
+						</test>
+						<set field="value">
+							<entry value="USER_ON_HOLD" />
+						</set>
+						</test>
+						<test op="AND">
+						<test op="EQ">
+							<value>#value</value>
+							<value>PENDING</value>
+						</test>
+						<test op="EQ">
+							<value>#default</value>
+							<value>JobHeldAdmin</value>
+						</test>
+						<set field="value">
+							<entry value="SYSTEM_ON_HOLD" />
+						</set>
+						</test>
+						<test op="AND">
+						<test op="EQ">
+							<value>#value</value>
+							<value>PENDING</value>
+						</test>
+						<test op="EQ">
+							<value>#default</value>
+							<value>PartitionDown</value>
+						</test>
+						<set field="value">
+							<entry value="SYSTEM_SUSPENDED" />
+						</set>
+						</test>
+						<test op="AND">
+						<test op="EQ">
+							<value>#value</value>
+							<value>PENDING</value>
+						</test>
+						<test op="EQ">
+							<value>#default</value>
+							<value>PartitionInactive</value>
+						</test>
+						<set field="value">
+							<entry value="SYSTEM_ON_HOLD" />
+						</set>
+						</test>
+						<test op="AND">
+						<test op="EQ">
+							<value>#value</value>
+							<value>PENDING</value>
+						</test>
+						<test op="EQ">
+							<value>#default</value>
+							<value>NodeDown</value>
+						</test>
+						<set field="value">
+							<entry value="SYSTEM_SUSPENDED" />
+						</set>
+						</test>
+						<test op="AND">
+						<test op="EQ">
+							<value>#value</value>
+							<value>PENDING</value>
+						</test>
+						<test op="EQ">
+							<value>#default</value>
+							<value>SystemFailure</value>
+						</test>
+						<set field="value">
+							<entry value="SYSTEM_SUSPENDED" />
+						</set>
+						</test>
+					</test>
+					<test op="EQ">
+						<value>#value</value>
+						<value>PENDING</value>
+						<set field="value">
+							<entry value="QUEUED_ACTIVE"/></set></test>
+					<test op="EQ">
+						<value>#value</value>
+						<value>CONFIGURING</value>
+						<set field="value">
+							<entry value="SUBMITTED"/></set></test>
+					<test op="EQ">
+						<value>#value</value>
+						<value>RUNNING</value>
+						<set field="value">
+							<entry value="RUNNING"/>
+						</set>
+					</test>
+					<test op="EQ">
+						<value>#value</value>
+						<value>SUSPENDED</value>
+						<set field="value">
+							<entry value="SUSPENDED"/>
+						</set>
+					</test>
+					<test op="EQ">
+						<value>#value</value>
+						<value>COMPLETED</value>
+						<set field="value">
+							<entry value="COMPLETED"/>
+						</set>
+					</test>
+					<test op="EQ">
+						<value>#value</value>
+						<value>COMPLETING</value>
+						<set field="value">
+							<entry value="COMPLETED"/>
+						</set>
+					</test>
+					<test op="EQ">
+						<value>#value</value>
+						<value>CANCELLED</value>
+						<set field="value">
+							<entry value="CANCELED"/>
+						</set>
+					</test>
+					<test op="EQ">
+						<value>#value</value>
+						<value>FAILED</value>
+						<set field="value">
+							<entry value="FAILED"/></set></test>
+					<test op="EQ">
+						<value>#value</value>
+						<value>NODE_FAIL</value>
+						<set field="value">
+							<entry value="FAILED"/></set></test>
+					<test op="EQ">
+						<value>#value</value>
+						<value>TIMEOUT</value>
+						<set field="value">
+							<entry value="FAILED"/></set></test>
+				</target>
+			</stdout-parser>
+			<stderr-parser delim="\n">
+				<target ref="@jobId">
+					<match>
+						<expression>.+</expression>
+						<set field="value">
+							<entry value="COMPLETED"/>
+						</set>
+					</match>
+				</target>
+			</stderr-parser>
+		</get-job-status>
+		<terminate-job name="cancel" ignoreExitStatus="true">
+			<arg>scancel</arg>
+			<arg>${ptp_rm:@jobId#name}</arg>
+		</terminate-job>
+		<hold-job name="hold" ignoreExitStatus="true">
+			<arg>scontrol</arg><arg>hold</arg>
+			<arg>${ptp_rm:@jobId#name}</arg>
+		</hold-job>
+		<release-job name="release" ignoreExitStatus="true">
+			<arg>scontrol</arg>
+			<arg>release</arg>
+			<arg>${ptp_rm:@jobId#name}</arg>
+		</release-job>
+		<launch-tab>
+			<dynamic includeWidgetValuesFrom="Secondary Settings">
+				<title>Basic Settings</title>
+				<layout>
+					<grid-layout/>
+				</layout>
+				<!-- ATTRIBUTES group -->
+				<composite group="true">
+					<layout>
+						<grid-layout numColumns="4" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
+					</layout>
+					<!-- HEADER -->
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Name</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Value</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Description</fixed-text>
+					</widget>
+					<!-- row 1 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:job_name#tooltip}</tooltip>
+						<fixed-text>Job Name: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="job_name">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:job_name#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:job_name#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:job_name#description}</fixed-text>
+					</widget>
+					<!-- row 2 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:partition#tooltip}</tooltip>
+						<fixed-text>Queue: </fixed-text>
+					</widget>
+					<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="partition">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:partition#tooltip}</tooltip>
+						<items-from>queues</items-from>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:partition#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:partition#description}</fixed-text>
+					</widget>
+					<!-- row 3 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:workdir#tooltip}</tooltip>
+						<fixed-text>Working Directory: </fixed-text>
+					</widget>
+					<browse title="Browse" textStyle="SWT.BORDER" attribute="workdir" readOnly="true" directory="true">
+						<text-layout-data>
+							<grid-data horizontalAlign="SWT.FILL"
+								horizontalSpan="1" grabExcessHorizontal="true"
+								widthHint="150" />
+						</text-layout-data>
+						<button-layout-data>
+							<grid-data horizontalAlign="SWT.FILL"
+								horizontalSpan="1" grabExcessHorizontal="false"
+								widthHint="50"/>
+						</button-layout-data>
+						<tooltip>Clear text box if "Browse" button does not work. ${ptp_rm:workdir#tooltip}</tooltip>
+					</browse>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:workdir#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:workdir#description}</fixed-text>
+					</widget>
+					<!-- row 4 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:nodes#tooltip}</tooltip>
+						<fixed-text>Number of nodes: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="nodes">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:nodes#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:nodes#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:nodes#description}</fixed-text>
+					</widget>
+					<!-- row 5 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:time#tooltip}</tooltip>
+						<fixed-text>Wallclock Time: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="time">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:time#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:time#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:time#description}</fixed-text>
+					</widget>
+					<!-- row 6 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:run.command#tooltip}</tooltip>
+						<fixed-text>MPI Command: </fixed-text>
+					</widget>
+					<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="run.command">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:run.command#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:run.command#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:run.command#description}</fixed-text>
+					</widget>
+					<!-- row 7 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:run.ntasks#tooltip}</tooltip>
+						<fixed-text>MPI Number of Tasks:</fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="run.ntasks">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:run.ntasks#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:run.ntasks#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:run.ntasks#description}</fixed-text>
+					</widget>
+					<!--row 8 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:run.ntasks_per_node#tooltip}</tooltip>
+						<fixed-text>MPI Ranks per Node:</fixed-text>
+					</widget>
+					<widget type="combo" style="SWT.BORDER" attribute="run.ntasks_per_node" readOnly="true">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" />
+						</layout-data>
+						<tooltip>${ptp_rm:run.ntasks_per_node#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:run.ntasks_per_node#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:run.ntasks_per_node#description}</fixed-text>
+					</widget>
+				</composite>
+			</dynamic>
+			<dynamic includeWidgetValuesFrom="Basic Settings">
+				<title>Secondary Settings</title>
+				<layout>
+					<grid-layout/>
+				</layout>
+				<!-- ATTRIBUTES group -->
+				<composite group="true">
+					<layout>
+						<grid-layout numColumns="4" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
+					</layout>
+					<!-- HEADER -->
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Name</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Value</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Description</fixed-text>
+					</widget>
+					<!-- row 1 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:acctg_freq#tooltip}</tooltip>
+						<fixed-text>Accounting Frequency: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="acctg_freq">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:acctg_freq#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:acctg_freq#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:acctg_freq#description}</fixed-text>
+					</widget>
+					<!-- row 2 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:comment#tooltip}</tooltip>
+						<fixed-text>Comment: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="comment">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:comment#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:comment#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:comment#description}</fixed-text>
+					</widget>
+					<!-- row 3 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:constraint#tooltip}</tooltip>
+						<fixed-text>Constraint: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="constraint">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:constraint#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:constraint#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:constraint#description}</fixed-text>
+					</widget>
+					<!-- row 4 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:contiguous#tooltip}</tooltip>
+						<fixed-text>Contiguous: </fixed-text>
+					</widget>
+					<widget type="checkbox" style="SWT.LEFT" attribute="contiguous">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:contiguous#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:contiguous#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:contiguous#description}</fixed-text>
+					</widget>
+					<!-- row 5 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:cores_per_socket#tooltip}</tooltip>
+						<fixed-text>Cores Per Socket: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="cores_per_socket">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:cores_per_socket#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:cores_per_socket#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:cores_per_socket#description}</fixed-text>
+					</widget>
+					<!-- row 6 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:cpu_bind#tooltip}</tooltip>
+						<fixed-text>CPU Bind: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="cpu_bind">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:cpu_bind#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:cpu_bind#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:cpu_bind#description}</fixed-text>
+					</widget>
+					<!-- row 7 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:cpus_per_task#tooltip}</tooltip>
+						<fixed-text>CPUs Per Task: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="cpus_per_task">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:cpus_per_task#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:cpus_per_task#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:cpus_per_task#description}</fixed-text>
+					</widget>
+					<!-- row 8 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:exclusive#tooltip}</tooltip>
+						<fixed-text>Exclusive: </fixed-text>
+					</widget>
+					<widget type="checkbox" style="SWT.LEFT" attribute="exclusive">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:exclusive#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:exclusive#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:exclusive#description}</fixed-text>
+					</widget>
+					<!-- row 9 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:export_file#tooltip}</tooltip>
+						<fixed-text>Export File: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="export_file">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:export_file#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:export_file#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:export_file#description}</fixed-text>
+					</widget>
+					<!-- row 10 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:extra_node_info#tooltip}</tooltip>
+						<fixed-text>Extra Node Info: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="extra_node_info">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:extra_node_info#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:extra_node_info#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:extra_node_info#description}</fixed-text>
+					</widget>
+				</composite>
+			</dynamic>
+			<dynamic>
+				<title>Advanced Settings</title>
+				<layout>
+					<grid-layout />
+				</layout>
+				<composite group="true">
+					<layout>
+						<grid-layout numColumns="1" />
+					</layout>
+					<viewer name="allAttributes" style="SWT.BORDER" sort="true" initialAllChecked="true" type="table">
+						<layout-data>
+							<grid-data widthHint="600" heightHint="400" horizontalSpan="1" />
+						</layout-data>
+						<!-- These are the 6 attribute fields mappable to columns. In a "table 
+							viewer" the order of the columns is entirely arbitrary -->
+						<column-data name="Name" width="300" />
+						<column-data name="Value" width="300" />
+						<items>
+							<include>account</include>
+							<include>acctg_freq</include>
+							<include>begin</include>
+							<include>checkpoint</include>
+							<include>checkpoint_dir</include>
+							<include>comment</include>
+							<include>constraint</include>
+							<include>contiguous</include>
+							<include>cores_per_socket</include>
+							<include>cpu_bind</include>
+							<include>cpus_per_task</include>
+							<include>dependency</include>
+							<include>error</include>
+							<include>exclusive</include>
+							<include>export</include>
+							<include>export_file</include>
+							<include>extra_node_info</include>
+							<include>get_user_env</include>
+							<include>hold</include>
+							<include>immediate</include>
+							<include>job_name</include>
+							<include>mail_type</include>
+							<include>mail_user</include>
+							<include>nice</include>
+							<include>nodes</include>
+							<include>open_mode</include>
+							<include>output</include>
+							<include>partition</include>
+							<include>quiet</include>
+							<include>reservation</include>
+							<include>run.epilog</include>
+							<include>run.label</include>
+							<include>run.ntasks</include>
+							<include>run.ntasks_per_node</include>
+							<include>run.prolog</include>
+							<include>signal</include>
+							<include>time</include>
+							<include>verbose</include>
+							<include>workdir</include>
+						</items>
+					</viewer>
+				</composite>
+			</dynamic>
+			<import title="Import SLURM Script">
+				<export-for-override name="exportedEnv" style="SWT.BORDER | SWT.MULTI | SWT.V_SCROLL" sort="true" type="table"
+					initialAllChecked="true" tooltipEnabled="true">
+					<layout-data>
+						<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true" heightHint="80"/>
+					</layout-data>
+					<column-data name="Name" width="175" resizable="true">
+						<tooltip>Multi-select and click checkbox to apply change to all rows.</tooltip>
+					</column-data>
+					<column-data name="Value" width="200" resizable="true">
+						<tooltip>Click to activate value widget.</tooltip>
+					</column-data>
+					<items>
+						<include>partition</include>
+						<include>job_name</include>
+						<include>output</include>
+						<include>error</include>
+						<include>workdir</include>
+					</items>
+				</export-for-override>
+			</import>
+		</launch-tab>
+	</control-data>
+	<monitor-data schedulerType="SLURM">
+	</monitor-data>
 </resource-manager-builder>
