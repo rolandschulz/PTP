@@ -2,5 +2,20 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension-point id="remoteServer" name="Remote Server" schema="schema/remoteServer.exsd"/>
+   <extension
+         point="org.eclipse.core.variables.valueVariables">
+      <variable
+            description="payload"
+            initialValue="&quot;&quot;"
+            name="payload"
+            readOnly="false">
+      </variable>
+      <variable
+            description="payload_args"
+            initialValue="&quot;&quot;"
+            name="payload_args"
+            readOnly="false">
+      </variable>
+   </extension>
 
 </plugin>

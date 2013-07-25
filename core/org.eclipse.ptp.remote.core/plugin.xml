@@ -14,21 +14,6 @@
       </remoteServices>
    </extension>
    <extension
-         point="org.eclipse.core.variables.valueVariables">
-      <variable
-            description="payload"
-            initialValue="&quot;&quot;"
-            name="payload"
-            readOnly="false">
-      </variable>
-      <variable
-            description="payload_args"
-            initialValue="&quot;&quot;"
-            name="payload_args"
-            readOnly="false">
-      </variable>
-   </extension>
-   <extension
          point="org.eclipse.core.runtime.adapters">
       <factory
             adaptableType="org.eclipse.core.resources.IResource"
