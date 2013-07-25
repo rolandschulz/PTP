@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011 Forschungszentrum Juelich GmbH
+ * Copyright (c) 2011-2013 Forschungszentrum Juelich GmbH
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution and is available at
@@ -7,6 +7,7 @@
  * 
  * Contributors:
  * 		Claudia Knobloch, FZ Juelich
+ * 		Carsten Karbach, FZ Juelich
  */
 package org.eclipse.ptp.rm.lml.core;
 
@@ -115,6 +116,16 @@ public class LMLManager {
 		fireFilterLgui(gid, filterValues);
 	}
 
+	/**
+	 * Retrieve the current LML-Layout and simultaneously send event
+	 * that the resource manager is closed. This method is called
+	 * right before a connection is closed. It returns the current layout
+	 * for successive sessions.
+	 * 
+	 * @param name
+	 *            Name of the ResourceManager
+	 * @return LML-Layout as string containing the current LML-Layout configuration
+	 */
 	public String getCurrentLayout(String name) {
 		ILguiItem item = null;
 		synchronized (LGUIS) {
@@ -241,6 +252,19 @@ public class LMLManager {
 		fireUnselectObject(oid);
 	}
 
+	/**
+	 * Run a refresh for one connection identified by name.
+	 * Sends the current LML layout to the passed output stream.
+	 * Expects an LML file as response from the input stream.
+	 * 
+	 * @param name
+	 *            Name of the ResourceManager
+	 * @param input
+	 *            input stream attached to LML_DA for retrieving the updated LML file
+	 * @param output
+	 *            output stream attached to LML_DA for transferring the LML request to the remote system
+	 * @throws CoreException
+	 */
 	public void update(String name, InputStream input, OutputStream output) throws CoreException {
 		ILguiItem lguiItem = null;
 		synchronized (LGUIS) {
@@ -257,6 +281,27 @@ public class LMLManager {
 					fireUpdatedLgui();
 				}
 			}
+		}
+	}
+
+	/**
+	 * Only read the current LML layout for the given resource manager.
+	 * If there is no resource manager with that name, nothing is written
+	 * to the output stream. The output can be used as request for the LML_DA
+	 * server scripts.
+	 * 
+	 * @param name
+	 *            Name of the ResourceManager
+	 * @param output
+	 *            stream, into which the current LML layout of the corresponding resource manager is written
+	 */
+	public void readCurrentLayout(String name, OutputStream output) {
+		ILguiItem lguiItem = null;
+		synchronized (LGUIS) {
+			lguiItem = LGUIS.get(name);
+		}
+		if (lguiItem != null) {
+			lguiItem.getCurrentLayout(output);
 		}
 	}
 
