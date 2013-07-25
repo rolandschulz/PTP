@@ -77,6 +77,15 @@ of the form "<job_id>.ckpt" for jobs and "<job_id>.<step_id>.ckpt" for job steps
 			<tooltip><![CDATA[An arbitrary comment enclosed in double quotes if using spaces
 or some special characters.]]></tooltip>
 		</attribute>
+		<attribute name="clusters" type="string">
+			<description>Specify the clusters where commands are issued. (--clusters&lt;string&gt;)</description>
+			<tooltip><![CDATA[Specify the clusters where command are issued. Multiple cluster names may be
+comma separated. The job will be submitted to the one cluster
+providing the earliest expected job initiation time. The default
+value is the current cluster. A value of 'all’ will query to run
+on all clusters. Note the --export option to control environment
+variables exported between clusters.]]></tooltip>
+		</attribute>
 		<attribute name="constraint" type="string">
 			<description>Specify which features are required. (--constraint=&lt;list&gt;)</description>
 			<tooltip><![CDATA[Nodes can have features assigned to them by the SLURM administrator.
@@ -137,8 +146,8 @@ Use absolute path or "${ptp_rm:workdir#value}" prefix to be relative to working 
 			<tooltip><![CDATA[The job allocation can not share nodes with other running jobs.
 This is the opposite of --share, whichever option is seen last
 on the command line will be used. The default shared/exclusive
-behavior depends on system configuration and the partition’s
-Shared option takes precedence over the job’s option.]]></tooltip>
+behavior depends on system configuration and the partition's
+Shared option takes precedence over the job's option.]]></tooltip>
 		</attribute>
 		<attribute name="export" type="string">
 			<description>Identify which environment variables are propagated to the batch job. (--export=&lt;environment variables|ALL|NONE&gt;)</description>
@@ -155,12 +164,12 @@ option is implicitly set to load other environment variables based upon
 the user's configuration on the cluster which executes the job.]]></tooltip>
 		</attribute>
 		<attribute name="export_file" type="string">
-			<description> (--export-file=&lt;filename|fd&gt;)</description>
+			<description>Specify environment variables defined in &lt;filename&gt; or read from &lt;fd&gt;. (--export-file=&lt;filename|fd&gt;)</description>
 			<tooltip><![CDATA[If a number between 3 and OPEN_MAX is specified as the argument
 to this option, a readable file descriptor will be assumed
 (STDIN and STDOUT are not supported as valid arguments). Otherwise
 a filename is assumed. Export environment variables
-defined in <filename> or read from <fd> to the job’s execution
+defined in <filename> or read from <fd> to the job's execution
 environment. The content is one or more environment variable
 definitions of the form NAME=value, each separated by a null
 character. This allows the use of special characters in environment
@@ -189,8 +198,7 @@ select/cons_res, it must have a parameter of CR_Core,
 CR_Core_Memory, CR_Socket, or CR_Socket_Memory for this option
 to be honored. This option is not supported on BlueGene systems
 (select/bluegene plugin is configured). If not specified, the
-scontrol show job will display ’ReqS:C:T=*:*:*’.
-]]></tooltip>
+scontrol show job will display 'ReqS:C:T=*:*:*'.]]></tooltip>
 		</attribute>
 		<attribute name="get_user_env" type="string">
 			<description>Tell sbatch to retrieve the login environment variables for the user. (--get_user_env[=timeout][mode])</description>
@@ -213,6 +221,33 @@ Example of use include "--get-user-env", "--get-user-env=10"
 "--get-user-env=10L", and "--get-user-env=S".
 This option was originally created for use by Moab.]]></tooltip>
 		</attribute>
+		<attribute name="gres" type="string">
+			<description>Specifies a comma delimited list of generic consumable resources. (--gres=&lt;list&gt;)</description>
+			<tooltip><![CDATA[Specifies a comma delimited list of generic consumable
+resources. The format of each entry on the list is
+"name[:count[*cpu]]". The name is that of the consumable
+resource. The count is the number of those resources with a
+default value of 1. The specified resources will be allocated
+to the job on each node allocated unless "*cpu" is appended, in
+which case the resources will be allocated on a per cpu basis.
+The available generic consumable resources is configurable by
+the system administrator. A list of available generic consumable
+resources will be printed and the command will exit if the
+option argument is "help". Examples of use include
+"--gres=gpus:2*cpu,disk=40G" and "--gres=help".]]></tooltip>
+		</attribute>
+		<attribute name="hint" type="choice">
+			<description>Bind tasks according to application hints. (--hint=&lt;type&gt;)</description>
+			<tooltip><![CDATA[Bind tasks according to application hints:
+(1) compute_bound - Select settings for compute bound applications: use all
+cores in each socket, one thread per core;
+(2) memory_bound - Select settings for memory bound applications: use only
+one core in each socket, one thread per core; and
+(3) [no]multithread - [don't] use extra threads with in-core multi-threading
+which can benefit communication intensive applications.]]></tooltip>
+			<choice>,compute_bound,memory_bound,multithread,nomultithread</choice>
+			<default></default>
+		</attribute>
 		<attribute name="hold" type="boolean" translateBooleanAs='--hold, '>
 			<description>Specify the job is to be submitted in a held state (priority of zero). (--hold)</description>
 			<tooltip><![CDATA[A held job can now be released using scontrol to reset its priority
@@ -223,6 +258,22 @@ This option was originally created for use by Moab.]]></tooltip>
 necessary to grant its job allocation are immediately available. (--immediate)</description>
 			<tooltip><![CDATA[If the job allocation has to wait in a queue of pending jobs,
 the batch script is not submitted.]]></tooltip>
+		</attribute>
+		<attribute name="input" type="string">
+			<description>Specify filename pattern of batch script's standard input. (--input=&lt;filename_pattern&gt;)</description>
+			<tooltip><![CDATA[Instruct SLURM to connect the batch script's standard input
+directly to the file name specified in the "filename pattern".
+By default, "/dev/null" is open on the batch script's standard
+input and both standard output and standard error are directed
+to a file of the name "slurm-%j.out", where the "%j" is replaced
+with the job allocation number, as described below.
+The filename pattern may contain one or more replacement symbols,
+which are a percent sign "%" followed by a letter (e.g.
+%j). Supported replacement symbols are:
+(1) %j - Job allocation number.
+(2) %N - Node name. Only one file is created, so %N will be
+replaced by the name of the first node in the job, which
+is the one that runs the script.]]></tooltip>
 		</attribute>
 		<attribute name="job_name" type="string">
 			<description>Specify a name for the job allocation. (--job-name=&lt;jobname&gt;)</description>
@@ -235,6 +286,14 @@ read on sbatch's standard input.]]></tooltip>
 				<regex expression="[a-zA-Z_][0-9a-zA-Z_]*"/>
 				<error-message>"job_name" field: Must be at least one alphanumeric character</error-message>
 			</validator>
+		</attribute>
+		<attribute name="licenses" type="string">
+			<description>Specify a comma delimited list of license names (--licenses=&lt;license&gt;)</description>
+			<tooltip><![CDATA[Specification of licenses (or other resources available on all
+nodes of the cluster) which must be allocated to this job.
+License names can be followed by an asterisk and count (the
+default count is one). Multiple license names should be comma
+separated (e.g. "--licenses=foo*4,bar").]]></tooltip>
 		</attribute>
 		<attribute name="mail_type" type="choice">
 			<description>Notify user by email when certain event types occur. (--mail-type=&lt;type&gt;)</description>
@@ -256,6 +315,14 @@ a negative adjustment. NOTE: This option is presently
 ignored if SchedulerType=sched/wiki or
 SchedulerType=sched/wiki2.]]></tooltip>
 		</attribute>
+		<attribute name="nodefile" type="string">
+			<description>Specify filename containing nodes. (--nodefile=&lt;node file&gt;)</description>
+			<tooltip><![CDATA[Much like --nodelist, but the list is contained in a file of
+name node file. The node names of the list may also span multiple
+lines in the file. Duplicate node names in the file will
+be ignored. The order of the node names in the list is not
+important; the node names will be sorted by SLURM.
+			]]></tooltip>		</attribute>
 		<attribute name="nodes" type="string">
 			<description>Request that a minimum of "minnodes" nodes be allocated to this job. (--nodes=&lt;minnodes[-maxnodes]&gt;)</description>
 			<tooltip><![CDATA[The scheduler may decide to launch the job on more than "minnodes" nodes.
@@ -277,6 +344,18 @@ behavior is to allocate enough nodes to satisfy the requirements of
 the "-n" and "-c" options.
 The job is allocated as many nodes as possible within the range specified
 and without delaying the initiation of the job.]]></tooltip>
+		</attribute>
+		<attribute name="no_kill" type="boolean" translateBooleanAs='--no-kill, '>
+			<description>Do not automatically terminate job if one of the nodes fails allocation. (--no-kill)</description>
+			<tooltip><![CDATA[Do not automatically terminate a job if one of the nodes
+fails allocation. The user will assume the responsibilities
+for fault-tolerance should a node fail. When there is a node
+failure, any active job steps (usually MPI jobs) on that node
+will almost certainly suffer a fatal error, but with --no-kill,
+the job allocation will not be revoked so the user may launch
+new job steps on the remaining nodes in their allocation.
+By default SLURM terminates the entire job allocation if any
+node fails in its range of allocated nodes.]]></tooltip>
 		</attribute>
 		<attribute name="open_mode" type="choice">
 			<description>Open the output and error files using append or truncate mode as specified. (--open_mode=append|truncate)</description>
@@ -402,12 +481,13 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip>
 			<line><arg isUndefinedIfMatches='#SBATCH --begin='>#SBATCH --begin=${ptp_rm:begin#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --checkpoint='>#SBATCH --checkpoint=${ptp_rm:checkpoint#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --checkpoint-dir='>#SBATCH --checkpoint-dir=${ptp_rm:checkpoint_dir#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --clusters='>#SBATCH --clusters=${ptp_rm:clusters#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --comment=""'>#SBATCH --comment="${ptp_rm:comment#value}"</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --constraint=""'>#SBATCH --constraint="${ptp_rm:constraint#value}"</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH'>#SBATCH ${ptp_rm:contiguous#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --cores-per-socket='>#SBATCH --cores-per-socket=${ptp_rm:cores_per_socket#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --cpu_bind='>#SBATCH --cpu_bind=${ptp_rm:cpu_bind#value}</arg></line>
-			<line><arg isUndefinedIfMatches='#SBATCH --cpus-per-task='>#SBATCH --cpus-per-task=${ptp_rm:cpus-per-task#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --cpus-per-task='>#SBATCH --cpus-per-task=${ptp_rm:cpus_per_task#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --dependency='>#SBATCH --dependency=${ptp_rm:dependency#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --error='>#SBATCH --error=${ptp_rm:error#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH'>#SBATCH ${ptp_rm:exclusive#value}</arg></line>
@@ -415,13 +495,19 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip>
 			<line><arg isUndefinedIfMatches='#SBATCH --export-file='>#SBATCH --export-file=${ptp_rm:export_file#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --extra-node-info='>#SBATCH --extra-node-info=${ptp_rm:extra_node_info#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --get-user-env='>#SBATCH --get-user-env=${ptp_rm:get_user_env#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --gres='>#SBATCH --gres=${ptp_rm:gres#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --hint='>#SBATCH --hint=${ptp_rm:hint#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH'>#SBATCH ${ptp_rm:hold#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH'>#SBATCH ${ptp_rm:immediate#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --input='>#SBATCH --input=${ptp_rm:input#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --job-name='>#SBATCH --job-name=${ptp_rm:job_name#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --licenses='>#SBATCH --licenses=${ptp_rm:licenses#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --mail-type='>#SBATCH --mail-type=${ptp_rm:mail_type#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --mail-user='>#SBATCH --mail-user=${ptp_rm:mail_user#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --nice='>#SBATCH --nice=${ptp_rm:nice#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --nodefile='>#SBATCH --nodefile=${ptp_rm:nodefile#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --nodes='>#SBATCH --nodes=${ptp_rm:nodes#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH'>#SBATCH ${ptp_rm:no_kill#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --open-mode='>#SBATCH --open-mode=${ptp_rm:open_mode#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --output='>#SBATCH --output=${ptp_rm:output#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --partition='>#SBATCH --partition=${ptp_rm:partition#value}</arg></line>
@@ -931,6 +1017,27 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip>
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
+						<tooltip>${ptp_rm:clusters#tooltip}</tooltip>
+						<fixed-text>Clusters: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="clusters">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:clusters#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:clusters#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:clusters#description}</fixed-text>
+					</widget>
+					<!-- row 3 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
 						<tooltip>${ptp_rm:comment#tooltip}</tooltip>
 						<fixed-text>Comment: </fixed-text>
 					</widget>
@@ -947,7 +1054,7 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip>
 						<tooltip>${ptp_rm:comment#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:comment#description}</fixed-text>
 					</widget>
-					<!-- row 3 -->
+					<!-- row 4 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -968,7 +1075,7 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip>
 						<tooltip>${ptp_rm:constraint#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:constraint#description}</fixed-text>
 					</widget>
-					<!-- row 4 -->
+					<!-- row 5 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -989,7 +1096,7 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip>
 						<tooltip>${ptp_rm:contiguous#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:contiguous#description}</fixed-text>
 					</widget>
-					<!-- row 5 -->
+					<!-- row 6 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1010,7 +1117,7 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip>
 						<tooltip>${ptp_rm:cores_per_socket#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:cores_per_socket#description}</fixed-text>
 					</widget>
-					<!-- row 6 -->
+					<!-- row 7 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1031,7 +1138,7 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip>
 						<tooltip>${ptp_rm:cpu_bind#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:cpu_bind#description}</fixed-text>
 					</widget>
-					<!-- row 7 -->
+					<!-- row 8 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1052,7 +1159,7 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip>
 						<tooltip>${ptp_rm:cpus_per_task#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:cpus_per_task#description}</fixed-text>
 					</widget>
-					<!-- row 8 -->
+					<!-- row 9 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1073,7 +1180,7 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip>
 						<tooltip>${ptp_rm:exclusive#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:exclusive#description}</fixed-text>
 					</widget>
-					<!-- row 9 -->
+					<!-- row 10 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1094,7 +1201,7 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip>
 						<tooltip>${ptp_rm:export_file#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:export_file#description}</fixed-text>
 					</widget>
-					<!-- row 10 -->
+					<!-- row 11 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1114,6 +1221,132 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip>
 						</layout-data>
 						<tooltip>${ptp_rm:extra_node_info#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:extra_node_info#description}</fixed-text>
+					</widget>
+					<!-- row 12 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:gres#tooltip}</tooltip>
+						<fixed-text>Generic Resources: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="gres">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:gres#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:gres#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:gres#description}</fixed-text>
+					</widget>
+					<!-- row 13 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:hint#tooltip}</tooltip>
+						<fixed-text>Hint: </fixed-text>
+					</widget>
+					<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="hint">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:hint#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:hint#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:hint#description}</fixed-text>
+					</widget>
+					<!-- row 14 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:input#tooltip}</tooltip>
+						<fixed-text>Input: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="input">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:input#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:input#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:input#description}</fixed-text>
+					</widget>
+					<!-- row 15 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:licenses#tooltip}</tooltip>
+						<fixed-text>Licenses: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="licenses">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:licenses#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:licenses#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:licenses#description}</fixed-text>
+					</widget>
+					<!-- row 16 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:nodefile#tooltip}</tooltip>
+						<fixed-text>Node File: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="nodefile">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:nodefile#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:nodefile#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:nodefile#description}</fixed-text>
+					</widget>
+					<!-- row 17 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:no_kill#tooltip}</tooltip>
+						<fixed-text>No Kill: </fixed-text>
+					</widget>
+					<widget type="checkbox" style="SWT.LEFT" attribute="no_kill">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:no_kill#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:no_kill#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:no_kill#description}</fixed-text>
 					</widget>
 				</composite>
 			</dynamic>
@@ -1140,6 +1373,7 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip>
 							<include>begin</include>
 							<include>checkpoint</include>
 							<include>checkpoint_dir</include>
+							<include>clusters</include>
 							<include>comment</include>
 							<include>constraint</include>
 							<include>contiguous</include>
@@ -1153,13 +1387,19 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip>
 							<include>export_file</include>
 							<include>extra_node_info</include>
 							<include>get_user_env</include>
+							<include>gres</include>
+							<include>hint</include>
 							<include>hold</include>
 							<include>immediate</include>
+							<include>input</include>
 							<include>job_name</include>
+							<include>licenses</include>
 							<include>mail_type</include>
 							<include>mail_user</include>
 							<include>nice</include>
+							<include>nodefile</include>
 							<include>nodes</include>
+							<include>no_kill</include>
 							<include>open_mode</include>
 							<include>output</include>
 							<include>partition</include>
