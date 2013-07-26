@@ -28,9 +28,8 @@
 		<egit-site>http://download.eclipse.org/egit/updates-${egit-version}</egit-site>
 		<photran-site>http://download.eclipse.org/tools/ptp/builds/hudson/ptp-release-photran</photran-site>
 		<!-- The following property is used by the production profile to install 
-			the final repo and -->
-		<!-- associated components. It should be overridden if installing into 
-			a different location. -->
+			the final repo and associated components. It should be overridden if installing 
+			into a different location. -->
 		<ptp-install-dir>/home/data/httpd/download.eclipse.org/tools/ptp/builds/${eclipse-release}/nightly</ptp-install-dir>
 	</properties>
 
@@ -301,23 +300,72 @@
 				<configuration>
 					<minmemory>128m</minmemory>
 					<maxmemory>1g</maxmemory>
+					<quiet>true</quiet>
 					<tags>
 						<tag>
-							<name>generated</name>
-							<placement>a</placement>
-							<head>Generated</head>
+							<name>TrackedGetter</name>
+							<placement>cm</placement>
+							<head>TrackedGetter</head>
 						</tag>
 						<tag>
-							<name>ordered</name>
+							<name>noimplement</name>
 							<placement>a</placement>
-							<head>Ordered</head>
+							<head>Restriction:</head>
 						</tag>
 						<tag>
-							<name>model</name>
+							<name>noextend</name>
 							<placement>a</placement>
-							<head>Model Properties:</head>
+							<head>Restriction:</head>
+						</tag>
+						<tag>
+							<name>noreference</name>
+							<placement>a</placement>
+							<head>Restriction:</head>
+						</tag>
+						<tag>
+							<name>noinstantiate</name>
+							<placement>a</placement>
+							<head>Restriction:</head>
+						</tag>
+						<tag>
+							<name>nooverride</name>
+							<placement>a</placement>
+							<head>Restriction:</head>
+						</tag>
+						<tag>
+							<name>Immutable</name>
+							<placement>t</placement>
 						</tag>
 					</tags>
+					<links>
+						<link>http://download.oracle.com/javase/6/docs/api"</link>
+						<link>http://www.osgi.org/javadoc/r5/core"</link>
+						<link>http://www.osgi.org/javadoc/r4v42"</link>
+					</links>
+					<groups>
+						<group>
+							<title>PTP Core Plug-in Packages</title>
+							<packages>org.eclipse.ptp.core;org.eclipse.ptp.core.*</packages>
+						</group>
+						<group>
+							<title>PTP UI Plug-in Packages</title>
+							<packages>org.eclipse.ptp.ui;org.eclipse.ptp.ui.*</packages>
+						</group>
+					</groups>
+					<header><![CDATA[<b>PTP</b><br></br>Release 7.0]]></header>
+					<bottom><![CDATA[Copyright (c) 2013 IBM Corporation and others. All Rights Reserved.]]></bottom>
+					<charset>iso-8859-1</charset>
+					<encoding>iso-8859-1</encoding>
+					<author>true</author>
+					<nodeprecated>false</nodeprecated>
+					<nodeprecatedlist>false</nodeprecatedlist>
+					<noindex>false</noindex>
+					<nonavbar>false</nonavbar>
+					<notree>false</notree>
+					<source>1.5</source>
+					<splitindex>true</splitindex>
+					<use>true</use>
+					<breakiterator>true</breakiterator>
 				</configuration>
 				<executions>
 					<execution>
@@ -331,7 +379,7 @@
 							<maxmemory>1024m</maxmemory>
 							<reportOutputDirectory>core/org.eclipse.ptp.doc.isv/reference</reportOutputDirectory>
 							<destDir>api</destDir>
-							<excludePackageNames>*.internal:*.internal.*:*.tests:*.tests.*:*.examples:*.examples.*</excludePackageNames>
+							<excludePackageNames>org.eclipse.cdt:org.eclipse.core:org.elipse.ptp.etfw.tau:org.eclipse.ptp.launch:org.eclipse.ptp.pldt.mpi:org.eclipse.ptp.pldt.openmp:org.eclipse.ptp.pldt.openshmem:org.eclipse.ptp.pldt.upc:org.eclipse.ptp.proxy:org.eclipse.ptp.rdt.core:org.eclipse.ptp.rdt.ui:org.eclipse.ptp.remotetools:org.eclipse.ptp.rm:*.messages.*:*.internal:*.internal.*:*.tests:*.tests.*:*.examples:*.examples.*</excludePackageNames>
 						</configuration>
 					</execution>
 				</executions>
