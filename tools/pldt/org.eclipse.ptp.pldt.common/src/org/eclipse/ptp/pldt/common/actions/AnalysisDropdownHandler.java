@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2007,2010 IBM Corporation.
+ * Copyright (c) 2007,2013 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,9 +19,11 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.pldt.common.CommonPlugin;
 import org.eclipse.ptp.pldt.common.messages.Messages;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
@@ -59,24 +61,28 @@ public class AnalysisDropdownHandler extends AbstractHandler implements ISelecti
 	 * but the editor now has the focus).
 	 */
 	public AnalysisDropdownHandler() {
-		if (traceOn)
-			System.out.println("AnalysisDropdownHandler() ctor... should not be >1 of these"); //$NON-NLS-1$
 		assert (instance == null); // we presume this is a singleton
 		instance = this;
 		ISelectionService ss = null;
 		try {
 			// register to be notified of future selections
-			ss = CommonPlugin.getDefault().getWorkbench()
-					.getActiveWorkbenchWindow().getSelectionService();
-			ss.addSelectionListener(this);
-			// and cache the selection that was in effect now.
-			ISelection sel = ss.getSelection();// gives selection in ACTIVE PART.If editor was just opened, active part is probably
-												// the editor.
-			//
-			if (sel instanceof IStructuredSelection) {
-				lastSelection = (IStructuredSelection) sel;
-				if (traceOn)
-					System.out.println("  ...got initial selection."); //$NON-NLS-1$
+			IWorkbenchWindow ww = CommonPlugin.getDefault().getWorkbench()
+					.getActiveWorkbenchWindow();
+			// if ss not set how are we notified of later selection changes??? BRT
+			if (ww != null) {
+				ss = ww.getSelectionService(); // throws on this
+				System.out.println("ss=" + ss);
+				ss.addSelectionListener(this);
+				// and cache the selection that was in effect now.
+				// gives selection in ACTIVE PART. If editor was just opened, active part is probably the editor.
+				ISelection sel = ss.getSelection();
+				if (sel instanceof IStructuredSelection) {
+					lastSelection = (IStructuredSelection) sel;
+					if (traceOn)
+						System.out.println("ADDH  ...got initial selection."); //$NON-NLS-1$
+				}
+			} else{
+				tryHarderToGetLastSelection(ss);
 			}
 		} catch (Exception e) {
 			Throwable t = e.getCause();
@@ -85,22 +91,35 @@ public class AnalysisDropdownHandler extends AbstractHandler implements ISelecti
 			if (t != null)
 				msg = t.getMessage();
 			System.out.println("AnalysisDropdownHandler <init> " + e.getMessage() + " cause: " + msg); //$NON-NLS-1$ //$NON-NLS-2$
-			// FIXME this gets hit on target workbench shutdown. WHY?
-			// BRT maybe we DO want to return here; sometimes ss=null (Junit tests) and the code below fails sometimes.
 			return;
-
 		}
 
+	}
+
+	/**
+	 * If no selection is apparent, try to use the Project Explorer selection
+	 * @param ss
+	 */
+	private void tryHarderToGetLastSelection(ISelectionService ss) {
 		// If we still don't know the selection then find out the selection in the
 		// project explorer view - its guess is probably right.
 		if (lastSelection == null) {
-			String projExpID = "org.eclipse.ui.navigator.ProjectExplorer"; //$NON-NLS-1$
-			ISelection apSel = ss.getSelection(projExpID);
-			if (apSel != null & apSel instanceof IStructuredSelection) {
-				if (!apSel.isEmpty()) {
-					lastSelection = (IStructuredSelection) apSel;
+			Display.getDefault().syncExec(new Runnable() {
+				public void run() {
+					// must do this within the UI thread to get WW.  Bug 410327
+					IWorkbenchWindow ww = CommonPlugin.getDefault().getWorkbench()
+							.getActiveWorkbenchWindow();
+					ISelectionService ss=ww.getSelectionService();
+					
+					final String projExpID = "org.eclipse.ui.navigator.ProjectExplorer"; //$NON-NLS-1$
+					ISelection apSel = ss.getSelection(projExpID);
+					if (apSel != null & apSel instanceof IStructuredSelection) {
+						if (!apSel.isEmpty()) {
+							lastSelection = (IStructuredSelection) apSel;
+						}
+					}
 				}
-			}
+			});
 		}
 	}
 
@@ -167,7 +186,6 @@ public class AnalysisDropdownHandler extends AbstractHandler implements ISelecti
 			if (traceOn)
 				System.out.println("ADDH.selectionChanged, got structured selection"); //$NON-NLS-1$
 		}
-
 	}
 
 	/**
@@ -176,6 +194,9 @@ public class AnalysisDropdownHandler extends AbstractHandler implements ISelecti
 	 * @return
 	 */
 	public IStructuredSelection getLastSelection() {
+		if(lastSelection==null){
+			this.tryHarderToGetLastSelection(null);
+		}
 		return lastSelection;
 	}
 

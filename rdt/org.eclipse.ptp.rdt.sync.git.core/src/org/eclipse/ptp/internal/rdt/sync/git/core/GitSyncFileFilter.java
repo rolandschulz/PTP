@@ -27,6 +27,7 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.NoFilepatternException;
 import org.eclipse.jgit.dircache.DirCache;
@@ -232,7 +233,8 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		} finally {
 			out.close();
 		}
-		final RmCommandCached rmCommand = new RmCommandCached(repository);
+		final RmCommand rmCommand = new RmCommand(repository);
+		rmCommand.setCached(true);
 		for (String fileName : getIgnoredFiles(null)) {
 			rmCommand.addFilepattern(fileName);
 		}
