@@ -39,6 +39,7 @@ import org.eclipse.jgit.api.CheckoutCommand;
 import org.eclipse.jgit.api.CommitCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.MergeCommand;
+import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.StatusCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -580,7 +581,8 @@ public class GitRemoteSyncConnection {
 
 			subMon.subTask(Messages.GitRemoteSyncConnection_10);
 			if (!diffFiles.removed.isEmpty()) {
-				final RmCommandCached rmCommand = new RmCommandCached(git.getRepository());
+				final RmCommand rmCommand = new RmCommand(git.getRepository());
+				rmCommand.setCached(true);
 				for (String fileName : diffFiles.removed) {
 					rmCommand.addFilepattern(fileName);
 				}
