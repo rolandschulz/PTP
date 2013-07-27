@@ -379,7 +379,7 @@
 							<maxmemory>1024m</maxmemory>
 							<reportOutputDirectory>core/org.eclipse.ptp.doc.isv/reference</reportOutputDirectory>
 							<destDir>api</destDir>
-							<excludePackageNames>org.eclipse.cdt:org.eclipse.core:org.elipse.ptp.etfw.tau:org.eclipse.ptp.launch:org.eclipse.ptp.pldt.mpi:org.eclipse.ptp.pldt.openmp:org.eclipse.ptp.pldt.openshmem:org.eclipse.ptp.pldt.upc:org.eclipse.ptp.proxy:org.eclipse.ptp.rdt.core:org.eclipse.ptp.rdt.ui:org.eclipse.ptp.remotetools:org.eclipse.ptp.rm:*.messages.*:*.internal:*.internal.*:*.tests:*.tests.*:*.examples:*.examples.*</excludePackageNames>
+							<excludePackageNames>org.eclipse.cdt:org.eclipse.core:org.eclipse.osgi:org.eclipse.ptp.etfw.tau:org.eclipse.ptp.launch:org.eclipse.ptp.pldt.mpi:org.eclipse.ptp.pldt.openmp:org.eclipse.ptp.pldt.openshmem:org.eclipse.ptp.pldt.upc:org.eclipse.ptp.proxy:org.eclipse.ptp.rdt.core:org.eclipse.ptp.rdt.editor:org.eclipse.ptp.rdt.make:org.eclipse.ptp.rdt.managedbuilder:org.eclipse.ptp.rdt.xlc:org.eclipse.ptp.rdt.ui:org.eclipse.ptp.remotetools:org.eclipse.ptp.rm:*.messages.*:*.internal:*.internal.*:*.tests:*.tests.*:*.examples:*.examples.*</excludePackageNames>
 						</configuration>
 					</execution>
 				</executions>
