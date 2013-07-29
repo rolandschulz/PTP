@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.NoFilepatternException;
 import org.eclipse.jgit.dircache.DirCache;
@@ -258,8 +259,8 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 	/**
 	 * Initialize based on other filter. Adds provider dependent default.
 	 * 
-	 * @param filter
-	 *            to copy
+	 * @param fileFilter
+	 *            filter to copy
 	 */
 	public void initialize(AbstractSyncFileFilter fileFilter) {
 		if (fileFilter instanceof GitSyncFileFilter) {
@@ -272,10 +273,14 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		}
 	}
 
-	/*
-	 * returns ignored files in the index
-	 * 
+	/**
+	 * Returns ignored files in the index
+	 *
 	 * @param ref reference to compute list of files for. If null use index.
+	 * 
+	 * @return set of ignored files
+	 * @throws IOException
+	 * 			on file system problems
 	 */
 	public Set<String> getIgnoredFiles(RevTree ref) throws IOException {
 		Repository repo = jgitRepo.getRepository();
@@ -336,6 +341,10 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 	 * Get all different files (modified/changed, missing/removed, untracked/added)
 	 * 
 	 * assumes that no files are in conflict (don't call during merge)
+	 * 
+	 * @return different files
+	 * @throws IOException
+	 * 			on file system problems
 	 */
 	public DiffFiles getDiffFiles() throws IOException {
 		final int INDEX = 0;
@@ -383,22 +392,26 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		return diffFiles;
 	}
 
-	// TODO: Fix: Main problem is that filter now needs a JGitRepo object, which needs an Eclipse project and thus makes this
-	// class Eclipse-dependent.
-	// for testing. args: work folder, git folder
-//	public static void main(String[] args) throws IOException {
-//		final File localDir = new File(args[0]);
-//		final FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
-//		File gitDirFile = new File(localDir + File.separator + args[1]);
-//		Repository repository = repoBuilder.setWorkTree(localDir).setGitDir(gitDirFile).build();
-//		GitSyncFileFilter filter = new GitSyncFileFilter(repository, null);
-//		filter.loadFilter();
-//		// List<String> files = filter.getIgnoredFiles();
-//		Set<String> files = filter.getDiffFiles().added;
-//		for (String path : files) {
-//			System.out.println(path);
-//		}
-//	}
+	/**
+	 * For testing
+	 *
+	 * @param args 
+	 * 			work folder, Git folder
+	 *
+	 * @throws GitAPIException
+	 * 			on JGit-specific problems
+	 * @throws IOException
+	 * 			on file system problems
+	 */
+	public static void main(String[] args) throws IOException, GitAPIException {
+		JGitRepo jgitRepo = new JGitRepo(new Path(args[0]), null);
+		GitSyncFileFilter filter = new GitSyncFileFilter(jgitRepo);
+		filter.loadFilter();
+		Set<String> files = filter.getDiffFiles().added;
+		for (String path : files) {
+			System.out.println(path);
+		}
+	}
 
 	/*
 	 * (non-Javadoc)

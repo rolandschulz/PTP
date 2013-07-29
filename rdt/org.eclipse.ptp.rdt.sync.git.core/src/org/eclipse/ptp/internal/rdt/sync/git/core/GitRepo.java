@@ -45,8 +45,7 @@ import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
 /**
- * Class for a "remote" (external) Git repository - a repository synchronized to a local Eclipse project and handled by executing
- * C git commands on the host.
+ * Class for a "remote" (external) Git repository, a repository handled by executing C git commands on the host.
  */
 public class GitRepo {
 	public static final String gitArgs = "--git-dir=" + GitSyncService.gitDir + " --work-tree=."; //$NON-NLS-1$ //$NON-NLS-2$
@@ -61,8 +60,6 @@ public class GitRepo {
 	 * Create a new Git repository to the specified host, initialized with the given local JGit repository.
 	 * See {@code buildRepo} for more details.
 	 *
-	 * @param localRepo
-	 * 				not stored and only needed for initializing file filtering.
 	 * @param rl
 	 * 				remote location information
 	 * @param monitor
@@ -71,7 +68,7 @@ public class GitRepo {
 	 * @throws MissingConnectionException
 	 *             when connection missing. The instance is invalid.
 	 */
-	public GitRepo(JGitRepo localRepo, RemoteLocation rl, IProgressMonitor monitor)
+	public GitRepo(RemoteLocation rl, IProgressMonitor monitor)
 			throws RemoteSyncException, MissingConnectionException {
 		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 10);
 		try {
@@ -82,7 +79,7 @@ public class GitRepo {
 				subMon.subTask(Messages.GitRepo_0);
 				remoteGitVersion = getRemoteGitVersion(subMon.newChild(2));
 				subMon.subTask(Messages.GitRepo_1);
-				buildRepo(localRepo, subMon.newChild(8));
+				buildRepo(subMon.newChild(8));
 			} catch (final IOException e) {
 				throw new RemoteSyncException(e);
 			} catch (final RemoteExecutionException e) {
@@ -98,8 +95,6 @@ public class GitRepo {
 	/**
 	 * Create the Git repository - creating directories, Git-specific files, and other resources as needed.
 	 *
-	 * @param localRepo
-	 *				The local JGit repository used only for initializing file filtering.
 	 * @param monitor
 	 *
 	 * @throws IOException
@@ -115,7 +110,7 @@ public class GitRepo {
 	 * @throws MissingConnectionException
 	 *             on missing connection.
 	 */
-	private void buildRepo(JGitRepo localRepo, IProgressMonitor monitor) throws IOException, RemoteExecutionException,
+	private void buildRepo(IProgressMonitor monitor) throws IOException, RemoteExecutionException,
 	RemoteSyncException, MissingConnectionException {
 		final RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 10);
 		try {
@@ -123,18 +118,14 @@ public class GitRepo {
 			try {
 				subMon.subTask(Messages.GitRepo_2);
 				CommandRunner.createRemoteDirectory(remoteLoc.getConnection(), remoteLoc.getDirectory(),
-						subMon.newChild(1));
+						subMon.newChild(2));
 			} catch (final CoreException e) {
 				throw new RemoteSyncException(e);
 			}
 
 			// Initialize remote directory if necessary
 			subMon.subTask(Messages.GitRepo_3);
-			doInit(subMon.newChild(1));
-
-			subMon.subTask(Messages.GitRepo_4);
-			uploadFilter(localRepo, subMon.newChild(4));
-			commitRemoteFiles(subMon.newChild(4));
+			doInit(subMon.newChild(8));
 		} finally {
 			if (monitor != null) {
 				monitor.done();
@@ -147,11 +138,11 @@ public class GitRepo {
 	 * we can simply rerun it each time.
 	 * 
 	 * @param monitor
+	 *
 	 * @throws IOException
 	 * @throws RemoteExecutionException
 	 * @throws RemoteSyncException
 	 * @throws MissingConnectionException
-	 * @return whether this repo already existed
 	 */
 	private void doInit(IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException,
 			MissingConnectionException {
@@ -391,8 +382,6 @@ public class GitRepo {
 	 * @param monitor
 	 * @return Git version as a single int in the format: MMMmmmrrr (Major, minor, and revision)
 	 *
-	 * @throws IOException
-	 * @throws RemoteExecutionException
 	 * @throws RemoteSyncException
 	 * @throws MissingConnectionException
 	 */

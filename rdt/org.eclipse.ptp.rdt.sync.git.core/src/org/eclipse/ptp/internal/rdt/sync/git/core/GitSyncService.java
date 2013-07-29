@@ -43,6 +43,9 @@ import org.eclipse.ptp.rdt.sync.core.exceptions.RemoteSyncMergeConflictException
 import org.eclipse.ptp.rdt.sync.core.services.AbstractSynchronizeService;
 import org.eclipse.ptp.rdt.sync.core.services.ISynchronizeServiceDescriptor;
 
+/**
+ * A Git-based synchronization service for synchronized projects
+ */
 public class GitSyncService extends AbstractSynchronizeService {
 	public static final String gitDir = ".ptp-sync"; //$NON-NLS-1$
 	// Name of file placed in empty directories to force sync'ing of those directories.
@@ -51,33 +54,33 @@ public class GitSyncService extends AbstractSynchronizeService {
 	public static final String remotePushBranch = "ptp-push"; //$NON-NLS-1$
 
 	// Implement storage of local JGit repositories and Git repositories.
-	private static final Map<IProject, JGitRepo> projectToJGitRepoMap = new HashMap<IProject, JGitRepo>();
+	private static final Map<IPath, JGitRepo> localDirectoryToJGitRepoMap = new HashMap<IPath, JGitRepo>();
 	private static final Map<RemoteLocation, GitRepo> remoteLocationToGitRepoMap = new HashMap<RemoteLocation, GitRepo>();
 
-	// Boilerplate class for IProject and RemoteLocation Pair.
+	// Boilerplate class for IPath and RemoteLocation Pair.
 	// Why doesn't Java have a pair class?
-	private class ProjectAndRemotePair {
-		IProject project;
+	private class LocalAndRemoteLocationPair {
+		IPath localDir;
 		RemoteLocation remoteLoc;
 
 		/**
 		 * Create new pair
-		 * @param p
-		 * 			project
+		 * @param ld
+		 * 			local directory
 		 * @param rl
 		 * 			remote location
 		 */
-		public ProjectAndRemotePair(IProject p, RemoteLocation rl) {
-			project = p;
+		public LocalAndRemoteLocationPair(IPath ld, RemoteLocation rl) {
+			localDir = ld;
 			remoteLoc = rl;
 		}
 
 		/**
-		 * Get project
-		 * @return project
+		 * Get the local directory
+		 * @return directory
 		 */
-		public IProject getProject() {
-			return project;
+		public IPath getLocal() {
+			return localDir;
 		}
 
 		@Override
@@ -86,7 +89,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 			int result = 1;
 			result = prime * result + getOuterType().hashCode();
 			result = prime * result
-					+ ((project == null) ? 0 : project.hashCode());
+					+ ((localDir == null) ? 0 : localDir.hashCode());
 			result = prime * result
 					+ ((remoteLoc == null) ? 0 : remoteLoc.hashCode());
 			return result;
@@ -100,13 +103,13 @@ public class GitSyncService extends AbstractSynchronizeService {
 				return false;
 			if (getClass() != obj.getClass())
 				return false;
-			ProjectAndRemotePair other = (ProjectAndRemotePair) obj;
+			LocalAndRemoteLocationPair other = (LocalAndRemoteLocationPair) obj;
 			if (!getOuterType().equals(other.getOuterType()))
 				return false;
-			if (project == null) {
-				if (other.project != null)
+			if (localDir == null) {
+				if (other.localDir != null)
 					return false;
-			} else if (!project.equals(other.project))
+			} else if (!localDir.equals(other.localDir))
 				return false;
 			if (remoteLoc == null) {
 				if (other.remoteLoc != null)
@@ -115,28 +118,36 @@ public class GitSyncService extends AbstractSynchronizeService {
 				return false;
 			return true;
 		}
+
 		private GitSyncService getOuterType() {
 			return GitSyncService.this;
 		}
 	}
+
 	// Entry indicates that the remote location has a clean (up-to-date) file filter for the project
-	private static final Set<ProjectAndRemotePair> cleanFileFilterMap = new HashSet<ProjectAndRemotePair>();
+	private static final Set<LocalAndRemoteLocationPair> cleanFileFilterMap = new HashSet<LocalAndRemoteLocationPair>();
 
 	/**
 	 * Get JGit repository instance for the given project, creating it if necessary.
-	 * @param project
+	 * @param project - cannot be null
+	 * @param monitor
 	 *
 	 * @return JGit repository instance - never null
 	 * @throws RemoteSyncException
 	 * 				on problems creating the repository
 	 */
 	static JGitRepo getLocalJGitRepo(IProject project, IProgressMonitor monitor) throws RemoteSyncException {
-		JGitRepo repo = projectToJGitRepoMap.get(project);
+		IPath localDir = project.getLocation();
+		if (localDir == null) {
+			throw new RemoteSyncException(Messages.GitSyncService_17 + project.getName());
+		}
+		JGitRepo repo = localDirectoryToJGitRepoMap.get(localDir);
 		try {
 			if (repo == null) {
 				try {
-					repo = new JGitRepo(project, monitor);
-					projectToJGitRepoMap.put(project, repo);
+					repo = new JGitRepo(localDir, monitor);
+					localDirectoryToJGitRepoMap.put(localDir, repo);
+					setRepoFilesAsDerived(project);
 				} catch (GitAPIException e) {
 					throw new RemoteSyncException(e);
 				} catch (IOException e) {
@@ -154,8 +165,6 @@ public class GitSyncService extends AbstractSynchronizeService {
 	/**
 	 * Get Git repository instance for given remote location, creating it if necessary.
 	 *
-	 * @param project
-	 * 			For initializing remote repository if necessary - cannot be null.
 	 * @param rl
 	 * 			remote location - cannot be null
 	 * @param monitor
@@ -164,8 +173,8 @@ public class GitSyncService extends AbstractSynchronizeService {
 	 * @throws RemoteSyncException
 	 * 			on problems creating the repository
 	 */
-	static GitRepo getGitRepo(IProject project, RemoteLocation rl, IProgressMonitor monitor) throws RemoteSyncException {
-		if (project == null || rl == null) {
+	static GitRepo getGitRepo(RemoteLocation rl, IProgressMonitor monitor) throws RemoteSyncException {
+		if (rl == null) {
 			throw new NullPointerException();
 		}
 		GitRepo repo = remoteLocationToGitRepoMap.get(rl);
@@ -173,10 +182,9 @@ public class GitSyncService extends AbstractSynchronizeService {
 			if (repo == null) {
 				RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
 				subMon.subTask(Messages.GitSyncService_1);
-				JGitRepo localRepo = getLocalJGitRepo(project, subMon.newChild(10));
 				try {
 					subMon.subTask(Messages.GitSyncService_2);
-					repo = new GitRepo(localRepo, rl, subMon.newChild(90));
+					repo = new GitRepo(rl, subMon.newChild(90));
 					remoteLocationToGitRepoMap.put(rl, repo);
 				} catch (MissingConnectionException e) {
 					return null;
@@ -220,6 +228,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 		if (repo != null) {
 			try {
 				repo.checkout(paths);
+				doRefresh(project);
 			} catch (GitAPIException e) {
 				throw new RemoteSyncException(e);
 			}
@@ -237,6 +246,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 		if (repo != null) {
 			try {
 				repo.checkoutRemoteCopy(paths);
+				doRefresh(project);
 			} catch (GitAPIException e) {
 				throw new RemoteSyncException(e);
 			}
@@ -288,7 +298,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 			return null;
 		} else {
 			try {
-				return repo.getMergeConflictParts(file);
+				return repo.getMergeConflictParts(file.getProjectRelativePath());
 			} catch (GitAPIException e) {
 				throw new RemoteSyncException(e);
 			} catch (IOException e) {
@@ -399,7 +409,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 				} catch (RemoteSyncMergeConflictException e) {
 					subMon.subTask(Messages.GitSyncService_10);
 					// Refresh after merge conflict since conflicted files are altered with markup.
-					project.refreshLocal(IResource.DEPTH_INFINITE, subMon.newChild(5));
+					doRefresh(project);
 					throw e;
 				}
 				finishedSyncTaskId = willFinishTaskId;
@@ -413,7 +423,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 
 			// Refresh after sync to display changes
 			subMon.subTask(Messages.GitSyncService_10);
-			project.refreshLocal(IResource.DEPTH_INFINITE, subMon.newChild(5));
+			doRefresh(project);
 		} finally {
 			if (monitor != null) {
 				monitor.done();
@@ -460,20 +470,20 @@ public class GitSyncService extends AbstractSynchronizeService {
 
 			// Get remote repository. creating it if necessary
 			subMon.subTask(Messages.GitSyncService_7);
-			GitRepo remoteRepo = getGitRepo(project, remoteLoc, subMon.newChild(15));
+			GitRepo remoteRepo = getGitRepo(remoteLoc, subMon.newChild(15));
 			// Unresolved connection - abort
 			if (remoteRepo == null) {
 				return;
 			}
 
 			// Update remote file filter
-			ProjectAndRemotePair parp = new ProjectAndRemotePair(localRepo.getProject(), remoteRepo.getRemoteLocation());
+			LocalAndRemoteLocationPair lp = new LocalAndRemoteLocationPair(localRepo.getDirectory(), remoteRepo.getRemoteLocation());
 			int commitWork = 20;
-			if (!cleanFileFilterMap.contains(parp)) {
+			if (!cleanFileFilterMap.contains(lp)) {
 				commitWork -= 10;
 				subMon.subTask(Messages.GitSyncService_11);
 				remoteRepo.uploadFilter(localRepo, subMon.newChild(10));
-				cleanFileFilterMap.add(parp);
+				cleanFileFilterMap.add(lp);
 			}
 
 			subMon.subTask(Messages.GitSyncService_13);
@@ -547,14 +557,58 @@ public class GitSyncService extends AbstractSynchronizeService {
 	 */
 	@Override
 	public void setSyncFileFilter(IProject project, AbstractSyncFileFilter filter) throws RemoteSyncException {
-		Iterator<ProjectAndRemotePair> it = cleanFileFilterMap.iterator();
+		Iterator<LocalAndRemoteLocationPair> it = cleanFileFilterMap.iterator();
+		IPath localDir = project.getLocation();
+		if (localDir == null) {
+			throw new RemoteSyncException(Messages.GitSyncService_17 + project.getName());
+		}
 		while (it.hasNext()) {
-			ProjectAndRemotePair parp = it.next();
-			if (parp.getProject() == project) {
+			LocalAndRemoteLocationPair lp = it.next();
+			if (lp.getLocal().equals(localDir)) {
 				it.remove();
 			}
 		}
 		JGitRepo localRepo = getLocalJGitRepo(project, null);
 		localRepo.setFilter(filter);
 	}
+	
+    // Refresh the workspace in a separate thread
+    // Bug 374409 - this prevents deadlock caused by locking both the sync lock and the workspace lock.
+    private static Thread doRefresh(final IProject project) {
+            Thread refreshWorkspaceThread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                            try {
+                                    project.refreshLocal(IResource.DEPTH_INFINITE, null);
+                            } catch (CoreException e) {
+                                    Activator.log(Messages.JGitRepo_16, e);
+                            }
+                    }
+            }, "Refresh workspace thread"); //$NON-NLS-1$
+            refreshWorkspaceThread.start();
+            return refreshWorkspaceThread;
+    }
+
+   	// Set Git repository files as derived.
+	// This prevents user-level operations, such as searching, from considering the repository directory.
+    private static void setRepoFilesAsDerived(final IProject project) {
+    	// First refresh project so that files appear
+    	final Thread refreshThread = doRefresh(project);
+ 
+    	// Set derived only after refresh completes
+    	Thread setDerivedThread = new Thread(new Runnable() {
+    		@Override
+    		public void run() {
+    			try {
+    				refreshThread.join();
+    				project.getFolder(GitSyncService.gitDir).setDerived(true, null);
+    			} catch (InterruptedException e) {
+    				Activator.log(e);
+    			} catch (CoreException e) {
+    				Activator.log(e);
+    			}
+    		}
+    	}, "Set repository as derived thread"); //$NON-NLS-1$
+    	setDerivedThread.start();
+    }
 }

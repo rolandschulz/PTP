@@ -41,6 +41,7 @@ public class Messages extends NLS {
 	public static String GitSyncService_14;
 	public static String GitSyncService_15;
 	public static String GitSyncService_16;
+	public static String GitSyncService_17;
 	public static String GitSyncService_18;
 	public static String GitSyncService_2;
 	public static String GitSyncService_3;
@@ -55,7 +56,6 @@ public class Messages extends NLS {
 	public static String CommandRunner_3;
 	public static String CommandRunner_4;
 	public static String JGitRepo_0;
-	public static String JGitRepo_1;
 	public static String JGitRepo_10;
 	public static String JGitRepo_11;
 	public static String JGitRepo_12;

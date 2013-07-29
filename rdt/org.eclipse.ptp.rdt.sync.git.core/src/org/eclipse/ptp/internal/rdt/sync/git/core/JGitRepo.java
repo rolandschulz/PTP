@@ -19,10 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
@@ -69,12 +65,12 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 
 /**
- * Class for a local Git repository for a particular project and managed by JGit
+ * Class for a local Git repository managed by JGit
  */
 public class JGitRepo {
-	public static final String remoteProjectName = "eclipse_auto"; //$NON-NLS-1$
+	public static final String remoteBranchName = "eclipse_auto"; //$NON-NLS-1$
 
-	private final IProject project;
+	private IPath localDirectory;
 	private Git git;
 	private GitSyncFileFilter fileFilter = null;
 	private boolean mergeMapInitialized = false; // Call "readMergeConflictFiles" at least once before using the map.
@@ -82,19 +78,20 @@ public class JGitRepo {
 	private final Map<RemoteLocation, TransportGitSsh> remoteToTransportMap = new HashMap<RemoteLocation, TransportGitSsh>();
 
 	/**
-	 * Create a new JGit repository instance for the given project - creating resources, such as Git-specific files, if necessary.
+	 * Create a JGit repository instance for the given local directory, creating resources, such as Git-specific files, if necessary.
 	 * 
-	 * @param project
+	 * @param localDir
+	 * @param monitor
 	 *
 	 * @throws GitAPIException
 	 * 				on JGit-specific problems - instance should be considered invalid
 	 * @throws IOException
 	 * 				on file system problems - instance should be considered invalid
 	 */
-	public JGitRepo(IProject proj, IProgressMonitor monitor) throws GitAPIException, IOException {
-		project = proj;
+	public JGitRepo(IPath localDir, IProgressMonitor monitor) throws GitAPIException, IOException {
+		localDirectory = localDir;
 		try {
-			buildRepo(project.getLocation().toOSString(), monitor);
+			buildRepo(localDirectory.toOSString(), monitor);
 		} finally {
 			if (monitor != null) {
 				monitor.done();
@@ -145,27 +142,6 @@ public class JGitRepo {
             	subMon.worked(4);
             }
 
-			// Refresh project
-			subMon.subTask(Messages.JGitRepo_1);
-			final Thread refreshThread = doRefresh(project, subMon.newChild(1));
-
-			// Set git repo as derived, which can only be done after refresh completes.
-			// This prevents user-level operations, such as searching, from considering the repo directory.
-			Thread setDerivedThread = new Thread(new Runnable() {
-				@Override
-				public void run() {
-					try {
-						refreshThread.join();
-						project.getFolder(GitSyncService.gitDir).setDerived(true, null);
-					} catch (InterruptedException e) {
-						Activator.log(e);
-					} catch (CoreException e) {
-						Activator.log(e);
-					}
-				}
-			}, "Set repo as derived thread"); //$NON-NLS-1$
-			setDerivedThread.start();
-
 			return git;
 		} finally {
 			if (monitor != null) {
@@ -189,13 +165,13 @@ public class JGitRepo {
 		RemoteConfig rconfig = null;
 
 		try {
-			rconfig = new RemoteConfig(config, remoteProjectName);
+			rconfig = new RemoteConfig(config, remoteBranchName);
 		} catch (final URISyntaxException e) {
 			throw new RuntimeException(e);
 		}
 
 		final RefSpec refSpecFetch = new RefSpec("+refs/heads/master:refs/remotes/" + //$NON-NLS-1$
-				remoteProjectName + "/master"); //$NON-NLS-1$
+				remoteBranchName + "/master"); //$NON-NLS-1$
 		final RefSpec refSpecPush = new RefSpec("+master:" + GitSyncService.remotePushBranch); //$NON-NLS-1$
 		rconfig.addFetchRefSpec(refSpecFetch);
 		rconfig.addPushRefSpec(refSpecPush);
@@ -218,7 +194,6 @@ public class JGitRepo {
 		}
 		checkoutCommand.setStartPoint("HEAD"); //$NON-NLS-1$
 		checkoutCommand.call();
-		doRefresh(project, null);
 	}
 
 	/**
@@ -234,9 +209,8 @@ public class JGitRepo {
 		for (IPath p : paths) {
 			checkoutCommand.addPath(p.toString());
 		}
-		checkoutCommand.setStartPoint("refs/remotes/" + remoteProjectName + "/master"); //$NON-NLS-1$ //$NON-NLS-2$
+		checkoutCommand.setStartPoint("refs/remotes/" + remoteBranchName + "/master"); //$NON-NLS-1$ //$NON-NLS-2$
 		checkoutCommand.call();
-		doRefresh(project, null);
 	}
 
 	/**
@@ -363,7 +337,7 @@ public class JGitRepo {
 	/**
 	 * Is repository currently in a merge state, either resolved or unresolved?
 	 *
-	 * @return
+	 * @return whether repository is in a merge state
 	 * @throws IOException
 	 */
 	public boolean inMergeState() throws IOException {
@@ -383,7 +357,7 @@ public class JGitRepo {
 	/**
 	 * Is repository currently in an unresolved merge state?
 	 *
-	 * @return
+	 * @return whether repository is in an unresolved merge state
 	 * @throws IOException
 	 */
 	public boolean inUnresolvedMergeState() throws IOException {
@@ -396,7 +370,9 @@ public class JGitRepo {
 
 	/**
 	 * Find and parse each merge-conflicted file, storing local, remote, and ancestor versions of each file in a cache.
-	 * 
+	 *
+	 * @param monitor
+	 *
 	 * @return whether any merge conflicts were found
 	 * @throws GitAPIException
 	 * 			on JGit-specific problems
@@ -484,6 +460,14 @@ public class JGitRepo {
 	}
 
 	/**
+	 * Get the local directory for this repository (an absolute path)
+	 * @return directory
+	 */
+	public IPath getDirectory() {
+		return localDirectory;
+	}
+
+	/**
 	 * Get the file filter for this repository
 	 * @return filter
 	 */
@@ -500,14 +484,6 @@ public class JGitRepo {
 	}
 
 	/**
-	 * Get the project
-	 * @return project
-	 */
-	public IProject getProject() {
-		return project;
-	}
-
-	/**
 	 * Get the real JGit repository
 	 * @return repository
 	 */
@@ -518,7 +494,7 @@ public class JGitRepo {
 	/**
 	 * Get the set of merge-conflicted files
 	 * 
-	 * @return set of project-relative paths of merge-conflicted files.
+	 * @return set of relative (to localDirectory) paths of merge-conflicted files.
 	 * @throws GitAPIException
 	 * 			on JGit-specific problems
 	 * @throws IOException
@@ -536,24 +512,26 @@ public class JGitRepo {
 	 * respectively) or null if the given file is not in a merge conflict.
 	 * 
 	 * @param localFile
+	 * 				Must be a relative path to the file from the repository
 	 * @return the three parts or null
 	 * @throws GitAPIException
 	 * 			on JGit-specific problems
 	 * @throws IOException
 	 * 			on file system problems 
 	 */
-	public String[] getMergeConflictParts(IFile localFile) throws GitAPIException, IOException {
+	public String[] getMergeConflictParts(IPath localFile) throws GitAPIException, IOException {
 		if (!mergeMapInitialized) {
 			this.readMergeConflictFiles(null);
 		}
-		return fileToMergePartsMap.get(localFile.getProjectRelativePath());
+		return fileToMergePartsMap.get(localFile);
 	}
 
 	/**
 	 * Merge changes previously fetched from a remote repository
 	 *
 	 * @param monitor
-	 * @return 
+	 *
+	 * @return merge results
 	 * @throws GitAPIException
 	 * 			on JGit-specific problems
 	 * @throws IOException
@@ -563,7 +541,7 @@ public class JGitRepo {
 		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 10);
 		try {
 		Ref remoteMasterRef = git.getRepository().
-				getRef("refs/remotes/" + remoteProjectName + "/master"); //$NON-NLS-1$ //$NON-NLS-2$
+				getRef("refs/remotes/" + remoteBranchName + "/master"); //$NON-NLS-1$ //$NON-NLS-2$
 		final MergeCommand mergeCommand = git.merge().include(remoteMasterRef);
 		subMon.subTask(Messages.JGitRepo_12);
 		return mergeCommand.call();
@@ -585,14 +563,14 @@ public class JGitRepo {
         try {
                 fileFilter.saveFilter();
         } catch (IOException e) {
-                Activator.log(Messages.JGitRepo_13 + project.getName(), e);
+                Activator.log(Messages.JGitRepo_13 + localDirectory, e);
         }
 	}
 
 	/**
 	 * Add the given path to the repository, resolving the merge conflict (if any)
 	 * 
-	 * @param path
+	 * @param paths
 	 * @throws GitAPIException
 	 * 			on JGit-specific problems
 	 */
@@ -737,23 +715,5 @@ public class JGitRepo {
 		git = null;
 		fileFilter = null;
 		fileToMergePartsMap.clear();
-	}
-
-	// Refresh the workspace after creating new local files
-	// Bug 374409 - run refresh in a separate thread to avoid possible deadlock from locking both the sync lock and the
-	// workspace lock.
-	private static Thread doRefresh(final IProject project, final IProgressMonitor monitor) {
-		Thread refreshWorkspaceThread = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
-				} catch (CoreException e) {
-					Activator.log(Messages.JGitRepo_16, e);
-				}
-			}
-		}, "Refresh workspace thread"); //$NON-NLS-1$
-		refreshWorkspaceThread.start();
-		return refreshWorkspaceThread;
 	}
 }
