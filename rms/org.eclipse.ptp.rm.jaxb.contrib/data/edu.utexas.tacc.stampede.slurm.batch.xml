@@ -130,6 +130,23 @@ controller will just try to allocate one processor per task.]]></tooltip>
 Many jobs can share the same dependency and these jobs may even belong to different
 users. The value may be changed after job submission using the scontrol command.]]></tooltip>
 		</attribute>
+		<attribute name="distribution" type="string">
+			<description>Specify alternate distribution methods for remote processes. (--distribution=&lt;block|cyclic|arbitrary|plane=&lt;options&gt;[:block|cyclic]&gt;)</description>
+			<tooltip><![CDATA[Specify alternate distribution methods for remote processes. In
+sbatch, this only sets environment variables that will be used
+by subsequent srun requests. This option controls the assign-
+ment of tasks to the nodes on which resources have been allo-
+cated, and the distribution of those resources to tasks for
+binding (task affinity). The first distribution method (before
+the ":") controls the distribution of resources across nodes.
+The optional second distribution method (after the ":") controls
+the distribution of resources across sockets within a node.
+Note that with select/cons_res, the number of cpus allocated on
+each socket and node may be different. Refer to
+http://www.schedmd.com/slurmdocs/mc_support.html for more infor-
+mation on resource allocation, assignment of tasks to nodes, and
+binding of tasks to CPUs.]]></tooltip>
+		</attribute>
 		<attribute name="error" type="string">
 			<description>Instruct SLURM to connect the batch script's standard error directly to the file name specified in the "filename pattern". (--error=&lt;filename_pattern&gt;)</description>
 			<tooltip><![CDATA[By default both standard output and standard error are directed to a file
@@ -140,6 +157,10 @@ Use absolute path or "${ptp_rm:workdir#value}" prefix to be relative to working 
 				<regex expression="/.+|\$\{ptp_rm\:workdir\#value\}/.+"></regex>
 				<error-message>"error" field: Use absolute path or "${ptp_rm:workdir#value}" prefix to be relative to working directory.</error-message>
 			</validator>
+		</attribute>
+		<attribute name="exclude" type="string">
+			<description>Specify what nodes to exclude. (--exclude=&lt;node name list&gt;)</description>
+			<tooltip><![CDATA[Explicitly exclude certain nodes from the resources granted to the job.]]></tooltip>
 		</attribute>
 		<attribute name="exclusive" type="boolean" translateBooleanAs='--exclusive, '>
 			<description>Do not share nodes with other running jobs. (--exclusive)</description>
@@ -303,8 +324,64 @@ change). The user to be notified is indicated with --mail-user.]]></tooltip>
 		</attribute>
 		<attribute name="mail_user" type="string">
 			<description>User to receive email notification of state changes. (--mail_user=&lt;user&gt;)</description>
-			<tooltip>As defined by --mail-type.
-The default value is the submitting user.</tooltip>
+			<tooltip><![CDATA[As defined by --mail-type.
+The default value is the submitting user.]]></tooltip>
+		</attribute>
+		<attribute name="mem" type="string">
+			<description>Specify the real memory required per node in MegaBytes. (--mem=&lt;MB&gt;)</description>
+			<tooltip><![CDATA[Specify the real memory required per node in MegaBytes. Default
+value is DefMemPerNode and the maximum value is MaxMemPerNode.
+If configured, both of parameters can be seen using the scontrol
+show config command. This parameter would generally be used if
+whole nodes are allocated to jobs (SelectType=select/linear).
+Also see --mem-per-cpu. --mem and --mem-per-cpu are mutually
+exclusive. NOTE: Enforcement of memory limits currently
+requires enabling of accounting, which samples memory use on a
+periodic basis (data need not be stored, just collected). A task
+may exceed the memory limit until the next periodic accounting
+sample.]]></tooltip>
+		</attribute>
+		<attribute name="mem_per_cpu" type="string">
+			<description>Mimimum memory required per allocated CPU in MegaBytes. (--mem-per-cpu=&lt;MB&gt;)</description>
+			<tooltip><![CDATA[Mimimum memory required per allocated CPU in MegaBytes. Default
+value is DefMemPerCPU and the maximum value is MaxMemPerCPU (see
+exception below). If configured, both of parameters can be seen
+using the scontrol show config command. Note that if the job's --mem-per-cpu
+value exceeds the configured MaxMemPerCPU, then the user's limit
+will be treated as a memory limit per task; --mem-per-cpu will be
+reduced to a value no larger than MaxMemPerCPU; --cpus-per-task
+will be set and value of --cpus-per-task multiplied by the new --mem-per-cpu
+value will equal the original --mem-per-cpu value specified by the user.
+This parameter would generally be used if individual processors are
+allocated to jobs (SelectType=select/cons_res). Also see --mem.
+--mem and --mem-per-cpu are mutually exclusive.]]></tooltip>
+		</attribute>
+		<attribute name="mem_bind" type="string">
+			<description>Bind tasks to memory. (--mem_bind=[{quite,verbose},]type)</description>
+			<tooltip><![CDATA[Bind tasks to memory. Used only when the task/affinity plugin 
+is enabled and the NUMA memory functions are available. Note that
+the resolution of CPU and memory binding may differ on some
+architectures. For example, CPU binding may be performed at the
+level of the cores within a processor while memory binding will
+be performed at the level of nodes, where the definition of
+"nodes" may differ from system to system. The use of any type other
+than "none" or "local" is not recommended. If you want greater
+control, try running a simple test code with the options
+"--cpu_bind=verbose,none --mem_bind=verbose,none" to determine
+the specific configuration.]]></tooltip>
+		</attribute>
+		<attribute name="mincpus" type="string">
+			<description>Specify a minimum number of logical cpus/processors per node. (--mincpus=&lt;n&gt;)</description>
+			<tooltip><![CDATA[Specify a minimum number of logical cpus/processors per node.]]></tooltip>
+		</attribute>
+		<attribute name="network" type="string">
+			<description>Specify the communication protocol to be used. (--network=&lt;type&gt;)</description>
+			<tooltip><![CDATA[Specify the communication protocol to be used. The interpretation
+of type is system dependent. This option is current supported on
+systems with IBM's Parallel Environment (PE). See IBM's LoadLeveler
+job command keyword documentation about the keyword "network" for
+more information. Multiple values may be specified in a comma
+separated list. All options are case in-sensitive. ]]></tooltip>
 		</attribute>
 		<attribute name="nice" type="string">
 			<description>Run the job with an adjusted scheduling priority within SLURM. (--nice[=adjustment])</description>
@@ -321,8 +398,16 @@ SchedulerType=sched/wiki2.]]></tooltip>
 name node file. The node names of the list may also span multiple
 lines in the file. Duplicate node names in the file will
 be ignored. The order of the node names in the list is not
-important; the node names will be sorted by SLURM.
-			]]></tooltip>		</attribute>
+important; the node names will be sorted by SLURM.]]></tooltip>
+		</attribute>
+		<attribute name="nodelist" type="string">
+			<description>Request a specific list of node names. (--nodelist=&lt;node name list&gt;)</description>
+			<tooltip><![CDATA[Request a specific list of node names. The list may be specified
+as a comma-separated list of node names, or a range of node
+names (e.g. mynode[1-5,7,...]). Duplicate node names in the list
+will be ignored. The order of the node names in the list is not
+important; the node names will be sorted by SLURM.]]></tooltip>
+		</attribute>
 		<attribute name="nodes" type="string">
 			<description>Request that a minimum of "minnodes" nodes be allocated to this job. (--nodes=&lt;minnodes[-maxnodes]&gt;)</description>
 			<tooltip><![CDATA[The scheduler may decide to launch the job on more than "minnodes" nodes.
@@ -357,9 +442,59 @@ new job steps on the remaining nodes in their allocation.
 By default SLURM terminates the entire job allocation if any
 node fails in its range of allocated nodes.]]></tooltip>
 		</attribute>
+		<attribute name="no_requeue" type="boolean" translateBooleanAs='--no-requeue, '>
+			<description>Specifies that the batch job should not be requeued after node failure. (--no-requeue)</description>
+			<tooltip><![CDATA[Specifies that the batch job should not be requeued after
+node failure. Setting this option will prevent system administrators
+from being able to restart the job (for example, after a scheduled
+downtime). When a job is requeued, the batch script is initiated
+from its beginning. Also see the --requeue option. The JobRequeue
+configuration parameter controls the default behavior on the cluster.]]></tooltip>
+		</attribute>
+		<attribute name="ntasks" type="integer" min="1">
+			<description>Specify the number of tasks to run. (--ntasks=&lt;number&gt;)</description>
+			<tooltip><![CDATA[Allocate resources for ntasks tasks. The default
+is one task per node, but note that the --ntasks-per-node option changes this default.]]></tooltip>
+			<default>1</default>
+		</attribute>
+		<attribute name="ntasks_per_core" type="choice">
+			<description>Request the maximum ntasks be invoked on each core. (--ntasks-per-core=&lt;ntasks&gt;)</description>
+			<tooltip><![CDATA[Request the maximum ntasks be invoked on each core.
+Meant to be used with the --ntasks option. Related to --ntasks-per-node
+except at the core level instead of the node level. Masks will automatically
+be generated to bind the tasks to specific core unless --cpu_bind=none is
+specified. NOTE: This option is not supported unless SelectTypeParameters=CR_Core
+or SelectTypeParameters=CR_Core_Memory is configured.]]></tooltip>
+			<choice>1,2,4,8,16,32,64</choice>
+			<default>1</default>
+		</attribute>
+		<attribute name="ntasks_per_node" type="choice">
+			<description>Request the maximum ntasks be invoked on each node. (--ntasks-per-node=&lt;ntasks&gt;)</description>
+			<tooltip><![CDATA[Meant to be used with the --nodes option. This is related to
+--cpus-per-task=ncpus, but does not require knowledge of the actual number of
+cpus on each node. In some cases, it is more convenient to be able to request that no 
+more than a specific number of tasks be invoked on each node. Examples of this
+include submitting a hybrid MPI/OpenMP app where only one MPI "task/rank" should
+be assigned to each node while allowing the OpenMP portion to utilize all of the
+parallelism present in the node, or submitting a single setup/cleanup/monitoring
+job to each node of a pre-existing allocation as one step in a larger job script.]]></tooltip>
+			<choice>1,2,4,8,16,32,64</choice>
+			<default>1</default>
+		</attribute>
+		<attribute name="ntasks_per_socket" type="choice">
+			<description>Request the maximum ntasks be invoked on each socket. (--ntasks-per-socket=&lt;ntasks&gt;)</description>
+			<tooltip><![CDATA[Request the maximum ntasks be invoked on each socket.
+Meant to be used with the --ntasks option. Related to --ntasks-per-node
+except at the socket level instead of the node level. Masks will automatically
+be generated to bind the tasks to specific sockets unless --cpu_bind=none is
+specified. NOTE: This option is not supported unless SelectTypeParameters=CR_Socket
+or SelectTypeParameters=CR_Socket_Memory is configured.]]></tooltip>
+			<choice>1,2,4,8,16,32,64</choice>
+			<default>1</default>
+		</attribute>
 		<attribute name="open_mode" type="choice">
 			<description>Open the output and error files using append or truncate mode as specified. (--open_mode=append|truncate)</description>
-			<tooltip>The default value is specified by the system configuration parameter JobFileAppend.</tooltip>
+			<tooltip><![CDATA[The default value is specified by the system configuration parameter JobFileAppend.]]></tooltip>
 			<choice>append,truncate</choice>
 		</attribute>
 		<attribute name="output" type="string">
@@ -373,6 +508,13 @@ Use absolute path or "${ptp_rm:workdir#value}" prefix to be relative to working 
 				<error-message>"output" field: Use absolute path or "${ptp_rm:workdir#value}" prefix to be relative to working directory.</error-message>
 			</validator>
 		</attribute>
+		<attribute name="overcommit" type="boolean" translateBooleanAs='--overcommit, '>
+			<description>Overcommit resources. (--overcommit)</description>
+			<tooltip><![CDATA[Overcommit resources. Normally, sbatch will
+allocate one task per processor. By specifying --overcommit you are
+explicitly allowing more than one task per processor. However no
+more than MAX_TASKS_PER_NODE tasks are permitted to execute per node.]]></tooltip>
+		</attribute>
 		<attribute name="partition" type="string">
 			<description>Request a specific partition for the resource allocation. (--partition=&lt;partition_names&gt;)</description>
 			<tooltip><![CDATA[If not specified, the default behaviour is to allow the slurm controller to select the default
@@ -380,9 +522,30 @@ partition as designated by the system administrator. If the job can use more
 than one partition, specify their names in a comma separate list and the one
 offering earliest initiation is used.]]></tooltip>
 		</attribute>
+		<attribute name="propagate" type="string">
+			<description>Specify which resource limits to propogate. (--propagate=&lt;rlimitfR&gt;)</description>
+			<tooltip><![CDATA[Allows users to specify which of the modifiable (soft)
+resource limits to propagate to the compute nodes and apply to their jobs.
+If rlimits is not specified, then all resource limits will be propagated.]]></tooltip>
+		</attribute>
+		<attribute name="qos" type="string">
+			<description>Request a quality of service for the job. (--qos=&lt;qos&gt;)</description>
+			<tooltip><![CDATA[Request a quality of service for the job.
+QOS values can be defined for each user/cluster/account association in
+the SLURM database. Users will be limited to their association's defined
+set of qos's when the SLURM configuration parameter, AccountingStorageEnforce,
+includes "qos" in it's definition.]]></tooltip>
+		</attribute>
 		<attribute name="quiet" type="boolean" translateBooleanAs="--quiet, ">
 			<description>Suppress informational messages from sbatch. (--quiet)</description>
 			<tooltip>Errors are still displayed.</tooltip>
+		</attribute>
+		<attribute name="requeue" type="boolean" translateBooleanAs='--requeue, '>
+			<description>Specifies that the batch job should be requeued after node failure. (--requeue)</description>
+			<tooltip><![CDATA[Specifies that the batch job should be requeued after node failure.
+When a job is requeued, the batch script is initiated from its
+beginning. Also see the --no-requeue option. The JobRequeue configuration
+parameter controls the default behavior on the cluster.]]></tooltip>
 		</attribute>
 		<attribute name="reservation" type="string">
 			<description>Allocate resources for the job from the named reservation. (--reservation=&lt;name&gt;)</description>
@@ -399,6 +562,47 @@ By default, no signal is sent before the job's end time.
 If a "sig_num" is specified without any sig_time,
 the default time is 60 seconds.]]></tooltip>
 		</attribute>
+		<attribute name="share" type="boolean" translateBooleanAs='--share, '>
+			<description>Specify if the job can shared nodes with other running jobs. (--share)</description>
+			<tooltip><![CDATA[The job allocation can share nodes with other running jobs.
+This is the opposite of --exclusive, whichever option is seen last
+on the command line will be used. The default shared/exclusive
+behavior depends on system configuration and the partition's Shared
+option takes precedence over the job's option. This option may result
+the allocation being granted sooner than if the --share option was not
+set and allow higher system utilization, but application performance
+will likely suffer due to competition for resources within a node.]]></tooltip>
+		</attribute>
+		<attribute name="sockets_per_node" type="string">
+			<description>Specify nodes with at least the specified number of sockets. (--sockets-per-node=&lt;sockets&gt;)</description>
+			<tooltip><![CDATA[Restrict node selection to nodes with at least the specified
+number of sockets. See additional information under -B option
+above when task/affinity plugin is enabled.]]></tooltip>
+		</attribute>
+		<attribute name="switches" type="string">
+			<description>Specify the maximum count of switches desired and the maximum time to wait for them. (--switches=&lt;count&gt;[@&lt;max-time&gt;])</description>
+			<tooltip><![CDATA[When a tree topology is used, this defines the maximum count
+of switches desired for the job allocation and optionally the
+maximum time to wait for that number of switches. If SLURM finds
+an allocation containing more switches than the count specified,
+the job remains pending until it either finds an allocation with
+desired switch count or the time limit expires. It there is no switch
+count limit, there is no delay in starting the job. Acceptable
+time formats include "minutes", "minutes:seconds", "hours:minutes:seconds",
+"days-hours", "days-hours:minutes" and "days-hours:minutes:seconds".
+The job's maximum time delay may be limited by the system administrator
+using the SchedulerParameters configuration parameter with the max_switch_wait
+parameter option. The default max-time is the max_switch_wait
+SchedulerParameter.]]></tooltip>
+		</attribute>
+		<attribute name="threads_per_core" type="string">
+			<description>Specify at least the number of threads per core. (--threads-per-core=&lt;threads&gt;)</description>
+			<tooltip><![CDATA[Restrict node selection to nodes with at least the specified
+number of threads per core. NOTE: "Threads" refers to the number of
+processing units on each core rather than the number of application
+tasks to be launched per core. See additional information under -B
+option above when task/affinity plugin is enabled.]]></tooltip>
+		</attribute>
 		<attribute name="time" type="string">
 			<description>Set a limit on the total run time of the job allocation. (--time=&lt;time&gt;)</description>
 			<tooltip><![CDATA[If the requested time limit exceeds the partition's time limit, the job is
@@ -411,14 +615,50 @@ limit be imposed. Acceptable time formats include "minutes",
 "minutes:seconds", "hours:minutes:seconds", "days-hours",
 "days-hours:minutes" and "days-hours:minutes:seconds".]]></tooltip>
 		</attribute>
+		<attribute name="time_min" type="string">
+			<description>Set a minimum time limit on the job allocation. (--time-min=&lt;time&gt;)</description>
+			<tooltip><![CDATA[Set a minimum time limit on the job allocation. If specified, the job may
+have it's --time limit lowered to a value no lower than --time-min if
+doing so permits the job to begin execution earlier than otherwise possible.
+The job's time limit will not be changed after the job is allocated resources.
+This is performed by a backfill scheduling algorithm to allocate resources
+otherwise reserved for higher priority jobs. Acceptable time formats include
+"minutes", "minutes:seconds", "hours:minutes:seconds", "days-hours",
+"days-hours:minutes" and "days-hours:minutes:seconds".]]></tooltip>
+		</attribute>
+		<attribute name="tmp" type="string">
+			<description>Specify a minimum amount of temporary disk space. (--tmp=&lt;&gt;)</description>
+			<tooltip><![CDATA[Specify a minimum amount of temporary disk space.]]></tooltip>
+		</attribute>
+		<attribute name="uid" type="string">
+			<description>Specify the userid to run the job. (--uid=&lt;user&gt;)</description>
+			<tooltip><![CDATA[Attempt to submit and/or run a job as user instead of the invoking user id.
+The invoking user's credentials will be used to check access permissions
+for the target partition. User root may use this option to run jobs as a
+normal user in a RootOnly partition for example. If run as root, sbatch will
+drop its permissions to the uid specified after node allocation is successful.
+user may be the user name or numerical user ID.]]></tooltip>
+		</attribute>
 		<attribute name="verbose" type="boolean" translateBooleanAs="--verbose, ">
 			<description>Increase the verbosity of sbatch's informational messages. (--verbose)</description>
 			<tooltip><![CDATA[Multiple -v's further increase sbatch's verbosity. By default only
 errors are displayed.]]></tooltip>
 		</attribute>
+		<attribute name="wait_all_nodes" type="string">
+			<description>Controls when the execution of the command begins. (--wait-all-nodes=&lt;value&gt;)</description>
+			<tooltip><![CDATA[Controls when the execution of the command begins.
+By default the job will begin execution as soon as the allocation is made.]]></tooltip>
+			<choice>,0,1</choice>
+			<default></default>
+		</attribute>
+		<attribute name="wckey" type="string">
+			<description>Specify wckey to be used with job. (--wckey=&lt;wckey&gt;)</description>
+			<tooltip><![CDATA[Specify wckey to be used with job.
+If TrackWCKey=no (default) in the slurm.conf this value is ignored.]]></tooltip>
+		</attribute>
 		<attribute name="workdir" type="string">
-			<description>Set the working directory of the batch script to "directory" before it it executed. (-- workdir=&lt;directory&gt;)</description>
-			<tooltip>Must use absolute path on scheduled system, or "${ptp_rm:directory#value}".</tooltip>
+			<description>Set the working directory of the batch script to "directory" before it it executed. (--workdir=&lt;directory&gt;)</description>
+			<tooltip><![CDATA[Must use absolute path on scheduled system, or "${ptp_rm:directory#value}".]]></tooltip>
 			<default>${ptp_rm:directory#value}</default>
 			<link-value-to>directory</link-value-to>
 			<validator>
@@ -436,42 +676,11 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 			<choice>,ibrun,ibrun tacc_affinity,ibrun.symm</choice>
 			<default>ibrun</default>
 		</attribute>
-		<attribute name="run.epilog" type="string">
-			<description> run this executable just after the job step completes. (--epilog)</description>
-			<tooltip><![CDATA[The command line arguments for this executable are the command and
-arguments of the job step. If executable is "none", then no epilog is run.
-This parameter overrides the SrunEpilog parameter in slurm.conf.]]></tooltip>
-		</attribute>
 		<attribute name="run.label" type="boolean" translateBooleanAs="--label, ">
 			<description>Prepend task number to lines of stdout/err. (--label)</description>
 			<tooltip><![CDATA[Normally, stdout and stderr from remote tasks is line-buffered directly
 to stdout and stderr. The --label option prepends lines of output
 with the remote task id.]]></tooltip>
-		</attribute>
-		<attribute name="run.ntasks" type="integer" min="1">
-			<description>Specify the number of tasks to run. (--ntasks=&lt;number&gt;)</description>
-			<tooltip><![CDATA[Allocate resources for ntasks tasks. The default
-is one task per node, but note that the --ntasks-per-node option changes this default.]]></tooltip>
-			<default>1</default>
-		</attribute>
-		<attribute name="run.ntasks_per_node" type="choice">
-			<description>Request the maximum ntasks be invoked on each node. (--ntasks-per-node=&lt;ntasks&gt;)</description>
-			<tooltip><![CDATA[Meant to be used with the --nodes option. This is related to
---cpus-per-task=ncpus, but does not require knowledge of the actual number of
-cpus on each node. In some cases, it is more convenient to be able to request that no 
-more than a specific number of tasks be invoked on each node. Examples of this
-include submitting a hybrid MPI/OpenMP app where only one MPI "task/rank" should
-be assigned to each node while allowing the OpenMP portion to utilize all of the
-parallelism present in the node, or submitting a single setup/cleanup/monitoring
-job to each node of a pre-existing allocation as one step in a larger job script.]]></tooltip>
-			<choice>1,2,4,8,16,32,64</choice>
-			<default>1</default>
-		</attribute>
-		<attribute name="run.prolog" type="string">
-			<description>Run this executable before launching the job step. (--prolog)</description>
-			<tooltip><![CDATA[The command line arguments for this executable are the command and 
-arguments of the job step. If executable is "none", then no prolog is run.
-This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip>
 		</attribute>
 		<script insertEnvironmentAfter="30" deleteAfterSubmit="true">
 			<file-staging-location>${ptp_rm:directory#value}</file-staging-location>
@@ -489,7 +698,9 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip>
 			<line><arg isUndefinedIfMatches='#SBATCH --cpu_bind='>#SBATCH --cpu_bind=${ptp_rm:cpu_bind#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --cpus-per-task='>#SBATCH --cpus-per-task=${ptp_rm:cpus_per_task#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --dependency='>#SBATCH --dependency=${ptp_rm:dependency#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --distribution='>#SBATCH --distribution=${ptp_rm:distribution#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --error='>#SBATCH --error=${ptp_rm:error#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --exclude='>#SBATCH --exclude=${ptp_rm:exclude#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH'>#SBATCH ${ptp_rm:exclusive#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --export='>#SBATCH --export=${ptp_rm:export#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --export-file='>#SBATCH --export-file=${ptp_rm:export_file#value}</arg></line>
@@ -504,23 +715,42 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip>
 			<line><arg isUndefinedIfMatches='#SBATCH --licenses='>#SBATCH --licenses=${ptp_rm:licenses#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --mail-type='>#SBATCH --mail-type=${ptp_rm:mail_type#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --mail-user='>#SBATCH --mail-user=${ptp_rm:mail_user#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --mem='>#SBATCH --mem=${ptp_rm:mem#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --mem-per-cpu='>#SBATCH --mem-per-cpu=${ptp_rm:mem_per_cpu#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --mem_bind='>#SBATCH --mem_bind=${ptp_rm:mem_bind#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --mincpus='>#SBATCH --mincpus=${ptp_rm:mincpus#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --network='>#SBATCH --network=${ptp_rm:network#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --nice='>#SBATCH --nice=${ptp_rm:nice#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --nodefile='>#SBATCH --nodefile=${ptp_rm:nodefile#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --nodelist='>#SBATCH --nodelist=${ptp_rm:nodelist#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --nodes='>#SBATCH --nodes=${ptp_rm:nodes#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH'>#SBATCH ${ptp_rm:no_kill#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH'>#SBATCH ${ptp_rm:no_requeue#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --ntasks='>#SBATCH --ntasks=${ptp_rm:ntasks#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --ntasks-per-node='>#SBATCH --ntasks-per-node=${ptp_rm:ntasks_per_node#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --ntasks-per-core='>#SBATCH --ntasks-per-core=${ptp_rm:ntasks_per_core#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --ntasks-per-socket='>#SBATCH --ntasks-per-socket=${ptp_rm:ntasks_per_socket#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --open-mode='>#SBATCH --open-mode=${ptp_rm:open_mode#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --output='>#SBATCH --output=${ptp_rm:output#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH'>#SBATCH ${ptp_rm:overcommit#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --partition='>#SBATCH --partition=${ptp_rm:partition#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --propagate='>#SBATCH --propagate=${ptp_rm:propagate#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --qos='>#SBATCH --qos=${ptp_rm:qos#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH'>#SBATCH ${ptp_rm:quiet#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH'>#SBATCH ${ptp_rm:requeue#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --reservation='>#SBATCH --reservation=${ptp_rm:reservation#value}</arg></line>
-			<line><arg isUndefinedIfMatches='#SBATCH --epilog='>#SBATCH --epilog=${ptp_rm:run.epilog#value}</arg></line>
-			<line><arg isUndefinedIfMatches='#SBATCH'>#SBATCH ${ptp_rm:run.label#value}</arg></line>
-			<line><arg isUndefinedIfMatches='#SBATCH --ntasks='>#SBATCH --ntasks=${ptp_rm:run.ntasks#value}</arg></line>
-			<line><arg isUndefinedIfMatches='#SBATCH --ntasks-per-node='>#SBATCH --ntasks-per-node=${ptp_rm:run.ntasks_per_node#value}</arg></line>
-			<line><arg isUndefinedIfMatches='#SBATCH --prolog='>#SBATCH --prolog=${ptp_rm:run.prolog#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH'>#SBATCH ${ptp_rm:share#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --signal='>#SBATCH --signal=${ptp_rm:signal#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --sockets-per-node='>#SBATCH --sockets-per-node=${ptp_rm:sockets_per_node#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --switches='>#SBATCH --switches=${ptp_rm:switches#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --threads-per-core='>#SBATCH --threads-per-core=${ptp_rm:threads_per_core#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --time='>#SBATCH --time=${ptp_rm:time#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --time-min='>#SBATCH --time-min=${ptp_rm:time_min#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --tmp='>#SBATCH --tmp=${ptp_rm:tmp#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --uid='>#SBATCH --uid=${ptp_rm:uid#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH'>#SBATCH ${ptp_rm:verbose#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --wait-all-nodes='>#SBATCH --wait-all-nodes=${ptp_rm:wait_all_nodes#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --wckey='>#SBATCH --wckey=${ptp_rm:wckey#value}</arg></line>
 			<line><arg isUndefinedIfMatches='cd'>cd ${ptp_rm:workdir#value}</arg></line>
 			<line><arg>${ptp_rm:run.command#value} ${ptp_rm:executablePath#value} ${ptp_rm:progArgs#value}</arg></line>
 		</script>
@@ -923,42 +1153,42 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip>
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<tooltip>${ptp_rm:run.ntasks#tooltip}</tooltip>
+						<tooltip>${ptp_rm:ntasks#tooltip}</tooltip>
 						<fixed-text>MPI Number of Tasks:</fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" attribute="run.ntasks">
+					<widget type="text" style="SWT.BORDER" attribute="ntasks">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
-						<tooltip>${ptp_rm:run.ntasks#tooltip}</tooltip>
+						<tooltip>${ptp_rm:ntasks#tooltip}</tooltip>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<tooltip>${ptp_rm:run.ntasks#tooltip}</tooltip>
-						<fixed-text>${ptp_rm:run.ntasks#description}</fixed-text>
+						<tooltip>${ptp_rm:ntasks#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:ntasks#description}</fixed-text>
 					</widget>
 					<!--row 8 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<tooltip>${ptp_rm:run.ntasks_per_node#tooltip}</tooltip>
+						<tooltip>${ptp_rm:ntasks_per_node#tooltip}</tooltip>
 						<fixed-text>MPI Ranks per Node:</fixed-text>
 					</widget>
-					<widget type="combo" style="SWT.BORDER" attribute="run.ntasks_per_node" readOnly="true">
+					<widget type="combo" style="SWT.BORDER" attribute="ntasks_per_node" readOnly="true">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" />
 						</layout-data>
-						<tooltip>${ptp_rm:run.ntasks_per_node#tooltip}</tooltip>
+						<tooltip>${ptp_rm:ntasks_per_node#tooltip}</tooltip>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<tooltip>${ptp_rm:run.ntasks_per_node#tooltip}</tooltip>
-						<fixed-text>${ptp_rm:run.ntasks_per_node#description}</fixed-text>
+						<tooltip>${ptp_rm:ntasks_per_node#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:ntasks_per_node#description}</fixed-text>
 					</widget>
 				</composite>
 			</dynamic>
@@ -1164,6 +1394,48 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip>
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
+						<tooltip>${ptp_rm:distribution#tooltip}</tooltip>
+						<fixed-text>Distribution: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="distribution">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:distribution#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:distribution#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:distribution#description}</fixed-text>
+					</widget>
+					<!-- row 11 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:exclude#tooltip}</tooltip>
+						<fixed-text>Exclude Node List: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="exclude">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:exclude#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:exclude#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:exclude#description}</fixed-text>
+					</widget>
+					<!-- row 9 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
 						<tooltip>${ptp_rm:exclusive#tooltip}</tooltip>
 						<fixed-text>Exclusive: </fixed-text>
 					</widget>
@@ -1311,6 +1583,111 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip>
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
+						<tooltip>${ptp_rm:mem#tooltip}</tooltip>
+						<fixed-text>Memory Per Node: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="mem">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:mem#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:mem#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:mem#description}</fixed-text>
+					</widget>
+					<!-- row 16 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:mem_per_cpu#tooltip}</tooltip>
+						<fixed-text>Memory Per CPU: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="mem_per_cpu">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:mem_per_cpu#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:mem_per_cpu#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:mem_per_cpu#description}</fixed-text>
+					</widget>
+					<!-- row 16 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:mem_bind#tooltip}</tooltip>
+						<fixed-text>Memory Bind: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="mem_bind">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:mem_bind#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:mem_bind#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:mem_bind#description}</fixed-text>
+					</widget>
+					<!-- row 16 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:mincpus#tooltip}</tooltip>
+						<fixed-text>Minimum Number of CPUs Per Node: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="mincpus">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:mincpus#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:mincpus#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:mincpus#description}</fixed-text>
+					</widget>
+					<!-- row 16 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:network#tooltip}</tooltip>
+						<fixed-text>Network: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="network">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:network#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:network#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:network#description}</fixed-text>
+					</widget>
+					<!-- row 16 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
 						<tooltip>${ptp_rm:nodefile#tooltip}</tooltip>
 						<fixed-text>Node File: </fixed-text>
 					</widget>
@@ -1326,6 +1703,27 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip>
 						</layout-data>
 						<tooltip>${ptp_rm:nodefile#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:nodefile#description}</fixed-text>
+					</widget>
+					<!-- row 16 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:nodelist#tooltip}</tooltip>
+						<fixed-text>Node Name List: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="nodelist">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:nodelist#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:nodelist#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:nodelist#description}</fixed-text>
 					</widget>
 					<!-- row 17 -->
 					<widget type="label" style="SWT.LEFT">
@@ -1348,6 +1746,342 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip>
 						<tooltip>${ptp_rm:no_kill#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:no_kill#description}</fixed-text>
 					</widget>
+					<!-- row 17 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:no_requeue#tooltip}</tooltip>
+						<fixed-text>Requeue: </fixed-text>
+					</widget>
+					<widget type="checkbox" style="SWT.LEFT" attribute="no_requeue">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:no_requeue#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:no_requeue#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:no_requeue#description}</fixed-text>
+					</widget>
+					<!-- row 16 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:ntasks_per_core#tooltip}</tooltip>
+						<fixed-text>Number of Tasks Per Core: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="ntasks_per_core">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:ntasks_per_core#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:ntasks_per_core#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:ntasks_per_core#description}</fixed-text>
+					</widget>
+					<!-- row 16 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:ntasks_per_socket#tooltip}</tooltip>
+						<fixed-text>Number of Tasks Per Socket: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="ntasks_per_socket">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:ntasks_per_socket#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:ntasks_per_socket#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:ntasks_per_socket#description}</fixed-text>
+					</widget>
+					<!-- row 17 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:overcommit#tooltip}</tooltip>
+						<fixed-text>Overcommit: </fixed-text>
+					</widget>
+					<widget type="checkbox" style="SWT.LEFT" attribute="overcommit">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:overcommit#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:overcommit#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:overcommit#description}</fixed-text>
+					</widget>
+					<!-- row 16 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:propagate#tooltip}</tooltip>
+						<fixed-text>Propagate: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="propagate">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:propagate#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:propagate#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:propagate#description}</fixed-text>
+					</widget>
+					<!-- row 16 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:qos#tooltip}</tooltip>
+						<fixed-text>QOS: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="qos">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:qos#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:qos#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:qos#description}</fixed-text>
+					</widget>
+					<!-- row 17 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:requeue#tooltip}</tooltip>
+						<fixed-text>Requeue: </fixed-text>
+					</widget>
+					<widget type="checkbox" style="SWT.LEFT" attribute="requeue">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:requeue#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:requeue#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:requeue#description}</fixed-text>
+					</widget>
+					<!-- row 17 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:share#tooltip}</tooltip>
+						<fixed-text>Share: </fixed-text>
+					</widget>
+					<widget type="checkbox" style="SWT.LEFT" attribute="share">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:share#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:share#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:share#description}</fixed-text>
+					</widget>
+					<!-- row 16 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:sockets_per_node#tooltip}</tooltip>
+						<fixed-text>Sockets Per Node: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="sockets_per_node">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:sockets_per_node#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:sockets_per_node#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:sockets_per_node#description}</fixed-text>
+					</widget>
+					<!-- row 16 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:switches#tooltip}</tooltip>
+						<fixed-text>Switches: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="switches">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:switches#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:switches#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:switches#description}</fixed-text>
+					</widget>
+					<!-- row 16 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:threads_per_core#tooltip}</tooltip>
+						<fixed-text>Threads Per Core: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="threads_per_core">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:threads_per_core#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:threads_per_core#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:threads_per_core#description}</fixed-text>
+					</widget>
+					<!-- row 16 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:time_min#tooltip}</tooltip>
+						<fixed-text>Time Mininum: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="time_min">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:time_min#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:time_min#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:time_min#description}</fixed-text>
+					</widget>
+					<!-- row 16 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:tmp#tooltip}</tooltip>
+						<fixed-text>Temporary Disk Space Minimum: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="tmp">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:tmp#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:tmp#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:tmp#description}</fixed-text>
+					</widget>
+					<!-- row 16 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:uid#tooltip}</tooltip>
+						<fixed-text>UID: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="uid">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:uid#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:uid#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:uid#description}</fixed-text>
+					</widget>
+					<!-- row 16 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:wait_all_nodes#tooltip}</tooltip>
+						<fixed-text>Wait All Nodes: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="wait_all_nodes">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:wait_all_nodes#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:wait_all_nodes#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:wait_all_nodes#description}</fixed-text>
+					</widget>
+					<!-- row 16 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:wckey#tooltip}</tooltip>
+						<fixed-text>WCKey: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="wckey">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:wckey#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:wckey#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:wckey#description}</fixed-text>
+					</widget>
 				</composite>
 			</dynamic>
 			<dynamic>
@@ -1367,6 +2101,7 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip>
 							viewer" the order of the columns is entirely arbitrary -->
 						<column-data name="Name" width="300" />
 						<column-data name="Value" width="300" />
+						<column-data name="Description" width="300" />
 						<items>
 							<include>account</include>
 							<include>acctg_freq</include>
@@ -1381,7 +2116,9 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip>
 							<include>cpu_bind</include>
 							<include>cpus_per_task</include>
 							<include>dependency</include>
+							<include>distribution</include>
 							<include>error</include>
+							<include>exclude</include>
 							<include>exclusive</include>
 							<include>export</include>
 							<include>export_file</include>
@@ -1396,23 +2133,43 @@ This parameter overrides the SrunProlog parameter in slurm.conf.]]></tooltip>
 							<include>licenses</include>
 							<include>mail_type</include>
 							<include>mail_user</include>
+							<include>mem</include>
+							<include>mem_per_cpu</include>
+							<include>mem_bind</include>
+							<include>mincpus</include>
+							<include>network</include>
 							<include>nice</include>
+							<include>nodelist</include>
 							<include>nodefile</include>
 							<include>nodes</include>
 							<include>no_kill</include>
+							<include>no_requeue</include>
+							<include>ntasks</include>
+							<include>ntasks_per_core</include>
+							<include>ntasks_per_node</include>
+							<include>ntasks_per_socket</include>
 							<include>open_mode</include>
 							<include>output</include>
+							<include>overcommit</include>
 							<include>partition</include>
+							<include>propagate</include>
+							<include>qos</include>
 							<include>quiet</include>
+							<include>requeue</include>
 							<include>reservation</include>
-							<include>run.epilog</include>
 							<include>run.label</include>
-							<include>run.ntasks</include>
-							<include>run.ntasks_per_node</include>
-							<include>run.prolog</include>
+							<include>share</include>
 							<include>signal</include>
+							<include>sockets_per_node</include>
+							<include>switches</include>
+							<include>threads_per_core</include>
 							<include>time</include>
+							<include>time_min</include>
+							<include>tmp</include>
+							<include>uid</include>
 							<include>verbose</include>
+							<include>wait_all_nodes</include>
+							<include>wckey</include>
 							<include>workdir</include>
 						</items>
 					</viewer>
