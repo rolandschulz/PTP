@@ -691,6 +691,9 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 			<choice>,ibrun,ibrun tacc_affinity,ibrun.symm</choice>
 			<default>ibrun</default>
 		</attribute>
+		<!-- ========================================================================================== -->
+		<!-- SBATCH SCRIPT																				-->
+		<!-- ========================================================================================== -->
 		<script insertEnvironmentAfter="30" deleteAfterSubmit="true">
 			<file-staging-location>${ptp_rm:directory#value}</file-staging-location>
 			<line><arg>#!/bin/bash</arg></line>
@@ -770,6 +773,9 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 				<arg>${ptp_rm:progArgs#value}</arg>
 			</line>
 		</script>
+		<!-- ========================================================================================== -->
+		<!-- START-UP COMMAND																			-->
+		<!-- ========================================================================================== -->
 		<start-up-command name="get-queues">
 			<arg>scontrol</arg>
 			<arg>show</arg>
@@ -785,6 +791,9 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 				</target>
 			</stdout-parser>
 		</start-up-command>
+		<!-- ========================================================================================== -->
+		<!-- SUBMIT BATCH																				-->
+		<!-- ========================================================================================== -->
 		<submit-batch name="submit-batch" directory="${ptp_rm:directory#value}" waitForId="true">
 			<arg>sbatch</arg>
 			<arg>${ptp_rm:managed_file_for_script#value}</arg>
@@ -820,6 +829,9 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 				</target>
 			</stderr-parser>
 		</submit-batch>
+		<!-- ========================================================================================== -->
+		<!-- GET JOB STATUS																				-->
+		<!-- ========================================================================================== -->
 		<get-job-status name="get-job-status" ignoreExitStatus="true">
 			<arg>scontrol</arg>
 			<arg>show</arg>
@@ -987,19 +999,31 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 				</target>
 			</stderr-parser>
 		</get-job-status>
+		<!-- ========================================================================================== -->
+		<!-- TERMINATE JOB																				-->
+		<!-- ========================================================================================== -->
 		<terminate-job name="cancel" ignoreExitStatus="true">
 			<arg>scancel</arg>
 			<arg>${ptp_rm:@jobId#name}</arg>
 		</terminate-job>
+		<!-- ========================================================================================== -->
+		<!-- HOLD JOB																					-->
+		<!-- ========================================================================================== -->
 		<hold-job name="hold" ignoreExitStatus="true">
 			<arg>scontrol</arg><arg>hold</arg>
 			<arg>${ptp_rm:@jobId#name}</arg>
 		</hold-job>
+		<!-- ========================================================================================== -->
+		<!-- RELEASE JOB																				-->
+		<!-- ========================================================================================== -->
 		<release-job name="release" ignoreExitStatus="true">
 			<arg>scontrol</arg>
 			<arg>release</arg>
 			<arg>${ptp_rm:@jobId#name}</arg>
 		</release-job>
+		<!-- ========================================================================================== -->
+		<!-- LAUNCH TAB																	-->
+		<!-- ========================================================================================== -->
 		<launch-tab>
 			<dynamic includeWidgetValuesFrom="Secondary Settings">
 				<title>Basic Settings</title>
@@ -1011,7 +1035,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 					<layout>
 						<grid-layout numColumns="4" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
 					</layout>
-					<!-- HEADER -->
+					<!-- HEADER ======================================================================== -->
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1030,7 +1054,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						</layout-data>
 						<fixed-text>Description</fixed-text>
 					</widget>
-					<!-- row 1 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1051,7 +1075,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:job_name#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:job_name#description}</fixed-text>
 					</widget>
-					<!-- row 2 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1073,7 +1097,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:partition#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:partition#description}</fixed-text>
 					</widget>
-					<!-- row 3 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1101,7 +1125,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:workdir#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:workdir#description}</fixed-text>
 					</widget>
-					<!-- row 4 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1122,7 +1146,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:nodes#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:nodes#description}</fixed-text>
 					</widget>
-					<!-- row 5 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1143,7 +1167,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:time#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:time#description}</fixed-text>
 					</widget>
-					<!-- row 6 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1164,7 +1188,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:run.command#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:run.command#description}</fixed-text>
 					</widget>
-					<!-- row 7 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1185,7 +1209,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:ntasks#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:ntasks#description}</fixed-text>
 					</widget>
-					<!--row 8 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1206,7 +1230,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:ntasks_per_node#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:ntasks_per_node#description}</fixed-text>
 					</widget>
-					<!--row 9 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1227,7 +1251,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:OMP_NUM_THREADS#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:OMP_NUM_THREADS#description}</fixed-text>
 					</widget>
-					<!--row 10 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1248,7 +1272,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:MIC_PPN#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:MIC_PPN#description}</fixed-text>
 					</widget>
-					<!--row 11 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1269,6 +1293,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:MIC_OMP_NUM_THREADS#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:MIC_OMP_NUM_THREADS#description}</fixed-text>
 					</widget>
+					<!-- ROW =========================================================================== -->
 				</composite>
 			</dynamic>
 			<dynamic includeWidgetValuesFrom="Basic Settings">
@@ -1281,7 +1306,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 					<layout>
 						<grid-layout numColumns="4" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
 					</layout>
-					<!-- HEADER -->
+					<!-- HEADER ======================================================================== -->
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1300,7 +1325,28 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						</layout-data>
 						<fixed-text>Description</fixed-text>
 					</widget>
-					<!-- row 1 -->
+					<!-- ROW =========================================================================== -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:account#tooltip}</tooltip>
+						<fixed-text>Account: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="account">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:account#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:account#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:account#description}</fixed-text>
+					</widget>
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1321,7 +1367,70 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:acctg_freq#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:acctg_freq#description}</fixed-text>
 					</widget>
-					<!-- row 2 -->
+					<!-- ROW =========================================================================== -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:begin#tooltip}</tooltip>
+						<fixed-text>Begin: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="begin">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:begin#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:begin#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:begin#description}</fixed-text>
+					</widget>
+					<!-- ROW =========================================================================== -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:checkpoint#tooltip}</tooltip>
+						<fixed-text>Checkpoint: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="checkpoint">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:checkpoint#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:checkpoint#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:checkpoint#description}</fixed-text>
+					</widget>
+					<!-- ROW =========================================================================== -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:checkpoint_dir#tooltip}</tooltip>
+						<fixed-text>Checkpoint Directory: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="checkpoint_dir">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:checkpoint_dir#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:checkpoint_dir#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:checkpoint_dir#description}</fixed-text>
+					</widget>
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1342,7 +1451,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:clusters#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:clusters#description}</fixed-text>
 					</widget>
-					<!-- row 3 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1363,7 +1472,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:comment#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:comment#description}</fixed-text>
 					</widget>
-					<!-- row 4 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1384,7 +1493,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:constraint#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:constraint#description}</fixed-text>
 					</widget>
-					<!-- row 5 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1405,7 +1514,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:contiguous#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:contiguous#description}</fixed-text>
 					</widget>
-					<!-- row 6 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1426,7 +1535,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:cores_per_socket#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:cores_per_socket#description}</fixed-text>
 					</widget>
-					<!-- row 7 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1447,7 +1556,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:cpu_bind#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:cpu_bind#description}</fixed-text>
 					</widget>
-					<!-- row 8 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1468,7 +1577,28 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:cpus_per_task#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:cpus_per_task#description}</fixed-text>
 					</widget>
-					<!-- row 9 -->
+					<!-- ROW =========================================================================== -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:dependency#tooltip}</tooltip>
+						<fixed-text>Dependency: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="dependency">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:dependency#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:dependency#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:dependency#description}</fixed-text>
+					</widget>
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1489,7 +1619,28 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:distribution#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:distribution#description}</fixed-text>
 					</widget>
-					<!-- row 10 -->
+					<!-- ROW =========================================================================== -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:error#tooltip}</tooltip>
+						<fixed-text>Error: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="error">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:error#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:error#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:error#description}</fixed-text>
+					</widget>
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1510,7 +1661,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:exclude#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:exclude#description}</fixed-text>
 					</widget>
-					<!-- row 11 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1531,7 +1682,28 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:exclusive#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:exclusive#description}</fixed-text>
 					</widget>
-					<!-- row 12 -->
+					<!-- ROW =========================================================================== -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:export#tooltip}</tooltip>
+						<fixed-text>Export: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="export">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:export#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:export#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:export#description}</fixed-text>
+					</widget>
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1552,7 +1724,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:export_file#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:export_file#description}</fixed-text>
 					</widget>
-					<!-- row 13 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1573,7 +1745,28 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:extra_node_info#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:extra_node_info#description}</fixed-text>
 					</widget>
-					<!-- row 14 -->
+					<!-- ROW =========================================================================== -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:get_user_env#tooltip}</tooltip>
+						<fixed-text>Get User Environment: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="get_user_env">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:get_user_env#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:get_user_env#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:get_user_env#description}</fixed-text>
+					</widget>
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1594,7 +1787,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:gres#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:gres#description}</fixed-text>
 					</widget>
-					<!-- row 15 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1615,7 +1808,49 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:hint#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:hint#description}</fixed-text>
 					</widget>
-					<!-- row 16 -->
+					<!-- ROW =========================================================================== -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:hold#tooltip}</tooltip>
+						<fixed-text>Hold: </fixed-text>
+					</widget>
+					<widget type="checkbox" style="SWT.LEFT" attribute="exclusive">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:hold#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:hold#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:hold#description}</fixed-text>
+					</widget>
+					<!-- ROW =========================================================================== -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:immediate#tooltip}</tooltip>
+						<fixed-text>Immediate: </fixed-text>
+					</widget>
+					<widget type="checkbox" style="SWT.LEFT" attribute="exclusive">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:immediate#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:immediate#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:immediate#description}</fixed-text>
+					</widget>
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1636,7 +1871,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:input#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:input#description}</fixed-text>
 					</widget>
-					<!-- row 17 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1657,7 +1892,49 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:licenses#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:licenses#description}</fixed-text>
 					</widget>
-					<!-- row 18 -->
+					<!-- ROW =========================================================================== -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:mail_type#tooltip}</tooltip>
+						<fixed-text>Msil Type: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="mail_type">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:mail_type#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:mail_type#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:mail_type#description}</fixed-text>
+					</widget>
+					<!-- ROW =========================================================================== -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:mail_user#tooltip}</tooltip>
+						<fixed-text>Mail User: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="mail_user">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:mail_user#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:mail_user#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:mail_user#description}</fixed-text>
+					</widget>
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1678,7 +1955,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:mem#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:mem#description}</fixed-text>
 					</widget>
-					<!-- row 19 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1699,7 +1976,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:mem_per_cpu#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:mem_per_cpu#description}</fixed-text>
 					</widget>
-					<!-- row 20 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1720,7 +1997,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:mem_bind#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:mem_bind#description}</fixed-text>
 					</widget>
-					<!-- row 21 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1741,7 +2018,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:mincpus#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:mincpus#description}</fixed-text>
 					</widget>
-					<!-- row 22 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1762,7 +2039,28 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:network#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:network#description}</fixed-text>
 					</widget>
-					<!-- row 23 -->
+					<!-- ROW =========================================================================== -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:nice#tooltip}</tooltip>
+						<fixed-text>Nice: </fixed-text>
+					</widget>
+					<widget type="checkbox" style="SWT.LEFT" attribute="nice">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:nice#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:nice#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:nice#description}</fixed-text>
+					</widget>
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1783,7 +2081,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:nodefile#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:nodefile#description}</fixed-text>
 					</widget>
-					<!-- row 24 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1804,7 +2102,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:nodelist#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:nodelist#description}</fixed-text>
 					</widget>
-					<!-- row 25 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1825,7 +2123,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:no_kill#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:no_kill#description}</fixed-text>
 					</widget>
-					<!-- row 26 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1846,7 +2144,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:no_requeue#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:no_requeue#description}</fixed-text>
 					</widget>
-					<!-- row 27 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1867,7 +2165,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:ntasks_per_core#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:ntasks_per_core#description}</fixed-text>
 					</widget>
-					<!-- row 28 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1888,7 +2186,49 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:ntasks_per_socket#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:ntasks_per_socket#description}</fixed-text>
 					</widget>
-					<!-- row 29 -->
+					<!-- ROW =========================================================================== -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:open_mode#tooltip}</tooltip>
+						<fixed-text>Open Mode: </fixed-text>
+					</widget>
+					<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="open_mode">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:open_mode#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:open_mode#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:open_mode#description}</fixed-text>
+					</widget>
+					<!-- ROW =========================================================================== -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:output#tooltip}</tooltip>
+						<fixed-text>Output: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="output">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:output#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:output#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:output#description}</fixed-text>
+					</widget>
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1909,7 +2249,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:overcommit#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:overcommit#description}</fixed-text>
 					</widget>
-					<!-- row 30 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1930,7 +2270,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:propagate#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:propagate#description}</fixed-text>
 					</widget>
-					<!-- row 31 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1951,7 +2291,28 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:qos#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:qos#description}</fixed-text>
 					</widget>
-					<!-- row 32 -->
+					<!-- ROW =========================================================================== -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:quiet#tooltip}</tooltip>
+						<fixed-text>Quiet: </fixed-text>
+					</widget>
+					<widget type="checkbox" style="SWT.LEFT" attribute="quiet">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:quiet#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:quiet#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:quiet#description}</fixed-text>
+					</widget>
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1972,7 +2333,28 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:requeue#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:requeue#description}</fixed-text>
 					</widget>
-					<!-- row 33 -->
+					<!-- ROW =========================================================================== -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:reservation#tooltip}</tooltip>
+						<fixed-text>Reservation: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="reservation">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:reservation#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:reservation#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:reservation#description}</fixed-text>
+					</widget>
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -1993,7 +2375,28 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:share#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:share#description}</fixed-text>
 					</widget>
-					<!-- row 34 -->
+					<!-- ROW =========================================================================== -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:signal#tooltip}</tooltip>
+						<fixed-text>Signal: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="signal">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:signal#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:signal#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:signal#description}</fixed-text>
+					</widget>
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -2014,7 +2417,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:sockets_per_node#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:sockets_per_node#description}</fixed-text>
 					</widget>
-					<!-- row 35 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -2035,7 +2438,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:switches#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:switches#description}</fixed-text>
 					</widget>
-					<!-- row 36 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -2056,7 +2459,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:threads_per_core#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:threads_per_core#description}</fixed-text>
 					</widget>
-					<!-- row 37 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -2077,7 +2480,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:time_min#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:time_min#description}</fixed-text>
 					</widget>
-					<!-- row 38 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -2098,7 +2501,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:tmp#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:tmp#description}</fixed-text>
 					</widget>
-					<!-- row 39 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -2119,7 +2522,28 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:uid#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:uid#description}</fixed-text>
 					</widget>
-					<!-- row 40 -->
+					<!-- ROW =========================================================================== -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:verbose#tooltip}</tooltip>
+						<fixed-text>Verbose: </fixed-text>
+					</widget>
+					<widget type="checkbox" style="SWT.LEFT" attribute="verbose">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:verbose#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:verbose#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:verbose#description}</fixed-text>
+					</widget>
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -2140,7 +2564,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:wait_all_nodes#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:wait_all_nodes#description}</fixed-text>
 					</widget>
-					<!-- row 41 -->
+					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -2161,6 +2585,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:wckey#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:wckey#description}</fixed-text>
 					</widget>
+					<!-- ROW =========================================================================== -->
 				</composite>
 			</dynamic>
 			<dynamic>
@@ -2220,8 +2645,8 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 							<include>mincpus</include>
 							<include>network</include>
 							<include>nice</include>
-							<include>nodelist</include>
 							<include>nodefile</include>
+							<include>nodelist</include>
 							<include>nodes</include>
 							<include>no_kill</include>
 							<include>no_requeue</include>
