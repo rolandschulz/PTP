@@ -24,7 +24,7 @@ with working directory = ${workspace_loc:/org.eclipse.ptp.rm.jaxb.core}
  -->
 
 <jxb:bindings xmlns="http://eclipse.org/ptp/lml">
-  <jxb:bindings schemaLocation="http://eclipse.org/ptp/schemas/v1.2/layout.xsd">
+  <jxb:bindings schemaLocation="http://eclipse.org/ptp/schemas/v1.1/layout.xsd">
     <jxb:schemaBindings>
       <jxb:package name="org.eclipse.ptp.rm.jaxb.core.data.lml"/>
     </jxb:schemaBindings>
