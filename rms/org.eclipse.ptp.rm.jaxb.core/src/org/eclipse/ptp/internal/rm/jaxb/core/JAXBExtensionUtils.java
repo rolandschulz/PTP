@@ -35,7 +35,7 @@ import org.osgi.framework.Bundle;
  * 
  * @author arossi
  * 
- * @since 1.1
+ * @since 1.2
  */
 public class JAXBExtensionUtils {
 	private static Map<String, URL> fPluginConfigurations = new TreeMap<String, URL>();

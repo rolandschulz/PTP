@@ -492,6 +492,12 @@ public class MonitorControl implements IMonitorControl {
 					}
 				}
 
+				if (fSavedLayout == null) {
+					// Load default layout from RMS configuration
+					fSavedLayout = MonitorControlManager.getSystemLayout(fConfigurationName);
+					// This might still be null or could contain the default layout configured in the RMS configuration
+				}
+
 				/*
 				 * Initialize LML classes
 				 */

@@ -12,7 +12,7 @@ package org.eclipse.ptp.internal.rm.jaxb.core;
 /**
  * Gathers all internal, unmodifiable string constants into a single place for convenience and in the interest of uncluttered code.
  * 
- * @since 1.1
+ * @since 1.2
  */
 public class JAXBCoreConstants {
 	public static final int UNDEFINED = -1;

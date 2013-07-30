@@ -44,7 +44,7 @@ import org.xml.sax.SAXParseException;
  * Convenience methods for validating and unmarshaling XML using JAXB.
  * 
  * @author arossi
- * @since 1.1
+ * @since 1.2
  * 
  */
 public class JAXBInitializationUtils {

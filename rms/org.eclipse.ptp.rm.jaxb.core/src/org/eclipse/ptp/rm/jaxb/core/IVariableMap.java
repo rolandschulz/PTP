@@ -24,7 +24,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
  * 
  * @author arossi
  * @author Jeff Overbey - Environment Manager support
- * @since 1.1
+ * @since 1.2
  */
 public interface IVariableMap {
 

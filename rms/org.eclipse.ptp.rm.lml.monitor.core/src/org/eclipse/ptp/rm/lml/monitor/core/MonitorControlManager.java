@@ -14,6 +14,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
@@ -23,6 +24,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.namespace.QName;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -41,6 +48,7 @@ import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.core.LaunchControllerManager;
 import org.eclipse.ptp.rm.jaxb.core.data.MonitorType;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
+import org.eclipse.ptp.rm.jaxb.core.data.lml.LayoutRoot;
 import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.monitor.core.listeners.IMonitorChangedListener;
 import org.eclipse.ptp.rm.lml.monitor.core.listeners.IMonitorRefreshListener;
@@ -57,7 +65,15 @@ public class MonitorControlManager {
 	private static final String MONITORS_SAVED_STATE = "monitors.xml";//$NON-NLS-1$
 	private static final String MONITORS_ATTR = "monitors";//$NON-NLS-1$
 	private static final String MONITOR_ID_ATTR = "monitor";//$NON-NLS-1$
+	private static final String RMXSDJAXBPackage = "org.eclipse.ptp.rm.jaxb.core.data"; //$NON-NLS-1$
+	private static final String LMLNamespace = "http://eclipse.org/ptp/lml"; //$NON-NLS-1$
+	private static final String LMLPrefix = "lml"; //$NON-NLS-1$
+	private static final String LocalPartOfLMLLayout = "layout"; //$NON-NLS-1$
 	private static Map<String, String> fSystemTypesByConfigName = new TreeMap<String, String>();
+	/**
+	 * Stores default layout for each config name, if available
+	 */
+	private static Map<String, String> fSystemLayoutByConfigName = new TreeMap<String, String>();
 
 	public static String generateMonitorId(String remoteServicesId, String connectionName, String monitorType) {
 		return LaunchControllerManager.generateControlId(remoteServicesId, connectionName, monitorType);
@@ -70,6 +86,21 @@ public class MonitorControlManager {
 	public static String getSystemType(String configName) {
 		loadSystemTypes();
 		return fSystemTypesByConfigName.get(configName);
+	}
+
+	/**
+	 * Retrieve the default layout string for the given RMS configuration name.
+	 * If there is no default layout specified, return null.
+	 * This layout can be sent as request to LML_DA. It represents a stand-alone
+	 * LML layout instance.
+	 * 
+	 * @param configName
+	 *            name of the RMS configuration such as
+	 * @return the xml layout for this configuration or null, if there is no layout defined
+	 */
+	public static String getSystemLayout(String configName) {
+		loadSystemLayouts();
+		return fSystemLayoutByConfigName.get(configName);
 	}
 
 	public static String[] getConfigurationNames() {
@@ -94,6 +125,51 @@ public class MonitorControlManager {
 					String type = monitorType.getSchedulerType();
 					if (type != null) {
 						fSystemTypesByConfigName.put(name, type);
+					}
+				}
+			} catch (Exception e) {
+				// Ignore
+			}
+		}
+	}
+
+	/**
+	 * Gets all extensions to the monitors extension point and loads their names
+	 * and default layouts. Stores them in the map fSystemLayoutByConfigName.
+	 */
+	private static void loadSystemLayouts() {
+		String[] configNames = JAXBExtensionUtils.getConfiguationNames();
+		// Use JAXB marshaller to convert JAXB object back to XML data, which is sent to LML_DA
+		JAXBContext jaxbContext;
+		try {
+			jaxbContext = JAXBContext.newInstance(RMXSDJAXBPackage);
+		} catch (JAXBException e1) {
+			e1.printStackTrace();
+			return;
+		}
+
+		Marshaller marshaller;
+		try {
+			marshaller = jaxbContext.createMarshaller();
+		} catch (JAXBException e1) {
+			e1.printStackTrace();
+			return;
+		}
+
+		for (String name : configNames) {
+			URL url = JAXBExtensionUtils.getConfigurationURL(name);
+			try {
+				ResourceManagerData data = JAXBInitializationUtils.initializeRMData(url);
+				MonitorType monitorType = data.getMonitorData();
+				if (monitorType != null) {
+					// Check if there is a layout existant
+					if (monitorType.getLayout() != null) {
+						final StringWriter sw = new StringWriter();
+						QName qname = new QName(LMLNamespace, LocalPartOfLMLLayout, LMLPrefix);
+						JAXBElement<LayoutRoot> jaxbEl = new JAXBElement<LayoutRoot>(qname, LayoutRoot.class,
+								monitorType.getLayout());
+						marshaller.marshal(jaxbEl, sw);
+						fSystemLayoutByConfigName.put(name, sw.toString());
 					}
 				}
 			} catch (Exception e) {
