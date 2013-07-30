@@ -10,7 +10,7 @@
 <!-- ****************************************************************************** -->
 <xs:schema targetNamespace="http://eclipse.org/ptp/rm" 
 	xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:rm="http://eclipse.org/ptp/rm"
-	elementFormDefault="qualified" version="1.1.0"
+	elementFormDefault="qualified" version="1.2.0"
 	xmlns:lml="http://eclipse.org/ptp/lml">
 	
 	
