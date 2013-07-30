@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -35,6 +37,7 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.RemoteServices;
+import org.eclipse.ptp.remote.core.RemoteServicesUtils;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.server.core.RemoteServerManager;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
@@ -95,32 +98,26 @@ public class MonitorControl implements IMonitorControl {
 		protected IStatus run(IProgressMonitor monitor) {
 			final SubMonitor subMon = SubMonitor.convert(monitor, 100);
 			try {
-				try {
-					fServer.startServer(subMon.newChild(20));
+				fServer.startServer(subMon.newChild(20));
+				if (!subMon.isCanceled()) {
+					fServer.waitForServerStart(subMon.newChild(20));
 					if (!subMon.isCanceled()) {
-						fServer.waitForServerStart(subMon.newChild(20));
-						if (!subMon.isCanceled()) {
-							LMLManager.getInstance().update(getControlId(), fServer.getInputStream(), fServer.getOutputStream());
-						}
+						LMLManager.getInstance().update(getControlId(), fServer.getInputStream(), fServer.getOutputStream());
 					}
-				} catch (final Exception e) {
-					fActive = false;
-					MonitorControlManager.getInstance().fireMonitorUpdated(new IMonitorControl[] { MonitorControl.this });
-					return new Status(IStatus.ERROR, LMLMonitorCorePlugin.PLUGIN_ID, e.getLocalizedMessage());
 				}
-				IStatus status = fServer.waitForServerFinish(subMon.newChild(40));
-				if (status == Status.OK_STATUS) {
-					schedule(JOB_SCHEDULE_FREQUENCY);
-				} else {
-					fActive = false;
-					MonitorControlManager.getInstance().fireMonitorUpdated(new IMonitorControl[] { MonitorControl.this });
-				}
-				return status;
-			} finally {
-				if (monitor != null) {
-					monitor.done();
-				}
+			} catch (final Exception e) {
+				fActive = false;
+				MonitorControlManager.getInstance().fireMonitorUpdated(new IMonitorControl[] { MonitorControl.this });
+				return new Status(IStatus.ERROR, LMLMonitorCorePlugin.PLUGIN_ID, e.getLocalizedMessage());
 			}
+			IStatus status = fServer.waitForServerFinish(subMon.newChild(40));
+			if (status == Status.OK_STATUS) {
+				schedule(JOB_SCHEDULE_FREQUENCY);
+			} else {
+				fActive = false;
+				MonitorControlManager.getInstance().fireMonitorUpdated(new IMonitorControl[] { MonitorControl.this });
+			}
+			return status;
 		}
 	}
 
@@ -129,8 +126,60 @@ public class MonitorControl implements IMonitorControl {
 	 */
 	private static final int JOB_SCHEDULE_FREQUENCY = 60000;
 
-	private MonitorJob fMonitorJob;
+	public static void checkForOutputFile(JobStatusData data, boolean isError, ILaunchController controller,
+			IProgressMonitor monitor) {
+		String path;
+		if (isError) {
+			path = data.getString(JobStatusData.STDERR_REMOTE_FILE_ATTR);
+		} else {
+			path = data.getString(JobStatusData.STDOUT_REMOTE_FILE_ATTR);
+		}
+		if (path != null) {
+			SubMonitor progress = SubMonitor.convert(monitor, 20);
+			IFileStore store = RemoteServicesUtils.getRemoteFileWithProgress(controller.getRemoteServicesId(),
+					controller.getConnectionName(), path, progress.newChild(10));
+			try {
+				if (store.fetchInfo(EFS.NONE, progress.newChild(10)).exists()) {
+					if (isError) {
+						data.setErrReady(true);
+					} else {
+						data.setOutReady(true);
+					}
+				}
+			} catch (CoreException e) {
+				// Ignore, output will remain unavailable
+			}
+		}
+	}
 
+	private static void checkOutputFile(JobStatusData jobData, final ILaunchController controller) {
+		checkOutputFiles(new JobStatusData[] { jobData }, controller);
+	}
+
+	/**
+	 * Check the stdout and stderr output files to see if they exist. If so, the ready flag will be set in the JobStatusData object.
+	 * 
+	 * @param jobData
+	 *            Array of JobStatusData object
+	 * @param controller
+	 *            launch controller
+	 */
+	private static void checkOutputFiles(final JobStatusData[] jobData, final ILaunchController controller) {
+		Job job = new Job(Messages.MonitorControl_Check_job_output) {
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				SubMonitor progress = SubMonitor.convert(monitor, 20);
+				for (JobStatusData data : jobData) {
+					checkForOutputFile(data, true, controller, progress.newChild(10));
+					checkForOutputFile(data, false, controller, progress.newChild(10));
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		job.schedule();
+	}
+
+	private MonitorJob fMonitorJob;
 	private final String fControlId;
 	private final LMLManager fLMLManager = LMLManager.getInstance();
 	private final JobListener fJobListener = new JobListener();
@@ -138,9 +187,9 @@ public class MonitorControl implements IMonitorControl {
 	private final List<JobStatusData> fSavedJobs = new ArrayList<JobStatusData>();
 	private String fConfigurationName;
 	private boolean fActive;
+
 	private String fRemoteServicesId;
 	private String fConnectionName;
-
 	private static final String XML = "xml";//$NON-NLS-1$ 
 	private static final String JOBS_ATTR = "jobs";//$NON-NLS-1$ 
 	private static final String JOB_ATTR = "job";//$NON-NLS-1$ 
@@ -149,7 +198,9 @@ public class MonitorControl implements IMonitorControl {
 	private static final String MONITOR_STATE = "monitorState";//$NON-NLS-1$;
 	private static final String MONITOR_ATTR = "monitor";//$NON-NLS-1$
 	private static final String REMOTE_SERVICES_ID_ATTR = "remoteServicesId";//$NON-NLS-1$;
+
 	private static final String CONNECTION_NAME_ATTR = "connectionName";//$NON-NLS-1$;
+
 	private static final String CONFIGURATION_NAME_ATTR = "configurationName";//$NON-NLS-1$
 
 	public MonitorControl(String controlId) {
@@ -167,6 +218,9 @@ public class MonitorControl implements IMonitorControl {
 			final JobStatusData data = new JobStatusData(status.getJobId(), attrs);
 			data.setState(status.getState());
 			data.setStateDetail(status.getStateDetail());
+			if (IJobStatus.JOB_OUTERR_READY.equals(status.getStateDetail())) {
+				checkOutputFile(data, controller);
+			}
 			fLMLManager.addUserJob(getControlId(), status.getJobId(), data);
 		}
 	}
@@ -183,6 +237,16 @@ public class MonitorControl implements IMonitorControl {
 		} catch (Exception e) {
 			LMLMonitorCorePlugin.log(e.getLocalizedMessage());
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#getConfigurationName()
+	 */
+	@Override
+	public String getConfigurationName() {
+		return fConfigurationName;
 	}
 
 	/*
@@ -224,16 +288,6 @@ public class MonitorControl implements IMonitorControl {
 		}
 		request.getDriver().add(driver);
 		return request;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#getConfigurationName()
-	 */
-	@Override
-	public String getConfigurationName() {
-		return fConfigurationName;
 	}
 
 	/**
@@ -406,6 +460,16 @@ public class MonitorControl implements IMonitorControl {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#setConfigurationName(java.lang.String)
+	 */
+	@Override
+	public void setConfigurationName(String name) {
+		fConfigurationName = name;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#setConnectionName
 	 * (java.lang.String)
@@ -430,16 +494,6 @@ public class MonitorControl implements IMonitorControl {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#setConfigurationName(java.lang.String)
-	 */
-	@Override
-	public void setConfigurationName(String name) {
-		fConfigurationName = name;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.eclipse.ptp.core.monitors.IMonitorControl#start(org.eclipse.core.
 	 * runtime.IProgressMonitor)
@@ -448,84 +502,82 @@ public class MonitorControl implements IMonitorControl {
 	public void start(IProgressMonitor monitor) throws CoreException {
 		if (!isActive()) {
 			SubMonitor progress = SubMonitor.convert(monitor, 30);
+			ILaunchController controller = LaunchControllerManager.getInstance().getLaunchController(getRemoteServicesId(),
+					getConnectionName(), getConfigurationName());
+
+			if (controller == null) {
+				throw new CoreException(new Status(IStatus.ERROR, LMLMonitorCorePlugin.getUniqueIdentifier(),
+						Messages.MonitorControl_UnableToLocateLaunchController));
+			}
+
 			try {
-				ILaunchController controller = LaunchControllerManager.getInstance().getLaunchController(getRemoteServicesId(),
-						getConnectionName(), getConfigurationName());
+				load();
+			} catch (CoreException e) {
+				/*
+				 * Can't find monitor data for some reason, so just log a
+				 * message but allow the monitor to be started anyway
+				 */
+				LMLMonitorCorePlugin.log(e.getLocalizedMessage());
+			}
 
-				if (controller == null) {
-					throw new CoreException(new Status(IStatus.ERROR, LMLMonitorCorePlugin.getUniqueIdentifier(),
-							Messages.MonitorControl_UnableToLocateLaunchController));
-				}
+			final IRemoteConnection conn = getRemoteConnection(progress.newChild(10));
 
+			if (conn == null) {
+				throw new CoreException(new Status(IStatus.ERROR, LMLMonitorCorePlugin.getUniqueIdentifier(), NLS.bind(
+						Messages.MonitorControl_UnableToLocateConnection, getConnectionName())));
+
+			}
+
+			if (conn == null || progress.isCanceled()) {
+				return;
+			}
+
+			if (!conn.isOpen()) {
 				try {
-					load();
-				} catch (CoreException e) {
-					/*
-					 * Can't find monitor data for some reason, so just log a
-					 * message but allow the monitor to be started anyway
-					 */
-					LMLMonitorCorePlugin.log(e.getLocalizedMessage());
+					conn.open(progress.newChild(10));
+				} catch (final RemoteConnectionException e) {
+					throw new CoreException(new Status(IStatus.ERROR, LMLMonitorCorePlugin.getUniqueIdentifier(), e.getMessage()));
 				}
-
-				final IRemoteConnection conn = getRemoteConnection(progress.newChild(10));
-
-				if (conn == null) {
-					throw new CoreException(new Status(IStatus.ERROR, LMLMonitorCorePlugin.getUniqueIdentifier(), NLS.bind(
-							Messages.MonitorControl_UnableToLocateConnection, getConnectionName())));
-
-				}
-
-				if (conn == null || progress.isCanceled()) {
-					return;
-				}
-
 				if (!conn.isOpen()) {
-					try {
-						conn.open(progress.newChild(10));
-					} catch (final RemoteConnectionException e) {
-						throw new CoreException(new Status(IStatus.ERROR, LMLMonitorCorePlugin.getUniqueIdentifier(),
-								e.getMessage()));
-					}
-					if (!conn.isOpen()) {
-						throw new CoreException(new Status(IStatus.ERROR, LMLMonitorCorePlugin.getUniqueIdentifier(),
-								Messages.LMLResourceManagerMonitor_unableToOpenConnection));
-					}
-				}
-
-				if (fSavedLayout == null) {
-					// Load default layout from RMS configuration
-					fSavedLayout = MonitorControlManager.getSystemLayout(fConfigurationName);
-					// This might still be null or could contain the default layout configured in the RMS configuration
-				}
-
-				/*
-				 * Initialize LML classes
-				 */
-				fLMLManager.openLgui(getControlId(), conn.getUsername(), getMonitorConfigurationRequestType(controller),
-						fSavedLayout, fSavedJobs.toArray(new JobStatusData[0]));
-
-				fActive = true;
-
-				MonitorControlManager.getInstance().fireMonitorUpdated(new IMonitorControl[] { this });
-
-				/*
-				 * Start monitoring job. Note that the monitoring job can fail,
-				 * in which case the monitor is considered to be stopped and the
-				 * active flag set appropriately.
-				 */
-				synchronized (this) {
-					if (fMonitorJob == null) {
-						fMonitorJob = new MonitorJob(conn);
-					}
-					fMonitorJob.schedule();
-				}
-
-				JobManager.getInstance().addListener(fJobListener);
-			} finally {
-				if (monitor != null) {
-					monitor.done();
+					throw new CoreException(new Status(IStatus.ERROR, LMLMonitorCorePlugin.getUniqueIdentifier(),
+							Messages.LMLResourceManagerMonitor_unableToOpenConnection));
 				}
 			}
+
+			if (fSavedLayout == null) {
+				// Load default layout from RMS configuration
+				fSavedLayout = MonitorControlManager.getSystemLayout(fConfigurationName);
+				// This might still be null or could contain the default layout configured in the RMS configuration
+			}
+
+			/*
+			 * Check status of output files for jobs
+			 */
+			checkOutputFiles(fSavedJobs.toArray(new JobStatusData[0]), controller);
+
+			/*
+			 * Initialize LML classes
+			 */
+			fLMLManager.openLgui(getControlId(), conn.getUsername(), getMonitorConfigurationRequestType(controller), fSavedLayout,
+					fSavedJobs.toArray(new JobStatusData[0]));
+
+			fActive = true;
+
+			MonitorControlManager.getInstance().fireMonitorUpdated(new IMonitorControl[] { this });
+
+			/*
+			 * Start monitoring job. Note that the monitoring job can fail,
+			 * in which case the monitor is considered to be stopped and the
+			 * active flag set appropriately.
+			 */
+			synchronized (this) {
+				if (fMonitorJob == null) {
+					fMonitorJob = new MonitorJob(conn);
+				}
+				fMonitorJob.schedule();
+			}
+
+			JobManager.getInstance().addListener(fJobListener);
 		}
 	}
 
@@ -558,7 +610,14 @@ public class MonitorControl implements IMonitorControl {
 
 	private void updateJob(IJobStatus status) {
 		if (status.getControlId().equals(getControlId())) {
-			fLMLManager.updateUserJob(getControlId(), status.getJobId(), status.getState(), status.getStateDetail());
+			ILaunchController controller = LaunchControllerManager.getInstance().getLaunchController(status.getControlId());
+			if (controller != null) {
+				JobStatusData data = fLMLManager.getUserJob(status.getControlId(), status.getJobId());
+				if (data != null && IJobStatus.JOB_OUTERR_READY.equals(status.getStateDetail())) {
+					checkOutputFile(data, controller);
+				}
+				fLMLManager.updateUserJob(getControlId(), status.getJobId(), status.getState(), status.getStateDetail());
+			}
 		}
 	}
 }

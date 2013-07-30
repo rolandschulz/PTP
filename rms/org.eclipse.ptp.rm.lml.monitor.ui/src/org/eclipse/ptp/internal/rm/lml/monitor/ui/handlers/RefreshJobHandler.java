@@ -17,10 +17,13 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.internal.rm.lml.monitor.ui.messages.Messages;
+import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
+import org.eclipse.ptp.rm.jaxb.control.core.LaunchControllerManager;
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
 import org.eclipse.ptp.rm.lml.core.model.Row;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -35,20 +38,29 @@ public class RefreshJobHandler extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		final IStructuredSelection selection = (IStructuredSelection) HandlerUtil.getCurrentSelection(event);
 		if (selection != null && !selection.isEmpty()) {
-			Job cancelJob = new Job(Messages.AbstractControlHandler_ControlJob) {
+			Job cancelJob = new Job(Messages.RefreshJobHandler_Refresh_job) {
 				@Override
 				protected IStatus run(IProgressMonitor monitor) {
+					ILaunchController controller = null;
+					SubMonitor progress = SubMonitor.convert(monitor, selection.toArray().length);
 					for (Object selected : selection.toArray()) {
 						if (selected instanceof Row) {
 							Row row = (Row) selected;
 							JobStatusData status = row.status;
 							try {
-								ActionUtils.maybeUpdateJobState(status, monitor);
-								if (monitor.isCanceled()) {
+								if (controller == null) {
+									String controlId = status.getString(JobStatusData.CONTROL_ID_ATTR);
+									controller = LaunchControllerManager.getInstance().getLaunchController(controlId);
+									controller.start(progress.newChild(10));
+								}
+								if (controller != null) {
+									controller.getJobStatus(status.getJobId(), progress.newChild(10));
+								}
+								if (progress.isCanceled()) {
 									break;
 								}
 							} catch (CoreException t) {
-								return CoreExceptionUtils.getErrorStatus(Messages.AbstractControlHandler_Failed_to_cancel_job, t);
+								return CoreExceptionUtils.getErrorStatus(Messages.RefreshJobHandler_Failed_to_refresh_job, t);
 							}
 						}
 					}

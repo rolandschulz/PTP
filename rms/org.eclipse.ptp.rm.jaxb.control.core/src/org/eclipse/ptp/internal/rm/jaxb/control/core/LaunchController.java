@@ -29,7 +29,6 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.ILaunchMode;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.core.jobs.IJobStatus;
-import org.eclipse.ptp.core.jobs.JobManager;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.ems.core.EnvManagerConfigString;
 import org.eclipse.ptp.ems.core.EnvManagerRegistry;
@@ -49,10 +48,7 @@ import org.eclipse.ptp.internal.rm.jaxb.core.JAXBInitializationUtils;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
 import org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener;
-import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemotePreferenceConstants;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.RemoteServices;
 import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.server.core.RemoteServerManager;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
@@ -430,11 +426,7 @@ public class LaunchController implements ILaunchController {
 				 * by the daemon; note that a COMPLETED state can correspond to a COMPLETED, CANCELED, FAILED or
 				 * JOB_OUTERR_READY detail
 				 */
-				status = jobStatusMap.terminated(jobId, progress.newChild(50));
-				if (status != null && status.stateChanged()) {
-					JobManager.getInstance().fireJobChanged(status);
-				}
-				return status;
+				return jobStatusMap.terminated(jobId, progress.newChild(50));
 			}
 
 			if (!force) {
@@ -489,7 +481,6 @@ public class LaunchController implements ILaunchController {
 		 */
 		if ((job != null && isCanceled(job)) || progress.isCanceled()) {
 			status.setState(IJobStatus.UNDETERMINED);
-			JobManager.getInstance().fireJobChanged(status);
 			return status;
 		}
 
@@ -499,10 +490,6 @@ public class LaunchController implements ILaunchController {
 			 * the daemon
 			 */
 			jobStatusMap.terminated(jobId, progress.newChild(50));
-		}
-
-		if (status.stateChanged()) {
-			JobManager.getInstance().fireJobChanged(status);
 		}
 
 		return status;
@@ -523,24 +510,6 @@ public class LaunchController implements ILaunchController {
 	 */
 	public Map<String, String> getLaunchEnv() {
 		return launchEnv;
-	}
-
-	private IRemoteConnection getRemoteConnection(IProgressMonitor monitor) {
-		final IRemoteServices rsrv = getRemoteServices(monitor);
-		if (rsrv == null) {
-			return null;
-		} else {
-			IRemoteConnectionManager connMgr = rsrv.getConnectionManager();
-			if (connMgr == null) {
-				return null;
-			} else {
-				return connMgr.getConnection(connectionName);
-			}
-		}
-	}
-
-	private IRemoteServices getRemoteServices(IProgressMonitor monitor) {
-		return RemoteServices.getRemoteServices(servicesId, monitor);
 	}
 
 	/*
