@@ -61,9 +61,6 @@ public class JobStatusData {
 		for (final String[] attr : attrs) {
 			fAttrs.put(attr[0], attr[1]);
 		}
-
-		fOutReady = getString(JobStatusData.STDOUT_REMOTE_FILE_ATTR) != null && JOB_OUTERR_READY.equals(getStateDetail());
-		fErrReady = getString(JobStatusData.STDERR_REMOTE_FILE_ATTR) != null && JOB_OUTERR_READY.equals(getStateDetail());
 	}
 
 	/**
@@ -195,8 +192,6 @@ public class JobStatusData {
 	 */
 	public void setStateDetail(String stateDetail) {
 		fAttrs.put(STATE_DETAIL_ATTR, stateDetail);
-		fOutReady = getString(JobStatusData.STDOUT_REMOTE_FILE_ATTR) != null && JOB_OUTERR_READY.equals(stateDetail);
-		fErrReady = getString(JobStatusData.STDERR_REMOTE_FILE_ATTR) != null && JOB_OUTERR_READY.equals(stateDetail);
 	}
 
 	/**

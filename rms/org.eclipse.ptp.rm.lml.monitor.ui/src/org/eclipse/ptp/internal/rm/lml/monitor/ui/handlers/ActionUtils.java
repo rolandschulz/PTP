@@ -22,7 +22,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.internal.rm.lml.monitor.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
@@ -32,7 +31,6 @@ import org.eclipse.ptp.remote.core.RemoteServicesUtils;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.core.LaunchControllerManager;
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
-import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IOConsole;
@@ -141,19 +139,12 @@ public class ActionUtils {
 	 */
 	public static void callDoControl(JobStatusData status, String operation, IProgressMonitor monitor) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 20);
-		try {
-			String controlId = status.getString(JobStatusData.CONTROL_ID_ATTR);
-			if (controlId != null) {
-				ILaunchController controller = LaunchControllerManager.getInstance().getLaunchController(controlId);
-				if (controller != null) {
-					controller.start(progress.newChild(10));
-					controller.control(status.getJobId(), operation, progress.newChild(10));
-					maybeUpdateJobState(controller, status, progress.newChild(10));
-				}
-			}
-		} finally {
-			if (monitor != null) {
-				monitor.done();
+		String controlId = status.getString(JobStatusData.CONTROL_ID_ATTR);
+		if (controlId != null) {
+			ILaunchController controller = LaunchControllerManager.getInstance().getLaunchController(controlId);
+			if (controller != null) {
+				controller.start(progress.newChild(10));
+				controller.control(status.getJobId(), operation, progress.newChild(10));
 			}
 		}
 	}
@@ -177,48 +168,6 @@ public class ActionUtils {
 			}
 		}
 		return false;
-	}
-
-	/**
-	 * 
-	 * @param job
-	 * @param autoStart
-	 * @param monitor
-	 * @throws CoreException
-	 */
-	public static void maybeUpdateJobState(JobStatusData status, IProgressMonitor monitor) throws CoreException {
-		SubMonitor progress = SubMonitor.convert(monitor, 20);
-		try {
-			String controlId = status.getString(JobStatusData.CONTROL_ID_ATTR);
-			if (controlId != null) {
-				ILaunchController controller = LaunchControllerManager.getInstance().getLaunchController(controlId);
-				if (controller != null) {
-					controller.start(progress.newChild(10));
-					maybeUpdateJobState(controller, status, progress.newChild(10));
-				}
-			}
-		} finally {
-			if (monitor != null) {
-				monitor.done();
-			}
-		}
-	}
-
-	private static void maybeUpdateJobState(ILaunchController controller, JobStatusData status, IProgressMonitor monitor)
-			throws CoreException {
-		SubMonitor progress = SubMonitor.convert(monitor, 20);
-		try {
-			IJobStatus refreshed = controller.getJobStatus(status.getJobId(), true, progress.newChild(10));
-			status.updateState(refreshed.getState(), refreshed.getStateDetail());
-			maybeCheckFiles(status);
-			String controlId = status.getString(JobStatusData.CONTROL_ID_ATTR);
-			LMLManager.getInstance().updateUserJob(controlId, status.getJobId(), status.getState(), status.getStateDetail());
-		} finally {
-			if (monitor != null) {
-				monitor.done();
-			}
-		}
-
 	}
 
 	/**
@@ -282,22 +231,6 @@ public class ActionUtils {
 		};
 		j.setUser(true);
 		j.schedule();
-	}
-
-	/**
-	 * Set the flags if this update carries ready info for the output files.
-	 * 
-	 * @param job
-	 */
-	private static void maybeCheckFiles(JobStatusData job) {
-		if (IJobStatus.JOB_OUTERR_READY.equals(job.getStateDetail())) {
-			if (job.getString(JobStatusData.STDOUT_REMOTE_FILE_ATTR) != null) {
-				job.setOutReady(true);
-			}
-			if (job.getString(JobStatusData.STDERR_REMOTE_FILE_ATTR) != null) {
-				job.setErrReady(true);
-			}
-		}
 	}
 
 	/*

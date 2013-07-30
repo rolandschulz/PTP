@@ -213,7 +213,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 */
 	public CommandJobStatus(String jobId, String state, ICommandJob open, ILaunchController control, IVariableMap map, String mode) {
 		this.jobId = jobId;
-		setState(state);
+		normalizeState(state);
 		this.open = open;
 		this.control = control;
 		this.fVarMap = map;
@@ -638,7 +638,12 @@ public class CommandJobStatus implements ICommandJobStatus {
 			}
 		}
 
-		if ((tout == null || tout.ready) && (terr == null || terr.ready)) {
+		/*
+		 * [414001] Set status if job has either an output or error file. This is a change from the previous check which set the
+		 * status only if *both* files exist. I believe this was because Torque/PBS always generate both files, however other job
+		 * schedulers don't necessarily do this.
+		 */
+		if ((tout != null && tout.ready) || (terr != null && terr.ready)) {
 			setState(IJobStatus.JOB_OUTERR_READY);
 		}
 
@@ -717,54 +722,60 @@ public class CommandJobStatus implements ICommandJobStatus {
 		dirty = false;
 		String previousDetail = stateDetail;
 
-		if (UNDETERMINED.equals(state)) {
-			this.state = UNDETERMINED;
-			stateDetail = UNDETERMINED;
-		} else if (SUBMITTED.equals(state)) {
-			this.state = SUBMITTED;
-			stateDetail = SUBMITTED;
-		} else if (RUNNING.equals(state)) {
-			this.state = RUNNING;
-			stateDetail = RUNNING;
-		} else if (SUSPENDED.equals(state)) {
-			this.state = SUSPENDED;
-			stateDetail = SUSPENDED;
-		} else if (COMPLETED.equals(state)) {
-			this.state = COMPLETED;
-			stateDetail = COMPLETED;
-		} else if (QUEUED_ACTIVE.equals(state)) {
-			this.state = SUBMITTED;
-			stateDetail = QUEUED_ACTIVE;
-		} else if (SYSTEM_ON_HOLD.equals(state)) {
-			this.state = SUBMITTED;
-			stateDetail = SYSTEM_ON_HOLD;
-		} else if (USER_ON_HOLD.equals(state)) {
-			this.state = SUBMITTED;
-			stateDetail = USER_ON_HOLD;
-		} else if (USER_SYSTEM_ON_HOLD.equals(state)) {
-			this.state = SUBMITTED;
-			stateDetail = USER_SYSTEM_ON_HOLD;
-		} else if (SYSTEM_SUSPENDED.equals(state)) {
-			this.state = SUSPENDED;
-			stateDetail = SYSTEM_SUSPENDED;
-		} else if (USER_SUSPENDED.equals(state)) {
-			this.state = SUSPENDED;
-			stateDetail = USER_SUSPENDED;
-		} else if (USER_SYSTEM_SUSPENDED.equals(state)) {
-			this.state = SUSPENDED;
-			stateDetail = USER_SYSTEM_SUSPENDED;
-		} else if (FAILED.equals(state)) {
-			this.state = COMPLETED;
-			stateDetail = FAILED;
-		} else if (CANCELED.equals(state)) {
-			this.state = COMPLETED;
-			stateDetail = CANCELED;
-		} else if (JOB_OUTERR_READY.equals(state)) {
-			this.state = COMPLETED;
-			stateDetail = JOB_OUTERR_READY;
-		}
+		normalizeState(state);
+
 		if (previousDetail == null || !previousDetail.equals(stateDetail)) {
 			dirty = true;
+			JobManager.getInstance().fireJobChanged(this);
+		}
+	}
+
+	private void normalizeState(String newState) {
+		if (UNDETERMINED.equals(newState)) {
+			state = UNDETERMINED;
+			stateDetail = UNDETERMINED;
+		} else if (SUBMITTED.equals(newState)) {
+			state = SUBMITTED;
+			stateDetail = SUBMITTED;
+		} else if (RUNNING.equals(newState)) {
+			state = RUNNING;
+			stateDetail = RUNNING;
+		} else if (SUSPENDED.equals(newState)) {
+			state = SUSPENDED;
+			stateDetail = SUSPENDED;
+		} else if (COMPLETED.equals(newState)) {
+			state = COMPLETED;
+			stateDetail = COMPLETED;
+		} else if (QUEUED_ACTIVE.equals(newState)) {
+			state = SUBMITTED;
+			stateDetail = QUEUED_ACTIVE;
+		} else if (SYSTEM_ON_HOLD.equals(newState)) {
+			state = SUBMITTED;
+			stateDetail = SYSTEM_ON_HOLD;
+		} else if (USER_ON_HOLD.equals(newState)) {
+			state = SUBMITTED;
+			stateDetail = USER_ON_HOLD;
+		} else if (USER_SYSTEM_ON_HOLD.equals(newState)) {
+			state = SUBMITTED;
+			stateDetail = USER_SYSTEM_ON_HOLD;
+		} else if (SYSTEM_SUSPENDED.equals(newState)) {
+			state = SUSPENDED;
+			stateDetail = SYSTEM_SUSPENDED;
+		} else if (USER_SUSPENDED.equals(newState)) {
+			state = SUSPENDED;
+			stateDetail = USER_SUSPENDED;
+		} else if (USER_SYSTEM_SUSPENDED.equals(newState)) {
+			state = SUSPENDED;
+			stateDetail = USER_SYSTEM_SUSPENDED;
+		} else if (FAILED.equals(newState)) {
+			state = COMPLETED;
+			stateDetail = FAILED;
+		} else if (CANCELED.equals(newState)) {
+			state = COMPLETED;
+			stateDetail = CANCELED;
+		} else if (JOB_OUTERR_READY.equals(newState)) {
+			state = COMPLETED;
+			stateDetail = JOB_OUTERR_READY;
 		}
 	}
 
@@ -846,8 +857,8 @@ public class CommandJobStatus implements ICommandJobStatus {
 						 * Update status
 						 */
 						ICommandJobStatusMap map = JobStatusMap.getInstance(control);
-						if (map != null && !map.addJobStatus(jobId, this)) {
-							JobManager.getInstance().fireJobChanged(this);
+						if (map != null) {
+							map.addJobStatus(jobId, this);
 						}
 					}
 				}

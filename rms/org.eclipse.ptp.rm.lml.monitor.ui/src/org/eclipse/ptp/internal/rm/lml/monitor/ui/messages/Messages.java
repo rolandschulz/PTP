@@ -25,6 +25,10 @@ public class Messages extends NLS {
 	public static String AddMonitorDialog_Monitor_Type;
 	public static String AddMonitorDialog_Please_select_a_monitor_type;
 	public static String AddMonitorDialog_Select_new_monitor;
+	public static String RefreshJobHandler_Failed_to_refresh_job;
+
+	public static String RefreshJobHandler_Refresh_job;
+
 	public static String RemoveMonitorHandler_Are_you_sure_1;
 	public static String RemoveMonitorHandler_Are_you_sure_2;
 	public static String RemoveMonitorHandler_Remove_Monitor;
