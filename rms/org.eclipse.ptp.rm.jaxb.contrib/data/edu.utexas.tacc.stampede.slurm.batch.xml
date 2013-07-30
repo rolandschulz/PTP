@@ -78,7 +78,7 @@ of the form "<job_id>.ckpt" for jobs and "<job_id>.<step_id>.ckpt" for job steps
 or some special characters.]]></tooltip>
 		</attribute>
 		<attribute name="clusters" type="string">
-			<description>Specify the clusters where commands are issued. (--clusters&lt;string&gt;)</description>
+			<description>Specify the clusters where commands are issued. (-M, --clusters&lt;string&gt;)</description>
 			<tooltip><![CDATA[Specify the clusters where command are issued. Multiple cluster names may be
 comma separated. The job will be submitted to the one cluster
 providing the earliest expected job initiation time. The default
@@ -87,7 +87,7 @@ on all clusters. Note the --export option to control environment
 variables exported between clusters.]]></tooltip>
 		</attribute>
 		<attribute name="constraint" type="string">
-			<description>Specify which features are required. (--constraint=&lt;list&gt;)</description>
+			<description>Specify which features are required. (-C, --constraint=&lt;list&gt;)</description>
 			<tooltip><![CDATA[Nodes can have features assigned to them by the SLURM administrator.
 Users can specify which of these features are required
 by their job using the constraint option. Only nodes having
@@ -119,19 +119,19 @@ verbose mode by setting the SLURM_CPU_BIND environment variable
 value to "verbose".]]></tooltip>
 		</attribute>
 		<attribute name="cpus_per_task" type="string">
-			<description>Bind tasks to CPUs. (--cpus-per-task=&lt;ncpus&gt;)</description>
+			<description>Bind tasks to CPUs. (-c, --cpus-per-task=&lt;ncpus&gt;)</description>
 			<tooltip><![CDATA[Advise the SLURM controller that ensuing job steps will require
 ncpus number of processors per task. Without this option, the
 controller will just try to allocate one processor per task.]]></tooltip>
 		</attribute>
 		<attribute name="dependency" type="string">
-			<description>Defer the start of this job until the specified dependencies have been satisfied completed. (--dependency=&lt;dependency_list&gt;)</description>
+			<description>Defer the start of this job until the specified dependencies have been satisfied completed. (-d, --dependency=&lt;dependency_list&gt;)</description>
 			<tooltip><![CDATA[Format is of the form "type:job_id[:job_id][,type:job_id[:job_id]].
 Many jobs can share the same dependency and these jobs may even belong to different
 users. The value may be changed after job submission using the scontrol command.]]></tooltip>
 		</attribute>
 		<attribute name="distribution" type="string">
-			<description>Specify alternate distribution methods for remote processes. (--distribution=&lt;block|cyclic|arbitrary|plane=&lt;options&gt;[:block|cyclic]&gt;)</description>
+			<description>Specify alternate distribution methods for remote processes. (-m, --distribution=&lt;block|cyclic|arbitrary|plane=&lt;options&gt;[:block|cyclic]&gt;)</description>
 			<tooltip><![CDATA[Specify alternate distribution methods for remote processes. In
 sbatch, this only sets environment variables that will be used
 by subsequent srun requests. This option controls the assign-
@@ -148,7 +148,7 @@ mation on resource allocation, assignment of tasks to nodes, and
 binding of tasks to CPUs.]]></tooltip>
 		</attribute>
 		<attribute name="error" type="string">
-			<description>Instruct SLURM to connect the batch script's standard error directly to the file name specified in the "filename pattern". (--error=&lt;filename_pattern&gt;)</description>
+			<description>Instruct SLURM to connect the batch script's standard error directly to the file name specified in the "filename pattern". (-e, --error=&lt;filename_pattern&gt;)</description>
 			<tooltip><![CDATA[By default both standard output and standard error are directed to a file
 of the name "slurm-%j.out", where the "%j" is replaced with the job allocation number.
 See the "--input" option for filename specification options.
@@ -159,7 +159,7 @@ Use absolute path or "${ptp_rm:workdir#value}" prefix to be relative to working 
 			</validator>
 		</attribute>
 		<attribute name="exclude" type="string">
-			<description>Specify what nodes to exclude. (--exclude=&lt;node name list&gt;)</description>
+			<description>Specify what nodes to exclude. (-x, --exclude=&lt;node name list&gt;)</description>
 			<tooltip><![CDATA[Explicitly exclude certain nodes from the resources granted to the job.]]></tooltip>
 		</attribute>
 		<attribute name="exclusive" type="boolean" translateBooleanAs='--exclusive, '>
@@ -197,7 +197,7 @@ character. This allows the use of special characters in environment
 definitions.]]></tooltip>
 		</attribute>
 		<attribute name="extra_node_info" type="string">
-			<description>Request specific allocation of resources. (--extra-node-info=&lt;socket[:cores[:threads]]&gt;).</description>
+			<description>Request specific allocation of resources. (-B, --extra-node-info=&lt;socket[:cores[:threads]]&gt;).</description>
 			<tooltip><![CDATA[Request a specific allocation of resources with details as to
 the number and type of computational resources within a cluster:
 number of sockets (or physical processors) per node, cores per
@@ -269,19 +269,19 @@ which can benefit communication intensive applications.]]></tooltip>
 			<choice>,compute_bound,memory_bound,multithread,nomultithread</choice>
 			<default></default>
 		</attribute>
-		<attribute name="hold" type="boolean" translateBooleanAs='--hold, '>
-			<description>Specify the job is to be submitted in a held state (priority of zero). (--hold)</description>
+		<attribute name="hold" type="boolean" translateBooleanAs='-H, '>
+			<description>Specify the job is to be submitted in a held state (priority of zero). (-H, --hold)</description>
 			<tooltip><![CDATA[A held job can now be released using scontrol to reset its priority
 (e.g. "scontrol update jobid=<id> priority=1").]]></tooltip>
 		</attribute>
-		<attribute name="immediate" type="boolean" translateBooleanAs="--immediate, ">
+		<attribute name="immediate" type="boolean" translateBooleanAs="-I, ">
 			<description>The batch script is only submitted to the controller if the resources
-necessary to grant its job allocation are immediately available. (--immediate)</description>
+necessary to grant its job allocation are immediately available. (-I, --immediate)</description>
 			<tooltip><![CDATA[If the job allocation has to wait in a queue of pending jobs,
 the batch script is not submitted.]]></tooltip>
 		</attribute>
 		<attribute name="input" type="string">
-			<description>Specify filename pattern of batch script's standard input. (--input=&lt;filename_pattern&gt;)</description>
+			<description>Specify filename pattern of batch script's standard input. (-i, --input=&lt;filename_pattern&gt;)</description>
 			<tooltip><![CDATA[Instruct SLURM to connect the batch script's standard input
 directly to the file name specified in the "filename pattern".
 By default, "/dev/null" is open on the batch script's standard
@@ -297,7 +297,7 @@ replaced by the name of the first node in the job, which
 is the one that runs the script.]]></tooltip>
 		</attribute>
 		<attribute name="job_name" type="string">
-			<description>Specify a name for the job allocation. (--job-name=&lt;jobname&gt;)</description>
+			<description>Specify a name for the job allocation. (-J, --job-name=&lt;jobname&gt;)</description>
 			<tooltip><![CDATA[The specified name appears along with
 the job id number when querying running jobs on the system. The default
 is the name of the batch script, or just "sbatch" if the script is
@@ -309,7 +309,7 @@ read on sbatch's standard input.]]></tooltip>
 			</validator>
 		</attribute>
 		<attribute name="licenses" type="string">
-			<description>Specify a comma delimited list of license names (--licenses=&lt;license&gt;)</description>
+			<description>Specify a comma delimited list of license names (-L, --licenses=&lt;license&gt;)</description>
 			<tooltip><![CDATA[Specification of licenses (or other resources available on all
 nodes of the cluster) which must be allocated to this job.
 License names can be followed by an asterisk and count (the
@@ -393,7 +393,7 @@ ignored if SchedulerType=sched/wiki or
 SchedulerType=sched/wiki2.]]></tooltip>
 		</attribute>
 		<attribute name="nodefile" type="string">
-			<description>Specify filename containing nodes. (--nodefile=&lt;node file&gt;)</description>
+			<description>Specify filename containing nodes. (-F, --nodefile=&lt;node file&gt;)</description>
 			<tooltip><![CDATA[Much like --nodelist, but the list is contained in a file of
 name node file. The node names of the list may also span multiple
 lines in the file. Duplicate node names in the file will
@@ -401,7 +401,7 @@ be ignored. The order of the node names in the list is not
 important; the node names will be sorted by SLURM.]]></tooltip>
 		</attribute>
 		<attribute name="nodelist" type="string">
-			<description>Request a specific list of node names. (--nodelist=&lt;node name list&gt;)</description>
+			<description>Request a specific list of node names. (-w, --nodelist=&lt;node name list&gt;)</description>
 			<tooltip><![CDATA[Request a specific list of node names. The list may be specified
 as a comma-separated list of node names, or a range of node
 names (e.g. mynode[1-5,7,...]). Duplicate node names in the list
@@ -409,7 +409,7 @@ will be ignored. The order of the node names in the list is not
 important; the node names will be sorted by SLURM.]]></tooltip>
 		</attribute>
 		<attribute name="nodes" type="string">
-			<description>Request that a minimum of "minnodes" nodes be allocated to this job. (--nodes=&lt;minnodes[-maxnodes]&gt;)</description>
+			<description>Request that a minimum of "minnodes" nodes be allocated to this job. (-N, --nodes=&lt;minnodes[-maxnodes]&gt;)</description>
 			<tooltip><![CDATA[The scheduler may decide to launch the job on more than "minnodes" nodes.
 A limit on the maximum node count may be specified with "maxnodes"
 (e.g. "--nodes=2-4"). The minimum and maximum node count may be the
@@ -429,9 +429,10 @@ behavior is to allocate enough nodes to satisfy the requirements of
 the "-n" and "-c" options.
 The job is allocated as many nodes as possible within the range specified
 and without delaying the initiation of the job.]]></tooltip>
+			<default>1</default>
 		</attribute>
-		<attribute name="no_kill" type="boolean" translateBooleanAs='--no-kill, '>
-			<description>Do not automatically terminate job if one of the nodes fails allocation. (--no-kill)</description>
+		<attribute name="no_kill" type="boolean" translateBooleanAs='-k, '>
+			<description>Do not automatically terminate job if one of the nodes fails allocation. (-k, --no-kill)</description>
 			<tooltip><![CDATA[Do not automatically terminate a job if one of the nodes
 fails allocation. The user will assume the responsibilities
 for fault-tolerance should a node fail. When there is a node
@@ -452,7 +453,7 @@ from its beginning. Also see the --requeue option. The JobRequeue
 configuration parameter controls the default behavior on the cluster.]]></tooltip>
 		</attribute>
 		<attribute name="ntasks" type="integer" min="1">
-			<description>Specify the number of tasks to run. (--ntasks=&lt;number&gt;)</description>
+			<description>Specify the number of tasks to run. (-n, --ntasks=&lt;number&gt;)</description>
 			<tooltip><![CDATA[Allocate resources for ntasks tasks. The default
 is one task per node, but note that the --ntasks-per-node option changes this default.]]></tooltip>
 			<default>1</default>
@@ -495,10 +496,15 @@ or SelectTypeParameters=CR_Socket_Memory is configured.]]></tooltip>
 		<attribute name="open_mode" type="choice">
 			<description>Open the output and error files using append or truncate mode as specified. (--open_mode=append|truncate)</description>
 			<tooltip><![CDATA[The default value is specified by the system configuration parameter JobFileAppend.]]></tooltip>
-			<choice>append,truncate</choice>
+			<choice>,append,truncate</choice>
+			<default></default>
+		</attribute>
+		<attribute name="other" type="string">
+			<description>Other Options.</description>
+			<tooltip><![CDATA[Specifies other options that do not appear elsewhere in list.]]></tooltip>
 		</attribute>
 		<attribute name="output" type="string">
-			<description>Instruct SLURM to connect the batch script's standard output directly to the file name specified in the "filename pattern". (--output=&lt;filename_pattern&gt;)</description>
+			<description>Instruct SLURM to connect the batch script's standard output directly to the file name specified in the "filename pattern". (-o, --output=&lt;filename_pattern&gt;)</description>
 			<tooltip><![CDATA[By default both standard output and standard error are directed to a file of
 the name "slurm-%j.out", where the "%j" is replaced with the job allocation number.
 See the --input option for filename specification options.
@@ -508,15 +514,15 @@ Use absolute path or "${ptp_rm:workdir#value}" prefix to be relative to working 
 				<error-message>"output" field: Use absolute path or "${ptp_rm:workdir#value}" prefix to be relative to working directory.</error-message>
 			</validator>
 		</attribute>
-		<attribute name="overcommit" type="boolean" translateBooleanAs='--overcommit, '>
-			<description>Overcommit resources. (--overcommit)</description>
+		<attribute name="overcommit" type="boolean" translateBooleanAs='-O, '>
+			<description>Overcommit resources. (-O, --overcommit)</description>
 			<tooltip><![CDATA[Overcommit resources. Normally, sbatch will
 allocate one task per processor. By specifying --overcommit you are
 explicitly allowing more than one task per processor. However no
 more than MAX_TASKS_PER_NODE tasks are permitted to execute per node.]]></tooltip>
 		</attribute>
 		<attribute name="partition" type="string">
-			<description>Request a specific partition for the resource allocation. (--partition=&lt;partition_names&gt;)</description>
+			<description>Request a specific partition for the resource allocation. (-p, --partition=&lt;partition_names&gt;)</description>
 			<tooltip><![CDATA[If not specified, the default behaviour is to allow the slurm controller to select the default
 partition as designated by the system administrator. If the job can use more
 than one partition, specify their names in a comma separate list and the one
@@ -536,8 +542,8 @@ the SLURM database. Users will be limited to their association's defined
 set of qos's when the SLURM configuration parameter, AccountingStorageEnforce,
 includes "qos" in it's definition.]]></tooltip>
 		</attribute>
-		<attribute name="quiet" type="boolean" translateBooleanAs="--quiet, ">
-			<description>Suppress informational messages from sbatch. (--quiet)</description>
+		<attribute name="quiet" type="boolean" translateBooleanAs="-Q, ">
+			<description>Suppress informational messages from sbatch. (-Q, --quiet)</description>
 			<tooltip>Errors are still displayed.</tooltip>
 		</attribute>
 		<attribute name="requeue" type="boolean" translateBooleanAs='--requeue, '>
@@ -550,6 +556,17 @@ parameter controls the default behavior on the cluster.]]></tooltip>
 		<attribute name="reservation" type="string">
 			<description>Allocate resources for the job from the named reservation. (--reservation=&lt;name&gt;)</description>
 		</attribute>
+		<attribute name="share" type="boolean" translateBooleanAs='-s, '>
+			<description>Specify if the job can shared nodes with other running jobs. (-s, --share)</description>
+			<tooltip><![CDATA[The job allocation can share nodes with other running jobs.
+This is the opposite of --exclusive, whichever option is seen last
+on the command line will be used. The default shared/exclusive
+behavior depends on system configuration and the partition's Shared
+option takes precedence over the job's option. This option may result
+the allocation being granted sooner than if the --share option was not
+set and allow higher system utilization, but application performance
+will likely suffer due to competition for resources within a node.]]></tooltip>
+		</attribute>
 		<attribute name="signal" type="string">
 			<description>When a job is within "sig_time" seconds of its end time,
 send it the signal "sig_num". (--signal=&lt;sig_num&gt;[@&lt;sig_time&gt;])</description>
@@ -561,17 +578,6 @@ be sent up to 60 seconds earlier than specified.
 By default, no signal is sent before the job's end time.
 If a "sig_num" is specified without any sig_time,
 the default time is 60 seconds.]]></tooltip>
-		</attribute>
-		<attribute name="share" type="boolean" translateBooleanAs='--share, '>
-			<description>Specify if the job can shared nodes with other running jobs. (--share)</description>
-			<tooltip><![CDATA[The job allocation can share nodes with other running jobs.
-This is the opposite of --exclusive, whichever option is seen last
-on the command line will be used. The default shared/exclusive
-behavior depends on system configuration and the partition's Shared
-option takes precedence over the job's option. This option may result
-the allocation being granted sooner than if the --share option was not
-set and allow higher system utilization, but application performance
-will likely suffer due to competition for resources within a node.]]></tooltip>
 		</attribute>
 		<attribute name="sockets_per_node" type="string">
 			<description>Specify nodes with at least the specified number of sockets. (--sockets-per-node=&lt;sockets&gt;)</description>
@@ -604,7 +610,7 @@ tasks to be launched per core. See additional information under -B
 option above when task/affinity plugin is enabled.]]></tooltip>
 		</attribute>
 		<attribute name="time" type="string">
-			<description>Set a limit on the total run time of the job allocation. (--time=&lt;time&gt;)</description>
+			<description>Set a limit on the total run time of the job allocation. (-t, --time=&lt;time&gt;)</description>
 			<tooltip><![CDATA[If the requested time limit exceeds the partition's time limit, the job is
 left in a PENDING state (possibly indefinitely). The default time
 limit is the partition's time limit. When the time limit is reached,
@@ -614,6 +620,7 @@ parameter "KillWait". A time limit of zero requests that no time
 limit be imposed. Acceptable time formats include "minutes",
 "minutes:seconds", "hours:minutes:seconds", "days-hours",
 "days-hours:minutes" and "days-hours:minutes:seconds".]]></tooltip>
+			<default>0:00</default>
 		</attribute>
 		<attribute name="time_min" type="string">
 			<description>Set a minimum time limit on the job allocation. (--time-min=&lt;time&gt;)</description>
@@ -639,8 +646,8 @@ normal user in a RootOnly partition for example. If run as root, sbatch will
 drop its permissions to the uid specified after node allocation is successful.
 user may be the user name or numerical user ID.]]></tooltip>
 		</attribute>
-		<attribute name="verbose" type="boolean" translateBooleanAs="--verbose, ">
-			<description>Increase the verbosity of sbatch's informational messages. (--verbose)</description>
+		<attribute name="verbose" type="boolean" translateBooleanAs="-v, ">
+			<description>Increase the verbosity of sbatch's informational messages. (-v, --verbose)</description>
 			<tooltip><![CDATA[Multiple -v's further increase sbatch's verbosity. By default only
 errors are displayed.]]></tooltip>
 		</attribute>
@@ -657,7 +664,7 @@ By default the job will begin execution as soon as the allocation is made.]]></t
 If TrackWCKey=no (default) in the slurm.conf this value is ignored.]]></tooltip>
 		</attribute>
 		<attribute name="workdir" type="string">
-			<description>Set the working directory of the batch script to "directory" before it it executed. (--workdir=&lt;directory&gt;)</description>
+			<description>Set the working directory of the batch script to "directory" before it it executed. (-D, --workdir=&lt;directory&gt;)</description>
 			<tooltip><![CDATA[Must use absolute path on scheduled system, or "${ptp_rm:directory#value}".]]></tooltip>
 			<default>${ptp_rm:directory#value}</default>
 			<link-value-to>directory</link-value-to>
@@ -697,34 +704,34 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 		<script insertEnvironmentAfter="30" deleteAfterSubmit="true">
 			<file-staging-location>${ptp_rm:directory#value}</file-staging-location>
 			<line><arg>#!/bin/bash</arg></line>
-			<line><arg isUndefinedIfMatches='#SBATCH --account='>#SBATCH --account=${ptp_rm:account#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH -A'>#SBATCH -A ${ptp_rm:account#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --acctg-freq='>#SBATCH --acctg-freq=${ptp_rm:acctg_freq#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --begin='>#SBATCH --begin=${ptp_rm:begin#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --checkpoint='>#SBATCH --checkpoint=${ptp_rm:checkpoint#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --checkpoint-dir='>#SBATCH --checkpoint-dir=${ptp_rm:checkpoint_dir#value}</arg></line>
-			<line><arg isUndefinedIfMatches='#SBATCH --clusters='>#SBATCH --clusters=${ptp_rm:clusters#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH -M'>#SBATCH -M ${ptp_rm:clusters#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --comment=""'>#SBATCH --comment="${ptp_rm:comment#value}"</arg></line>
-			<line><arg isUndefinedIfMatches='#SBATCH --constraint=""'>#SBATCH --constraint="${ptp_rm:constraint#value}"</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH -C ""'>#SBATCH -C "${ptp_rm:constraint#value}"</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH'>#SBATCH ${ptp_rm:contiguous#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --cores-per-socket='>#SBATCH --cores-per-socket=${ptp_rm:cores_per_socket#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --cpu_bind='>#SBATCH --cpu_bind=${ptp_rm:cpu_bind#value}</arg></line>
-			<line><arg isUndefinedIfMatches='#SBATCH --cpus-per-task='>#SBATCH --cpus-per-task=${ptp_rm:cpus_per_task#value}</arg></line>
-			<line><arg isUndefinedIfMatches='#SBATCH --dependency='>#SBATCH --dependency=${ptp_rm:dependency#value}</arg></line>
-			<line><arg isUndefinedIfMatches='#SBATCH --distribution='>#SBATCH --distribution=${ptp_rm:distribution#value}</arg></line>
-			<line><arg isUndefinedIfMatches='#SBATCH --error='>#SBATCH --error=${ptp_rm:error#value}</arg></line>
-			<line><arg isUndefinedIfMatches='#SBATCH --exclude='>#SBATCH --exclude=${ptp_rm:exclude#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH -c'>#SBATCH -c ${ptp_rm:cpus_per_task#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH -d'>#SBATCH -d ${ptp_rm:dependency#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH -m'>#SBATCH -m ${ptp_rm:distribution#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH -e'>#SBATCH -e ${ptp_rm:error#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH -x'>#SBATCH -x ${ptp_rm:exclude#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH'>#SBATCH ${ptp_rm:exclusive#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --export='>#SBATCH --export=${ptp_rm:export#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --export-file='>#SBATCH --export-file=${ptp_rm:export_file#value}</arg></line>
-			<line><arg isUndefinedIfMatches='#SBATCH --extra-node-info='>#SBATCH --extra-node-info=${ptp_rm:extra_node_info#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH -B '>#SBATCH -B ${ptp_rm:extra_node_info#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --get-user-env='>#SBATCH --get-user-env=${ptp_rm:get_user_env#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --gres='>#SBATCH --gres=${ptp_rm:gres#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --hint='>#SBATCH --hint=${ptp_rm:hint#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH'>#SBATCH ${ptp_rm:hold#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH'>#SBATCH ${ptp_rm:immediate#value}</arg></line>
-			<line><arg isUndefinedIfMatches='#SBATCH --input='>#SBATCH --input=${ptp_rm:input#value}</arg></line>
-			<line><arg isUndefinedIfMatches='#SBATCH --job-name='>#SBATCH --job-name=${ptp_rm:job_name#value}</arg></line>
-			<line><arg isUndefinedIfMatches='#SBATCH --licenses='>#SBATCH --licenses=${ptp_rm:licenses#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH -i'>#SBATCH -i ${ptp_rm:input#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH -J'>#SBATCH -J ${ptp_rm:job_name#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH -L'>#SBATCH -L ${ptp_rm:licenses#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --mail-type='>#SBATCH --mail-type=${ptp_rm:mail_type#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --mail-user='>#SBATCH --mail-user=${ptp_rm:mail_user#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --mem='>#SBATCH --mem=${ptp_rm:mem#value}</arg></line>
@@ -733,19 +740,19 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 			<line><arg isUndefinedIfMatches='#SBATCH --mincpus='>#SBATCH --mincpus=${ptp_rm:mincpus#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --network='>#SBATCH --network=${ptp_rm:network#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --nice='>#SBATCH --nice=${ptp_rm:nice#value}</arg></line>
-			<line><arg isUndefinedIfMatches='#SBATCH --nodefile='>#SBATCH --nodefile=${ptp_rm:nodefile#value}</arg></line>
-			<line><arg isUndefinedIfMatches='#SBATCH --nodelist='>#SBATCH --nodelist=${ptp_rm:nodelist#value}</arg></line>
-			<line><arg isUndefinedIfMatches='#SBATCH --nodes='>#SBATCH --nodes=${ptp_rm:nodes#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH -F'>#SBATCH -F ${ptp_rm:nodefile#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH -w'>#SBATCH -w ${ptp_rm:nodelist#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH -N'>#SBATCH -N ${ptp_rm:nodes#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH'>#SBATCH ${ptp_rm:no_kill#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH'>#SBATCH ${ptp_rm:no_requeue#value}</arg></line>
-			<line><arg isUndefinedIfMatches='#SBATCH --ntasks='>#SBATCH --ntasks=${ptp_rm:ntasks#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH -n '>#SBATCH -n ${ptp_rm:ntasks#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --ntasks-per-node='>#SBATCH --ntasks-per-node=${ptp_rm:ntasks_per_node#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --ntasks-per-core='>#SBATCH --ntasks-per-core=${ptp_rm:ntasks_per_core#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --ntasks-per-socket='>#SBATCH --ntasks-per-socket=${ptp_rm:ntasks_per_socket#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --open-mode='>#SBATCH --open-mode=${ptp_rm:open_mode#value}</arg></line>
-			<line><arg isUndefinedIfMatches='#SBATCH --output='>#SBATCH --output=${ptp_rm:output#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH -o '>#SBATCH -o ${ptp_rm:output#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH'>#SBATCH ${ptp_rm:overcommit#value}</arg></line>
-			<line><arg isUndefinedIfMatches='#SBATCH --partition='>#SBATCH --partition=${ptp_rm:partition#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH -p '>#SBATCH -p ${ptp_rm:partition#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --propagate='>#SBATCH --propagate=${ptp_rm:propagate#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --qos='>#SBATCH --qos=${ptp_rm:qos#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH'>#SBATCH ${ptp_rm:quiet#value}</arg></line>
@@ -756,13 +763,15 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 			<line><arg isUndefinedIfMatches='#SBATCH --sockets-per-node='>#SBATCH --sockets-per-node=${ptp_rm:sockets_per_node#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --switches='>#SBATCH --switches=${ptp_rm:switches#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --threads-per-core='>#SBATCH --threads-per-core=${ptp_rm:threads_per_core#value}</arg></line>
-			<line><arg isUndefinedIfMatches='#SBATCH --time='>#SBATCH --time=${ptp_rm:time#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH -t '>#SBATCH -t ${ptp_rm:time#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --time-min='>#SBATCH --time-min=${ptp_rm:time_min#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --tmp='>#SBATCH --tmp=${ptp_rm:tmp#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --uid='>#SBATCH --uid=${ptp_rm:uid#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH'>#SBATCH ${ptp_rm:verbose#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --wait-all-nodes='>#SBATCH --wait-all-nodes=${ptp_rm:wait_all_nodes#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --wckey='>#SBATCH --wckey=${ptp_rm:wckey#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH -D '>#SBATCH -D ${ptp_rm:workdir#value}</arg></line>
+			<line><arg isUndefinedIfMatches="#SBATCH">#SBATCH ${ptp_rm:other#value}</arg></line>
 			<line><arg isUndefinedIfMatches='export OMP_NUM_THREADS='>export OMP_NUM_THREADS=${ptp_rm:OMP_NUM_THREADS#value}</arg></line>
 			<line><arg isUndefinedIfMatches='export MIC_PPN='>export MIC_PPN=${ptp_rm:MIC_PPN#value}</arg></line>
 			<line><arg isUndefinedIfMatches='export MIC_OMP_NUM_THREADS='>export MIC_OMP_NUM_THREADS=${ptp_rm:MIC_OMP_NUM_THREADS#value}</arg></line>
@@ -1025,7 +1034,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 		<!-- LAUNCH TAB																	-->
 		<!-- ========================================================================================== -->
 		<launch-tab>
-			<dynamic includeWidgetValuesFrom="Secondary Settings">
+			<dynamic includeWidgetValuesFrom="Secondary Settings,MIC Settings">
 				<title>Basic Settings</title>
 				<layout>
 					<grid-layout/>
@@ -1074,6 +1083,27 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						</layout-data>
 						<tooltip>${ptp_rm:job_name#tooltip}</tooltip>
 						<fixed-text>${ptp_rm:job_name#description}</fixed-text>
+					</widget>
+					<!-- ROW =========================================================================== -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:account#tooltip}</tooltip>
+						<fixed-text>Account: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="account">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:account#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:account#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:account#description}</fixed-text>
 					</widget>
 					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
@@ -1235,6 +1265,48 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
+						<tooltip>${ptp_rm:mail_type#tooltip}</tooltip>
+						<fixed-text>Msil Type: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="mail_type">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:mail_type#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:mail_type#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:mail_type#description}</fixed-text>
+					</widget>
+					<!-- ROW =========================================================================== -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:mail_user#tooltip}</tooltip>
+						<fixed-text>Mail User: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="mail_user">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:mail_user#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:mail_user#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:mail_user#description}</fixed-text>
+					</widget>
+					<!-- ROW =========================================================================== -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
 						<tooltip>${ptp_rm:OMP_NUM_THREADS#tooltip}</tooltip>
 						<fixed-text>OpenMP Number of Threads:</fixed-text>
 					</widget>
@@ -1252,51 +1324,9 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<fixed-text>${ptp_rm:OMP_NUM_THREADS#description}</fixed-text>
 					</widget>
 					<!-- ROW =========================================================================== -->
-					<widget type="label" style="SWT.LEFT">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-						</layout-data>
-						<tooltip>${ptp_rm:MIC_PPN#tooltip}</tooltip>
-						<fixed-text>Number of MPI Tasks Per MIC:</fixed-text>
-					</widget>
-					<widget type="text" style="SWT.BORDER" attribute="MIC_PPN">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
-						</layout-data>
-						<tooltip>${ptp_rm:MIC_PPN#tooltip}</tooltip>
-					</widget>
-					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-						</layout-data>
-						<tooltip>${ptp_rm:MIC_PPN#tooltip}</tooltip>
-						<fixed-text>${ptp_rm:MIC_PPN#description}</fixed-text>
-					</widget>
-					<!-- ROW =========================================================================== -->
-					<widget type="label" style="SWT.LEFT">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-						</layout-data>
-						<tooltip>${ptp_rm:MIC_OMP_NUM_THREADS#tooltip}</tooltip>
-						<fixed-text>MIC OpenMP Number of Threads:</fixed-text>
-					</widget>
-					<widget type="text" style="SWT.BORDER" attribute="MIC_OMP_NUM_THREADS">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
-						</layout-data>
-						<tooltip>${ptp_rm:MIC_OMP_NUM_THREADS#tooltip}</tooltip>
-					</widget>
-					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-						</layout-data>
-						<tooltip>${ptp_rm:MIC_OMP_NUM_THREADS#tooltip}</tooltip>
-						<fixed-text>${ptp_rm:MIC_OMP_NUM_THREADS#description}</fixed-text>
-					</widget>
-					<!-- ROW =========================================================================== -->
 				</composite>
 			</dynamic>
-			<dynamic includeWidgetValuesFrom="Basic Settings">
+			<dynamic includeWidgetValuesFrom="Basic Settings,MIC Settings">
 				<title>Secondary Settings</title>
 				<layout>
 					<grid-layout/>
@@ -1324,27 +1354,6 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>Description</fixed-text>
-					</widget>
-					<!-- ROW =========================================================================== -->
-					<widget type="label" style="SWT.LEFT">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-						</layout-data>
-						<tooltip>${ptp_rm:account#tooltip}</tooltip>
-						<fixed-text>Account: </fixed-text>
-					</widget>
-					<widget type="text" style="SWT.BORDER" attribute="account">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
-						</layout-data>
-						<tooltip>${ptp_rm:account#tooltip}</tooltip>
-					</widget>
-					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-						</layout-data>
-						<tooltip>${ptp_rm:account#tooltip}</tooltip>
-						<fixed-text>${ptp_rm:account#description}</fixed-text>
 					</widget>
 					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
@@ -1897,48 +1906,6 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<tooltip>${ptp_rm:mail_type#tooltip}</tooltip>
-						<fixed-text>Msil Type: </fixed-text>
-					</widget>
-					<widget type="text" style="SWT.BORDER" attribute="mail_type">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
-						</layout-data>
-						<tooltip>${ptp_rm:mail_type#tooltip}</tooltip>
-					</widget>
-					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-						</layout-data>
-						<tooltip>${ptp_rm:mail_type#tooltip}</tooltip>
-						<fixed-text>${ptp_rm:mail_type#description}</fixed-text>
-					</widget>
-					<!-- ROW =========================================================================== -->
-					<widget type="label" style="SWT.LEFT">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-						</layout-data>
-						<tooltip>${ptp_rm:mail_user#tooltip}</tooltip>
-						<fixed-text>Mail User: </fixed-text>
-					</widget>
-					<widget type="text" style="SWT.BORDER" attribute="mail_user">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
-						</layout-data>
-						<tooltip>${ptp_rm:mail_user#tooltip}</tooltip>
-					</widget>
-					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-						</layout-data>
-						<tooltip>${ptp_rm:mail_user#tooltip}</tooltip>
-						<fixed-text>${ptp_rm:mail_user#description}</fixed-text>
-					</widget>
-					<!-- ROW =========================================================================== -->
-					<widget type="label" style="SWT.LEFT">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-						</layout-data>
 						<tooltip>${ptp_rm:mem#tooltip}</tooltip>
 						<fixed-text>Memory Per Node: </fixed-text>
 					</widget>
@@ -2047,7 +2014,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<tooltip>${ptp_rm:nice#tooltip}</tooltip>
 						<fixed-text>Nice: </fixed-text>
 					</widget>
-					<widget type="checkbox" style="SWT.LEFT" attribute="nice">
+					<widget type="text" style="SWT.BORDER" attribute="nice">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
@@ -2586,6 +2553,100 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<fixed-text>${ptp_rm:wckey#description}</fixed-text>
 					</widget>
 					<!-- ROW =========================================================================== -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:other#tooltip}</tooltip>
+						<fixed-text>Other Options: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="other">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:other#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:other#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:other#description}</fixed-text>
+					</widget>
+					<!-- ROW =========================================================================== -->
+				</composite>
+			</dynamic>
+			<dynamic includeWidgetValuesFrom="Basic Settings,Secondary Settings">
+				<title>MIC Settings</title>
+				<layout>
+					<grid-layout />
+				</layout>
+				<composite group="true">
+					<layout>
+						<grid-layout numColumns="4" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
+					</layout>
+					<!-- HEADER ======================================================================== -->
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Name</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Value</fixed-text>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>Description</fixed-text>
+					</widget>
+					<!-- ROW =========================================================================== -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:MIC_PPN#tooltip}</tooltip>
+						<fixed-text>Number of MPI Tasks Per MIC:</fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="MIC_PPN">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:MIC_PPN#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:MIC_PPN#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:MIC_PPN#description}</fixed-text>
+					</widget>
+					<!-- ROW =========================================================================== -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:MIC_OMP_NUM_THREADS#tooltip}</tooltip>
+						<fixed-text>MIC OpenMP Number of Threads:</fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="MIC_OMP_NUM_THREADS">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+						<tooltip>${ptp_rm:MIC_OMP_NUM_THREADS#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:MIC_OMP_NUM_THREADS#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:MIC_OMP_NUM_THREADS#description}</fixed-text>
+					</widget>
+					<!-- ROW =========================================================================== -->
 				</composite>
 			</dynamic>
 			<dynamic>
@@ -2599,7 +2660,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 					</layout>
 					<viewer name="allAttributes" style="SWT.BORDER" sort="true" initialAllChecked="true" type="table">
 						<layout-data>
-							<grid-data widthHint="600" heightHint="400" horizontalSpan="1" />
+							<grid-data widthHint="900" heightHint="400" horizontalSpan="1" />
 						</layout-data>
 						<!-- These are the 6 attribute fields mappable to columns. In a "table 
 							viewer" the order of the columns is entirely arbitrary -->
@@ -2656,6 +2717,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 							<include>ntasks_per_socket</include>
 							<include>OMP_NUM_THREADS</include>
 							<include>open_mode</include>
+							<include>other</include>
 							<include>output</include>
 							<include>overcommit</include>
 							<include>partition</include>
