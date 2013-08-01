@@ -34,6 +34,7 @@ import org.eclipse.ptp.internal.rm.jaxb.control.core.ICommandJobStreamsProxy;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.JAXBControlConstants;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.JAXBControlCorePlugin;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.RemoteServicesDelegate;
+import org.eclipse.ptp.internal.rm.jaxb.control.core.messages.Messages;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.runnable.JobStatusMap;
 import org.eclipse.ptp.internal.rm.jaxb.core.JAXBCoreConstants;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
@@ -305,7 +306,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * @return thread running the check
 	 */
 	private FileReadyChecker checkForReady(String path, int block, IProgressMonitor monitor) {
-		FileReadyChecker t = new FileReadyChecker(path);
+		FileReadyChecker t = new FileReadyChecker(Messages.CommandJobStatus_Checking_output_file + path);
 		t.block = block;
 		t.path = path;
 		t.callerMonitor = monitor;
