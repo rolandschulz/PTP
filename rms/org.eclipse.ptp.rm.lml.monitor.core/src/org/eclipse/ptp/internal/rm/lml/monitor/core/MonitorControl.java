@@ -360,13 +360,13 @@ public class MonitorControl implements IMonitorControl {
 
 		boolean active = loadState(memento);
 
-		IMemento childLayout = memento.getChild(LAYOUT_ATTR);
-		if (childLayout != null) {
-			fSavedLayout = childLayout.getString(LAYOUT_STRING_ATTR);
+		IMemento layout = memento.getChild(LAYOUT_ATTR);
+		if (layout != null) {
+			fSavedLayout = layout.getString(LAYOUT_STRING_ATTR);
 		}
 
-		childLayout = memento.getChild(JOBS_ATTR);
-		loadJobs(childLayout, fSavedJobs);
+		IMemento jobs = memento.getChild(JOBS_ATTR);
+		loadJobs(jobs, fSavedJobs);
 
 		return active;
 	}
@@ -427,9 +427,7 @@ public class MonitorControl implements IMonitorControl {
 		if (jobs != null && jobs.length > 0) {
 			final IMemento jobsMemento = memento.createChild(JOBS_ATTR);
 			for (final JobStatusData status : jobs) {
-				if (!status.isRemoved()) {
-					saveJob(status, jobsMemento);
-				}
+				saveJob(status, jobsMemento);
 			}
 		}
 
@@ -613,7 +611,7 @@ public class MonitorControl implements IMonitorControl {
 			ILaunchController controller = LaunchControllerManager.getInstance().getLaunchController(status.getControlId());
 			if (controller != null) {
 				JobStatusData data = fLMLManager.getUserJob(status.getControlId(), status.getJobId());
-				if (data != null && IJobStatus.JOB_OUTERR_READY.equals(status.getStateDetail())) {
+				if (data != null && !data.isRemoved() && IJobStatus.JOB_OUTERR_READY.equals(status.getStateDetail())) {
 					checkOutputFile(data, controller);
 				}
 				fLMLManager.updateUserJob(getControlId(), status.getJobId(), status.getState(), status.getStateDetail());

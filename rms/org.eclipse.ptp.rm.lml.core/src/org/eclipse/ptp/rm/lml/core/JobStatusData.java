@@ -39,6 +39,7 @@ public class JobStatusData {
 	public static final String QUEUE_NAME_ATTR = "queueName";//$NON-NLS-1$;
 	public static final String OWNER_ATTR = "owner";//$NON-NLS-1$;
 	public static final String CONTROL_ID_ATTR = "controlId";//$NON-NLS-1$
+	public static final String REMOVED_ATTR = "removed";//$NON-NLS-1$
 
 	private static boolean detailIsFinal(String detail) {
 		return CANCELED.equals(detail) || FAILED.equals(detail) || JOB_OUTERR_READY.equals(detail);
@@ -46,7 +47,6 @@ public class JobStatusData {
 
 	private boolean fOutReady = false;
 	private boolean fErrReady = false;
-	private boolean fRemoved = false;
 
 	private final Map<String, String> fAttrs = new HashMap<String, String>();
 
@@ -136,7 +136,7 @@ public class JobStatusData {
 	 * @return job has been removed by user
 	 */
 	public boolean isRemoved() {
-		return fRemoved;
+		return fAttrs.containsKey(REMOVED_ATTR);
 	}
 
 	/**
@@ -175,7 +175,7 @@ public class JobStatusData {
 	 * Set job as removed
 	 */
 	public void setRemoved() {
-		fRemoved = true;
+		fAttrs.put(REMOVED_ATTR, "true"); //$NON-NLS-1$
 	}
 
 	/**
