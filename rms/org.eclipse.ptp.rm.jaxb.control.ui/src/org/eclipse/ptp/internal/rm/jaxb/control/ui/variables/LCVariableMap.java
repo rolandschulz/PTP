@@ -58,7 +58,8 @@ public class LCVariableMap implements IVariableMap {
 	private static final Object monitor = new Object();
 
 	/**
-	 * Assures that properties set by the other tabs get included in this RM's property set.
+	 * Assures that launch attributes set by the other tabs get included in this RM's attributes set. Note that zero length strings
+	 * are considered valid (see bug 414308).
 	 * 
 	 * @param rmPrefix
 	 * @param configuration
@@ -74,27 +75,26 @@ public class LCVariableMap implements IVariableMap {
 		configuration.removeAttribute(rmPrefix + JAXBControlConstants.DEBUGGER_ID);
 		configuration.removeAttribute(rmPrefix + JAXBControlConstants.DEBUGGER_LAUNCHER);
 
-		String attr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH,
-				JAXBControlConstants.ZEROSTR);
-		if (!JAXBControlConstants.ZEROSTR.equals(attr)) {
+		String attr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, (String) null);
+		if (attr != null) {
 			configuration.setAttribute(rmPrefix + JAXBControlConstants.EXEC_PATH, attr);
 			attr = new Path(attr).removeLastSegments(1).toString();
 			configuration.setAttribute(rmPrefix + JAXBControlConstants.EXEC_DIR, attr);
 		}
-		attr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, JAXBControlConstants.ZEROSTR);
-		if (!JAXBControlConstants.ZEROSTR.equals(attr)) {
+		attr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_ARGUMENTS, (String) null);
+		if (attr != null) {
 			configuration.setAttribute(rmPrefix + JAXBControlConstants.PROG_ARGS, attr);
 		}
-		attr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ARGS, JAXBControlConstants.ZEROSTR);
-		if (!JAXBControlConstants.ZEROSTR.equals(attr)) {
+		attr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ARGS, (String) null);
+		if (attr != null) {
 			configuration.setAttribute(rmPrefix + JAXBControlConstants.DEBUGGER_ARGS, attr);
 		}
-		attr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ID, JAXBControlConstants.ZEROSTR);
-		if (!JAXBControlConstants.ZEROSTR.equals(attr)) {
+		attr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_DEBUGGER_ID, (String) null);
+		if (attr != null) {
 			configuration.setAttribute(rmPrefix + JAXBControlConstants.DEBUGGER_ID, attr);
 		}
-		attr = configuration.getAttribute("org.eclipse.ptp.launch.DEBUGGER_LAUNCHER", JAXBControlConstants.ZEROSTR); //$NON-NLS-1$
-		if (!JAXBControlConstants.ZEROSTR.equals(attr)) {
+		attr = configuration.getAttribute("org.eclipse.ptp.launch.DEBUGGER_LAUNCHER", (String) null); //$NON-NLS-1$
+		if (attr != null) {
 			configuration.setAttribute(rmPrefix + JAXBControlConstants.DEBUGGER_LAUNCHER, attr);
 		}
 	}

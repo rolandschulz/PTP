@@ -47,8 +47,8 @@ public class RMVariableMap implements IVariableMap {
 	private static final Object monitor = new Object();
 
 	/**
-	 * Checks for current valid attributes by examining the valid list for the current controller, excluding <code>null</code> or
-	 * 0-length string values. Removes the rm unique id prefix.
+	 * Checks for current valid attributes by examining the valid list for the current controller, excluding <code>null</code>.
+	 * Attributes with zero length strings are considered valid (see bug 414308). Removes the rm unique id prefix.
 	 * 
 	 * @param config
 	 * @return currently valid variables
@@ -67,7 +67,7 @@ public class RMVariableMap implements IVariableMap {
 
 		for (String name : attrs.keySet()) {
 			Object value = attrs.get(name);
-			if (value == null || JAXBControlConstants.ZEROSTR.equals(value)) {
+			if (value == null) {
 				continue;
 			}
 			if (name.startsWith(rmId)) {
@@ -115,7 +115,7 @@ public class RMVariableMap implements IVariableMap {
 
 	/**
 	 * @param name
-	 *            or property or attribute
+	 *            of attribute
 	 * @return whether it is a ptp or debug
 	 */
 	public static boolean isExternal(String name) {
@@ -123,10 +123,10 @@ public class RMVariableMap implements IVariableMap {
 	}
 
 	/**
-	 * Standard properties needed by control.
+	 * Standard attribute needed by control.
 	 * 
 	 * @param name
-	 *            or property or attribute
+	 *            of attribute
 	 * @return if it belongs to this group
 	 */
 	public static boolean isFixedValid(String name) {
