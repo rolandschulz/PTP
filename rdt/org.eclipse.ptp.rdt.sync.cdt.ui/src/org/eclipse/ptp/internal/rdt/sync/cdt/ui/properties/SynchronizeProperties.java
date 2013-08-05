@@ -265,6 +265,7 @@ public class SynchronizeProperties extends AbstractSynchronizeProperties {
 		if ((fUserDefinedContent != null) && !fUserDefinedContent.isDisposed()) {
 			cacheConfig();
 		}
+
 		Set<IProject> projectsToUpdate = new HashSet<IProject>();
 		/*
 		 * Iterate through all the potentially changed configurations and update the build configuration information
@@ -278,6 +279,7 @@ public class SynchronizeProperties extends AbstractSynchronizeProperties {
 
 		for (Entry<SyncConfig, IEnvManagerConfig> dirty : fDirtyEnvConfigs.entrySet()) {
 			dirty.getKey().setProperty(SyncCommandLauncher.EMS_CONFIG_PROPERTY, dirty.getValue().toString());
+			projectsToUpdate.add(dirty.getKey().getProject());
 		}
 
 		// This should always only iterate once... right?
