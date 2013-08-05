@@ -27,7 +27,6 @@ import org.eclipse.ptp.internal.rm.lml.core.model.TableColumnLayout;
 import org.eclipse.ptp.internal.rm.lml.core.model.TableSorter;
 import org.eclipse.ptp.rm.lml.core.ILMLCoreConstants;
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
-import org.eclipse.ptp.rm.lml.core.LMLManager;
 import org.eclipse.ptp.rm.lml.core.elements.CellType;
 import org.eclipse.ptp.rm.lml.core.elements.ColumnType;
 import org.eclipse.ptp.rm.lml.core.elements.ColumnlayoutType;
@@ -329,8 +328,8 @@ public class TableHandler extends LguiHandler {
 						rel = selects.get(0).getRel();
 					}
 					if (rel != null) {
-						patternList.add((new Pattern(columnLayout.getKey(), column.getSort().value())).setRelation(rel,
-								selects.get(0).getValue()));
+						patternList.add((new Pattern(columnLayout.getKey(), column.getSort().value())).setRelation(rel, selects
+								.get(0).getValue()));
 					}
 				} else if (selects.size() == 2) {
 					String minValue = null;
@@ -343,8 +342,8 @@ public class TableHandler extends LguiHandler {
 						}
 					}
 					if (minValue != null && maxValue != null) {
-						patternList.add((new Pattern(columnLayout.getKey(), column.getSort().value())).setRange(minValue,
-								maxValue));
+						patternList
+								.add((new Pattern(columnLayout.getKey(), column.getSort().value())).setRange(minValue, maxValue));
 
 					}
 				}
@@ -491,46 +490,54 @@ public class TableHandler extends LguiHandler {
 		if (table == null) {
 			return new Row[0];
 		}
-		final Row[] tableData = new Row[table.getRow().size()];
-		for (int i = 0; i < tableData.length; i++) {
-			final RowType row = table.getRow().get(i);
-			tableData[i] = new Row();
-			tableData[i].setOid(row.getOid());
+		final List<Row> tableData = new ArrayList<Row>();
+		for (int i = 0; i < table.getRow().size(); i++) {
+			final RowType rowType = table.getRow().get(i);
+			final Row row = new Row();
+			row.setOid(rowType.getOid());
 			if (addColor) {
-				tableData[i].setColor(lguiItem.getOIDToObject().getColorById(row.getOid()));
+				row.setColor(lguiItem.getOIDToObject().getColorById(rowType.getOid()));
 			}
 
 			final BigInteger jobIdIndex = getColumnIndex(table, ILguiItem.JOB_ID);
 			final Cell[] tableDataRow = new Cell[cids.length];
 			String jobId = null;
 			for (int j = 0; j < cids.length; j++) {
-				for (final CellType cell : row.getCell()) {
+				for (final CellType cell : rowType.getCell()) {
 					if (cell.getCid() != null && cell.getCid().equals(cids[j])) {
-						tableDataRow[j] = new Cell(cell.getValue(), tableData[i]);
+						tableDataRow[j] = new Cell(cell.getValue(), row);
 						break;
 					}
 				}
 				if (tableDataRow[j] == null) {
-					tableDataRow[j] = new Cell(ILMLCoreConstants.QM, tableData[i]);
+					tableDataRow[j] = new Cell(ILMLCoreConstants.QM, row);
 				}
 				if (cids[j].equals(jobIdIndex)) {
 					jobId = tableDataRow[j].value;
 				}
 			}
+			row.setCells(tableDataRow);
 			if (jobId != null) {
-				JobStatusData status = LMLManager.getInstance().getUserJob(lguiItem.getName(), jobId);
+				JobStatusData status = lguiItem.getUserJob(jobId);
 				if (status == null) {
-					final String queueName = getCellValue(table, row, ILguiItem.JOB_QUEUE_NAME);
-					final String owner = getCellValue(table, row, ILguiItem.JOB_OWNER);
+					final String queueName = getCellValue(table, rowType, ILguiItem.JOB_QUEUE_NAME);
+					final String owner = getCellValue(table, rowType, ILguiItem.JOB_OWNER);
+					final String state = getCellValue(table, rowType, ILguiItem.JOB_STATUS);
 					final String[][] attrs = { { JobStatusData.CONTROL_ID_ATTR, lguiItem.getName() },
-							{ JobStatusData.QUEUE_NAME_ATTR, queueName }, { JobStatusData.OWNER_ATTR, owner } };
+							{ JobStatusData.QUEUE_NAME_ATTR, queueName }, { JobStatusData.OWNER_ATTR, owner },
+							{ JobStatusData.STATE_ATTR, state } };
 					status = new JobStatusData(jobId, attrs);
+				} else if (status.isRemoved()) {
+					/*
+					 * Skip rows that have been marked as "removed"
+					 */
+					continue;
 				}
-				tableData[i].setJobStatusData(status);
+				row.setJobStatusData(status);
 			}
-			tableData[i].setCells(tableDataRow);
+			tableData.add(row);
 		}
-		return tableData;
+		return tableData.toArray(new Row[tableData.size()]);
 	}
 
 	public Row[] getTableDataWithColor(String gid, boolean addColor, List<IPattern> filterTitlesValues) {

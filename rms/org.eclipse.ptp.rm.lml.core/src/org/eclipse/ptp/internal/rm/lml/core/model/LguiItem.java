@@ -363,11 +363,7 @@ public class LguiItem implements ILguiItem {
 	 */
 	@Override
 	public JobStatusData getUserJob(String jobId) {
-		final JobStatusData status = fJobMap.get(jobId);
-		if (status != null && !status.isRemoved()) {
-			return status;
-		}
-		return null;
+		return fJobMap.get(jobId);
 	}
 
 	/*
@@ -580,7 +576,7 @@ public class LguiItem implements ILguiItem {
 		String s;
 		try {
 			while (null != (s = reader.readLine())) {
-				xmlStream.append(s + "\n");
+				xmlStream.append(s + "\n"); //$NON-NLS-1$
 			}
 		} catch (final IOException e) {
 			xmlStream = new StringBuilder();
@@ -610,6 +606,13 @@ public class LguiItem implements ILguiItem {
 	}
 
 	/*
+	 * Update a job in the table model with new status information. First finds the job in the table and updates the status column.
+	 * Then checks if the status update has caused the job to be moved to a different table. If so, the job is removed from the old
+	 * table and a copy is added to the new table.
+	 * 
+	 * The job must already exist in the fJobMap, which means is must have been launched via the UI rather than being discovered on
+	 * the target system.
+	 * 
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#updateUserJob(java.lang.String , java.lang.String, java.lang.String)
@@ -815,13 +818,11 @@ public class LguiItem implements ILguiItem {
 	}
 
 	/**
-	 * Update the job map with the new job data. On this refresh, the new job that was added to the table should have been
-	 * "discovered" by the scheduler, so it should appear in one of the job tables. We need to find these jobs and update the OID
-	 * and status information.
+	 * Update the job map with the new job data. New jobs "discovered" by the scheduler will be added to one of the job tables.
+	 * Existing jobs will have their OID and status information updated.
 	 */
 	private void updateJobData() {
 		final Set<String> jobsInTable = new HashSet<String>();
-		final List<String> oidsToRemove = new ArrayList<String>();
 
 		/*
 		 * First check for jobs that are in the table and update them
@@ -836,64 +837,45 @@ public class LguiItem implements ILguiItem {
 							/*
 							 * job exists in both map and LML, so update the map with the oid and latest status
 							 */
-							status.setOid(info.getOid());
+							status.putString(JobStatusData.OID_ATTR, info.getOid());
 							status.setState(getOverviewAccess().getInfodataValue(info, JOB_STATUS));
-							/*
-							 * Remember this job is in the table for later
-							 */
-							jobsInTable.add(status.getJobId());
-						} else {
-							/*
-							 * job has been removed by the user. remove it from the table
-							 */
-							oidsToRemove.add(info.getOid());
 						}
+						jobsInTable.add(status.getJobId());
 					}
 				}
 			}
 		}
 
-		/*
-		 * Also store additional information from into the jobstatusdata
-		 */
-		getTableHandler().forwardRowToJobData();
-
-		/*
-		 * Remove any rows for removed jobs
-		 */
 		final TableHandler handler = getTableHandler();
 		if (handler != null) {
-			for (final TableType table : handler.getTables()) {
-				for (final String row : oidsToRemove) {
-					table.getRow().remove(row);
-				}
-				oidsToRemove.clear();
-			}
-
 			checkTables(handler);
 
 			/*
-			 * Next find any jobs that are no longer in any of the tables. We need to create a "fake" entry in the jobslistwait
-			 * table for these. Note that these jobs are now considered "COMPLETED".
+			 * Store additional information from into the jobstatusdata
 			 */
-			TableType table = getTableHandler().getTable(ILMLCoreConstants.ID_INACTIVE_JOBS_VIEW);
-			if (table == null) {
-				table = getTableHandler().generateDefaultTable(ILMLCoreConstants.ID_INACTIVE_JOBS_VIEW);
-			}
+			handler.forwardRowToJobData();
 
-			synchronized (fJobMap) {
-				for (final JobStatusData status : fJobMap.values()) {
-					if (!status.isRemoved() && !jobsInTable.contains(status.getJobId())) {
-						if (!status.isCompleted()) {
-							status.setState(JobStatusData.COMPLETED);
-							status.putString(JobStatusData.OID_ATTR, generateOid());
+			/*
+			 * Find any jobs that are not in any table data obtained from the target system. Jobs not in "removed" state (i.e. the
+			 * user has "removed" them from the table) are marked as COMPLETED. Jobs that have been "removed" are removed from the
+			 * map.
+			 */
+			TableType table = handler.getTable(ILMLCoreConstants.ID_INACTIVE_JOBS_VIEW);
+			if (table != null) {
+				for (final JobStatusData status : getUserJobs()) {
+					if (!jobsInTable.contains(status.getJobId())) {
+						if (!status.isRemoved()) {
+							if (!status.isCompleted()) {
+								status.setState(JobStatusData.COMPLETED);
+								status.putString(JobStatusData.OID_ATTR, generateOid());
+							}
+							addJobToTable(table, status.getString(JobStatusData.OID_ATTR), status);
+						} else {
+							fJobMap.remove(status.getJobId());
 						}
-						addJobToTable(table, status.getString(JobStatusData.OID_ATTR), status);
 					}
 				}
 			}
 		}
-
 	}
-
 }
