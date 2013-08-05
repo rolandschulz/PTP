@@ -278,6 +278,7 @@ public class SynchronizeProperties extends AbstractSynchronizeProperties {
 
 		for (Entry<SyncConfig, IEnvManagerConfig> dirty : fDirtyEnvConfigs.entrySet()) {
 			dirty.getKey().setProperty(SyncCommandLauncher.EMS_CONFIG_PROPERTY, dirty.getValue().toString());
+			projectsToUpdate.add(dirty.getKey().getProject());
 		}
 
 		// This should always only iterate once... right?
