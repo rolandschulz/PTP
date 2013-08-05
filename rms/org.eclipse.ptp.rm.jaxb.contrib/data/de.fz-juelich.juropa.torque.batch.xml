@@ -88,10 +88,6 @@ the name of the job, see -N option, and Seq_num
 is the job number assigned when the job is submitted; 
 default value: (job_name).e(job_number).]]></tooltip>
 		</attribute>
-		<attribute name="export_all" type="boolean" translateBooleanAs="-V, ">
-			<description><![CDATA[All variables in the qsub command's environment are to be exported to the batch job.]]></description>
-			<default>-V</default>
-		</attribute>
 		<attribute name="group_list" type="string">
 			<description><![CDATA[A list of hosts under which the job is run on a given host.]]></description>
 			<tooltip><![CDATA[Format: composite-descriptor 
@@ -382,9 +378,6 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 			</line>
 			<line>
 				<arg isUndefinedIfMatches="#MSUB -v">#MSUB -v ${ptp_rm:Variable_List#value}</arg>
-			</line>
-			<line>
-				<arg isUndefinedIfMatches="#MSUB">#MSUB ${ptp_rm:export_all#value}</arg>
 			</line>
 			<line>
 				<arg>MPI_ARGS="-np ${ptp_rm:mpiNumberOfProcesses#value}"</arg>
@@ -793,25 +786,6 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						<dynamic-text>
 							<arg>The '-np' value (Should match with nodes*ppn/tpt = ${ptp_rm:Resource_List.nodes#value}*${ptp_rm:processesPerNode#value}/${ptp_rm:threadsPerTask#value})</arg>
 						</dynamic-text>
-					</widget>
-					<!-- row 11 -->
-					<widget type="label" style="SWT.LEFT">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
-						</layout-data>
-						<tooltip>${ptp_rm:export_all#tooltip}</tooltip>
-						<fixed-text>Export Environment: </fixed-text>
-					</widget>
-					<widget type="checkbox" style="SWT.BORDER" attribute="export_all">
-                  <layout-data>
-                     <grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false"/>
-                  </layout-data>
-               </widget>
-					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
-						</layout-data>
-						<fixed-text>${ptp_rm:export_all#description}</fixed-text>
 					</widget>
 				</composite>
 			</dynamic>
