@@ -7,21 +7,27 @@
  *
  * Contributors:
  * IBM Corporation - Initial API and implementation
+ * Ioana Grigoropol (Intel) - browseDirectory should return a path when selecting 'My Home' or 'Root'
  *******************************************************************************/
 package org.eclipse.ptp.internal.remote.rse.ui;
 
 import java.util.Vector;
 
+import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.internal.remote.rse.core.RSEConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
+import org.eclipse.rse.core.filters.ISystemFilterReference;
 import org.eclipse.rse.core.model.IHost;
+import org.eclipse.rse.core.model.SystemChildrenContentsType;
 import org.eclipse.rse.files.ui.dialogs.SystemRemoteFileDialog;
 import org.eclipse.rse.files.ui.dialogs.SystemRemoteFolderDialog;
+import org.eclipse.rse.internal.ui.view.SystemViewFilterReferenceAdapter;
 import org.eclipse.rse.subsystems.files.core.subsystems.IRemoteFile;
+import org.eclipse.rse.ui.RSEUIPlugin;
 import org.eclipse.swt.widgets.Shell;
 
 public class RSEUIFileManager implements IRemoteUIFileManager {
@@ -51,6 +57,27 @@ public class RSEUIFileManager implements IRemoteUIFileManager {
 			if (retObj instanceof IRemoteFile) {
 				IRemoteFile selectedFile = (IRemoteFile) retObj;
 				return selectedFile.getAbsolutePath();
+			} else if (retObj instanceof ISystemFilterReference) {
+				ISystemFilterReference selectedFile = (ISystemFilterReference) retObj;
+
+				RSEUIPlugin plugin = RSEUIPlugin.getDefault();
+				if (selectedFile.getContents(SystemChildrenContentsType.getInstance()) == null) {
+					// in order to make sure that the children of this SystemFilterReference are populated
+					// the method getChildren() of the underlying adapter must be invoked
+					IAdapterFactory factory = plugin.getSystemViewAdapterFactory();
+					SystemViewFilterReferenceAdapter adapter = (SystemViewFilterReferenceAdapter) factory.getAdapter(selectedFile,
+							ISystemFilterReference.class);
+					adapter.getChildren(selectedFile);
+				}
+				// now that the children are cached for the filter references we can try and access them
+				Object[] con = selectedFile.getContents(SystemChildrenContentsType.getInstance());
+				if (con != null && con[0] instanceof IRemoteFile) {
+					IRemoteFile file = (IRemoteFile) con[0];
+					if (file.getParentPath() == null) {
+						return file.getAbsolutePath();// this is actually the root of the file system
+					}
+					return file.getParentPath();
+				}
 			}
 		}
 		return null;
@@ -92,9 +119,9 @@ public class RSEUIFileManager implements IRemoteUIFileManager {
 			connection = connMgr.getConnection(connHost.getName());
 			Object retObj[] = dlg.getSelectedObjects();
 			Vector<String> selections = new Vector<String>(retObj.length);
-			for (int i = 0; i < retObj.length; i++) {
-				if (retObj[i] instanceof IRemoteFile) {
-					selections.add(((IRemoteFile) retObj[i]).getAbsolutePath());
+			for (Object element : retObj) {
+				if (element instanceof IRemoteFile) {
+					selections.add(((IRemoteFile) element).getAbsolutePath());
 				}
 			}
 			String remotePaths[] = new String[selections.size()];
