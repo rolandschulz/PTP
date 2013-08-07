@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.ems.ui.LazyEnvManagerDetector;
 import org.eclipse.ptp.internal.rm.jaxb.control.ui.handlers.ValueUpdateHandler;
@@ -58,13 +59,16 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	protected ScriptType script;
 
 	/**
-	 * @param rm
-	 *            the resource manager
+	 * @param control
+	 *            the launch controller that will launch jobs
 	 * @param dialog
-	 *            the launch dialog parent
+	 *            the parent launch configuration dialog
+	 * @param monitor
+	 *            progress monitor
 	 * @throws Throwable
 	 */
-	public JAXBControllerLaunchConfigurationTab(ILaunchController control, IProgressMonitor monitor) throws Throwable {
+	public JAXBControllerLaunchConfigurationTab(ILaunchController control, ILaunchConfigurationDialog dialog,
+			IProgressMonitor monitor) throws Throwable {
 		SubMonitor progress = SubMonitor.convert(monitor, 100);
 		fControl = control;
 		LCVariableMap varMap = null;
@@ -117,6 +121,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 			updateHandler = null;
 		}
 		lcMap = varMap;
+		setLaunchConfigurationDialog(dialog);
 	}
 
 	/*

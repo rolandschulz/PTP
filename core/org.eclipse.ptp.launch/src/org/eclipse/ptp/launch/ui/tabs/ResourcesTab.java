@@ -409,8 +409,8 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			IProgressMonitor monitor) {
 		if (!fDynamicTabs.containsKey(controller)) {
 			try {
-				IRMLaunchConfigurationDynamicTab dynamicTab = new JAXBControllerLaunchConfigurationTab(controller, monitor);
-				dynamicTab.setLaunchConfigurationDialog(getLaunchConfigurationDialog());
+				IRMLaunchConfigurationDynamicTab dynamicTab = new JAXBControllerLaunchConfigurationTab(controller,
+						getLaunchConfigurationDialog(), monitor);
 				dynamicTab.addContentsChangedListener(launchContentsChangedListener);
 				fDynamicTabs.put(controller, dynamicTab);
 				return dynamicTab;

@@ -70,7 +70,8 @@ import org.eclipse.swt.widgets.Label;
  * @author Chris Navarro
  * 
  */
-public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab implements IToolLaunchConfigurationConstants, IExecutableExtension {
+public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab implements IToolLaunchConfigurationConstants,
+		IExecutableExtension {
 
 	private static final String TAB_ID = "org.eclipse.ptp.internal.etfw.launch.PerformanceAnalysisTab"; //$NON-NLS-1$
 	/**
@@ -244,7 +245,8 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 		}
 
 		try {
-			launchTabParent = new ETFWParentLaunchConfigurationTab(controller, new NullProgressMonitor(), vmap);
+			launchTabParent = new ETFWParentLaunchConfigurationTab(controller, getLaunchConfigurationDialog(),
+					new NullProgressMonitor(), vmap);
 		} catch (Throwable e1) {
 			e1.printStackTrace();
 		}
@@ -491,17 +493,17 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 
 		return true;
 	}
-	
+
 	/**
 	 * Sets whether it is possible to initiate a parallel launch from
 	 * this tab
-	 *
+	 * 
 	 * @param noPar
 	 *            Availability of the PTP to this tab's launch configuration
 	 *            delegate
 	 */
-	public void setInitializationData(IConfigurationElement config,
-			String propertyName, Object data) throws CoreException {
+	@Override
+	public void setInitializationData(IConfigurationElement config, String propertyName, Object data) throws CoreException {
 		if (data != null) {
 			Map<String, String> parameters = (Map<String, String>) data;
 			noPTP = Boolean.valueOf(parameters.get("noPTP")); //$NON-NLS-1$
