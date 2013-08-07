@@ -46,9 +46,9 @@ public class LSFQueryDialog extends Dialog {
 			// first column
 			// of the row.
 			selections = ((IStructuredSelection) arg0.getSelection()).toList();
-			selectedValues = " ";
+			selectedValues = " "; //$NON-NLS-1$
 			for (String[] s : selections) {
-				selectedValues = selectedValues + s[0] + " ";
+				selectedValues = selectedValues + s[0] + " "; //$NON-NLS-1$
 			}
 		}
 	}
@@ -68,7 +68,11 @@ public class LSFQueryDialog extends Dialog {
 		super(parent);
 		parentShell = parent;
 		dialogTitle = title;
-		columnLabels = labels;
+		if (labels == null) {
+			columnLabels = new String[0];
+		} else {
+			columnLabels = labels;
+		}
 		commandResponse = response;
 		multiSelect = mSelect;
 	}
@@ -146,7 +150,7 @@ public class LSFQueryDialog extends Dialog {
 		// Select rows in the table corresponding to names in the selectedValues
 		// string.
 		n = queryTable.getItemCount();
-		selections = selectedValues.split(" ");
+		selections = selectedValues.split(" "); //$NON-NLS-1$
 		trialSelectionIndices = new int[selections.length];
 		// First, find which rows have values matching a string in the
 		// selectedValues string and save their indices
