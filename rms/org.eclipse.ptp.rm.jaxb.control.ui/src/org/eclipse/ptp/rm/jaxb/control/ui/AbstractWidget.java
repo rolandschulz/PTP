@@ -21,6 +21,8 @@ import org.eclipse.swt.widgets.Composite;
 public abstract class AbstractWidget extends Composite {
 
 	/**
+	 * Constructor that supplies the parent composite and information that may be useful to the widget
+	 * 
 	 * @param parent
 	 *            a widget which will be the parent of the new instance (cannot be null)
 	 * @param wd
@@ -32,13 +34,15 @@ public abstract class AbstractWidget extends Composite {
 	}
 
 	/**
+	 * Constructor that supplies the parent composite and additional information that may be useful to the widget
+	 * 
 	 * @param parent
 	 *            a widget which will be the parent of the new instance (cannot be null)
 	 * @param wd
-	 *            a widget descriptor containing additonal information useful to the control
+	 *            a widget descriptor containing additional information useful to the control
 	 * @since 1.2
 	 */
 	protected AbstractWidget(Composite parent, IWidgetDescriptor2 wd) {
-		super(parent, wd.getStyle());
+		this(parent, (IWidgetDescriptor) wd);
 	}
 }
