@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
@@ -59,6 +60,7 @@ import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateHandler;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.IValidator;
 import org.eclipse.ptp.rm.jaxb.control.ui.IWidgetDescriptor;
+import org.eclipse.ptp.rm.jaxb.control.ui.IWidgetDescriptor2;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
@@ -229,7 +231,7 @@ public class UpdateModelFactory {
 	 * @author arossi
 	 * 
 	 */
-	private static class ControlDescriptor implements IWidgetDescriptor {
+	private static class ControlDescriptor implements IWidgetDescriptor2 {
 		private final IJAXBLaunchConfigurationTab tab;
 		private String widgetType;
 		private String typeId;
@@ -306,6 +308,10 @@ public class UpdateModelFactory {
 
 		public String getItemsFrom() {
 			return itemsFrom;
+		}
+
+		public ILaunchConfigurationDialog getLaunchConfigurationDialog() {
+			return tab.getLaunchConfigurationDialog();
 		}
 
 		public Object getLayoutData() {
@@ -560,8 +566,8 @@ public class UpdateModelFactory {
 			} else {
 				path = uiFileManager.browseFile(shell, title, path, type);
 			}
-		} catch (Throwable t) {
-			JAXBControlUIPlugin.log(t);
+		} catch (Exception e) {
+			JAXBControlUIPlugin.log(e);
 		}
 
 		if (path == null) {
@@ -585,15 +591,15 @@ public class UpdateModelFactory {
 	private static Control createActionButton(Composite parent, final ControlDescriptor cd, final IJAXBLaunchConfigurationTab tab) {
 		Button b = WidgetBuilderUtils.createButton(parent, cd.layoutData, cd.title, SWT.PUSH, new SelectionListener() {
 
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
+			public void widgetDefaultSelected(SelectionEvent event) {
+				widgetSelected(event);
 			}
 
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(SelectionEvent event) {
 				try {
 					tab.run(cd.action);
-				} catch (Throwable t) {
-					JAXBControlUIPlugin.log(t);
+				} catch (Exception e) {
+					JAXBControlUIPlugin.log(e);
 				}
 			}
 		});
@@ -1099,8 +1105,8 @@ public class UpdateModelFactory {
 					Constructor<?> cons = cls.getConstructor(String.class, IUpdateHandler.class, Control.class);
 					return (IUpdateModel) cons.newInstance(attr, handler, control);
 				}
-			} catch (Throwable t) {
-				throw CoreExceptionUtils.newException(Messages.WidgetInstantiationError + wd.getType(), t);
+			} catch (Exception e) {
+				throw CoreExceptionUtils.newException(Messages.WidgetInstantiationError + wd.getType(), e);
 			}
 		}
 		return null;
@@ -1170,7 +1176,7 @@ public class UpdateModelFactory {
 	 * @return the control instance
 	 * @throws CoreException
 	 */
-	private static Control createWidget(IWidgetDescriptor wd, Composite parent) throws CoreException {
+	private static Control createWidget(IWidgetDescriptor2 wd, Composite parent) throws CoreException {
 		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(JAXBControlUIPlugin.PLUGIN_ID,
 				JAXBControlUIConstants.WIDGET_EXT_PT);
 		IConfigurationElement[] elements = extensionPoint.getConfigurationElements();
@@ -1180,11 +1186,16 @@ public class UpdateModelFactory {
 					String widgetClass = element.getAttribute(JAXBControlUIConstants.WIDGETCLASS);
 					Class<?> cls = Platform.getBundle(element.getDeclaringExtension().getContributor().getName()).loadClass(
 							widgetClass);
-					Constructor<?> cons = cls.getConstructor(Composite.class, IWidgetDescriptor.class);
+					Constructor<?> cons;
+					try {
+						cons = cls.getConstructor(Composite.class, IWidgetDescriptor2.class);
+					} catch (NoSuchMethodException e) {
+						cons = cls.getConstructor(Composite.class, IWidgetDescriptor.class);
+					}
 					return (Control) cons.newInstance(parent, wd);
 				}
-			} catch (Throwable t) {
-				throw CoreExceptionUtils.newException(Messages.WidgetInstantiationError + wd.getType(), t);
+			} catch (Exception e) {
+				throw CoreExceptionUtils.newException(Messages.WidgetInstantiationError + wd.getType(), e);
 			}
 		}
 		return null;

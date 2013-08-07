@@ -22,11 +22,23 @@ public abstract class AbstractWidget extends Composite {
 
 	/**
 	 * @param parent
-	 *            name of the model, which will correspond to the name of an attribute if the widget value is to be saved
-	 * @param style
-	 *            the handler for notifying other widgets to refresh their values
+	 *            a widget which will be the parent of the new instance (cannot be null)
+	 * @param wd
+	 *            a widget descriptor containing information useful to the control
+	 * @since 1.2
 	 */
 	protected AbstractWidget(Composite parent, IWidgetDescriptor wd) {
+		super(parent, wd.getStyle());
+	}
+
+	/**
+	 * @param parent
+	 *            a widget which will be the parent of the new instance (cannot be null)
+	 * @param wd
+	 *            a widget descriptor containing additonal information useful to the control
+	 * @since 1.2
+	 */
+	protected AbstractWidget(Composite parent, IWidgetDescriptor2 wd) {
 		super(parent, wd.getStyle());
 	}
 }

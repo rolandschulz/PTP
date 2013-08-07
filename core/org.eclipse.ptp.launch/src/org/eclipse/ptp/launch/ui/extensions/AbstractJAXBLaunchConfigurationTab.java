@@ -24,8 +24,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * Base class for the JAXB LaunchConfiguration tabs which provide views of editable widgets. Up to three such tabs can be configured
- * as children of the controller tab.<br>
+ * Base class for the target configuration dynamic tabs which provide views of editable widgets. Up to three such tabs can be
+ * configured as children of the controller tab.<br>
  * <br>
  * 
  * @see org.eclipse.ptp.rm.jaxb.ui.launch.JAXBDynamicLaunchConfigurationTab

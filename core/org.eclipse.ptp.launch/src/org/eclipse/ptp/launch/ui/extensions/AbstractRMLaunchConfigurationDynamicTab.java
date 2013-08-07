@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 
 /**
@@ -40,6 +41,8 @@ public abstract class AbstractRMLaunchConfigurationDynamicTab implements IRMLaun
 		return new CoreException(status);
 	}
 
+	protected ILaunchConfigurationDialog fLaunchConfigurationDialog;
+
 	private final ListenerList listenerList = new ListenerList();
 
 	/**
@@ -58,6 +61,21 @@ public abstract class AbstractRMLaunchConfigurationDynamicTab implements IRMLaun
 		listenerList.add(listener);
 	}
 
+	/**
+	 * This should be called when GUI elements are modified by the user, e.g. a Text widget should have its ModifyListener's
+	 * modifyText method set up to notify all of the contents changed listeners.
+	 */
+	protected void fireContentsChanged() {
+		Object[] listeners = listenerList.getListeners();
+		for (Object listener : listeners) {
+			((IRMLaunchConfigurationContentsChangedListener) listener).handleContentsChanged(this);
+		}
+	}
+
+	public ILaunchConfigurationDialog getLaunchConfigurationDialog() {
+		return fLaunchConfigurationDialog;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -68,14 +86,13 @@ public abstract class AbstractRMLaunchConfigurationDynamicTab implements IRMLaun
 		listenerList.remove(listener);
 	}
 
-	/**
-	 * This should be called when GUI elements are modified by the user, e.g. a Text widget should have its ModifyListener's
-	 * modifyText method set up to notify all of the contents changed listeners.
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#setLaunchConfigurationDialog(org.eclipse.debug.ui.
+	 * ILaunchConfigurationDialog)
 	 */
-	protected void fireContentsChanged() {
-		Object[] listeners = listenerList.getListeners();
-		for (Object listener : listeners) {
-			((IRMLaunchConfigurationContentsChangedListener) listener).handleContentsChanged(this);
-		}
+	public void setLaunchConfigurationDialog(ILaunchConfigurationDialog dialog) {
+		fLaunchConfigurationDialog = dialog;
 	}
 }
