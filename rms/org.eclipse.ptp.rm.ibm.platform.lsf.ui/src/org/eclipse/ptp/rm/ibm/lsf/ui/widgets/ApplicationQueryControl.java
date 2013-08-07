@@ -14,6 +14,7 @@ import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.rm.ibm.lsf.ui.LSFCommand;
 import org.eclipse.ptp.rm.jaxb.control.ui.IWidgetDescriptor;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -21,6 +22,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
 public class ApplicationQueryControl extends LSFQueryControl {
+	private static final String queryCommand[] = {"bapp", "-w"}; //$NON-NLS-1$ //$NON-NLS-2$
 
 	/**
 	 * Create the custom widget for the JAXB ui. In this case the widget is a
@@ -34,6 +36,7 @@ public class ApplicationQueryControl extends LSFQueryControl {
 	 */
 	public ApplicationQueryControl(Composite parent, final IWidgetDescriptor wd) {
 		super(parent, wd);
+		queryTitle = Messages.ApplicationQueryTitle;
 	}
 
 	@Override
@@ -49,19 +52,7 @@ public class ApplicationQueryControl extends LSFQueryControl {
 			 * @param e: The selection event
 			 */
 			public void widgetSelected(SelectionEvent e) {
-				int selection;
-
-				if (getQueryResponse(connection)) {
-					dialog = new LSFQueryDialog(getShell(),
-							Messages.ApplicationQueryControl_0, columnLabels,
-							commandResponse, false);
-					dialog.setSelectedValue(selectedValues);
-					selection = dialog.open();
-					if (selection == 0) {
-						selectedValues = dialog.getSelectedValues();
-						notifyListeners();
-					}
-				}
+				getQueryResponse(connection);
 			}
 		});
 	}
@@ -74,78 +65,10 @@ public class ApplicationQueryControl extends LSFQueryControl {
 	 *            : Connection to the remote system
 	 */
 	@Override
-	protected boolean getQueryResponse(IRemoteConnection connection) {
-		IRemoteServices remoteServices;
-		IRemoteProcessBuilder processBuilder;
-		IRemoteProcess process;
-
-		remoteServices = connection.getRemoteServices();
-		processBuilder = remoteServices.getProcessBuilder(connection, "bapp", "-w"); //$NON-NLS-1$ //$NON-NLS-2$
-		process = null;
-		try {
-			BufferedReader reader;
-			String data;
-			boolean headerLine;
-
-			process = processBuilder.start();
-			try {
-				process.waitFor();
-			} catch (InterruptedException e) {
-				// Do nothing
-			}
-			if (process.exitValue() == 0) {
-				String columnData[];
-
-				/*
-				 * Read stderr and check for "No application profiles found."
-				 * as the first line of output. Subsequent lines are ignored.
-				 */
-				reader = new BufferedReader(new InputStreamReader(
-						process.getErrorStream()));
-				data = reader.readLine();
-				headerLine = true;
-				while (data != null) {
-					if (headerLine) {
-						if (data.equals("No application profiles found.")) { //$NON-NLS-1$
-							MessageDialog.openWarning(getShell(),
-									Messages.ApplicationQueryControl_2,
-									Messages.ApplicationQueryControl_3);
-							reader.close();
-							return false;
-						}
-						headerLine = false;
-					}
-					data = reader.readLine();
-				}
-				reader.close();
-
-				/*
-				 * Read stdout and tokenize each line of data into an array of
-				 * blank-delimited strings. The first line of output is the
-				 * column headings. Subsequent lines are reservation data.
-				 */
-				reader = new BufferedReader(new InputStreamReader(
-						process.getInputStream()));
-				data = reader.readLine();
-				headerLine = true;
-				commandResponse.clear();
-				while (data != null) {
-					if (headerLine) {
-						columnLabels = data.split(" +"); //$NON-NLS-1$
-						headerLine = false;
-					} else {
-						columnData = data.split(" +"); //$NON-NLS-1$
-						commandResponse.add(columnData);
-					}
-					data = reader.readLine();
-				}
-				reader.close();
-			}
-		} catch (IOException e) {
-			MessageDialog.openError(getShell(), "Error", //$NON-NLS-1$
-					"Error querying reservations:\n" + e.getMessage()); //$NON-NLS-1$
-			return false;
-		}
-		return true;
+	protected void getQueryResponse(IRemoteConnection connection) {
+		queueQuery = new LSFCommand(Messages.ApplicationCommandDesc, connection, queryCommand);
+		queueQuery.setUser(true);
+		queueQuery.addJobChangeListener(jobListener);
+		queueQuery.schedule();
 	}
 }

@@ -5,22 +5,21 @@
 
 package org.eclipse.ptp.rm.ibm.lsf.ui.widgets;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
-import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteProcess;
-import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
-import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.ptp.rm.ibm.lsf.ui.LSFCommand;
 import org.eclipse.ptp.rm.jaxb.control.ui.IWidgetDescriptor;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 
 public class QueueQueryControl extends LSFQueryControl {
+
+	private static final String queryCommand[] = { "bqueues", "-w" }; //$NON-NLS-1$ //$NON-NLS-2$
 
 	/**
 	 * Create the custom widget for the JAXB ui. In this case the widget is a
@@ -34,6 +33,7 @@ public class QueueQueryControl extends LSFQueryControl {
 	 */
 	public QueueQueryControl(Composite parent, final IWidgetDescriptor wd) {
 		super(parent, wd);
+		queryTitle = Messages.JobQueueTitle;
 	}
 
 	@Override
@@ -51,17 +51,7 @@ public class QueueQueryControl extends LSFQueryControl {
 			public void widgetSelected(SelectionEvent e) {
 				int selection;
 
-				if (getQueryResponse(connection)) {
-					dialog = new LSFQueryDialog(getShell(),
-							Messages.QueueQueryControl_0, columnLabels,
-							commandResponse, true);
-					dialog.setSelectedValue(selectedValues);
-					selection = dialog.open();
-					if (selection == 0) {
-						selectedValues = dialog.getSelectedValues();
-						notifyListeners();
-					}
-				}
+				getQueryResponse(connection);
 			}
 		});
 	}
@@ -74,65 +64,10 @@ public class QueueQueryControl extends LSFQueryControl {
 	 *            : Connection to the remote system
 	 */
 	@Override
-	protected boolean getQueryResponse(IRemoteConnection connection) {
-		IRemoteServices remoteServices;
-		IRemoteProcessBuilder processBuilder;
-		IRemoteProcess process;
-
-		remoteServices = connection.getRemoteServices();
-		processBuilder = remoteServices.getProcessBuilder(connection,
-				"bqueues", "-w"); //$NON-NLS-1$ //$NON-NLS-2$
-		process = null;
-		try {
-			BufferedReader reader;
-			String data;
-			boolean headerLine;
-
-			process = processBuilder.start();
-			try {
-				process.waitFor();
-			} catch (InterruptedException e) {
-				// Do nothing
-			}
-			if (process.exitValue() == 0) {
-				String columnData[];
-
-				/*
-				 * Read stdout and tokenize each line of data into an array of
-				 * blank-delimited strings. The first line of output is the
-				 * column headings. Subsequent lines are reservation data.
-				 */
-				reader = new BufferedReader(new InputStreamReader(
-						process.getInputStream()));
-				data = reader.readLine();
-				headerLine = true;
-				commandResponse.clear();
-				while (data != null) {
-					if (headerLine) {
-						columnLabels = data.split(" +"); //$NON-NLS-1$
-						headerLine = false;
-					} else {
-						/*
-						 * The 'brsvs -w' command inserts ' ' before and after
-						 * the '/' in the NCPUS and RSV_HOSTS columns. Since
-						 * this code determines the number of columns based on
-						 * the number of blank delimited tokens in the first
-						 * line, these additional blanks interfere with correct
-						 * formatting, so the first step is to remove them.
-						 */
-						data = data.replaceAll(" +/ +", "/"); //$NON-NLS-1$ //$NON-NLS-2$
-						columnData = data.split(" +"); //$NON-NLS-1$
-						commandResponse.add(columnData);
-					}
-					data = reader.readLine();
-				}
-				reader.close();
-			}
-		} catch (IOException e) {
-			MessageDialog.openError(getShell(), "Error", //$NON-NLS-1$
-					"Error querying queues:\n" + e.getMessage()); //$NON-NLS-1$
-			return false;
-		}
-		return true;
+	protected void getQueryResponse(IRemoteConnection connection) {
+		queueQuery = new LSFCommand(Messages.QueueCommandDesc, connection, queryCommand);
+		queueQuery.setUser(true);
+		queueQuery.addJobChangeListener(jobListener);
+		queueQuery.schedule();
 	}
 }
