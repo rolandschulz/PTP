@@ -117,12 +117,12 @@ In order to reference the new widget from the target system configuration XML:
          <meta.section type="apiinfo"/>
       </appinfo>
       <documentation>
-         The widgetClass attribute must specify a class that extends &lt;code&gt;org.eclipse.swt.widgets.Control&lt;/code&gt;. In addition, the constructor for the new class must have two arguments &lt;code&gt;org.eclipse.swt.widgets.Composity&lt;/code&gt; and &lt;code&gt;org.eclipse.ptp.rm.jaxb.control.ui.IWidgetDescriptor&lt;/code&gt;:
+         The widgetClass attribute must specify a class that extends &lt;code&gt;org.eclipse.swt.widgets.Control&lt;/code&gt;. In addition, the constructor for the new class must have two arguments &lt;code&gt;org.eclipse.swt.widgets.Composity&lt;/code&gt; and either &lt;code&gt;org.eclipse.ptp.rm.jaxb.control.ui.IWidgetDescriptor&lt;/code&gt; or &lt;code&gt;org.eclipse.ptp.rm.jaxb.control.ui.IWidgetDescriptor2&lt;/code&gt;:
 
 &lt;pre&gt;
 public MyWidgetControl extends Control {
 
-    public MyWidgetControl(Composite parent, IWidgetDescriptor wd) {
+    public MyWidgetControl(Composite parent, IWidgetDescriptor2 wd) {
         ...
     }
 
