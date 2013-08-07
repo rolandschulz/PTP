@@ -6,9 +6,11 @@
  * 	
  * Contributors: 
  * 	Albert L. Rossi - design and implementation
+ *  Greg Watson - improvements to support more launch configuration functionality
  ******************************************************************************/
 package org.eclipse.ptp.internal.rm.jaxb.control.ui.launch;
 
+import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.internal.rm.jaxb.control.ui.variables.LCVariableMap;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
@@ -16,13 +18,15 @@ import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateHandler;
 import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
 
 /**
- * JAXB Launch configuration tab
+ * Target Configuration Launch Tab interface. Corresponds to the "launch-tab" element in the target configuration.
  * 
  */
 public interface IJAXBParentLaunchConfigurationTab {
 	public IRemoteConnection getConnection();
 
 	public ILaunchController getJobControl();
+
+	public ILaunchConfigurationDialog getLaunchConfigurationDialog();
 
 	public ScriptType getScript();
 

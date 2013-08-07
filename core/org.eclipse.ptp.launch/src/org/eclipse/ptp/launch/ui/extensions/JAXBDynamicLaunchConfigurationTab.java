@@ -71,20 +71,20 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * Launch Tab which builds its control from the JAXB data elements. The number, type and disposition of widgets connected to
- * Properties or Attributes is almost entirely configurable via the XML.<br>
+ * attributes is almost entirely configurable via the XML.<br>
  * <br>
  * Aside from being registered with the update handler, the widgets specific to this tab are also maintained in a local map so that
  * their values (and only theirs) will appear in the environment when performApply() is called. <br>
  * <br>
- * If different widgets on different tabs reference the same Attribute, its value will change everywhere. However, if
- * the <code>shared</code> property is given a list of other controllers, their values are included in the local environment.
+ * If different widgets on different tabs reference the same attribute, its value will change everywhere. However, if
+ * the <code>shared</code> attribute is given a list of other controllers, their values are included in the local environment.
  * 
  * @author arossi
  * @author Jeff Overbey - Environment Manager support
  * @since 7.0
  */
-public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigurationTab implements IJAXBLaunchConfigurationTab,
-		SelectionListener {
+public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigurationTab implements
+		IJAXBLaunchConfigurationTab, SelectionListener {
 
 	protected final ILaunchController fControl;
 	protected final IUpdateHandler updateHandler;
@@ -139,12 +139,13 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 		updateHandler = parentTab.getUpdateHandler();
 		localWidgets = new HashMap<Object, IUpdateModel>();
 		viewers = new ArrayList<Viewer>();
+		setLaunchConfigurationDialog(parentTab.getLaunchConfigurationDialog());
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab #canSave(org.eclipse.swt.widgets.Control)
+	 * @see org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab#canSave(org.eclipse.swt.widgets.Control)
 	 */
 	public RMLaunchValidation canSave(Control control) {
 		return checkForValidationError();
@@ -309,8 +310,8 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.ui.launch.AbstractJAXBLaunchConfigurationTab
-	 * #performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
+	 * @see org.eclipse.ptp.launch.ui.extensions.AbstractJAXBLaunchConfigurationTab#performApply(org.eclipse.debug.core.
+	 * ILaunchConfigurationWorkingCopy)
 	 */
 	@Override
 	public RMLaunchValidation performApply(ILaunchConfigurationWorkingCopy configuration) {
@@ -365,8 +366,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	/*
 	 * Pull out the local maps from each and set them into the shared array. (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.ui.launch.AbstractJAXBLaunchConfigurationTab
-	 * #setUpSharedEnvironment(java.util.List)
+	 * @see org.eclipse.ptp.launch.ui.extensions.AbstractJAXBLaunchConfigurationTab#setUpSharedEnvironment(java.util.Map)
 	 */
 	@Override
 	public void setUpSharedEnvironment(Map<String, AbstractJAXBLaunchConfigurationTab> controllers) throws CoreException {
@@ -382,7 +382,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	/*
 	 * Reactivates the tab; if this was not the last tab, the Apply button should become active.
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.ui.launch.AbstractJAXBLaunchConfigurationTab #setVisible()
+	 * @see org.eclipse.ptp.launch.ui.extensions.AbstractJAXBLaunchConfigurationTab#setVisible()
 	 */
 	@Override
 	public void setVisible() {
@@ -661,7 +661,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	 * Calls {@link ControlStateListener#setState()} on all control state listeners to update any widget state that is based on an
 	 * attribute value rather than a button ID.
 	 * 
-	 * @see org.eclipse.ptp.internal.rm.jaxb.ui.launch.AbstractJAXBLaunchConfigurationTab# doRefreshLocal()
+	 * @see org.eclipse.ptp.launch.ui.extensions.AbstractJAXBLaunchConfigurationTab#doRefreshLocal()
 	 */
 	@Override
 	protected void doRefreshLocal() {
@@ -720,7 +720,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	/**
 	 * VISIBLE, ENABLED, (LOCALLY) INVALID and VALID.
 	 * 
-	 * @see org.eclipse.ptp.rm.jaxb.control.ui.launch.AbstractJAXBLaunchConfigurationTab #writeLocalProperties()
+	 * @see org.eclipse.ptp.launch.ui.extensions.AbstractJAXBLaunchConfigurationTab#writeLocalProperties()
 	 */
 	@Override
 	protected void writeLocalProperties() {

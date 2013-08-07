@@ -119,17 +119,10 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 		lcMap = varMap;
 	}
 
-	private IEnvManager getEnvManager(IProgressMonitor monitor) {
-		LazyEnvManagerDetector envMgr = new LazyEnvManagerDetector(fRemoteConnection);
-		envMgr.setProgressMonitor(monitor);
-		return envMgr;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.rm.jaxb.control.ui.launch.ExtensibleJAXBControllerTab#createControl(org.eclipse.swt.widgets.Composite,
+	 * @see org.eclipse.ptp.launch.ui.extensions.ExtensibleJAXBControllerTab#createControl(org.eclipse.swt.widgets.Composite,
 	 * java.lang.String)
 	 */
 	@Override
@@ -148,7 +141,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	 * always included here, and this triggers its updateButtons and performApply methods, which then propagates down to the child
 	 * tabs. (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab #fireContentsChanged()
+	 * @see org.eclipse.ptp.launch.ui.extensions.AbstractRMLaunchConfigurationDynamicTab#fireContentsChanged()
 	 */
 	@Override
 	public void fireContentsChanged() {
@@ -159,18 +152,10 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 		return fRemoteConnection;
 	}
 
-	/**
-	 * @return JAXB elements for building the launch tab controls
-	 */
-	public LaunchTabType getLaunchTabData() {
-		return launchTabData;
-	}
-
-	/**
-	 * @return launch tab environment map (built from the resource manager environment)
-	 */
-	public LCVariableMap getVariableMap() {
-		return lcMap;
+	private IEnvManager getEnvManager(IProgressMonitor monitor) {
+		LazyEnvManagerDetector envMgr = new LazyEnvManagerDetector(fRemoteConnection);
+		envMgr.setProgressMonitor(monitor);
+		return envMgr;
 	}
 
 	/**
@@ -180,6 +165,13 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	 */
 	public ILaunchController getJobControl() {
 		return fControl;
+	}
+
+	/**
+	 * @return JAXB elements for building the launch tab controls
+	 */
+	public LaunchTabType getLaunchTabData() {
+		return launchTabData;
 	}
 
 	/**
@@ -197,6 +189,13 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	}
 
 	/**
+	 * @return launch tab environment map (built from the resource manager environment)
+	 */
+	public LCVariableMap getVariableMap() {
+		return lcMap;
+	}
+
+	/**
 	 * @return whether this resource manager uses a script
 	 */
 	public boolean hasScript() {
@@ -207,8 +206,8 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	 * Rebuilds the launch tab environment map, and clears the controls registered with the update handler. This is necessary
 	 * because on calls to this method subsequent to the first, the widgets it contained will have been disposed. (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.internal.rm.jaxb.ui.launch.ExtensibleJAXBControllerTab#initializeFrom
-	 * (org.eclipse.debug.core.ILaunchConfiguration)
+	 * @see
+	 * org.eclipse.ptp.launch.ui.extensions.ExtensibleJAXBControllerTab#initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	@Override
 	public RMLaunchValidation initializeFrom(final ILaunchConfiguration configuration) {
@@ -242,6 +241,16 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	}
 
 	/**
+	 * resizes the tab and calls setVisible
+	 */
+	private void setVisibleOnSelected() {
+		lastIndex = tabFolder.getSelectionIndex();
+		AbstractJAXBLaunchConfigurationTab t = getControllers().get(lastIndex);
+		t.getControl().setVisible(true);
+		t.setVisible();
+	}
+
+	/**
 	 * see {@link #widgetSelected(SelectionEvent)}
 	 */
 	public void widgetDefaultSelected(SelectionEvent e) {
@@ -253,15 +262,5 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	 */
 	public void widgetSelected(SelectionEvent e) {
 		setVisibleOnSelected();
-	}
-
-	/**
-	 * resizes the tab and calls setVisible
-	 */
-	private void setVisibleOnSelected() {
-		lastIndex = tabFolder.getSelectionIndex();
-		AbstractJAXBLaunchConfigurationTab t = getControllers().get(lastIndex);
-		t.getControl().setVisible(true);
-		t.setVisible();
 	}
 }
