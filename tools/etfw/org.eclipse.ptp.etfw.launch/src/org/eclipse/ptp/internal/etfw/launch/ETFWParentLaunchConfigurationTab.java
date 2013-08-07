@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.internal.etfw.launch.ui.util.ETFWToolTabBuilder;
 import org.eclipse.ptp.internal.rm.jaxb.control.ui.launch.IJAXBLaunchConfigurationTab;
 import org.eclipse.ptp.launch.ui.extensions.JAXBControllerLaunchConfigurationTab;
@@ -44,9 +45,9 @@ public class ETFWParentLaunchConfigurationTab extends JAXBControllerLaunchConfig
 	private final IVariableMap variableMap;
 	private List<IJAXBLaunchConfigurationTab> tabControllers;
 
-	public ETFWParentLaunchConfigurationTab(ILaunchController control, IProgressMonitor monitor, IVariableMap variableMap)
-			throws Throwable {
-		super(control, monitor);
+	public ETFWParentLaunchConfigurationTab(ILaunchController control, ILaunchConfigurationDialog dialog, IProgressMonitor monitor,
+			IVariableMap variableMap) throws Throwable {
+		super(control, dialog, monitor);
 		this.variableMap = variableMap;
 	}
 

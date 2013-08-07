@@ -19,7 +19,6 @@ package org.eclipse.ptp.launch.ui.extensions;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
@@ -130,12 +129,4 @@ public interface IRMLaunchConfigurationDynamicTab {
 	 * @since 6.0
 	 */
 	public RMLaunchValidation setDefaults(ILaunchConfigurationWorkingCopy configuration);
-
-	/**
-	 * Sets the launch configuration dialog that hosts this tab.
-	 * 
-	 * @param dialog
-	 *            launch configuration dialog
-	 */
-	public void setLaunchConfigurationDialog(ILaunchConfigurationDialog dialog);
 }
