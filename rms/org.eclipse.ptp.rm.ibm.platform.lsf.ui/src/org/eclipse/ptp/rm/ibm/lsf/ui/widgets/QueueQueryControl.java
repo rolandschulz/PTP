@@ -5,17 +5,16 @@
 
 package org.eclipse.ptp.rm.ibm.lsf.ui.widgets;
 
-import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import java.lang.reflect.InvocationTargetException;
+
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.rm.ibm.lsf.ui.LSFCommand;
-import org.eclipse.ptp.rm.jaxb.control.ui.IWidgetDescriptor;
+import org.eclipse.ptp.rm.jaxb.control.ui.IWidgetDescriptor2;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 
 public class QueueQueryControl extends LSFQueryControl {
 
@@ -31,7 +30,7 @@ public class QueueQueryControl extends LSFQueryControl {
 	 * @param wd
 	 *            : Information about the custom widget
 	 */
-	public QueueQueryControl(Composite parent, final IWidgetDescriptor wd) {
+	public QueueQueryControl(Composite parent, final IWidgetDescriptor2 wd) {
 		super(parent, wd);
 		queryTitle = Messages.JobQueueTitle;
 	}
@@ -49,8 +48,6 @@ public class QueueQueryControl extends LSFQueryControl {
 			 * @param e: The selection event
 			 */
 			public void widgetSelected(SelectionEvent e) {
-				int selection;
-
 				getQueryResponse(connection);
 			}
 		});
@@ -65,9 +62,18 @@ public class QueueQueryControl extends LSFQueryControl {
 	 */
 	@Override
 	protected void getQueryResponse(IRemoteConnection connection) {
-		queueQuery = new LSFCommand(Messages.QueueCommandDesc, connection, queryCommand);
-		queueQuery.setUser(true);
-		queueQuery.addJobChangeListener(jobListener);
-		queueQuery.schedule();
+		try {
+			IStatus runStatus;
+			LSFCommand command;
+			
+			command = new LSFCommand(Messages.QueueCommandDesc, connection, queryCommand);
+			widgetDescriptor.getLaunchConfigurationDialog().run(true, true, command);
+			runStatus = command.getRunStatus();
+			processCommandResponse(command, runStatus);
+		} catch (InvocationTargetException e) {
+			// Do nothing
+		} catch (InterruptedException e) {
+			// Do nothing
+		}
 	}
 }

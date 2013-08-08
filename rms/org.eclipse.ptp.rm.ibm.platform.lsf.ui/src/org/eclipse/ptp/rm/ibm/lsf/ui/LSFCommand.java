@@ -13,8 +13,7 @@ import java.util.Vector;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
@@ -24,9 +23,10 @@ import org.eclipse.ptp.rm.ibm.lsf.ui.widgets.Messages;
  * This class implements invocation of LSF commands as a job running on a non-UI thread with the
  * ability for the user to cancel the job.
  */
-public class LSFCommand extends Job {
+public class LSFCommand implements IRunnableWithProgress {
 
 	private String command[];
+	private String commandDescription; 
 	private IRemoteConnection remoteConnection;
 	private Vector<String[]> commandResponse;
 	private String columnLabels[];
@@ -34,6 +34,7 @@ public class LSFCommand extends Job {
 	public static final int COMMAND_ERROR = 3;
 	public static final int CANCELED = 2;
 	public static final int NO_DATA = 3;
+	private IStatus runStatus;
 	
 	/**
 	 * Constructor for creating a job to run a LSF command
@@ -42,7 +43,7 @@ public class LSFCommand extends Job {
 	 * @param cmd Array containing command name and command parameters
 	 */
 	public LSFCommand(String name, IRemoteConnection connection, String cmd[]) {
-		super(name);
+		commandDescription = name;
 		remoteConnection = connection;
 		command = cmd;
 		commandResponse = new Vector<String[]>();
@@ -54,7 +55,7 @@ public class LSFCommand extends Job {
 	 * @param monitor - Progress monitor used to monitor and control job execution 
 	 */
 	@Override
-	protected IStatus run(IProgressMonitor monitor) {
+	public void run(IProgressMonitor monitor) {
 		IRemoteServices remoteServices;
 		IRemoteProcessBuilder processBuilder;
 		IRemoteProcess process;
@@ -67,7 +68,7 @@ public class LSFCommand extends Job {
 			String data;
 			boolean headerLine;
 
-			monitor.beginTask(command[0],  IProgressMonitor.UNKNOWN);
+			monitor.beginTask(commandDescription,  IProgressMonitor.UNKNOWN);
 			process = processBuilder.start();
 			try {
 				for (;;) {
@@ -77,7 +78,8 @@ public class LSFCommand extends Job {
 					if (monitor.isCanceled()) {
 						process.destroy();
 						monitor.done();
-						return new Status(IStatus.CANCEL, Activator.PLUGIN_ID, CANCELED, Messages.CommandCancelMessage, null);
+						runStatus = new Status(IStatus.CANCEL, Activator.PLUGIN_ID, CANCELED, Messages.CommandCancelMessage, null);
+						return;
 					}
 					Thread.sleep(1000);
 				}
@@ -100,7 +102,8 @@ public class LSFCommand extends Job {
 						if (data.equals("No application profiles found.")) {  //$NON-NLS-1$
 							reader.close();
 							monitor.done();
-							return new Status(IStatus.INFO, Activator.PLUGIN_ID, NO_DATA, Messages.NoProfileMessage, null);
+							runStatus = new Status(IStatus.INFO, Activator.PLUGIN_ID, NO_DATA, Messages.NoProfileMessage, null);
+							return;
 						}
 						headerLine = false;
 					}
@@ -122,7 +125,8 @@ public class LSFCommand extends Job {
 						if (data.equals("No reservation found")) { //$NON-NLS-1$
 							reader.close();
 							monitor.done();
-							return new Status(IStatus.INFO, Activator.PLUGIN_ID, NO_DATA, Messages.NoReservationMessage, null);
+							runStatus = new Status(IStatus.INFO, Activator.PLUGIN_ID, NO_DATA, Messages.NoReservationMessage, null);
+							return;
 						} else {
 							columnLabels = data.split(" +"); //$NON-NLS-1$
 							headerLine = false;
@@ -138,14 +142,17 @@ public class LSFCommand extends Job {
 			}
 			else {
 				monitor.done();
-				return new Status(IStatus.ERROR, Activator.PLUGIN_ID, COMMAND_ERROR, Messages.LSFCommandFailed, null);
+				runStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, COMMAND_ERROR, Messages.LSFCommandFailed, null);
+				return;
 			}
 		} catch (IOException e) {
 			monitor.done();
-			return new Status(IStatus.ERROR, Activator.PLUGIN_ID, COMMAND_ERROR, Messages.LSFCommandFailed, e);
+			runStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, COMMAND_ERROR, Messages.LSFCommandFailed, e);
+			return;
 		}
 		monitor.done();
-		return new Status(IStatus.OK, Activator.PLUGIN_ID, OK, Messages.OkMessage, null);
+		runStatus = new Status(IStatus.OK, Activator.PLUGIN_ID, OK, Messages.OkMessage, null);
+		return;
 	}
 
 	/**
@@ -165,5 +172,9 @@ public class LSFCommand extends Job {
 	 */
 	public String[] getColumnLabels() {
 		return columnLabels;
+	}
+	
+	public IStatus getRunStatus() {
+		return runStatus;
 	}
 }
