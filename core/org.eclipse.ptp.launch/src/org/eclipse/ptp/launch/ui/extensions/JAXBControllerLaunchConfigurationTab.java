@@ -72,6 +72,7 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 		SubMonitor progress = SubMonitor.convert(monitor, 100);
 		fControl = control;
 		LCVariableMap varMap = null;
+		setLaunchConfigurationDialog(dialog);
 
 		try {
 			ResourceManagerData data = control.getConfiguration();
@@ -121,7 +122,6 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 			updateHandler = null;
 		}
 		lcMap = varMap;
-		setLaunchConfigurationDialog(dialog);
 	}
 
 	/*
