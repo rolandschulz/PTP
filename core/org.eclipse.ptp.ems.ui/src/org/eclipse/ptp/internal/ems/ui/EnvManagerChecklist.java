@@ -60,6 +60,8 @@ public final class EnvManagerChecklist extends Composite {
 	private IRemoteConnection remoteConnection;
 	private IEnvManager envManager;
 	private IErrorListener errorListener;
+	private Job repopulateJob;
+	private boolean isValid;
 
 	private URI lastSyncURI;
 	private List<String> lastSelectedItems;
@@ -280,23 +282,32 @@ public final class EnvManagerChecklist extends Composite {
 	}
 
 	private void inBackgroundThreadDetectEnvManager(final IRemoteConnection remoteConnection, final List<String> selectedItems) {
-		setDetectingMessage();
-		final Job job = new Job(Messages.EnvManagerChecklist_DetectingRemoteEMS) {
-			@Override
-			protected IStatus run(IProgressMonitor monitor) {
-				try {
-					envManager = EnvManagerRegistry.getEnvManager(monitor, remoteConnection);
-					final String description = envManager.getDescription(monitor);
-					inUIThreadDisplayChecklist(selectedItems, description);
-					return Status.OK_STATUS;
-				} catch (final Exception e) {
-					EMSUIPlugin.log(e);
-					return new Status(IStatus.ERROR, EMSUIPlugin.PLUGIN_ID, e.getLocalizedMessage(), e);
+		if (repopulateJob == null) {
+			repopulateJob = new Job(Messages.EnvManagerChecklist_DetectingRemoteEMS) {
+				@Override
+				protected IStatus run(IProgressMonitor monitor) {
+					try {
+						if (!isDisposed()) {
+							getDisplay().syncExec(new Runnable() {
+								@Override
+								public void run() {
+									setDetectingMessage();
+								}
+							});
+						}
+						envManager = EnvManagerRegistry.getEnvManager(monitor, remoteConnection);
+						final String description = envManager.getDescription(monitor);
+						inUIThreadDisplayChecklist(selectedItems, description);
+						return Status.OK_STATUS;
+					} catch (final Exception e) {
+						EMSUIPlugin.log(e);
+						return new Status(IStatus.ERROR, EMSUIPlugin.PLUGIN_ID, e.getLocalizedMessage(), e);
+					}
 				}
-			}
-		};
-		job.setPriority(Job.INTERACTIVE);
-		job.schedule();
+			};
+			repopulateJob.setPriority(Job.INTERACTIVE);
+		}
+		repopulateJob.schedule();
 	}
 
 	private void setDetectingMessage() {
@@ -310,44 +321,36 @@ public final class EnvManagerChecklist extends Composite {
 	}
 
 	private void inUIThreadDisplayChecklist(final List<String> selectedItems, final String description) {
-		final Job job = new Job(Messages.EnvManagerChecklist_UpdatingChecklist) {
-			@Override
-			protected IStatus run(IProgressMonitor monitor) {
-				if (!isDisposed()) {
-					getDisplay().asyncExec(new Runnable() {
-						@Override
-						public void run() {
-							String instructions = envManager.getInstructions();
-							if (instructions.length() > 0) {
-								instructions += Messages.EnvManagerChecklist_SettingsOnEnvironmentsPageAreAppliedBeforehand;
-							}
-							checklist.setInstructions(instructions, 250);
-							checklist.setComparator(envManager.getComparator());
+		if (!isDisposed()) {
+			getDisplay().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					String instructions = envManager.getInstructions();
+					if (instructions.length() > 0) {
+						instructions += Messages.EnvManagerChecklist_SettingsOnEnvironmentsPageAreAppliedBeforehand;
+					}
+					checklist.setInstructions(instructions, 250);
+					checklist.setComparator(envManager.getComparator());
 
-							if (envManager.equals(EnvManagerRegistry.getNullEnvManager())) {
-								setIncompatibleInstallationMessage();
-							} else {
-								checklist.setTitle(
-										NLS.bind(
-												Messages.EnvManagerChecklist_EnvManagerInfo,
-												description,
-												getConnectionName()));
+					if (envManager.equals(EnvManagerRegistry.getNullEnvManager())) {
+						setIncompatibleInstallationMessage();
+					} else {
+						checklist.setTitle(
+								NLS.bind(
+										Messages.EnvManagerChecklist_EnvManagerInfo,
+										description,
+										getConnectionName()));
 
-								checklist.setEnabledAndVisible(false);
-								stackLayout.topControl = checklist;
-								stack.layout(true, true);
-								errorListener.errorCleared();
+						checklist.setEnabledAndVisible(false);
+						stackLayout.topControl = checklist;
+						stack.layout(true, true);
+						errorListener.errorCleared();
 
-								populateModuleList(selectedItems);
-							}
-						}
-					});
+						populateModuleList(selectedItems);
+					}
 				}
-				return Status.OK_STATUS;
-			}
-		};
-		job.setPriority(Job.INTERACTIVE);
-		job.schedule();
+			});
+		}
 	}
 
 	private boolean connectionIsOpen() {
@@ -369,6 +372,7 @@ public final class EnvManagerChecklist extends Composite {
 	}
 
 	private void populateModuleList(final List<String> selectedItems) {
+		isValid = false;
 		checklist.asyncRepopulate(new AsyncRepopulationStrategy() {
 			@Override
 			public String getMessage() {
@@ -392,14 +396,18 @@ public final class EnvManagerChecklist extends Composite {
 			@Override
 			public void afterRepopulation() {
 				checklist.setEnabledAndVisible(EnvManagerChecklist.this.isEnabled());
+				isValid = true;
 			}
 		});
 	}
 
 	/**
-	 * @return the text of the elements which are checked in the checklist. This list may be empty but is never <code>null</code>.
-	 *         It is, in theory, a subset of the strings returned by
-	 *         {@link IEnvManager#determineAvailableElements(IProgressMonitor)}.
+	 * Get the text of the elements which are checked in the checklist. This list may be empty but is never <code>null</code>.
+	 * It is, in theory, a subset of the strings returned by {@link IEnvManager#determineAvailableElements(IProgressMonitor)}.
+	 * 
+	 * This list is only valid if {@link #isValid() is true}
+	 * 
+	 * @return list of checked elements
 	 * 
 	 * @see EnvManagerConfigWidget#getSelectedElements()
 	 */
@@ -415,6 +423,15 @@ public final class EnvManagerChecklist extends Composite {
 	 */
 	public boolean isChecklistEnabled() {
 		return checklist.isEnabled();
+	}
+
+	/**
+	 * Test if the checklist is properly configured. The contents of the checklist is only valid when this is true.
+	 * 
+	 * @return true if checklist is valid
+	 */
+	public boolean isValid() {
+		return isValid;
 	}
 
 	/** @return the {@link IEnvManager} being used to populate this checklist */
