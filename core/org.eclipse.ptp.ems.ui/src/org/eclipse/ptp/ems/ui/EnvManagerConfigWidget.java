@@ -302,13 +302,26 @@ public final class EnvManagerConfigWidget extends Composite {
 	}
 
 	/**
-	 * @return the text of the elements which are checked in the checklist. This list may be empty but is never <code>null</code>.
-	 *         It is, in theory, a subset of the strings returned by
-	 *         {@link IEnvManager#determineAvailableElements(org.eclipse.core.runtime.IProgressMonitor)}.
+	 * Get the text of the elements which are checked in the checklist. This list may be empty but is never <code>null</code>.
+	 * It is, in theory, a subset of the strings returned by {@link IEnvManager#determineAvailableElements(IProgressMonitor)}.
+	 * 
+	 * @return list of checked elements
+	 * 
 	 * @since 2.0
 	 */
 	public List<String> getSelectedElements() {
 		return envConfigChecklist.getSelectedElements();
+	}
+
+	/**
+	 * Test if the checklist is properly configured. The contents of the checklist is only valid when this is true.
+	 * 
+	 * TODO: Should probably be public, but this would require an API change
+	 * 
+	 * @return true if checklist is valid
+	 */
+	private boolean isValid() {
+		return envConfigChecklist.isValid();
 	}
 
 	/**
@@ -370,7 +383,7 @@ public final class EnvManagerConfigWidget extends Composite {
 			} else {
 				// Only overwrite the module list if the checklist was available for editing;
 				// this allows old values to be resurrected if environment management support was temporarily disabled
-				if (isChecklistEnabled()) {
+				if (isChecklistEnabled() && isValid()) {
 					config.setConnectionName(getConnectionName());
 					config.setConfigElements(getSelectedElements());
 				}
