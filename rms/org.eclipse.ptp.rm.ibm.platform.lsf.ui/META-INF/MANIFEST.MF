@@ -10,7 +10,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ptp.rm.jaxb.control.ui,
  org.eclipse.ptp.rm.jaxb.core,
  org.eclipse.ptp.remote.core,
- org.eclipse.debug.core
+ org.eclipse.debug.core,
+ org.eclipse.debug.ui;bundle-version="3.9.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin

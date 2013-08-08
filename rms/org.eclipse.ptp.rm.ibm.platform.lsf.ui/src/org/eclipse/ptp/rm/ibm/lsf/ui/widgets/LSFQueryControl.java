@@ -10,18 +10,15 @@ import java.util.List;
 import java.util.Vector;
 
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.rm.ibm.lsf.ui.LSFCommand;
-import org.eclipse.ptp.rm.jaxb.control.ui.IWidgetDescriptor;
+import org.eclipse.ptp.rm.jaxb.control.ui.IWidgetDescriptor2;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 
 public abstract class LSFQueryControl extends Composite {
 
@@ -31,56 +28,17 @@ public abstract class LSFQueryControl extends Composite {
 	private final List<ModifyListener> modifyListeners = new LinkedList<ModifyListener>();
 	protected String selectedValues = ""; //$NON-NLS-1$
 	protected String queryTitle;
-	protected LSFJobListener jobListener;
-	protected LSFCommand queueQuery;
+	protected final IWidgetDescriptor2 widgetDescriptor;
 
-	protected class LSFJobListener extends JobChangeAdapter {
-		public void done(final IJobChangeEvent e) {
-			Display.getDefault().asyncExec(new Runnable() {
-				/*
-				 * Display a pop-up dialog containing the response from the LSF command
-				 */
-				@Override
-				public void run() {
-					// The user may have closed the launch dialog before the
-					// LSF command completes, for instance if LSF is being
-					// restarted. Therefore, make sure this object has not
-					// been disposed before trying to use it.
-					//
-					// There's also no point to displaying LSF command
-					// output if the launch configuration has been closed.
-					if (!isDisposed()) {
-						if (e.getResult().isOK()) {
-							int selection;
-							
-							dialog = new LSFQueryDialog(getShell(), queryTitle,
-									queueQuery.getColumnLabels(), queueQuery
-											.getCommandResponse(), true);
-							dialog.setSelectedValue(selectedValues);
-							selection = dialog.open();
-							if (selection == 0) {
-								selectedValues = dialog.getSelectedValues();
-								notifyListeners();
-							}
-						}
-						else if (e.getResult().getSeverity() == IStatus.INFO) {
-							MessageDialog.openInformation(getShell(),
-									Messages.WarningMessageLabel,
-									e.getResult().getMessage());
-						}
-					}
-				}
-			});
-		}
-	}
 
 	/**
 	 * Create a custom UI widget (pushbutton) in the JAXB UI
 	 * @param parent - Parent of this widget
 	 * @param wd - Widget attributes
 	 */
-	public LSFQueryControl(Composite parent, final IWidgetDescriptor wd) {
+	public LSFQueryControl(Composite parent, final IWidgetDescriptor2 wd) {
 		super(parent, wd.getStyle());
+		widgetDescriptor = wd;
 		setLayout(new FillLayout());
 		setLayoutData(wd.getLayoutData());
 		Button button = new Button(this, SWT.PUSH);
@@ -88,7 +46,6 @@ public abstract class LSFQueryControl extends Composite {
 		button.setToolTipText(wd.getToolTipText());
 		commandResponse = new Vector<String[]>();
 		configureQueryButton(button, wd.getRemoteConnection());
-		jobListener = new LSFJobListener();
 	}
 
 	/**
@@ -161,5 +118,38 @@ public abstract class LSFQueryControl extends Composite {
 			return false;
 		}
 		return true;
+	}
+	
+	protected void processCommandResponse(LSFCommand command, IStatus runStatus) {
+		int selection;
+		
+		switch (runStatus.getSeverity()) {
+		case IStatus.OK:
+			dialog = new LSFQueryDialog(getShell(), queryTitle,
+					command.getColumnLabels(), command
+							.getCommandResponse(), true);
+			dialog.setSelectedValue(selectedValues);
+			selection = dialog.open();
+			if (selection == 0) {
+				selectedValues = dialog.getSelectedValues();
+				notifyListeners();
+			}
+			break;
+		case IStatus.INFO:
+			MessageDialog.openInformation(getShell(),
+					Messages.InformationalMessage,
+					runStatus.getMessage());
+			break;
+		case IStatus.WARNING:
+			MessageDialog.openInformation(getShell(),
+					Messages.WarningMessageLabel,
+					runStatus.getMessage());
+			break;
+		case IStatus.ERROR:
+			MessageDialog.openInformation(getShell(),
+					Messages.ErrorMessage,
+					runStatus.getMessage());
+			break;
+		}
 	}
 }

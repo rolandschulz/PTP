@@ -7,6 +7,8 @@ public class Messages extends NLS {
 	public static String ApplicationQueryControl_ApplicationCommandDesc;
 	public static String ApplicationQueryTitle;
 	public static String CommandCancelMessage;
+	public static String ErrorMessage;
+	public static String InformationalMessage;
 	public static String WarningMessageLabel;
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rm.ibm.lsf.ui.widgets.messages"; //$NON-NLS-1$
 	public static String JobQueueTitle;

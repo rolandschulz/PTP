@@ -5,17 +5,12 @@
 
 package org.eclipse.ptp.rm.ibm.lsf.ui.widgets;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
 
-import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteProcess;
-import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
-import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.rm.ibm.lsf.ui.LSFCommand;
-import org.eclipse.ptp.rm.jaxb.control.ui.IWidgetDescriptor;
+import org.eclipse.ptp.rm.jaxb.control.ui.IWidgetDescriptor2;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
@@ -34,7 +29,7 @@ public class ApplicationQueryControl extends LSFQueryControl {
 	 * @param wd
 	 *            : Information about the custom widget
 	 */
-	public ApplicationQueryControl(Composite parent, final IWidgetDescriptor wd) {
+	public ApplicationQueryControl(Composite parent, final IWidgetDescriptor2 wd) {
 		super(parent, wd);
 		queryTitle = Messages.ApplicationQueryTitle;
 	}
@@ -66,9 +61,18 @@ public class ApplicationQueryControl extends LSFQueryControl {
 	 */
 	@Override
 	protected void getQueryResponse(IRemoteConnection connection) {
-		queueQuery = new LSFCommand(Messages.ApplicationCommandDesc, connection, queryCommand);
-		queueQuery.setUser(true);
-		queueQuery.addJobChangeListener(jobListener);
-		queueQuery.schedule();
+		try {
+			IStatus runStatus;
+			LSFCommand command;
+			
+			command = new LSFCommand(Messages.ApplicationCommandDesc, connection, queryCommand);
+			widgetDescriptor.getLaunchConfigurationDialog().run(true, true, command);
+			runStatus = command.getRunStatus();
+			processCommandResponse(command, runStatus);
+		} catch (InvocationTargetException e) {
+			// Do nothing
+		} catch (InterruptedException e) {
+			// Do nothing
+		}
 	}
 }
