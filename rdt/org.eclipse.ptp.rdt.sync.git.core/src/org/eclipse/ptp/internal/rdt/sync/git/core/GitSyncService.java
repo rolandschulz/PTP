@@ -17,7 +17,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.core.resources.IFile;
@@ -57,8 +60,15 @@ public class GitSyncService extends AbstractSynchronizeService {
 	private static final Map<IPath, JGitRepo> localDirectoryToJGitRepoMap = new HashMap<IPath, JGitRepo>();
 	private static final Map<RemoteLocation, GitRepo> remoteLocationToGitRepoMap = new HashMap<RemoteLocation, GitRepo>();
 
-	// Boilerplate class for IPath and RemoteLocation Pair.
-	// Why doesn't Java have a pair class?
+	// Variables for managing sync threads
+	private static final ReentrantLock syncLock = new ReentrantLock();
+	private static final ConcurrentMap<ProjectAndRemoteLocationPair, AtomicLong> syncThreadsWaiting =
+			new ConcurrentHashMap<ProjectAndRemoteLocationPair, AtomicLong>();
+
+	// Entry indicates that the remote location has a clean (up-to-date) file filter for the project
+	private static final Set<LocalAndRemoteLocationPair> cleanFileFilterMap = new HashSet<LocalAndRemoteLocationPair>();
+
+	// Boilerplate class for IPath and RemoteLocation Pair
 	private class LocalAndRemoteLocationPair {
 		IPath localDir;
 		RemoteLocation remoteLoc;
@@ -97,25 +107,33 @@ public class GitSyncService extends AbstractSynchronizeService {
 
 		@Override
 		public boolean equals(Object obj) {
-			if (this == obj)
+			if (this == obj) {
 				return true;
-			if (obj == null)
+			}
+			if (obj == null) {
 				return false;
-			if (getClass() != obj.getClass())
+			}
+			if (getClass() != obj.getClass()) {
 				return false;
+			}
 			LocalAndRemoteLocationPair other = (LocalAndRemoteLocationPair) obj;
-			if (!getOuterType().equals(other.getOuterType()))
+			if (!getOuterType().equals(other.getOuterType())) {
 				return false;
+			}
 			if (localDir == null) {
-				if (other.localDir != null)
+				if (other.localDir != null) {
 					return false;
-			} else if (!localDir.equals(other.localDir))
+				}
+			} else if (!localDir.equals(other.localDir)) {
 				return false;
+			}
 			if (remoteLoc == null) {
-				if (other.remoteLoc != null)
+				if (other.remoteLoc != null) {
 					return false;
-			} else if (!remoteLoc.equals(other.remoteLoc))
+				}
+			} else if (!remoteLoc.equals(other.remoteLoc)) {
 				return false;
+			}
 			return true;
 		}
 
@@ -124,8 +142,71 @@ public class GitSyncService extends AbstractSynchronizeService {
 		}
 	}
 
-	// Entry indicates that the remote location has a clean (up-to-date) file filter for the project
-	private static final Set<LocalAndRemoteLocationPair> cleanFileFilterMap = new HashSet<LocalAndRemoteLocationPair>();
+	// Boilerplate class for IProject and RemoteLocation Pair
+	private class ProjectAndRemoteLocationPair {
+		IProject project;
+		RemoteLocation remoteLoc;
+
+		/**
+		 * Create new pair
+		 * @param p
+		 * 			project
+		 * @param rl
+		 * 			remote location
+		 */
+		public ProjectAndRemoteLocationPair(IProject p, RemoteLocation rl) {
+			project = p;
+			remoteLoc = rl;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + getOuterType().hashCode();
+			result = prime * result
+					+ ((project == null) ? 0 : project.hashCode());
+			result = prime * result
+					+ ((remoteLoc == null) ? 0 : remoteLoc.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj == null) {
+				return false;
+			}
+			if (getClass() != obj.getClass()) {
+				return false;
+			}
+			ProjectAndRemoteLocationPair other = (ProjectAndRemoteLocationPair) obj;
+			if (!getOuterType().equals(other.getOuterType())) {
+				return false;
+			}
+			if (project == null) {
+				if (other.project != null) {
+					return false;
+				}
+			} else if (!project.equals(other.project)) {
+				return false;
+			}
+			if (remoteLoc == null) {
+				if (other.remoteLoc != null) {
+					return false;
+				}
+			} else if (!remoteLoc.equals(other.remoteLoc)) {
+				return false;
+			}
+			return true;
+		}
+
+		private GitSyncService getOuterType() {
+			return GitSyncService.this;
+		}
+	}
 
 	/**
 	 * Get JGit repository instance for the given project, creating it if necessary.
@@ -197,11 +278,6 @@ public class GitSyncService extends AbstractSynchronizeService {
 		}
 		return repo;
 	}
-
-	private static final ReentrantLock syncLock = new ReentrantLock();
-	private Integer fWaitingThreadsCount = 0;
-	private Integer syncTaskId = -1; // ID for most recent synchronization task, functions as a time-stamp
-	private int finishedSyncTaskId = -1; // all synchronizations up to this ID (including it) have finished
 
 	private static boolean consCalled = false;
 	/**
@@ -357,20 +433,20 @@ public class GitSyncService extends AbstractSynchronizeService {
 				return;
 			}
 
-			int mySyncTaskId;
-			synchronized (syncTaskId) {
-				syncTaskId++;
-				mySyncTaskId = syncTaskId;
-				// suggestion for Deltas: add delta to list of deltas
-			}
+			ProjectAndRemoteLocationPair syncTarget = new ProjectAndRemoteLocationPair(project, remoteLoc);
+		    AtomicLong threadCount = syncThreadsWaiting.get(syncTarget);
+		    if (threadCount != null && threadCount.get() > 0 && syncFlags == SyncFlag.NO_FORCE) {
+		    	return; // the queued thread will do the work for us. And we don't have to wait because of NO_FORCE
+		    }
 
-			synchronized (fWaitingThreadsCount) {
-				if (fWaitingThreadsCount > 0 && syncFlags == SyncFlag.NO_FORCE) {
-					return; // the queued thread will do the work for us. And we don't have to wait because of NO_FORCE
-				} else {
-					fWaitingThreadsCount++;
-				}
-			}
+		    // Increment the value, initializing it if necessary. See:
+		    // http://stackoverflow.com/questions/2539654/java-concurrency-many-writers-one-reader/2539761#2539761
+		    if (threadCount == null){ 
+		    	threadCount = syncThreadsWaiting.putIfAbsent(syncTarget, new AtomicLong(1)); 
+		    } 
+		    if(threadCount != null){
+		    	threadCount.incrementAndGet();      
+		    }
 
 			// lock syncLock. interruptible by progress monitor
 			try {
@@ -382,37 +458,19 @@ public class GitSyncService extends AbstractSynchronizeService {
 			} catch (InterruptedException e1) {
 				throw new CoreException(new Status(IStatus.CANCEL, Activator.PLUGIN_ID, Messages.GitSyncService_5));
 			} finally {
-				synchronized (fWaitingThreadsCount) {
-					fWaitingThreadsCount--;
-				}
+				threadCount = syncThreadsWaiting.get(syncTarget);
+				assert(threadCount != null) : Messages.GitSyncService_19;
+				threadCount.decrementAndGet();
 			}
 
 			try {
-				if (mySyncTaskId <= finishedSyncTaskId && syncFlags == SyncFlag.NO_FORCE) { // some other thread has already done
-																							// the work for us
-					return;
-				}
-
-				// This synchronization operation will include all tasks up to current syncTaskId
-				// syncTaskId can be larger than mySyncTaskId (than we do also the work for other threads)
-				// we might synchronize even more than that if a file is already saved but syncTaskId wasn't increased yet
-				// thus we cannot guarantee a maximum but we can guarantee syncTaskId as a minimum
-				// suggestion for Deltas: make local copy of list of deltas, remove list of deltas
-				int willFinishTaskId;
-				synchronized (syncTaskId) {
-					willFinishTaskId = syncTaskId;
-				}
-
-				try {
-					subMon.subTask(Messages.GitSyncService_9);
-					doSync(project, remoteLoc, syncFlags, subMon.newChild(95));
-				} catch (RemoteSyncMergeConflictException e) {
-					subMon.subTask(Messages.GitSyncService_10);
-					// Refresh after merge conflict since conflicted files are altered with markup.
-					doRefresh(project);
-					throw e;
-				}
-				finishedSyncTaskId = willFinishTaskId;
+				subMon.subTask(Messages.GitSyncService_9);
+				doSync(project, remoteLoc, syncFlags, subMon.newChild(95));
+			} catch (RemoteSyncMergeConflictException e) {
+				subMon.subTask(Messages.GitSyncService_10);
+				// Refresh after merge conflict since conflicted files are altered with markup.
+				doRefresh(project);
+				throw e;
 			} finally {
 				syncLock.unlock();
 			}
