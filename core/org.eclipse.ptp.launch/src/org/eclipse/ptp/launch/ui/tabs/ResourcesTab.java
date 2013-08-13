@@ -87,7 +87,16 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 */
 	public static final String TAB_ID = "org.eclipse.ptp.launch.applicationLaunch.resourcesTab"; //$NON-NLS-1$
 
+	private static Display getDisplay() {
+		Display display = Display.getCurrent();
+		if (display == null) {
+			display = Display.getDefault();
+		}
+		return display;
+	}
+
 	private Combo fSystemTypeCombo;
+
 	private final List<String> fProviders = new ArrayList<String>();
 
 	/*
@@ -95,6 +104,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 */
 	private ILaunchController fLaunchControl;
 	private RemoteConnectionWidget fRemoteConnectionWidget;
+
 	/*
 	 * Keep current remote connection so we can revert back to it
 	 */
@@ -106,6 +116,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	private ScrolledComposite launchAttrsScrollComposite;
 
 	private final Map<IJobControl, IRMLaunchConfigurationDynamicTab> fDynamicTabs = new HashMap<IJobControl, IRMLaunchConfigurationDynamicTab>();
+
 	private final ContentsChangedListener launchContentsChangedListener = new ContentsChangedListener();
 
 	/*
@@ -113,7 +124,6 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	 * 
 	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#canSave()
 	 */
-
 	@Override
 	public boolean canSave() {
 		setErrorMessage(null);
@@ -140,12 +150,6 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		return true;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#createControl(org.eclipse .swt.widgets.Composite)
-	 */
-
 	private boolean changeConnection(final IRemoteConnection conn, ILaunchController controller) {
 		boolean autoRun = false;
 		boolean askToOpen = true;
@@ -155,7 +159,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 			// Ignore
 		}
 		if (!autoRun && controller.getConfiguration().getControlData().getStartUpCommand() != null) {
-			MessageDialogWithToggle dialog = MessageDialogWithToggle.openYesNoQuestion(getShell(),
+			MessageDialogWithToggle dialog = MessageDialogWithToggle.openYesNoQuestion(getDisplay().getActiveShell(),
 					Messages.ResourcesTab_Run_Command, NLS.bind(Messages.ResourcesTab_noInformation, conn.getName()),
 					Messages.ResourcesTab_Dont_ask_to_run_command, false, null, null);
 			if (dialog.getReturnCode() == IDialogConstants.NO_ID) {
@@ -166,7 +170,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		}
 		if (!conn.isOpen()) {
 			if (!askToOpen
-					|| MessageDialog.openQuestion(getShell(), Messages.ResourcesTab_openConnection,
+					|| MessageDialog.openQuestion(getDisplay().getActiveShell(), Messages.ResourcesTab_openConnection,
 							NLS.bind(Messages.ResourcesTab_There_is_no_connection, conn.getName()))) {
 				try {
 					getLaunchConfigurationDialog().run(false, true, new IRunnableWithProgress() {
@@ -189,6 +193,11 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		return true;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#createControl(org.eclipse.swt.widgets.Composite)
+	 */
 	public void createControl(Composite parent) {
 		final int numColumns = 2;
 		final Composite comp = new Composite(parent, SWT.NONE);
@@ -262,12 +271,6 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		setLaunchAttrsScrollComposite(scrollComp);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#getId()
-	 */
-
 	/**
 	 * @param parent
 	 * @param colspan
@@ -282,12 +285,6 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		attrComp.setExpandVertical(true);
 		return attrComp;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#getImage()
-	 */
 
 	/**
 	 * Enable content-assist-like completion/filtering of TSC type by typing
@@ -328,9 +325,8 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#getName()
+	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#getId()
 	 */
-
 	@Override
 	public String getId() {
 		return TAB_ID;
@@ -339,19 +335,12 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#initializeFrom(org.eclipse .debug.core.ILaunchConfiguration)
+	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#getImage()
 	 */
-
 	@Override
 	public Image getImage() {
 		return LaunchImages.getImage(LaunchImages.IMG_PARALLEL_TAB);
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#isValid(org.eclipse .debug.core.ILaunchConfiguration)
-	 */
 
 	/**
 	 * @return
@@ -389,12 +378,6 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		return fDynamicTabs.get(controller);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#setDefaults(org.eclipse. debug.core.ILaunchConfigurationWorkingCopy)
-	 */
-
 	/**
 	 * Returns a cached launch configuration dynamic tab. If it isn't in the cache then it creates a new one, and puts it in the
 	 * cache.
@@ -423,6 +406,11 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		return fDynamicTabs.get(controller);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#getName()
+	 */
 	public String getName() {
 		return Messages.ResourcesTab_Resources;
 	}
@@ -473,6 +461,11 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.launch.ui.tabs.LaunchConfigurationTab#initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
+	 */
 	@Override
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		super.initializeFrom(configuration);
@@ -536,6 +529,11 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		return result;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#isValid(org.eclipse.debug.core.ILaunchConfiguration)
+	 */
 	@Override
 	public boolean isValid(ILaunchConfiguration configuration) {
 		setErrorMessage(null);
@@ -616,6 +614,11 @@ public class ResourcesTab extends LaunchConfigurationTab {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
+	 */
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
 		// Do nothing
 	}
@@ -680,7 +683,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 					getLaunchConfigurationDialog().run(false, true, new IRunnableWithProgress() {
 
 						public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-							SubMonitor progress = SubMonitor.convert(monitor, 20);
+							SubMonitor progress = SubMonitor.convert(monitor, Messages.ResourcesTab_Loading_Resources_tab, 20);
 							try {
 								controller.start(progress.newChild(10));
 								dynamicTab[0] = getLaunchConfigurationDynamicTab(controller, progress.newChild(10));

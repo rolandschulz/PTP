@@ -39,6 +39,9 @@
 		<attribute name="mpiNumberOfProcesses" min="1" type="integer">
 			<description>The '-np' value</description>
 		</attribute>
+		<attribute name="mpiExtraArgs" type="string">
+			<description>Additional arguments to be passed to the mpi command</description>
+		</attribute>
 		<attribute name="Account_Name" type="string">
 			<description>Account to which to charge this job.</description>
 			<tooltip>Format: string</tooltip>
@@ -383,25 +386,13 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 				<arg isUndefinedIfMatches="">${ptp_rm:modules#value}</arg>
 			</line>
 			<line>
-				<arg>MPI_ARGS="-np ${ptp_rm:mpiNumberOfProcesses#value}"</arg>
-			</line>
-			<line>
-				<arg resolve="false">if [ "-np" == "${MPI_ARGS}" ] ; then</arg>
-			</line>
-			<line>
-				<arg resolve="false"> MPI_ARGS=</arg>
-			</line>
-			<line>
-				<arg resolve="false">fi</arg>
-			</line>
-			<line>
 				<arg>COMMAND=${ptp_rm:mpiCommand#value}</arg>
 			</line>
 			<line>
 				<arg resolve="false">if [ -n "${COMMAND}" ] ; then</arg>
 			</line>
 			<line>
-				<arg resolve="false"> COMMAND="${COMMAND} ${MPI_ARGS}</arg>
+				<arg resolve="false"> COMMAND="${COMMAND} -np ${ptp_rm:mpiNumberOfProcesses#value} ${ptp_rm:mpiExtraArgs}</arg>
 				<arg>${ptp_rm:executablePath#value} ${ptp_rm:progArgs#value}"</arg>
 			</line>
 			<line>
@@ -741,6 +732,24 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
 						</layout-data>
+						<fixed-text>Extra MPI Arguments: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="mpiExtraArgs">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<fixed-text>${ptp_rm:mpiExtraArgs#description}</fixed-text>
+					</widget>
+					<!-- row 10 -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
 						<tooltip>${ptp_rm:export_all#tooltip}</tooltip>
 						<fixed-text>Export Environment: </fixed-text>
 					</widget>
@@ -755,7 +764,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						</layout-data>
 						<fixed-text>${ptp_rm:export_all#description}</fixed-text>
 					</widget>
-					<!-- row 10 -->
+					<!-- row 11 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
