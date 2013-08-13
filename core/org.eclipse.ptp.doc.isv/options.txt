@@ -17,7 +17,40 @@
 ;../../core/org.eclipse.ptp.services.core/src
 ;../../core/org.eclipse.ptp.services.ui/src"
 -d reference/api
--classpath @cp@
+-classpath @rt@
+;${dependency.dir}/org.apache.ant_*.jar
+;${dependency.dir}/org.junit_*.jar
+;${dependency.dir}/com.ibm.icu_*.jar
+;${dependency.dir}/org.eclipse.debug.core_*.jar
+;${dependency.dir}/org.eclipse.debug.ui_*.jar
+;${dependency.dir}/org.eclipse.cdt.core_*.jar
+;${dependency.dir}/org.eclipse.cdt.ui_*.jar
+;${dependency.dir}/org.eclipse.core.commands_*.jar
+;${dependency.dir}/org.eclipse.core.contenttype_*.jar
+;${dependency.dir}/org.eclipse.core.expressions_*.jar
+;${dependency.dir}/org.eclipse.core.filebuffers_*.jar
+;${dependency.dir}/org.eclipse.core.filesystem_*.jar
+;${dependency.dir}/org.eclipse.core.jobs_*.jar
+;${dependency.dir}/org.eclipse.core.resources_*.jar
+;${dependency.dir}/org.eclipse.core.runtime_*.jar
+;${dependency.dir}/org.eclipse.core.variables_*.jar
+;${dependency.dir}/org.eclipse.equinox.common_*.jar
+;${dependency.dir}/org.eclipse.equinox.preferences_*.jar
+;${dependency.dir}/org.eclipse.equinox.registry_*.jar
+;${dependency.dir}/org.eclipse.help_*.jar
+;${dependency.dir}/org.eclipse.jface_*.jar
+;${dependency.dir}/org.eclipse.jface.text_*.jar
+;${dependency.dir}/org.eclipse.osgi_*.jar
+;${dependency.dir}/org.eclipse.swt_*.jar
+;${dependency.dir}/org.eclipse.swt.cocoa.macosx.x86_64_*.jar
+;${dependency.dir}/org.eclipse.swt.gtk.linux.x86_64_*.jar
+;${dependency.dir}/org.eclipse.text_*.jar
+;${dependency.dir}/org.eclipse.ui_*.jar
+;${dependency.dir}/org.eclipse.ui.editors_*.jar
+;${dependency.dir}/org.eclipse.ui.forms_*.jar
+;${dependency.dir}/org.eclipse.ui.ide_*.jar
+;${dependency.dir}/org.eclipse.ui.workbench_*.jar
+;${dependency.dir}/org.eclipse.ui.workbench.texteditor_*.jar
 -breakiterator
 -tag 'TrackedGetter:cm:"TrackedGetter"'
 -tag 'noimplement:a:Restriction:'
@@ -34,9 +67,9 @@
 -bottom "Copyright (c) 2011 IBM Corporation and others. All Rights Reserved."
 -group "PTP Core Plug-in Packages" "org.eclipse.ptp.core;org.eclipse.ptp.core.*"
 -group "PTP UI Plug-in Packages" "org.eclipse.ptp.ui;org.eclipse.ptp.ui.*"
--link http://download.oracle.com/javase/6/docs/api
+-link http://download.oracle.com/javase/7/docs/api
 -link http://www.osgi.org/javadoc/r5/core
--link http://www.osgi.org/javadoc/r4v42
+-link http://www.osgi.org/javadoc/r5/enterprise
 
 org.eclipse.ptp.core
 org.eclipse.ptp.core.jobs
