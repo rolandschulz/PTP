@@ -24,6 +24,7 @@ import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ptp.internal.remote.ui.PTPRemoteUIPlugin;
 import org.eclipse.ptp.internal.remote.ui.RemoteUIServicesProxy;
+import org.eclipse.ptp.internal.remote.ui.messages.Messages;
 import org.eclipse.ptp.remote.core.IRemoteServices;
 import org.eclipse.ptp.remote.core.RemoteServices;
 import org.eclipse.ui.PlatformUI;
@@ -56,6 +57,7 @@ public class RemoteUIServices {
 			final IRemoteServices[] remoteService = new IRemoteServices[1];
 			IRunnableWithProgress runnable = new IRunnableWithProgress() {
 				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+					monitor.beginTask(Messages.RemoteUIServices_Configuring_remote_services, 10);
 					remoteService[0] = RemoteServices.getRemoteServices(id, monitor);
 				}
 			};
