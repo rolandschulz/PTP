@@ -449,7 +449,12 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 				com = envManager.createBashScript(null, false, envMgrConfig, concat);
 				final IFileStore envScript = fileManager.getResource(com);
 				final IFileInfo envInfo = envScript.fetchInfo();
+				
+				envInfo.setAttribute(EFS.ATTRIBUTE_EXECUTABLE,true);
+				
 				envInfo.setAttribute(EFS.ATTRIBUTE_OWNER_EXECUTE, true);
+					
+				
 				envScript.putInfo(envInfo, EFS.SET_ATTRIBUTES, null);
 
 			} catch (final RemoteConnectionException e) {

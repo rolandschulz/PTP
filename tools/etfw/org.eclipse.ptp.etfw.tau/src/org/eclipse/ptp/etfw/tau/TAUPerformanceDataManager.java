@@ -439,7 +439,12 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager {
 			ppout = utilBlob.runToolGetOutput(ppl, null, directory);
 
 			try {
-				os.write(ppout);
+				if(ppout!=null)
+				{
+					os.write(ppout);
+				}else{
+					os.write("Error executing remote command".getBytes());
+				}
 				// os.write(("Moving profile data to: "+ppkFile.toString()).getBytes());
 				os.close();
 			} catch (final IOException e) {
@@ -452,7 +457,12 @@ public class TAUPerformanceDataManager extends AbstractToolDataManager {
 				for (int i = 0; i < profiles.size(); i++) {
 					os.write(profiles.get(i).getName().getBytes());
 					ppout = utilBlob.runToolGetOutput(ppl, null, profiles.get(i).toURI().getPath());
-					os.write(ppout);
+					if(ppout!=null)
+					{
+						os.write(ppout);
+					}else{
+						os.write("Error executing remote command".getBytes());
+					}
 				}
 
 				// os.write(("Moving profile data to: "+ppk.toString()).getBytes());
