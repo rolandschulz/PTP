@@ -43,6 +43,8 @@ public class JAXBRMPreferenceManager extends AbstractPreferenceInitializer {
 		Preferences.setDefaultBoolean(JAXBControlCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.SHOW_COMMAND, false);
 		Preferences.setDefaultBoolean(JAXBControlCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.SHOW_COMMAND_OUTPUT,
 				false);
+		Preferences.setDefaultBoolean(JAXBControlCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.KEEP_MANAGED_FILES,
+				false);
 		Preferences.setDefaultString(JAXBControlCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.LOG_FILE,
 				JAXBCoreConstants.ZEROSTR);
 	}

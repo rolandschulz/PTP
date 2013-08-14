@@ -28,6 +28,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.ILaunchMode;
 import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.ems.core.EnvManagerConfigString;
@@ -671,7 +672,10 @@ public class LaunchController implements ILaunchController {
 	 * @throws CoreException
 	 */
 	private void maybeCleanupManagedFiles(String uuid, List<ManagedFilesType> lists) throws CoreException {
-		if (lists == null || lists.isEmpty()) {
+		if (lists == null
+				|| lists.isEmpty()
+				|| Preferences
+						.getBoolean(JAXBControlCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.KEEP_MANAGED_FILES)) {
 			return;
 		}
 		for (ManagedFilesType files : lists) {

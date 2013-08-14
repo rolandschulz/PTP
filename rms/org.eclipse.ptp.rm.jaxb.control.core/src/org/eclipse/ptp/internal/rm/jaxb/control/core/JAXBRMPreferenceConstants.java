@@ -23,4 +23,5 @@ public class JAXBRMPreferenceConstants {
 	public static final String SHOW_COMMAND_OUTPUT = Messages.ShowCommandOutput;
 	public static final String SHOW_COMMAND = Messages.ShowCommand;
 	public static final String LOG_FILE = Messages.LogFile;
+	public static final String KEEP_MANAGED_FILES = Messages.KeepManagedFiles;
 }

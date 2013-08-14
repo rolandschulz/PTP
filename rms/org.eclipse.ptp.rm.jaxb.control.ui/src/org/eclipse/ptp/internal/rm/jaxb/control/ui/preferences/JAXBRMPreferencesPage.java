@@ -46,6 +46,7 @@ public class JAXBRMPreferencesPage extends PreferencePage implements IWorkbenchP
 	private Button createdProperties;
 	private Button showCommandOutput;
 	private Button showCommand;
+	private Button keepManagedFiles;
 	private Text logFile;
 
 	@Override
@@ -66,6 +67,9 @@ public class JAXBRMPreferencesPage extends PreferencePage implements IWorkbenchP
 		reloadOption = new Button(optionsGroup, SWT.CHECK | SWT.LEFT);
 		reloadOption.addSelectionListener(this);
 		reloadOption.setText(JAXBRMPreferenceConstants.FORCE_XML_RELOAD);
+		keepManagedFiles = new Button(optionsGroup, SWT.CHECK | SWT.LEFT);
+		keepManagedFiles.addSelectionListener(this);
+		keepManagedFiles.setText(JAXBRMPreferenceConstants.KEEP_MANAGED_FILES);
 
 		Group parserOptionsGroup = new Group(preferences, SWT.SHADOW_ETCHED_IN);
 		parserOptionsGroup.setText(Messages.JAXBRMPreferencesPage_ParserDebug_options);
@@ -187,6 +191,11 @@ public class JAXBRMPreferencesPage extends PreferencePage implements IWorkbenchP
 		b = Platform.getPreferencesService().getBoolean(JAXBControlCorePlugin.getUniqueIdentifier(),
 				JAXBRMPreferenceConstants.SHOW_COMMAND_OUTPUT, def, null);
 		showCommandOutput.setSelection(b);
+		def = Preferences.getDefaultBoolean(JAXBControlCorePlugin.getUniqueIdentifier(),
+				JAXBRMPreferenceConstants.KEEP_MANAGED_FILES, false);
+		b = Platform.getPreferencesService().getBoolean(JAXBControlCorePlugin.getUniqueIdentifier(),
+				JAXBRMPreferenceConstants.KEEP_MANAGED_FILES, def, null);
+		keepManagedFiles.setSelection(b);
 		String defText = Preferences.getDefaultString(JAXBControlCorePlugin.getUniqueIdentifier(),
 				JAXBRMPreferenceConstants.LOG_FILE, JAXBUIConstants.ZEROSTR);
 		String text = Platform.getPreferencesService().getString(JAXBControlCorePlugin.getUniqueIdentifier(),
@@ -228,6 +237,8 @@ public class JAXBRMPreferencesPage extends PreferencePage implements IWorkbenchP
 				JAXBRMPreferenceConstants.SHOW_COMMAND, false));
 		showCommandOutput.setSelection(Preferences.getDefaultBoolean(JAXBControlCorePlugin.getUniqueIdentifier(),
 				JAXBRMPreferenceConstants.SHOW_COMMAND_OUTPUT, false));
+		keepManagedFiles.setSelection(Preferences.getDefaultBoolean(JAXBControlCorePlugin.getUniqueIdentifier(),
+				JAXBRMPreferenceConstants.KEEP_MANAGED_FILES, false));
 		logFile.setText(Preferences.getDefaultString(JAXBControlCorePlugin.getUniqueIdentifier(),
 				JAXBRMPreferenceConstants.LOG_FILE, JAXBUIConstants.ZEROSTR));
 		updateApplyButton();
@@ -288,6 +299,9 @@ public class JAXBRMPreferencesPage extends PreferencePage implements IWorkbenchP
 		} else if (source == showCommandOutput) {
 			boolean b = showCommandOutput.getSelection();
 			Preferences.setBoolean(JAXBControlCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.SHOW_COMMAND_OUTPUT, b);
+		} else if (source == keepManagedFiles) {
+			boolean b = keepManagedFiles.getSelection();
+			Preferences.setBoolean(JAXBControlCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.KEEP_MANAGED_FILES, b);
 		}
 	}
 }

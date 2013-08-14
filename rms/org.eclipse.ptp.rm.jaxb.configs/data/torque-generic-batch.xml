@@ -392,8 +392,11 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 				<arg resolve="false">if [ -n "${COMMAND}" ] ; then</arg>
 			</line>
 			<line>
-				<arg resolve="false"> COMMAND="${COMMAND} -np ${ptp_rm:mpiNumberOfProcesses#value} ${ptp_rm:mpiExtraArgs}</arg>
-				<arg>${ptp_rm:executablePath#value} ${ptp_rm:progArgs#value}"</arg>
+				<arg resolve="false"> COMMAND="${COMMAND}</arg>
+				<arg>-np ${ptp_rm:mpiNumberOfProcesses#value}</arg>
+				<arg isUndefinedIfMatches="">${ptp_rm:mpiExtraArgs#value}</arg>
+				<arg>${ptp_rm:executablePath#value}</arg>
+				<arg isUndefinedIfMatches="">${ptp_rm:progArgs#value}"</arg>
 			</line>
 			<line>
 				<arg resolve="false">else</arg>
