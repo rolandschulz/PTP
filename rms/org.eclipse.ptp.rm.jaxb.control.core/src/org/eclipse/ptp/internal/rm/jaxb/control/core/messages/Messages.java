@@ -79,6 +79,7 @@ public class Messages extends NLS {
 	public static String ShowCommand;
 	public static String ShowCommandOutput;
 	public static String LogFile;
+	public static String KeepManagedFiles;
 
 	public static String RemoteServicesDelegate_Copy_Operation_NullSourceFileManager;
 	public static String RemoteServicesDelegate_Copy_Operation_NullTargetFileManager;
