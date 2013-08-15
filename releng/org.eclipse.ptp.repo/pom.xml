@@ -94,7 +94,7 @@
 										<unzip
 											src="${basedir}/../../core/org.eclipse.ptp.utils/target/org.eclipse.ptp.utils-${project.version}.jar"
 											dest="${ptp-install-dir}/sdm/org.eclipse.ptp.utils_${unqualifiedVersion}.${buildQualifier}" />
-										<exec executable="zip" spawn="true" dir="${ptp-install-dir}">
+										<exec executable="zip" dir="${ptp-install-dir}">
 											<arg
 												line="-r ${ptp-install-dir}/ptp-sdm-${unqualifiedVersion}.zip sdm" />
 										</exec>
