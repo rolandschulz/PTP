@@ -201,11 +201,14 @@ public class NewSyncProjectWizard extends Wizard implements INewWizard, IExecuta
 		}
 		if (wizardMode == WizardMode.NEW) {
 			mainPage = SyncMainWizardPage.newProjectPage("basicNewProjectPage");//$NON-NLS-1$
+			mainPage.setTitle(Messages.NewProject_title);
+			mainPage.setDescription(Messages.NewProject_description);
 		} else if (wizardMode == WizardMode.CONVERT){
 			mainPage = SyncMainWizardPage.convertProjectPage("basicConvertProjectPage"); //$NON-NLS-1$
+			mainPage.setTitle(Messages.ConvertProject_title);
+			mainPage.setDescription(Messages.ConvertProject_description);
 		}
-		mainPage.setTitle(Messages.NewProject_title);
-		mainPage.setDescription(Messages.NewProject_description);
+
 		this.addPage(mainPage);
 
 		// only add page if there are already projects in the workspace
@@ -326,7 +329,16 @@ public class NewSyncProjectWizard extends Wizard implements INewWizard, IExecuta
 		this.selection = currentSelection;
 		initializeDefaultPageImageDescriptor();
 		setNeedsProgressMonitor(true);
-		setWindowTitle(Messages.NewProject_windowTitle);
+
+		// By default run as a new project wizard
+		if (wizardMode == null) {
+			wizardMode = WizardMode.NEW;
+		}
+		if (wizardMode == WizardMode.NEW) {
+			setWindowTitle(Messages.NewProject_windowTitle);
+		} else if (wizardMode == WizardMode.CONVERT) {
+			setWindowTitle(Messages.ConvertProject_windowTitle);
+		}
 	}
 
 	/*
