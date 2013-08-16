@@ -56,15 +56,16 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 	public static final String REMOTE_FILTER_IS_DIRTY = "remote_filter_is_dirty"; //$NON-NLS-1$
 	// Map of projects to file filters along with basic getter and setter methods. These static data and methods operate
 	// independently of the rest of the class and could be moved into a separate class if desired.
-	private static Map<IProject, GitSyncFileFilter> projectToFilterMap = new HashMap<IProject, GitSyncFileFilter>();
+	// Bug 371507 - Change key to local directory instead of project to support relocating projects.
+	private static Map<String, GitSyncFileFilter> pathToFilterMap = new HashMap<String, GitSyncFileFilter>();
 
 	public static GitSyncFileFilter getFilter(IProject project) {
-		GitSyncFileFilter filter = projectToFilterMap.get(project);
+		GitSyncFileFilter filter = pathToFilterMap.get(project.getLocation().toString());
 		if (filter == null) {
 			try {
 				filter = new GitSyncFileFilter(GitRemoteSyncConnection.getLocalRepo(project.getLocation().toString()), project);
 				filter.loadFilter();
-				projectToFilterMap.put(project, filter);
+				pathToFilterMap.put(project.getLocation().toString(), filter);
 			} catch (IOException e) {
 				Activator.log(Messages.GitSyncFileFilter_UnableToLoad + project.getName(), e);
 			}
@@ -80,7 +81,7 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		} catch (IOException e) {
 			Activator.log(Messages.GitSyncFileFilter_UnableToSave + project.getName(), e);
 		}
-		projectToFilterMap.put(project, newGitFilter);
+		pathToFilterMap.put(project.getLocation().toString(), newGitFilter);
 	}
 
 	private final Repository repository;
