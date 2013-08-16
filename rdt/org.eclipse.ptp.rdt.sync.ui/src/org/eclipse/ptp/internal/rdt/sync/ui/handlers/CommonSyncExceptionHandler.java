@@ -16,6 +16,7 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.ptp.internal.rdt.sync.ui.RDTSyncUIPlugin;
+import org.eclipse.ptp.internal.rdt.sync.ui.SyncMergeFileTableViewer;
 import org.eclipse.ptp.internal.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.exceptions.RemoteSyncMergeConflictException;
@@ -100,6 +101,10 @@ public class CommonSyncExceptionHandler implements ISyncExceptionHandler {
 					try {
 						PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
 								.showView(SYNC_MERGE_FILE_VIEW, null, IWorkbenchPage.VIEW_VISIBLE);
+						SyncMergeFileTableViewer viewer = SyncMergeFileTableViewer.getActiveInstance();
+						if (viewer != null) {
+							viewer.update(project);
+						}
 					} catch (CoreException e) {
 						throw new RuntimeException(e);
 					}
