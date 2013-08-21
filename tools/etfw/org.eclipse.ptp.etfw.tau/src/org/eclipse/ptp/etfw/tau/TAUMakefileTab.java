@@ -269,8 +269,7 @@ public class TAUMakefileTab implements IToolUITab {
 	 * @param mw
 	 * @return
 	 */
-	protected static GridLayout createGridLayout(int columns, boolean isEqual, int mh,
-			int mw) {
+	protected static GridLayout createGridLayout(int columns, boolean isEqual, int mh, int mw) {
 		final GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = columns;
 		gridLayout.makeColumnsEqualWidth = isEqual;
@@ -404,9 +403,9 @@ public class TAUMakefileTab implements IToolUITab {
 	// URL testURL=ETFWUtils.getDefault().getBundle().getEntry("toolxml"+File.separator+"tau_tool.xml");
 	// tauToolXML = new File(new URI(FileLocator.toFileURL(testURL).toString().replaceAll(" ", "%20")));
 
-	protected Map<String, Object> archvarmap = null;
+	protected Map<String, String> archvarmap = null;
 
-	protected Map<String, Object> varmap = null;
+	protected Map<String, String> varmap = null;
 
 	// } catch (Exception e) {
 	// e.printStackTrace();
@@ -792,7 +791,7 @@ public class TAUMakefileTab implements IToolUITab {
 
 			final String pn = "PAPI_NATIVE_"; //$NON-NLS-1$
 			final String pPre = "PAPI_"; //$NON-NLS-1$
-			varmap = new HashMap<String, Object>(selset.size());
+			varmap = new HashMap<String, String>(selset.size());
 			varmap.put("COUNTER1", "GET_TIME_OF_DAY"); //$NON-NLS-1$ //$NON-NLS-2$
 			final Iterator<Object> varit = selset.iterator();
 			int counter = 2;
@@ -810,8 +809,7 @@ public class TAUMakefileTab implements IToolUITab {
 		}
 	}
 
-	public void initializePane(ILaunchConfiguration configuration)
-			throws CoreException {
+	public void initializePane(ILaunchConfiguration configuration) throws CoreException {
 		try {
 
 			if (LaunchUtils.getRemoteServicesId(configuration) != null) {
@@ -1204,10 +1202,10 @@ public class TAUMakefileTab implements IToolUITab {
 		 */
 		if (((varmap == null) && (archvarmap != null)) || ((varmap != null) && (archvarmap == null))
 				|| ((varmap != null) && (archvarmap != null) && !varmap.equals(archvarmap))) {
-			Map<String, Object> envvars = null;
+			Map<String, String> envvars = null;
 
 			try {
-				envvars = configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, (Map<String, Object>) null);
+				envvars = configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, (Map<String, String>) null);
 			} catch (final CoreException e) {
 				e.printStackTrace();
 			}
@@ -1221,7 +1219,7 @@ public class TAUMakefileTab implements IToolUITab {
 
 			if ((varmap != null) && (varmap.size() > 0)) {
 				if (envvars == null) {
-					envvars = new HashMap<String, Object>();
+					envvars = new HashMap<String, String>();
 				}
 				envvars.putAll(varmap);
 			}
@@ -1377,7 +1375,7 @@ public class TAUMakefileTab implements IToolUITab {
 		configuration.setAttribute(ITAULaunchConfigurationConstants.SELECT, 0);
 		configuration.setAttribute(ITAULaunchConfigurationConstants.SELECT_FILE, ""); //$NON-NLS-1$
 
-		configuration.setAttribute(ITAULaunchConfigurationConstants.ENVVARS, (Map<String, Object>) null);
+		configuration.setAttribute(ITAULaunchConfigurationConstants.ENVVARS, (Map<String, String>) null);
 
 		configuration.setAttribute(ITAULaunchConfigurationConstants.TAU_MAKEFILE, ""); //$NON-NLS-1$
 
