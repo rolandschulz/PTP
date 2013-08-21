@@ -924,7 +924,7 @@ public class TAUMakefileTab implements IToolUITab {
 			//
 			// portalCheck.setSelection(configuration.getAttribute(ITAULaunchConfigurationConstants.PORTAL, false));
 
-			varmap = archvarmap = configuration.getAttribute(ITAULaunchConfigurationConstants.ENVVARS, (Map<String, Object>) null);
+			varmap = archvarmap = configuration.getAttribute(ITAULaunchConfigurationConstants.ENVVARS, (Map<String, String>) null);
 
 			//ETFWUtils.getDefault().getPluginPreferences().setDefault(ITAULaunchConfigurationConstants.TAU_CHECK_AUTO_OPT,true); //$NON-NLS-1$
 
