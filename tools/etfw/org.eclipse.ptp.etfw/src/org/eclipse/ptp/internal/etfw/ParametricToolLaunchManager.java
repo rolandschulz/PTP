@@ -357,18 +357,15 @@ public class ParametricToolLaunchManager {
 	public static String getTauMetadata(Map<String, String> build, RunParams par) {
 		String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<tau:metadata xmlns:tau=\"http://www.cs.uoregon.edu/research/tau\">\n<tau:CommonProfileAttributes>"; //$NON-NLS-1$
 
-		if (build != null)
-		{
+		if (build != null) {
 			xml += makeTauAtts(build, "BUILD:"); //$NON-NLS-1$
 		}
 
-		if (par.args != null)
-		{
+		if (par.args != null) {
 			xml += makeTauAtt("ApplicationArguments", par.args); //$NON-NLS-1$
 		}
 
-		if (par.vars != null)
-		{
+		if (par.vars != null) {
 			xml += makeTauAtts(par.vars, "ENV:"); //$NON-NLS-1$
 		}
 
@@ -494,8 +491,7 @@ public class ParametricToolLaunchManager {
 		};
 
 		final ExternalToolProcess pproc = ETFWUtils.getTool(configuration.getAttribute(
-				IToolLaunchConfigurationConstants.SELECTED_TOOL,
-				(String) null));
+				IToolLaunchConfigurationConstants.SELECTED_TOOL, (String) null));
 		// paraDel=lcd;
 		// this.lf=lf;
 		// here is where the loop(s) for the parametric study should go - for
@@ -589,8 +585,7 @@ public class ParametricToolLaunchManager {
 		System.out.println(params.size());
 		for (final RunParams param : params) {
 			System.out.println("Num Processors: " + param.numProcs); //$NON-NLS-1$
-			if (param.args != null)
-			{
+			if (param.args != null) {
 				System.out.println("Program args: " + param.args); //$NON-NLS-1$
 			}
 			System.out.println("Env args: "); //$NON-NLS-1$
@@ -705,10 +700,10 @@ public class ParametricToolLaunchManager {
 
 				/* Set up environment variables for this run */
 				if (param.vars != null) {
-					Map<String, Object> envvars = null;
-					envvars = wc.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, (Map<String, Object>) null);
+					Map<String, String> envvars = null;
+					envvars = wc.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, (Map<String, String>) null);
 					if (envvars == null) {
-						envvars = new HashMap<String, Object>();
+						envvars = new HashMap<String, String>();
 					}
 					envvars.putAll(param.vars);
 					wc.setAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, envvars);
