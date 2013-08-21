@@ -25,7 +25,7 @@ import java.util.List;
 import org.eclipse.cdt.internal.ui.IContextMenuConstants;
 import org.eclipse.cdt.internal.ui.actions.ActionMessages;
 import org.eclipse.cdt.internal.ui.actions.CDTQuickMenuCreator;
-import org.eclipse.cdt.internal.ui.editor.AddIncludeOnSelectionAction;
+import org.eclipse.cdt.internal.ui.editor.AddIncludeAction;
 import org.eclipse.cdt.internal.ui.editor.CEditor;
 import org.eclipse.cdt.internal.ui.editor.ICEditorActionDefinitionIds;
 import org.eclipse.cdt.internal.ui.editor.SortLinesAction;
@@ -116,7 +116,7 @@ public class GenerateActionGroup extends ActionGroup implements ISelectionChange
 	private List<ISelectionChangedListener> fRegisteredSelectionListeners;
 //	private List<RefactoringAction> fRefactorActions= new ArrayList<RefactoringAction>();
 	
-	private AddIncludeOnSelectionAction fAddInclude;
+	private AddIncludeAction fAddInclude;
 //	private OverrideMethodsAction fOverrideMethods;
 //	private GenerateHashCodeEqualsAction fHashCodeEquals;
 //	private AddGetterSetterAction fAddGetterSetter;
@@ -152,9 +152,9 @@ public class GenerateActionGroup extends ActionGroup implements ISelectionChange
 		fEditor= editor;
 		fGroupName= groupName;
 				
-		fAddInclude= new AddIncludeOnSelectionAction(editor);
+		fAddInclude= new AddIncludeAction(editor);
 		fAddInclude.setActionDefinitionId(ICEditorActionDefinitionIds.ADD_INCLUDE);
-		editor.setAction("AddIncludeOnSelection", fAddInclude); //$NON-NLS-1$
+		editor.setAction("AddInclude", fAddInclude); //$NON-NLS-1$
 		
 //		fOrganizeIncludes= new OrganizeIncludesAction(editor);
 //		fOrganizeIncludes.setActionDefinitionId(ICEditorActionDefinitionIds.ORGANIZE_INCLUDES);
