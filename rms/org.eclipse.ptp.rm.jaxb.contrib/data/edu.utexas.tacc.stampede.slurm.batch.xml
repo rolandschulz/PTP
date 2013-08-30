@@ -197,10 +197,6 @@ job to each node of a pre-existing allocation as one step in a larger job script
 			<choice>,append,truncate</choice>
 			<default></default>
 		</attribute>
-		<attribute name="other" type="string">
-			<description>Other Options.</description>
-			<tooltip><![CDATA[Specifies other options that do not appear elsewhere in list.]]></tooltip>
-		</attribute>
 		<attribute name="output" type="string">
 			<description>Instruct SLURM to connect the batch script's standard output directly to the file name specified in the "filename pattern". (-o, --output=&lt;filename_pattern&gt;)</description>
 			<tooltip><![CDATA[By default both standard output and standard error are directed to a file of
@@ -284,7 +280,7 @@ errors are displayed.]]></tooltip>
 		<!-- SBATCH RUN OPTIONS																			-->
 		<!-- ========================================================================================== -->
 		<attribute name="run.command" type="choice">
-			<description>Which prefix command to use.</description>
+			<description>The prefix command used to launch the application (e.g. "ibrun ./a.out").</description>
 			<tooltip><![CDATA[The prefix command to use with this executable. Specify no
 prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></tooltip>
 			<choice>,ibrun,ibrun tacc_affinity,ibrun.symm</choice>
@@ -322,7 +318,6 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 			<line><arg isUndefinedIfMatches='#SBATCH --time-min='>#SBATCH --time-min=${ptp_rm:time_min#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH'>#SBATCH ${ptp_rm:verbose#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH -D'>#SBATCH -D ${ptp_rm:workdir#value}</arg></line>
-			<line><arg isUndefinedIfMatches='#SBATCH'>#SBATCH ${ptp_rm:other#value}</arg></line>
 			<line><arg isUndefinedIfMatches='export OMP_NUM_THREADS='>export OMP_NUM_THREADS=${ptp_rm:OMP_NUM_THREADS#value}</arg></line>
 			<line><arg isUndefinedIfMatches='export MIC_PPN='>export MIC_PPN=${ptp_rm:MIC_PPN#value}</arg></line>
 			<line><arg isUndefinedIfMatches='export MIC_OMP_NUM_THREADS='>export MIC_OMP_NUM_THREADS=${ptp_rm:MIC_OMP_NUM_THREADS#value}</arg></line>
@@ -585,7 +580,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 		<!-- LAUNCH TAB																	-->
 		<!-- ========================================================================================== -->
 		<launch-tab>
-			<dynamic includeWidgetValuesFrom="Supplemental Settings,OMP Environment,MIC Environment">
+			<dynamic includeWidgetValuesFrom="Supplemental Settings,Environment">
 				<title>Basic Settings</title>
 				<layout>
 					<grid-layout/>
@@ -847,30 +842,9 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<fixed-text>${ptp_rm:mail_type#description}</fixed-text>
 					</widget>
 					<!-- ROW =========================================================================== -->
-					<widget type="label" style="SWT.LEFT">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-						</layout-data>
-						<tooltip>${ptp_rm:other#tooltip}</tooltip>
-						<fixed-text>Other Options: </fixed-text>
-					</widget>
-					<widget type="text" style="SWT.BORDER" attribute="other">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
-						</layout-data>
-						<tooltip>${ptp_rm:other#tooltip}</tooltip>
-					</widget>
-					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-						</layout-data>
-						<tooltip>${ptp_rm:other#tooltip}</tooltip>
-						<fixed-text>${ptp_rm:other#description}</fixed-text>
-					</widget>
-					<!-- ROW =========================================================================== -->
 				</composite>
 			</dynamic>
-			<dynamic includeWidgetValuesFrom="Basic Settings,OMP Environment,MIC Environment">
+			<dynamic includeWidgetValuesFrom="Basic Settings,Environment">
 				<title>Supplemental Settings</title>
 				<layout>
 					<grid-layout/>
@@ -1245,8 +1219,8 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 					<!-- ROW =========================================================================== -->
 				</composite>
 			</dynamic>
-			<dynamic includeWidgetValuesFrom="Basic Settings,Supplemental Settings,MIC Environment">
-				<title>OMP Environment</title>
+			<dynamic includeWidgetValuesFrom="Basic Settings,Supplemental Settings">
+				<title>Environment</title>
 				<layout>
 					<grid-layout />
 				</layout>
@@ -1279,7 +1253,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
 						<tooltip>${ptp_rm:OMP_NUM_THREADS#tooltip}</tooltip>
-						<fixed-text>OpenMP Number of Threads:</fixed-text>
+						<fixed-text>OMP_NUM_THREADS:</fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER" attribute="OMP_NUM_THREADS">
 						<layout-data>
@@ -1295,43 +1269,12 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<fixed-text>${ptp_rm:OMP_NUM_THREADS#description}</fixed-text>
 					</widget>
 					<!-- ROW =========================================================================== -->
-				</composite>
-			</dynamic>
-			<dynamic includeWidgetValuesFrom="Basic Settings,Supplemental Settings,OMP Environment">
-				<title>MIC Environment</title>
-				<layout>
-					<grid-layout />
-				</layout>
-				<composite group="true">
-					<layout>
-						<grid-layout numColumns="4" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
-					</layout>
-					<!-- HEADER ======================================================================== -->
-					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-						</layout-data>
-						<fixed-text>Name</fixed-text>
-					</widget>
-					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" horizontalSpan="2" grabExcessHorizontal="false"/>
-						</layout-data>
-						<fixed-text>Value</fixed-text>
-					</widget>
-					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
-						</layout-data>
-						<fixed-text>Description</fixed-text>
-					</widget>
-					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
 						<tooltip>${ptp_rm:MIC_PPN#tooltip}</tooltip>
-						<fixed-text>Number of MPI Tasks Per MIC:</fixed-text>
+						<fixed-text>MIC_PPN:</fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER" attribute="MIC_PPN">
 						<layout-data>
@@ -1352,7 +1295,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
 						<tooltip>${ptp_rm:MIC_OMP_NUM_THREADS#tooltip}</tooltip>
-						<fixed-text>MIC OpenMP Number of Threads:</fixed-text>
+						<fixed-text>MIC_OMP_NUM_THREADS:</fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER" attribute="MIC_OMP_NUM_THREADS">
 						<layout-data>
@@ -1410,7 +1353,6 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 							<include>ntasks_per_node</include>
 							<include>OMP_NUM_THREADS</include>
 							<include>open_mode</include>
-							<include>other</include>
 							<include>output</include>
 							<include>partition</include>
 							<include>quiet</include>
