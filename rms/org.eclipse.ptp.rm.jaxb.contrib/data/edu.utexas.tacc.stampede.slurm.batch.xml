@@ -657,7 +657,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
 						<tooltip>${ptp_rm:output#tooltip}</tooltip>
-						<fixed-text>Output: </fixed-text>
+						<fixed-text>Output File: </fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER" attribute="output">
 						<layout-data>
@@ -678,7 +678,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
 						<tooltip>${ptp_rm:error#tooltip}</tooltip>
-						<fixed-text>Error: </fixed-text>
+						<fixed-text>Error File: </fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER" attribute="error">
 						<layout-data>
@@ -742,7 +742,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
 						<tooltip>${ptp_rm:ntasks#tooltip}</tooltip>
-						<fixed-text>MPI Number of Tasks:</fixed-text>
+						<fixed-text>Number of Tasks:</fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER" attribute="ntasks">
 						<layout-data>
