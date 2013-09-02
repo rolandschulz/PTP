@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.core.remotemake;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,13 +19,20 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.ErrorParserManager;
+import org.eclipse.cdt.core.cdtvariables.CdtVariableException;
 import org.eclipse.cdt.core.envvar.IEnvironmentVariable;
 import org.eclipse.cdt.core.model.ICModelMarker;
 import org.eclipse.cdt.core.resources.IConsole;
+import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
 import org.eclipse.cdt.internal.core.ConsoleOutputSniffer;
+import org.eclipse.cdt.internal.core.cdtvariables.CdtVariableManager;
+import org.eclipse.cdt.internal.core.cdtvariables.ICoreVariableContextInfo;
 import org.eclipse.cdt.make.core.IMakeBuilderInfo;
 import org.eclipse.cdt.make.core.MakeBuilder;
 import org.eclipse.cdt.make.core.MakeCorePlugin;
@@ -43,7 +49,12 @@ import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.cdt.managedbuilder.core.ITool;
 import org.eclipse.cdt.managedbuilder.core.IToolChain;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
+import org.eclipse.cdt.managedbuilder.internal.core.Configuration;
 import org.eclipse.cdt.managedbuilder.internal.core.InputType;
+import org.eclipse.cdt.utils.cdtvariables.CdtVariableResolver;
+import org.eclipse.cdt.utils.cdtvariables.IVariableContextInfo;
+import org.eclipse.cdt.utils.cdtvariables.IVariableSubstitutor;
+import org.eclipse.cdt.utils.cdtvariables.SupplierBasedCdtVariableSubstitutor;
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
@@ -218,6 +229,7 @@ public class RemoteMakeBuilder extends MakeBuilder {
 				// oh well...
 				String args = mbsInfo.getBuildArguments();
 				if (args != null && !args.equals("")) { //$NON-NLS-1$
+					args = resolveArguments(args, configuration);
 					String[] newArgs = makeArray(args);
 					buildArguments = new String[targets.length + newArgs.length];
 					System.arraycopy(newArgs, 0, buildArguments, 0, newArgs.length);
@@ -492,6 +504,67 @@ public class RemoteMakeBuilder extends MakeBuilder {
 		}
 	}
 	
+
+	/**
+	 * 
+	 * @param args -- the string with several arguments, eg: gmake ${VALUE} ${MY VALUE} This 
+	 * method should resolve ${VALUE} and ${MY VALUE} to related value.
+	 * @param cfg 
+	 * @return args -- the processed arguments.
+	 */
+	private String resolveArguments(String args, IConfiguration cfg) {
+		// This regular expression will match contents inside {}, "", '',
+		// and replace the matched contents with an unique UUID string.
+		// eg: if have user defined variable ${a b c}=test, and {$fg}=build, and have the build command as:
+		// ${a b c} d e ${fg} h="i j k" 'l  m'
+		// then it will be processed and replaced as: REGEX d e REGEX h=REGEX REGEX
+		// Then split the line by space would be safe.
+		// After resolve each variable, will finally have:  
+		// test d e build h="i j k" 'l  m'
+		String regex = "[$\\{,\\(,\\[,\",\'].*?[\\},\\),\\],\",\']"; //$NON-NLS-1$
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher(args);
+		UUID uuid = UUID.randomUUID();
+		args = args.replaceAll(regex, uuid.toString());
+		ArrayList<String> matcherList = new ArrayList<String>();
+		while(matcher.find()){
+			matcherList.add(matcher.group());
+		}
+		
+		String[] argList = args.split(" "); //$NON-NLS-1$
+		
+		StringBuffer buffer = new StringBuffer();
+		int contextType; 
+		if (cfg instanceof Configuration) {
+			ICConfigurationDescription cfgd = ((Configuration) cfg).getConfigurationDescription();
+			if (cfgd != null) {
+				contextType = ICoreVariableContextInfo.CONTEXT_CONFIGURATION;
+			} else {
+				contextType = ICoreVariableContextInfo.CONTEXT_WORKSPACE;
+			}
+
+			IVariableContextInfo contextInfo = CdtVariableManager.getDefault().getMacroContextInfo(contextType, cfgd);
+			IVariableSubstitutor substitutor = new SupplierBasedCdtVariableSubstitutor(contextInfo, "", ""); //$NON-NLS-1$//$NON-NLS-2$
+
+			int k = 0;
+			for (int i = 0; i < argList.length; i++) {
+				if(argList[i].contains(uuid.toString())){
+					argList[i] = argList[i].replace(uuid.toString(), matcherList.get(k));
+					k++;
+				}
+				try {
+					String resolvedArg = CdtVariableResolver.resolveToString(argList[i], substitutor);
+					buffer.append(resolvedArg);
+					buffer.append(" "); //$NON-NLS-1$
+				} catch (CdtVariableException e) {
+					e.printStackTrace();
+				}
+			}
+			return buffer.toString();
+		}
+		return args;
+	}
+
 	// Turn the string into an array.
 	private String[] makeArray(String string) {
 		string.trim();
