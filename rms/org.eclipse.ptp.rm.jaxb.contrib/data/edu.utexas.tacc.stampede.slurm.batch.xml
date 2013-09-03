@@ -214,6 +214,7 @@ Use absolute path or "${ptp_rm:workdir#value}" prefix to be relative to working 
 partition as designated by the system administrator. If the job can use more
 than one partition, specify their names in a comma separate list and the one
 offering earliest initiation is used.]]></tooltip>
+            <default>development</default>
 		</attribute>
 		<attribute name="quiet" type="boolean" translateBooleanAs="-Q, ">
 			<description>Suppress informational messages from sbatch. (-Q, --quiet)</description>
@@ -233,7 +234,7 @@ parameter "KillWait". A time limit of zero requests that no time
 limit be imposed. Acceptable time formats include "minutes",
 "minutes:seconds", "hours:minutes:seconds", "days-hours",
 "days-hours:minutes" and "days-hours:minutes:seconds".]]></tooltip>
-			<default>0:00</default>
+			<default>1</default>
 		</attribute>
 		<attribute name="time_min" type="string">
 			<description>Set a minimum time limit on the job allocation. (--time-min=&lt;time&gt;)</description>
