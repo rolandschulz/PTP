@@ -28,7 +28,7 @@
 		</attribute>
 		<!-- needed by RM internals for fetch; name is fixed by convention -->
 		<attribute name="stderr_remote_path" visible="false">
-			<default>${ptp_rm:workdir#value}/slurm-${ptp_rm:@jobId#default}.out</default>
+			<default>${ptp_rm:workdir#value}/slurm-${ptp_rm:@jobId#default}.err</default>
 			<link-value-to>error</link-value-to>
 		</attribute>
 		<!-- ========================================================================================== -->
