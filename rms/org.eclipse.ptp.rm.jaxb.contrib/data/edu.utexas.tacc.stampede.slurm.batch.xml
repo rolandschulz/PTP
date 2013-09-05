@@ -35,12 +35,12 @@
 		<!-- SBATCH COMMAND ARGUMENTS																	-->
 		<!-- ========================================================================================== -->
 		<attribute name="account" type="string">
-			<description>Charge resources used by this job to specified account. (-A, --account=&lt;account&gt;)</description>
+			<description>Account to charge resources used by this job. (-A, --account=&lt;account&gt;)</description>
 			<tooltip><![CDATA[The account is an arbitrary string. The account name may be changed after
 job submission using the scontrol command.]]></tooltip>
 		</attribute>
 		<attribute name="begin" type="string">
-			<description>Defer the allocation of the job until the specified time. (--begin&lt;time&gt;)</description>
+			<description>Time to begin the allocation of the job. (--begin&lt;time&gt;)</description>
 			<tooltip><![CDATA[Submit the batch script to the SLURM controller immediately, like normal, 
 but tell the controller to defer the allocation of the job until the specified time. 
 Time may be of the form HH:MM:SS to run a job at a specific time of day 
@@ -57,18 +57,18 @@ tomorrow with the keyword "tomorrow".
 The value may be changed after job submission using the scontrol command.]]></tooltip>
 		</attribute>
 		<attribute name="comment" type="string">
-			<description>An arbitrary comment. (--comment&lt;string&gt;)</description>
+			<description>Arbitrary comment. (--comment&lt;string&gt;)</description>
 			<tooltip><![CDATA[An arbitrary comment enclosed in double quotes if using spaces
 or some special characters.]]></tooltip>
 		</attribute>
 		<attribute name="dependency" type="string">
-			<description>Defer the start of this job until the specified dependencies have been satisfied completed. (-d, --dependency=&lt;dependency_list&gt;)</description>
+			<description>Dependencies before job starts. (-d, --dependency=&lt;dependency_list&gt;)</description>
 			<tooltip><![CDATA[Format is of the form "type:job_id[:job_id][,type:job_id[:job_id]].
 Many jobs can share the same dependency and these jobs may even belong to different
 users. The value may be changed after job submission using the scontrol command.]]></tooltip>
 		</attribute>
 		<attribute name="error" type="string">
-			<description>Instruct SLURM to connect the batch script's standard error directly to the file name specified in the "filename pattern". (-e, --error=&lt;filename_pattern&gt;)</description>
+			<description>Filename pattern of standard error. (-e, --error=&lt;filename_pattern&gt;)</description>
 			<tooltip><![CDATA[By default both standard output and standard error are directed to a file
 of the name "slurm-%j.out", where the "%j" is replaced with the job allocation number.
 See the "--input" option for filename specification options.
@@ -79,22 +79,21 @@ Use absolute path or "${ptp_rm:workdir#value}" prefix to be relative to working 
 			</validator>
 		</attribute>
 		<attribute name="exclude" type="string">
-			<description>Specify what nodes to exclude. (-x, --exclude=&lt;node name list&gt;)</description>
+			<description>Nodes to exclude. (-x, --exclude=&lt;node name list&gt;)</description>
 			<tooltip><![CDATA[Explicitly exclude certain nodes from the resources granted to the job.]]></tooltip>
 		</attribute>
 		<attribute name="hold" type="boolean" translateBooleanAs='-H, '>
-			<description>Specify the job is to be submitted in a held state (priority of zero). (-H, --hold)</description>
+			<description>Hold the job upon submission. (priority of zero). (-H, --hold)</description>
 			<tooltip><![CDATA[A held job can now be released using scontrol to reset its priority
 (e.g. "scontrol update jobid=<id> priority=1").]]></tooltip>
 		</attribute>
 		<attribute name="immediate" type="boolean" translateBooleanAs="-I, ">
-			<description>The batch script is only submitted to the controller if the resources
-necessary to grant its job allocation are immediately available. (-I, --immediate)</description>
+			<description>Submit job if resources are immediately available. (-I, --immediate)</description>
 			<tooltip><![CDATA[If the job allocation has to wait in a queue of pending jobs,
 the batch script is not submitted.]]></tooltip>
 		</attribute>
 		<attribute name="input" type="string">
-			<description>Specify filename pattern of batch script's standard input. (-i, --input=&lt;filename_pattern&gt;)</description>
+			<description>Filename pattern of standard input. (-i, --input=&lt;filename_pattern&gt;)</description>
 			<tooltip><![CDATA[Instruct SLURM to connect the batch script's standard input
 directly to the file name specified in the "filename pattern".
 By default, "/dev/null" is open on the batch script's standard
@@ -110,7 +109,7 @@ replaced by the name of the first node in the job, which
 is the one that runs the script.]]></tooltip>
 		</attribute>
 		<attribute name="job_name" type="string">
-			<description>Specify a name for the job allocation. (-J, --job-name=&lt;jobname&gt;)</description>
+			<description>Job name for the submission. (-J, --job-name=&lt;jobname&gt;)</description>
 			<tooltip><![CDATA[The specified name appears along with
 the job id number when querying running jobs on the system. The default
 is the name of the batch script, or just "sbatch" if the script is
@@ -122,7 +121,7 @@ read on sbatch's standard input.]]></tooltip>
 			</validator>
 		</attribute>
 		<attribute name="mail_type" type="choice">
-			<description>Notify user by email when certain event types occur. (--mail-type=&lt;type&gt;)</description>
+			<description>Event type to notify user by email. (--mail-type=&lt;type&gt;)</description>
 			<tooltip><![CDATA[Valid type values are BEGIN, END, FAIL, REQUEUE, and ALL (any state
 change). The user to be notified is indicated with --mail-user.]]></tooltip>
 			<choice>,BEGIN,END,FAIL,REQUEUE,ALL</choice>
@@ -134,7 +133,7 @@ change). The user to be notified is indicated with --mail-user.]]></tooltip>
 The default value is the submitting user.]]></tooltip>
 		</attribute>
 		<attribute name="nodefile" type="string">
-			<description>Specify filename containing nodes. (-F, --nodefile=&lt;node file&gt;)</description>
+			<description>Name of the file containing nodes. (-F, --nodefile=&lt;node file&gt;)</description>
 			<tooltip><![CDATA[Much like --nodelist, but the list is contained in a file of
 name node file. The node names of the list may also span multiple
 lines in the file. Duplicate node names in the file will
@@ -142,7 +141,7 @@ be ignored. The order of the node names in the list is not
 important; the node names will be sorted by SLURM.]]></tooltip>
 		</attribute>
 		<attribute name="nodelist" type="string">
-			<description>Request a specific list of node names. (-w, --nodelist=&lt;node name list&gt;)</description>
+			<description>List of node names. (-w, --nodelist=&lt;node name list&gt;)</description>
 			<tooltip><![CDATA[Request a specific list of node names. The list may be specified
 as a comma-separated list of node names, or a range of node
 names (e.g. mynode[1-5,7,...]). Duplicate node names in the list
@@ -150,7 +149,7 @@ will be ignored. The order of the node names in the list is not
 important; the node names will be sorted by SLURM.]]></tooltip>
 		</attribute>
 		<attribute name="nodes" type="string">
-			<description>Request that a minimum of "minnodes" nodes be allocated to this job. (-N, --nodes=&lt;minnodes[-maxnodes]&gt;)</description>
+			<description>Number of nodes to be allocated to this job. (-N, --nodes=&lt;minnodes[-maxnodes]&gt;)</description>
 			<tooltip><![CDATA[The scheduler may decide to launch the job on more than "minnodes" nodes.
 A limit on the maximum node count may be specified with "maxnodes"
 (e.g. "--nodes=2-4"). The minimum and maximum node count may be the
@@ -173,13 +172,13 @@ and without delaying the initiation of the job.]]></tooltip>
 			<default>1</default>
 		</attribute>
 		<attribute name="ntasks" type="integer" min="1">
-			<description>Specify the number of tasks to run. (-n, --ntasks=&lt;number&gt;)</description>
+			<description>Number of tasks to run. (-n, --ntasks=&lt;number&gt;)</description>
 			<tooltip><![CDATA[Allocate resources for ntasks tasks. The default
 is one task per node, but note that the --ntasks-per-node option changes this default.]]></tooltip>
 			<default>1</default>
 		</attribute>
 		<attribute name="ntasks_per_node" type="choice">
-			<description>Request the maximum ntasks be invoked on each node. (--ntasks-per-node=&lt;ntasks&gt;)</description>
+			<description>Maximum number of tasks for each node. (--ntasks-per-node=&lt;ntasks&gt;)</description>
 			<tooltip><![CDATA[Meant to be used with the --nodes option. This is related to
 --cpus-per-task=ncpus, but does not require knowledge of the actual number of
 cpus on each node. In some cases, it is more convenient to be able to request that no 
@@ -192,13 +191,13 @@ job to each node of a pre-existing allocation as one step in a larger job script
 			<default></default>
 		</attribute>
 		<attribute name="open_mode" type="choice">
-			<description>Open the output and error files using append or truncate mode as specified. (--open_mode=append|truncate)</description>
+			<description>Mode to open the output and error files. (--open_mode=append|truncate)</description>
 			<tooltip><![CDATA[The default value is specified by the system configuration parameter JobFileAppend.]]></tooltip>
 			<choice>,append,truncate</choice>
 			<default></default>
 		</attribute>
 		<attribute name="output" type="string">
-			<description>Instruct SLURM to connect the batch script's standard output directly to the file name specified in the "filename pattern". (-o, --output=&lt;filename_pattern&gt;)</description>
+			<description>The filename pattern of standard output. (-o, --output=&lt;filename_pattern&gt;)</description>
 			<tooltip><![CDATA[By default both standard output and standard error are directed to a file of
 the name "slurm-%j.out", where the "%j" is replaced with the job allocation number.
 See the --input option for filename specification options.
@@ -209,7 +208,7 @@ Use absolute path or "${ptp_rm:workdir#value}" prefix to be relative to working 
 			</validator>
 		</attribute>
 		<attribute name="partition" type="string">
-			<description>Request a specific partition for the resource allocation. (-p, --partition=&lt;partition_names&gt;)</description>
+			<description>Partition for the resource allocation. (-p, --partition=&lt;partition_names&gt;)</description>
 			<tooltip><![CDATA[If not specified, the default behaviour is to allow the slurm controller to select the default
 partition as designated by the system administrator. If the job can use more
 than one partition, specify their names in a comma separate list and the one
@@ -217,14 +216,14 @@ offering earliest initiation is used.]]></tooltip>
             <default>development</default>
 		</attribute>
 		<attribute name="quiet" type="boolean" translateBooleanAs="-Q, ">
-			<description>Suppress informational messages from sbatch. (-Q, --quiet)</description>
+			<description>Suppress informational messages. (-Q, --quiet)</description>
 			<tooltip>Errors are still displayed.</tooltip>
 		</attribute>
 		<attribute name="reservation" type="string">
-			<description>Allocate resources for the job from the named reservation. (--reservation=&lt;name&gt;)</description>
+			<description>Allocate resources from the named reservation. (--reservation=&lt;name&gt;)</description>
 		</attribute>
 		<attribute name="time" type="string">
-			<description>Set a limit on the total run time of the job allocation. (-t, --time=&lt;time&gt;)</description>
+			<description>Limit on the total run time of the job allocation. (-t, --time=&lt;time&gt;)</description>
 			<tooltip><![CDATA[If the requested time limit exceeds the partition's time limit, the job is
 left in a PENDING state (possibly indefinitely). The default time
 limit is the partition's time limit. When the time limit is reached,
@@ -237,7 +236,7 @@ limit be imposed. Acceptable time formats include "minutes",
 			<default>00:05:00</default>
 		</attribute>
 		<attribute name="time_min" type="string">
-			<description>Set a minimum time limit on the job allocation. (--time-min=&lt;time&gt;)</description>
+			<description>Minimum time limit on the job allocation. (--time-min=&lt;time&gt;)</description>
 			<tooltip><![CDATA[Set a minimum time limit on the job allocation. If specified, the job may
 have it's --time limit lowered to a value no lower than --time-min if
 doing so permits the job to begin execution earlier than otherwise possible.
@@ -248,12 +247,12 @@ otherwise reserved for higher priority jobs. Acceptable time formats include
 "days-hours:minutes" and "days-hours:minutes:seconds".]]></tooltip>
 		</attribute>
 		<attribute name="verbose" type="boolean" translateBooleanAs="-v, ">
-			<description>Increase the verbosity of sbatch's informational messages. (-v, --verbose)</description>
+			<description>Increase the verbosity of informational messages. (-v, --verbose)</description>
 			<tooltip><![CDATA[Multiple -v's further increase sbatch's verbosity. By default only
 errors are displayed.]]></tooltip>
 		</attribute>
 		<attribute name="workdir" type="string">
-			<description>Set the working directory of the batch script to "directory" before it it executed. (-D, --workdir=&lt;directory&gt;)</description>
+			<description>Working directory of the batch script. (-D, --workdir=&lt;directory&gt;)</description>
 			<tooltip><![CDATA[Must use absolute path on scheduled system, or "${ptp_rm:directory#value}".]]></tooltip>
 			<default>${ptp_rm:directory#value}</default>
 			<link-value-to>directory</link-value-to>
@@ -281,7 +280,7 @@ errors are displayed.]]></tooltip>
 		<!-- SBATCH RUN OPTIONS																			-->
 		<!-- ========================================================================================== -->
 		<attribute name="run.command" type="choice">
-			<description>The prefix command for an MPI program (e.g. "ibrun ./a.out") or blank for non-MPI program.</description>
+			<description>Prefix command for an MPI program (e.g. "ibrun ./a.out") or blank for non-MPI program.</description>
 			<tooltip><![CDATA[The prefix command to use with this executable. Specify no
 prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></tooltip>
 			<choice>,ibrun,ibrun tacc_affinity,ibrun.symm</choice>
@@ -722,7 +721,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
 						<tooltip>${ptp_rm:nodes#tooltip}</tooltip>
-						<fixed-text>Number of nodes: </fixed-text>
+						<fixed-text>Number of Nodes: </fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER" attribute="nodes">
 						<layout-data>
@@ -1199,14 +1198,10 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 					</widget>
 					<browse title="Browse" textStyle="SWT.BORDER" attribute="workdir" readOnly="true" directory="true">
 						<text-layout-data>
-							<grid-data horizontalAlign="SWT.FILL"
-								horizontalSpan="1" grabExcessHorizontal="true"
-								widthHint="150" />
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="1" grabExcessHorizontal="true" widthHint="150" />
 						</text-layout-data>
 						<button-layout-data>
-							<grid-data horizontalAlign="SWT.FILL"
-								horizontalSpan="1" grabExcessHorizontal="false"
-								widthHint="50"/>
+							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="1" grabExcessHorizontal="false" widthHint="50"/>
 						</button-layout-data>
 						<tooltip>Clear text box if "Browse" button does not work. ${ptp_rm:workdir#tooltip}</tooltip>
 					</browse>
@@ -1325,13 +1320,13 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 					</layout>
 					<viewer name="allAttributes" style="SWT.BORDER" sort="true" initialAllChecked="true" type="table">
 						<layout-data>
-							<grid-data widthHint="900" heightHint="400" horizontalSpan="1" />
+							<grid-data widthHint="750" horizontalSpan="1"/>
 						</layout-data>
 						<!-- These are the 6 attribute fields mappable to columns. In a "table 
 							viewer" the order of the columns is entirely arbitrary -->
-						<column-data name="Name" width="300" />
-						<column-data name="Value" width="300" />
-						<column-data name="Description" width="300" />
+						<column-data name="Name" width="150" />
+						<column-data name="Value" width="150" />
+						<column-data name="Description" width="450" />
 						<items>
 							<include>account</include>
 							<include>begin</include>
