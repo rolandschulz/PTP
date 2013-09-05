@@ -234,7 +234,7 @@ parameter "KillWait". A time limit of zero requests that no time
 limit be imposed. Acceptable time formats include "minutes",
 "minutes:seconds", "hours:minutes:seconds", "days-hours",
 "days-hours:minutes" and "days-hours:minutes:seconds".]]></tooltip>
-			<default>1</default>
+			<default>00:05:00</default>
 		</attribute>
 		<attribute name="time_min" type="string">
 			<description>Set a minimum time limit on the job allocation. (--time-min=&lt;time&gt;)</description>
@@ -281,7 +281,7 @@ errors are displayed.]]></tooltip>
 		<!-- SBATCH RUN OPTIONS																			-->
 		<!-- ========================================================================================== -->
 		<attribute name="run.command" type="choice">
-			<description>The prefix command used to launch the application (e.g. "ibrun ./a.out").</description>
+			<description>The prefix command for an MPI program (e.g. "ibrun ./a.out") or blank for non-MPI program.</description>
 			<tooltip><![CDATA[The prefix command to use with this executable. Specify no
 prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></tooltip>
 			<choice>,ibrun,ibrun tacc_affinity,ibrun.symm</choice>
