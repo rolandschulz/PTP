@@ -637,27 +637,6 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
-						</layout-data>
-						<tooltip>${ptp_rm:modules#tooltip}</tooltip>
-						<fixed-text>Modules to Load: </fixed-text>
-					</widget>
-					<widget type="custom" typeId="envconfig" style="SWT.NONE" attribute="modules">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false"/>
-						</layout-data>
-						<tooltip>${ptp_rm:modules#tooltip}</tooltip>
-					</widget>
-					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
-						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
-						</layout-data>
-						<tooltip>${ptp_rm:modules#tooltip}</tooltip>
-						<fixed-text>${ptp_rm:modules#description}</fixed-text>
-					</widget>
-					<!-- ROW =========================================================================== -->
-					<widget type="label" style="SWT.LEFT">
-						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
 						<tooltip>${ptp_rm:job_name#tooltip}</tooltip>
@@ -1267,6 +1246,27 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
 						<fixed-text>Description</fixed-text>
+					</widget>
+					<!-- ROW =========================================================================== -->
+					<widget type="label" style="SWT.LEFT">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:modules#tooltip}</tooltip>
+						<fixed-text>Modules to Load: </fixed-text>
+					</widget>
+					<widget type="custom" typeId="envconfig" style="SWT.NONE" attribute="modules">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:modules#tooltip}</tooltip>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+						</layout-data>
+						<tooltip>${ptp_rm:modules#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:modules#description}</fixed-text>
 					</widget>
 					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
