@@ -121,7 +121,7 @@ read on sbatch's standard input.]]></tooltip>
 			<tooltip><![CDATA[Valid type values are BEGIN, END, FAIL, REQUEUE, and ALL (any state
 change). The user to be notified is indicated with --mail-user.]]></tooltip>
 			<choice>,BEGIN,END,FAIL,REQUEUE,ALL</choice>
-			<default></default>
+			<default>ALL</default>
 		</attribute>
 		<attribute name="mail_user" type="string">
 			<description>User to receive email notification of state changes. (--mail_user=&lt;user&gt;)</description>
