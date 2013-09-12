@@ -278,7 +278,7 @@ errors are displayed.]]></tooltip>
 			<description>Prefix command for an MPI program (e.g. "ibrun ./a.out") or blank for non-MPI program.</description>
 			<tooltip><![CDATA[The prefix command to use with this executable. Specify no
 prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></tooltip>
-			<choice>,ibrun,ibrun tacc_affinity,ibrun.symm</choice>
+			<choice>,ibrun,ibrun tacc_affinity</choice>
 			<default>ibrun</default>
 		</attribute>
 		<!-- ========================================================================================== -->
