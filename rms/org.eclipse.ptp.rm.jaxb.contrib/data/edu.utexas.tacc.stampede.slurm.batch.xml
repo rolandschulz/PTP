@@ -104,7 +104,7 @@ which are a percent sign "%" followed by a letter (e.g.
 replaced by the name of the first node in the job, which
 is the one that runs the script.]]></tooltip>
 		</attribute>
-		<attribute name="job_name" type="string">
+		<attribute name="job-name" type="string">
 			<description>Job name for the submission. (-J, --job-name=&lt;jobname&gt;)</description>
 			<tooltip><![CDATA[The specified name appears along with
 the job id number when querying running jobs on the system. The default
@@ -113,18 +113,18 @@ read on sbatch's standard input.]]></tooltip>
 			<default>ptp_sbatch</default>
 			<validator>
 				<regex expression="[a-zA-Z_][0-9a-zA-Z_]*"/>
-				<error-message>"job_name" field: Must be at least one alphanumeric character</error-message>
+				<error-message>"job-name" field: Must be at least one alphanumeric character</error-message>
 			</validator>
 		</attribute>
-		<attribute name="mail_type" type="choice">
+		<attribute name="mail-type" type="choice">
 			<description>Event type to notify user by email. (--mail-type=&lt;type&gt;)</description>
 			<tooltip><![CDATA[Valid type values are BEGIN, END, FAIL, REQUEUE, and ALL (any state
 change). The user to be notified is indicated with --mail-user.]]></tooltip>
 			<choice>,BEGIN,END,FAIL,REQUEUE,ALL</choice>
 			<default>ALL</default>
 		</attribute>
-		<attribute name="mail_user" type="string">
-			<description>User to receive email notification of state changes. (--mail_user=&lt;user&gt;)</description>
+		<attribute name="mail-user" type="string">
+			<description>User to receive email notification of state changes. (--mail-user=&lt;user&gt;)</description>
 			<tooltip><![CDATA[As defined by --mail-type.
 The default value is the submitting user.]]></tooltip>
 		</attribute>
@@ -176,7 +176,7 @@ and without delaying the initiation of the job.]]></tooltip>
 is one task per node, but note that the --ntasks-per-node option changes this default.]]></tooltip>
 			<default>1</default>
 		</attribute>
-		<attribute name="ntasks_per_node" type="choice">
+		<attribute name="ntasks-per-node" type="choice">
 			<description>Maximum number of tasks for each node. (--ntasks-per-node=&lt;ntasks&gt;)</description>
 			<tooltip><![CDATA[Meant to be used with the --nodes option. This is related to
 --cpus-per-task=ncpus, but does not require knowledge of the actual number of
@@ -189,8 +189,8 @@ job to each node of a pre-existing allocation as one step in a larger job script
 			<choice>,1,2,4,8,16,32,64</choice>
 			<default></default>
 		</attribute>
-		<attribute name="open_mode" type="choice">
-			<description>Mode to open the output and error files. (--open_mode=append|truncate)</description>
+		<attribute name="open-mode" type="choice">
+			<description>Mode to open the output and error files. (--open-mode=append|truncate)</description>
 			<tooltip><![CDATA[The default value is specified by the system configuration parameter JobFileAppend.]]></tooltip>
 			<choice>,append,truncate</choice>
 			<default></default>
@@ -230,7 +230,7 @@ limit be imposed. Acceptable time formats include "minutes",
 "days-hours:minutes" and "days-hours:minutes:seconds".]]></tooltip>
 			<default>00:05:00</default>
 		</attribute>
-		<attribute name="time_min" type="string">
+		<attribute name="time-min" type="string">
 			<description>Minimum time limit on the job allocation. (--time-min=&lt;time&gt;)</description>
 			<tooltip><![CDATA[Set a minimum time limit on the job allocation. If specified, the job may
 have it's --time limit lowered to a value no lower than --time-min if
@@ -296,21 +296,21 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 			<line><arg isUndefinedIfMatches='#SBATCH'>#SBATCH ${ptp_rm:hold#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH'>#SBATCH ${ptp_rm:immediate#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH -i'>#SBATCH -i ${ptp_rm:input#value}</arg></line>
-			<line><arg isUndefinedIfMatches='#SBATCH -J'>#SBATCH -J ${ptp_rm:job_name#value}</arg></line>
-			<line><arg isUndefinedIfMatches='#SBATCH --mail-type='>#SBATCH --mail-type=${ptp_rm:mail_type#value}</arg></line>
-			<line><arg isUndefinedIfMatches='#SBATCH --mail-user='>#SBATCH --mail-user=${ptp_rm:mail_user#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH -J'>#SBATCH -J ${ptp_rm:job-name#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --mail-type='>#SBATCH --mail-type=${ptp_rm:mail-type#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --mail-user='>#SBATCH --mail-user=${ptp_rm:mail-user#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH -F'>#SBATCH -F ${ptp_rm:nodefile#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH -w'>#SBATCH -w ${ptp_rm:nodelist#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH -N'>#SBATCH -N ${ptp_rm:nodes#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH -n'>#SBATCH -n ${ptp_rm:ntasks#value}</arg></line>
-			<line><arg isUndefinedIfMatches='#SBATCH --ntasks-per-node='>#SBATCH --ntasks-per-node=${ptp_rm:ntasks_per_node#value}</arg></line>
-			<line><arg isUndefinedIfMatches='#SBATCH --open-mode='>#SBATCH --open-mode=${ptp_rm:open_mode#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --ntasks-per-node='>#SBATCH --ntasks-per-node=${ptp_rm:ntasks-per-node#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --open-mode='>#SBATCH --open-mode=${ptp_rm:open-mode#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH -o'>#SBATCH -o ${ptp_rm:output#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH -p'>#SBATCH -p ${ptp_rm:partition#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH'>#SBATCH ${ptp_rm:quiet#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH --reservation='>#SBATCH --reservation=${ptp_rm:reservation#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH -t'>#SBATCH -t ${ptp_rm:time#value}</arg></line>
-			<line><arg isUndefinedIfMatches='#SBATCH --time-min='>#SBATCH --time-min=${ptp_rm:time_min#value}</arg></line>
+			<line><arg isUndefinedIfMatches='#SBATCH --time-min='>#SBATCH --time-min=${ptp_rm:time-min#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH'>#SBATCH ${ptp_rm:verbose#value}</arg></line>
 			<line><arg isUndefinedIfMatches='#SBATCH -D'>#SBATCH -D ${ptp_rm:workdir#value}</arg></line>
 			<line><arg isUndefinedIfMatches="">${ptp_rm:modules#value}</arg></line>
@@ -631,21 +631,21 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<tooltip>${ptp_rm:job_name#tooltip}</tooltip>
+						<tooltip>${ptp_rm:job-name#tooltip}</tooltip>
 						<fixed-text>Job Name: </fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" attribute="job_name">
+					<widget type="text" style="SWT.BORDER" attribute="job-name">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
-						<tooltip>${ptp_rm:job_name#tooltip}</tooltip>
+						<tooltip>${ptp_rm:job-name#tooltip}</tooltip>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<tooltip>${ptp_rm:job_name#tooltip}</tooltip>
-						<fixed-text>${ptp_rm:job_name#description}</fixed-text>
+						<tooltip>${ptp_rm:job-name#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:job-name#description}</fixed-text>
 					</widget>
 					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
@@ -800,42 +800,42 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<tooltip>${ptp_rm:mail_user#tooltip}</tooltip>
+						<tooltip>${ptp_rm:mail-user#tooltip}</tooltip>
 						<fixed-text>Mail User: </fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" attribute="mail_user">
+					<widget type="text" style="SWT.BORDER" attribute="mail-user">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
-						<tooltip>${ptp_rm:mail_user#tooltip}</tooltip>
+						<tooltip>${ptp_rm:mail-user#tooltip}</tooltip>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<tooltip>${ptp_rm:mail_user#tooltip}</tooltip>
-						<fixed-text>${ptp_rm:mail_user#description}</fixed-text>
+						<tooltip>${ptp_rm:mail-user#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:mail-user#description}</fixed-text>
 					</widget>
 					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<tooltip>${ptp_rm:mail_type#tooltip}</tooltip>
+						<tooltip>${ptp_rm:mail-type#tooltip}</tooltip>
 						<fixed-text>Mail Type: </fixed-text>
 					</widget>
-					<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="mail_type">
+					<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="mail-type">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"/>
 						</layout-data>
-						<tooltip>${ptp_rm:mail_type#tooltip}</tooltip>
+						<tooltip>${ptp_rm:mail-type#tooltip}</tooltip>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<tooltip>${ptp_rm:mail_type#tooltip}</tooltip>
-						<fixed-text>${ptp_rm:mail_type#description}</fixed-text>
+						<tooltip>${ptp_rm:mail-type#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:mail-type#description}</fixed-text>
 					</widget>
 					<!-- ROW =========================================================================== -->
 				</composite>
@@ -1063,42 +1063,42 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<tooltip>${ptp_rm:ntasks_per_node#tooltip}</tooltip>
+						<tooltip>${ptp_rm:ntasks-per-node#tooltip}</tooltip>
 						<fixed-text>MPI Ranks per Node:</fixed-text>
 					</widget>
-					<widget type="combo" style="SWT.BORDER" attribute="ntasks_per_node" readOnly="true">
+					<widget type="combo" style="SWT.BORDER" attribute="ntasks-per-node" readOnly="true">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" />
 						</layout-data>
-						<tooltip>${ptp_rm:ntasks_per_node#tooltip}</tooltip>
+						<tooltip>${ptp_rm:ntasks-per-node#tooltip}</tooltip>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<tooltip>${ptp_rm:ntasks_per_node#tooltip}</tooltip>
-						<fixed-text>${ptp_rm:ntasks_per_node#description}</fixed-text>
+						<tooltip>${ptp_rm:ntasks-per-node#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:ntasks-per-node#description}</fixed-text>
 					</widget>
 					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<tooltip>${ptp_rm:open_mode#tooltip}</tooltip>
+						<tooltip>${ptp_rm:open-mode#tooltip}</tooltip>
 						<fixed-text>Open Mode: </fixed-text>
 					</widget>
-					<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="open_mode">
+					<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="open-mode">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false"/>
 						</layout-data>
-						<tooltip>${ptp_rm:open_mode#tooltip}</tooltip>
+						<tooltip>${ptp_rm:open-mode#tooltip}</tooltip>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<tooltip>${ptp_rm:open_mode#tooltip}</tooltip>
-						<fixed-text>${ptp_rm:open_mode#description}</fixed-text>
+						<tooltip>${ptp_rm:open-mode#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:open-mode#description}</fixed-text>
 					</widget>
 					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
@@ -1147,21 +1147,21 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<tooltip>${ptp_rm:time_min#tooltip}</tooltip>
+						<tooltip>${ptp_rm:time-min#tooltip}</tooltip>
 						<fixed-text>Time Mininum: </fixed-text>
 					</widget>
-					<widget type="text" style="SWT.BORDER" attribute="time_min">
+					<widget type="text" style="SWT.BORDER" attribute="time-min">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.FILL" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
 						</layout-data>
-						<tooltip>${ptp_rm:time_min#tooltip}</tooltip>
+						<tooltip>${ptp_rm:time-min#tooltip}</tooltip>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
 							<grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 						</layout-data>
-						<tooltip>${ptp_rm:time_min#tooltip}</tooltip>
-						<fixed-text>${ptp_rm:time_min#description}</fixed-text>
+						<tooltip>${ptp_rm:time-min#tooltip}</tooltip>
+						<fixed-text>${ptp_rm:time-min#description}</fixed-text>
 					</widget>
 					<!-- ROW =========================================================================== -->
 					<widget type="label" style="SWT.LEFT">
@@ -1354,24 +1354,24 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 							<include>hold</include>
 							<include>immediate</include>
 							<include>input</include>
-							<include>job_name</include>
-							<include>mail_type</include>
-							<include>mail_user</include>
+							<include>job-name</include>
+							<include>mail-type</include>
+							<include>mail-user</include>
 							<include>MIC_OMP_NUM_THREADS</include>
 							<include>MIC_PPN</include>
 							<include>nodefile</include>
 							<include>nodelist</include>
 							<include>nodes</include>
 							<include>ntasks</include>
-							<include>ntasks_per_node</include>
+							<include>ntasks-per-node</include>
 							<include>OMP_NUM_THREADS</include>
-							<include>open_mode</include>
+							<include>open-mode</include>
 							<include>output</include>
 							<include>partition</include>
 							<include>quiet</include>
 							<include>reservation</include>
 							<include>time</include>
-							<include>time_min</include>
+							<include>time-min</include>
 							<include>verbose</include>
 							<include>workdir</include>
 						</items>
@@ -1392,7 +1392,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 					</column-data>
 					<items>
 						<include>partition</include>
-						<include>job_name</include>
+						<include>job-name</include>
 						<include>output</include>
 						<include>error</include>
 						<include>workdir</include>
