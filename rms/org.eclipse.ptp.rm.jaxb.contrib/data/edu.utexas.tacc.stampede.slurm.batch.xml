@@ -73,10 +73,6 @@ users. The value may be changed after job submission using the scontrol command.
 of the name "slurm-%j.out", where the "%j" is replaced with the job allocation number.
 See the "--input" option for filename specification options.
 Use absolute path or "${ptp_rm:workdir#value}" prefix to be relative to working directory.]]></tooltip>
-			<validator>
-				<regex expression="/.+|\$\{ptp_rm\:workdir\#value\}/.+"></regex>
-				<error-message>"error" field: Use absolute path or "${ptp_rm:workdir#value}" prefix to be relative to working directory.</error-message>
-			</validator>
 		</attribute>
 		<attribute name="exclude" type="string">
 			<description>Nodes to exclude. (-x, --exclude=&lt;node name list&gt;)</description>
@@ -205,10 +201,6 @@ job to each node of a pre-existing allocation as one step in a larger job script
 the name "slurm-%j.out", where the "%j" is replaced with the job allocation number.
 See the --input option for filename specification options.
 Use absolute path or "${ptp_rm:workdir#value}" prefix to be relative to working directory.]]></tooltip>
-			<validator>
-				<regex expression="/.+|\$\{ptp_rm\:workdir\#value\}/.+"></regex>
-				<error-message>"output" field: Use absolute path or "${ptp_rm:workdir#value}" prefix to be relative to working directory.</error-message>
-			</validator>
 		</attribute>
 		<attribute name="partition" type="string">
 			<description>Partition for the resource allocation. (-p, --partition=&lt;partition_names&gt;)</description>
