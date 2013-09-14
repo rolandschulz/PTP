@@ -12,6 +12,10 @@
 #*******************************************************************************/ 
 use strict;
 
+use FindBin;
+use lib "$FindBin::RealBin/../../lib";
+use LML_da_util;
+
 if ($#ARGV != 0) {
   die " Usage: $0 <filename> $#ARGV\n";
 }
@@ -19,6 +23,7 @@ my $filename = $ARGV[0];
 
 my $system_time = &get_current_date();
 my $hostname = `hostname`; chomp($hostname);
+$hostname = &LML_da_util::escapeForXML($hostname);
 
 open(OUT,"> $filename") || die "cannot open file $filename";
 printf OUT <<EOF;
