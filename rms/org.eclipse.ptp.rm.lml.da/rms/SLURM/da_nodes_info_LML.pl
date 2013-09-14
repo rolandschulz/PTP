@@ -11,6 +11,10 @@
 #*******************************************************************************/
 use strict;
 
+use FindBin;
+use lib "$FindBin::RealBin/../../lib";
+use LML_da_util;
+
 my $patint = "([\\+\\-\\d]+)";  # Pattern for Integer number
 my $patfp = "([\\+\\-\\d.E]+)"; # Pattern for Floating Point number
 my $patwrd = "([\^\\s]+)";      # Pattern for Work (all noblank characters)
@@ -178,7 +182,7 @@ if ( $bgp eq "true" || $bgq eq "true" ) {
     $maxz = 0;
     foreach $node ( sort( keys(%nodes) ) ) {
     	if ( $bgp eq "true" ) {
-        	printf( OUT "<object id=\"bgbp%06d\" name=\"%s\" type=\"partition\"/>\n", $count, $node );
+        	printf( OUT "<object id=\"bgbp%06d\" name=\"%s\" type=\"partition\"/>\n", $count, &LML_da_util::escapeForXML($node) );
     	}
         $count++;
         $x = substr $node, -3, 1;
@@ -212,7 +216,7 @@ foreach $node ( sort( keys(%nodes) ) ) {
 	        	$nodeid = sprintf( "R%02d%02d-M%01d-N%02d", $row, $rack, $mid, $nodecard );
             	$nodenr{$nodeid}{num} = $count;
             	$nodenr{$nodeid}{midplane} = $node;
-            	printf( OUT "<object id=\"nd%06d\" name=\"%s\" type=\"node\"/>\n", $count, $nodeid );
+            	printf( OUT "<object id=\"nd%06d\" name=\"%s\" type=\"node\"/>\n", $count, &LML_da_util::escapeForXML($nodeid) );
             	$count++;
         	}
 		}
@@ -223,7 +227,7 @@ foreach $node ( sort( keys(%nodes) ) ) {
 				$nodeid = sprintf( "R%02d%02d-M%01d", $row, $rack, $mid );
 				$nodes{$node}{RackMidplane} = $nodeid;
 			}
-       		printf( OUT "<object id=\"%s\" name=\"%s\" type=\"node\"/>\n", $node, $nodeid );    		
+       		printf( OUT "<object id=\"%s\" name=\"%s\" type=\"node\"/>\n", &LML_da_util::escapeForXML($node), &LML_da_util::escapeForXML($nodeid) );    		
         	$nodenr{$node}{node} = $node;
 		}
         $mid++;
@@ -239,7 +243,7 @@ foreach $node ( sort( keys(%nodes) ) ) {
 	else {
         $nodenr{$node}{num} = $count;
         $nodenr{$node}{node} = $node;
-        printf( OUT "<object id=\"nd%06d\" name=\"%s\" type=\"node\"/>\n", $count, $node );
+        printf( OUT "<object id=\"nd%06d\" name=\"%s\" type=\"node\"/>\n", $count, &LML_da_util::escapeForXML($node) );
         $count++;		
 	}
 }
@@ -255,10 +259,10 @@ if ( $bgp eq "true" ) {
     my $mid   = 0;
     foreach $node ( sort( keys(%nodes) ) ) {
         printf( OUT "<info oid=\"bgbp%06d\" type=\"short\">\n", $count );
-        printf( OUT "  <data %-20s value=\"%s\"/>\n", "key=\"" . "bgp_partitionid" . "\"", $node );
-        printf( OUT "  <data %-20s value=\"%s\"/>\n", "key=\"" . "x_loc" . "\"", $row );
-        printf( OUT "  <data %-20s value=\"%s\"/>\n", "key=\"" . "y_loc" . "\"", $rack );
-        printf( OUT "  <data %-20s value=\"%s\"/>\n", "key=\"" . "z_loc" . "\"", $mid );
+        printf( OUT "  <data %-20s value=\"%s\"/>\n", "key=\"" . "bgp_partitionid" . "\"", &LML_da_util::escapeForXML($node) );
+        printf( OUT "  <data %-20s value=\"%s\"/>\n", "key=\"" . "x_loc" . "\"", &LML_da_util::escapeForXML($row) );
+        printf( OUT "  <data %-20s value=\"%s\"/>\n", "key=\"" . "y_loc" . "\"", &LML_da_util::escapeForXML($rack) );
+        printf( OUT "  <data %-20s value=\"%s\"/>\n", "key=\"" . "z_loc" . "\"", &LML_da_util::escapeForXML($mid) );
         printf( OUT "</info>\n" );
         $count++;
 
@@ -283,7 +287,7 @@ foreach $nodeid ( sort( keys(%nodenr) ) ) {
 	else {
 		$nodenum = sprintf( "nd%06d", $nodenr{$nodeid}{num} );
 	}
-   	printf( OUT "<info oid=\"%s\" type=\"short\">\n", $nodenum );
+   	printf( OUT "<info oid=\"%s\" type=\"short\">\n", &LML_da_util::escapeForXML($nodenum) );
    	if ( $bgp eq "true" ) {
        	$node = $nodenr{$nodeid}{midplane};
    	}
@@ -295,7 +299,7 @@ foreach $nodeid ( sort( keys(%nodenr) ) ) {
           	if ( $mapping{$key} ne "" ) {
                 $value = &modify( $key, $mapping{$key}, $nodes{$node}{$key}, $nodeid );
                 if ($value) {
-                    printf( OUT " <data %-20s value=\"%s\"/>\n", "key=\"" . $mapping{$key} . "\"", $value );
+                    printf( OUT " <data %-20s value=\"%s\"/>\n", "key=\"" . $mapping{$key} . "\"", &LML_da_util::escapeForXML($value) );
                 }
             }
             else {
