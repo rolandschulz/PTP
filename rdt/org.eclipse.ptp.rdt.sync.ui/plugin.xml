@@ -210,6 +210,56 @@
                visible="true">
          </separator>
       </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="org.eclipse.ptp.rdt.sync.ui.toolbar">
+            <command
+                  commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
+                  icon="icons/etool16/sync.gif"
+                  id="org.eclipse.ptp.rdt.sync.ui.refCommand"
+                  style="pulldown">
+               <visibleWhen
+                     checkEnabled="false">
+                  <or>
+                     <or>
+                        <with
+                              variable="activeWorkbenchWindow.activePerspective">
+                           <equals
+                                 value="org.eclipse.cdt.ui.CPerspective">
+                           </equals>
+                        </with>
+                        <with
+                              variable="activeWorkbenchWindow.activePerspective">
+                           <equals
+                                 value="org.eclipse.ptp.rdt.ui.remoteCPerspective">
+                           </equals>
+                        </with>
+                     </or>
+                     <with
+                           variable="activeWorkbenchWindow.activePerspective">
+                        <equals
+                              value="org.eclipse.photran.ui.FortranPerspective">
+                        </equals>
+                     </with>
+                  </or>
+               </visibleWhen>
+               <parameter
+                     name="org.eclipse.ptp.rdt.sync.ui.syncCommand.syncModeParameter"
+                     value="sync_active">
+               </parameter>
+            </command>
+         </toolbar>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="menu:org.eclipse.ptp.rdt.sync.ui.refCommand?after=additions">
+         <dynamic
+               class="org.eclipse.ptp.internal.rdt.sync.ui.menus.SetActiveMenu"
+               id="org.eclipse.ptp.rdt.sync.ui.dynamic2">
+         </dynamic>
+      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.decorators">
