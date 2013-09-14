@@ -11,6 +11,10 @@
 #*******************************************************************************/
 use strict;
 
+use FindBin;
+use lib "$FindBin::RealBin/../../lib";
+use LML_da_util;
+
 my $patint = "([\\+\\-]?[\\d]+)";   # Pattern for Integer number
 my $patfp = "([\\+\\-]?[\\d.E]+)";  # Pattern for Floating Point number
 my $patwrd = "([\^\\s]+)";          # Pattern for Work (all noblank characters)
@@ -331,7 +335,7 @@ $count = 0;
 foreach $jobid ( sort( keys(%jobs) ) ) {
     $count++;
     $jobnr{$jobid} = $count;
-    printf( OUT "<object id=\"j%06d\" name=\"%s\" type=\"job\"/>\n", $count, $jobid );
+    printf( OUT "<object id=\"j%06d\" name=\"%s\" type=\"job\"/>\n", $count, &LML_da_util::escapeForXML($jobid) );
 }
 printf( OUT "</objects>\n" );
 printf( OUT "<information>\n" );
@@ -342,7 +346,7 @@ foreach $jobid ( sort( keys(%jobs) ) ) {
             if ( $mapping{$key} ne "" ) {
                 $value = &modify( $jobid, $key, $mapping{$key}, $jobs{$jobid}{$key} );
                 if ($value) {
-                    printf( OUT " <data %-20s value=\"%s\"/>\n", "key=\"" . $mapping{$key} . "\"", $value );
+                    printf( OUT " <data %-20s value=\"%s\"/>\n", "key=\"" . $mapping{$key} . "\"", &LML_da_util::escapeForXML($value) );
                 }
             }
             else {
@@ -463,8 +467,6 @@ sub modify {
     if ( $mkey eq "totalcores" ) {
         $ret =~ s/-[\d]+//;
     }
-
-    $ret=~s/\&/\&amp;/gs;
 
     return ($ret);
 }
