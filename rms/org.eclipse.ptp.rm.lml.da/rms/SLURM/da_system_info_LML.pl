@@ -42,7 +42,7 @@ my ( $sysinfoid, $cmd, $line, $type, %sysinfo, %sysinfonr, $key, $value,
     $count, %notmappedkeys, %notfoundkeys );
 
 $cmd = "/usr/bin/scontrol";
-$cmd = $ENV{"CMD_NODEINFO"} if ( $ENV{"CMD_NODEINFO"} );
+$cmd = $ENV{"CMD_SYSINFO"} if ( $ENV{"CMD_SYSINFO"} );
 
 # Get SLURM configuration for BG details
 open( IN, "$cmd show config |" );
