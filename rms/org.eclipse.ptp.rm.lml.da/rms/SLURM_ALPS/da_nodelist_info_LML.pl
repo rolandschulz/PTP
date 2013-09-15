@@ -11,6 +11,10 @@
 #*******************************************************************************/ 
 use strict;
 
+use FindBin;
+use lib "$FindBin::RealBin/../../lib";
+use LML_da_util;
+
 my $patint="([\\+\\-\\d]+)";   # Pattern for Integer number
 my $patfp ="([\\+\\-\\d.E]+)"; # Pattern for Floating Point number
 my $patwrd="([\^\\s]+)";       # Pattern for Work (all noblank characters)
@@ -109,7 +113,7 @@ printf(OUT "<objects>\n");
 $count=0;
 foreach $nid (sort(keys(%node))) {
     $count++;$nodenr{$nid}=$count;
-    printf(OUT "<object id=\"nd%06d\" name=\"%s\" type=\"node\"/>\n",$count,$nid);
+    printf(OUT "<object id=\"nd%06d\" name=\"%s\" type=\"node\"/>\n",$count,&LML_da_util::escapeForXML($nid));
 }
 printf(OUT "</objects>\n");
 printf(OUT "<information>\n");
@@ -120,7 +124,7 @@ foreach $nid (sort(keys(%node))) {
 	    if($mapping{$key} ne "") {
 		$value=&modify($key,$mapping{$key},$node{$nid}{$key});
 		if($value) {
-		    printf(OUT " <data %-20s value=\"%s\"/>\n","key=\"".$mapping{$key}."\"",$value);
+		    printf(OUT " <data %-20s value=\"%s\"/>\n","key=\"".$mapping{$key}."\"",&LML_da_util::escapeForXML($value));
 		}
 	    } else {
 		$notmappedkeys{$key}++;

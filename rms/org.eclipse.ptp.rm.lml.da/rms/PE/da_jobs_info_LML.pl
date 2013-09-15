@@ -8,6 +8,10 @@
 #*******************************************************************************/
 use strict;
 
+use FindBin;
+use lib "$FindBin::RealBin/../../lib";
+use LML_da_util;
+
 my $patint = "([\\+\\-\\d]+)";      # Pattern for Integer number
 my $patfp  = "([\\+\\-\\d.E]+)";    # Pattern for Floating Point number
 my $patwrd = "([\^\\s]+)";          # Pattern for Word (all noblank characters)
@@ -153,7 +157,7 @@ foreach $jobid ( sort( keys(%jobs) ) ) {
 	$count++;
 	$jobnr{$jobid} = $count;
 	printf( OUT "<object id=\"j%06d\" name=\"%s\" type=\"job\"/>\n",
-		$count, $jobid );
+		$count, &LML_da_util::escapeForXML($jobid) );
 }
 
 # node objs
@@ -162,7 +166,7 @@ foreach $nodeid ( sort( keys(%nodes) ) ) {
 	$count++;
 	$nodenr{$nodeid} = $count;
 	printf( OUT "<object id=\"nd%06d\" name=\"%s\" type=\"node\"/>\n",
-		$count, $nodeid );
+		$count, &LML_da_util::escapeForXML($nodeid) );
 }
 
 printf( OUT "</objects>\n" );
@@ -178,7 +182,7 @@ foreach $jobid ( sort( keys(%jobs) ) ) {
 				  &modify( $key, $mapping_job{$key}, $jobs{$jobid}{$key} );
 				if ($value) {
 					printf( OUT " <data %-20s value=\"%s\"/>\n",
-						"key=\"" . $mapping_job{$key} . "\"", $value );
+						"key=\"" . $mapping_job{$key} . "\"", &LML_da_util::escapeForXML($value) );
 				}
 			} else {
 				$notmappedkeys{$key}++;
@@ -201,7 +205,7 @@ foreach $nodeid ( sort( keys(%nodes) ) ) {
 				  &modify( $key, $mapping_node{$key}, $nodes{$nodeid}{$key} );
 				if ($value) {
 					printf( OUT " <data %-20s value=\"%s\"/>\n",
-						"key=\"" . $mapping_node{$key} . "\"", $value );
+						"key=\"" . $mapping_node{$key} . "\"", &LML_da_util::escapeForXML($value) );
 				}
 			} else {
 				$notmappedkeys{$key}++;
