@@ -576,7 +576,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 		<!-- LAUNCH TAB																	-->
 		<!-- ========================================================================================== -->
 		<launch-tab>
-			<dynamic includeWidgetValuesFrom="Supplemental Settings,Environment">
+			<dynamic includeWidgetValuesFrom="Supplemental Settings,Environment Settings">
 				<title>Basic Settings</title>
 				<layout>
 					<grid-layout/>
@@ -840,7 +840,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 					<!-- ROW =========================================================================== -->
 				</composite>
 			</dynamic>
-			<dynamic includeWidgetValuesFrom="Basic Settings,Environment">
+			<dynamic includeWidgetValuesFrom="Basic Settings,Environment Settings">
 				<title>Supplemental Settings</title>
 				<layout>
 					<grid-layout/>
