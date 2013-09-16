@@ -46,7 +46,7 @@ import org.eclipse.swt.widgets.Label;
  * <ul>
  * <li>If a connection to the remote machine is available but not yet opened, an informational message is displayed with a button
  * allowing the user to establish the connection.
- * <li>If a connection to the remote machine is open, a {@link SearchableChecklist} is displayed with a list of available
+ * <li>If a connection to the remote machine is open, a {@link SearchableSelectionList} is displayed with a list of available
  * environment modules/macros.
  * <li>If there is no remote connection configured, or if the remote system does not have a supported environment configuration
  * system installed, then an informational message is displayed to the user.

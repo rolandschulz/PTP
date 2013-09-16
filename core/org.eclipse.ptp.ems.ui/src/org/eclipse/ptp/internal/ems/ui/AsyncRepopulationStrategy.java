@@ -15,11 +15,11 @@ import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
- * Strategy object used for asynchronous population of a {@link SearchableChecklist}.
+ * Strategy object used for asynchronous population of a {@link SearchableSelectionList}.
  * 
  * @author Jeff Overbey
  * 
- * @see SearchableChecklist#asyncRepopulate(AsyncRepopulationStrategy)
+ * @see SearchableSelectionList#asyncRepopulate(AsyncRepopulationStrategy)
  */
 public interface AsyncRepopulationStrategy {
 

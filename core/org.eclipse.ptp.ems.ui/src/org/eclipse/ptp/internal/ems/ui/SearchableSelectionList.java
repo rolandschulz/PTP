@@ -56,7 +56,7 @@ import org.eclipse.swt.widgets.Text;
  * <p>
  * Typically, a {@link SearchableSelectionList} is used as follows.
  * <ol>
- * <li>Invoke the constructor, {@link SearchableSelectionList#SearchableChecklist(Composite)}.
+ * <li>Invoke the constructor, {@link SearchableSelectionList#SearchableSelectionList(Composite)}.
  * <li>Customize the title, label, and column headings using {@link #setTitle(String)}, {@link #setInstructions(String)}/
  * {@link #setInstructions(String, int)}, and {@link #setColumnHeaders(String, String)}, respectively.
  * <li>If necessary, invoke {@link #setComparator(Comparator)} to change how items are sorted.
@@ -326,7 +326,7 @@ public final class SearchableSelectionList extends Composite {
 	private void createLowerButtons() {
 		fReloadButton = new Button(fMainGroup, SWT.PUSH);
 		fReloadButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false));
-		fReloadButton.setText(Messages.SearchableChecklist_ReloadList);
+		fReloadButton.setText(Messages.SearchableSelectionList_ReloadList);
 	}
 
 	private void createRightButtons() {
@@ -419,7 +419,7 @@ public final class SearchableSelectionList extends Composite {
 
 	private void createTableWithSearchBox() {
 		final Label filter = new Label(fMainGroup, SWT.WRAP);
-		filter.setText(Messages.SearchableChecklist_SearchBoxLabel);
+		filter.setText(Messages.SearchableSelectionList_SearchBoxLabel);
 		filter.setForeground(this.getDisplay().getSystemColor(
 				SWT.COLOR_WIDGET_DARK_SHADOW));
 
