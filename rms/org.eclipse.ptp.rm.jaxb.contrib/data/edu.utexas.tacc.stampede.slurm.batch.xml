@@ -1212,7 +1212,7 @@ prefix command for serial, OpenMP (host only or MIC only), or offload code.]]></
 				</composite>
 			</dynamic>
 			<dynamic includeWidgetValuesFrom="Basic Settings,Supplemental Settings">
-				<title>Environment</title>
+				<title>Environment Settings</title>
 				<layout>
 					<grid-layout />
 				</layout>
