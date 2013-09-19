@@ -37,10 +37,10 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.etfw.tau.ui.messages.Messages;
 import org.eclipse.ptp.internal.etfw.RemoteBuildLaunchUtils;
 import org.eclipse.ptp.internal.rm.jaxb.core.JAXBCoreConstants;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.rm.jaxb.control.ui.AbstractWidget;
 import org.eclipse.ptp.rm.jaxb.control.ui.IWidgetDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
+import org.eclipse.remote.core.IRemoteConnection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -94,7 +94,7 @@ public class TAUMakefileCombo extends AbstractWidget {
 	private IFileStore taulib = null;
 	private LinkedHashSet<String> allmakefiles = null;;
 	boolean refreshing = false;
-	
+
 	final Job job = new Job(Messages.TAUMakefileCombo_UpdatingMakefileList) {
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
@@ -104,8 +104,9 @@ public class TAUMakefileCombo extends AbstractWidget {
 				@Override
 				public void run() {
 					updateMakefileCombo();
-					if (combo != null && !combo.isDisposed())
+					if (combo != null && !combo.isDisposed()) {
 						combo.getParent().layout();
+					}
 					refreshing = false;
 				}
 			});
@@ -134,8 +135,6 @@ public class TAUMakefileCombo extends AbstractWidget {
 		combo.setItems(new String[] { Messages.TAUMakefileCombo_BuildingMakefileList });
 		combo.select(0);
 		combo.setEnabled(false);
-
-		
 
 		combo.addDisposeListener(new DisposeListener() {
 
@@ -212,10 +211,11 @@ public class TAUMakefileCombo extends AbstractWidget {
 		combo.setItems(items);
 		combo.setEnabled(true);
 		if (items.length > 1) {
-			if (preDex > 0)
+			if (preDex > 0) {
 				combo.select(preDex);
-			else
+			} else {
 				combo.select(1);
+			}
 			combo.notifyListeners(SWT.Selection, null);
 		}
 		getParent().layout(true);
@@ -296,10 +296,10 @@ public class TAUMakefileCombo extends AbstractWidget {
 			try {
 				mfiles = taulib.childStores(EFS.NONE, null);
 				tmfiles = new ArrayList<IFileStore>();
-				for (int i = 0; i < mfiles.length; i++) {
-					IFileInfo finf = mfiles[i].fetchInfo();
+				for (IFileStore mfile : mfiles) {
+					IFileInfo finf = mfile.fetchInfo();
 					if (!finf.isDirectory() && finf.getName().startsWith(ITauConstants.TAU_MAKEFILE_PREFIX)) {
-						tmfiles.add(mfiles[i]);
+						tmfiles.add(mfile);
 					}
 				}
 			} catch (CoreException e) {
@@ -320,9 +320,9 @@ public class TAUMakefileCombo extends AbstractWidget {
 		String makefilePath = taulib.toURI().getPath() + JAXBCoreConstants.REMOTE_PATH_SEP + selection;
 		return makefilePath;
 	}
-	
-	public void setConfiguration(ILaunchConfiguration configuration){
-		if(blt!=null&&blt.getConfig()==null){
+
+	public void setConfiguration(ILaunchConfiguration configuration) {
+		if (blt != null && blt.getConfig() == null) {
 			blt.setConfig(configuration);
 			job.setUser(true);
 			job.schedule();

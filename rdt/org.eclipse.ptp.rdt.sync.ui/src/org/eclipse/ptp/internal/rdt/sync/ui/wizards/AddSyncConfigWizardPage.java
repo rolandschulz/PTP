@@ -18,13 +18,13 @@ import org.eclipse.ptp.internal.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.services.ISynchronizeServiceDescriptor;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
-import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
-import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
-import org.eclipse.ptp.remote.ui.IRemoteUIServices;
-import org.eclipse.ptp.remote.ui.RemoteUIServices;
-import org.eclipse.ptp.remote.ui.widgets.RemoteConnectionWidget;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.ui.IRemoteUIConnectionManager;
+import org.eclipse.remote.ui.IRemoteUIConstants;
+import org.eclipse.remote.ui.IRemoteUIFileManager;
+import org.eclipse.remote.ui.IRemoteUIServices;
+import org.eclipse.remote.ui.RemoteUIServices;
+import org.eclipse.remote.ui.widgets.RemoteConnectionWidget;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -196,8 +196,8 @@ public class AddSyncConfigWizardPage extends WizardPage {
 	 */
 	public SyncConfig getSyncConfig() {
 		if (isPageComplete()) {
-			SyncConfig config = SyncConfigManager.newConfig(fConfigName, fSyncProvider.getId(),
-					fSelectedConnection.getRemoteServices().getId(), fSelectedConnection.getName(), fProjectLocation);
+			SyncConfig config = SyncConfigManager.newConfig(fConfigName, fSyncProvider.getId(), fSelectedConnection
+					.getRemoteServices().getId(), fSelectedConnection.getName(), fProjectLocation);
 			config.setProject(fProject);
 			return config;
 		}

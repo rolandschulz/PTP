@@ -29,12 +29,12 @@ import java.net.URISyntaxException;
 import org.eclipse.ptp.internal.remote.remotetools.core.RemoteToolsAdapterCorePlugin;
 import org.eclipse.ptp.internal.remote.remotetools.core.RemoteToolsFileSystem;
 import org.eclipse.ptp.internal.remote.remotetools.ui.messages.Messages;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.RemoteServices;
-import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
-import org.eclipse.ptp.remote.ui.IRemoteUIServices;
-import org.eclipse.ptp.remote.ui.RemoteUIServices;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteServices;
+import org.eclipse.remote.core.RemoteServices;
+import org.eclipse.remote.ui.IRemoteUIFileManager;
+import org.eclipse.remote.ui.IRemoteUIServices;
+import org.eclipse.remote.ui.RemoteUIServices;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.ide.fileSystem.FileSystemContributor;
 
@@ -75,6 +75,7 @@ public class RemoteToolsFileSystemContributor extends FileSystemContributor {
 		try {
 			return new URI(string);
 		} catch (URISyntaxException e) {
+			// Ignore
 		}
 		return null;
 	}

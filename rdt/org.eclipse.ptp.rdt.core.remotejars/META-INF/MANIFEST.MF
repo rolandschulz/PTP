@@ -7,6 +7,5 @@ Require-Bundle: org.eclipse.ptp.rdt.core;bundle-version="1.1.0",
  org.eclipse.ptp.rdt.make.ui;bundle-version="1.1.0",
  org.eclipse.ptp.rdt.managedbuilder.xlc.ui;bundle-version="3.0.0",
  org.eclipse.ptp.rdt.ui;bundle-version="3.1.100",
- org.eclipse.ptp.remote.rse.core;bundle-version="5.0.1",
  org.eclipse.ptp.rdt.xlc;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

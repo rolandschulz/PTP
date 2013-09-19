@@ -27,11 +27,11 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.internal.rdt.sync.git.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.RecursiveSubMonitor;
 import org.eclipse.ptp.rdt.sync.core.exceptions.RemoteSyncException;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.remote.core.IRemoteProcess;
-import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
-import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteFileManager;
+import org.eclipse.remote.core.IRemoteProcess;
+import org.eclipse.remote.core.IRemoteProcessBuilder;
+import org.eclipse.remote.core.exception.RemoteConnectionException;
 
 // Static class for running system-level commands. This includes local and remote directory operations and also running arbitrary
 // commands on remote machines.
@@ -113,7 +113,7 @@ public class CommandRunner {
 	 * @return the directory status
 	 */
 	public static DirectoryStatus checkRemoteDirectory(IRemoteConnection conn, String remoteDir) {
-		final IRemoteFileManager fileManager = conn.getRemoteServices().getFileManager(conn);
+		final IRemoteFileManager fileManager = conn.getFileManager();
 		final IFileStore fileStore = fileManager.getResource(remoteDir);
 		final IFileInfo fileInfo = fileStore.fetchInfo();
 
@@ -155,7 +155,7 @@ public class CommandRunner {
 	 */
 	public static DirectoryStatus createRemoteDirectory(IRemoteConnection conn, String remoteDir, IProgressMonitor monitor)
 			throws CoreException {
-		final IRemoteFileManager fileManager = conn.getRemoteServices().getFileManager(conn);
+		final IRemoteFileManager fileManager = conn.getFileManager();
 		final IFileStore fileStore = fileManager.getResource(remoteDir);
 		final IFileInfo fileInfo = fileStore.fetchInfo();
 
@@ -224,8 +224,8 @@ public class CommandRunner {
 		try {
 			progress.subTask(Messages.CommandRunner_4);
 			conn.open(progress.newChild(50));
-			final IRemoteProcessBuilder rpb = conn.getRemoteServices().getProcessBuilder(conn, commandList);
-			final IRemoteFileManager rfm = conn.getRemoteServices().getFileManager(conn);
+			final IRemoteProcessBuilder rpb = conn.getProcessBuilder(commandList);
+			final IRemoteFileManager rfm = conn.getFileManager();
 			if (remoteDirectory != null && remoteDirectory.length() > 0) {
 				rpb.directory(rfm.getResource(remoteDirectory));
 			}

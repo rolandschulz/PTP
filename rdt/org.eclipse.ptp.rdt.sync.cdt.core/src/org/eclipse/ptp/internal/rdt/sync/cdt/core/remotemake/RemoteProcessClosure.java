@@ -19,7 +19,7 @@ import java.io.OutputStream;
 import java.text.MessageFormat;
 
 import org.eclipse.ptp.internal.rdt.sync.cdt.core.messages.Messages;
-import org.eclipse.ptp.remote.core.IRemoteProcess;
+import org.eclipse.remote.core.IRemoteProcess;
 
 /**
  * @author crecoskie
@@ -100,7 +100,8 @@ public class RemoteProcessClosure {
 				} finally {
 					try {
 
-						if (!fIsErrorReader && ((lastLine == null) || (!lastLine.contains(Messages.RemoteProcessClosure_exit_code)))) {
+						if (!fIsErrorReader
+								&& ((lastLine == null) || (!lastLine.contains(Messages.RemoteProcessClosure_exit_code)))) {
 							// make sure the Spawner has finished up and that the exit code is retrievable
 							int exit_code = 0;
 							try {

@@ -57,11 +57,11 @@ import org.eclipse.ptp.internal.debug.core.pdi.Session;
 import org.eclipse.ptp.internal.debug.sdm.core.messages.Messages;
 import org.eclipse.ptp.internal.debug.sdm.core.pdi.PDIDebugger;
 import org.eclipse.ptp.internal.debug.sdm.core.utils.DebugUtil;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.RemoteServices;
-import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteFileManager;
+import org.eclipse.remote.core.IRemoteServices;
+import org.eclipse.remote.core.RemoteServices;
+import org.eclipse.remote.core.exception.RemoteConnectionException;
 import org.osgi.framework.Bundle;
 
 /**
@@ -143,7 +143,7 @@ public class SDMDebugger implements IPDebugger {
 							if (osName != null && osArch != null) {
 								Bundle bundle = Platform.getBundle(BUNDLE_PREFIX + osName);
 								if (bundle != null) {
-									IRemoteFileManager fileManager = remoteServices.getFileManager(remoteConnection);
+									IRemoteFileManager fileManager = remoteConnection.getFileManager();
 									if (fileManager != null) {
 										/*
 										 * Create the .eclipssettings directory if it doesn't exist on the remote machine. The mkdir
@@ -370,7 +370,7 @@ public class SDMDebugger implements IPDebugger {
 		if (conn == null) {
 			throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.PLUGIN_ID, Messages.SDMDebugger_2));
 		}
-		IRemoteFileManager fileManager = conn.getRemoteServices().getFileManager(conn);
+		IRemoteFileManager fileManager = conn.getFileManager();
 		if (fileManager == null) {
 			throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.PLUGIN_ID, Messages.SDMDebugger_3));
 		}

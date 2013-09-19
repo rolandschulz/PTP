@@ -9,7 +9,7 @@ package org.eclipse.ptp.internal.remote.terminal;
 
 import org.eclipse.tm.internal.terminal.provisional.api.ISettingsStore;
 
-public class RemoteToolsSettings implements IRemoteToolsSettings {
+public class RemoteSettings implements IRemoteSettings {
 	protected String fRemoteServices;
 	protected String fConnectionName;
 

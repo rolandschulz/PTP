@@ -11,7 +11,7 @@
 
 package org.eclipse.ptp.rm.jaxb.control.ui;
 
-import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteConnection;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 
@@ -98,6 +98,7 @@ public interface IWidgetDescriptor {
 	 * Get the remote connection of the widget.
 	 * 
 	 * @return the remote connection
+	 * @since 2.0
 	 */
 	public IRemoteConnection getRemoteConnection();
 

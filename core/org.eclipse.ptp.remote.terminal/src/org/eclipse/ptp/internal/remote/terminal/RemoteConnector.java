@@ -16,17 +16,17 @@ import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
 import org.eclipse.tm.internal.terminal.provisional.api.Logger;
 import org.eclipse.tm.internal.terminal.provisional.api.provider.TerminalConnectorImpl;
 
-public class RemoteToolsConnector extends TerminalConnectorImpl {
+public class RemoteConnector extends TerminalConnectorImpl {
 	private OutputStream fOutputStream;
 	private InputStream fInputStream;
-	private RemoteToolsConnection fConnection;
-	private final RemoteToolsSettings fSettings;
+	private RemoteConnection fConnection;
+	private final RemoteSettings fSettings;
 
-	public RemoteToolsConnector() {
-		this(new RemoteToolsSettings());
+	public RemoteConnector() {
+		this(new RemoteSettings());
 	}
 
-	public RemoteToolsConnector(RemoteToolsSettings settings) {
+	public RemoteConnector(RemoteSettings settings) {
 		fSettings = settings;
 	}
 
@@ -35,7 +35,7 @@ public class RemoteToolsConnector extends TerminalConnectorImpl {
 
 	public void connect(ITerminalControl control) {
 		super.connect(control);
-		fConnection = new RemoteToolsConnection(this, control);
+		fConnection = new RemoteConnection(this, control);
 		fConnection.start();
 	}
 
@@ -88,12 +88,12 @@ public class RemoteToolsConnector extends TerminalConnectorImpl {
 	 * @return the settings for a concrete connection.
 	 * @since org.eclipse.tm.terminal.ssh 2.0 renamed from getTelnetSettings()
 	 */
-	public IRemoteToolsSettings getSshSettings() {
+	public IRemoteSettings getSshSettings() {
 		return fSettings;
 	}
 
 	public ISettingsPage makeSettingsPage() {
-		return new RemoteToolsSettingsPage(fSettings);
+		return new RemoteSettingsPage(fSettings);
 	}
 
 	public String getSettingsSummary() {

@@ -10,8 +10,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ptp.rdt.sync.core,
  org.eclipse.ptp.rdt.sync.ui,
  org.eclipse.ptp.rdt.sync.git.core,
- org.eclipse.ptp.remote.core,
- org.eclipse.ptp.remote.ui
+ org.eclipse.remote.core,
+ org.eclipse.remote.ui
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: %pluginProvider

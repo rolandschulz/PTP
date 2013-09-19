@@ -81,11 +81,11 @@ import org.eclipse.ptp.rdt.core.RDTLog;
 import org.eclipse.ptp.rdt.core.activator.Activator;
 import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.remote.core.IRemoteProcess;
-import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
-import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteFileManager;
+import org.eclipse.remote.core.IRemoteProcess;
+import org.eclipse.remote.core.IRemoteProcessBuilder;
+import org.eclipse.remote.core.IRemoteServices;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceProvider;
@@ -348,7 +348,7 @@ public class RemoteMakeBuilder extends MakeBuilder {
 					for(int k = 0; k <  buildArguments.length; k++)
 						command.add(buildArguments[k]);
 								
-					IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, command);
+					IRemoteProcessBuilder processBuilder = connection.getProcessBuilder(command);
 					
 					// set the environment for the builder
 					Map<String, String> remoteEnvMap = processBuilder.environment();
@@ -361,7 +361,7 @@ public class RemoteMakeBuilder extends MakeBuilder {
 					remoteEnvMap.putAll(envMap);
 					
 					// set the directory in which to run the command
-					IRemoteFileManager fileManager = remoteServices.getFileManager(connection);
+					IRemoteFileManager fileManager = connection.getFileManager();
 					if (fileManager != null) {
 						processBuilder.directory(fileManager.getResource(workingDirectory.toString()));
 					}

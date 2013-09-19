@@ -18,7 +18,7 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
+import org.eclipse.remote.core.IRemoteFileManager;
 import org.eclipse.rse.core.IRSESystemType;
 
 public class RSEFileManager implements IRemoteFileManager {

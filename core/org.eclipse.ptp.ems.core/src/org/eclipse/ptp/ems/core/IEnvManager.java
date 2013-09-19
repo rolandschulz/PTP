@@ -15,8 +15,8 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.exception.RemoteConnectionException;
 
 /**
  * An object which provides access to an environment management system on a remote machine.
@@ -66,6 +66,7 @@ public interface IEnvManager {
 	 * 
 	 * @param remoteConnection
 	 *            {@link IRemoteConnection} (non-<code>null</code>)
+	 * @since 3.0
 	 */
 	void configure(IRemoteConnection remoteConnection);
 

@@ -36,16 +36,15 @@ import org.eclipse.ptp.internal.rdt.sync.git.ui.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.RecursiveSubMonitor;
 import org.eclipse.ptp.rdt.sync.core.exceptions.RemoteExecutionException;
 import org.eclipse.ptp.rdt.sync.core.exceptions.RemoteSyncException;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemotePreferenceConstants;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.RemoteServices;
-import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
-import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
-import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
-import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
-import org.eclipse.ptp.remote.ui.IRemoteUIServices;
-import org.eclipse.ptp.remote.ui.RemoteUIServices;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteServices;
+import org.eclipse.remote.core.RemoteServices;
+import org.eclipse.remote.core.exception.RemoteConnectionException;
+import org.eclipse.remote.ui.IRemoteUIConnectionManager;
+import org.eclipse.remote.ui.IRemoteUIConstants;
+import org.eclipse.remote.ui.IRemoteUIFileManager;
+import org.eclipse.remote.ui.IRemoteUIServices;
+import org.eclipse.remote.ui.RemoteUIServices;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -323,26 +322,26 @@ public class SyncGitPreferencePage extends PreferencePage implements IWorkbenchP
 
 		// TODO: Handle case where service provider is not found.
 		IRemoteServices rs = this.getRemoteServicesProvider();
-		IRemoteConnection[] connections = rs.getConnectionManager().getConnections();
+		List<IRemoteConnection> connections = rs.getConnectionManager().getConnections();
 
 		fComboIndexToRemoteConnectionMap.clear();
-		for (int i = 0; i < connections.length; i++) {
-			connectionCombo.add(connections[i].getName(), i);
-			fComboIndexToRemoteConnectionMap.put(i, connections[i]);
+		for (int i = 0; i < connections.size(); i++) {
+			connectionCombo.add(connections.get(i).getName(), i);
+			fComboIndexToRemoteConnectionMap.put(i, connections.get(i));
 		}
 
-		if (connections.length > 0) {
+		if (connections.size() > 0) {
 			connectionCombo.select(0);
 		}
 	}
 
 	// Return the remote service to use or null if it cannot be found.
-	// Currently, we simply always return the remote tools provider, which *should* always be available.
+	// Currently, we simply always return the JSch provider, which *should* always be available.
 	IRemoteServices remoteServicesProvider = null;
 
 	private IRemoteServices getRemoteServicesProvider() {
 		if (remoteServicesProvider == null) {
-			remoteServicesProvider = RemoteServices.getRemoteServices(IRemotePreferenceConstants.REMOTE_TOOLS_REMOTE_SERVICES_ID);
+			remoteServicesProvider = RemoteServices.getRemoteServices("org.eclipse.remote.JSch"); //$NON-NLS-1$
 		}
 		return remoteServicesProvider;
 	}

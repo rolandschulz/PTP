@@ -53,9 +53,6 @@ import org.eclipse.ptp.internal.rm.jaxb.control.core.messages.Messages;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.utils.DebuggingLogger;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.utils.EnvironmentVariableUtils;
 import org.eclipse.ptp.internal.rm.jaxb.core.JAXBCoreConstants;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteProcess;
-import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.ArgType;
@@ -64,6 +61,9 @@ import org.eclipse.ptp.rm.jaxb.core.data.CommandType;
 import org.eclipse.ptp.rm.jaxb.core.data.EnvironmentType;
 import org.eclipse.ptp.rm.jaxb.core.data.SimpleCommandType;
 import org.eclipse.ptp.rm.jaxb.core.data.TokenizerType;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteProcess;
+import org.eclipse.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ui.progress.IProgressConstants;
 
 /**
@@ -554,7 +554,7 @@ public class CommandJob extends Job implements ICommandJob {
 		if (DebuggingLogger.getLogger().getCommand()) {
 			System.out.println(getName() + ": " + cmdArgs.getCommandLine(false)); //$NON-NLS-1$
 		}
-		IRemoteProcessBuilder builder = delegate.getRemoteServices().getProcessBuilder(conn, cmdArgs.getTokenList());
+		IRemoteProcessBuilder builder = conn.getProcessBuilder(cmdArgs.getTokenList());
 		String directory = command.getDirectory();
 		if (directory != null && !JAXBControlConstants.ZEROSTR.equals(directory)) {
 			directory = rmVarMap.getString(uuid, directory);
@@ -660,8 +660,9 @@ public class CommandJob extends Job implements ICommandJob {
 		}
 		String message = error.toString();
 		error.setLength(0);
-		return CoreExceptionUtils.getErrorStatus(arg + JAXBControlConstants.SP + Messages.ProcessExitValueError
-				+ Integer.toString(exit) + JAXBControlConstants.LINE_SEP + message, null);
+		return CoreExceptionUtils.getErrorStatus(
+				arg + JAXBControlConstants.SP + Messages.ProcessExitValueError + Integer.toString(exit)
+						+ JAXBControlConstants.LINE_SEP + message, null);
 	}
 
 	/*

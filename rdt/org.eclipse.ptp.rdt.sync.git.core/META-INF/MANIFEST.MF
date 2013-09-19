@@ -8,7 +8,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
  org.eclipse.core.filesystem,
  org.eclipse.ptp.rdt.sync.core,
- org.eclipse.ptp.remote.core,
+ org.eclipse.remote.core,
  org.eclipse.jgit
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

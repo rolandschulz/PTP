@@ -19,9 +19,9 @@ import org.eclipse.ptp.internal.rdt.sync.core.services.SynchronizeServiceRegistr
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
 import org.eclipse.ptp.rdt.sync.core.handlers.IMissingConnectionHandler;
 import org.eclipse.ptp.rdt.sync.core.services.ISynchronizeService;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.RemoteServices;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteServices;
+import org.eclipse.remote.core.RemoteServices;
 
 /**
  * Class to encapsulate information about syncing a project
@@ -199,6 +199,7 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	 *             1) The connection was renamed
 	 *             2) The connection was deleted
 	 *             3) The connection never existed, such as when a project is imported to a different workspace
+	 * @since 4.0
 	 */
 	public IRemoteConnection getRemoteConnection() throws MissingConnectionException {
 		if (fRemoteServices == null) {
@@ -302,6 +303,7 @@ public class SyncConfig implements Comparable<SyncConfig> {
 	 * Set the remote connection
 	 * 
 	 * @param connection
+	 * @since 4.0
 	 */
 	public void setConnection(IRemoteConnection connection) {
 		fRemoteServices = connection.getRemoteServices();

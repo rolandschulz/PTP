@@ -38,8 +38,8 @@ import org.eclipse.ptp.rdt.sync.core.handlers.ISyncExceptionHandler;
 import org.eclipse.ptp.rdt.sync.core.listeners.ISyncListener;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ptp.rdt.sync.core.services.ISynchronizeService;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteServices;
 import org.osgi.service.prefs.Preferences;
 
 /**

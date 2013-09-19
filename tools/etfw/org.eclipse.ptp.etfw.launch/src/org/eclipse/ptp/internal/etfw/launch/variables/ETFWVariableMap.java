@@ -24,9 +24,9 @@ import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.JAXBControlConstants;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.JAXBControlCorePlugin;
 import org.eclipse.ptp.internal.rm.jaxb.core.JAXBCoreConstants;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
+import org.eclipse.remote.core.IRemoteConnection;
 
 /**
  * Based on RMVariableMap by Albert Rossi and Jeff Overbey, this contains all the properties

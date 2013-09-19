@@ -28,6 +28,8 @@ public class Messages extends NLS {
 	public static String RemoteToolsConnection_forwarding;
 	public static String RemoteToolsConnection_port_is_already_forwarded;
 	public static String RemoteToolsConnectionManager_cannotRemoveOpenConnection;
+
+	public static String RemoteToolsConnectionManager_Connection_with_name_already_exists;
 	public static String RemoteToolsConnectionManager_invalidConnectionType;
 	public static String RemoteToolsFileStore_0;
 	public static String RemoteToolsFileStore_1;

@@ -1,5 +1,4 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,8 +9,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.remote.remotetools.core;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
@@ -20,14 +21,6 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ptp.internal.remote.remotetools.core.messages.Messages;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
-import org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.IUserAuthenticator;
-import org.eclipse.ptp.remote.core.exception.AddressInUseException;
-import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
-import org.eclipse.ptp.remote.core.exception.UnableToForwardPortException;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
 import org.eclipse.ptp.remotetools.core.IRemotePortForwarding;
 import org.eclipse.ptp.remotetools.core.IRemoteTunnel;
@@ -37,10 +30,23 @@ import org.eclipse.ptp.remotetools.environment.control.ITargetStatus;
 import org.eclipse.ptp.remotetools.environment.core.ITargetElement;
 import org.eclipse.ptp.remotetools.environment.core.ITargetElementStatus;
 import org.eclipse.ptp.remotetools.environment.core.ITargetEventListener;
+import org.eclipse.ptp.remotetools.environment.core.TargetElement;
 import org.eclipse.ptp.remotetools.environment.core.TargetEnvironmentManager;
 import org.eclipse.ptp.remotetools.exception.CancelException;
 import org.eclipse.ptp.remotetools.exception.LocalPortBoundException;
 import org.eclipse.ptp.remotetools.exception.PortForwardingException;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteConnectionChangeEvent;
+import org.eclipse.remote.core.IRemoteConnectionChangeListener;
+import org.eclipse.remote.core.IRemoteConnectionWorkingCopy;
+import org.eclipse.remote.core.IRemoteFileManager;
+import org.eclipse.remote.core.IRemoteProcess;
+import org.eclipse.remote.core.IRemoteProcessBuilder;
+import org.eclipse.remote.core.IRemoteServices;
+import org.eclipse.remote.core.IUserAuthenticator;
+import org.eclipse.remote.core.exception.AddressInUseException;
+import org.eclipse.remote.core.exception.RemoteConnectionException;
+import org.eclipse.remote.core.exception.UnableToForwardPortException;
 
 /**
  * @since 5.0
@@ -53,8 +59,9 @@ public class RemoteToolsConnection implements IRemoteConnection {
 
 	private final String fConnName;
 	private final IRemoteServices fRemoteServices;
-	private final ITargetElement fTargetElement;
+	private final TargetElement fTargetElement;
 	private final ITargetControl fTargetControl;
+	private final RemoteToolsFileManager fFileManager = new RemoteToolsFileManager(this);
 	private final ListenerList fListeners = new ListenerList();
 
 	private final ITargetEventListener fTargetEventListener = new ITargetEventListener() {
@@ -68,9 +75,15 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	/**
 	 * @since 5.0
 	 */
-	public RemoteToolsConnection(String name, ITargetElement element, IRemoteServices services) throws CoreException {
+	public RemoteToolsConnection(String name, TargetElement element, IRemoteServices services) {
 		fTargetElement = element;
-		fTargetControl = element.getControl();
+		try {
+			fTargetControl = element.getControl();
+		} catch (CoreException e) {
+			// Should not happen, but we are in a bad state if it does
+			RemoteToolsAdapterCorePlugin.log(e);
+			throw new RuntimeException(e.getMessage());
+		}
 		fConnName = name;
 		fRemoteServices = services;
 		TargetEnvironmentManager targetMgr = EnvironmentPlugin.getDefault().getTargetsManager();
@@ -103,6 +116,15 @@ public class RemoteToolsConnection implements IRemoteConnection {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
+	public int compareTo(IRemoteConnection o) {
+		return getName().compareTo(o.getName());
+	}
+
 	/**
 	 * Create a new execution manager. Required because script execution closes channel after execution.
 	 * 
@@ -125,14 +147,24 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	}
 
 	/**
+	 * Actions to perform when connection closes
+	 */
+	private void doClose() {
+		/*
+		 * Force refresh of working directory when connection is closed. See bug 383033.
+		 */
+		fWorkingDir = null;
+	}
+
+	/**
 	 * Notify all fListeners when this connection's status changes.
 	 * 
 	 * @param event
 	 */
-	public void fireConnectionChangeEvent(final IRemoteConnection connection, final int type) {
+	public void fireConnectionChangeEvent(final int type) {
 		IRemoteConnectionChangeEvent event = new IRemoteConnectionChangeEvent() {
 			public IRemoteConnection getConnection() {
-				return connection;
+				return RemoteToolsConnection.this;
 			}
 
 			public int getType() {
@@ -278,6 +310,15 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.remote.core.IRemoteConnection#getCommandShell(int)
+	 */
+	public IRemoteProcess getCommandShell(int flags) throws IOException {
+		throw new IOException("Not currently implemented"); //$NON-NLS-1$
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getEnv()
 	 */
 	public Map<String, String> getEnv() {
@@ -321,6 +362,15 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.remote.core.IRemoteConnection#getFileManager()
+	 */
+	public IRemoteFileManager getFileManager() {
+		return fFileManager;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getName()
 	 */
 	public String getName() {
@@ -339,11 +389,51 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.remote.core.IRemoteConnection#getProcessBuilder(java.util.List)
+	 */
+	public IRemoteProcessBuilder getProcessBuilder(List<String> command) {
+		return new RemoteToolsProcessBuilder(this, fFileManager, command);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.remote.core.IRemoteConnection#getProcessBuilder(java.lang.String[])
+	 */
+	public IRemoteProcessBuilder getProcessBuilder(String... command) {
+		return new RemoteToolsProcessBuilder(this, fFileManager, command);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getProperty(java.lang.String )
 	 */
 	public String getProperty(String key) {
 		loadProperties();
 		return fProperties.get(key);
+	}
+
+	/**
+	 * Get the result of executing a pwd command.
+	 * 
+	 * @return current working directory
+	 */
+	private String getPwd() {
+		IRemoteExecutionManager exeMgr = null;
+		try {
+			exeMgr = createExecutionManager();
+		} catch (org.eclipse.ptp.remotetools.exception.RemoteConnectionException e) {
+			// Ignore
+		}
+		if (exeMgr != null) {
+			try {
+				return exeMgr.getExecutionTools().executeWithOutput("pwd").trim(); //$NON-NLS-1$
+			} catch (Exception e) {
+				// Ignore
+			}
+		}
+		return null;
 	}
 
 	/*
@@ -358,6 +448,14 @@ public class RemoteToolsConnection implements IRemoteConnection {
 		return fRemoteServices;
 	}
 
+	public ITargetControl getTargetControl() {
+		return fTargetControl;
+	}
+
+	public TargetElement getTargetElement() {
+		return fTargetElement;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -365,6 +463,15 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	 */
 	public String getUsername() {
 		return fTargetControl.getConfig().getLoginUsername();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.remote.core.IRemoteConnection#getWorkingCopy()
+	 */
+	public IRemoteConnectionWorkingCopy getWorkingCopy() {
+		return new RemoteToolsConnectionWorkingCopy(this);
 	}
 
 	/*
@@ -395,220 +502,6 @@ public class RemoteToolsConnection implements IRemoteConnection {
 	 */
 	public synchronized boolean isOpen() {
 		return fTargetControl.query() == ITargetStatus.RESUMED;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#open()
-	 */
-	public void open(IProgressMonitor monitor) throws RemoteConnectionException {
-		SubMonitor progress = SubMonitor.convert(monitor, 2);
-		if (!isOpen()) {
-			progress.beginTask(Messages.RemoteToolsConnection_open, 2);
-			try {
-				fTargetControl.create(progress.newChild(1));
-			} catch (CoreException e) {
-				throw new RemoteConnectionException(e.getMessage());
-			}
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#open(org.eclipse.ptp.remote.core.IUserAuthenticator,
-	 * org.eclipse.core.runtime.IProgressMonitor)
-	 */
-	public void open(IUserAuthenticator authenticator, IProgressMonitor monitor) throws RemoteConnectionException {
-		SubMonitor progress = SubMonitor.convert(monitor, 2);
-		if (!isOpen()) {
-			progress.beginTask(Messages.RemoteToolsConnection_open, 2);
-			try {
-				fTargetControl.create(progress.newChild(1));
-			} catch (CoreException e) {
-				throw new RemoteConnectionException(e.getMessage());
-			}
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#removeConnectionChangeListener
-	 * (org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener)
-	 */
-	public void removeConnectionChangeListener(IRemoteConnectionChangeListener listener) {
-		fListeners.remove(listener);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#removeLocalPortForwarding(int)
-	 */
-	public void removeLocalPortForwarding(int port) throws RemoteConnectionException {
-		if (!isOpen()) {
-			throw new RemoteConnectionException(Messages.RemoteToolsConnection_connectionNotOpen);
-		}
-		Integer portToRemove = Integer.valueOf(port);
-		IRemoteTunnel tunnel = fTunnels.get(portToRemove);
-		if (tunnel != null) {
-			try {
-				fTargetControl.getExecutionManager().releaseTunnel(tunnel);
-				fTunnels.remove(portToRemove);
-			} catch (Exception e) {
-				throw new RemoteConnectionException(e.getMessage());
-			}
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#removeRemotePortForwarding(int)
-	 */
-	public void removeRemotePortForwarding(int port) throws RemoteConnectionException {
-		if (!isOpen()) {
-			throw new RemoteConnectionException(Messages.RemoteToolsConnection_connectionNotOpen);
-		}
-		try {
-			IRemotePortForwarding portForwarding = fTargetControl.getExecutionManager().getPortForwardingTools()
-					.getRemotePortForwarding(port);
-			fTargetControl.getExecutionManager().getPortForwardingTools().releaseForwarding(portForwarding);
-		} catch (Exception e) {
-			throw new RemoteConnectionException(e.getMessage());
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#setAddress(java.lang.String )
-	 */
-	public void setAddress(String address) {
-		fTargetControl.getConfig().setConnectionAddress(address);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#setAttribute(java.lang. String, java.lang.String)
-	 */
-	/**
-	 * @since 5.0
-	 */
-	public void setAttribute(String key, String value) {
-		fTargetControl.getConfig().setAttribute(key, value);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#setName(java.lang.String)
-	 */
-	public void setName(String name) {
-		fTargetElement.setName(name);
-		fireConnectionChangeEvent(this, IRemoteConnectionChangeEvent.CONNECTION_RENAMED);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#setPassword(java.lang.String )
-	 */
-	/**
-	 * @since 5.0
-	 */
-	public void setPassword(String password) {
-		fTargetControl.getConfig().setLoginPassword(password);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#setPort(int)
-	 */
-	public void setPort(int port) {
-		fTargetControl.getConfig().setConnectionPort(port);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#setUsername(java.lang.String )
-	 */
-	public void setUsername(String userName) {
-		fTargetControl.getConfig().setLoginUsername(userName);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#setWorkingDirectory(java .lang.String)
-	 */
-	/**
-	 * @since 4.0
-	 */
-	public void setWorkingDirectory(String path) {
-		if (new Path(path).isAbsolute()) {
-			fWorkingDir = path;
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#supportsTCPPortForwarding()
-	 */
-	public boolean supportsTCPPortForwarding() {
-		return true;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		String str = getName() + " [" + getUsername() + "@" + getAddress(); //$NON-NLS-1$ //$NON-NLS-2$
-		if (getPort() >= 0) {
-			str += ":" + getPort(); //$NON-NLS-1$
-		}
-		return str + "]"; //$NON-NLS-1$
-	}
-
-	/**
-	 * Actions to perform when connection closes
-	 */
-	private void doClose() {
-		/*
-		 * Force refresh of working directory when connection is closed. See bug 383033.
-		 */
-		fWorkingDir = null;
-	}
-
-	/**
-	 * Get the result of executing a pwd command.
-	 * 
-	 * @return current working directory
-	 */
-	private String getPwd() {
-		IRemoteExecutionManager exeMgr = null;
-		try {
-			exeMgr = createExecutionManager();
-		} catch (org.eclipse.ptp.remotetools.exception.RemoteConnectionException e) {
-			// Ignore
-		}
-		if (exeMgr != null) {
-			try {
-				return exeMgr.getExecutionTools().executeWithOutput("pwd").trim(); //$NON-NLS-1$
-			} catch (Exception e) {
-				// Ignore
-			}
-		}
-		return null;
 	}
 
 	/**
@@ -712,5 +605,131 @@ public class RemoteToolsConnection implements IRemoteConnection {
 				// Ignore
 			}
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#open()
+	 */
+	public void open(IProgressMonitor monitor) throws RemoteConnectionException {
+		SubMonitor progress = SubMonitor.convert(monitor, 2);
+		if (!isOpen()) {
+			progress.beginTask(Messages.RemoteToolsConnection_open, 2);
+			try {
+				fTargetControl.create(progress.newChild(1));
+			} catch (CoreException e) {
+				throw new RemoteConnectionException(e.getMessage());
+			}
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#open(org.eclipse.ptp.remote.core.IUserAuthenticator,
+	 * org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	public void open(IUserAuthenticator authenticator, IProgressMonitor monitor) throws RemoteConnectionException {
+		SubMonitor progress = SubMonitor.convert(monitor, 2);
+		if (!isOpen()) {
+			progress.beginTask(Messages.RemoteToolsConnection_open, 2);
+			try {
+				fTargetControl.create(progress.newChild(1));
+			} catch (CoreException e) {
+				throw new RemoteConnectionException(e.getMessage());
+			}
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#removeConnectionChangeListener
+	 * (org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener)
+	 */
+	public void removeConnectionChangeListener(IRemoteConnectionChangeListener listener) {
+		fListeners.remove(listener);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#removeLocalPortForwarding(int)
+	 */
+	public void removeLocalPortForwarding(int port) throws RemoteConnectionException {
+		if (!isOpen()) {
+			throw new RemoteConnectionException(Messages.RemoteToolsConnection_connectionNotOpen);
+		}
+		Integer portToRemove = Integer.valueOf(port);
+		IRemoteTunnel tunnel = fTunnels.get(portToRemove);
+		if (tunnel != null) {
+			try {
+				fTargetControl.getExecutionManager().releaseTunnel(tunnel);
+				fTunnels.remove(portToRemove);
+			} catch (Exception e) {
+				throw new RemoteConnectionException(e.getMessage());
+			}
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#removeRemotePortForwarding(int)
+	 */
+	public void removeRemotePortForwarding(int port) throws RemoteConnectionException {
+		if (!isOpen()) {
+			throw new RemoteConnectionException(Messages.RemoteToolsConnection_connectionNotOpen);
+		}
+		try {
+			IRemotePortForwarding portForwarding = fTargetControl.getExecutionManager().getPortForwardingTools()
+					.getRemotePortForwarding(port);
+			fTargetControl.getExecutionManager().getPortForwardingTools().releaseForwarding(portForwarding);
+		} catch (Exception e) {
+			throw new RemoteConnectionException(e.getMessage());
+		}
+	}
+
+	public void setName(String name) {
+		fTargetElement.setName(name);
+		fireConnectionChangeEvent(IRemoteConnectionChangeEvent.CONNECTION_RENAMED);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.remote.core.IRemoteFileManager#setWorkingDirectory(java .lang.String)
+	 */
+	/**
+	 * @since 4.0
+	 */
+	public void setWorkingDirectory(String path) {
+		if (new Path(path).isAbsolute()) {
+			fWorkingDir = path;
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#supportsTCPPortForwarding()
+	 */
+	public boolean supportsTCPPortForwarding() {
+		return true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		String str = getName() + " [" + getUsername() + "@" + getAddress(); //$NON-NLS-1$ //$NON-NLS-2$
+		if (getPort() >= 0) {
+			str += ":" + getPort(); //$NON-NLS-1$
+		}
+		return str + "]"; //$NON-NLS-1$
 	}
 }

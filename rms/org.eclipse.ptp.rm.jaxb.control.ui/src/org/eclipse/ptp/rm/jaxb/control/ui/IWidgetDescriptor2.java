@@ -17,7 +17,7 @@ import org.eclipse.debug.ui.ILaunchConfigurationDialog;
  * Extended API for widget objects associated with SWT controls.
  * 
  * @author gwatson
- * @since 1.2
+ * @since 2.0
  * 
  */
 public interface IWidgetDescriptor2 extends IWidgetDescriptor {

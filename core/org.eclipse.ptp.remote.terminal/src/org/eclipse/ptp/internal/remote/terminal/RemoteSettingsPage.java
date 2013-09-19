@@ -7,18 +7,18 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.remote.terminal;
 
-import org.eclipse.ptp.remote.ui.widgets.RemoteConnectionWidget;
+import org.eclipse.remote.ui.widgets.RemoteConnectionWidget;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tm.internal.terminal.provisional.api.AbstractSettingsPage;
 
-public class RemoteToolsSettingsPage extends AbstractSettingsPage {
-	private final RemoteToolsSettings fTerminalSettings;
+public class RemoteSettingsPage extends AbstractSettingsPage {
+	private final RemoteSettings fTerminalSettings;
 	private RemoteConnectionWidget fRemoteConnectionWidget;
 
-	public RemoteToolsSettingsPage(RemoteToolsSettings settings) {
+	public RemoteSettingsPage(RemoteSettings settings) {
 		fTerminalSettings = settings;
 	}
 

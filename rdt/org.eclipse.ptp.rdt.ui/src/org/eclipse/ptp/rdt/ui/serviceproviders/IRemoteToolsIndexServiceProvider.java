@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.ui.serviceproviders;
 
-import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteConnection;
 
 /**
  * @since 2.0
@@ -20,6 +20,7 @@ public interface IRemoteToolsIndexServiceProvider extends IIndexServiceProvider2
 	 * Get the remote connection used by a service provider
 	 * 
 	 * @return remote connection
+	 * @since 6.0
 	 */
 	public IRemoteConnection getConnection();
 
@@ -28,6 +29,7 @@ public interface IRemoteToolsIndexServiceProvider extends IIndexServiceProvider2
 	 * 
 	 * @param conn
 	 *            remote connection
+	 * @since 6.0
 	 */
 	public void setConnection(IRemoteConnection conn);
 }

@@ -15,9 +15,12 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ptp.internal.rdt.sync.ui.RDTSyncUIPlugin;
 import org.eclipse.ptp.internal.rdt.sync.ui.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.handlers.IMissingConnectionHandler;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
-import org.eclipse.ptp.remote.ui.RemoteUIServices;
+import org.eclipse.remote.core.IRemoteConnectionWorkingCopy;
+import org.eclipse.remote.core.IRemoteServices;
+import org.eclipse.remote.ui.IRemoteUIConnectionManager;
+import org.eclipse.remote.ui.IRemoteUIConnectionWizard;
+import org.eclipse.remote.ui.RemoteUIServices;
+import org.eclipse.remote.ui.widgets.RemoteConnectionWidget;
 
 public class CommonMissingConnectionHandler implements IMissingConnectionHandler {
 	private static long lastMissingConnectiontDialogTimeStamp = 0;
@@ -47,7 +50,10 @@ public class CommonMissingConnectionHandler implements IMissingConnectionHandler
 					IRemoteUIConnectionManager connectionManager = RemoteUIServices.getRemoteUIServices(remoteServices)
 							.getUIConnectionManager();
 					if (connectionManager != null) {
-						connectionManager.newConnection(dialog.getShell());
+						IRemoteUIConnectionWizard wizard = connectionManager.getConnectionWizard(dialog.getShell());
+						wizard.setConnectionName(RemoteConnectionWidget.DEFAULT_CONNECTION_NAME);
+						IRemoteConnectionWorkingCopy wc = wizard.open();
+						wc.save();
 					}
 				}
 			}

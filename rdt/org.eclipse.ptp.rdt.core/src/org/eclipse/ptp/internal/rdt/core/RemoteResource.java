@@ -15,7 +15,7 @@ import java.net.URI;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.remote.core.IRemoteResource;
+import org.eclipse.remote.core.IRemoteResource;
 
 public class RemoteResource implements IRemoteResource {
 	private IResource fResource;

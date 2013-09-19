@@ -19,11 +19,11 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter;
+import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.exceptions.RemoteSyncException;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteConnection;
 
 /**
  * Provides synchronization services.
@@ -93,6 +93,7 @@ public interface ISynchronizeService extends ISynchronizeServiceDescriptor {
 	 * Get the remote connection used by this sync service provider.
 	 * 
 	 * @return connection
+	 * @since 4.0
 	 */
 	public IRemoteConnection getRemoteConnection();
 
@@ -124,6 +125,7 @@ public interface ISynchronizeService extends ISynchronizeServiceDescriptor {
 	 *            remote connection
 	 * @throws RuntimeException
 	 *             if already set. Changing these local parameters is not currently supported but should be possible.
+	 * @since 4.0
 	 */
 	public void setRemoteConnection(IRemoteConnection conn);
 
@@ -144,25 +146,26 @@ public interface ISynchronizeService extends ISynchronizeServiceDescriptor {
 	 * @throws CoreException
 	 *             if synchronization fails
 	 */
-	public void synchronize(IProject project, SyncConfig syncConfig, IResourceDelta delta,
-			IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException;
-	
+	public void synchronize(IProject project, SyncConfig syncConfig, IResourceDelta delta, IProgressMonitor monitor,
+			EnumSet<SyncFlag> syncFlags) throws CoreException;
+
 	/**
 	 * Get SyncFileFilter. Empty if not initialized before
-	 *
+	 * 
 	 * @param project
-	 *
+	 * 
 	 * @return file filter
-	 * @throws RemoteSyncException 
+	 * @throws RemoteSyncException
 	 */
 	public AbstractSyncFileFilter getSyncFileFilter(IProject project);
 
 	/**
 	 * Set sync file filter for the given project
-	 *
-	 * @param project - cannot be null
+	 * 
+	 * @param project
+	 *            - cannot be null
 	 * @param filter
-	 *          generic file filter  - cannot be null
+	 *            generic file filter - cannot be null
 	 */
 	public void setSyncFileFilter(IProject project, AbstractSyncFileFilter filter);
 }

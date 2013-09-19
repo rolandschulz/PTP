@@ -10,8 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.core.serviceproviders;
 
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteServices;
 import org.eclipse.ptp.services.core.IServiceProvider;
 
 /**
@@ -31,6 +31,7 @@ public interface IRemoteExecutionServiceProvider extends IServiceProvider {
 	 * Gets the provider of remote services.
 	 * 
 	 * @return IRemoteServices
+	 * @since 5.0
 	 */
 	public IRemoteServices getRemoteServices();
 
@@ -39,6 +40,7 @@ public interface IRemoteExecutionServiceProvider extends IServiceProvider {
 	 * open, so clients should check to make sure it is open before using it.
 	 * 
 	 * @return IRemoteConnection
+	 * @since 5.0
 	 */
 	public IRemoteConnection getConnection();
 
@@ -54,7 +56,7 @@ public interface IRemoteExecutionServiceProvider extends IServiceProvider {
 	 * Set the connection to use for this service.
 	 * 
 	 * @param connection remote connection
-	 * @since 3.1
+	 * @since 5.0
 	 */
 	public void setRemoteToolsConnection(IRemoteConnection connection);
 	

@@ -143,6 +143,7 @@ public class SDMPreferencePage extends AbstractPreferencePage {
 	 * Handle combo selection
 	 */
 	private void handleSDMComboSelected() {
+		// Do nothing
 	}
 
 	private void initializeValues() {

@@ -24,8 +24,6 @@ import org.eclipse.ptp.internal.rm.jaxb.control.ui.launch.IJAXBParentLaunchConfi
 import org.eclipse.ptp.internal.rm.jaxb.control.ui.utils.WidgetActionUtils;
 import org.eclipse.ptp.internal.rm.jaxb.control.ui.variables.LCVariableMap;
 import org.eclipse.ptp.launch.internal.messages.Messages;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.RemoteServicesUtils;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateHandler;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModelEnabled;
@@ -33,6 +31,8 @@ import org.eclipse.ptp.rm.jaxb.core.data.LaunchTabType;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
 import org.eclipse.ptp.rm.jaxb.core.data.TabControllerType;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.RemoteServicesUtils;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Composite;

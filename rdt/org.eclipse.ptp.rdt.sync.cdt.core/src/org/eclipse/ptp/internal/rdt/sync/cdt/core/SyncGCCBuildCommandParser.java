@@ -23,7 +23,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteConnection;
 
 /**
  * Language settings provider to detect compiler settings from the build output of the GCC compiler, modified to work with

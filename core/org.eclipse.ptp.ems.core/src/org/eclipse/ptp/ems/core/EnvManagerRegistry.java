@@ -16,7 +16,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ptp.internal.ems.core.EMSCorePlugin;
 import org.eclipse.ptp.internal.ems.core.managers.NullEnvManager;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteConnection;
 
 /**
  * Provides {@link IEnvManager} objects, which provide access to remote machines' environment management systems.
@@ -50,10 +50,12 @@ public final class EnvManagerRegistry {
 	 *            {@link IRemoteConnection} providing a connection to a particular remote machine (non-<code>null</code>)
 	 * 
 	 * @return {@link IEnvManager} (non-<code>null</code>)
+	 * @since 3.0
 	 */
 	public static IEnvManager getEnvManager(IProgressMonitor pm, IRemoteConnection remoteConnection) {
 		if (remoteConnection != null) {
-			final IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(IEnvManager.ENV_MANAGER_EXTENSION_POINT_ID);
+			final IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(
+					IEnvManager.ENV_MANAGER_EXTENSION_POINT_ID);
 			for (final IConfigurationElement element : extensionPoint.getConfigurationElements()) {
 				try {
 					final IEnvManager manager = (IEnvManager) element.createExecutableExtension("class"); //$NON-NLS-1$

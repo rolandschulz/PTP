@@ -11,13 +11,16 @@
 package org.eclipse.ptp.internal.remote.rse.core;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteConnectionManager;
+import org.eclipse.remote.core.IRemoteConnectionWorkingCopy;
+import org.eclipse.remote.core.IRemoteServices;
+import org.eclipse.remote.core.exception.RemoteConnectionException;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.model.ISystemRegistry;
 
@@ -38,7 +41,7 @@ public class RSEConnectionManager implements IRemoteConnectionManager {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.remote.IRemoteConnectionManager#getConnection(java.lang
+	 * org.eclipse.remote.IRemoteConnectionManager#getConnection(java.lang
 	 * .String)
 	 */
 	public IRemoteConnection getConnection(String name) {
@@ -64,7 +67,7 @@ public class RSEConnectionManager implements IRemoteConnectionManager {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.remote.core.IRemoteConnectionManager#getConnection(java
+	 * org.eclipse.remote.core.IRemoteConnectionManager#getConnection(java
 	 * .net.URI)
 	 */
 	/**
@@ -84,26 +87,28 @@ public class RSEConnectionManager implements IRemoteConnectionManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.remote.IRemoteConnectionManager#getConnections()
+	 * @see org.eclipse.remote.IRemoteConnectionManager#getConnections()
 	 */
-	public IRemoteConnection[] getConnections() {
+	public List<IRemoteConnection> getConnections() {
 		refreshConnections();
-		return fConnections.values().toArray(new IRemoteConnection[fConnections.size()]);
+		return new ArrayList<IRemoteConnection>(fConnections.values());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.remote.core.IRemoteConnectionManager#newConnection(java
-	 * .lang.String)
-	 */
 	/**
 	 * @since 5.0
 	 */
-	public IRemoteConnection newConnection(String name) throws RemoteConnectionException {
-		// TODO implement
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.remote.core.IRemoteConnectionManager#newConnection(java.lang.String)
+	 */
+	public IRemoteConnectionWorkingCopy newConnection(String name) throws RemoteConnectionException {
+		// Appears to only be possible through UI
 		return null;
+	}
+
+	public IRemoteConnection createConnection(IHost host) {
+		return new RSEConnection(host, fRemoteServices);
 	}
 
 	/**
@@ -130,8 +135,8 @@ public class RSEConnectionManager implements IRemoteConnectionManager {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.remote.core.IRemoteConnectionManager#removeConnection
-	 * (org.eclipse.ptp.remote.core.IRemoteConnection)
+	 * org.eclipse.remote.core.IRemoteConnectionManager#removeConnection
+	 * (org.eclipse.remote.core.IRemoteConnection)
 	 */
 	public void removeConnection(IRemoteConnection conn) {
 		if (conn instanceof RSEConnection) {

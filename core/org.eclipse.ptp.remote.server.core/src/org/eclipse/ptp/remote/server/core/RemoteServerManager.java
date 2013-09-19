@@ -17,7 +17,7 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ptp.internal.remote.server.core.Activator;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteConnection;
 
 /**
  * @since 5.0
@@ -163,6 +163,7 @@ public class RemoteServerManager {
 	 * @param connection
 	 *            connection used to launch server
 	 * @return instance of the remote server, or null if no extension can be found
+	 * @since 2.0
 	 */
 	public static AbstractRemoteServerRunner getServer(String id, IRemoteConnection connection) {
 		AbstractRemoteServerRunner server = fServerMap.get(getKey(id, connection));

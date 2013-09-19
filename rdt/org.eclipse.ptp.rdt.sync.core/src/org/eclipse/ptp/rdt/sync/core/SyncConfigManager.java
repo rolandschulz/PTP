@@ -34,11 +34,11 @@ import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
 import org.eclipse.ptp.rdt.sync.core.listeners.ISyncConfigListener;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
 import org.eclipse.ptp.rdt.sync.core.services.ISynchronizeService;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.RemoteServices;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteConnectionManager;
+import org.eclipse.remote.core.IRemoteFileManager;
+import org.eclipse.remote.core.IRemoteServices;
+import org.eclipse.remote.core.RemoteServices;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 import org.osgi.service.prefs.BackingStoreException;
@@ -288,7 +288,7 @@ public class SyncConfigManager {
 			} catch (MissingConnectionException e) {
 				return null;
 			}
-			IRemoteFileManager fileMgr = conn.getRemoteServices().getFileManager(conn);
+			IRemoteFileManager fileMgr = conn.getFileManager();
 			return fileMgr.toURI(path);
 		}
 		return null;
@@ -381,6 +381,7 @@ public class SyncConfigManager {
 	 * @param conn
 	 * @param location
 	 * @return
+	 * @since 4.0
 	 */
 	public static SyncConfig newConfig(String name, String providerId, IRemoteConnection conn, String location) {
 		SyncConfig config = new SyncConfig(name);

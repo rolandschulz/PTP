@@ -36,11 +36,11 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.ptp.rdt.core.RDTLog;
 import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteFileManager;
+import org.eclipse.remote.core.IRemoteProcessBuilder;
+import org.eclipse.remote.core.IRemoteServices;
+import org.eclipse.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceProvider;
@@ -134,9 +134,9 @@ public class RemoteSpecsRunSIProvider extends RemoteRunSIProvider {
 				}
 
 			// get the config dir
-			IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, ""); //$NON-NLS-1$
+			IRemoteProcessBuilder processBuilder = connection.getProcessBuilder(""); //$NON-NLS-1$
 			String configPath = executionProvider.getConfigLocation();
-			IRemoteFileManager remoteFileManager = remoteServices.getFileManager(connection);
+			IRemoteFileManager remoteFileManager = connection.getFileManager();
 			IFileStore workingDir = remoteFileManager.getResource(configPath);
 
 			// set the working directory for the process to be the config
@@ -220,7 +220,7 @@ public class RemoteSpecsRunSIProvider extends RemoteRunSIProvider {
 				}
 			
 		// get the CWD
-		IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, ""); //$NON-NLS-1$
+		IRemoteProcessBuilder processBuilder = connection.getProcessBuilder( ""); //$NON-NLS-1$
 		IFileStore workingDir = processBuilder.directory();
 		
 		IPath path = new Path(EFSExtensionManager.getDefault().getPathFromURI(workingDir.toURI()));

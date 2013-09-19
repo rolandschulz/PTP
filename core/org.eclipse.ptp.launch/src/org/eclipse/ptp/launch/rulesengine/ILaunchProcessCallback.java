@@ -14,7 +14,7 @@ package org.eclipse.ptp.launch.rulesengine;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
+import org.eclipse.remote.core.IRemoteFileManager;
 
 /**
  * TODO NEEDS TO BE DOCUMENTED

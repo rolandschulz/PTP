@@ -54,8 +54,8 @@ import org.eclipse.ptp.internal.rdt.sync.cdt.core.remotemake.SyncCommandLauncher
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteFileManager;
 
 /**
  * Language settings provider to detect built-in compiler settings for GCC compiler, modified to work with synchronized projects.
@@ -75,7 +75,7 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 	private static final int TICKS_OUTPUT_PARSING = 1 * MONITOR_SCALE;
 	private static final int TICKS_EXECUTE_COMMAND = 1 * MONITOR_SCALE;
 
-	private AtomicBoolean isBeingExecuted = new AtomicBoolean(false);
+	private final AtomicBoolean isBeingExecuted = new AtomicBoolean(false);
 
 	// Indicate whether the spec file has been created or verified to exist. This may be false on project startup before project is
 	// fully initialized or become false if there are problems connecting to and running commands on the remote machine. Checking
@@ -109,9 +109,10 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 	 * A copy of: {@link org.eclipse.cdt.managedbuilder.language.settings.providers.AbstractBuiltinSpecsDetector#runForLanguage()}
 	 * modified to use the sync command launcher and to not run if spec file is null (see code comments). Note that this method is
 	 * called by "runForLanguage," it does not override it. Thus, all of the setup for running is done twice. Specifically, a
-	 * BuildRunnerHelper is built twice. Ideally, CDT would provide an extension point to change the command launcher, as it does for
+	 * BuildRunnerHelper is built twice. Ideally, CDT would provide an extension point to change the command launcher, as it does
+	 * for
 	 * builds.
-	 *
+	 * 
 	 * @return ICommandLauncher status of run
 	 */
 	@Override
@@ -280,7 +281,7 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 			return fileLocation.toString();
 		}
 
-		final IRemoteFileManager fileManager = conn.getRemoteServices().getFileManager(conn);
+		final IRemoteFileManager fileManager = conn.getFileManager();
 		final IFileStore fileStore = fileManager.getResource(fileLocation.toString());
 		final IFileInfo fileInfo = fileStore.fetchInfo();
 		if (!fileInfo.exists()) {

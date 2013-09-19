@@ -9,10 +9,9 @@ Bundle-Activator: org.eclipse.ptp.internal.rm.jaxb.ui.JAXBUIPlugin
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
  org.eclipse.ptp.rm.jaxb.core,
- org.eclipse.ptp.remote.core,
  org.eclipse.ptp.core,
  org.eclipse.debug.ui,
- org.eclipse.ptp.remote.core
+ org.eclipse.remote.core
 Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.ptp.internal.rm.jaxb.ui;x-friends:="org.eclipse.ptp.rm.jaxb.control.ui,org.eclipse.ptp.launch",
  org.eclipse.ptp.internal.rm.jaxb.ui.messages;x-internal:=true,

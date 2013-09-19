@@ -44,12 +44,12 @@ import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.remote.core.IRemoteProcess;
-import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
-import org.eclipse.ptp.remote.core.RemoteProcessAdapter;
-import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteFileManager;
+import org.eclipse.remote.core.IRemoteProcess;
+import org.eclipse.remote.core.IRemoteProcessBuilder;
+import org.eclipse.remote.core.RemoteProcessAdapter;
+import org.eclipse.remote.core.exception.RemoteConnectionException;
 
 // TODO (Jeff): Remove/replace NON_ESCAPED_ASCII_CHARS, static initializer, and escape(String) after Bug 371691 is fixed
 public class SyncCommandLauncher implements ICommandLauncher {
@@ -96,6 +96,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		}
 		return sb.toString();
 	}
+
 	protected IProject fProject;
 	protected Process fProcess;
 	protected IRemoteProcess fRemoteProcess;
@@ -229,7 +230,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		// Set process's command and environment
 		List<String> command = constructCommand(commandPath, args, connection, progress.newChild(10));
 
-		IRemoteProcessBuilder processBuilder = connection.getRemoteServices().getProcessBuilder(connection, command);
+		IRemoteProcessBuilder processBuilder = connection.getProcessBuilder(command);
 
 		remoteEnvMap = processBuilder.environment();
 
@@ -244,7 +245,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		}
 
 		// set the directory in which to run the command
-		IRemoteFileManager fileManager = connection.getRemoteServices().getFileManager(connection);
+		IRemoteFileManager fileManager = connection.getFileManager();
 		if (changeToDirectory != null && fileManager != null) {
 			processBuilder.directory(fileManager.getResource(changeToDirectory.toString()));
 		}
@@ -355,6 +356,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 
 	/**
 	 * Set whether launcher should sync project after executing. The default behavior is to sync.
+	 * 
 	 * @param shouldSync
 	 */
 	public void setSyncAfterRun(boolean shouldSync) {
@@ -363,6 +365,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 
 	/**
 	 * Set whether launcher should sync project before executing. The default behavior is to sync.
+	 * 
 	 * @param shouldSync
 	 */
 	public void setSyncBeforeRun(boolean shouldSync) {

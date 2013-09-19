@@ -7,7 +7,7 @@ Bundle-Version: 2.0.0.qualifier
 Bundle-Activator: org.eclipse.ptp.rm.lml.da.server.Activator
 Bundle-Vendor: %pluginProvider
 Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.ptp.remote.core,
+ org.eclipse.remote.core,
  org.eclipse.ptp.remote.server.core
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy

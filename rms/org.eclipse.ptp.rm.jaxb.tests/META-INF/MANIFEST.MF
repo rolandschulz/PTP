@@ -6,7 +6,7 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.eclipse.ptp.rm.jaxb.tests.JAXBTestsPlugin
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.debug.core,
- org.eclipse.ptp.remote.core,
+ org.eclipse.remote.core,
  org.eclipse.ptp.core,
  org.junit,
  org.eclipse.ptp.rm.jaxb.core,

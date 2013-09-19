@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.internal.ems.core.messages.Messages;
-import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.remote.core.exception.RemoteConnectionException;
 
 /**
  * An {@link IEnvManager} for <a href="http://www.mcs.anl.gov/hs/software/systems/softenv/softenv-intro.html">SoftEnv</a>.

@@ -11,9 +11,9 @@ import java.util.Vector;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.rm.ibm.lsf.ui.LSFCommand;
 import org.eclipse.ptp.rm.jaxb.control.ui.IWidgetDescriptor2;
+import org.eclipse.remote.core.IRemoteConnection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.FillLayout;
@@ -30,11 +30,13 @@ public abstract class LSFQueryControl extends Composite {
 	protected String queryTitle;
 	protected final IWidgetDescriptor2 widgetDescriptor;
 
-
 	/**
 	 * Create a custom UI widget (pushbutton) in the JAXB UI
-	 * @param parent - Parent of this widget
-	 * @param wd - Widget attributes
+	 * 
+	 * @param parent
+	 *            - Parent of this widget
+	 * @param wd
+	 *            - Widget attributes
 	 */
 	public LSFQueryControl(Composite parent, final IWidgetDescriptor2 wd) {
 		super(parent, wd.getStyle());
@@ -60,8 +62,7 @@ public abstract class LSFQueryControl extends Composite {
 		modifyListeners.add(listener);
 	}
 
-	protected abstract void configureQueryButton(Button button,
-			IRemoteConnection connection);
+	protected abstract void configureQueryButton(Button button, IRemoteConnection connection);
 
 	protected abstract void getQueryResponse(IRemoteConnection connection);
 
@@ -119,15 +120,13 @@ public abstract class LSFQueryControl extends Composite {
 		}
 		return true;
 	}
-	
+
 	protected void processCommandResponse(LSFCommand command, IStatus runStatus) {
 		int selection;
-		
+
 		switch (runStatus.getSeverity()) {
 		case IStatus.OK:
-			dialog = new LSFQueryDialog(getShell(), queryTitle,
-					command.getColumnLabels(), command
-							.getCommandResponse(), true);
+			dialog = new LSFQueryDialog(getShell(), queryTitle, command.getColumnLabels(), command.getCommandResponse(), true);
 			dialog.setSelectedValue(selectedValues);
 			selection = dialog.open();
 			if (selection == 0) {
@@ -136,19 +135,13 @@ public abstract class LSFQueryControl extends Composite {
 			}
 			break;
 		case IStatus.INFO:
-			MessageDialog.openInformation(getShell(),
-					Messages.InformationalMessage,
-					runStatus.getMessage());
+			MessageDialog.openInformation(getShell(), Messages.InformationalMessage, runStatus.getMessage());
 			break;
 		case IStatus.WARNING:
-			MessageDialog.openInformation(getShell(),
-					Messages.WarningMessageLabel,
-					runStatus.getMessage());
+			MessageDialog.openInformation(getShell(), Messages.WarningMessageLabel, runStatus.getMessage());
 			break;
 		case IStatus.ERROR:
-			MessageDialog.openInformation(getShell(),
-					Messages.ErrorMessage,
-					runStatus.getMessage());
+			MessageDialog.openInformation(getShell(), Messages.ErrorMessage, runStatus.getMessage());
 			break;
 		}
 	}

@@ -8,8 +8,8 @@ Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.tm.terminal,
- org.eclipse.ptp.remote.core,
- org.eclipse.ptp.remote.ui
+ org.eclipse.remote.core,
+ org.eclipse.remote.ui
 Bundle-RequiredExecutionEnvironment: J2SE-1.4
 Export-Package: org.eclipse.ptp.internal.remote.terminal;x-internal:=true
 Bundle-Activator: org.eclipse.ptp.internal.remote.terminal.Activator

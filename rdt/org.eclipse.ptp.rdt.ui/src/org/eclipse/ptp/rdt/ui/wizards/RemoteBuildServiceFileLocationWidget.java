@@ -23,11 +23,11 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.internal.rdt.ui.RSEUtils;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
-import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
-import org.eclipse.ptp.remote.ui.IRemoteUIServices;
-import org.eclipse.ptp.remote.ui.RemoteUIServices;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.ui.IRemoteUIConstants;
+import org.eclipse.remote.ui.IRemoteUIFileManager;
+import org.eclipse.remote.ui.IRemoteUIServices;
+import org.eclipse.remote.ui.RemoteUIServices;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -58,7 +58,7 @@ public class RemoteBuildServiceFileLocationWidget extends Composite {
 	private final Map<String, String> previousSelections = new HashMap<String, String>();
 
 	/**
-	 * @since 5.0
+	 * @since 6.0
 	 */
 	public RemoteBuildServiceFileLocationWidget(Composite parent, int style,
 			IRemoteConnection initialConnection, String defaultPath) {
@@ -118,6 +118,9 @@ public class RemoteBuildServiceFileLocationWidget extends Composite {
 			text.setText(defaultPath);
 	}
 
+	/**
+	 * @since 6.0
+	 */
 	public IRemoteConnection getConnection() {
 		return fRemoteConnection;
 	}
@@ -140,14 +143,14 @@ public class RemoteBuildServiceFileLocationWidget extends Composite {
 	// }
 
 	/**
-	 * @since 5.0
+	 * @since 6.0
 	 */
 	public static String getDefaultPath(IRemoteConnection connection) {
 		// get the user's home directory
 		if(connection != null && connection.isOpen()) {
 			String homeDir = connection.getProperty(IRemoteConnection.USER_HOME_PROPERTY);
 			if (homeDir != null) {
-				IFileStore homeStore = connection.getRemoteServices().getFileManager(connection).getResource(homeDir);
+				IFileStore homeStore = connection.getFileManager().getResource(homeDir);
 				URI uri = homeStore.toURI();
 				String pathString = EFSExtensionManager.getDefault().getPathFromURI(uri);
 				if(pathString!=null){
@@ -195,7 +198,7 @@ public class RemoteBuildServiceFileLocationWidget extends Composite {
 	}
 
 	/**
-	 * @since 5.0
+	 * @since 6.0
 	 */
 	public void update(IRemoteConnection connection) {
 		fRemoteConnection = connection;

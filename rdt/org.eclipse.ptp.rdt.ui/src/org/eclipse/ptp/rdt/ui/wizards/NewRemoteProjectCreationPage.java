@@ -26,8 +26,8 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ptp.rdt.ui.wizards.RemoteProjectContentsLocationArea.IErrorMessageReporter;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteServices;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -266,10 +266,16 @@ public class NewRemoteProjectCreationPage extends WizardNewProjectCreationPage {
 		return projectNameField.getText().trim();
 	}
 
+	/**
+	 * @since 6.0
+	 */
 	public IRemoteConnection getRemoteConnection() {
 		return locationArea.getRemoteConnection();
 	}
 
+	/**
+	 * @since 6.0
+	 */
 	public IRemoteServices getRemoteServices() {
 		return locationArea.getRemoteServices();
 	}

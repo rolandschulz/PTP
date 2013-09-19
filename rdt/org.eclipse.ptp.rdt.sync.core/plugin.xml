@@ -13,7 +13,7 @@
       </runtime>
    </extension>
    <extension
-         point="org.eclipse.ptp.remote.core.remoteResources">
+         point="org.eclipse.remote.core.remoteResources">
       <remoteResource
             class="org.eclipse.ptp.internal.rdt.sync.core.SynchronizedResource"
             nature="org.eclipse.ptp.rdt.sync.core.remoteSyncNature">

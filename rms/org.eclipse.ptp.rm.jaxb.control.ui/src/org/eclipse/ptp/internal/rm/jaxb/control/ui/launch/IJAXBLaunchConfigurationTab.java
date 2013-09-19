@@ -16,10 +16,10 @@ import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.internal.rm.jaxb.control.ui.handlers.ControlStateListener;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel;
 import org.eclipse.ptp.rm.jaxb.core.data.ButtonActionType;
 import org.eclipse.ptp.rm.jaxb.core.data.TabControllerType;
+import org.eclipse.remote.core.IRemoteConnection;
 
 /**
  * Target Configuration Dynamic Tab interface. Corresponds to the "dynamic" element in the target configuration.

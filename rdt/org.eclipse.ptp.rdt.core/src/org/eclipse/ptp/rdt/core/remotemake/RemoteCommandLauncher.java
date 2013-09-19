@@ -31,13 +31,13 @@ import org.eclipse.ptp.internal.rdt.core.index.IndexBuildSequenceController;
 import org.eclipse.ptp.internal.rdt.core.remotemake.RemoteProcessClosure;
 import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.remote.core.IRemoteProcess;
-import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.RemoteProcessAdapter;
-import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteFileManager;
+import org.eclipse.remote.core.IRemoteProcess;
+import org.eclipse.remote.core.IRemoteProcessBuilder;
+import org.eclipse.remote.core.IRemoteServices;
+import org.eclipse.remote.core.RemoteProcessAdapter;
+import org.eclipse.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceProvider;
@@ -151,7 +151,7 @@ public class RemoteCommandLauncher implements ICommandLauncher {
 			for(int k = 0; k <  args.length; k++)
 				command.add(args[k]);
 						
-			IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, command);
+			IRemoteProcessBuilder processBuilder = connection.getProcessBuilder(command);
 			
 			remoteEnvMap = processBuilder.environment();
 			remoteEnvMap.clear();
@@ -162,7 +162,7 @@ public class RemoteCommandLauncher implements ICommandLauncher {
 			}
 			
 			// set the directory in which to run the command
-			IRemoteFileManager fileManager = remoteServices.getFileManager(connection);
+			IRemoteFileManager fileManager = connection.getFileManager();
 			if(changeToDirectory != null && fileManager != null) {
 				processBuilder.directory(fileManager.getResource(changeToDirectory.toString()));
 			}

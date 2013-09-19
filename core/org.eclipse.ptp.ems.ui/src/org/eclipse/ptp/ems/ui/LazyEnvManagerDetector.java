@@ -22,8 +22,8 @@ import org.eclipse.ptp.ems.core.EnvManagerRegistry;
 import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.ems.core.IEnvManagerConfig;
 import org.eclipse.ptp.internal.ems.ui.EMSUIPlugin;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ui.PlatformUI;
 
 /**
@@ -70,6 +70,7 @@ public class LazyEnvManagerDetector implements IEnvManager {
 	 * @param remoteConnection
 	 *            {@link IRemoteConnection} used to access files and execute shell commands on the remote machine (non-
 	 *            <code>null</code>)
+	 * @since 3.0
 	 */
 	public LazyEnvManagerDetector(final IRemoteConnection remoteConnection) {
 		this.remoteConnection = remoteConnection;
@@ -88,7 +89,10 @@ public class LazyEnvManagerDetector implements IEnvManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.ems.core.IEnvManager#configure(org.eclipse.ptp.remote.core.IRemoteConnection)
+	 * @see org.eclipse.ptp.ems.core.IEnvManager#configure(org.eclipse.remote.core.IRemoteConnection)
+	 */
+	/**
+	 * @since 3.0
 	 */
 	@Override
 	public void configure(IRemoteConnection remoteConnection) {

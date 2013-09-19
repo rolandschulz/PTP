@@ -11,10 +11,10 @@
 package org.eclipse.ptp.internal.remote.remotetools.ui;
 
 import org.eclipse.jface.window.Window;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
-import org.eclipse.ptp.remote.ui.dialogs.RemoteResourceBrowser;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteServices;
+import org.eclipse.remote.ui.IRemoteUIFileManager;
+import org.eclipse.remote.ui.dialogs.RemoteResourceBrowser;
 import org.eclipse.swt.widgets.Shell;
 
 public class RemoteToolsUIFileManager implements IRemoteUIFileManager {
@@ -30,13 +30,11 @@ public class RemoteToolsUIFileManager implements IRemoteUIFileManager {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.remote.core.IRemoteFileManager#browseDirectory(org.eclipse
+	 * org.eclipse.remote.core.IRemoteFileManager#browseDirectory(org.eclipse
 	 * .swt.widgets.Shell, java.lang.String, java.lang.String)
 	 */
-	public String browseDirectory(Shell shell, String message,
-			String filterPath, int flags) {
-		RemoteResourceBrowser browser = new RemoteResourceBrowser(services,
-				connection, shell, RemoteResourceBrowser.SINGLE);
+	public String browseDirectory(Shell shell, String message, String filterPath, int flags) {
+		RemoteResourceBrowser browser = new RemoteResourceBrowser(services, connection, shell, RemoteResourceBrowser.SINGLE);
 		browser.setType(RemoteResourceBrowser.DIRECTORY_BROWSER);
 		browser.setInitialPath(filterPath);
 		browser.setTitle(message);
@@ -56,13 +54,11 @@ public class RemoteToolsUIFileManager implements IRemoteUIFileManager {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.remote.core.IRemoteFileManager#browseFile(org.eclipse
+	 * org.eclipse.remote.core.IRemoteFileManager#browseFile(org.eclipse
 	 * .swt.widgets.Shell, java.lang.String, java.lang.String)
 	 */
-	public String browseFile(Shell shell, String message, String filterPath,
-			int flags) {
-		RemoteResourceBrowser browser = new RemoteResourceBrowser(services,
-				connection, shell, RemoteResourceBrowser.SINGLE);
+	public String browseFile(Shell shell, String message, String filterPath, int flags) {
+		RemoteResourceBrowser browser = new RemoteResourceBrowser(services, connection, shell, RemoteResourceBrowser.SINGLE);
 		browser.setType(RemoteResourceBrowser.FILE_BROWSER);
 		browser.setInitialPath(filterPath);
 		browser.setTitle(message);
@@ -82,13 +78,11 @@ public class RemoteToolsUIFileManager implements IRemoteUIFileManager {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.remote.core.IRemoteFileManager#browseFile(org.eclipse
+	 * org.eclipse.remote.core.IRemoteFileManager#browseFile(org.eclipse
 	 * .swt.widgets.Shell, java.lang.String, java.lang.String)
 	 */
-	public String[] browseFiles(Shell shell, String message, String filterPath,
-			int flags) {
-		RemoteResourceBrowser browser = new RemoteResourceBrowser(services,
-				connection, shell, RemoteResourceBrowser.MULTI);
+	public String[] browseFiles(Shell shell, String message, String filterPath, int flags) {
+		RemoteResourceBrowser browser = new RemoteResourceBrowser(services, connection, shell, RemoteResourceBrowser.MULTI);
 		browser.setType(RemoteResourceBrowser.FILE_BROWSER);
 		browser.setInitialPath(filterPath);
 		browser.setTitle(message);
@@ -107,7 +101,7 @@ public class RemoteToolsUIFileManager implements IRemoteUIFileManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.remote.ui.IRemoteUIFileManager#getConnection()
+	 * @see org.eclipse.remote.ui.IRemoteUIFileManager#getConnection()
 	 */
 	public IRemoteConnection getConnection() {
 		return connection;
@@ -117,8 +111,8 @@ public class RemoteToolsUIFileManager implements IRemoteUIFileManager {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.remote.ui.IRemoteUIFileManager#setConnection(org.eclipse
-	 * .ptp.remote.core.IRemoteConnection)
+	 * org.eclipse.remote.ui.IRemoteUIFileManager#setConnection(org.eclipse
+	 * .remote.core.IRemoteConnection)
 	 */
 	public void setConnection(IRemoteConnection connection) {
 		this.connection = connection;
@@ -128,7 +122,7 @@ public class RemoteToolsUIFileManager implements IRemoteUIFileManager {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.remote.ui.IRemoteUIFileManager#showConnections(boolean)
+	 * org.eclipse.remote.ui.IRemoteUIFileManager#showConnections(boolean)
 	 */
 	public void showConnections(boolean enable) {
 		showConnections = enable;

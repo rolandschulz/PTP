@@ -60,13 +60,13 @@ import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.resources.RemoteSyncNature;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.remote.core.IRemoteProcess;
-import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.RemoteServices;
-import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteFileManager;
+import org.eclipse.remote.core.IRemoteProcess;
+import org.eclipse.remote.core.IRemoteProcessBuilder;
+import org.eclipse.remote.core.IRemoteServices;
+import org.eclipse.remote.core.RemoteServices;
+import org.eclipse.remote.core.exception.RemoteConnectionException;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IViewPart;
@@ -564,7 +564,7 @@ public class GemUtilities {
 		final IRemoteServices services = RemoteServices.getRemoteServices(projectURI);
 		services.initialize(null);
 		final IRemoteConnection connection = services.getConnectionManager().getConnection(projectURI);
-		final IRemoteFileManager manager = services.getFileManager(connection);
+		final IRemoteFileManager manager = connection.getFileManager();
 
 		return manager;
 	}
@@ -596,7 +596,7 @@ public class GemUtilities {
 		final IRemoteServices services = RemoteServices.getRemoteServices(projectURI);
 		services.initialize(null);
 		final IRemoteConnection connection = getRemoteConnection(services, projectURI);
-		final IRemoteProcessBuilder rpb = services.getProcessBuilder(connection, args);
+		final IRemoteProcessBuilder rpb = connection.getProcessBuilder(args);
 
 		return rpb;
 	}

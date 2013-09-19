@@ -22,9 +22,9 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ptp.rdt.core.resources.RemoteNature;
 import org.eclipse.ptp.rdt.managedbuilder.xlc.ui.messages.Messages;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.RemoteServices;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteServices;
+import org.eclipse.remote.core.RemoteServices;
 import org.eclipse.swt.widgets.Composite;
 
 /**
@@ -54,7 +54,7 @@ public class RemoteXLCompilerPropertyPage extends XLCompilerPropertyPage {
 	 * Get the remote connection of a given project
 	 * 
 	 * @param project
-	 * @since 3.0
+	 * @since 4.0
 	 */
 	protected IRemoteConnection getRemoteConnection(IProject project) {
 		IRemoteServices provider = RemoteServices.getRemoteServices(project.getLocationURI());

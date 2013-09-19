@@ -22,12 +22,12 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder;
-import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionManager;
 import org.eclipse.ptp.remotetools.core.IRemoteExecutionTools;
 import org.eclipse.ptp.remotetools.core.IRemoteScript;
 import org.eclipse.ptp.remotetools.core.RemoteProcess;
+import org.eclipse.remote.core.AbstractRemoteProcessBuilder;
+import org.eclipse.remote.core.IRemoteProcess;
 
 public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 	private final RemoteToolsConnection fConnection;
@@ -40,7 +40,7 @@ public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 	 * @since 4.0
 	 */
 	public RemoteToolsProcessBuilder(RemoteToolsConnection conn, RemoteToolsFileManager fileMgr, List<String> command) {
-		super(conn, command);
+		super(command);
 		fConnection = conn;
 		fFileMgr = fileMgr;
 		fRemoteEnv = new HashMap<String, String>(conn.getEnv());
@@ -71,7 +71,7 @@ public class RemoteToolsProcessBuilder extends AbstractRemoteProcessBuilder {
 	public IFileStore directory() {
 		IFileStore dir = super.directory();
 		if (dir == null) {
-			dir = fFileMgr.getResource(connection().getWorkingDirectory());
+			dir = fFileMgr.getResource(fConnection.getWorkingDirectory());
 			directory(dir);
 		}
 		return dir;

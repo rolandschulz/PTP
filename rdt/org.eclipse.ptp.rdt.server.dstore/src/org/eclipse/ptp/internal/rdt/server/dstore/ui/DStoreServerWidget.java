@@ -8,7 +8,7 @@
 package org.eclipse.ptp.internal.rdt.server.dstore.ui;
 
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteConnection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;

@@ -53,14 +53,16 @@
 		<module>core/org.eclipse.ptp.launch</module>
 		<module>core/org.eclipse.ptp.proxy</module>
 		<module>core/org.eclipse.ptp.proxy.protocol</module>
-		<module>core/org.eclipse.ptp.remote.core</module>
+		<module>core/org.eclipse.remote.core</module>
+		<module>core/org.eclipse.remote.jsch.core</module>
+		<module>core/org.eclipse.remote.jsch.ui</module>
+		<module>core/org.eclipse.remote.ui</module>
 		<module>core/org.eclipse.ptp.remote.remotetools.core</module>
 		<module>core/org.eclipse.ptp.remote.remotetools.ui</module>
 		<module>core/org.eclipse.ptp.remote.rse.core</module>
 		<module>core/org.eclipse.ptp.remote.rse.ui</module>
 		<module>core/org.eclipse.ptp.remote.server.core</module>
 		<module>core/org.eclipse.ptp.remote.terminal</module>
-		<module>core/org.eclipse.ptp.remote.ui</module>
 		<module>core/org.eclipse.ptp.services.core</module>
 		<module>core/org.eclipse.ptp.services.ui</module>
 		<module>core/org.eclipse.ptp.ui</module>

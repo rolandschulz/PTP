@@ -37,11 +37,11 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.internal.remote.server.core.Activator;
 import org.eclipse.ptp.internal.remote.server.core.DebugUtil;
 import org.eclipse.ptp.internal.remote.server.core.messages.Messages;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.remote.core.IRemoteProcess;
-import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
-import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteFileManager;
+import org.eclipse.remote.core.IRemoteProcess;
+import org.eclipse.remote.core.IRemoteProcessBuilder;
+import org.eclipse.remote.core.exception.RemoteConnectionException;
 import org.osgi.framework.Bundle;
 
 /**
@@ -122,6 +122,13 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	}
 
 	/**
+	 * @since 2.0
+	 */
+	public boolean serverIsRunning() {
+		return fServerState == ServerState.RUNNING;
+	}
+
+	/**
 	 * Get the launch command for this server
 	 * 
 	 * @return launch command
@@ -155,6 +162,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 * Get the remote connection used to launch the server
 	 * 
 	 * @return remote connection
+	 * @since 2.0
 	 */
 	public IRemoteConnection getRemoteConnection() {
 		return fRemoteConnection;
@@ -314,6 +322,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 * 
 	 * @param conn
 	 *            remote connection
+	 * @since 2.0
 	 */
 	public void setRemoteConnection(IRemoteConnection conn) {
 		fRemoteConnection = conn;
@@ -423,63 +432,57 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 */
 	public void startServer(IProgressMonitor monitor) throws IOException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 100);
-		try {
-			if (fRemoteConnection != null && fServerState != ServerState.RUNNING) {
-				if (!doServerStarting(subMon.newChild(10))) {
-					throw new IOException(Messages.AbstractRemoteServerRunner_serverRestartAborted);
+		if (fRemoteConnection != null && fServerState != ServerState.RUNNING) {
+			if (!doServerStarting(subMon.newChild(10))) {
+				throw new IOException(Messages.AbstractRemoteServerRunner_serverRestartAborted);
+			}
+			setServerState(ServerState.STARTING);
+			if (!fRemoteConnection.isOpen()) {
+				try {
+					fRemoteConnection.open(subMon.newChild(10));
+				} catch (RemoteConnectionException e) {
+					throw new IOException(e.getMessage());
 				}
-				setServerState(ServerState.STARTING);
+				if (subMon.isCanceled()) {
+					return;
+				}
 				if (!fRemoteConnection.isOpen()) {
-					try {
-						fRemoteConnection.open(subMon.newChild(10));
-					} catch (RemoteConnectionException e) {
-						throw new IOException(e.getMessage());
-					}
-					if (subMon.isCanceled()) {
-						return;
-					}
-					if (!fRemoteConnection.isOpen()) {
-						throw new IOException(Messages.AbstractRemoteServerRunner_unableToOpenConnection);
-					}
-				}
-
-				/*
-				 * Check if the launch command is valid
-				 */
-				if ((getVerifyLaunchCommand() != null && getVerifyLaunchCommand().length() != 0)
-						&& !isValidCommand(getVerifyLaunchCommand(), getVerifyLaunchPattern(), subMon.newChild(10))) {
-					if (getVerifyLaunchFailMessage() != null && getVerifyLaunchFailMessage().length() != 0) {
-						setServerState(ServerState.STOPPED);
-						throw new IOException(NLS.bind(getVerifyLaunchFailMessage(),
-								new Object[] { fServerName, fRemoteConnection.getName() }));
-					}
-					setServerState(ServerState.STOPPED);
-					throw new IOException(Messages.AbstractRemoteServerRunner_cannotRunServerMissingRequirements);
-				}
-
-				/*
-				 * Check if the unpack command is valid
-				 */
-				if ((getVerifyUnpackCommand() != null && getVerifyUnpackCommand().length() != 0)
-						&& !isValidCommand(getVerifyUnpackCommand(), getVerifyUnpackPattern(), subMon.newChild(10))) {
-					if (getVerifyUnpackFailMessage() != null && getVerifyUnpackFailMessage().length() != 0) {
-						setServerState(ServerState.STOPPED);
-						throw new IOException(NLS.bind(getVerifyUnpackFailMessage(),
-								new Object[] { fServerName, fRemoteConnection.getName() }));
-					}
-					setServerState(ServerState.STOPPED);
-					throw new IOException(Messages.AbstractRemoteServerRunner_cannotRunUnpack);
-				}
-
-				fStatus = Status.OK_STATUS;
-
-				if (!subMon.isCanceled()) {
-					schedule();
+					throw new IOException(Messages.AbstractRemoteServerRunner_unableToOpenConnection);
 				}
 			}
-		} finally {
-			if (monitor != null) {
-				monitor.done();
+
+			/*
+			 * Check if the launch command is valid
+			 */
+			if ((getVerifyLaunchCommand() != null && getVerifyLaunchCommand().length() != 0)
+					&& !isValidCommand(getVerifyLaunchCommand(), getVerifyLaunchPattern(), subMon.newChild(10))) {
+				if (getVerifyLaunchFailMessage() != null && getVerifyLaunchFailMessage().length() != 0) {
+					setServerState(ServerState.STOPPED);
+					throw new IOException(NLS.bind(getVerifyLaunchFailMessage(),
+							new Object[] { fServerName, fRemoteConnection.getName() }));
+				}
+				setServerState(ServerState.STOPPED);
+				throw new IOException(Messages.AbstractRemoteServerRunner_cannotRunServerMissingRequirements);
+			}
+
+			/*
+			 * Check if the unpack command is valid
+			 */
+			if ((getVerifyUnpackCommand() != null && getVerifyUnpackCommand().length() != 0)
+					&& !isValidCommand(getVerifyUnpackCommand(), getVerifyUnpackPattern(), subMon.newChild(10))) {
+				if (getVerifyUnpackFailMessage() != null && getVerifyUnpackFailMessage().length() != 0) {
+					setServerState(ServerState.STOPPED);
+					throw new IOException(NLS.bind(getVerifyUnpackFailMessage(),
+							new Object[] { fServerName, fRemoteConnection.getName() }));
+				}
+				setServerState(ServerState.STOPPED);
+				throw new IOException(Messages.AbstractRemoteServerRunner_cannotRunUnpack);
+			}
+
+			fStatus = Status.OK_STATUS;
+
+			if (!subMon.isCanceled()) {
+				schedule();
 			}
 		}
 	}
@@ -493,30 +496,23 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 */
 	public void updateServer(IProgressMonitor monitor) throws IOException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 100);
-		try {
-			if (fRemoteConnection != null) {
-				if (!fRemoteConnection.isOpen()) {
-					try {
-						fRemoteConnection.open(subMon.newChild(20));
-					} catch (RemoteConnectionException e) {
-						throw new IOException(e.getMessage());
-					}
-					if (subMon.isCanceled()) {
-						return;
-					}
-					if (!fRemoteConnection.isOpen()) {
-						throw new IOException(Messages.AbstractRemoteServerRunner_unableToOpenConnection);
-					}
+		if (fRemoteConnection != null) {
+			if (!fRemoteConnection.isOpen()) {
+				try {
+					fRemoteConnection.open(subMon.newChild(20));
+				} catch (RemoteConnectionException e) {
+					throw new IOException(e.getMessage());
 				}
+				if (subMon.isCanceled()) {
+					return;
+				}
+				if (!fRemoteConnection.isOpen()) {
+					throw new IOException(Messages.AbstractRemoteServerRunner_unableToOpenConnection);
+				}
+			}
 
-				doUpdate(subMon.newChild(80));
-			}
-		} finally {
-			if (monitor != null) {
-				monitor.done();
-			}
+			doUpdate(subMon.newChild(80));
 		}
-
 	}
 
 	/**
@@ -528,22 +524,16 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 */
 	public IStatus waitForServerFinish(IProgressMonitor monitor) {
 		SubMonitor subMon = SubMonitor.convert(monitor, 100);
-		try {
-			while (getServerState() != ServerState.STOPPED && !subMon.isCanceled()) {
-				synchronized (this) {
-					try {
-						wait(100);
-					} catch (InterruptedException e) {
-						// Ignore
-					}
+		while (getServerState() != ServerState.STOPPED && !subMon.isCanceled()) {
+			synchronized (this) {
+				try {
+					wait(100);
+				} catch (InterruptedException e) {
+					// Ignore
 				}
 			}
-			return fStatus;
-		} finally {
-			if (monitor != null) {
-				monitor.done();
-			}
 		}
+		return fStatus;
 	}
 
 	/**
@@ -577,19 +567,13 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 */
 	public void waitForServerStart(IProgressMonitor monitor) {
 		SubMonitor subMon = SubMonitor.convert(monitor, 100);
-		try {
-			while (getServerState() == ServerState.STARTING && !subMon.isCanceled()) {
-				synchronized (this) {
-					try {
-						wait(100);
-					} catch (InterruptedException e) {
-						// Ignore
-					}
+		while (getServerState() == ServerState.STARTING && !subMon.isCanceled()) {
+			synchronized (this) {
+				try {
+					wait(100);
+				} catch (InterruptedException e) {
+					// Ignore
 				}
-			}
-		} finally {
-			if (monitor != null) {
-				monitor.done();
 			}
 		}
 	}
@@ -630,10 +614,6 @@ public abstract class AbstractRemoteServerRunner extends Job {
 			return false;
 		} catch (Exception e) {
 			throw new IOException(e.getMessage());
-		} finally {
-			if (monitor != null) {
-				monitor.done();
-			}
 		}
 	}
 
@@ -643,7 +623,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 			/*
 			 * Check if the remote file exists or is a different size to the local version and copy over if required.
 			 */
-			IRemoteFileManager fileManager = fRemoteConnection.getRemoteServices().getFileManager(fRemoteConnection);
+			IRemoteFileManager fileManager = fRemoteConnection.getFileManager();
 			IFileStore directory = fileManager.getResource(getWorkingDir());
 			/*
 			 * Create the directory if it doesn't exist (has no effect if the directory already exists). Also, check if a file of
@@ -660,10 +640,6 @@ public abstract class AbstractRemoteServerRunner extends Job {
 			return directory;
 		} catch (CoreException e) {
 			throw new IOException(e.getMessage());
-		} finally {
-			if (monitor != null) {
-				monitor.done();
-			}
 		}
 
 	}
@@ -677,38 +653,34 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 */
 	private boolean isValidCommand(String command, String verifyPattern, IProgressMonitor monitor) throws IOException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 100);
+		// compile the pattern for search
+		Pattern pattern = Pattern.compile(verifyPattern);
+
+		// get the remote process that runs the verify command
+		IRemoteProcess p = runCommand(command, Messages.AbstractRemoteServerRunner_runningValidate, null, true,
+				subMon.newChild(100));
+		// get the buffer reader
+		BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+		// read the output from the command
 		try {
-			// compile the pattern for search
-			Pattern pattern = Pattern.compile(verifyPattern);
-
-			// get the remote process that runs the verify command
-			IRemoteProcess p = runCommand(command, Messages.AbstractRemoteServerRunner_runningValidate, null, true,
-					subMon.newChild(100));
-			// get the buffer reader
-			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-
-			// read the output from the command
-			try {
-				String s;
-				while ((s = stdInput.readLine()) != null) {
-					// get a matcher object
-					Matcher m = pattern.matcher(s);
-					if (m.matches()) {
-						return true;
-					}
+			String s;
+			while ((s = stdInput.readLine()) != null) {
+				// get a matcher object
+				Matcher m = pattern.matcher(s);
+				if (m.matches()) {
+					return true;
 				}
-			} catch (IOException e) {
-				/*
-				 * For some reason we're sometimes seeing a "write end dead" message here even though the correct result is
-				 * returned. Ignore this exception for now, though the root cause needs to be ascertained.
-				 */
-				Activator.log(e);
 			}
-
-			return false;
-		} finally {
-			monitor.done();
+		} catch (IOException e) {
+			/*
+			 * For some reason we're sometimes seeing a "write end dead" message here even though the correct result is
+			 * returned. Ignore this exception for now, though the root cause needs to be ascertained.
+			 */
+			Activator.log(e);
 		}
+
+		return false;
 	}
 
 	/**
@@ -724,23 +696,17 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 */
 	private IRemoteProcess launchServer(IProgressMonitor monitor) throws IOException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 100);
-		try {
-			IFileStore directory = doUpdate(subMon.newChild(50));
+		IFileStore directory = doUpdate(subMon.newChild(50));
 
-			/*
-			 * Now launch the server.
-			 */
-			if (!subMon.isCanceled()) {
-				return runCommand(getLaunchCommand(), Messages.AbstractRemoteServerRunner_launching, directory, false,
-						subMon.newChild(50));
-			}
-
-			return null;
-		} finally {
-			if (monitor != null) {
-				monitor.done();
-			}
+		/*
+		 * Now launch the server.
+		 */
+		if (!subMon.isCanceled()) {
+			return runCommand(getLaunchCommand(), Messages.AbstractRemoteServerRunner_launching, directory, false,
+					subMon.newChild(50));
 		}
+
+		return null;
 	}
 
 	/**
@@ -756,23 +722,17 @@ public abstract class AbstractRemoteServerRunner extends Job {
 			IProgressMonitor monitor) throws IOException {
 		SubMonitor subMon = SubMonitor.convert(monitor);
 		subMon.subTask(message);
-		try {
-			RemoteVariableManager varMgr = RemoteVariableManager.getInstance();
-			varMgr.setVars(fVars);
-			String cmdToRun = varMgr.performStringSubstitution(command);
-			List<String> cmdArgs = Arrays.asList(cmdToRun.split(" ")); //$NON-NLS-1$
-			IRemoteProcessBuilder builder = fRemoteConnection.getRemoteServices().getProcessBuilder(fRemoteConnection, cmdArgs);
-			if (directory != null) {
-				builder.directory(directory);
-			}
-			builder.redirectErrorStream(redirect);
-			builder.environment().putAll(getEnv());
-			return builder.start();
-		} finally {
-			if (monitor != null) {
-				monitor.done();
-			}
+		RemoteVariableManager varMgr = RemoteVariableManager.getInstance();
+		varMgr.setVars(fVars);
+		String cmdToRun = varMgr.performStringSubstitution(command);
+		List<String> cmdArgs = Arrays.asList(cmdToRun.split(" ")); //$NON-NLS-1$
+		IRemoteProcessBuilder builder = fRemoteConnection.getProcessBuilder(cmdArgs);
+		if (directory != null) {
+			builder.directory(directory);
 		}
+		builder.redirectErrorStream(redirect);
+		builder.environment().putAll(getEnv());
+		return builder.start();
 	}
 
 	/**
@@ -971,6 +931,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 					RemoteServerException exc = new RemoteServerException(stdErrOutput);
 					String msg = NLS.bind(Messages.AbstractRemoteServerRunner_serverFinishedWithExitCode,
 							fRemoteProcess.exitValue());
+					Activator.log(msg + ": " + stdErrOutput); //$NON-NLS-1$
 					fStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, msg, exc);
 				}
 			}
@@ -979,9 +940,6 @@ public abstract class AbstractRemoteServerRunner extends Job {
 		} finally {
 			doServerFinished(subMon.newChild(1));
 			setServerState(ServerState.STOPPED);
-			if (monitor != null) {
-				monitor.done();
-			}
 		}
 		return fStatus;
 	}

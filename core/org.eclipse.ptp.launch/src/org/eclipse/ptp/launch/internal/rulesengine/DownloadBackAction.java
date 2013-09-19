@@ -21,7 +21,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.launch.RMLaunchUtils;
 import org.eclipse.ptp.launch.rulesengine.IRuleAction;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
+import org.eclipse.remote.core.IRemoteFileManager;
 
 /**
  * TODO NEEDS TO BE DOCUMENTED

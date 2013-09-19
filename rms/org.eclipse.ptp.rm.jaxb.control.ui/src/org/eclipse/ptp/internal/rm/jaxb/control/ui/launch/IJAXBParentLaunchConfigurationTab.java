@@ -12,10 +12,10 @@ package org.eclipse.ptp.internal.rm.jaxb.control.ui.launch;
 
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.ptp.internal.rm.jaxb.control.ui.variables.LCVariableMap;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateHandler;
 import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
+import org.eclipse.remote.core.IRemoteConnection;
 
 /**
  * Target Configuration Launch Tab interface. Corresponds to the "launch-tab" element in the target configuration.

@@ -3,14 +3,14 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.ems.ui;singleton:=true
 Bundle-Vendor: %providerName
-Bundle-Version: 2.0.0.qualifier
+Bundle-Version: 3.0.0.qualifier
 Bundle-Localization: plugin
 Bundle-Activator: org.eclipse.ptp.internal.ems.ui.EMSUIPlugin
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
  org.eclipse.ptp.ems.core,
- org.eclipse.ptp.remote.core,
- org.eclipse.ptp.remote.ui,
+ org.eclipse.remote.core,
+ org.eclipse.remote.ui,
  org.eclipse.ptp.rm.jaxb.ui,
  org.eclipse.ptp.rm.jaxb.control.ui,
  org.eclipse.ptp.rm.jaxb.core,

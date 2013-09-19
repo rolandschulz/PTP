@@ -11,7 +11,7 @@
 package org.eclipse.ptp.rdt.sync.core.services;
 
 import org.eclipse.ptp.internal.rdt.sync.core.messages.Messages;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteConnection;
 
 /**
  * @since 3.0
@@ -52,6 +52,9 @@ public abstract class AbstractSynchronizeService implements ISynchronizeService 
 	 * 
 	 * @see org.eclipse.ptp.rdt.sync.core.services.ISynchronizeService#getRemoteConnection()
 	 */
+	/**
+	 * @since 4.0
+	 */
 	@Override
 	public IRemoteConnection getRemoteConnection() {
 		return fConnection;
@@ -84,7 +87,10 @@ public abstract class AbstractSynchronizeService implements ISynchronizeService 
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.rdt.sync.core.services.ISynchronizeService#setRemoteConnection(org.eclipse.ptp.remote.core.IRemoteConnection)
+	 * org.eclipse.ptp.rdt.sync.core.services.ISynchronizeService#setRemoteConnection(org.eclipse.remote.core.IRemoteConnection)
+	 */
+	/**
+	 * @since 4.0
 	 */
 	@Override
 	public void setRemoteConnection(IRemoteConnection conn) {

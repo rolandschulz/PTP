@@ -16,10 +16,10 @@ import java.util.Vector;
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ptp.internal.remote.rse.core.RSEConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteConnectionManager;
+import org.eclipse.remote.core.IRemoteServices;
+import org.eclipse.remote.ui.IRemoteUIFileManager;
 import org.eclipse.rse.core.filters.ISystemFilterReference;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.model.SystemChildrenContentsType;
@@ -43,7 +43,7 @@ public class RSEUIFileManager implements IRemoteUIFileManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.remote.IRemoteFileManager#browseDirectory(org.eclipse .swt.widgets.Shell, java.lang.String,
+	 * @see org.eclipse.remote.IRemoteFileManager#browseDirectory(org.eclipse .swt.widgets.Shell, java.lang.String,
 	 * java.lang.String)
 	 */
 	public String browseDirectory(Shell shell, String message, String filterPath, int flags) {
@@ -86,7 +86,7 @@ public class RSEUIFileManager implements IRemoteUIFileManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.remote.IRemoteFileManager#browseFile(org.eclipse.swt. widgets.Shell, java.lang.String, java.lang.String)
+	 * @see org.eclipse.remote.IRemoteFileManager#browseFile(org.eclipse.swt. widgets.Shell, java.lang.String, java.lang.String)
 	 */
 	public String browseFile(Shell shell, String message, String filterPath, int flags) {
 		SystemRemoteFileDialog dlg = new SystemRemoteFileDialog(shell, message, connHost);
@@ -107,7 +107,7 @@ public class RSEUIFileManager implements IRemoteUIFileManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.remote.IRemoteFileManager#browseFile(org.eclipse.swt. widgets.Shell, java.lang.String, java.lang.String)
+	 * @see org.eclipse.remote.IRemoteFileManager#browseFile(org.eclipse.swt. widgets.Shell, java.lang.String, java.lang.String)
 	 */
 	public String[] browseFiles(Shell shell, String message, String filterPath, int flags) {
 		SystemRemoteFileDialog dlg = new SystemRemoteFileDialog(shell, message, connHost);
@@ -137,7 +137,7 @@ public class RSEUIFileManager implements IRemoteUIFileManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.remote.ui.IRemoteUIFileManager#getConnection()
+	 * @see org.eclipse.remote.ui.IRemoteUIFileManager#getConnection()
 	 */
 	public IRemoteConnection getConnection() {
 		return connection;
@@ -146,7 +146,7 @@ public class RSEUIFileManager implements IRemoteUIFileManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.remote.ui.IRemoteUIFileManager#setConnection(org.eclipse .ptp.remote.core.IRemoteConnection)
+	 * @see org.eclipse.remote.ui.IRemoteUIFileManager#setConnection(org.eclipse .remote.core.IRemoteConnection)
 	 */
 	public void setConnection(IRemoteConnection connection) {
 		this.connection = connection;
@@ -156,7 +156,7 @@ public class RSEUIFileManager implements IRemoteUIFileManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.remote.ui.IRemoteUIFileManager#showConnections(boolean)
+	 * @see org.eclipse.remote.ui.IRemoteUIFileManager#showConnections(boolean)
 	 */
 	public void showConnections(boolean enable) {
 		onlyConnection = !enable;

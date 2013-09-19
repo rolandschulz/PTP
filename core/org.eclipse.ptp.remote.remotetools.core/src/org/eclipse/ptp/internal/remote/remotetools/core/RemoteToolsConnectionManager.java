@@ -11,16 +11,13 @@
 package org.eclipse.ptp.internal.remote.remotetools.core;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.CoreException;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.internal.remote.remotetools.core.messages.Messages;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
-import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remotetools.environment.EnvironmentPlugin;
 import org.eclipse.ptp.remotetools.environment.core.ITargetElement;
 import org.eclipse.ptp.remotetools.environment.core.ITargetElementStatus;
@@ -28,6 +25,12 @@ import org.eclipse.ptp.remotetools.environment.core.ITargetEventListener;
 import org.eclipse.ptp.remotetools.environment.core.TargetElement;
 import org.eclipse.ptp.remotetools.environment.core.TargetEnvironmentManager;
 import org.eclipse.ptp.remotetools.environment.core.TargetTypeElement;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteConnectionChangeEvent;
+import org.eclipse.remote.core.IRemoteConnectionManager;
+import org.eclipse.remote.core.IRemoteConnectionWorkingCopy;
+import org.eclipse.remote.core.IRemoteServices;
+import org.eclipse.remote.core.exception.RemoteConnectionException;
 
 public class RemoteToolsConnectionManager implements IRemoteConnectionManager, ITargetEventListener {
 	private final IRemoteServices fRemoteServices;
@@ -81,9 +84,9 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager, I
 	 * @see
 	 * org.eclipse.ptp.remote.core.IRemoteConnectionManager#getConnections()
 	 */
-	public IRemoteConnection[] getConnections() {
+	public List<IRemoteConnection> getConnections() {
 		refreshConnections();
-		return fConnections.values().toArray(new IRemoteConnection[fConnections.size()]);
+		return new ArrayList<IRemoteConnection>(fConnections.values());
 	}
 
 	/*
@@ -101,10 +104,10 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager, I
 		if (conn != null) {
 			switch (event) {
 			case ITargetElementStatus.RESUMED:
-				((RemoteToolsConnection) conn).fireConnectionChangeEvent(conn, IRemoteConnectionChangeEvent.CONNECTION_OPENED);
+				((RemoteToolsConnection) conn).fireConnectionChangeEvent(IRemoteConnectionChangeEvent.CONNECTION_OPENED);
 				break;
 			case ITargetElementStatus.STOPPED:
-				((RemoteToolsConnection) conn).fireConnectionChangeEvent(conn, IRemoteConnectionChangeEvent.CONNECTION_CLOSED);
+				((RemoteToolsConnection) conn).fireConnectionChangeEvent(IRemoteConnectionChangeEvent.CONNECTION_CLOSED);
 				break;
 			default:
 				/*
@@ -125,11 +128,21 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager, I
 	/**
 	 * @since 5.0
 	 */
-	public IRemoteConnection newConnection(String name) throws RemoteConnectionException {
+	public IRemoteConnectionWorkingCopy newConnection(String name) throws RemoteConnectionException {
+		if (getConnection(name) != null) {
+			throw new RemoteConnectionException(NLS.bind(Messages.RemoteToolsConnectionManager_Connection_with_name_already_exists, name));
+		}
+		TargetElement element = newTargetElement(name);
+		return createConnection(element).getWorkingCopy();
+	}
+
+	public TargetElement newTargetElement(String name) {
 		String id = EnvironmentPlugin.getDefault().getEnvironmentUniqueID();
-		TargetElement element = new TargetElement(fRemoteHost, name, id);
-		fRemoteHost.addElement(element);
-		return createConnection(element);
+		return new TargetElement(fRemoteHost, name, id);
+	}
+
+	public void addConnection(RemoteToolsConnection connection) {
+		fRemoteHost.addElement(connection.getTargetElement());
 	}
 
 	/*
@@ -159,12 +172,8 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager, I
 	 * @return new remote tools connection
 	 * @throws RemoteConnectionException
 	 */
-	private IRemoteConnection createConnection(ITargetElement element) throws RemoteConnectionException {
-		try {
-			return new RemoteToolsConnection(element.getName(), element, fRemoteServices);
-		} catch (CoreException e) {
-			throw new RemoteConnectionException(e.getMessage());
-		}
+	private IRemoteConnection createConnection(TargetElement element) {
+		return new RemoteToolsConnection(element.getName(), element, fRemoteServices);
 	}
 
 	/**
@@ -175,16 +184,14 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager, I
 		if (fRemoteHost != null) {
 			Map<String, IRemoteConnection> newConns = new HashMap<String, IRemoteConnection>();
 			for (Object obj : fRemoteHost.getElements()) {
-				ITargetElement element = (ITargetElement) obj;
-				IRemoteConnection conn = fConnections.get(element.getName());
-				if (conn == null) {
-					try {
+				if (obj instanceof TargetElement) {
+					TargetElement element = (TargetElement) obj;
+					IRemoteConnection conn = fConnections.get(element.getName());
+					if (conn == null) {
 						conn = createConnection(element);
-					} catch (RemoteConnectionException e) {
-						// Ignore
 					}
+					newConns.put(element.getName(), conn);
 				}
-				newConns.put(element.getName(), conn);
 			}
 			fConnections.clear();
 			fConnections.putAll(newConns);

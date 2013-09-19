@@ -21,14 +21,12 @@ import org.eclipse.ptp.internal.rdt.sync.git.core.GitRemoteSyncConnection;
 import org.eclipse.ptp.rdt.sync.core.PreferenceSyncFileFilterStorage;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
-import org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.remote.core.IRemotePreferenceConstants;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.RemoteServices;
-import org.eclipse.ptp.remotetools.environment.generichost.core.ConfigFactory;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteConnectionManager;
+import org.eclipse.remote.core.IRemoteConnectionWorkingCopy;
+import org.eclipse.remote.core.IRemoteFileManager;
+import org.eclipse.remote.core.IRemoteServices;
+import org.eclipse.remote.core.RemoteServices;
 import org.junit.rules.ExternalResource;
 import org.junit.rules.TemporaryFolder;
 
@@ -80,7 +78,7 @@ public class TemporaryGitRemoteSyncConnection extends ExternalResource {
 		/* setup remote connection */
 		IRemoteServices fRemoteServices;
 
-		fRemoteServices = RemoteServices.getRemoteServices(IRemotePreferenceConstants.REMOTE_TOOLS_REMOTE_SERVICES_ID);
+		fRemoteServices = RemoteServices.getRemoteServices("org.eclipse.remote.JSch");
 		assertNotNull(fRemoteServices);
 
 		connMgr = fRemoteServices.getConnectionManager();
@@ -88,24 +86,18 @@ public class TemporaryGitRemoteSyncConnection extends ExternalResource {
 
 		// TODO: understand why it is causes problem when all connections are called the same. Should be fine because
 		// connections are deleted. There seems to be a problem in RemoteTools with creating a new connection with the same name
-		fRemoteConnection = connMgr.newConnection("test_connection" + n); //$NON-NLS-1$  
-
+		IRemoteConnectionWorkingCopy wc = connMgr.newConnection("test_connection" + n); //$NON-NLS-1$  
+		wc.setAddress(test.host);
+		wc.setUsername(test.username);
+		wc.setPassword(test.password);
+		fRemoteConnection = wc.save();
 		assertNotNull(fRemoteConnection);
-		fRemoteConnection.setAddress(test.host);
-		fRemoteConnection.setUsername(test.username);
-		if (test.privatekey == null) {
-			fRemoteConnection.setPassword(test.password);
-		} else {
-			fRemoteConnection.setAttribute(ConfigFactory.ATTR_KEY_PATH, test.privatekey);
-			fRemoteConnection.setAttribute(ConfigFactory.ATTR_KEY_PASSPHRASE, test.password);
-			fRemoteConnection.setAttribute(ConfigFactory.ATTR_IS_PASSWORD_AUTH, Boolean.toString(false));
-		}
 
 		if (!fRemoteConnection.isOpen()) {
 			fRemoteConnection.open(null);
 		}
 
-		fileManager = fRemoteConnection.getRemoteServices().getFileManager(fRemoteConnection);
+		fileManager = fRemoteConnection.getFileManager();
 
 		/* local folder */
 		localFolder = new TemporaryFolder();

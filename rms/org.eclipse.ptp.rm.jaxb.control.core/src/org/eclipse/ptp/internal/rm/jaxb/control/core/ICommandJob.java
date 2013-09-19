@@ -10,7 +10,7 @@
 package org.eclipse.ptp.internal.rm.jaxb.control.core;
 
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.ptp.remote.core.IRemoteProcess;
+import org.eclipse.remote.core.IRemoteProcess;
 
 /**
  * Abstraction of methods common among types of CommandJobs.

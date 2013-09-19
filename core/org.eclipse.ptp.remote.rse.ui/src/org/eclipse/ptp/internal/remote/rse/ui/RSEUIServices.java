@@ -10,26 +10,29 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.remote.rse.ui;
 
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
-import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
-import org.eclipse.ptp.remote.ui.IRemoteUIServices;
-
+import org.eclipse.remote.core.IRemoteServices;
+import org.eclipse.remote.ui.IRemoteUIConnectionManager;
+import org.eclipse.remote.ui.IRemoteUIFileManager;
+import org.eclipse.remote.ui.IRemoteUIServices;
 
 public class RSEUIServices implements IRemoteUIServices {
 	private static RSEUIServices fInstance = null;
-	
+
 	private final IRemoteServices fServices;
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesDescriptor#getId()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.remote.ui.IRemoteUIServicesDescriptor#getId()
 	 */
 	public String getId() {
 		return fServices.getId();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesDescriptor#getName()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.remote.ui.IRemoteUIServicesDescriptor#getName()
 	 */
 	public String getName() {
 		return fServices.getName();
@@ -46,20 +49,24 @@ public class RSEUIServices implements IRemoteUIServices {
 		}
 		return fInstance;
 	}
-	
+
 	public RSEUIServices(IRemoteServices services) {
 		fServices = services;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesDescriptor#getUIConnectionManager()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.remote.ui.IRemoteUIServicesDescriptor#getUIConnectionManager()
 	 */
 	public IRemoteUIConnectionManager getUIConnectionManager() {
 		return new RSEUIConnectionManager(fServices);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.ui.IRemoteUIServicesDescriptor#getUIFileManager()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.remote.ui.IRemoteUIServicesDescriptor#getUIFileManager()
 	 */
 	public IRemoteUIFileManager getUIFileManager() {
 		return new RSEUIFileManager(fServices);

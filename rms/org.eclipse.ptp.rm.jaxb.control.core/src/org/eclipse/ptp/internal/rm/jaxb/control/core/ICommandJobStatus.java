@@ -12,7 +12,7 @@ package org.eclipse.ptp.internal.rm.jaxb.control.core;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.core.jobs.IPJobStatus;
-import org.eclipse.ptp.remote.core.IRemoteProcess;
+import org.eclipse.remote.core.IRemoteProcess;
 
 /**
  * CommandJob-specific extension to IJobStatus.

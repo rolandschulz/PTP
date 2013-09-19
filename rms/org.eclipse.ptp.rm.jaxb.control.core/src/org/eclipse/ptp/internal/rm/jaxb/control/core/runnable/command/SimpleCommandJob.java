@@ -29,12 +29,12 @@ import org.eclipse.ptp.internal.rm.jaxb.control.core.LaunchController;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.RemoteServicesDelegate;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.messages.Messages;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.utils.DebuggingLogger;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteProcess;
-import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.SimpleCommandType;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteProcess;
+import org.eclipse.remote.core.IRemoteProcessBuilder;
 
 /**
  * Implementation of runnable Job for the simple execution of external processes. Uses the IRemoteProcessBuilder with the
@@ -267,7 +267,7 @@ public class SimpleCommandJob extends Job {
 		if (DebuggingLogger.getLogger().getCommand()) {
 			System.out.println(getName() + ": " + args.getCommandLine(false)); //$NON-NLS-1$
 		}
-		IRemoteProcessBuilder builder = delegate.getRemoteServices().getProcessBuilder(conn, args.getTokenList());
+		IRemoteProcessBuilder builder = conn.getProcessBuilder(args.getTokenList());
 		if (fDirectory != null && !JAXBControlConstants.ZEROSTR.equals(fDirectory)) {
 			String directory = fVarMap.getString(fUuid, fDirectory);
 			IFileStore dir = delegate.getRemoteFileManager().getResource(directory);

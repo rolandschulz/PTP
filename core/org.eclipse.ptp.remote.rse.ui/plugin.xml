@@ -2,7 +2,7 @@
 <?eclipse version="3.2"?>
 <plugin>
    <extension
-         point="org.eclipse.ptp.remote.ui.remoteUIServices">
+         point="org.eclipse.remote.ui.remoteUIServices">
       <remoteUIServices
             class="org.eclipse.ptp.internal.remote.rse.ui.RSEUIServicesFactory"
             id="org.eclipse.ptp.remote.RSERemoteServices"

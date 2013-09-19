@@ -17,7 +17,7 @@ import java.util.Map;
 import org.eclipse.cdt.utils.UNCPathConverter;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.ptp.remote.core.RemoteServicesUtils;
+import org.eclipse.remote.core.RemoteServicesUtils;
 
 public class SyncUNCPathConverter extends UNCPathConverter {
 	private static Map<IPath, URI> fConnMap = new HashMap<IPath, URI>();

@@ -26,7 +26,7 @@ import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.launch.RMLaunchUtils;
 import org.eclipse.ptp.launch.rulesengine.IRuleAction;
 import org.eclipse.ptp.launch.rulesengine.OverwritePolicies;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
+import org.eclipse.remote.core.IRemoteFileManager;
 
 /**
  * TODO NEEDS TO BE DOCUMENTED
@@ -79,10 +79,10 @@ public class DownloadRuleAction implements IRuleAction {
 		// Download all remote paths
 		IPath remotePaths[] = fRule.getRemoteFilesAsPathArray();
 		IPath remoteWorkingPath = new Path(fConfiguration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EXECUTABLE_PATH, "")).removeLastSegments(1); //$NON-NLS-1$
-		for (int i = 0; i < remotePaths.length; i++) {
+		for (IPath remotePath2 : remotePaths) {
 			progress.setWorkRemaining(100);
 
-			IPath remotePath = remotePaths[i];
+			IPath remotePath = remotePath2;
 
 			// Make paths absolute
 			if (!remotePath.isAbsolute()) {

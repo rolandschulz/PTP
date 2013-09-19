@@ -27,11 +27,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.messages.Messages;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.RemoteServices;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteConnectionManager;
+import org.eclipse.remote.core.IRemoteFileManager;
+import org.eclipse.remote.core.IRemoteServices;
+import org.eclipse.remote.core.RemoteServices;
 
 /**
  * A wrapper for holding initialized remote services information. <br>
@@ -369,7 +369,7 @@ public class RemoteServicesDelegate {
 					localConnection = localConnectionManager.getConnection(IRemoteConnectionManager.LOCAL_CONNECTION_NAME);
 				}
 				if (localConnection != null) {
-					localFileManager = localServices.getFileManager(localConnection);
+					localFileManager = localConnection.getFileManager();
 				}
 			}
 
@@ -380,7 +380,7 @@ public class RemoteServicesDelegate {
 					if (remoteConnectionManager != null) {
 						remoteConnection = remoteConnectionManager.getConnection(remoteConnectionName);
 						if (remoteConnection != null) {
-							remoteFileManager = remoteServices.getFileManager(remoteConnection);
+							remoteFileManager = remoteConnection.getFileManager();
 						}
 					}
 				}

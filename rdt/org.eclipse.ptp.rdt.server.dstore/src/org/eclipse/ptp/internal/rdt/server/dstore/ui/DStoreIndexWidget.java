@@ -10,8 +10,8 @@ package org.eclipse.ptp.internal.rdt.server.dstore.ui;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.ptp.internal.rdt.server.dstore.messages.Messages;
 import org.eclipse.ptp.internal.rdt.server.dstore.ui.DStoreServerWidget.FieldModifier;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.ui.widgets.RemoteDirectoryWidget;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.ui.widgets.RemoteDirectoryWidget;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -32,7 +32,7 @@ public class DStoreIndexWidget extends Composite {
 		setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		fDirectoryWidget = new RemoteDirectoryWidget(this, SWT.NONE, Messages.DStoreIndexWidget_0, fDefaultPath);
-		fDirectoryWidget.setBrowseMessage(Messages.DStoreIndexWidget_1); 
+		fDirectoryWidget.setBrowseMessage(Messages.DStoreIndexWidget_1);
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, false);
 		data.horizontalSpan = 3;
 		fDirectoryWidget.setLayoutData(data); // set layout to grab horizontal

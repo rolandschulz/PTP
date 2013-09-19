@@ -10,94 +10,61 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.remote.rse.ui;
 
-import java.util.Arrays;
-import java.util.Comparator;
+import java.util.Set;
 
 import org.eclipse.ptp.internal.remote.rse.core.RSEConnectionManager;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.ui.AbstractRemoteUIConnectionManager;
+import org.eclipse.remote.core.IRemoteConnectionWorkingCopy;
+import org.eclipse.remote.core.IRemoteServices;
+import org.eclipse.remote.ui.AbstractRemoteUIConnectionManager;
+import org.eclipse.remote.ui.IRemoteUIConnectionWizard;
+import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.ui.actions.SystemNewConnectionAction;
 import org.eclipse.swt.widgets.Shell;
 
 public class RSEUIConnectionManager extends AbstractRemoteUIConnectionManager {
-	private SystemNewConnectionAction action;
-	private final RSEConnectionManager manager;
+	private SystemNewConnectionAction fNewConnAction;
+	private final RSEConnectionManager fConnManager;
 
 	public RSEUIConnectionManager(IRemoteServices services) {
-		this.manager = (RSEConnectionManager) services.getConnectionManager();
+		this.fConnManager = (RSEConnectionManager) services.getConnectionManager();
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.remote.IRemoteConnectionManager#newConnection()
+	 * @see org.eclipse.remote.ui.IRemoteUIConnectionManager#getConnectionWizard(org.eclipse.swt.widgets.Shell)
 	 */
-	public IRemoteConnection newConnection(Shell shell) {
-		IRemoteConnection[] oldConns = manager.getConnections();
+	public IRemoteUIConnectionWizard getConnectionWizard(final Shell shell) {
+		return new IRemoteUIConnectionWizard() {
+			public IRemoteConnectionWorkingCopy open() {
+				if (fNewConnAction == null) {
+					fNewConnAction = new SystemNewConnectionAction(shell, false, false, null);
+				}
 
-		if (action == null) {
-			action = new SystemNewConnectionAction(shell, false, false, null);
-		}
+				try {
+					fNewConnAction.run();
+				} catch (Exception e) {
+					// Ignore
+				}
 
-		try {
-			action.run();
-		} catch (Exception e) {
-			// Ignore
-		}
-
-		manager.refreshConnections();
-
-		/*
-		 * Try to work out which is the new connection. Assumes that connections
-		 * can only be created, NOT removed.
-		 */
-		IRemoteConnection[] newConns = manager.getConnections();
-
-		if (newConns.length <= oldConns.length) {
-			return null;
-		}
-
-		Arrays.sort(oldConns, new Comparator<IRemoteConnection>() {
-			public int compare(IRemoteConnection c1, IRemoteConnection c2) {
-				return c1.getName().compareToIgnoreCase(c2.getName());
+				Object value = fNewConnAction.getValue();
+				if (value != null && value instanceof IHost) {
+					return fConnManager.createConnection((IHost) value).getWorkingCopy();
+				}
+				return null;
 			}
-		});
-		Arrays.sort(newConns, new Comparator<IRemoteConnection>() {
-			public int compare(IRemoteConnection c1, IRemoteConnection c2) {
-				return c1.getName().compareToIgnoreCase(c2.getName());
+
+			public void setInvalidConnectionNames(Set<String> names) {
+				// Not supported
 			}
-		});
-		for (int i = 0; i < oldConns.length; i++) {
-			if (!oldConns[i].equals(newConns[i])) {
-				return newConns[i];
+
+			public void setConnectionName(String name) {
+				// Not supported
 			}
-		}
 
-		return newConns[newConns.length - 1];
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager#newConnection(org
-	 * .eclipse.swt.widgets.Shell, java.lang.String[], java.lang.String[])
-	 */
-	public IRemoteConnection newConnection(Shell shell, String[] attrHints, String[] attrHintValues) {
-		return newConnection(shell);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager#updateConnection
-	 * (org.eclipse.swt.widgets.Shell,
-	 * org.eclipse.ptp.remote.core.IRemoteConnection)
-	 */
-	public void updateConnection(Shell shell, IRemoteConnection connection) {
-		// TODO Auto-generated method stub
-
+			public void setConnection(IRemoteConnectionWorkingCopy connection) {
+				// Not supported
+			}
+		};
 	}
 }

@@ -9,7 +9,7 @@ package org.eclipse.ptp.internal.remote.terminal;
 
 import org.eclipse.tm.internal.terminal.provisional.api.ISettingsStore;
 
-public interface IRemoteToolsSettings {
+public interface IRemoteSettings {
 	/**
 	 * Get the host name or IP address of remote system to connect.
 	 * 

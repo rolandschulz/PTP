@@ -59,15 +59,15 @@ import org.eclipse.ptp.launch.rulesengine.IRuleAction;
 import org.eclipse.ptp.launch.rulesengine.ISynchronizationRule;
 import org.eclipse.ptp.launch.rulesengine.RuleActionFactory;
 import org.eclipse.ptp.launch.rulesengine.RuleFactory;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.RemoteServices;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl;
 import org.eclipse.ptp.rm.lml.monitor.core.MonitorControlManager;
 import org.eclipse.ptp.rm.lml.ui.ILMLUIConstants;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteConnectionManager;
+import org.eclipse.remote.core.IRemoteFileManager;
+import org.eclipse.remote.core.IRemoteServices;
+import org.eclipse.remote.core.RemoteServices;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -220,7 +220,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		IRemoteServices localServices = RemoteServices.getLocalServices();
 		IRemoteConnectionManager lconnMgr = localServices.getConnectionManager();
 		IRemoteConnection lconn = lconnMgr.getConnection(IRemoteConnectionManager.LOCAL_CONNECTION_NAME);
-		return localServices.getFileManager(lconn);
+		return lconn.getFileManager();
 	}
 
 	/**
@@ -233,7 +233,7 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			throws CoreException {
 		IRemoteConnection conn = RMLaunchUtils.getRemoteConnection(configuration, monitor);
 		if (conn != null) {
-			return conn.getRemoteServices().getFileManager(conn);
+			return conn.getFileManager();
 		}
 		return null;
 	}

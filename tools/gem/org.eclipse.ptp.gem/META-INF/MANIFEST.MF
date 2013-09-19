@@ -18,8 +18,8 @@ Import-Package: org.eclipse.cdt.core.model,
  org.eclipse.ptp.rdt.core.resources,
  org.eclipse.ptp.rdt.sync.core,
  org.eclipse.ptp.rdt.sync.core.resources,
- org.eclipse.ptp.remote.core,
- org.eclipse.ptp.remote.core.exception
+ org.eclipse.remote.core,
+ org.eclipse.remote.core.exception
 Export-Package: org.eclipse.ptp.internal.gem;x-internal:=true,
  org.eclipse.ptp.internal.gem.handlers;x-internal:=true,
  org.eclipse.ptp.internal.gem.messages;x-internal:=true,

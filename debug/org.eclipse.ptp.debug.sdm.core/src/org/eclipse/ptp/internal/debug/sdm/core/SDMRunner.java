@@ -16,10 +16,10 @@ import org.eclipse.ptp.debug.core.launch.IPLaunch;
 import org.eclipse.ptp.internal.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.internal.debug.sdm.core.messages.Messages;
 import org.eclipse.ptp.internal.debug.sdm.core.utils.DebugUtil;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.remote.core.IRemoteProcess;
-import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteFileManager;
+import org.eclipse.remote.core.IRemoteProcess;
+import org.eclipse.remote.core.IRemoteProcessBuilder;
 
 public class SDMRunner extends Job {
 	public enum SDMMasterState {
@@ -89,9 +89,9 @@ public class SDMRunner extends Job {
 			/*
 			 * Prepare remote connection.
 			 */
-			IRemoteFileManager fileManager = connection.getRemoteServices().getFileManager(connection);
+			IRemoteFileManager fileManager = connection.getFileManager();
 
-			IRemoteProcessBuilder sdmProcessBuilder = connection.getRemoteServices().getProcessBuilder(connection, command);
+			IRemoteProcessBuilder sdmProcessBuilder = connection.getProcessBuilder(command);
 			if (workDir != null) {
 				sdmProcessBuilder.directory(fileManager.getResource(workDir));
 			}

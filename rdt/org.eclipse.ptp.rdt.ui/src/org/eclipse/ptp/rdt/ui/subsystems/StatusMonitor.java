@@ -33,9 +33,9 @@ import org.eclipse.dstore.core.model.DataStore;
 import org.eclipse.dstore.core.model.DataStoreSchema;
 import org.eclipse.dstore.extra.DomainEvent;
 import org.eclipse.dstore.extra.IDomainListener;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
-import org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteConnectionChangeEvent;
+import org.eclipse.remote.core.IRemoteConnectionChangeListener;
 import org.eclipse.swt.widgets.Display;
 
 /*
@@ -52,10 +52,16 @@ import org.eclipse.swt.widgets.Display;
  *			smon.waitForUpdate(status, monitor);
  * </pre></blockquote>
  */
+/**
+ * @since 6.0
+ */
 public class StatusMonitor implements IDomainListener, IRemoteConnectionChangeListener {
 
 	private static Map<IRemoteConnection, StatusMonitor> fMonitors = new HashMap<IRemoteConnection, StatusMonitor>();
 	
+	/**
+	 * @since 6.0
+	 */
 	public static StatusMonitor getStatusMonitorFor(IRemoteConnection connection, DataStore store) {
 		StatusMonitor monitor = fMonitors.get(connection);
 		if (monitor == null) {
@@ -82,6 +88,7 @@ public class StatusMonitor implements IDomainListener, IRemoteConnectionChangeLi
 	 *            the system associated with this monitor
 	 * @param dataStore
 	 *            the dataStore associated with this monitor
+	 * @since 6.0
 	 */
 	public StatusMonitor(IRemoteConnection connection, DataStore dataStore) {
 		fRemoteConnection = connection;
@@ -90,7 +97,10 @@ public class StatusMonitor implements IDomainListener, IRemoteConnectionChangeLi
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener#connectionChanged(org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent)
+	 * @see org.eclipse.remote.core.IRemoteConnectionChangeListener#connectionChanged(org.eclipse.remote.core.IRemoteConnectionChangeEvent)
+	 */
+	/**
+	 * @since 6.0
 	 */
 	public void connectionChanged(IRemoteConnectionChangeEvent e) {
 		if (e.getType() == IRemoteConnectionChangeEvent.CONNECTION_CLOSED ||

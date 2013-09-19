@@ -14,13 +14,13 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.core.util.LaunchUtils;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.RemoteServices;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.core.LaunchControllerManager;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteConnectionManager;
+import org.eclipse.remote.core.IRemoteFileManager;
+import org.eclipse.remote.core.IRemoteServices;
+import org.eclipse.remote.core.RemoteServices;
 
 /**
  * Utility methods for managing launch configuration attributes.
@@ -85,7 +85,7 @@ public class RMLaunchUtils {
 		IRemoteServices localServices = RemoteServices.getLocalServices();
 		IRemoteConnectionManager lconnMgr = localServices.getConnectionManager();
 		IRemoteConnection lconn = lconnMgr.getConnection(IRemoteConnectionManager.LOCAL_CONNECTION_NAME);
-		return localServices.getFileManager(lconn);
+		return lconn.getFileManager();
 	}
 
 	/**
@@ -100,7 +100,7 @@ public class RMLaunchUtils {
 			throws CoreException {
 		IRemoteConnection conn = getRemoteConnection(configuration, monitor);
 		if (!monitor.isCanceled()) {
-			return conn.getRemoteServices().getFileManager(conn);
+			return conn.getFileManager();
 		}
 		return null;
 	}

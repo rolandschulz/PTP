@@ -27,15 +27,15 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.rdt.core.RDTLog;
 import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.ProjectNotConfiguredException;
 import org.eclipse.ptp.services.core.ServiceModelManager;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteProcessBuilder;
+import org.eclipse.remote.core.IRemoteServices;
+import org.eclipse.remote.core.exception.RemoteConnectionException;
 
 /**
  * Supplies remote environment variables on a per-configuration basis. Right now it actually doesn't take into account service model
@@ -138,7 +138,7 @@ public class RemoteConfigurationEnvironmentSupplier implements IConfigurationEnv
 
 				List<String> command = new LinkedList<String>();
 
-				IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, command);
+				IRemoteProcessBuilder processBuilder = connection.getProcessBuilder(command);
 
 				remoteEnvMap = processBuilder.environment();
 

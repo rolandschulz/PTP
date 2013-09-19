@@ -30,13 +30,13 @@ import org.eclipse.ptp.internal.rm.jaxb.control.core.LaunchController;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.RemoteServicesDelegate;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.data.LineImpl;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.messages.Messages;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.LineType;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFileType;
 import org.eclipse.ptp.rm.jaxb.core.data.ManagedFilesType;
+import org.eclipse.remote.core.IRemoteConnection;
 
 /**
  * A managed file is a client-side file which needs to be moved to the resource to which the job will be submitted. This class wraps

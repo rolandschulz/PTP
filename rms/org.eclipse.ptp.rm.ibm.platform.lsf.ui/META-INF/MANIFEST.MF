@@ -9,7 +9,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.ptp.rm.jaxb.control.ui,
  org.eclipse.ptp.rm.jaxb.core,
- org.eclipse.ptp.remote.core,
+ org.eclipse.remote.core,
  org.eclipse.debug.core,
  org.eclipse.debug.ui;bundle-version="3.9.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

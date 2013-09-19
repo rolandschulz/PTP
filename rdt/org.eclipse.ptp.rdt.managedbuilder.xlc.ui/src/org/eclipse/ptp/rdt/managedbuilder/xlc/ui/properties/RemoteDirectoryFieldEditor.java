@@ -13,11 +13,11 @@ package org.eclipse.ptp.rdt.managedbuilder.xlc.ui.properties;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.jface.preference.DirectoryFieldEditor;
 import org.eclipse.ptp.rdt.managedbuilder.xlc.ui.messages.Messages;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
-import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
-import org.eclipse.ptp.remote.ui.IRemoteUIServices;
-import org.eclipse.ptp.remote.ui.RemoteUIServices;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.ui.IRemoteUIConstants;
+import org.eclipse.remote.ui.IRemoteUIFileManager;
+import org.eclipse.remote.ui.IRemoteUIServices;
+import org.eclipse.remote.ui.RemoteUIServices;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
@@ -46,7 +46,7 @@ public class RemoteDirectoryFieldEditor extends DirectoryFieldEditor {
 	 *            the parent of the field editor's control
 	 * @param IHost
 	 *            the remote file system connection host
-	 * @since 3.0
+	 * @since 4.0
 	 */
 	public RemoteDirectoryFieldEditor(String name, String labelText, Composite parent, IRemoteConnection connection) {
 		super(name, labelText, parent);
@@ -102,8 +102,7 @@ public class RemoteDirectoryFieldEditor extends DirectoryFieldEditor {
 			// reset currentRemoteFileStore first
 			fCurrentRemoteFileStore = null;
 			if (fRemoteConnection != null) {
-				fCurrentRemoteFileStore = fRemoteConnection.getRemoteServices().getFileManager(fRemoteConnection)
-						.getResource(dirName);
+				fCurrentRemoteFileStore = fRemoteConnection.getFileManager().getResource(dirName);
 			}
 		}
 

@@ -18,7 +18,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.text.MessageFormat;
 
-import org.eclipse.ptp.remote.core.IRemoteProcess;
+import org.eclipse.remote.core.IRemoteProcess;
 
 /**
  * @author crecoskie

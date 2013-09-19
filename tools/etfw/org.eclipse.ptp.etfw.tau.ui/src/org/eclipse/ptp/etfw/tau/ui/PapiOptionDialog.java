@@ -45,10 +45,10 @@ import org.eclipse.ptp.etfw.tau.ui.messages.Messages;
 import org.eclipse.ptp.internal.etfw.BuildLaunchUtils;
 import org.eclipse.ptp.internal.etfw.RemoteBuildLaunchUtils;
 import org.eclipse.ptp.internal.rm.jaxb.core.JAXBCoreConstants;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.rm.jaxb.control.ui.AbstractWidget;
 import org.eclipse.ptp.rm.jaxb.control.ui.IWidgetDescriptor;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
+import org.eclipse.remote.core.IRemoteConnection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -78,7 +78,7 @@ public class PapiOptionDialog extends AbstractWidget {
 	private final Button button;
 	private final IBuildLaunchUtils blt;
 	boolean refreshing = false;
-	protected Map<String, String> varmap = new HashMap<String,String>();
+	protected Map<String, String> varmap = new HashMap<String, String>();
 
 	/**
 	 * The list of all available options found among all available TAU makefiles
@@ -100,11 +100,10 @@ public class PapiOptionDialog extends AbstractWidget {
 		super(parent, wd);
 
 		this.remoteConnection = wd.getRemoteConnection();
-		
-		if(remoteConnection!=null){
+
+		if (remoteConnection != null) {
 			blt = new RemoteBuildLaunchUtils(remoteConnection);
-		}
-		else{
+		} else {
 			blt = new BuildLaunchUtils();
 		}
 		setLayout(new GridLayout(1, false));
@@ -197,7 +196,7 @@ public class PapiOptionDialog extends AbstractWidget {
 			String pPre = "PAPI_"; //$NON-NLS-1$
 			varmap = new HashMap<String, String>(selset.size());
 			varmap.put("COUNTER1", "GET_TIME_OF_DAY"); //$NON-NLS-1$ //$NON-NLS-2$
-			//String agg = "time";
+			// String agg = "time";
 			Iterator<Object> varit = selset.iterator();
 			int counter = 2;
 			while (varit.hasNext()) {
@@ -206,7 +205,7 @@ public class PapiOptionDialog extends AbstractWidget {
 					varTxt = pn + varTxt;
 				}
 				varmap.put("COUNTER" + counter, varTxt); //$NON-NLS-1$
-				//agg+=":"+varTxt;
+				// agg+=":"+varTxt;
 				counter++;
 			}
 
@@ -299,8 +298,8 @@ public class PapiOptionDialog extends AbstractWidget {
 	public void setVariableMap(IVariableMap lcMap) {
 		this.map = lcMap;
 	}
-	
-	public Map<String, String> getVariableMap(){
+
+	public Map<String, String> getVariableMap() {
 		return varmap;
 	}
 }

@@ -39,11 +39,11 @@ import org.eclipse.ptp.rdt.core.RDTLog;
 import org.eclipse.ptp.rdt.core.messages.Messages;
 import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider;
 import org.eclipse.ptp.rdt.core.services.IRDTServiceConstants;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.remote.core.IRemoteProcess;
-import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
-import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteFileManager;
+import org.eclipse.remote.core.IRemoteProcess;
+import org.eclipse.remote.core.IRemoteProcessBuilder;
+import org.eclipse.remote.core.IRemoteServices;
 import org.eclipse.ptp.services.core.IService;
 import org.eclipse.ptp.services.core.IServiceConfiguration;
 import org.eclipse.ptp.services.core.IServiceProvider;
@@ -130,14 +130,14 @@ public abstract class RemoteRunSIProvider implements IExternalScannerInfoProvide
 		if (remoteServices == null)
 			return false;
 		
-		IRemoteProcessBuilder processBuilder = remoteServices.getProcessBuilder(connection, runCommand);
+		IRemoteProcessBuilder processBuilder = connection.getProcessBuilder(runCommand);
 		processBuilder.redirectErrorStream(true);
 
 		// get the configuration directory for the provider... this is where the
 		// build
 		// should execute
 		String configPath = executionProvider.getConfigLocation();
-		IRemoteFileManager remoteFileManager = remoteServices.getFileManager(connection);
+		IRemoteFileManager remoteFileManager = connection.getFileManager();
 		IFileStore workingDir = remoteFileManager.getResource(configPath);
 
 		// set the working directory for the process to be the config directory

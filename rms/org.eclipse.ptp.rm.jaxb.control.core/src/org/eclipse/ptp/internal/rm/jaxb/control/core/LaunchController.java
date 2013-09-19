@@ -46,11 +46,6 @@ import org.eclipse.ptp.internal.rm.jaxb.control.core.runnable.command.CommandJob
 import org.eclipse.ptp.internal.rm.jaxb.control.core.utils.JobIdPinTable;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.variables.RMVariableMap;
 import org.eclipse.ptp.internal.rm.jaxb.core.JAXBInitializationUtils;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent;
-import org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener;
-import org.eclipse.ptp.remote.core.IRemotePreferenceConstants;
-import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.server.core.RemoteServerManager;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.core.LaunchControllerManager;
@@ -63,6 +58,10 @@ import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
 import org.eclipse.ptp.rm.jaxb.core.data.SiteType;
 import org.eclipse.ptp.rm.lml.da.server.core.LMLDAServer;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteConnectionChangeEvent;
+import org.eclipse.remote.core.IRemoteConnectionChangeListener;
+import org.eclipse.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ui.progress.IProgressConstants;
 
 /**
@@ -94,8 +93,8 @@ public class LaunchController implements ILaunchController {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see org.eclipse.ptp.remote.core.IRemoteConnectionChangeListener# connectionChanged
-		 * (org.eclipse.ptp.remote.core.IRemoteConnectionChangeEvent)
+		 * @see org.eclipse.remote.core.IRemoteConnectionChangeListener# connectionChanged
+		 * (org.eclipse.remote.core.IRemoteConnectionChangeEvent)
 		 */
 		public void connectionChanged(IRemoteConnectionChangeEvent event) {
 			if (event.getType() == IRemoteConnectionChangeEvent.CONNECTION_ABORTED
@@ -571,7 +570,7 @@ public class LaunchController implements ILaunchController {
 			if (site != null) {
 				servicesId = site.getRemoteServices();
 				if (servicesId == null) {
-					servicesId = IRemotePreferenceConstants.REMOTE_TOOLS_REMOTE_SERVICES_ID;
+					servicesId = "org.eclipse.remote.JSch"; //$NON-NLS-1$
 				}
 				connectionName = site.getConnectionName();
 			}

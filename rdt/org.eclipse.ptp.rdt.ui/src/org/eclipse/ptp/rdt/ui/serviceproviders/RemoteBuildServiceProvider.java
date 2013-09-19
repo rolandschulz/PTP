@@ -21,11 +21,11 @@ import org.eclipse.ptp.internal.rdt.ui.RSEUtils;
 import org.eclipse.ptp.rdt.core.activator.Activator;
 import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.RemoteServices;
-import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteConnectionManager;
+import org.eclipse.remote.core.IRemoteServices;
+import org.eclipse.remote.core.RemoteServices;
+import org.eclipse.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.services.core.ServiceProvider;
 
 /**
@@ -59,7 +59,7 @@ public class RemoteBuildServiceProvider extends ServiceProvider implements IRemo
 		// get the user's home directory
 		String homeDir = connection.getProperty(IRemoteConnection.USER_HOME_PROPERTY);
 		if (homeDir != null) {
-			IFileStore homeStore = remoteServices.getFileManager(connection).getResource(homeDir);
+			IFileStore homeStore = connection.getFileManager().getResource(homeDir);
 			URI uri = homeStore.toURI();
 			String pathString = EFSExtensionManager.getDefault().getPathFromURI(uri);
 			IPath path = new Path(pathString);
@@ -105,6 +105,9 @@ public class RemoteBuildServiceProvider extends ServiceProvider implements IRemo
 	 * org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider
 	 * #getConnection()
 	 */
+	/**
+	 * @since 6.0
+	 */
 	public IRemoteConnection getConnection() {
 		IRemoteConnection conn = null;
 		if (getRemoteConnectionName() != null) {
@@ -145,6 +148,9 @@ public class RemoteBuildServiceProvider extends ServiceProvider implements IRemo
 	 * org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider
 	 * #getRemoteServices()
 	 */
+	/**
+	 * @since 6.0
+	 */
 	public IRemoteServices getRemoteServices() {
 		return RemoteServices.getRemoteServices(getRemoteToolsProviderID());
 	}
@@ -168,6 +174,7 @@ public class RemoteBuildServiceProvider extends ServiceProvider implements IRemo
 	 * services.
 	 * 
 	 * @param connection
+	 * @since 6.0
 	 */
 	public void setRemoteToolsConnection(IRemoteConnection connection) {
 		String name = ""; //$NON-NLS-1$

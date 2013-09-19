@@ -2,12 +2,12 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name.0
 Bundle-SymbolicName: org.eclipse.ptp.rdt.sync.core;singleton:=true
-Bundle-Version: 3.0.0.qualifier
+Bundle-Version: 4.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.filesystem,
  org.eclipse.core.resources,
- org.eclipse.ptp.remote.core,
+ org.eclipse.remote.core,
  org.eclipse.ui
 Export-Package: org.eclipse.ptp.internal.rdt.sync.core;x-friends:="org.eclipse.ptp.rdt.sync.ui",
  org.eclipse.ptp.internal.rdt.sync.core.messages;x-internal:=true,

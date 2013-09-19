@@ -37,10 +37,10 @@ import org.eclipse.ptp.internal.rm.jaxb.control.core.RemoteServicesDelegate;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.messages.Messages;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.runnable.JobStatusMap;
 import org.eclipse.ptp.internal.rm.jaxb.core.JAXBCoreConstants;
-import org.eclipse.ptp.remote.core.IRemoteProcess;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
+import org.eclipse.remote.core.IRemoteProcess;
 
 /**
  * Extension of the IJobStatus class to handle resource manager command jobs. Also handles availability notification for remote
@@ -663,7 +663,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.internal.rm.jaxb.control.core.ICommandJobStatus#setProcess(org.eclipse.ptp.remote.core.IRemoteProcess)
+	 * @see org.eclipse.ptp.internal.rm.jaxb.control.core.ICommandJobStatus#setProcess(org.eclipse.remote.core.IRemoteProcess)
 	 */
 	public void setProcess(IRemoteProcess process) {
 		this.process = process;

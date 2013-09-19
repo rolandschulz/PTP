@@ -13,8 +13,8 @@ import org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider
 import org.eclipse.ptp.services.core.IServiceProvider;
 import org.eclipse.ptp.services.core.ServiceProvider;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteServices;
 
 /**
  * A build service provider that does nothing.
@@ -49,7 +49,7 @@ public class NullBuildServiceProvider extends ServiceProvider implements IServic
 
 
 	/**
-	 * @since 2.0
+	 * @since 6.0
 	 */
 	public IRemoteConnection getConnection() {
 		return null;
@@ -57,7 +57,7 @@ public class NullBuildServiceProvider extends ServiceProvider implements IServic
 
 
 	/**
-	 * @since 2.0
+	 * @since 6.0
 	 */
 	public IRemoteServices getRemoteServices() {
 		return null;
@@ -82,10 +82,10 @@ public class NullBuildServiceProvider extends ServiceProvider implements IServic
 
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#setRemoteToolsConnection(org.eclipse.ptp.remote.core.IRemoteConnection)
+	 * @see org.eclipse.ptp.rdt.core.serviceproviders.IRemoteExecutionServiceProvider#setRemoteToolsConnection(org.eclipse.remote.core.IRemoteConnection)
 	 */
 	/**
-	 * @since 3.1
+	 * @since 6.0
 	 */
 	public void setRemoteToolsConnection(IRemoteConnection connection) {
 		// TODO Auto-generated method stub

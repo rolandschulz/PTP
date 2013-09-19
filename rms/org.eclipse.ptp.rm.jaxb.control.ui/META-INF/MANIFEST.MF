@@ -2,18 +2,17 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ptp.rm.jaxb.control.ui;singleton:=true
-Bundle-Version: 1.2.0.qualifier
+Bundle-Version: 2.0.0.qualifier
 Bundle-Activator: org.eclipse.ptp.internal.rm.jaxb.control.ui.JAXBControlUIPlugin
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
  org.eclipse.ptp.rm.jaxb.control.core,
  org.eclipse.ptp.rm.jaxb.core,
  org.eclipse.core.filesystem,
- org.eclipse.ptp.remote.core,
  org.eclipse.core.variables,
  org.eclipse.ptp.core,
- org.eclipse.ptp.remote.ui,
- org.eclipse.ptp.remote.core,
+ org.eclipse.remote.ui,
+ org.eclipse.remote.core,
  org.eclipse.debug.core,
  org.eclipse.debug.ui,
  org.eclipse.ptp.rm.jaxb.ui,

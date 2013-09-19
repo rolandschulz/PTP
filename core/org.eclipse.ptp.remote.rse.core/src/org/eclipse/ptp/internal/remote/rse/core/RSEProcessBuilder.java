@@ -19,10 +19,10 @@ import java.util.Map;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.internal.remote.rse.core.messages.Messages;
-import org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.remote.core.IRemoteProcess;
+import org.eclipse.remote.core.AbstractRemoteProcessBuilder;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteFileManager;
+import org.eclipse.remote.core.IRemoteProcess;
 import org.eclipse.rse.connectorservice.dstore.DStoreConnectorService;
 import org.eclipse.rse.core.subsystems.IConnectorService;
 import org.eclipse.rse.core.subsystems.ISubSystem;
@@ -45,7 +45,7 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 	 * @since 4.0
 	 */
 	public RSEProcessBuilder(IRemoteConnection conn, IRemoteFileManager fileMgr, List<String> command) {
-		super(conn, command);
+		super(command);
 		fConnection = (RSEConnection) conn;
 		fFileMgr = (RSEFileManager) fileMgr;
 		fRemoteEnv = new HashMap<String, String>(conn.getEnv());
@@ -75,7 +75,7 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.remote.AbstractRemoteProcessBuilder#environment()
+	 * @see org.eclipse.remote.AbstractRemoteProcessBuilder#environment()
 	 */
 	@Override
 	public Map<String, String> environment() {
@@ -86,7 +86,7 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder#getSupportedFlags
+	 * org.eclipse.remote.core.AbstractRemoteProcessBuilder#getSupportedFlags
 	 * ()
 	 */
 	@Override
@@ -97,7 +97,7 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.remote.IRemoteProcessBuilder#start(int)
+	 * @see org.eclipse.remote.IRemoteProcessBuilder#start(int)
 	 */
 	@Override
 	public IRemoteProcess start(int flags) throws IOException {
@@ -123,16 +123,16 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 			}
 
 			SpawnerSubsystem subsystem = getSpawnerSubsystem();
-			
-			if(subsystem instanceof LocalSpawnerSubsystem) {
-				Process process = subsystem.spawnLocalRedirected(remoteCmd, initialDir, null, getEnvironment(), new NullProgressMonitor());
+
+			if (subsystem instanceof LocalSpawnerSubsystem) {
+				Process process = subsystem.spawnLocalRedirected(remoteCmd, initialDir, null, getEnvironment(),
+						new NullProgressMonitor());
 				return new LocalProcessWrapper(process);
 			}
-			
+
 			else {
 				if (subsystem != null) {
-					hostShell = subsystem.spawnRedirected(remoteCmd, initialDir, null, getEnvironment(),
-							new NullProgressMonitor());
+					hostShell = subsystem.spawnRedirected(remoteCmd, initialDir, null, getEnvironment(), new NullProgressMonitor());
 
 					if (hostShell == null) {
 						// fall back to old method of using RSE
@@ -175,7 +175,7 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 		if (connectorService == null) {
 			// try getting the local connector service
 			connectorService = getLocalConnectorService();
-			if(connectorService == null) {
+			if (connectorService == null) {
 				return null;
 			}
 		}
@@ -197,7 +197,7 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 				return (LocalConnectorService) service;
 			}
 		}
-		
+
 		return null;
 	}
 
@@ -221,7 +221,7 @@ public class RSEProcessBuilder extends AbstractRemoteProcessBuilder {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.remote.core.AbstractRemoteProcessBuilder#directory()
+	 * @see org.eclipse.remote.core.AbstractRemoteProcessBuilder#directory()
 	 */
 	@Override
 	public IFileStore directory() {

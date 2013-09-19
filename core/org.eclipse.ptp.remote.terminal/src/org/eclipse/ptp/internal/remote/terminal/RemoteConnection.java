@@ -11,19 +11,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.core.IRemoteProcess;
-import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.RemoteServices;
-import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteConnectionManager;
+import org.eclipse.remote.core.IRemoteProcess;
+import org.eclipse.remote.core.IRemoteProcessBuilder;
+import org.eclipse.remote.core.IRemoteServices;
+import org.eclipse.remote.core.RemoteServices;
+import org.eclipse.remote.core.exception.RemoteConnectionException;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
 import org.eclipse.tm.internal.terminal.provisional.api.Logger;
 import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
 
-class RemoteToolsConnection extends Thread {
+class RemoteConnection extends Thread {
 	private static int fgNo;
 
 	protected static Display getStandardDisplay() {
@@ -35,12 +35,12 @@ class RemoteToolsConnection extends Thread {
 	}
 
 	private final ITerminalControl fControl;
-	private final RemoteToolsConnector fConn;
+	private final RemoteConnector fConn;
 	private IRemoteConnection fRemoteConnection;
 	private IRemoteProcess fProcess;
 
-	protected RemoteToolsConnection(RemoteToolsConnector conn, ITerminalControl control) {
-		super("RemoteToolsConnection-" + fgNo++); //$NON-NLS-1$
+	protected RemoteConnection(RemoteConnector conn, ITerminalControl control) {
+		super("RemoteConnection-" + fgNo++); //$NON-NLS-1$
 		fControl = control;
 		fConn = conn;
 		fControl.setState(TerminalState.CONNECTING);
@@ -66,9 +66,12 @@ class RemoteToolsConnection extends Thread {
 			if (!fRemoteConnection.isOpen()) {
 				return;
 			}
-			IRemoteProcessBuilder processBuilder = fRemoteConnection.getRemoteServices().getProcessBuilder(fRemoteConnection,
-					new String[] { "/bin/bash", "-l" });
-			fProcess = processBuilder.start(IRemoteProcessBuilder.ALLOCATE_PTY);
+			if ((fRemoteConnection.getRemoteServices().getCapabilities() & IRemoteServices.CAPABILITY_SUPPORTS_COMMAND_SHELL) != 0) {
+				fProcess = fRemoteConnection.getCommandShell(IRemoteProcessBuilder.ALLOCATE_PTY);
+			} else {
+				IRemoteProcessBuilder processBuilder = fRemoteConnection.getProcessBuilder(new String[] { "/bin/bash", "-l" });
+				fProcess = processBuilder.start(IRemoteProcessBuilder.ALLOCATE_PTY);
+			}
 			fConn.setInputStream(fProcess.getInputStream());
 			fConn.setOutputStream(fProcess.getOutputStream());
 			fControl.setState(TerminalState.CONNECTED);
@@ -107,7 +110,7 @@ class RemoteToolsConnection extends Thread {
 	private void disconnect() {
 		interrupt();
 		synchronized (this) {
-			if (!fProcess.isCompleted()) {
+			if (fProcess != null && !fProcess.isCompleted()) {
 				fProcess.destroy();
 			}
 		}

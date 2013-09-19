@@ -18,7 +18,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.SyncFlag;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
-import org.eclipse.ptp.remote.core.IRemoteResource;
+import org.eclipse.remote.core.IRemoteResource;
 
 public class SynchronizedResource implements IRemoteResource {
 	private IResource fResource;

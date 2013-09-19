@@ -40,7 +40,7 @@ public abstract class AbstractWidget extends Composite {
 	 *            a widget which will be the parent of the new instance (cannot be null)
 	 * @param wd
 	 *            a widget descriptor containing additional information useful to the control
-	 * @since 1.2
+	 * @since 2.0
 	 */
 	protected AbstractWidget(Composite parent, IWidgetDescriptor2 wd) {
 		this(parent, (IWidgetDescriptor) wd);

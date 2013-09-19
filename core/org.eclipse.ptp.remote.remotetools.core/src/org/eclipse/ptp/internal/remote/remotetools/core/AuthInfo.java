@@ -14,8 +14,8 @@ package org.eclipse.ptp.internal.remote.remotetools.core;
 import java.net.PasswordAuthentication;
 
 import org.eclipse.ptp.internal.remote.remotetools.core.messages.Messages;
-import org.eclipse.ptp.remote.core.IUserAuthenticator;
 import org.eclipse.ptp.remotetools.core.IAuthInfo;
+import org.eclipse.remote.core.IUserAuthenticator;
 
 /**
  * Provides feedback to user for connection authentication

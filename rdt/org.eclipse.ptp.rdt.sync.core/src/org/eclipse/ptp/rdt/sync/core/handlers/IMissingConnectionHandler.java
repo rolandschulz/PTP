@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core.handlers;
 
-import org.eclipse.ptp.remote.core.IRemoteServices;
+import org.eclipse.remote.core.IRemoteServices;
 
 /**
  * Class for encapsulating logic to handle missing connections. The UI can specify a default handler for the core to execute so
@@ -26,6 +26,7 @@ public interface IMissingConnectionHandler {
 	 *            remote services for the connection
 	 * @param connectionName
 	 *            connection name
+	 * @since 4.0
 	 */
 	public void handle(IRemoteServices remoteServices, String connectionName);
 }

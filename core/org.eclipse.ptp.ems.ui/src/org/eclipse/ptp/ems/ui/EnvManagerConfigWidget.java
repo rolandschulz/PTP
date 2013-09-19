@@ -21,7 +21,7 @@ import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.ems.core.IEnvManagerConfig;
 import org.eclipse.ptp.internal.ems.ui.EnvManagerChecklist;
 import org.eclipse.ptp.internal.ems.ui.messages.Messages;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteConnection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -103,7 +103,7 @@ public final class EnvManagerConfigWidget extends Composite {
 	 * @param connection
 	 *            {@link IRemoteConnection} used to access files and execute shell commands on the remote machine (non-
 	 *            <code>null</code>)
-	 * @since 2.0
+	 * @since 3.0
 	 */
 	public void setConnection(IRemoteConnection connection) {
 		if (envConfigChecklist != null) {
@@ -258,7 +258,7 @@ public final class EnvManagerConfigWidget extends Composite {
 	 *            {@link IRemoteConnection} providing access to the remote machine (non-<code>null</code>)
 	 * @param selectedItems
 	 *            the items which should be selected in the checklist (non-<code>null</code>)
-	 * @since 2.0
+	 * @since 3.0
 	 */
 	public void configurationChanged(URI uri, IRemoteConnection remoteConnection,
 			List<String> selectedItems) {

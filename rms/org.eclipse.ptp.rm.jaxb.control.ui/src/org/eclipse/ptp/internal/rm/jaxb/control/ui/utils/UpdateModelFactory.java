@@ -49,12 +49,6 @@ import org.eclipse.ptp.internal.rm.jaxb.control.ui.model.TextUpdateModel;
 import org.eclipse.ptp.internal.rm.jaxb.control.ui.model.ValueTreeNodeUpdateModel;
 import org.eclipse.ptp.internal.rm.jaxb.control.ui.model.ViewerUpdateModel;
 import org.eclipse.ptp.internal.rm.jaxb.ui.util.WidgetBuilderUtils;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
-import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
-import org.eclipse.ptp.remote.ui.IRemoteUIServices;
-import org.eclipse.ptp.remote.ui.RemoteUIServices;
 import org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateHandler;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel;
@@ -74,6 +68,12 @@ import org.eclipse.ptp.rm.jaxb.core.data.FontType;
 import org.eclipse.ptp.rm.jaxb.core.data.LayoutDataType;
 import org.eclipse.ptp.rm.jaxb.core.data.PushButtonType;
 import org.eclipse.ptp.rm.jaxb.core.data.WidgetType;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteFileManager;
+import org.eclipse.remote.ui.IRemoteUIConstants;
+import org.eclipse.remote.ui.IRemoteUIFileManager;
+import org.eclipse.remote.ui.IRemoteUIServices;
+import org.eclipse.remote.ui.RemoteUIServices;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -644,7 +644,7 @@ public class UpdateModelFactory {
 					RemoteServicesDelegate delegate = RemoteServicesDelegate.getDelegate(conn.getRemoteServices().getId(),
 							conn.getName(), null);
 					if (JAXBControlUIConstants.ZEROSTR.equals(initial)) {
-						IRemoteFileManager mgr = conn.getRemoteServices().getFileManager(conn);
+						IRemoteFileManager mgr = conn.getFileManager();
 						uri = mgr.toURI(tab.getParent().getConnection().getWorkingDirectory());
 					} else {
 						uri = new URI(initial);
@@ -1231,8 +1231,7 @@ public class UpdateModelFactory {
 				 */
 				public Object validate(Object value) throws Exception {
 					IRemoteConnection conn = tab.getConnection();
-					WidgetActionUtils.validate(String.valueOf(value), attr.getValidator(),
-							conn.getRemoteServices().getFileManager(conn));
+					WidgetActionUtils.validate(String.valueOf(value), attr.getValidator(), conn.getFileManager());
 					return value;
 				}
 

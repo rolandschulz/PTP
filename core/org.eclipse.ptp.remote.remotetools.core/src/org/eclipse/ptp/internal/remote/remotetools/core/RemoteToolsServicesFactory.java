@@ -10,15 +10,15 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.remote.remotetools.core;
 
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.IRemoteServicesDescriptor;
-import org.eclipse.ptp.remote.core.IRemoteServicesFactory;
+import org.eclipse.remote.core.IRemoteServices;
+import org.eclipse.remote.core.IRemoteServicesDescriptor;
+import org.eclipse.remote.core.IRemoteServicesFactory;
 
 public class RemoteToolsServicesFactory implements IRemoteServicesFactory {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.remote.core.IRemoteServicesFactory#getServices(org.eclipse.ptp.remote.core.IRemoteServicesDescriptor)
+	 * @see org.eclipse.remote.core.IRemoteServicesFactory#getServices(org.eclipse.remote.core.IRemoteServicesDescriptor)
 	 */
 	public IRemoteServices getServices(IRemoteServicesDescriptor descriptor) {
 		return new RemoteToolsServices(descriptor);

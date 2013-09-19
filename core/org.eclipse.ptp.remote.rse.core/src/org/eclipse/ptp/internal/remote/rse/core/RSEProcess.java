@@ -29,7 +29,7 @@ import org.eclipse.dstore.extra.DomainEvent;
 import org.eclipse.dstore.extra.IDomainListener;
 import org.eclipse.ptp.internal.remote.rse.core.messages.Messages;
 import org.eclipse.ptp.internal.remote.rse.core.miners.SpawnerMiner;
-import org.eclipse.ptp.remote.core.AbstractRemoteProcess;
+import org.eclipse.remote.core.AbstractRemoteProcess;
 import org.eclipse.rse.internal.services.local.shells.LocalHostShell;
 import org.eclipse.rse.services.shells.HostShellOutputStream;
 import org.eclipse.rse.services.shells.IHostOutput;
@@ -293,7 +293,7 @@ public class RSEProcess extends AbstractRemoteProcess implements IHostShellOutpu
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.remote.AbstractRemoteProcess#isCompleted()
+	 * @see org.eclipse.remote.AbstractRemoteProcess#isCompleted()
 	 */
 	@Override
 	public boolean isCompleted() {

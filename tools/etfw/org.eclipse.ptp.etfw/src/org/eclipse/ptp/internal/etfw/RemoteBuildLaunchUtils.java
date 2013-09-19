@@ -48,17 +48,17 @@ import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.toolopts.ExternalToolProcess;
 import org.eclipse.ptp.internal.etfw.jaxb.ETFWCoreConstants;
 import org.eclipse.ptp.internal.etfw.messages.Messages;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.remote.core.IRemoteProcess;
-import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.RemoteServices;
-import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
-import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
-import org.eclipse.ptp.remote.ui.IRemoteUIServices;
-import org.eclipse.ptp.remote.ui.RemoteUIServices;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteConnectionManager;
+import org.eclipse.remote.core.IRemoteFileManager;
+import org.eclipse.remote.core.IRemoteProcess;
+import org.eclipse.remote.core.IRemoteProcessBuilder;
+import org.eclipse.remote.core.IRemoteServices;
+import org.eclipse.remote.core.RemoteServices;
+import org.eclipse.remote.core.exception.RemoteConnectionException;
+import org.eclipse.remote.ui.IRemoteUIFileManager;
+import org.eclipse.remote.ui.IRemoteUIServices;
+import org.eclipse.remote.ui.RemoteUIServices;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
@@ -139,7 +139,7 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 		conn = connMgr.getConnection(LaunchUtils.getConnectionName(config));
 		fileManagerUI = remoteUIServices.getUIFileManager();
 		fileManagerUI.setConnection(conn);
-		fileManager = remoteServices.getFileManager(conn);
+		fileManager = conn.getFileManager();
 		envMgrConfig = getEnvManagerConfig(config);
 		if (envMgrConfig != null) {
 			envManager = EnvManagerRegistry.getEnvManager(null, conn);
@@ -152,7 +152,7 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 
 		// this.selshell=PlatformUI.getWorkbench().getDisplay().getActiveShell();
 	}
-	
+
 	/**
 	 * 
 	 * @return the ILaunchConfiguration set in this object or null if not set
@@ -162,23 +162,25 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 	}
 
 	/**
-	 * Sets the ILaunchConfiguration object to be used by the remote connection utility functions provided if not already set, otherwise does nothing.
-	 * @param config 
+	 * Sets the ILaunchConfiguration object to be used by the remote connection utility functions provided if not already set,
+	 * otherwise does nothing.
+	 * 
+	 * @param config
 	 */
 	public void setConfig(ILaunchConfiguration config) {
-		//if(this.config==null && config!=null){
+		// if(this.config==null && config!=null){
 		this.config = config;
 		envMgrConfig = getEnvManagerConfig(config);
 		if (envMgrConfig != null) {
 			envManager = EnvManagerRegistry.getEnvManager(null, conn);
-			//System.out.println(envManager);
+			// System.out.println(envManager);
 			// if (envManager != null) {
 			// //moduleSetup = envManager.getBashConcatenation(";", false, envMgrConfig, null);
 			// moduleSetup = envManager.createBashScript(null, false, config, commandToExecuteAfterward)
 			//
 			// }
 		}
-		//}
+		// }
 	}
 
 	public RemoteBuildLaunchUtils(IRemoteConnection conn) {
@@ -188,7 +190,7 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 		connMgr = remoteServices.getConnectionManager();
 		// conn = connMgr.getConnection(LaunchUtils.getConnectionName(config));
 		fileManagerUI = remoteUIServices.getUIFileManager();
-		fileManager = remoteServices.getFileManager(conn);
+		fileManager = conn.getFileManager();
 
 		// Can we get the envManager from the connection if we need it?
 		// envManager = null;
@@ -242,10 +244,10 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 		}
 		String pPath = null;
 		try {
-			final IRemoteProcessBuilder rpb = remoteServices.getProcessBuilder(conn);
+			final IRemoteProcessBuilder rpb = conn.getProcessBuilder();
 			if (envManager != null) {
 				String com = EMPTY_STRING;
-				
+
 				try {
 					com = envManager.createBashScript(null, false, envMgrConfig, "which " + toolname); //$NON-NLS-1$
 					final IFileStore envScript = fileManager.getResource(com);
@@ -262,7 +264,7 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 					e.printStackTrace();
 				}
 				rpb.command(com);
-				
+
 			} else {
 				rpb.command("which", toolname);//$NON-NLS-1$
 			}
@@ -410,14 +412,13 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 	private IEnvManagerConfig getEnvManagerConfig(ILaunchConfiguration configuration) {
 		try {
 			String emsConfigAttr = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_EMS_CONFIG, (String) null);
-			if(emsConfigAttr==null)
-			{
-				String moduleLine=configuration.getAttribute(ETFWCoreConstants.RM_NAME, (String) null);
-				if(moduleLine!=null){
-					emsConfigAttr = configuration.getAttribute(moduleLine+".modules", (String) null);
+			if (emsConfigAttr == null) {
+				String moduleLine = configuration.getAttribute(ETFWCoreConstants.RM_NAME, (String) null);
+				if (moduleLine != null) {
+					emsConfigAttr = configuration.getAttribute(moduleLine + ".modules", (String) null);
 				}
 			}
-			
+
 			if (emsConfigAttr != null) {
 				final EnvManagerConfigString config = new EnvManagerConfigString(emsConfigAttr);
 				if (config.isEnvMgmtEnabled()) {
@@ -449,12 +450,11 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 				com = envManager.createBashScript(null, false, envMgrConfig, concat);
 				final IFileStore envScript = fileManager.getResource(com);
 				final IFileInfo envInfo = envScript.fetchInfo();
-				
-				envInfo.setAttribute(EFS.ATTRIBUTE_EXECUTABLE,true);
-				
+
+				envInfo.setAttribute(EFS.ATTRIBUTE_EXECUTABLE, true);
+
 				envInfo.setAttribute(EFS.ATTRIBUTE_OWNER_EXECUTE, true);
-					
-				
+
 				envScript.putInfo(envInfo, EFS.SET_ATTRIBUTES, null);
 
 			} catch (final RemoteConnectionException e) {
@@ -463,9 +463,9 @@ public class RemoteBuildLaunchUtils implements IBuildLaunchUtils {
 			} catch (final CoreException e) {
 				e.printStackTrace();
 			}
-			pb = remoteServices.getProcessBuilder(conn, com);
+			pb = conn.getProcessBuilder(com);
 		} else {
-			pb = remoteServices.getProcessBuilder(conn, tool);// new IRemoteProcessBuilder(tool);
+			pb = conn.getProcessBuilder(tool);// new IRemoteProcessBuilder(tool);
 		}
 		if (directory != null) {
 			pb.directory(fileManager.getResource(directory));

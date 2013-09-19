@@ -10,19 +10,13 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.remote.rse.core;
 
-import java.io.IOException;
-import java.util.List;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ptp.internal.remote.rse.core.messages.Messages;
-import org.eclipse.ptp.remote.core.AbstractRemoteServices;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.remote.core.IRemoteProcess;
-import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
-import org.eclipse.ptp.remote.core.IRemoteServicesDescriptor;
+import org.eclipse.remote.core.AbstractRemoteServices;
+import org.eclipse.remote.core.IRemoteConnectionManager;
+import org.eclipse.remote.core.IRemoteServices;
+import org.eclipse.remote.core.IRemoteServicesDescriptor;
 import org.eclipse.rse.core.RSECorePlugin;
 import org.eclipse.rse.core.model.ISystemRegistry;
 
@@ -67,17 +61,17 @@ public class RSEServices extends AbstractRemoteServices {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.remote.core.IRemoteServices#getCommandShell(org.eclipse.ptp.remote.core.IRemoteConnection, int)
+	 * @see org.eclipse.remote.core.IRemoteServices#getCapabilities()
 	 */
-	public IRemoteProcess getCommandShell(IRemoteConnection conn, int flags) throws IOException {
-		throw new IOException("Not currently implemented"); //$NON-NLS-1$
+	public int getCapabilities() {
+		return IRemoteServices.CAPABILITY_ADD_CONNECTIONS | IRemoteServices.CAPABILITY_REMOVE_CONNECTIONS;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.ptp.remote.IRemoteServicesDelegate#getConnectionManager()
+	 * org.eclipse.remote.IRemoteServicesDelegate#getConnectionManager()
 	 */
 	public IRemoteConnectionManager getConnectionManager() {
 		if (!fInitialized) {
@@ -92,60 +86,12 @@ public class RSEServices extends AbstractRemoteServices {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ptp.remote.IRemoteServicesDelegate#getFileManager(org.eclipse
-	 * .ptp.remote.IRemoteConnection)
-	 */
-	public IRemoteFileManager getFileManager(IRemoteConnection conn) {
-		if (!fInitialized) {
-			return null;
-		}
-
-		if (!(conn instanceof RSEConnection)) {
-			return null;
-		}
-		return new RSEFileManager((RSEConnection) conn);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.remote.IRemoteServicesDelegate#getProcessBuilder(org.
-	 * eclipse.ptp.remote.IRemoteConnection, java.util.List)
-	 */
-	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, List<String> command) {
-		if (!fInitialized) {
-			return null;
-		}
-
-		return new RSEProcessBuilder(conn, getFileManager(conn), command);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ptp.remote.IRemoteServicesDelegate#getProcessBuilder(org.
-	 * eclipse.ptp.remote.IRemoteConnection, java.lang.String[])
-	 */
-	public IRemoteProcessBuilder getProcessBuilder(IRemoteConnection conn, String... command) {
-		if (!fInitialized) {
-			return null;
-		}
-
-		return new RSEProcessBuilder(conn, getFileManager(conn), command);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ptp.remote.core.IRemoteServices#initialize()
+	 * @see org.eclipse.remote.core.IRemoteServices#initialize()
 	 */
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.remote.core.IRemoteServices#initialize(org.eclipse.core.runtime.IProgressMonitor)
+	 * @see org.eclipse.remote.core.IRemoteServices#initialize(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public boolean initialize(IProgressMonitor monitor) {
 		if (!fInitialized) {

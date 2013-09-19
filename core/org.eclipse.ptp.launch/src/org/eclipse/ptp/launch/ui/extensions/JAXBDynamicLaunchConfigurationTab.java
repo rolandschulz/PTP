@@ -48,7 +48,6 @@ import org.eclipse.ptp.internal.rm.jaxb.ui.JAXBUIPlugin;
 import org.eclipse.ptp.internal.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.ptp.launch.PTPLaunchPlugin;
 import org.eclipse.ptp.launch.internal.messages.Messages;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.ui.ICellEditorUpdateModel;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateHandler;
@@ -56,6 +55,7 @@ import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.ButtonActionType;
 import org.eclipse.ptp.rm.jaxb.core.data.TabControllerType;
+import org.eclipse.remote.core.IRemoteConnection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -83,8 +83,8 @@ import org.eclipse.swt.widgets.Shell;
  * @author Jeff Overbey - Environment Manager support
  * @since 7.0
  */
-public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigurationTab implements
-		IJAXBLaunchConfigurationTab, SelectionListener {
+public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigurationTab implements IJAXBLaunchConfigurationTab,
+		SelectionListener {
 
 	protected final ILaunchController fControl;
 	protected final IUpdateHandler updateHandler;

@@ -19,15 +19,15 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.ptp.rdt.ui.messages.Messages;
 import org.eclipse.ptp.rdt.ui.serviceproviders.RemoteBuildServiceProvider;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
-import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
-import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
-import org.eclipse.ptp.remote.ui.IRemoteUIServices;
-import org.eclipse.ptp.remote.ui.RemoteUIServices;
-import org.eclipse.ptp.remote.ui.widgets.RemoteConnectionWidget;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteFileManager;
+import org.eclipse.remote.core.IRemoteServices;
+import org.eclipse.remote.ui.IRemoteUIConnectionManager;
+import org.eclipse.remote.ui.IRemoteUIConstants;
+import org.eclipse.remote.ui.IRemoteUIFileManager;
+import org.eclipse.remote.ui.IRemoteUIServices;
+import org.eclipse.remote.ui.RemoteUIServices;
+import org.eclipse.remote.ui.widgets.RemoteConnectionWidget;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -156,6 +156,7 @@ public class RemoteProjectContentsLocationArea {
 
 	/**
 	 * Returns the name of the selected connection.
+	 * @since 6.0
 	 */
 	public IRemoteConnection getConnection() {
 		return fSelectedConnection;
@@ -178,13 +179,19 @@ public class RemoteProjectContentsLocationArea {
 	public URI getProjectLocationURI() {
 		if (fSelectedConnection == null)
 			return null;
-		return fSelectedConnection.getRemoteServices().getFileManager(fSelectedConnection).toURI(fLocationText.getText());
+		return fSelectedConnection.getFileManager().toURI(fLocationText.getText());
 	}
 
+	/**
+	 * @since 6.0
+	 */
 	public IRemoteConnection getRemoteConnection() {
 		return fSelectedConnection;
 	}
 
+	/**
+	 * @since 6.0
+	 */
 	public IRemoteServices getRemoteServices() {
 		if (fSelectedConnection != null)
 			return fSelectedConnection.getRemoteServices();
@@ -248,7 +255,7 @@ public class RemoteProjectContentsLocationArea {
 	 */
 	private String getDefaultPathDisplayString() {
 		if (getRemoteConnection() != null && getRemoteConnection().isOpen()) {
-			IRemoteFileManager fileMgr = fSelectedConnection.getRemoteServices().getFileManager(getRemoteConnection());
+			IRemoteFileManager fileMgr = getRemoteConnection().getFileManager();
 			URI defaultURI = fileMgr.toURI(getRemoteConnection().getWorkingDirectory());
 
 			// Handle files specially. Assume a file if there is no project to

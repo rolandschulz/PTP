@@ -32,7 +32,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ptp.internal.rdt.sync.git.core.CommandRunner;
 import org.eclipse.ptp.internal.rdt.sync.git.core.CommandRunner.CommandResults;
 import org.eclipse.ptp.rdt.sync.core.exceptions.RemoteSyncException;
-import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.remote.core.exception.RemoteConnectionException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;

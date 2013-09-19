@@ -15,10 +15,10 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.ptp.internal.rm.lml.monitor.ui.messages.Messages;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.ui.widgets.RemoteConnectionWidget;
 import org.eclipse.ptp.rm.jaxb.control.core.LaunchControllerManager;
 import org.eclipse.ptp.rm.lml.monitor.core.MonitorControlManager;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.ui.widgets.RemoteConnectionWidget;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -132,7 +132,8 @@ public class AddMonitorDialog extends TitleAreaDialog {
 			}
 		});
 
-		fRemoteConnectionWidget = new RemoteConnectionWidget(composite, SWT.NONE, Messages.AddMonitorDialog_Connection_Type, 0, null);
+		fRemoteConnectionWidget = new RemoteConnectionWidget(composite, SWT.NONE, Messages.AddMonitorDialog_Connection_Type, 0,
+				null);
 		fRemoteConnectionWidget.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
 		fRemoteConnectionWidget.addSelectionListener(new SelectionAdapter() {
 			@Override

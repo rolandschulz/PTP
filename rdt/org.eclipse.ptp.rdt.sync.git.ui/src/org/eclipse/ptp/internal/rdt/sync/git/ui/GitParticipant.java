@@ -23,14 +23,14 @@ import org.eclipse.ptp.rdt.sync.core.services.ISynchronizeService;
 import org.eclipse.ptp.rdt.sync.ui.AbstractSynchronizeParticipant;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipantDescriptor;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.remote.ui.IRemoteUIConnectionManager;
-import org.eclipse.ptp.remote.ui.IRemoteUIConstants;
-import org.eclipse.ptp.remote.ui.IRemoteUIFileManager;
-import org.eclipse.ptp.remote.ui.IRemoteUIServices;
-import org.eclipse.ptp.remote.ui.RemoteUIServices;
-import org.eclipse.ptp.remote.ui.widgets.RemoteConnectionWidget;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteFileManager;
+import org.eclipse.remote.ui.IRemoteUIConnectionManager;
+import org.eclipse.remote.ui.IRemoteUIConstants;
+import org.eclipse.remote.ui.IRemoteUIFileManager;
+import org.eclipse.remote.ui.IRemoteUIServices;
+import org.eclipse.remote.ui.RemoteUIServices;
+import org.eclipse.remote.ui.widgets.RemoteConnectionWidget;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -174,7 +174,7 @@ public class GitParticipant extends AbstractSynchronizeParticipant {
 		// projectName = ((CDTMainWizardPage) page).getProjectName();
 		// }
 		if (fSelectedConnection != null && fSelectedConnection.isOpen()) {
-			IRemoteFileManager fileMgr = fSelectedConnection.getRemoteServices().getFileManager(fSelectedConnection);
+			IRemoteFileManager fileMgr = fSelectedConnection.getFileManager();
 			URI defaultURI = fileMgr.toURI(fSelectedConnection.getWorkingDirectory());
 
 			// Handle files specially. Assume a file if there is no project to
@@ -201,7 +201,7 @@ public class GitParticipant extends AbstractSynchronizeParticipant {
 		if (fLocationText.getText().length() == 0) {
 			return Messages.GitParticipant_2;
 		}
-		IRemoteFileManager fileManager = fSelectedConnection.getRemoteServices().getFileManager(fSelectedConnection);
+		IRemoteFileManager fileManager = fSelectedConnection.getFileManager();
 		if (fileManager.toURI(fLocationText.getText()) == null) {
 			return Messages.GitParticipant_3;
 		}

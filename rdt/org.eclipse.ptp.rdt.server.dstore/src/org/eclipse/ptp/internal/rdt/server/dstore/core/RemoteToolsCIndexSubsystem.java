@@ -1117,7 +1117,7 @@ public class RemoteToolsCIndexSubsystem implements ICIndexSubsystem {
 	}
 
 	protected URI convertRemotePathToURI(String path) throws URISyntaxException {
-		return fProvider.getConnection().getRemoteServices().getFileManager(fProvider.getConnection()).toURI(path);
+		return fProvider.getConnection().getFileManager().toURI(path);
 	}
 
 	protected String convertURIToRemotePath(URI locationURI) {

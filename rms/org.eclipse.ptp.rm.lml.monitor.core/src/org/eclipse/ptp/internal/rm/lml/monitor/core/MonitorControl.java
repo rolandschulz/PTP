@@ -33,12 +33,6 @@ import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.jobs.JobManager;
 import org.eclipse.ptp.core.util.CoreExceptionUtils;
 import org.eclipse.ptp.internal.rm.lml.monitor.core.messages.Messages;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteConnectionManager;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.RemoteServices;
-import org.eclipse.ptp.remote.core.RemoteServicesUtils;
-import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ptp.remote.server.core.RemoteServerManager;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.core.LaunchControllerManager;
@@ -53,6 +47,12 @@ import org.eclipse.ptp.rm.lml.core.elements.RequestType;
 import org.eclipse.ptp.rm.lml.da.server.core.LMLDAServer;
 import org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl;
 import org.eclipse.ptp.rm.lml.monitor.core.MonitorControlManager;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteConnectionManager;
+import org.eclipse.remote.core.IRemoteServices;
+import org.eclipse.remote.core.RemoteServices;
+import org.eclipse.remote.core.RemoteServicesUtils;
+import org.eclipse.remote.core.exception.RemoteConnectionException;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 
@@ -101,14 +101,14 @@ public class MonitorControl implements IMonitorControl {
 				fServer.startServer(subMon.newChild(20));
 				if (!subMon.isCanceled()) {
 					fServer.waitForServerStart(subMon.newChild(20));
-					if (!subMon.isCanceled()) {
+					if (!subMon.isCanceled() && fServer.serverIsRunning()) {
 						LMLManager.getInstance().update(getControlId(), fServer.getInputStream(), fServer.getOutputStream());
 					}
 				}
 			} catch (final Exception e) {
 				fActive = false;
 				MonitorControlManager.getInstance().fireMonitorUpdated(new IMonitorControl[] { MonitorControl.this });
-				return new Status(IStatus.ERROR, LMLMonitorCorePlugin.PLUGIN_ID, e.getLocalizedMessage());
+				return new Status(IStatus.ERROR, LMLMonitorCorePlugin.PLUGIN_ID, e.getLocalizedMessage(), e);
 			}
 			IStatus status = fServer.waitForServerFinish(subMon.newChild(40));
 			if (status == Status.OK_STATUS) {

@@ -32,12 +32,12 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.ems.core.IEnvManagerConfig;
 import org.eclipse.ptp.internal.ems.core.EMSCorePlugin;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
-import org.eclipse.ptp.remote.core.IRemoteProcess;
-import org.eclipse.ptp.remote.core.IRemoteProcessBuilder;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteFileManager;
+import org.eclipse.remote.core.IRemoteProcess;
+import org.eclipse.remote.core.IRemoteProcessBuilder;
+import org.eclipse.remote.core.IRemoteServices;
+import org.eclipse.remote.core.exception.RemoteConnectionException;
 
 /**
  * Base class for implementations of {@link IEnvManager}.
@@ -80,7 +80,7 @@ public abstract class AbstractEnvManager implements IEnvManager {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.ems.core.IEnvManager#configure(org.eclipse.ptp.remote.core.IRemoteConnection)
+	 * @see org.eclipse.ptp.ems.core.IEnvManager#configure(org.eclipse.remote.core.IRemoteConnection)
 	 */
 	@Override
 	public final void configure(IRemoteConnection remoteConnection) {
@@ -211,7 +211,7 @@ public abstract class AbstractEnvManager implements IEnvManager {
 			connection.open(monitor.newChild(80));
 		}
 
-		return connection.getRemoteServices().getProcessBuilder(connection, command);
+		return connection.getProcessBuilder(command);
 	}
 
 	private void readLines(InputStream input, List<String> result) throws IOException {
@@ -361,7 +361,7 @@ public abstract class AbstractEnvManager implements IEnvManager {
 	}
 
 	private void checkTempFile(String pathToTempFile) throws IOException {
-		final IRemoteFileManager fileManager = getRemoteServices().getFileManager(getRemoteConnection());
+		final IRemoteFileManager fileManager = getRemoteConnection().getFileManager();
 		final IFileStore script = fileManager.getResource(pathToTempFile);
 		final IFileInfo info = script.fetchInfo();
 		if (info.isDirectory() || info.getLength() > 0) {
@@ -370,7 +370,7 @@ public abstract class AbstractEnvManager implements IEnvManager {
 	}
 
 	private void writeBashScript(boolean echo, String pathToTempFile, IEnvManagerConfig config, String commandToExecuteAfterward) {
-		final IRemoteFileManager fileManager = getRemoteServices().getFileManager(getRemoteConnection());
+		final IRemoteFileManager fileManager = getRemoteConnection().getFileManager();
 		final IFileStore script = fileManager.getResource(pathToTempFile);
 		PrintStream out = null;
 		try {

@@ -26,7 +26,7 @@ import org.eclipse.ptp.core.IPTPLaunchConfigurationConstants;
 import org.eclipse.ptp.launch.RMLaunchUtils;
 import org.eclipse.ptp.launch.rulesengine.IRuleAction;
 import org.eclipse.ptp.launch.rulesengine.OverwritePolicies;
-import org.eclipse.ptp.remote.core.IRemoteFileManager;
+import org.eclipse.remote.core.IRemoteFileManager;
 
 /**
  * TODO NEEDS TO BE DOCUMENTED
@@ -90,10 +90,8 @@ public class UploadRuleAction implements IRuleAction {
 		/*
 		 * Process paths.
 		 */
-		for (int i = 0; i < localPaths.length; i++) {
+		for (IPath localPath : localPaths) {
 			progress.setWorkRemaining(100);
-
-			IPath localPath = localPaths[i];
 
 			IRemoteFileManager localFileManager = RMLaunchUtils.getLocalFileManager(fConfiguration);
 			IFileStore localFileStore = localFileManager.getResource(localPath.toString());

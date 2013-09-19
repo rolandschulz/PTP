@@ -16,7 +16,7 @@ import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 
-import org.eclipse.ptp.remote.core.AbstractRemoteProcess;
+import org.eclipse.remote.core.AbstractRemoteProcess;
 
 public class RemoteToolsProcess extends AbstractRemoteProcess {
 	private static int refCount = 0;
