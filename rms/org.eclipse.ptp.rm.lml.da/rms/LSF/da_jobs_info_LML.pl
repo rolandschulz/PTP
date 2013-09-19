@@ -11,6 +11,10 @@
 #*******************************************************************************/ 
 use strict;
 
+use FindBin;
+use lib "$FindBin::RealBin/../../lib";
+use LML_da_util;
+
 my $srcDir = $0;
 if($srcDir =~ /\// ){
 	$srcDir =~ s/[^\/]+\.pl$//;
@@ -365,7 +369,7 @@ sub modify {
 	$ret=~s/\"//gs;
     }
 
-	$ret = escapeForXML($ret);
+	$ret = &LML_da_util::escapeForXML($ret);
 
     return($ret);
 }
