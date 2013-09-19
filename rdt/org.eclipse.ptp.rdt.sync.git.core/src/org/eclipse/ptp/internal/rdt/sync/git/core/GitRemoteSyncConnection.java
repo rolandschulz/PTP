@@ -301,8 +301,8 @@ public class GitRemoteSyncConnection {
 	private boolean doRemoteInit(IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException,
 			MissingConnectionException {
 		try {
-			String commands = "git --git-dir=" + gitDir + " init && " + //$NON-NLS-1$ //$NON-NLS-2$
-					"git --git-dir=" + gitDir + " config core.preloadindex true"; //$NON-NLS-1$ //$NON-NLS-2$
+			String commands = gitCommand() + " init && " + //$NON-NLS-1$
+					gitCommand() + " config core.preloadindex true"; //$NON-NLS-1$
 			CommandResults commandResults = null;
 
 			try {
