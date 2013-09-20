@@ -655,7 +655,7 @@ public class CommandJob extends Job implements ICommandJob {
 	 * @return IStatus
 	 */
 	private IStatus processError(String arg, int exit, IStatus status) throws CoreException {
-		if (!status.isOK()) {
+		if (status != null && !status.isOK()) {
 			error.append(status.getMessage()).append(JAXBControlConstants.LINE_SEP);
 		}
 		String message = error.toString();
