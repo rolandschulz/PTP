@@ -34,7 +34,6 @@
       <import plugin="org.eclipse.ptp.etfw" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.editors"/>
       <import plugin="org.eclipse.ui.ide" version="3.5.1" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ptp.remote.core"/>
    </requires>
 
    <plugin
