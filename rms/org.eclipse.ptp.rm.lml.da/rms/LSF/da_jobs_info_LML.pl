@@ -269,7 +269,7 @@ my @sortedJobIDs = sort{ jobCompare($a,$b) } keys(%jobs);
 
 foreach $jobid (@sortedJobIDs) {
     $count++;$jobnr{$jobid}=$count;
-    printf(OUT "<object id=\"j%06d\" name=\"%s\" type=\"job\"/>\n",$count,$jobid);
+    printf(OUT "<object id=\"j%06d\" name=\"%s\" type=\"job\"/>\n",$count,&LML_da_util::escapeForXML($jobid));
 }
 printf(OUT "</objects>\n");
 printf(OUT "<information>\n");
@@ -280,7 +280,7 @@ foreach $jobid (@sortedJobIDs) {
 	    if($mapping{$key} ne "") {
 		$value=&modify($key,$mapping{$key},$jobs{$jobid}{$key});
 		if($value) {
-		    printf(OUT " <data %-20s value=\"%s\"/>\n","key=\"".$mapping{$key}."\"",$value);
+		    printf(OUT " <data %-20s value=\"%s\"/>\n","key=\"".$mapping{$key}."\"",&LML_da_util::escapeForXML($value));
 		}
 	    } else {
 		$notmappedkeys{$key}++;
@@ -368,9 +368,6 @@ sub modify {
     if(($mkey eq "comment")) {
 	$ret=~s/\"//gs;
     }
-
-	$ret = &LML_da_util::escapeForXML($ret);
-
     return($ret);
 }
 
