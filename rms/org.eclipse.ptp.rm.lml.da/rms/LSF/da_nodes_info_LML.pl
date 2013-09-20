@@ -110,7 +110,7 @@ printf(OUT "<objects>\n");
 $count=0;
 foreach $nodeid (sort(keys(%nodes))) {
     $count++;$nodenr{$nodeid}=$count;
-    printf(OUT "<object id=\"nd%06d\" name=\"%s\" type=\"node\"/>\n",$count,$nodeid);
+    printf(OUT "<object id=\"nd%06d\" name=\"%s\" type=\"node\"/>\n",$count,&LML_da_util::escapeForXML($nodeid));
 }
 printf(OUT "</objects>\n");
 printf(OUT "<information>\n");
@@ -121,7 +121,7 @@ foreach $nodeid (sort(keys(%nodes))) {
 	    if($mapping{$key} ne "") {
 		$value=&modify($key,$mapping{$key},$nodes{$nodeid}{$key});
 		if(defined($value)) {
-		    printf(OUT " <data %-20s value=\"%s\"/>\n","key=\"".$mapping{$key}."\"",$value);
+		    printf(OUT " <data %-20s value=\"%s\"/>\n","key=\"".$mapping{$key}."\"",&LML_da_util::escapeForXML($value));
 		}
 	    } else {
 		$notmappedkeys{$key}++;
@@ -167,8 +167,6 @@ sub modify {
 	$ret="Down"     if ($value eq "unlicensed");
 	$ret="unknown"  if ($value eq "unknown");
     }
-
-	$ret = &LML_da_util::escapeForXML($ret);
 
     return($ret);
 }
