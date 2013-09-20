@@ -27,6 +27,7 @@
 		<egit-version>nightly</egit-version>
 		<egit-site>http://download.eclipse.org/egit/updates-${egit-version}</egit-site>
 		<photran-site>http://download.eclipse.org/tools/ptp/builds/hudson/ptp-nightly-photran</photran-site>
+		<remote-site>http://download.eclipse.org/tools/ptp/builds/remote/${eclipse-release}/nightly</remote-site>
 		<!-- The following property is used by the production profile to install the final repo and  -->
 		<!-- associated components. It should be overridden if installing into a different location. -->
 		<ptp-install-dir>/home/data/httpd/download.eclipse.org/tools/ptp/builds/${eclipse-release}/nightly</ptp-install-dir>
@@ -53,10 +54,6 @@
 		<module>core/org.eclipse.ptp.launch</module>
 		<module>core/org.eclipse.ptp.proxy</module>
 		<module>core/org.eclipse.ptp.proxy.protocol</module>
-		<module>core/org.eclipse.remote.core</module>
-		<module>core/org.eclipse.remote.jsch.core</module>
-		<module>core/org.eclipse.remote.jsch.ui</module>
-		<module>core/org.eclipse.remote.ui</module>
 		<module>core/org.eclipse.ptp.remote.remotetools.core</module>
 		<module>core/org.eclipse.ptp.remote.remotetools.ui</module>
 		<module>core/org.eclipse.ptp.remote.rse.core</module>
@@ -218,6 +215,11 @@
 			<url>${photran-site}</url>
 			<layout>p2</layout>
 		</repository>
+		<repository>
+			<id>remote</id>
+			<url>${remote-site}</url>
+			<layout>p2</layout>
+		</repository>
 	</repositories>
 
 	<pluginRepositories>
@@ -230,10 +232,6 @@
 			<releases>
 				<enabled>true</enabled>
 			</releases>
-		</pluginRepository>
-		<pluginRepository>
-			<id>maven.eclipse.org</id>
-			<url>http://maven.eclipse.org/nexus/content/repositories/milestone-indigo</url>
 		</pluginRepository>
 	</pluginRepositories>
 

@@ -34,10 +34,6 @@
          version="0.0.0"/>
 
    <includes
-         id="org.eclipse.remote"
-         version="0.0.0"/>
-
-   <includes
          id="org.eclipse.ptp.remote.remotetools"
          version="0.0.0"/>
 
@@ -75,6 +71,10 @@
 
    <includes
          id="org.eclipse.ptp.rdt.sync.cdt"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ptp.remote"
          version="0.0.0"/>
 
    <plugin
