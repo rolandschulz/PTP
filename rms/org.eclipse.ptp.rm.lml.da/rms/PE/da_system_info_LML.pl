@@ -10,6 +10,10 @@ use strict;
 
 use lib ".";
 
+use FindBin;
+use lib "$FindBin::RealBin/../../lib";
+use LML_da_util;
+
 my $patint = "([\\+\\-\\d]+)";      # Pattern for Integer number
 my $patfp  = "([\\+\\-\\d.E]+)";    # Pattern for Floating Point number
 my $patwrd = "([\^\\s]+)";          # Pattern for Work (all noblank characters)
@@ -56,7 +60,7 @@ foreach $sysinfoid ( sort( keys(%sysinfo) ) ) {
 	$count++;
 	$sysinfonr{$sysinfoid} = $count;
 	printf( OUT "<object id=\"sys%06d\" name=\"%s\" type=\"system\"/>\n",
-		$count, $sysinfoid );
+		$count, &LML_da_util::escapeForXML($sysinfoid) );
 }
 printf( OUT "</objects>\n" );
 printf( OUT "<information>\n" );
@@ -72,7 +76,7 @@ foreach $sysinfoid ( sort( keys(%sysinfo) ) ) {
 				  &modify( $key, $mapping{$key}, $sysinfo{$sysinfoid}{$key} );
 				if ( defined($value) ) {
 					printf( OUT " <data %-20s value=\"%s\"/>\n",
-						"key=\"" . $mapping{$key} . "\"", $value );
+						"key=\"" . $mapping{$key} . "\"", &LML_da_util::escapeForXML($value) );
 				}
 			} else {
 				$notmappedkeys{$key}++;

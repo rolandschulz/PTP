@@ -40,7 +40,6 @@
    <extension
          point="org.eclipse.ui.commands">
       <command
-            defaultHandler="org.eclipse.ptp.internal.rdt.sync.ui.menus.SyncMenuOperation"
             id="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
             name="Sync Operations">
          <commandParameter
@@ -210,6 +209,56 @@
                visible="true">
          </separator>
       </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:org.eclipse.ui.main.toolbar">
+         <toolbar
+               id="org.eclipse.ui.workbench.file">
+            <command
+                  commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
+                  icon="icons/etool16/sync.gif"
+                  id="org.eclipse.ptp.rdt.sync.ui.refCommand"
+                  style="pulldown">
+               <visibleWhen
+                     checkEnabled="false">
+                  <or>
+                     <or>
+                        <with
+                              variable="activeWorkbenchWindow.activePerspective">
+                           <equals
+                                 value="org.eclipse.cdt.ui.CPerspective">
+                           </equals>
+                        </with>
+                        <with
+                              variable="activeWorkbenchWindow.activePerspective">
+                           <equals
+                                 value="org.eclipse.ptp.rdt.ui.remoteCPerspective">
+                           </equals>
+                        </with>
+                     </or>
+                     <with
+                           variable="activeWorkbenchWindow.activePerspective">
+                        <equals
+                              value="org.eclipse.photran.ui.FortranPerspective">
+                        </equals>
+                     </with>
+                  </or>
+               </visibleWhen>
+               <parameter
+                     name="org.eclipse.ptp.rdt.sync.ui.syncCommand.syncModeParameter"
+                     value="sync_active">
+               </parameter>
+            </command>
+         </toolbar>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="menu:org.eclipse.ptp.rdt.sync.ui.refCommand">
+         <dynamic
+               class="org.eclipse.ptp.internal.rdt.sync.ui.menus.SetActiveMenu"
+               id="org.eclipse.ptp.rdt.sync.ui.dynamic2">
+         </dynamic>
+      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.decorators">
@@ -236,7 +285,7 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            category="org.eclipse.ptp.remote.ui.RemoteDevelopmentPreferencePage"
+            category="org.eclipse.remote.ui.RemoteDevelopmentPreferencePage"
             class="org.eclipse.ptp.internal.rdt.sync.ui.preferences.SyncPreferencePage"
             id="org.eclipse.ptp.rdt.sync.ui.SyncPreferencePage"
             name="%SynchronizedProjectsPreferencePage.name">
@@ -293,4 +342,28 @@
         </page>
 
      </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="org.eclipse.ptp.internal.rdt.sync.ui.menus.SyncMenuOperation"
+            commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand">
+         <enabledWhen>
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <adapt
+                           type="org.eclipse.core.resources.IProject">
+                        <test
+                              property="org.eclipse.core.resources.projectNature"
+                              value="org.eclipse.ptp.rdt.sync.core.remoteSyncNature">
+                        </test>
+                     </adapt>
+                  </iterate>
+               </with>
+         </enabledWhen>
+      </handler>
+   </extension>
 </plugin>
