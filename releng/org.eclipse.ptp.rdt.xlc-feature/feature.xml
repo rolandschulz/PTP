@@ -29,24 +29,25 @@
       <import plugin="org.eclipse.cdt.managedbuilder.xlc.core" version="5.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.cdt.managedbuilder.xlc.ui" version="6.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ptp.rdt.core" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ptp.remote.core" version="2.1.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.cdt.core" version="5.1.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ptp.services.core" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.cdt.make.xlc.core" version="5.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.filesystem" version="1.2.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ptp.rdt.ui" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="com.ibm.icu" version="3.8.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.cdt.managedbuilder.core" version="7.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.cdt.managedbuilder.xlupc.ui" version="1.1.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.rse.core" version="3.0.3" match="greaterOrEqual"/>
       <import plugin="org.eclipse.rse.files.ui" version="3.0.3" match="greaterOrEqual"/>
       <import plugin="org.eclipse.rse.subsystems.files.core" version="3.0.2" match="greaterOrEqual"/>
       <import plugin="org.eclipse.rse.services" version="3.0.1" match="greaterOrEqual"/>
       <import plugin="org.eclipse.rse.ui" version="3.0.3" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ptp.rdt.ui" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="com.ibm.icu" version="3.8.1" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.cdt.make.xlc.core" version="5.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.core.filesystem" version="1.2.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.cdt.managedbuilder.core" version="7.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.cdt.managedbuilder.xlupc.ui" version="1.1.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ptp.rdt.managedbuilder.xlc.ui" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.cdt.managedbuilder.xlc.ui" version="6.1.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.cdt.core.parser.upc" version="5.1.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.variables" version="3.2.300" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.remote.core"/>
+      <import plugin="org.eclipse.remote.ui"/>
    </requires>
 
    <plugin

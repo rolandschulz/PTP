@@ -19,23 +19,23 @@
 
    <requires>
       <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.ptp.remote.core"/>
       <import plugin="org.eclipse.core.filesystem"/>
       <import plugin="org.eclipse.rse.core"/>
       <import plugin="org.eclipse.rse.subsystems.files.core"/>
       <import plugin="org.eclipse.rse.services"/>
       <import plugin="org.eclipse.rse.subsystems.shells.core"/>
-      <import plugin="org.eclipse.rse.ui" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ui"/>
-      <import plugin="org.eclipse.ptp.remote.rse.core"/>
-      <import plugin="org.eclipse.ptp.remote.core"/>
-      <import plugin="org.eclipse.ptp.remote.ui"/>
-      <import plugin="org.eclipse.rse.core"/>
-      <import plugin="org.eclipse.rse.files.ui"/>
-      <import plugin="org.eclipse.rse.subsystems.files.core"/>
       <import plugin="org.eclipse.dstore.core"/>
       <import plugin="org.eclipse.rse.connectorservice.dstore"/>
       <import plugin="org.eclipse.rse.services.dstore"/>
+      <import plugin="org.eclipse.rse.ui" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.rse.files.ui"/>
+      <import plugin="org.eclipse.remote.core"/>
+      <import plugin="org.eclipse.cdt.core"/>
+      <import plugin="org.eclipse.dstore.extra"/>
+      <import plugin="org.eclipse.rse.connectorservice.local"/>
+      <import plugin="org.eclipse.rse.services.local"/>
+      <import plugin="org.eclipse.remote.ui"/>
    </requires>
 
    <plugin
