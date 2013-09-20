@@ -218,7 +218,8 @@
                   commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
                   icon="icons/etool16/sync.gif"
                   id="org.eclipse.ptp.rdt.sync.ui.refCommand"
-                  style="pulldown">
+                  style="pulldown"
+                  tooltip="%SyncCommand.tooltip">
                <visibleWhen
                      checkEnabled="false">
                   <or>
