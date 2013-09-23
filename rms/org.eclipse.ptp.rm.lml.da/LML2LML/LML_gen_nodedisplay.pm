@@ -18,6 +18,9 @@ use Data::Dumper;
 use Time::Local;
 use Time::HiRes qw ( time );
 #use String::Scanf;
+use FindBin;
+use lib "$FindBin::RealBin/../lib";
+use lib "$FindBin::RealBin/.";
 use LML_da_util;
 
 use LML_ndtree;
