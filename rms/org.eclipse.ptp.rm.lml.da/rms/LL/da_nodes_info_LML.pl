@@ -11,6 +11,10 @@
 #*******************************************************************************/ 
 use strict;
 
+use FindBin;
+use lib "$FindBin::RealBin/../../lib";
+use LML_da_util;
+
 my $patint="([\\+\\-\\d]+)";   # Pattern for Integer number
 my $patfp ="([\\+\\-\\d.E]+)"; # Pattern for Floating Point number
 my $patwrd="([\^\\s]+)";       # Pattern for Work (all noblank characters)

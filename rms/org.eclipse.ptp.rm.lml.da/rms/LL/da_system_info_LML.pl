@@ -11,6 +11,10 @@
 #*******************************************************************************/ 
 use strict;
 
+use FindBin;
+use lib "$FindBin::RealBin/../../lib";
+use LML_da_util;
+
 use lib ".";
 
 my $patint="([\\+\\-\\d]+)";   # Pattern for Integer number
