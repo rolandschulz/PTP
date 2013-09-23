@@ -21,7 +21,7 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            category="org.eclipse.ptp.remote.ui.RemoteDevelopmentPreferencePage"
+            category="org.eclipse.remote.ui.RemoteDevelopmentPreferencePage"
             class="org.eclipse.ptp.internal.services.ui.preferences.ServiceConfigurationPreferencePage"
             id="org.eclipse.ptp.services.ui.ServiceConfigurationPreference"
             name="%ServiceConfigurationsPreferencePage.name">

@@ -5,7 +5,7 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            category="org.eclipse.ptp.remote.ui.RemoteDevelopmentPreferencePage"
+            category="org.eclipse.remote.ui.RemoteDevelopmentPreferencePage"
             class="org.eclipse.ptp.remotetools.preferences.ui.TargetPreferencePage"
             id="org.eclipse.ptp.remotetools.preferences.ui.RemoteToolsPreferencePage"
             name="Remote Tools">
