@@ -200,14 +200,14 @@ public class RemoteIncludeDialog extends Dialog {
 					IRemoteUIConnectionManager connMgr = getUIConnectionManager();
 					if (connMgr != null) {
 						connMgr.openConnectionWithProgress(shell, null, fRemoteConnection);
-						if (fRemoteConnection.isOpen()) {
-							IRemoteUIFileManager fileMgr = getUIFileManager();
-							if (fileMgr != null) {
-								fileMgr.setConnection(fRemoteConnection);
-								String path = fileMgr.browseDirectory(shell, Messages.RemoteIncludeDialog_select, "", 0); //$NON-NLS-1$
-								if (path != null) {
-									text.setText(path);
-								}
+					}
+					if (fRemoteConnection.isOpen()) {
+						IRemoteUIFileManager fileMgr = getUIFileManager();
+						if (fileMgr != null) {
+							fileMgr.setConnection(fRemoteConnection);
+							String path = fileMgr.browseDirectory(shell, Messages.RemoteIncludeDialog_select, "", 0); //$NON-NLS-1$
+							if (path != null) {
+								text.setText(path);
 							}
 						}
 					}
