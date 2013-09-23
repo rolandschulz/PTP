@@ -11,6 +11,10 @@
 #*******************************************************************************/ 
 use strict;
 
+use FindBin;
+use lib "$FindBin::RealBin/../../lib";
+use LML_da_util;
+
 my $patint="([\\+\\-\\d]+)";   # Pattern for Integer number
 my $patfp ="([\\+\\-\\d.E]+)"; # Pattern for Floating Point number
 my $patwrd="([\^\\s]+)";       # Pattern for Work (all noblank characters)
@@ -92,18 +96,18 @@ printf(OUT "<objects>\n");
 $count=0;
 foreach $apid (sort(keys(%apps))) {
     $count++;$appnr{$apid}=$count;
-    printf(OUT "<object id=\"a%06d\" name=\"%s\" type=\"app\"/>\n",$count,$apid);
+    printf(OUT "<object id=\"a%06d\" name=\"%s\" type=\"app\"/>\n",$count,&LML_da_util::escapeForXML($apid));
 }
 printf(OUT "</objects>\n");
 printf(OUT "<information>\n");
 foreach $apid (sort(keys(%apps))) {
-    printf(OUT "<info oid=\"a%06d\" type=\"short\">\n",$appnr{$apid});
+    printf(OUT "<info oid=\"a%06d\" type=\"short\">\n",&LML_da_util::escapeForXML($appnr{$apid}));
     foreach $key (sort(keys(%{$apps{$apid}}))) {
 	if(exists($mapping{$key})) {
 	    if($mapping{$key} ne "") {
 		$value=&modify($key,$mapping{$key},$apps{$apid}{$key});
 		if($value) {
-		    printf(OUT " <data %-20s value=\"%s\"/>\n","key=\"".$mapping{$key}."\"",$value);
+		    printf(OUT " <data %-20s value=\"%s\"/>\n","key=\"".$mapping{$key}."\"",&LML_da_util::escapeForXML($value));
 		}
 	    } else {
 		$notmappedkeys{$key}++;

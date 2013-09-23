@@ -120,7 +120,7 @@ $count=0;
 foreach $blockid (sort(keys(%blocks))) {
     next if($blocks{$blockid}{"Block_Status"} ne "Initialized");
     $count++;$nodenr{$blockid}=$count;
-    printf(OUT "<object id=\"bgj%06d\" name=\"%s\" type=\"partition\"/>\n",$count,$blockid);
+    printf(OUT "<object id=\"bgj%06d\" name=\"%s\" type=\"partition\"/>\n",$count,&LML_da_util::escapeForXML($blockid));
 }
 printf(OUT "</objects>\n");
 printf(OUT "<information>\n");
@@ -132,7 +132,7 @@ foreach $blockid (sort(keys(%blocks))) {
 	    if($mapping{$key} ne "") {
 		$value=&modify($key,$mapping{$key},$blocks{$blockid}{$key});
 		if($value) {
-		    printf(OUT " <data %-20s value=\"%s\"/>\n","key=\"".$mapping{$key}."\"",$value);
+		    printf(OUT " <data %-20s value=\"%s\"/>\n","key=\"".$mapping{$key}."\"",&LML_da_util::escapeForXML($value));
 		}
 	    } else {
 		$notmappedkeys{$key}++;
