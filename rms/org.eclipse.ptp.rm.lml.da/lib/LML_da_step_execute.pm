@@ -13,6 +13,8 @@ package LML_da_step_execute;
 my($debug)=0;
 
 use strict;
+use FindBin;
+use lib "$FindBin::RealBin/.";
 use Data::Dumper;
 use Time::Local;
 use Time::HiRes qw ( time );

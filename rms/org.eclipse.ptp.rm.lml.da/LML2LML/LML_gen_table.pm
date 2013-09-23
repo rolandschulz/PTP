@@ -16,7 +16,9 @@ use strict;
 use Data::Dumper;
 use Time::Local;
 use Time::HiRes qw ( time );
+use FindBin;
 use lib "$FindBin::RealBin/../LML_specs";
+use lib "$FindBin::RealBin/../lib";
 use LML_specs;
 use LML_da_util;
 

@@ -11,7 +11,9 @@
 package LML_combine_obj_check;
 use strict;
 use Data::Dumper;
+use FindBin;
 use lib "$FindBin::RealBin/../LML_specs";
+use lib "$FindBin::RealBin/../lib";
 use LML_specs;
 use LML_da_date_manip;
 
