@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.eclipse.ptp.internal.rm.jaxb.control.core;
 
+import java.io.OutputStream;
+
 import org.eclipse.debug.core.model.IStreamsProxy;
 import org.eclipse.debug.core.model.IStreamsProxy2;
 
@@ -33,6 +35,14 @@ public interface ICommandJobStreamsProxy extends IStreamsProxy, IStreamsProxy2 {
 	 *            monitor for error stream
 	 */
 	public void setErrMonitor(ICommandJobStreamMonitor err);
+
+	/**
+	 * Set the output stream connected to the process's input stream. This can be used to send input to the process.
+	 * 
+	 * @param procInput
+	 *            output stream connected to the process's input stream
+	 */
+	public void setInputStream(OutputStream procInput);
 
 	/**
 	 * 

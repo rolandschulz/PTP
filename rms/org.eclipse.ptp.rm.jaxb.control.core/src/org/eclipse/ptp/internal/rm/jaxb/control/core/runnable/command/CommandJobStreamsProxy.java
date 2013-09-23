@@ -10,12 +10,11 @@
 package org.eclipse.ptp.internal.rm.jaxb.control.core.runnable.command;
 
 import java.io.IOException;
+import java.io.OutputStream;
 
 import org.eclipse.debug.core.model.IStreamMonitor;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.ICommandJobStreamMonitor;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.ICommandJobStreamsProxy;
-import org.eclipse.ptp.internal.rm.jaxb.control.core.JAXBControlCorePlugin;
-import org.eclipse.ptp.internal.rm.jaxb.control.core.messages.Messages;
 
 /**
  * Implementation of (@see org.eclipse.debug.core.model.IStreamsProxy, @see
@@ -29,6 +28,7 @@ public class CommandJobStreamsProxy implements ICommandJobStreamsProxy {
 
 	private ICommandJobStreamMonitor out;
 	private ICommandJobStreamMonitor err;
+	private OutputStream fProcInput;
 
 	private boolean fClosed = false;
 	private boolean fStarted = false;
@@ -53,7 +53,9 @@ public class CommandJobStreamsProxy implements ICommandJobStreamsProxy {
 	 * the future.
 	 */
 	public void closeInputStream() throws IOException {
-		JAXBControlCorePlugin.log(new IOException(Messages.UnsupportedWriteException));
+		if (fProcInput != null) {
+			fProcInput.close();
+		}
 	}
 
 	/**
@@ -86,6 +88,10 @@ public class CommandJobStreamsProxy implements ICommandJobStreamsProxy {
 		this.out = out;
 	}
 
+	public void setInputStream(OutputStream procInput) {
+		fProcInput = procInput;
+	}
+
 	/**
 	 * Called inside the command job sequence.
 	 */
@@ -106,6 +112,9 @@ public class CommandJobStreamsProxy implements ICommandJobStreamsProxy {
 	 * the future.
 	 */
 	public void write(String input) throws IOException {
-		JAXBControlCorePlugin.log(new IOException(Messages.UnsupportedWriteException));
+		if (fProcInput != null) {
+			fProcInput.write(input.getBytes());
+			fProcInput.flush();
+		}
 	}
 }

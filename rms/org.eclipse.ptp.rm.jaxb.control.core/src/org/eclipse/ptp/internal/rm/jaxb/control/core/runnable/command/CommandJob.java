@@ -964,16 +964,19 @@ public class CommandJob extends Job implements ICommandJob {
 	}
 
 	/**
-	 * Calls {@link #prepareInput()}.
+	 * Write contents of <input></input> elements to the remote process. Connects the input stream of the process to the console
+	 * when completed.
 	 * 
 	 * @param process
 	 */
 	private IStatus writeInputToProcess(IRemoteProcess process) {
+		proxy.setInputStream(null);
 		OutputStream stream = process.getOutputStream();
 		try {
 			stream.write(prepareInput().getBytes());
 			stream.write(JAXBControlConstants.LINE_SEP.getBytes());
 			stream.flush();
+			proxy.setInputStream(stream);
 		} catch (Throwable t) {
 			return CoreExceptionUtils.getErrorStatus(Messages.ProcessRunError, t);
 		}
