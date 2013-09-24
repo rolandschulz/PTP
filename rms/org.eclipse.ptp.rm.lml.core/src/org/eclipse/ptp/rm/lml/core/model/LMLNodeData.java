@@ -11,7 +11,6 @@
 package org.eclipse.ptp.rm.lml.core.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -20,7 +19,6 @@ import org.eclipse.ptp.internal.rm.lml.core.messages.Messages;
 import org.eclipse.ptp.internal.rm.lml.core.model.FastImpCheck;
 import org.eclipse.ptp.internal.rm.lml.core.model.LMLCheck;
 import org.eclipse.ptp.internal.rm.lml.core.model.LMLCheck.SchemeAndData;
-import org.eclipse.ptp.internal.rm.lml.core.model.NumberComparator;
 import org.eclipse.ptp.rm.lml.core.elements.DataElement;
 import org.eclipse.ptp.rm.lml.core.elements.DataType;
 import org.eclipse.ptp.rm.lml.core.elements.JobType;
@@ -426,7 +424,8 @@ public class LMLNodeData {
 		// Search for children ids and corresponding schemes
 		getLowerIdsAndSchemesForIds(scheme, numbersList, schemesMap);
 
-		Collections.sort(numbersList, new NumberComparator(true));
+		// The nodes could be sorted by the following command
+		// Collections.sort(numbersList, new NumberComparator(true));
 
 		final ArrayList<Integer> levelsList = getLevelIds();
 		final Object data = getData();
