@@ -324,6 +324,11 @@ public class TAUMakefileCombo extends AbstractWidget {
 	public void setConfiguration(ILaunchConfiguration configuration){
 		if(blt!=null&&blt.getConfig()==null){
 			blt.setConfig(configuration);
+			try {
+				job.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 			job.setUser(true);
 			job.schedule();
 		}
