@@ -1,28 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- ******************************************************************************* -->
-<!-- * Copyright (c) 2011-2012 University of Illinois and others. All rights reserved. This program -->
-<!-- * and the accompanying materials are made available under the terms of the -->
-<!-- * Eclipse Public License v1.0 which accompanies this distribution, and is -->
+<!-- * Copyright (c) 2011-2012 University of Illinois and others. All rights 
+	reserved. This program -->
+<!-- * and the accompanying materials are made available under the terms 
+	of the -->
+<!-- * Eclipse Public License v1.0 which accompanies this distribution, and 
+	is -->
 <!-- * available at http://www.eclipse.org/legal/epl-v10.html -->
 <!-- * -->
 <!-- * Contributors: -->
 <!-- * Albert L. Rossi - design and implementation -->
 <!-- * Carsten Karbach - additional parameters for juropa job submission -->
 <!-- ****************************************************************************** -->
-<resource-manager-builder 
-	xmlns="http://eclipse.org/ptp/rm" 
+<resource-manager-builder xmlns="http://eclipse.org/ptp/rm"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://eclipse.org/ptp/rm http://eclipse.org/ptp/schemas/v1.1/rm.xsd" 
+	xsi:schemaLocation="http://eclipse.org/ptp/rm http://eclipse.org/ptp/schemas/v1.2/rm.xsd"
 	name="de.fz-juelich.juropa.torque.batch">
 	<control-data>
-		<!-- Set the default value of this attribute if MSUB is installed in a non-standard location -->
-		<attribute name="bindir" visible="false"/>
-		<!-- This is a necessary attribute for the functioning of LML; link it to the batch-specific variable name -->
+		<!-- Set the default value of this attribute if MSUB is installed in a 
+			non-standard location -->
+		<attribute name="bindir" visible="false" />
+		<!-- This is a necessary attribute for the functioning of LML; link it 
+			to the batch-specific variable name -->
 		<attribute name="control.queue.name" visible="false">
 			<link-value-to>destination</link-value-to>
 		</attribute>
 		<!-- We set this to invisible because the values are not really modifiable -->
-		<attribute name="queues" visible="false"/>
+		<attribute name="queues" visible="false" />
 		<!-- Needed by RM internals for fetch; name is fixed by convention -->
 		<attribute name="stdout_remote_path" visible="false">
 			<default>${ptp_rm:directory#value}/${ptp_rm:Job_Name#value}.o${ptp_rm:@jobId#default}</default>
@@ -116,7 +120,7 @@ first character must be alphabetic; default value:
 the base name of the job script or STDIN.]]></tooltip>
 			<default>ptp_job</default>
 			<validator>
-				<regex expression="[a-zA-Z_][0-9a-zA-Z_]*"/>
+				<regex expression="[a-zA-Z_][0-9a-zA-Z_]*" />
 				<error-message>must be at least one alphanumeric character</error-message>
 			</validator>
 		</attribute>
@@ -187,7 +191,8 @@ w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 in bytes or words (word size of the host): b (bytes), 
 w (words), kb/kw (kilo), mb/mw (mega), gb/bw (giga).]]></tooltip>
 		</attribute>
-		<attribute name="Resource_List.nice" type="integer" min="0" max="10">
+		<attribute name="Resource_List.nice" type="integer" min="0"
+			max="10">
 			<description>The nice value under which the job is to be run.</description>
 			<tooltip>0 to 10.</tooltip>
 			<default>0</default>
@@ -207,7 +212,8 @@ Example: To ask for 2 processors on each of two blue nodes and
 three processors on one red node: -l nodes=2:blue:ppn=2+red:ppn=3.]]></tooltip>
 			<default>1</default>
 		</attribute>
-		<attribute name="Resource_List.ompthreads" type="integer" min="1">
+		<attribute name="Resource_List.ompthreads" type="integer"
+			min="1">
 			<description>Number of threads per processor for Open MP jobs.</description>
 			<default>1</default>
 		</attribute>
@@ -238,7 +244,7 @@ in bytes or words (word size of the host): b (bytes), w (words), kb/kw
 			<tooltip>Format: [[hours:]minutes:]seconds[.milliseconds].</tooltip>
 			<default>00:30:00</default>
 			<validator>
-				<regex expression="\d\d:\d\d:\d\d"/>
+				<regex expression="\d\d:\d\d:\d\d" />
 				<error-message>format must be hh:mm:ss</error-message>
 			</validator>
 		</attribute>
@@ -275,109 +281,144 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 				<arg>#!/bin/bash</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#MSUB -A">#MSUB -A ${ptp_rm:Account_Name#value}</arg>
+				<arg isUndefinedIfMatches="#MSUB -A">#MSUB -A ${ptp_rm:Account_Name#value}
+				</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#MSUB -c">#MSUB -c ${ptp_rm:Checkpoint#value}</arg>
+				<arg isUndefinedIfMatches="#MSUB -c">#MSUB -c ${ptp_rm:Checkpoint#value}
+				</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#MSUB -W depend=">#MSUB -W depend=${ptp_rm:depend#value}</arg>
+				<arg isUndefinedIfMatches="#MSUB -W depend=">#MSUB -W depend=${ptp_rm:depend#value}
+				</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#MSUB -q">#MSUB -q ${ptp_rm:destination#value}</arg>
+				<arg isUndefinedIfMatches="#MSUB -q">#MSUB -q ${ptp_rm:destination#value}
+				</arg>
 			</line>
 			<line>
 				<arg isUndefinedIfMatches="#MSUB -C">#MSUB -C ${ptp_rm:line#value}</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#MSUB -e">#MSUB -e ${ptp_rm:Error_Path#value}</arg>
+				<arg isUndefinedIfMatches="#MSUB -e">#MSUB -e ${ptp_rm:Error_Path#value}
+				</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#MSUB -W group_list=">#MSUB -W group_list=${ptp_rm:group_list#value}</arg>
+				<arg isUndefinedIfMatches="#MSUB -W group_list=">#MSUB -W
+					group_list=${ptp_rm:group_list#value}</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#MSUB -h">#MSUB -h ${ptp_rm:Hold_Types#value}</arg>
+				<arg isUndefinedIfMatches="#MSUB -h">#MSUB -h ${ptp_rm:Hold_Types#value}
+				</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#MSUB -N">#MSUB -N ${ptp_rm:Job_Name#value}</arg>
+				<arg isUndefinedIfMatches="#MSUB -N">#MSUB -N ${ptp_rm:Job_Name#value}
+				</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#MSUB -j">#MSUB -j ${ptp_rm:Join_Path#value}</arg>
+				<arg isUndefinedIfMatches="#MSUB -j">#MSUB -j ${ptp_rm:Join_Path#value}
+				</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#MSUB -k">#MSUB -k ${ptp_rm:Keep_Files#value}</arg>
+				<arg isUndefinedIfMatches="#MSUB -k">#MSUB -k ${ptp_rm:Keep_Files#value}
+				</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#MSUB -m">#MSUB -m ${ptp_rm:Mail_Points#value}</arg>
+				<arg isUndefinedIfMatches="#MSUB -m">#MSUB -m ${ptp_rm:Mail_Points#value}
+				</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#MSUB -M">#MSUB -M ${ptp_rm:Mail_Users#value}</arg>
+				<arg isUndefinedIfMatches="#MSUB -M">#MSUB -M ${ptp_rm:Mail_Users#value}
+				</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#MSUB -o">#MSUB -o ${ptp_rm:Output_Path#value}</arg>
+				<arg isUndefinedIfMatches="#MSUB -o">#MSUB -o ${ptp_rm:Output_Path#value}
+				</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#MSUB -p">#MSUB -p ${ptp_rm:Priority#value}</arg>
+				<arg isUndefinedIfMatches="#MSUB -p">#MSUB -p ${ptp_rm:Priority#value}
+				</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#MSUB -r">#MSUB -r ${ptp_rm:Rerunnable#value}</arg>
+				<arg isUndefinedIfMatches="#MSUB -r">#MSUB -r ${ptp_rm:Rerunnable#value}
+				</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#MSUB -l arch=">#MSUB -l arch=${ptp_rm:Resource_List.arch#value}</arg>
+				<arg isUndefinedIfMatches="#MSUB -l arch=">#MSUB -l
+					arch=${ptp_rm:Resource_List.arch#value}</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#MSUB -l cput=">#MSUB -l cput=${ptp_rm:Resource_List.cput#value}</arg>
+				<arg isUndefinedIfMatches="#MSUB -l cput=">#MSUB -l
+					cput=${ptp_rm:Resource_List.cput#value}</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#MSUB -l file=">#MSUB -l file=${ptp_rm:Resource_List.file#value}</arg>
+				<arg isUndefinedIfMatches="#MSUB -l file=">#MSUB -l
+					file=${ptp_rm:Resource_List.file#value}</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#MSUB -l host=">#MSUB -l host=${ptp_rm:Resource_List.host#value}</arg>
+				<arg isUndefinedIfMatches="#MSUB -l host=">#MSUB -l
+					host=${ptp_rm:Resource_List.host#value}</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#MSUB -l mem=">#MSUB -l mem=${ptp_rm:Resource_List.mem#value}</arg>
+				<arg isUndefinedIfMatches="#MSUB -l mem=">#MSUB -l
+					mem=${ptp_rm:Resource_List.mem#value}</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#MSUB -l nice=">#MSUB -l nice=${ptp_rm:Resource_List.nice#value}</arg>
+				<arg isUndefinedIfMatches="#MSUB -l nice=">#MSUB -l
+					nice=${ptp_rm:Resource_List.nice#value}</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#MSUB -l nodes=">#MSUB -l nodes=${ptp_rm:Resource_List.nodes#value}:ppn=${ptp_rm:processesPerNode#value}</arg>
+				<arg isUndefinedIfMatches="#MSUB -l nodes=">#MSUB -l
+					nodes=${ptp_rm:Resource_List.nodes#value}:ppn=${ptp_rm:processesPerNode#value}
+				</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#MSUB -v tpt=">#MSUB -v tpt=${ptp_rm:threadsPerTask#value}</arg>
+				<arg isUndefinedIfMatches="#MSUB -v tpt=">#MSUB -v
+					tpt=${ptp_rm:threadsPerTask#value}</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#MSUB -l ompthreads=">#MSUB -l ompthreads=${ptp_rm:Resource_List.ompthreads#value}</arg>
+				<arg isUndefinedIfMatches="#MSUB -l ompthreads=">#MSUB -l
+					ompthreads=${ptp_rm:Resource_List.ompthreads#value}</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#MSUB -l pcput=">#MSUB -l pcput=${ptp_rm:Resource_List.pcput#value}</arg>
+				<arg isUndefinedIfMatches="#MSUB -l pcput=">#MSUB -l
+					pcput=${ptp_rm:Resource_List.pcput#value}</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#MSUB -l pmem=">#MSUB -l pmem=${ptp_rm:Resource_List.pmem#value}</arg>
+				<arg isUndefinedIfMatches="#MSUB -l pmem=">#MSUB -l
+					pmem=${ptp_rm:Resource_List.pmem#value}</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#MSUB -l pvmem=">#MSUB -l pvmem=${ptp_rm:Resource_List.pvmem#value}</arg>
+				<arg isUndefinedIfMatches="#MSUB -l pvmem=">#MSUB -l
+					pvmem=${ptp_rm:Resource_List.pvmem#value}</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#MSUB -l vmem=">#MSUB -l vmem=${ptp_rm:Resource_List.vmem#value}</arg>
+				<arg isUndefinedIfMatches="#MSUB -l vmem=">#MSUB -l
+					vmem=${ptp_rm:Resource_List.vmem#value}</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#MSUB -l walltime=">#MSUB -l walltime=${ptp_rm:Resource_List.walltime#value}</arg>
+				<arg isUndefinedIfMatches="#MSUB -l walltime=">#MSUB -l
+					walltime=${ptp_rm:Resource_List.walltime#value}</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#MSUB -S">#MSUB -S ${ptp_rm:Shell_Path_List#value}</arg>
+				<arg isUndefinedIfMatches="#MSUB -S">#MSUB -S
+					${ptp_rm:Shell_Path_List#value}</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#MSUB -W stagein=">#MSUB -W stagein=${ptp_rm:stagein#value}</arg>
+				<arg isUndefinedIfMatches="#MSUB -W stagein=">#MSUB -W
+					stagein=${ptp_rm:stagein#value}</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#MSUB -W stageout=">#MSUB -W stageout=${ptp_rm:stageout#value}</arg>
+				<arg isUndefinedIfMatches="#MSUB -W stageout=">#MSUB -W
+					stageout=${ptp_rm:stageout#value}</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#MSUB -u">#MSUB -u ${ptp_rm:User_List#value}</arg>
+				<arg isUndefinedIfMatches="#MSUB -u">#MSUB -u ${ptp_rm:User_List#value}
+				</arg>
 			</line>
 			<line>
-				<arg isUndefinedIfMatches="#MSUB -v">#MSUB -v ${ptp_rm:Variable_List#value}</arg>
+				<arg isUndefinedIfMatches="#MSUB -v">#MSUB -v ${ptp_rm:Variable_List#value}
+				</arg>
 			</line>
 			<line>
 				<arg>MPI_ARGS="-np ${ptp_rm:mpiNumberOfProcesses#value}"</arg>
@@ -405,7 +446,8 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 				<arg resolve="false">else</arg>
 			</line>
 			<line>
-				<arg> COMMAND="${ptp_rm:executablePath#value} ${ptp_rm:progArgs#value}"</arg>
+				<arg> COMMAND="${ptp_rm:executablePath#value}
+					${ptp_rm:progArgs#value}"</arg>
 			</line>
 			<line>
 				<arg resolve="false">fi</arg>
@@ -426,13 +468,14 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 					<match>
 						<expression>Queue: ([\w\d]+)</expression>
 						<add field="value">
-							<entry valueGroup="1"/>
+							<entry valueGroup="1" />
 						</add>
 					</match>
 				</target>
 			</stdout-parser>
 		</start-up-command>
-		<submit-batch name="submit-batch" directory="${ptp_rm:directory#value}" waitForId="true">
+		<submit-batch name="submit-batch" directory="${ptp_rm:directory#value}"
+			waitForId="true">
 			<arg>${ptp_rm:bindir#value}msub</arg>
 			<arg>${ptp_rm:managed_file_for_script#value}</arg>
 			<stdout-parser delim="\n" all="true" save="1">
@@ -441,42 +484,42 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 					<match>
 						<expression>([\d]+).*</expression>
 						<set field="name">
-							<entry valueGroup="0"/>
+							<entry valueGroup="0" />
 						</set>
 						<append field="name" separator=".">
-							<entry value="jj28b01"/>
+							<entry value="jj28b01" />
 						</append>
 						<set field="default">
-							<entry valueGroup="1"/>
+							<entry valueGroup="1" />
 						</set>
 						<set field="value">
-							<entry value="SUBMITTED"/>
+							<entry value="SUBMITTED" />
 						</set>
 					</match>
 					<match>
 						<expression>([\d]+)([.])(.+)[\s]+.*</expression>
 						<append field="name">
-							<entry valueGroup="1"/>
-							<entry valueGroup="2"/>
-							<entry valueGroup="3"/>
+							<entry valueGroup="1" />
+							<entry valueGroup="2" />
+							<entry valueGroup="3" />
 						</append>
 						<set field="default">
-							<entry valueGroup="1"/>
+							<entry valueGroup="1" />
 						</set>
 						<set field="value">
-							<entry value="SUBMITTED"/>
+							<entry value="SUBMITTED" />
 						</set>
 					</match>
 					<match>
 						<expression>([\d]+)[.].+</expression>
 						<set field="name">
-							<entry valueGroup="0"/>
+							<entry valueGroup="0" />
 						</set>
 						<set field="default">
-							<entry valueGroup="1"/>
+							<entry valueGroup="1" />
 						</set>
 						<set field="value">
-							<entry value="SUBMITTED"/>
+							<entry value="SUBMITTED" />
 						</set>
 					</match>
 				</target>
@@ -484,7 +527,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 					<match>
 						<expression flags="DOTALL|UNIX_LINES">.*Job not submitted.*</expression>
 						<set field="value">
-							<entry value="FAILED"/>
+							<entry value="FAILED" />
 						</set>
 					</match>
 				</target>
@@ -493,7 +536,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 				<target ref="@jobId">
 					<match>
 						<expression>.*Job not submitted.*</expression>
-						<throw message="Job Submit Failed"/>
+						<throw message="Job Submit Failed" />
 					</match>
 				</target>
 			</stderr-parser>
@@ -504,51 +547,52 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 			<stdout-parser delim="\n">
 				<target ref="@jobId">
 					<match>
-						<expression>[\d]+[.].+[\s]+.+[\s]+.+[\s]+.+[\s]+([A-Z])[\s]+.+</expression>
+						<expression>[\d]+[.].+[\s]+.+[\s]+.+[\s]+.+[\s]+([A-Z])[\s]+.+
+						</expression>
 						<set field="value">
-							<entry valueGroup="1"/>
+							<entry valueGroup="1" />
 						</set>
 					</match>
 					<test op="EQ">
 						<value>#value</value>
 						<value>Q</value>
 						<set field="value">
-							<entry value="QUEUED_ACTIVE"/>
+							<entry value="QUEUED_ACTIVE" />
 						</set>
 					</test>
 					<test op="EQ">
 						<value>#value</value>
 						<value>R</value>
 						<set field="value">
-							<entry value="RUNNING"/>
+							<entry value="RUNNING" />
 						</set>
 					</test>
 					<test op="EQ">
 						<value>#value</value>
 						<value>S</value>
 						<set field="value">
-							<entry value="SUSPENDED"/>
+							<entry value="SUSPENDED" />
 						</set>
 					</test>
 					<test op="EQ">
 						<value>#value</value>
 						<value>C</value>
 						<set field="value">
-							<entry value="COMPLETED"/>
+							<entry value="COMPLETED" />
 						</set>
 					</test>
 					<test op="EQ">
 						<value>#value</value>
 						<value>E</value>
 						<set field="value">
-							<entry value="COMPLETED"/>
+							<entry value="COMPLETED" />
 						</set>
 					</test>
 					<test op="EQ">
 						<value>#value</value>
 						<value>H</value>
 						<set field="value">
-							<entry value="SYSTEM_ON_HOLD"/>
+							<entry value="SYSTEM_ON_HOLD" />
 						</set>
 					</test>
 				</target>
@@ -558,7 +602,7 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 					<match>
 						<expression>.+</expression>
 						<set field="value">
-							<entry value="COMPLETED"/>
+							<entry value="COMPLETED" />
 						</set>
 					</match>
 				</target>
@@ -572,219 +616,262 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 			<dynamic>
 				<title>Basic Settings</title>
 				<layout>
-					<grid-layout/>
+					<grid-layout />
 				</layout>
 				<!-- ATTRIBUTES group -->
 				<composite group="true">
 					<layout>
-						<grid-layout numColumns="4" makeColumnsEqualWidth="false" horizontalSpacing="10" verticalSpacing="15"/>
+						<grid-layout numColumns="4" makeColumnsEqualWidth="false"
+							horizontalSpacing="10" verticalSpacing="15" />
 					</layout>
 					<!-- HEADER -->
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								verticalAlign="SWT.CENTER" grabExcessHorizontal="false" />
 						</layout-data>
 						<fixed-text>Name</fixed-text>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								verticalAlign="SWT.CENTER" horizontalSpan="2"
+								grabExcessHorizontal="false" />
 						</layout-data>
 						<fixed-text>Value</fixed-text>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_RED">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								verticalAlign="SWT.CENTER" grabExcessHorizontal="false" />
 						</layout-data>
 						<fixed-text>Description</fixed-text>
 					</widget>
 					<!-- row 1 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								verticalAlign="SWT.CENTER" grabExcessHorizontal="false" />
 						</layout-data>
 						<tooltip>${ptp_rm:Job_Name#tooltip}</tooltip>
 						<fixed-text>Job Name: </fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER" attribute="Job_Name">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER"
+								horizontalSpan="2" grabExcessHorizontal="false" widthHint="150" />
 						</layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								verticalAlign="SWT.CENTER" grabExcessHorizontal="false" />
 						</layout-data>
 						<fixed-text>${ptp_rm:Job_Name#description}</fixed-text>
 					</widget>
 					<!-- row 2 -->
 					<widget type="label" style="SWT.LEFT">
-                  <layout-data>
-                     <grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
-                  </layout-data>
-                  <tooltip>${ptp_rm:Account_Name#tooltip}</tooltip>
-                  <fixed-text>Account: </fixed-text>
-               </widget>
-               <widget type="text" style="SWT.BORDER" attribute="Account_Name">
-                  <layout-data>
-                     <grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
-                  </layout-data>
-               </widget>
-               <widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
-                  <layout-data>
-                     <grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
-                  </layout-data>
-                  <fixed-text>${ptp_rm:Account_Name#description}</fixed-text>
-               </widget>
-               <!-- row 3 -->
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								verticalAlign="SWT.CENTER" grabExcessHorizontal="false" />
+						</layout-data>
+						<tooltip>${ptp_rm:Account_Name#tooltip}</tooltip>
+						<fixed-text>Account: </fixed-text>
+					</widget>
+					<widget type="text" style="SWT.BORDER" attribute="Account_Name">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER"
+								horizontalSpan="2" grabExcessHorizontal="false" widthHint="150" />
+						</layout-data>
+					</widget>
+					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+						<layout-data>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								verticalAlign="SWT.CENTER" grabExcessHorizontal="false" />
+						</layout-data>
+						<fixed-text>${ptp_rm:Account_Name#description}</fixed-text>
+					</widget>
+					<!-- row 3 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								verticalAlign="SWT.CENTER" grabExcessHorizontal="false" />
 						</layout-data>
 						<tooltip>${ptp_rm:destination#tooltip}</tooltip>
 						<fixed-text>Queue: </fixed-text>
 					</widget>
-					<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="destination">
+					<widget type="combo" style="SWT.BORDER" readOnly="true"
+						attribute="destination">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER"
+								horizontalSpan="2" grabExcessHorizontal="false" />
 						</layout-data>
 						<items-from>queues</items-from>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								verticalAlign="SWT.CENTER" grabExcessHorizontal="false" />
 						</layout-data>
 						<fixed-text>${ptp_rm:destination#description}</fixed-text>
 					</widget>
 					<!-- row 4 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								verticalAlign="SWT.CENTER" grabExcessHorizontal="false" />
 						</layout-data>
 						<tooltip>${ptp_rm:Resource_List.nodes#tooltip}</tooltip>
 						<fixed-text>Number of nodes: </fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER" attribute="Resource_List.nodes">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER"
+								horizontalSpan="2" grabExcessHorizontal="false" widthHint="150" />
 						</layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								verticalAlign="SWT.CENTER" grabExcessHorizontal="false" />
 						</layout-data>
 						<fixed-text>${ptp_rm:Resource_List.nodes#description}</fixed-text>
 					</widget>
 					<!-- row 5 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								verticalAlign="SWT.CENTER" grabExcessHorizontal="false" />
 						</layout-data>
 						<tooltip>${ptp_rm:Resource_List.mem#tooltip}</tooltip>
 						<fixed-text>Total Memory Needed: </fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER" attribute="Resource_List.mem">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER"
+								horizontalSpan="2" grabExcessHorizontal="false" widthHint="150" />
 						</layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								verticalAlign="SWT.CENTER" grabExcessHorizontal="false" />
 						</layout-data>
 						<fixed-text>${ptp_rm:Resource_List.mem#description}</fixed-text>
 					</widget>
 					<!-- row 6 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								verticalAlign="SWT.CENTER" grabExcessHorizontal="false" />
 						</layout-data>
 						<tooltip>${ptp_rm:Resource_List.walltime#tooltip}</tooltip>
 						<fixed-text>Wallclock Time: </fixed-text>
 					</widget>
 					<widget type="text" style="SWT.BORDER" attribute="Resource_List.walltime">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false" widthHint="150"/>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER"
+								horizontalSpan="2" grabExcessHorizontal="false" widthHint="150" />
 						</layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								verticalAlign="SWT.CENTER" grabExcessHorizontal="false" />
 						</layout-data>
 						<fixed-text>${ptp_rm:Resource_List.walltime#description}</fixed-text>
 					</widget>
 					<!-- row 7 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								verticalAlign="SWT.CENTER" grabExcessHorizontal="false" />
 						</layout-data>
 						<fixed-text>MPI Command: </fixed-text>
 					</widget>
-					<widget type="combo" style="SWT.BORDER" readOnly="false" attribute="mpiCommand">
+					<widget type="combo" style="SWT.BORDER" readOnly="false"
+						attribute="mpiCommand">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER"
+								horizontalSpan="2" grabExcessHorizontal="false" />
 						</layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								verticalAlign="SWT.CENTER" grabExcessHorizontal="false" />
 						</layout-data>
 						<fixed-text>${ptp_rm:mpiCommand#description}</fixed-text>
 					</widget>
 					<!-- row 8 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								verticalAlign="SWT.CENTER" grabExcessHorizontal="false" />
 						</layout-data>
 						<fixed-text>Processes per Node: </fixed-text>
 					</widget>
 					<widget type="spinner" style="SWT.BORDER" attribute="processesPerNode">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false" widthHint="100"/>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								verticalAlign="SWT.CENTER" horizontalSpan="2"
+								grabExcessHorizontal="false" widthHint="100" />
 						</layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								verticalAlign="SWT.CENTER" grabExcessHorizontal="false" />
 						</layout-data>
 						<fixed-text>${ptp_rm:processesPerNode#description}</fixed-text>
 					</widget>
 					<!-- row 9 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								verticalAlign="SWT.CENTER" grabExcessHorizontal="false" />
 						</layout-data>
 						<fixed-text>Threads per Task: </fixed-text>
 					</widget>
 					<widget type="spinner" style="SWT.BORDER" attribute="threadsPerTask">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false" widthHint="100"/>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								verticalAlign="SWT.CENTER" horizontalSpan="2"
+								grabExcessHorizontal="false" widthHint="100" />
 						</layout-data>
 					</widget>
 					<widget type="label" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								verticalAlign="SWT.CENTER" grabExcessHorizontal="false" />
 						</layout-data>
 						<fixed-text>${ptp_rm:threadsPerTask#description}</fixed-text>
 					</widget>
 					<!-- row 10 -->
 					<widget type="label" style="SWT.LEFT">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								verticalAlign="SWT.CENTER" grabExcessHorizontal="false" />
 						</layout-data>
 						<fixed-text>MPI Number of Tasks: </fixed-text>
 					</widget>
 					<widget type="spinner" style="SWT.BORDER" attribute="mpiNumberOfProcesses">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" horizontalSpan="2" grabExcessHorizontal="false" widthHint="100"/>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								verticalAlign="SWT.CENTER" horizontalSpan="2"
+								grabExcessHorizontal="false" widthHint="100" />
 						</layout-data>
 					</widget>
-					<widget type="text" readOnly="true" style="SWT.LEFT" foreground="SWT.COLOR_DARK_BLUE">
+					<widget type="text" readOnly="true" style="SWT.LEFT"
+						foreground="SWT.COLOR_DARK_BLUE">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.BEGINNING" verticalAlign="SWT.CENTER" grabExcessHorizontal="false"/>
+							<grid-data horizontalAlign="SWT.BEGINNING"
+								verticalAlign="SWT.CENTER" grabExcessHorizontal="false" />
 						</layout-data>
 						<dynamic-text>
-							<arg>The '-np' value (Should match with nodes*ppn/tpt = ${ptp_rm:Resource_List.nodes#value}*${ptp_rm:processesPerNode#value}/${ptp_rm:threadsPerTask#value})</arg>
+							<arg>The '-np' value (Should match with nodes*ppn/tpt =
+								${ptp_rm:Resource_List.nodes#value}*${ptp_rm:processesPerNode#value}/${ptp_rm:threadsPerTask#value})
+							</arg>
 						</dynamic-text>
 					</widget>
 				</composite>
@@ -792,20 +879,22 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 			<dynamic>
 				<title>Advanced Settings</title>
 				<layout>
-					<grid-layout/>
+					<grid-layout />
 				</layout>
 				<!-- QUEUES remote path group -->
 				<composite group="true">
 					<layout>
-						<grid-layout numColumns="3"/>
+						<grid-layout numColumns="3" />
 					</layout>
 					<widget type="label" style="SWT.LEFT">
 						<tooltip>${ptp_rm:destination#tooltip}</tooltip>
 						<fixed-text>Queue: </fixed-text>
 					</widget>
-					<widget type="combo" style="SWT.BORDER" readOnly="true" attribute="destination">
+					<widget type="combo" style="SWT.BORDER" readOnly="true"
+						attribute="destination">
 						<layout-data>
-							<grid-data widthHint="150" horizontalAlign="SWT.FILL" horizontalSpan="2"/>
+							<grid-data widthHint="150" horizontalAlign="SWT.FILL"
+								horizontalSpan="2" />
 						</layout-data>
 						<items-from>queues</items-from>
 					</widget>
@@ -813,23 +902,29 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 				<!-- VIEWER group -->
 				<composite group="true">
 					<layout>
-						<grid-layout/>
+						<grid-layout />
 					</layout>
 					<layout-data>
-						<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true"/>
+						<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER"
+							grabExcessHorizontal="true" />
 					</layout-data>
-					<widget type="text" readOnly="true" style="SWT.BORDER | SWT.WRAP | SWT.V_SCROLL">
+					<widget type="text" readOnly="true"
+						style="SWT.BORDER | SWT.WRAP | SWT.V_SCROLL">
 						<layout-data>
-							<grid-data heightHint="75" horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true"/>
+							<grid-data heightHint="75" horizontalAlign="SWT.FILL"
+								verticalAlign="SWT.CENTER" grabExcessHorizontal="true" />
 						</layout-data>
 						<dynamic-text>
 							<arg>${ptp_rm:allAttributes#value}</arg>
-							<arg isUndefinedIfMatches=" destination=''"> destination='${ptp_rm:destination#value}'</arg>
+							<arg isUndefinedIfMatches=" destination=''">
+								destination='${ptp_rm:destination#value}'</arg>
 						</dynamic-text>
 					</widget>
-					<viewer name="allAttributes" style="SWT.BORDER | SWT.MULTI | SWT.V_SCROLL" sort="true" type="table" initialAllChecked="false">
+					<viewer name="allAttributes" style="SWT.BORDER | SWT.MULTI | SWT.V_SCROLL"
+						sort="true" type="table" initialAllChecked="false">
 						<layout-data>
-							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true"/>
+							<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER"
+								grabExcessHorizontal="true" />
 						</layout-data>
 						<column-data name="Name" width="175" resizable="true">
 							<tooltip>Multi-select and click checkbox to apply change to all rows.</tooltip>
@@ -840,15 +935,17 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 						<items allPredefined="true">
 							<exclude>destination</exclude>
 						</items>
-						<value pattern="@name='@value'"/>
+						<value pattern="@name='@value'" />
 					</viewer>
 				</composite>
 			</dynamic>
 			<import title="Import MSUB Script">
-				<export-for-override name="exportedEnv" style="SWT.BORDER | SWT.MULTI | SWT.V_SCROLL" sort="true" type="table"
+				<export-for-override name="exportedEnv"
+					style="SWT.BORDER | SWT.MULTI | SWT.V_SCROLL" sort="true" type="table"
 					initialAllChecked="true" tooltipEnabled="true">
 					<layout-data>
-						<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER" grabExcessHorizontal="true" heightHint="80"/>
+						<grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.CENTER"
+							grabExcessHorizontal="true" heightHint="80" />
 					</layout-data>
 					<column-data name="Name" width="175" resizable="true">
 						<tooltip>Multi-select and click checkbox to apply change to all rows.</tooltip>
@@ -867,5 +964,123 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 		</launch-tab>
 	</control-data>
 	<monitor-data schedulerType="TORQUE">
+		<rm:layout version="1.0" xmlns="" xmlns:rm="http://eclipse.org/ptp/rm">
+			<tablelayout id="tl_Run"
+				gid="org.eclipse.ptp.rm.lml.ui.ActiveJobsView" active="true"
+				contenthint="jobs">
+				<column cid="1" pos="0" width="0.1" active="true" key="step" />
+				<column cid="2" pos="1" width="0.1" active="true" key="owner" />
+				<column cid="3" pos="2" width="0.1" active="true" key="queue" />
+				<column cid="4" pos="3" width="0.1" active="true" key="wall" />
+				<column cid="5" pos="4" width="0.1" active="true" key="queuedate" />
+				<column cid="6" pos="5" width="0.1" active="true" key="dispatchdate" />
+				<column cid="7" pos="6" width="0.1" active="true" key="totalcores" />
+				<column cid="8" pos="7" width="0.3" active="true" key="status">
+					<pattern>
+						<select rel="=" value="RUNNING" />
+					</pattern>
+				</column>
+				<column cid="9" pos="8" width="1.0" active="false" key="dependency" />
+				<column cid="10" pos="9" width="1.0" active="false" key="detailedstatus" />
+				<column cid="11" pos="10" width="1.0" active="false" key="group" />
+				<column cid="12" pos="11" width="1.0" active="false" key="name" />
+				<column cid="13" pos="12" width="1.0" active="false" key="nodelist" />
+				<column cid="14" pos="13" width="1.0" active="false" key="restart" />
+				<column cid="15" pos="14" width="1.0" active="false" key="spec" />
+				<column cid="16" pos="15" width="1.0" active="false" key="state" />
+				<column cid="17" pos="16" width="1.0" active="false" key="totaltasks" />
+			</tablelayout>
+			<tablelayout id="tl_WAIT"
+				gid="org.eclipse.ptp.rm.lml.ui.InactiveJobsView" active="true"
+				contenthint="jobs">
+				<column cid="1" pos="1" width="0.1" active="true" key="step" />
+				<column cid="2" pos="0" width="0.1" active="true" key="owner" />
+				<column cid="3" pos="2" width="0.1" active="true" key="queue" />
+				<column cid="4" pos="3" width="0.1" active="true" key="wall" />
+				<column cid="5" pos="4" width="0.1" active="true" key="queuedate" />
+				<column cid="6" pos="5" width="0.1" active="true" key="dispatchdate" />
+				<column cid="7" pos="6" width="0.1" active="true" key="totalcores" />
+				<column cid="8" pos="7" width="0.3" active="true" key="status">
+					<pattern>
+						<select rel="!=" value="RUNNING" />
+					</pattern>
+				</column>
+				<column cid="9" pos="8" width="1.0" active="false" key="dependency" />
+				<column cid="10" pos="9" width="1.0" active="false" key="detailedstatus" />
+				<column cid="11" pos="10" width="1.0" active="false" key="group" />
+				<column cid="12" pos="11" width="1.0" active="false" key="name" />
+				<column cid="13" pos="12" width="1.0" active="false" key="nodelist" />
+				<column cid="14" pos="13" width="1.0" active="false" key="restart" />
+				<column cid="15" pos="14" width="1.0" active="false" key="spec" />
+				<column cid="16" pos="15" width="1.0" active="false" key="state" />
+				<column cid="17" pos="16" width="1.0" active="false" key="totaltasks" />
+				<column cid="18" pos="17" width="1.0" active="false" key="vnodelist" />
+			</tablelayout>
+			<nodedisplaylayout id="nodedisplay" gid="nd_1"
+				active="true">
+				<schemehint>
+					<el1 tagname="part" min="0" max="0" map="jj">
+						<el2 tagname="rack" min="1" max="6" mask="%02d">
+							<el3 tagname="node" min="1" max="96" mask="c%02d">
+								<el4 tagname="core" min="0" max="15" mask="-c%02d">
+								</el4>
+							</el3>
+						</el2>
+						<el2 tagname="rack" min="8" max="18" mask="%02d">
+							<el3 tagname="node" min="1" max="96" mask="c%02d">
+								<el4 tagname="core" min="0" max="15" mask="-c%02d">
+								</el4>
+							</el3>
+						</el2>
+						<el2 tagname="rack" min="20" max="25" mask="%02d">
+							<el3 tagname="node" min="1" max="96" mask="c%02d">
+								<el4 tagname="core" min="0" max="15" mask="-c%02d">
+								</el4>
+							</el3>
+						</el2>
+					</el1>
+					<el1 tagname="part" min="1" max="1" map="jf">
+						<el2 tagname="rack" min="38" max="42" mask="%02d">
+							<el3 tagname="node" min="1" max="54" mask="c%02d">
+								<el4 tagname="core" min="0" max="15" mask="-c%02d">
+								</el4>
+							</el3>
+						</el2>
+						<el2 tagname="rack" min="44" max="53" mask="%02d">
+							<el3 tagname="node" min="1" max="54" mask="c%02d">
+								<el4 tagname="core" min="0" max="15" mask="-c%02d">
+								</el4>
+							</el3>
+						</el2>
+						<el2 tagname="rack" min="55" max="59" mask="%02d">
+							<el3 tagname="node" min="1" max="54" mask="c%02d">
+								<el4 tagname="core" min="0" max="15" mask="-c%02d">
+								</el4>
+							</el3>
+						</el2>
+					</el1>
+				</schemehint>
+				<el0 vgap="5" transparent="false" showtitle="false" mouseborder="0"
+					maxlevel="3" hgap="0" fontsize="10" fontfamily="Monospaced" cols="1"
+					rows="2" border="1" background="#fff">
+					<el1 transparent="false" showtitle="true" rows="1" cols="23"
+						min="0" maxlevel="4" border="1" background="#eee" bordercolor="#eee" titlebackground="#eee">
+						<el2 vgap="0" transparent="false" showtitle="true" min="1"
+							maxlevel="4" max="25" cols="3" rows="32" background="#ddd" titlebackground="#ccc">
+							<el3 vgap="0" min="1" maxlevel="4" max="96" hgap="0" cols="8">
+							</el3>
+						</el2>
+					</el1>
+					<el1 transparent="false" showtitle="true" rows="1" cols="13"
+						min="1" maxlevel="4" border="1" background="#aaa" bordercolor="#aaa" titlebackground="#aaa">
+						<el2 vgap="0" transparent="false" showtitle="true" min="38"
+							maxlevel="4" max="59" cols="3" rows="18" background="#ddd" titlebackground="#ccc">
+							<el3 vgap="0" min="1" maxlevel="4" max="54" hgap="0" cols="8">
+							</el3>
+						</el2>
+					</el1>
+				</el0>
+			</nodedisplaylayout>
+		</rm:layout>
 	</monitor-data>
 </resource-manager-builder>

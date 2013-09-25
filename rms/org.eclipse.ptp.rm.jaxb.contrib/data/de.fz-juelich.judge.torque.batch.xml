@@ -12,7 +12,7 @@
 <resource-manager-builder 
 	xmlns="http://eclipse.org/ptp/rm" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://eclipse.org/ptp/rm http://eclipse.org/ptp/schemas/v1.1/rm.xsd" 
+	xsi:schemaLocation="http://eclipse.org/ptp/rm http://eclipse.org/ptp/schemas/v1.2/rm.xsd" 
 	name="de.fz-juelich.judge.torque.batch">
 	<control-data>
 		<!-- Set the default value of this attribute if MSUB is installed in a non-standard location -->
@@ -936,5 +936,99 @@ Job_Owner as the user name. Default value: job owner name.]]></tooltip>
 		</launch-tab>
 	</control-data>
 	<monitor-data schedulerType="TORQUE">
+		<rm:layout version="1.0" xmlns="" xmlns:rm="http://eclipse.org/ptp/rm">
+			<tablelayout id="tl_Run"
+				gid="org.eclipse.ptp.rm.lml.ui.ActiveJobsView" active="true"
+				contenthint="jobs">
+				<column cid="1" pos="0" width="0.1" active="true" key="step" />
+				<column cid="2" pos="1" width="0.1" active="true" key="owner" />
+				<column cid="3" pos="2" width="0.1" active="true" key="queue" />
+				<column cid="4" pos="3" width="0.1" active="true" key="wall" />
+				<column cid="5" pos="4" width="0.1" active="true" key="queuedate" />
+				<column cid="6" pos="5" width="0.1" active="true" key="dispatchdate" />
+				<column cid="7" pos="6" width="0.1" active="true" key="totalcores" />
+				<column cid="8" pos="7" width="0.1" active="true" key="status">
+					<pattern>
+						<select rel="=" value="RUNNING" />
+					</pattern>
+				</column>
+				<column cid="9" pos="8" width="1.0" active="false" key="dependency" />
+				<column cid="10" pos="9" width="1.0" active="false" key="detailedstatus" />
+				<column cid="11" pos="10" width="1.0" active="false" key="gpulist" />
+				<column cid="12" pos="11" width="1.0" active="false" key="group" />
+				<column cid="13" pos="12" width="1.0" active="false" key="name" />
+				<column cid="14" pos="13" width="1.0" active="false" key="nodelist" />
+				<column cid="15" pos="14" width="1.0" active="false" key="restart" />
+				<column cid="16" pos="15" width="1.0" active="false" key="spec" />
+				<column cid="17" pos="16" width="1.0" active="false" key="state" />
+				<column cid="18" pos="17" width="1.0" active="false" key="totaltasks" />
+			</tablelayout>
+			<tablelayout id="tl_WAIT"
+				gid="org.eclipse.ptp.rm.lml.ui.InactiveJobsView" active="true"
+				contenthint="jobs">
+				<column cid="1" pos="0" width="0.1" active="true" key="step" />
+				<column cid="2" pos="1" width="0.1" active="true" key="owner" />
+				<column cid="3" pos="2" width="0.1" active="true" key="queue" />
+				<column cid="4" pos="3" width="0.1" active="true" key="wall" />
+				<column cid="5" pos="4" width="0.1" active="true" key="queuedate" />
+				<column cid="6" pos="5" width="0.1" active="true" key="dispatchdate" />
+				<column cid="7" pos="6" width="0.1" active="true" key="totalcores" />
+				<column cid="8" pos="7" width="0.1" active="true" key="status">
+					<pattern>
+						<select rel="!=" value="RUNNING" />
+					</pattern>
+				</column>
+				<column cid="9" pos="8" width="1.0" active="false" key="dependency" />
+				<column cid="10" pos="9" width="1.0" active="false" key="detailedstatus" />
+				<column cid="11" pos="10" width="1.0" active="false" key="group" />
+				<column cid="12" pos="11" width="1.0" active="false" key="name" />
+				<column cid="13" pos="12" width="1.0" active="false" key="nodelist" />
+				<column cid="14" pos="13" width="1.0" active="false" key="restart" />
+				<column cid="15" pos="14" width="1.0" active="false" key="spec" />
+				<column cid="16" pos="15" width="1.0" active="false" key="state" />
+				<column cid="17" pos="16" width="1.0" active="false" key="totaltasks" />
+				<column cid="18" pos="17" width="1.0" active="false" key="vnodelist" />
+			</tablelayout>
+			<nodedisplaylayout id="nodedisplay" gid="nd_1"
+				active="true">
+				<schemehint>
+					<el1 tagname="node" min="1" max="206" mask="judge%03d">
+						<el2 tagname="core" min="0" max="25" mask="-c%02d" />
+					</el1>
+				</schemehint>
+				<el0 rows="10" maxlevel="2" cols="21" vgap="5">
+					<el1 min="1" max="21" background="#fff" rows="7" cols="4">
+						<el2 min="24" max="25" border="2" mouseborder="3" />
+					</el1>
+					<el1 min="22" max="42" background="#aaa" rows="7" cols="4">
+						<el2 min="24" max="25" border="2" mouseborder="3" />
+					</el1>
+					<el1 min="43" max="63" background="#fff" rows="7" cols="4">
+						<el2 min="24" max="25" border="2" mouseborder="3" />
+					</el1>
+					<el1 min="64" max="84" background="#aaa" rows="7" cols="4">
+						<el2 min="24" max="25" border="2" mouseborder="3" />
+					</el1>
+					<el1 min="85" max="105" background="#fff" rows="7" cols="4">
+						<el2 min="24" max="25" border="2" mouseborder="3" />
+					</el1>
+					<el1 min="106" max="126" background="#aaa" rows="7" cols="4">
+						<el2 min="24" max="25" border="2" mouseborder="3" />
+					</el1>
+					<el1 min="127" max="147" background="#fff" rows="7" cols="4">
+						<el2 min="24" max="25" border="2" mouseborder="3" />
+					</el1>
+					<el1 min="148" max="168" background="#aaa" rows="7" cols="4">
+						<el2 min="24" max="25" border="2" mouseborder="3" />
+					</el1>
+					<el1 min="169" max="189" background="#fff" rows="7" cols="4">
+						<el2 min="24" max="25" border="2" mouseborder="3" />
+					</el1>
+					<el1 min="190" max="206" background="#aaa" rows="7" cols="4">
+						<el2 min="24" max="25" border="2" mouseborder="3" />
+					</el1>
+				</el0>
+			</nodedisplaylayout>
+		</rm:layout>
 	</monitor-data>
 </resource-manager-builder>
