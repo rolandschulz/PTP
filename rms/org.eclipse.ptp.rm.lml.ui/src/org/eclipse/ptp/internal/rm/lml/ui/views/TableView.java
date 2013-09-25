@@ -381,33 +381,52 @@ public class TableView extends ViewPart {
 			UIUtils.safeRunSyncInUIThread(new SafeRunnable() {
 				@Override
 				public void run() throws Exception {
-					if (composite != null && viewCreated) {
-						if (firstColumnlabelProvider != null) {
-							firstColumnlabelProvider.clearImages();
-						}
-						if (selectedItem != null && !selectedItem.isDisposed()) {
-							lmlManager.unmarkObject(selectedItem.getData().toString());
-							selectedItem = null;
-						}
-						if (componentAdded) {
-							if (fLguiItem != null && fLguiItem.getObjectStatus() != null) {
-								fLguiItem.getObjectStatus().removeComponent(eventForwarder);
-							}
-							componentAdded = false;
-						}
-						fLguiItem = lmlManager.getSelectedLguiItem();
+					if (composite != null) {
 
-						if (fLguiItem != null && fLguiItem.getTableHandler() != null && tree.getSortColumn() != null) {
-							fLguiItem.getTableHandler().getSortProperties(gid);
-							fLguiItem.getTableHandler().sort(gid, SWT.UP, getSortIndex(), tree.getSortDirection());
+						if (viewCreated) {
+
+							if (firstColumnlabelProvider != null) {
+								firstColumnlabelProvider.clearImages();
+							}
+							if (selectedItem != null && !selectedItem.isDisposed()) {
+								lmlManager.unmarkObject(selectedItem.getData().toString());
+								selectedItem = null;
+							}
+							if (componentAdded) {
+								if (fLguiItem != null && fLguiItem.getObjectStatus() != null) {
+									fLguiItem.getObjectStatus().removeComponent(eventForwarder);
+								}
+								componentAdded = false;
+							}
+							fLguiItem = lmlManager.getSelectedLguiItem();
+
+							if (fLguiItem != null) {
+								System.out.println();
+							}
+
+							if (fLguiItem != null && fLguiItem.getTableHandler() != null && tree.getSortColumn() != null) {
+								fLguiItem.getTableHandler().getSortProperties(gid);
+								fLguiItem.getTableHandler().sort(gid, SWT.UP, getSortIndex(), tree.getSortDirection());
+							}
+							updateViewerInput();
+							updateAfterLastFilter = true;
+							if (fLguiItem != null && fLguiItem.getTableHandler() != null) {
+								fLguiItem.getObjectStatus().addComponent(eventForwarder);
+								componentAdded = true;
+							}
+							viewer.refresh();
+
 						}
-						updateViewerInput();
-						updateAfterLastFilter = true;
-						if (fLguiItem != null && fLguiItem.getTableHandler() != null) {
-							fLguiItem.getObjectStatus().addComponent(eventForwarder);
-							componentAdded = true;
+						else {// View still needs to be created
+							fLguiItem = lmlManager.getSelectedLguiItem();
+							if (fLguiItem != null) {
+								viewCreated = createTable();
+								if (!componentAdded && fLguiItem != null && fLguiItem.getTableHandler() != null) {
+									fLguiItem.getObjectStatus().addComponent(eventForwarder);
+									componentAdded = true;
+								}
+							}
 						}
-						viewer.refresh();
 					}
 				}
 			});
@@ -866,26 +885,31 @@ public class TableView extends ViewPart {
 
 	private boolean createTable() {
 		boolean viewChanged = false;
-		if (fLguiItem != null && composite.getClientArea().width > 0) {
-			createColumns();
-			if (fLguiItem.getTableHandler() != null) {
-				final Object[] sortProperties = fLguiItem.getTableHandler().getSortProperties(gid);
+		if (fLguiItem != null && !fLguiItem.isLayout() && composite.getClientArea().width > 0) {
+			// Check if there is a table with the requested gid at all, otherwise return false, so that a view is recreated
+			if (fLguiItem.getTableHandler() != null && fLguiItem.getTableHandler().getTable(gid) != null) {
 
-				if (!((String) sortProperties[1]).equals(ITableColumnLayout.SORT_DIRECTION_NONE)
-						&& ((Integer) sortProperties[0]) != -1) {
-					tree.setSortDirection(getSortDirectionInt((String) sortProperties[1]));
-					tree.setSortColumn(getSortColumn((Integer) sortProperties[0]));
-					fLguiItem.getTableHandler().sort(gid, SWT.UP, getSortIndex(), tree.getSortDirection());
+				createColumns();
+				if (fLguiItem.getTableHandler() != null) {
+					final Object[] sortProperties = fLguiItem.getTableHandler().getSortProperties(gid);
+
+					if (!((String) sortProperties[1]).equals(ITableColumnLayout.SORT_DIRECTION_NONE)
+							&& ((Integer) sortProperties[0]) != -1) {
+						tree.setSortDirection(getSortDirectionInt((String) sortProperties[1]));
+						tree.setSortColumn(getSortColumn((Integer) sortProperties[0]));
+						fLguiItem.getTableHandler().sort(gid, SWT.UP, getSortIndex(), tree.getSortDirection());
+					}
+
+					filterOwnJobsActionItem.getAction().setEnabled(true);
+					filterOwnJobsActionItem.getAction().setChecked(fLguiItem.isFilterOwnJobActive(gid));
+					filterActionItem.getAction().setEnabled(true);
 				}
 
-				filterOwnJobsActionItem.getAction().setEnabled(true);
-				filterOwnJobsActionItem.getAction().setChecked(fLguiItem.isFilterOwnJobActive(gid));
-				filterActionItem.getAction().setEnabled(true);
-			}
+				// Insert the input
+				updateViewerInput();
+				viewChanged = true;
 
-			// Insert the input
-			updateViewerInput();
-			viewChanged = true;
+			}
 		}
 		composite.layout();
 		return viewChanged;
