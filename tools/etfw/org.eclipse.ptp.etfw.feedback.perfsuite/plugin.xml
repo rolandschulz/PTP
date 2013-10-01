@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+  
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            name="%category.name"
+            id="org.eclipse.ptp.etfw.feedback.actions.commands.category">
+      </category>
+      <command
+            name="%command.name"
+            categoryId="org.eclipse.ptp.etfw.feedback.actions.commands.category"
+            id="org.eclipse.ptp.etfw.feedback.actions.commands.perfsuiteCommand">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            commandId="org.eclipse.ptp.etfw.feedback.actions.commands.perfsuiteCommand"
+            class="org.eclipse.ptp.etfw.feedback.actions.handlers.ShowFeedbackHandler">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="org.eclipse.ptp.etfw.feedback.actions.commands.perfsuiteCommand"
+            contextId="org.eclipse.ui.contexts.window"
+            sequence="M1+7"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </key>
+   </extension>
+<!-- this needs to be a context/popup menu and not added to the main toolbar
+   <extension
+         point="org.eclipse.ui.menus">
+         
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
+         <menu
+               label="Feedback"
+               mnemonic="b"
+               id="org.eclipse.ptp.etfw.feedback.actions.menus.perfsuiteMenu">
+            <command
+                  commandId="org.eclipse.ptp.etfw.feedback.actions.commands.perfsuiteCommand"
+                  mnemonic="P"
+                  id="org.eclipse.ptp.etfw.feedback.actions.menus.perfsuiteCommand">
+            </command>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="org.eclipse.ptp.etfw.feedback.actions.toolbars.perfsuiteToolbar">
+            <command
+                  commandId="org.eclipse.ptp.etfw.feedback.actions.commands.perfsuiteCommand"
+                  icon="icons/feedback_action.gif"
+                  tooltip="Show ETFw Feedback view for selected PerfSuite XML file"
+                  id="org.eclipse.ptp.etfw.feedback.actions.toolbars.perfsuiteCommand">
+            </command>
+         </toolbar>
+      </menuContribution>
+     
+   </extension>
+    -->
+      <extension
+         id="perfsuiteParser"
+         name="PerfSuite PTP Feedback view report items"
+         point="org.eclipse.ptp.etfw.feedback.parser">
+      <feedtype
+            class="org.eclipse.ptp.internal.etfw.feedback.perfsuite.PerfSuiteFeedbackParser"
+            id="org.eclipse.ptp.etfw.feedback.perfsuite.parser"
+            name="PerfSuite feedback parser"
+            nodeName="multihwpcprofilereport">
+      </feedtype>
+   </extension>
+     <extension
+         point="org.eclipse.ui.views">
+   	   <category
+            name="PTP ETFw Feedback View"
+            id="org.eclipse.ptp.etfw.feedback">
+       </category>
+       <view
+            name="PerfSuite Feedback Items"
+            icon="icons/feedback_view.gif"
+            category="org.eclipse.ptp.etfw.feedback"
+            class="org.eclipse.ptp.internal.etfw.feedback.perfsuite.PerfSuiteFeedbackView"
+            id="org.eclipse.ptp.etfw.feedback.perfsuite.view">
+      </view>
+   </extension>
+   <!--  instead of action, this should be a handler 
+      <extension
+         id="perfsuiteAction"
+         name="PerfSuite Added Action"
+         point="org.eclipse.ptp.etfw.feedback.action">
+      <action
+            class="org.eclipse.ptp.internal.etfw.feedback.perfsuite.actions.PerfSuiteFeedbackAction"
+            icon="icons/feedback_action.gif" 
+            id="perfsuiteFeedbackAction1"
+            name="PerfSuite Feedback Action"
+            viewID="org.eclipse.ptp.etfw.feedback.perfsuite.view">
+      </action>
+   </extension>
+   -->
+
+   <extension
+         id="org.eclipse.ptp.etfw.feedback.perfsuite.marker"
+         name="PerfSuite feedback"
+         point="org.eclipse.core.resources.markers">
+      <super type="org.eclipse.core.resources.textmarker"/>
+   </extension>
+   
+   <!-- this changes the marker image in the editor marker bar  -->
+   
+   <extension
+         point="org.eclipse.ui.editors.annotationTypes">
+      <type
+            markerType="org.eclipse.ptp.etfw.feedback.perfsuite.marker"
+            name="org.eclipse.ptp.etfw.feedback.perfsuite.markerAnnotation">
+      </type>
+   </extension>
+   
+   
+   <extension
+         point="org.eclipse.ui.editors.markerAnnotationSpecification">
+   <specification
+         annotationType="org.eclipse.ptp.etfw.feedback.perfsuite.markerAnnotation"
+         colorPreferenceKey="org.eclipse.ptp.etfw.feedback.perfsuite.color"
+         colorPreferenceValue="192,255,192"
+         contributesToHeader="true"
+         highlightPreferenceKey="org.eclipse.ptp.etfw.feedback.perfsuite.highlight"
+         highlightPreferenceValue="true"
+         includeOnPreferencePage="true"
+         label="PerfSuite Feedback Marker"
+         overviewRulerPreferenceKey="org.eclipse.ptp.etfw.feedback.perfsuite.overview"
+         overviewRulerPreferenceValue="true"
+         presentationLayer="0"
+         textPreferenceKey="org.eclipse.ptp.etfw.feedback.perfsuite.text"
+         textPreferenceValue="true"
+         textStylePreferenceValue="BOX"
+         verticalRulerPreferenceKey="org.eclipse.ptp.etfw.feedback.perfsuite.ruler"
+         verticalRulerPreferenceValue="true"
+         symbolicIcon="info">
+   </specification>
+   </extension>
+	
+	
+</plugin>
