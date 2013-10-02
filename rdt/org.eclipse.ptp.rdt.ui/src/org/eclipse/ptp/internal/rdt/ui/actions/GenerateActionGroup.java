@@ -25,7 +25,6 @@ import java.util.List;
 import org.eclipse.cdt.internal.ui.IContextMenuConstants;
 import org.eclipse.cdt.internal.ui.actions.ActionMessages;
 import org.eclipse.cdt.internal.ui.actions.CDTQuickMenuCreator;
-import org.eclipse.cdt.internal.ui.editor.AddIncludeOnSelectionAction;
 import org.eclipse.cdt.internal.ui.editor.CEditor;
 import org.eclipse.cdt.internal.ui.editor.ICEditorActionDefinitionIds;
 import org.eclipse.cdt.internal.ui.editor.SortLinesAction;
@@ -116,7 +115,7 @@ public class GenerateActionGroup extends ActionGroup implements ISelectionChange
 	private List<ISelectionChangedListener> fRegisteredSelectionListeners;
 //	private List<RefactoringAction> fRefactorActions= new ArrayList<RefactoringAction>();
 	
-	private AddIncludeOnSelectionAction fAddInclude;
+//	private AddIncludeOnSelectionAction fAddInclude;
 //	private OverrideMethodsAction fOverrideMethods;
 //	private GenerateHashCodeEqualsAction fHashCodeEquals;
 //	private AddGetterSetterAction fAddGetterSetter;
@@ -152,9 +151,9 @@ public class GenerateActionGroup extends ActionGroup implements ISelectionChange
 		fEditor= editor;
 		fGroupName= groupName;
 				
-		fAddInclude= new AddIncludeOnSelectionAction(editor);
-		fAddInclude.setActionDefinitionId(ICEditorActionDefinitionIds.ADD_INCLUDE);
-		editor.setAction("AddIncludeOnSelection", fAddInclude); //$NON-NLS-1$
+//		fAddInclude= new AddIncludeOnSelectionAction(editor);
+//		fAddInclude.setActionDefinitionId(ICEditorActionDefinitionIds.ADD_INCLUDE);
+//		editor.setAction("AddIncludeOnSelection", fAddInclude); //$NON-NLS-1$
 		
 //		fOrganizeIncludes= new OrganizeIncludesAction(editor);
 //		fOrganizeIncludes.setActionDefinitionId(ICEditorActionDefinitionIds.ORGANIZE_INCLUDES);
@@ -415,7 +414,7 @@ public class GenerateActionGroup extends ActionGroup implements ISelectionChange
 		added+= addEditorAction(source, "Indent"); //$NON-NLS-1$
 		added+= addEditorAction(source, "Format"); //$NON-NLS-1$
 		source.add(new Separator(GROUP_ORGANIZE));
-		added+= addAction(source, fAddInclude);
+//		added+= addAction(source, fAddInclude);
 //		added+= addAction(source, fOrganizeIncludes);
 //		added+= addAction(source, fSortMembers);
 		added+= addAction(source, fSortLines);
@@ -441,7 +440,7 @@ public class GenerateActionGroup extends ActionGroup implements ISelectionChange
 		source.add(new Separator(GROUP_EDIT));
 		added+= addAction(source, fFormatAll);
 		source.add(new Separator(GROUP_ORGANIZE));
-		added+= addAction(source, fAddInclude);
+//		added+= addAction(source, fAddInclude);
 //		added+= addAction(source, fOrganizeIncludes);
 //		added+= addAction(source, fSortMembers);
 //		added+= addAction(source, fCleanUp);
@@ -480,7 +479,7 @@ public class GenerateActionGroup extends ActionGroup implements ISelectionChange
 	}
 	
 	private void setGlobalActionHandlers(IActionBars actionBar) {
-		actionBar.setGlobalActionHandler(CdtActionConstants.ADD_INCLUDE, fAddInclude);
+//		actionBar.setGlobalActionHandler(CdtActionConstants.ADD_INCLUDE, fAddInclude);
 //		actionBar.setGlobalActionHandler(CdtActionConstants.OVERRIDE_METHODS, fOverrideMethods);
 //		actionBar.setGlobalActionHandler(CdtActionConstants.GETTERS_AND_SETTERS, fAddGetterSetter);
 //		actionBar.setGlobalActionHandler(CdtActionConstants.IMPLEMENT_METHOD, fImplementMethod);
