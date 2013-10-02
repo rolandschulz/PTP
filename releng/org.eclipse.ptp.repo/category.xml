@@ -33,6 +33,9 @@
    <feature url="features/org.eclipse.ptp.etfw.tau.fortran_0.0.0.jar" id="org.eclipse.ptp.etfw.tau.fortran" version="0.0.0">
       <category name="Parallel Tools Platform"/>
    </feature>
+   <feature url="features/org.eclipse.ptp.etfw.feedback.perfsuite_0.0.0.jar" id="org.eclipse.ptp.etfw.feedback.perfsuite" version="0.0.0">
+      <category name="Parallel Tools Platform"/>
+   </feature>
    <feature url="features/org.eclipse.ptp.sci_0.0.0.jar" id="org.eclipse.ptp.sci" version="0.0.0">
       <category name="Parallel Tools Platform"/>
    </feature>
@@ -66,9 +69,7 @@
    <feature url="features/org.eclipse.remote_0.0.0.jar" id="org.eclipse.remote" version="0.0.0">
       <category name="Remote Services"/>
    </feature>
-   <feature url="features/org.eclipse.ptp.etfw.feedback.perfsuite_1.0.0.jar" id="org.eclipse.ptp.etfw.feedback.perfsuite" version="1.0.0">
-      <category name="Parallel Tools Platform"/>
-   </feature>
+
    <category-def name="Parallel Tools Platform" label="Parallel Tools Platform"/>
    <category-def name="Remote Development Tools" label="Remote Development Tools"/>
    <category-def name="Remote Services" label="Remote Services"/>
