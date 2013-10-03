@@ -142,6 +142,35 @@
          symbolicIcon="info">
    </specification>
    </extension>
-	
-	
+   
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="popup:org.eclipse.ui.popup.any?after=buildGroup">
+            <command
+                  commandId="org.eclipse.ptp.etfw.feedback.actions.commands.perfsuiteCommand"
+                  mnemonic="P"
+                  id="org.eclipse.ptp.etfw.feedback.actions.menus.perfsuiteCommand">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeMenuSelection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <adapt
+                           type="org.eclipse.core.resources.IResource">
+                        <test
+                              property="org.eclipse.core.resources.name"
+                              value="*.xml">
+                        </test>
+                     </adapt>
+                  </iterate>
+               </with>
+            </visibleWhen>
+            </command>
+      </menuContribution>     
+   </extension>
+
 </plugin>
