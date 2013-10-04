@@ -154,6 +154,7 @@
 		<module>tools/etfw/org.eclipse.ptp.etfw.doc.user</module>
 		<module>tools/etfw/org.eclipse.ptp.etfw.feedback</module>
 		<module>tools/etfw/org.eclipse.ptp.etfw.feedback.perfsuite</module>
+		<module>tools/etfw/org.eclipse.ptp.etfw.feedback.perfsuite.doc.user</module>
 		<module>tools/etfw/org.eclipse.ptp.etfw.parallel</module>
 		<module>tools/etfw/org.eclipse.ptp.etfw.jaxb</module>
 		<module>tools/etfw/org.eclipse.ptp.etfw.launch</module>

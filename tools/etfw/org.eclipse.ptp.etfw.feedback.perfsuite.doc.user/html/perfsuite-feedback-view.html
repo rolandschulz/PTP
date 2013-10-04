@@ -1,0 +1,180 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<title>PTP ETFw PerfSuite Feedback View</title>
+	<link rel="stylesheet" type="text/css" href="help.css">
+</head>
+
+<body>
+<h1><img src="images/feedback_view.gif">PTP ETFw PerfSuite Feedback View</h1>
+<h2>Overview</h2>
+
+<p>
+PerfSuite is a collection of tools and libraries
+for software performance analysis on Linux-based systems.
+It supports counting and profiling using CPU and other (such as network, thermal)
+hardware performance counters, and interval timer profiling.
+
+<p>
+The Parallel Tools Platform External Tools Framework Feedback View
+(PTP ETFw Feedback View)
+provides a convenient
+way to use the file name and line number information contained in an XML file
+to allow a user to easily navigate to the lines in the files.
+
+<p>The PTP ETFw PerfSuite Feedback View plug-in is based on the above 
+feature.
+Specifically, it provides an Eclipse view, exposing information found
+in an XML file
+of the type "multihwpcprofilereport" -- a specific type of XML file that
+PerfSuite generates --
+with convenient mapping and navigation to source lines referenced in the XML file.
+With this, a user may find it easier to correlate the source code with the
+information contained in the
+XML file -- the hot spots, where the most samples are collected during a previous
+run.
+</p>
+
+<h2>Instructions</h2>
+<p>
+
+<ol>
+<li>Either use tools inside Eclipse such as PTP ETFw, or use tools outside Eclipse such as
+on the command line, to perform PerfSuite runs to measure and analyze the results, and
+create a file of the type "multihwpcprofilereport".  One way to create such files
+is to run "psrun &lt;options&gt; myprog myargs" with a profiling configuration file
+to profile the program, then run "psprocess -x -o mhpr.xml myprog.*.xml" to do the
+source code mapping and combine the results of multiple processes/threads into
+one file "mhpr.xml".
+<li>Select the file "mhpr.xml" in the Project Explorer view.
+<li>Hit the PerfSuite Feedback View button
+(<img src="images/feedback_view.gif"></img>)
+in the toolbar, or select the menu "Feedback -> PerfSuite Feedback",
+or type the keyboard shortcut CTRL-7.
+The PerfSuite Feedback View Plugin parses the xml file, creates markers that are associated
+with the source code files, and create a feedback view with line items which are associated
+with the markers.
+
+<p>
+The line items are initially all collapsed. You can click on the triangle symbol in front of
+the individual parent nodes to expand them, or use the
+"Expand All" button (<img src="images/expandall.gif"></img>) in the view's toolbar.
+
+<p>
+The line items are grouped by the files.
+The format of the section is "&lt;hostname&gt;-PID_&lt;pid&gt;-thread_&lt;threadid&gt;".
+In an MPI run, the thread IDs are all 0s,
+but the PIDs are different.  In a pure OpenMP run, the PIDs will be the same, and the
+thread IDs will be different numbers instead of all 0s.
+<p>
+<li>To see the source file line referred to by a line item, double-click on the line in the Feedback
+view.  The Eclipse editor window will load the source file if it's not loaded or bring it to front
+if it is loaded, and the cursor/focus goes to the line number referred in the line item.
+<p>
+<p>
+The line items are sorted in the order from the most samples to the least.  Since the line items
+must have associated markers, which in turn associate with the files inside of the Eclipse work space,
+for the files which PerfSuite's psrun collected samples from but are not inside of the Eclipse
+work space, the line items will not appear in the view.  This typically happens for the
+shared libraries used by the program.
+
+<li>You can double-click on the line items one by one to review the hot spots in the file,
+or navigate by clicking the markers in the overview ruler of the text editor window, which is
+vertical space at the far right side of the editor window.
+</ol>
+
+
+<h2>Examples</h2>
+<p>
+
+<ol>
+<li>In this example, we created a Makefile MPI C project named "testfeedback" inside of Eclipse.
+We have both MPI and
+PerfSuite installed on the machine.  Inside of Eclipse, we used the makefile to drive the process
+of building the program, running the program with PerfSuite, and post-processing the result, and
+created a PerfSuite "multihwpcprofile" report. 
+The following is the content of the Makefile:
+<pre>
+SHELL=/bin/bash
+all: build run process
+
+build:
+	mpicc -g -O2 -o testfeedback testfeedback.c
+
+run:
+	source /home/ruiliu/tmp/nightly-test/perfsuite-install/bin/psenv.sh; \
+	mpirun -np 4 /home/ruiliu/tmp/nightly-test/perfsuite-install/bin/psrun -f -C -c papi_profile_cycles.xml ./testfeedback
+
+process:
+	/home/ruiliu/tmp/nightly-test/perfsuite-install/bin/psprocess -x -o mhpr.xml testfeedback.*.xml
+
+clean:
+	rm -rf testfeedback mhpr.xml testfeedback.*.xml
+</pre>
+
+We selected the menu item "Project -> Clean", followed by "Project -> Build All".
+After that, the "testfeedback" program was built, run with "psrun", and the generated
+"testfeedback.*.xml" files were processed by "psprocess" and combined into "mhpr.xml".
+
+<li>We selected the file "mhpr.xml" in the Project Explorer view.
+<li>We typed "CTRL-7", and the plug-in created a new view.  We then clicked the "Expand All"
+button to see the line items.  The line items are grouped by the files.
+The format is "&lt;hostname&gt;-PID_&lt;pid&gt;-thread_&lt;threadid&gt;".
+In the case of the first one "Amituofo-PID_4228-thread_0", the host name is "Amituofo".
+Since it's an MPI run, the thread IDs are all 0s,
+but the PIDs are different.
+<img src="images/result-view.png"></img>
+<li>We double-clicked on the line corresponding to line 40 in the "Amituofo-PID_4228-thread_0"
+section.  The editor window brought the file "testfeedback.c" to front, and focused in line 40.
+<img src="images/double-clicked.png"></img>
+
+<li>We also tried to click the markers in the editor window's overview ruler to go to other
+hot spot locations.
+<img src="images/overview-ruler.png"></img>
+
+</ol>
+
+
+
+<h2>GUI Items Added In This Feature</h2>
+<p>
+
+Several GUI items were added by this feature, as shown in the following screen shots.
+<nl>
+<li>A new menu entry "Feedback -> PerfSuite Feedback"
+and a keyboard combination shortcut "CTRL-7"<br/>
+<img src="images/menu.png" alt="New Menu Entry">
+
+<li>A new toolbar button<br/>
+<img src="images/toolbar-button.png" alt="New Toolbar Button">
+
+<li>A new view category "PTP ETFw Feedback View" and a new view
+"PerfSuite Feedback Items"</br>
+<img src="images/show-view.png" alt="New View Category and View">
+
+<li>A new annotation type "PerfSuite Feedback Marker" and its preferences
+ in "General -> Editors -> Text Editors -> Annotations -> PerfSuite Feedback Marker"<br/>
+The preference items allow a user to choose for the lines associated with
+the markers: whether the markers appear in the
+vertical ruler, the overview ruler or neither, whether the text is highlighted or
+underlined with squiggly lines or neither, and the background color
+of the lines.
+<img src="images/prefs.png" alt="New Annotation Preference">
+
+</nl>
+
+<h2>References</h2>
+<p>
+
+<ul>
+<li>Eclipse PTP ETFw Feedback View page on Eclipse Wiki:<br/>
+    <a href="http://wiki.eclipse.org/PTP/ETFw/PTP_External_Tools_Framework_Feedback_View">http://wiki.eclipse.org/PTP/ETFw/PTP_External_Tools_Framework_Feedback_View</a>
+<li>PerfSuite web site:<br/>
+    At NCSA: <a href="http://perfsuite.ncsa.illinois.edu">http://perfsuite.ncsa.illinois.edu</a><br/>
+    At Source Forge: <a href="http://sourceforge.net/projects/perfsuite/">http://sourceforge.net/projects/perfsuite/</a>
+</ul>
+
+</body>
+</html>
