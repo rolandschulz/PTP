@@ -24,12 +24,14 @@ public class RemoteToolsConnectionWorkingCopy extends RemoteToolsConnection impl
 
 	private final RemoteToolsConnection fConnection;
 	private String fName;
+	private boolean fIsDirty;
 
 	public RemoteToolsConnectionWorkingCopy(RemoteToolsConnection conn) {
 		super(conn.getName(), new TargetElement(RemoteToolsServices.getTargetTypeElement(), conn.getName(), conn.getTargetControl()
 				.getConfig().getAttributes(), EnvironmentPlugin.getDefault().getEnvironmentUniqueID()), conn.getRemoteServices());
 		fConnection = conn;
 		fName = conn.getName();
+		fIsDirty = false;
 	}
 
 	/*
@@ -65,6 +67,15 @@ public class RemoteToolsConnectionWorkingCopy extends RemoteToolsConnection impl
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.remote.core.IRemoteConnectionWorkingCopy#getOriginal()
+	 */
+	public IRemoteConnection getOriginal() {
+		return fConnection;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ptp.remote.core.IRemoteConnection#getPort()
 	 */
 	@Override
@@ -95,6 +106,15 @@ public class RemoteToolsConnectionWorkingCopy extends RemoteToolsConnection impl
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.remote.core.IRemoteConnectionWorkingCopy#isDirty()
+	 */
+	public boolean isDirty() {
+		return fIsDirty;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.remote.core.IRemoteConnectionWorkingCopy#save()
 	 */
 	public IRemoteConnection save() {
@@ -103,6 +123,7 @@ public class RemoteToolsConnectionWorkingCopy extends RemoteToolsConnection impl
 			fConnection.setName(fName);
 		}
 		((RemoteToolsConnectionManager) fConnection.getRemoteServices().getConnectionManager()).addConnection(fConnection);
+		fIsDirty = false;
 		return fConnection;
 	}
 
@@ -112,6 +133,7 @@ public class RemoteToolsConnectionWorkingCopy extends RemoteToolsConnection impl
 	 * @see org.eclipse.remote.core.IRemoteConnectionWorkingCopy#setAddress(java.lang.String)
 	 */
 	public void setAddress(String address) {
+		fIsDirty = true;
 		getTargetControl().getConfig().setConnectionAddress(address);
 	}
 
@@ -121,6 +143,7 @@ public class RemoteToolsConnectionWorkingCopy extends RemoteToolsConnection impl
 	 * @see org.eclipse.remote.core.IRemoteConnectionWorkingCopy#setAttribute(java.lang.String, java.lang.String)
 	 */
 	public void setAttribute(String key, String value) {
+		fIsDirty = true;
 		getTargetControl().getConfig().setAttribute(key, value);
 	}
 
@@ -131,6 +154,7 @@ public class RemoteToolsConnectionWorkingCopy extends RemoteToolsConnection impl
 	 */
 	@Override
 	public void setName(String name) {
+		fIsDirty = true;
 		fName = name;
 	}
 
@@ -140,6 +164,7 @@ public class RemoteToolsConnectionWorkingCopy extends RemoteToolsConnection impl
 	 * @see org.eclipse.remote.core.IRemoteConnectionWorkingCopy#setPassword(java.lang.String)
 	 */
 	public void setPassword(String password) {
+		fIsDirty = true;
 		getTargetControl().getConfig().setLoginPassword(password);
 	}
 
@@ -149,10 +174,12 @@ public class RemoteToolsConnectionWorkingCopy extends RemoteToolsConnection impl
 	 * @see org.eclipse.remote.core.IRemoteConnectionWorkingCopy#setPort(int)
 	 */
 	public void setPort(int port) {
+		fIsDirty = true;
 		getTargetControl().getConfig().setConnectionPort(port);
 	}
 
 	public void setTimeout(int timeout) {
+		fIsDirty = true;
 		getTargetControl().getConfig().setConnectionTimeout(timeout);
 	}
 
@@ -162,6 +189,7 @@ public class RemoteToolsConnectionWorkingCopy extends RemoteToolsConnection impl
 	 * @see org.eclipse.remote.core.IRemoteConnectionWorkingCopy#setUsername(java.lang.String)
 	 */
 	public void setUsername(String userName) {
+		fIsDirty = true;
 		getTargetControl().getConfig().setLoginUsername(userName);
 	}
 }

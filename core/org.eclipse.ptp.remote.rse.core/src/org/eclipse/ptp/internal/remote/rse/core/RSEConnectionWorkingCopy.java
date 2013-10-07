@@ -18,10 +18,21 @@ import org.eclipse.remote.core.IRemoteConnectionWorkingCopy;
 public class RSEConnectionWorkingCopy extends RSEConnection implements IRemoteConnectionWorkingCopy {
 
 	private final RSEConnection fConnection;
+	private boolean fIsDirty;
 
 	public RSEConnectionWorkingCopy(RSEConnection conn) {
 		super(conn.getHost(), conn.getRemoteServices());
 		fConnection = conn;
+		fIsDirty = false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.remote.core.IRemoteConnectionWorkingCopy#getOriginal()
+	 */
+	public IRemoteConnection getOriginal() {
+		return fConnection;
 	}
 
 	/*
@@ -37,9 +48,19 @@ public class RSEConnectionWorkingCopy extends RSEConnection implements IRemoteCo
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.remote.core.IRemoteConnectionWorkingCopy#isDirty()
+	 */
+	public boolean isDirty() {
+		return fIsDirty;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.remote.core.IRemoteConnectionWorkingCopy#save()
 	 */
 	public IRemoteConnection save() {
+		fIsDirty = false;
 		return fConnection;
 	}
 
@@ -49,6 +70,7 @@ public class RSEConnectionWorkingCopy extends RSEConnection implements IRemoteCo
 	 * @see org.eclipse.remote.core.IRemoteConnectionWorkingCopy#setAddress(java.lang.String)
 	 */
 	public void setAddress(String address) {
+		fIsDirty = true;
 		fConnection.getHost().setHostName(address);
 	}
 
@@ -67,6 +89,7 @@ public class RSEConnectionWorkingCopy extends RSEConnection implements IRemoteCo
 	 * @see org.eclipse.remote.core.IRemoteConnectionWorkingCopy#setName(java.lang.String)
 	 */
 	public void setName(String name) {
+		fIsDirty = true;
 		fConnection.getHost().setAliasName(name);
 	}
 
@@ -94,6 +117,7 @@ public class RSEConnectionWorkingCopy extends RSEConnection implements IRemoteCo
 	 * @see org.eclipse.remote.core.IRemoteConnectionWorkingCopy#setUsername(java.lang.String)
 	 */
 	public void setUsername(String userName) {
+		fIsDirty = true;
 		fConnection.getHost().setDefaultUserId(userName);
 	}
 }
