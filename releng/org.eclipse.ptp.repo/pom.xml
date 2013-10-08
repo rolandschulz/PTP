@@ -56,18 +56,26 @@
 												<include name="**/*" />
 											</fileset>
 										</delete>
+										
+										<!-- Unzip p2 repo into install dir -->
 										<unzip
 											src="${project.build.directory}/${project.build.finalName}.zip"
 											dest="${ptp-install-dir}" />
+											
+										<!-- Put copy of master repo zip into install dir -->
 										<copy
 											file="${project.build.directory}/${project.build.finalName}.zip"
 											tofile="${ptp-install-dir}/ptp-master-${unqualifiedVersion}.${buildQualifier}.zip" />
+											
+										<!-- Copy the rdt server jars into install dir -->
 										<copy includeemptydirs="false" todir="${ptp-install-dir}">
 											<fileset
 												dir="${basedir}/../../rdt/org.eclipse.ptp.rdt.core.remotejars">
 												<include name="rdt-server-*" />
 											</fileset>
 										</copy>
+										
+										<!-- Create zip archive for the SDM source and binaries -->
 										<unzip
 											src="${basedir}/../../releng/org.eclipse.ptp.aix/target/org.eclipse.ptp.aix-${project.version}.jar"
 											dest="${ptp-install-dir}/sdm/org.eclipse.ptp.aix_${unqualifiedVersion}.${buildQualifier}" />
@@ -101,12 +109,25 @@
 										<delete includeEmptyDirs="true">
 											<fileset dir="${ptp-install-dir}/sdm" />
 										</delete>
+										
+										<!-- Create a tar archive for the SCI source -->
+										<unzip
+											src="${basedir}/../../tools/sci/org.eclipse.ptp.sci/target/org.eclipse.ptp.sci-${project.version}.jar"
+											dest="${ptp-install-dir}/org.eclipse.ptp.sci_${unqualifiedVersion}.${buildQualifier}" />
+										<tar
+											basedir="${ptp-install-dir}/org.eclipse.ptp.sci_${unqualifiedVersion}.${buildQualifier}"
+											destfile="${ptp-install-dir}/ptp-sci-${unqualifiedVersion}.tar.gz" 
+											compression="gzip" />
+											
+										<!-- Copy the index.html and update with new version -->
 										<copy file="${basedir}/index.html" tofile="${ptp-install-dir}/index.html" />
 										<replace file="${ptp-install-dir}/index.html">
 											<replacefilter token="@unqualifiedVersion@"
 												value="${unqualifiedVersion}" />
 											<replacefilter token="@buildQualifier@" value="${buildQualifier}" />
 										</replace>
+										
+										<!--  Make sure the install dir is writable to the group -->
 										<chmod perm="g+w">
 											<fileset dir="${ptp-install-dir}">
 												<include name="**" />
