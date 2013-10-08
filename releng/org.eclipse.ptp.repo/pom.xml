@@ -113,11 +113,14 @@
 										<!-- Create a tar archive for the SCI source -->
 										<unzip
 											src="${basedir}/../../tools/sci/org.eclipse.ptp.sci/target/org.eclipse.ptp.sci-${project.version}.jar"
-											dest="${ptp-install-dir}/org.eclipse.ptp.sci_${unqualifiedVersion}.${buildQualifier}" />
+											dest="${ptp-install-dir}/sci/ptp-sci-${unqualifiedVersion}" />
 										<tar
-											basedir="${ptp-install-dir}/org.eclipse.ptp.sci_${unqualifiedVersion}.${buildQualifier}"
+											basedir="${ptp-install-dir}/sci"
 											destfile="${ptp-install-dir}/ptp-sci-${unqualifiedVersion}.tar.gz" 
 											compression="gzip" />
+										<delete includeEmptyDirs="true">
+											<fileset dir="${ptp-install-dir}/sci" />
+										</delete>
 											
 										<!-- Copy the index.html and update with new version -->
 										<copy file="${basedir}/index.html" tofile="${ptp-install-dir}/index.html" />
