@@ -231,8 +231,16 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 */
 	public static IRemoteFileManager getRemoteFileManager(ILaunchConfiguration configuration, IProgressMonitor monitor)
 			throws CoreException {
-		IRemoteConnection conn = RMLaunchUtils.getRemoteConnection(configuration, monitor);
+		SubMonitor progress = SubMonitor.convert(monitor, 10);
+		IRemoteConnection conn = RMLaunchUtils.getRemoteConnection(configuration, progress.newChild(5));
 		if (conn != null) {
+			if (!conn.isOpen()) {
+				conn.open(progress.newChild(5));
+				if (!progress.isCanceled() && !conn.isOpen()) {
+					throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
+							Messages.AbstractParallelLaunchConfigurationDelegate_Connection_is_not_open));
+				}
+			}
 			return conn.getFileManager();
 		}
 		return null;
@@ -742,19 +750,23 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 * @since 5.0
 	 */
 	protected IPath verifyResource(String path, ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
-		IRemoteFileManager fileManager = getRemoteFileManager(configuration, monitor);
-		if (monitor.isCanceled()) {
-			return null;
+		SubMonitor progress = SubMonitor.convert(monitor, 10);
+		IRemoteFileManager fileManager = getRemoteFileManager(configuration, progress.newChild(5));
+		if (!monitor.isCanceled()) {
+			if (fileManager == null) {
+				throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
+						Messages.AbstractParallelLaunchConfigurationDelegate_unableToObtainConnectionInfo));
+			}
+			boolean exists = fileManager.getResource(path).fetchInfo(EFS.NONE, progress.newChild(5)).exists();
+			if (!progress.isCanceled()) {
+				if (!exists) {
+					throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(), NLS.bind(
+							Messages.AbstractParallelLaunchConfigurationDelegate_Path_not_found, new Object[] { path })));
+				}
+				return new Path(path);
+			}
 		}
-		if (fileManager == null) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(),
-					Messages.AbstractParallelLaunchConfigurationDelegate_unableToObtainConnectionInfo));
-		}
-		if (!fileManager.getResource(path).fetchInfo().exists()) {
-			throw new CoreException(new Status(IStatus.ERROR, PTPLaunchPlugin.getUniqueIdentifier(), NLS.bind(
-					Messages.AbstractParallelLaunchConfigurationDelegate_Path_not_found, new Object[] { path })));
-		}
-		return new Path(path);
+		return null;
 	}
 
 	/**

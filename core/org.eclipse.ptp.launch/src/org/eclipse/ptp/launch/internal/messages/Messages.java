@@ -134,6 +134,8 @@ public class Messages extends NLS {
 	public static String AbstractParallelLaunchConfigurationDelegate_launchType2;
 	public static String AbstractParallelLaunchConfigurationDelegate_launchType3;
 	public static String AbstractParallelLaunchConfigurationDelegate_ConfirmActions;
+
+	public static String AbstractParallelLaunchConfigurationDelegate_Connection_is_not_open;
 	public static String AbstractParallelLaunchConfigurationDelegate_Specified_resource_manager_not_found;
 	public static String AbstractParallelLaunchConfigurationDelegate_Path_not_found;
 	public static String AbstractParallelLaunchConfigurationDelegate_unableToObtainConnectionInfo;
