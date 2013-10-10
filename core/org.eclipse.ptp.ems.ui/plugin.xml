@@ -9,6 +9,17 @@
             widgetClass="org.eclipse.ptp.internal.ems.ui.EnvManagerConfigButton">
       </widget>
    </extension>
+   <extension
+         point="org.eclipse.ui.trace.traceComponents">
+      <component
+            id="org.eclipse.ptp.ems.core.component"
+            label="EMS Core">
+         <bundle
+               consumed="true"
+               name="org.eclipse.ptp.ems.core">
+         </bundle>
+      </component>
+   </extension>
 
 
 </plugin>

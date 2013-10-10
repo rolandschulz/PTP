@@ -22,10 +22,6 @@ public class Messages extends NLS {
 	public static String SDMPreferencePage_10;
 	public static String SDMPreferencePage_11;
 	public static String SDMPreferencePage_12;
-	public static String SDMPreferencePage_13;
-	public static String SDMPreferencePage_14;
-	public static String SDMPreferencePage_15;
-	public static String SDMPreferencePage_16;
 	public static String SDMPreferencePage_17;
 	public static String SDMPreferencePage_18;
 	public static String SDMPreferencePage_2;

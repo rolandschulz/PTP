@@ -22,6 +22,7 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ptp.core.Preferences;
+import org.eclipse.ptp.internal.debug.core.PDebugOptions;
 import org.eclipse.ptp.internal.debug.sdm.core.SDMDebugCorePlugin;
 import org.eclipse.ptp.internal.debug.sdm.core.SDMPreferenceConstants;
 import org.eclipse.ptp.internal.debug.sdm.ui.messages.Messages;
@@ -72,15 +73,9 @@ public class SDMPreferencePage extends AbstractPreferencePage {
 	private Button debugServerButton;
 	private Button debugBackendButton;
 	private Button debugProtocolButton;
-	private Button debugClientEnabledButton;
-	private Button debugClientTraceButton;
-	private Button debugClientTraceMoreButton;
-	private Button debugClientOutputButton;
 
 	private boolean debugEnabled = false;
 	private int debugLevel = SDMPreferenceConstants.DEBUG_LEVEL_NONE;
-	private boolean debugClientEnabled = false;
-	private int debugClientLevel = SDMPreferenceConstants.DEBUG_CLIENT_NONE;
 
 	protected WidgetListener listener = new WidgetListener();
 
@@ -112,8 +107,6 @@ public class SDMPreferencePage extends AbstractPreferencePage {
 		initializeValues();
 		debugEnabled = false;
 		debugLevel = SDMPreferenceConstants.DEBUG_LEVEL_NONE;
-		debugClientEnabled = false;
-		debugClientLevel = SDMPreferenceConstants.DEBUG_CLIENT_NONE;
 		updateDebugButtons();
 		super.performDefaults();
 	}
@@ -179,18 +172,6 @@ public class SDMPreferencePage extends AbstractPreferencePage {
 				.setSelection((debugLevel & SDMPreferenceConstants.DEBUG_LEVEL_BACKEND) == SDMPreferenceConstants.DEBUG_LEVEL_BACKEND);
 		debugProtocolButton
 				.setSelection((debugLevel & SDMPreferenceConstants.DEBUG_LEVEL_PROTOCOL) == SDMPreferenceConstants.DEBUG_LEVEL_PROTOCOL);
-
-		debugClientEnabledButton.setSelection(debugClientEnabled);
-		debugClientTraceButton.setEnabled(debugClientEnabled);
-		debugClientTraceMoreButton.setEnabled(debugClientEnabled);
-		debugClientOutputButton.setEnabled(debugClientEnabled);
-
-		debugClientTraceButton
-				.setSelection((debugClientLevel & SDMPreferenceConstants.DEBUG_CLIENT_TRACING) == SDMPreferenceConstants.DEBUG_CLIENT_TRACING);
-		debugClientTraceMoreButton
-				.setSelection((debugClientLevel & SDMPreferenceConstants.DEBUG_CLIENT_TRACING_MORE) == SDMPreferenceConstants.DEBUG_CLIENT_TRACING_MORE);
-		debugClientOutputButton
-				.setSelection((debugClientLevel & SDMPreferenceConstants.DEBUG_CLIENT_OUTPUT) == SDMPreferenceConstants.DEBUG_CLIENT_OUTPUT);
 	}
 
 	private void updateValues() {
@@ -280,10 +261,7 @@ public class SDMPreferencePage extends AbstractPreferencePage {
 
 			public void widgetSelected(SelectionEvent e) {
 				debugEnabled = debugEnabledButton.getSelection();
-				if (debugEnabled) {
-					debugClientEnabled = true;
-					debugClientLevel |= SDMPreferenceConstants.DEBUG_CLIENT_OUTPUT;
-				}
+				PDebugOptions.setDebugging(PDebugOptions.DEBUG_MASTER_OUTPUT, true);
 				updateDebugButtons();
 			}
 		});
@@ -421,82 +399,6 @@ public class SDMPreferencePage extends AbstractPreferencePage {
 			}
 		});
 
-		Composite masterDebugComp = createComposite(debugGroup, 1);
-		gd = new GridData();
-		gd.verticalAlignment = SWT.TOP;
-		masterDebugComp.setLayoutData(gd);
-
-		debugClientEnabledButton = new Button(masterDebugComp, SWT.CHECK);
-		debugClientEnabledButton.setText(Messages.SDMPreferencePage_13);
-		debugClientEnabledButton.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-
-			public void widgetSelected(SelectionEvent e) {
-				debugClientEnabled = debugEnabled || debugClientEnabledButton.getSelection();
-				updateDebugButtons();
-			}
-		});
-
-		debugClientTraceButton = new Button(masterDebugComp, SWT.CHECK);
-		debugClientTraceButton.setText(Messages.SDMPreferencePage_14);
-		gd = new GridData();
-		gd.horizontalIndent = 20;
-		debugClientTraceButton.setLayoutData(gd);
-		debugClientTraceButton.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-
-			public void widgetSelected(SelectionEvent e) {
-				if (debugClientTraceButton.getSelection()) {
-					debugClientLevel |= SDMPreferenceConstants.DEBUG_CLIENT_TRACING;
-				} else {
-					debugClientLevel &= ~SDMPreferenceConstants.DEBUG_CLIENT_TRACING;
-				}
-			}
-		});
-
-		debugClientTraceMoreButton = new Button(masterDebugComp, SWT.CHECK);
-		debugClientTraceMoreButton.setText(Messages.SDMPreferencePage_15);
-		gd = new GridData();
-		gd.horizontalIndent = 20;
-		debugClientTraceMoreButton.setLayoutData(gd);
-		debugClientTraceMoreButton.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-
-			public void widgetSelected(SelectionEvent e) {
-				if (debugClientTraceMoreButton.getSelection()) {
-					debugClientLevel |= SDMPreferenceConstants.DEBUG_CLIENT_TRACING_MORE;
-				} else {
-					debugClientLevel &= ~SDMPreferenceConstants.DEBUG_CLIENT_TRACING_MORE;
-				}
-			}
-		});
-
-		debugClientOutputButton = new Button(masterDebugComp, SWT.CHECK);
-		debugClientOutputButton.setText(Messages.SDMPreferencePage_16);
-		gd = new GridData();
-		gd.horizontalIndent = 20;
-		debugClientOutputButton.setLayoutData(gd);
-		debugClientOutputButton.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-
-			public void widgetSelected(SelectionEvent e) {
-				if (debugClientOutputButton.getSelection()) {
-					debugClientLevel |= SDMPreferenceConstants.DEBUG_CLIENT_OUTPUT;
-				} else if (!debugEnabled) {
-					debugClientLevel &= ~SDMPreferenceConstants.DEBUG_CLIENT_OUTPUT;
-				}
-				updateDebugButtons();
-			}
-		});
-
 		updateDebugButtons();
 
 		sdmBackendCombo.select(0);
@@ -522,8 +424,6 @@ public class SDMPreferencePage extends AbstractPreferencePage {
 		sdmBackendPathText.setText(store.getString(SDMPreferenceConstants.PREFS_SDM_BACKEND_PATH + backend));
 		debugEnabled = store.getBoolean(SDMPreferenceConstants.SDM_DEBUG_ENABLED);
 		debugLevel = store.getInt(SDMPreferenceConstants.SDM_DEBUG_LEVEL);
-		debugClientEnabled = store.getBoolean(SDMPreferenceConstants.SDM_DEBUG_CLIENT_ENABLED);
-		debugClientLevel = store.getInt(SDMPreferenceConstants.SDM_DEBUG_CLIENT_LEVEL);
 		updateDebugButtons();
 	}
 
@@ -537,8 +437,6 @@ public class SDMPreferencePage extends AbstractPreferencePage {
 		IPreferenceStore store = getPreferenceStore();
 		store.setValue(SDMPreferenceConstants.SDM_DEBUG_ENABLED, debugEnabled);
 		store.setValue(SDMPreferenceConstants.SDM_DEBUG_LEVEL, debugLevel);
-		store.setValue(SDMPreferenceConstants.SDM_DEBUG_CLIENT_ENABLED, debugClientEnabled);
-		store.setValue(SDMPreferenceConstants.SDM_DEBUG_CLIENT_LEVEL, debugClientLevel);
 		int index = sdmBackendCombo.getSelectionIndex();
 		if (index >= 0) {
 			String backend = sdmBackendCombo.getItem(index);

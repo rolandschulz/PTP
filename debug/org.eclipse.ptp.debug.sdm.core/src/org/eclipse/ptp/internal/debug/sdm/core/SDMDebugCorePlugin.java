@@ -27,7 +27,6 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
-import org.eclipse.ptp.internal.debug.sdm.core.utils.DebugUtil;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -143,7 +142,6 @@ public class SDMDebugCorePlugin extends Plugin {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		DebugUtil.configurePluginDebugOptions();
 	}
 
 	/**

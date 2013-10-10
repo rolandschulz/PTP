@@ -36,7 +36,7 @@ import org.eclipse.ptp.debug.core.IPSession;
 import org.eclipse.ptp.debug.core.model.IPBreakpoint;
 import org.eclipse.ptp.debug.core.model.IPLineBreakpoint;
 import org.eclipse.ptp.internal.debug.core.PDebugModel;
-import org.eclipse.ptp.internal.debug.core.PDebugUtils;
+import org.eclipse.ptp.internal.debug.core.PDebugOptions;
 import org.eclipse.ptp.internal.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.internal.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.internal.debug.ui.UIDebugManager;
@@ -243,7 +243,7 @@ public class ToggleBreakpointsTarget implements IToggleBreakpointsTargetExtensio
 	 * (org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
 	 */
 	public void toggleMethodBreakpoints(IWorkbenchPart part, ISelection selection) throws CoreException {
-		PDebugUtils.println("*** Not Implemented YET ***"); //$NON-NLS-1$
+		PDebugOptions.trace("*** Not Implemented YET ***"); //$NON-NLS-1$
 	}
 
 	/*

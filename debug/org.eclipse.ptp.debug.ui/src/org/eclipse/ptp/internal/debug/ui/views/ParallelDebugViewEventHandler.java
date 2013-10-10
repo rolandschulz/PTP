@@ -30,6 +30,7 @@ import org.eclipse.ptp.debug.core.event.IPDebugEvent;
 import org.eclipse.ptp.debug.core.event.IPDebugInfo;
 import org.eclipse.ptp.debug.core.event.IPDebugRegisterInfo;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
+import org.eclipse.ptp.internal.debug.core.PDebugOptions;
 import org.eclipse.ptp.internal.debug.ui.PDebugUIUtils;
 import org.eclipse.ptp.internal.debug.ui.PTPDebugUIPlugin;
 import org.eclipse.ptp.internal.debug.ui.UIDebugManager;
@@ -132,7 +133,7 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugViewEventHandle
 			break;
 		case IPDebugEvent.RESUME:
 			time_record = System.currentTimeMillis();
-			System.err.println("================= TIME RESUME: " + time_record); //$NON-NLS-1$
+			PDebugOptions.trace("================= TIME RESUME: " + time_record); //$NON-NLS-1$
 			// ((UIDebugManager)
 			// getPView().getUIManager()).updateVariableValue(false,
 			// info.getAllRegisteredTasks());
@@ -142,7 +143,7 @@ public class ParallelDebugViewEventHandler extends AbstractPDebugViewEventHandle
 			IPSession s = ((UIDebugManager) getPView().getUIManager()).getDebugSession(jobId);
 			if (s != null) {
 				if (s.getTasks().cardinality() == s.getPDISession().getTaskManager().getSuspendedTasks().cardinality()) {
-					System.err.println("================= TIME ALL SUSPENDED: " + (System.currentTimeMillis() - time_record)); //$NON-NLS-1$
+					PDebugOptions.trace("================= TIME ALL SUSPENDED: " + (System.currentTimeMillis() - time_record)); //$NON-NLS-1$
 					time_record = System.currentTimeMillis();
 				}
 			}

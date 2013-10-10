@@ -45,12 +45,6 @@ import org.w3c.dom.Document;
  * 
  */
 public class PDebugUtils {
-	public static final boolean DEBUG = true;
-
-	public static void println(String msg) {
-		System.err.println(msg);
-	}
-
 	public static boolean question(IStatus status, Object source) {
 		Boolean result = Boolean.FALSE;
 		IStatusHandler handler = DebugPlugin.getDefault().getStatusHandler(status);
@@ -97,10 +91,12 @@ public class PDebugUtils {
 	}
 
 	public static char charFromByte(byte value) {
-		if (value >= 0x0 && value <= 0x9)
+		if (value >= 0x0 && value <= 0x9) {
 			return (char) (value + '0');
-		if (value >= 0xa && value <= 0xf)
+		}
+		if (value >= 0xa && value <= 0xf) {
 			return (char) (value - 0xa + 'a');
+		}
 		return '0';
 	}
 
@@ -126,38 +122,44 @@ public class PDebugUtils {
 	}
 
 	public static byte toByte(char[] bytes, boolean le) {
-		if (bytes.length != 2)
+		if (bytes.length != 2) {
 			return 0;
+		}
 		return (byte) Long.parseLong(bytesToString(bytes, le, true), 16);
 	}
 
 	public static short toUnsignedByte(char[] bytes, boolean le) {
-		if (bytes.length != 2)
+		if (bytes.length != 2) {
 			return 0;
+		}
 		return (short) Long.parseLong(bytesToString(bytes, le, false), 16);
 	}
 
 	public static short toShort(char[] bytes, boolean le) {
-		if (bytes.length != 4)
+		if (bytes.length != 4) {
 			return 0;
+		}
 		return (short) Long.parseLong(bytesToString(bytes, le, true), 16);
 	}
 
 	public static int toUnsignedShort(char[] bytes, boolean le) {
-		if (bytes.length != 4)
+		if (bytes.length != 4) {
 			return 0;
+		}
 		return (int) Long.parseLong(bytesToString(bytes, le, false), 16);
 	}
 
 	public static int toInt(char[] bytes, boolean le) {
-		if (bytes.length != 8)
+		if (bytes.length != 8) {
 			return 0;
+		}
 		return (int) Long.parseLong(bytesToString(bytes, le, true), 16);
 	}
 
 	public static long toUnsignedInt(char[] bytes, boolean le) {
-		if (bytes.length != 8)
+		if (bytes.length != 8) {
 			return 0;
+		}
 		return Long.parseLong(bytesToString(bytes, le, false), 16);
 	}
 
@@ -226,9 +228,10 @@ public class PDebugUtils {
 			List<IProject> projects = PDebugUtils.getReferencedProjects(project);
 			Iterator<IProject> it = projects.iterator();
 			while (it.hasNext()) {
-				IProject prj = (IProject) it.next();
-				if (prj.exists() && (prj.equals(project)))
+				IProject prj = it.next();
+				if (prj.exists() && (prj.equals(project))) {
 					return true;
+				}
 			}
 		}
 		return false;
@@ -255,8 +258,9 @@ public class PDebugUtils {
 	}
 
 	public static int getAddressSize() {
-		if (Platform.getOSArch().endsWith("64")) //$NON-NLS-1$
+		if (Platform.getOSArch().endsWith("64")) {
 			return 8;
+		}
 		return 4;
 	}
 }

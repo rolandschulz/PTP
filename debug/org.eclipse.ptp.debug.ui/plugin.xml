@@ -568,5 +568,16 @@
        </enablement>
     </toggleTargetFactory>
  </extension>
+ <extension
+       point="org.eclipse.ui.trace.traceComponents">
+    <component
+          id="org.eclipse.ptp.debug.core.component"
+          label="PTP Debug Core">
+       <bundle
+             consumed="true"
+             name="org.eclipse.ptp.debug.core">
+       </bundle>
+    </component>
+ </extension>
 
 </plugin>

@@ -60,6 +60,7 @@ public class DStoreServer extends AbstractRemoteServerRunner {
 			} catch (IOException e) {
 				final IStatus status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, 0, e.getMessage(), e);
 				Display.getDefault().asyncExec(new Runnable() {
+					@Override
 					public void run() {
 						ErrorDialog.openError(Display.getDefault().getActiveShell(), Messages.DStoreServer_serverError,
 								Messages.DStoreServer_unableToStart, status);
@@ -142,16 +143,13 @@ public class DStoreServer extends AbstractRemoteServerRunner {
 			try {
 				port = getRemoteConnection().forwardLocalPort("localhost", fDStorePort, subMon.newChild(10)); //$NON-NLS-1$
 			} catch (RemoteConnectionException e) {
-				if (DebugUtil.SERVER_TRACING) {
-					System.err.println(Messages.DStoreServer_1 + e.getLocalizedMessage());
-				}
+				ServerDebugOptions
+						.trace(ServerDebugOptions.DEBUG_SERVER_TRACING, Messages.DStoreServer_1 + e.getLocalizedMessage());
 				return false;
 			}
 			getClientConnection().setHost("localhost"); //$NON-NLS-1$
 			getClientConnection().setPort(Integer.toString(port));
-			if (DebugUtil.SERVER_TRACING) {
-				System.out.println(Messages.DStoreServer_2);
-			}
+			ServerDebugOptions.trace(ServerDebugOptions.DEBUG_SERVER_TRACING, Messages.DStoreServer_2);
 			ConnectionStatus status = getClientConnection().connect(null, 0);
 			if (status.isConnected()) {
 				DataStore dataStore = getClientConnection().getDataStore();
@@ -165,9 +163,7 @@ public class DStoreServer extends AbstractRemoteServerRunner {
 					// Data store will be disconnected if error occurs
 					return false;
 				}
-				if (DebugUtil.SERVER_TRACING) {
-					System.out.println(Messages.DStoreServer_3);
-				}
+				ServerDebugOptions.trace(ServerDebugOptions.DEBUG_SERVER_TRACING, Messages.DStoreServer_3);
 				return true;
 			}
 			return false;
@@ -190,9 +186,7 @@ public class DStoreServer extends AbstractRemoteServerRunner {
 		case WAITING_FOR_SUCCESS_STRING:
 			if (output.startsWith(SUCCESS_STRING)) {
 				fState = DStoreState.WAITING_FOR_PORT;
-				if (DebugUtil.SERVER_TRACING) {
-					System.out.println(Messages.DStoreServer_4);
-				}
+				ServerDebugOptions.trace(ServerDebugOptions.DEBUG_SERVER_TRACING, Messages.DStoreServer_4);
 			}
 			break;
 
@@ -200,9 +194,7 @@ public class DStoreServer extends AbstractRemoteServerRunner {
 			if (output.matches("^[0-9]+$")) { //$NON-NLS-1$
 				fDStorePort = Integer.parseInt(output);
 				fState = DStoreState.COMPLETED;
-				if (DebugUtil.SERVER_TRACING) {
-					System.out.println(Messages.DStoreServer_5 + fDStorePort);
-				}
+				ServerDebugOptions.trace(ServerDebugOptions.DEBUG_SERVER_TRACING, Messages.DStoreServer_5 + fDStorePort);
 			}
 			break;
 

@@ -11,7 +11,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.debug.ui,
  org.eclipse.jface.text,
  org.eclipse.ui.forms,
- org.eclipse.ptp.core
+ org.eclipse.ptp.core,
+ org.eclipse.ui.trace
 Bundle-ActivationPolicy: lazy
 Export-Package: 
  org.eclipse.ptp.internal.ui;x-friends:="org.eclipse.ptp.debug.ui",

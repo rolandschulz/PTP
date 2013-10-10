@@ -100,8 +100,8 @@ public class PTPDebugCorePlugin extends Plugin {
 			try {
 				setDispatching(true);
 				Object[] listeners = getEventListeners();
-				for (int i = 0; i < listeners.length; i++) {
-					fListener = (IPDebugEventListener) listeners[i];
+				for (Object listener : listeners) {
+					fListener = (IPDebugEventListener) listener;
 					SafeRunner.run(this);
 				}
 
@@ -112,10 +112,12 @@ public class PTPDebugCorePlugin extends Plugin {
 			fListener = null;
 		}
 
+		@Override
 		public void handleException(Throwable exception) {
 			log(new Status(IStatus.ERROR, getUniqueIdentifier(), INTERNAL_ERROR, Messages.PTPDebugCorePlugin_0, exception));
 		}
 
+		@Override
 		public void run() throws Exception {
 			fListener.handleDebugEvent(fEvent);
 		}
@@ -227,8 +229,9 @@ public class PTPDebugCorePlugin extends Plugin {
 	 * @param event
 	 */
 	public void fireDebugEvent(IPDebugEvent event) {
-		if (isShuttingDown() || event == null || fEventListeners.isEmpty())
+		if (isShuttingDown() || event == null || fEventListeners.isEmpty()) {
 			return;
+		}
 		synchronized (fEventQueue) {
 			fEventQueue.add(event);
 		}
@@ -327,17 +330,22 @@ public class PTPDebugCorePlugin extends Plugin {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
+		PDebugOptions.configure(context);
 		ResourcesPlugin.getWorkspace().addSaveParticipant(getUniqueIdentifier(), new ISaveParticipant() {
+			@Override
 			public void saving(ISaveContext saveContext) throws CoreException {
 				Preferences.savePreferences(getUniqueIdentifier());
 			}
 
+			@Override
 			public void rollback(ISaveContext saveContext) {
 			}
 
+			@Override
 			public void prepareToSave(ISaveContext saveContext) throws CoreException {
 			}
 
+			@Override
 			public void doneSaving(ISaveContext saveContext) {
 			}
 		});
@@ -371,8 +379,9 @@ public class PTPDebugCorePlugin extends Plugin {
 	 * 
 	 */
 	private void disposeCommonSourceLookupDirector() {
-		if (fCommonSourceLookupDirector != null)
+		if (fCommonSourceLookupDirector != null) {
 			fCommonSourceLookupDirector.dispose();
+		}
 	}
 
 	private void disposeDebugConfigurations() {
@@ -418,8 +427,7 @@ public class PTPDebugCorePlugin extends Plugin {
 		if (extensionPoint != null) {
 			IConfigurationElement[] infos = extensionPoint.getConfigurationElements();
 			fDebugConfigurations = new HashMap<String, PDebugConfiguration>(infos.length);
-			for (int i = 0; i < infos.length; i++) {
-				IConfigurationElement configurationElement = infos[i];
+			for (IConfigurationElement configurationElement : infos) {
 				PDebugConfiguration configType = new PDebugConfiguration(configurationElement);
 				fDebugConfigurations.put(configType.getID(), configType);
 			}

@@ -153,7 +153,7 @@ public class PTPUIPlugin extends AbstractUIPlugin {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		DebugUtil.configurePluginDebugOptions();
+		PTPUIDebugOptions.configure(context);
 	}
 
 	/*

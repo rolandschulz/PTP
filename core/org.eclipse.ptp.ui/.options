@@ -1,5 +1,4 @@
-org.eclipse.ptp.ui/debug=true
+org.eclipse.ptp.ui/debug=false
 
 # View tracing
-org.eclipse.ptp.ui/views/jobs/tracing=false
-org.eclipse.ptp.ui/views/machines/tracing=false
+org.eclipse.ptp.ui/debug/views/jobs/tracing=false

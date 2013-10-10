@@ -24,8 +24,8 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ptp.debug.core.TaskSet;
+import org.eclipse.ptp.internal.debug.core.PDebugOptions;
 import org.eclipse.ptp.internal.debug.sdm.core.messages.Messages;
-import org.eclipse.ptp.internal.debug.sdm.core.utils.DebugUtil;
 import org.eclipse.ptp.proxy.debug.client.AbstractProxyDebugClient;
 import org.eclipse.ptp.proxy.debug.command.IProxyDebugCommand;
 import org.eclipse.ptp.proxy.debug.command.ProxyDebugBreakpointAfterCommand;
@@ -370,7 +370,7 @@ public class ProxyDebugClient extends AbstractProxyDebugClient {
 	 * @throws IOException
 	 */
 	public boolean waitConnect(IProgressMonitor monitor) throws IOException {
-		DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, Messages.ProxyDebugClient_0);
+		PDebugOptions.trace(PDebugOptions.DEBUG_MASTER, Messages.ProxyDebugClient_0);
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}

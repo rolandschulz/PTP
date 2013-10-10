@@ -56,32 +56,6 @@ public interface SDMPreferenceConstants {
 	public static final int DEBUG_LEVEL_PROTOCOL = 0x40;
 
 	/**
-	 * @since 4.0
-	 */
-	public static final String SDM_DEBUG_CLIENT_ENABLED = PLUGIN_ID + ".debug_client_enabled"; //$NON-NLS-1$
-	/**
-	 * @since 4.0
-	 */
-	public static final String SDM_DEBUG_CLIENT_LEVEL = PLUGIN_ID + ".debug_client_level"; //$NON-NLS-1$
-
-	/**
-	 * @since 4.0
-	 */
-	public static final int DEBUG_CLIENT_NONE = 0x00;
-	/**
-	 * @since 4.0
-	 */
-	public static final int DEBUG_CLIENT_TRACING = 0x01;
-	/**
-	 * @since 4.0
-	 */
-	public static final int DEBUG_CLIENT_TRACING_MORE = 0x02;
-	/**
-	 * @since 4.0
-	 */
-	public static final int DEBUG_CLIENT_OUTPUT = 0x04;
-
-	/**
 	 * Default SDM backend
 	 * 
 	 * @since 6.0

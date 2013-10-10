@@ -31,4 +31,15 @@
               id="org.eclipse.ptp.rdt.server.dstore.RemoteToolsCIndexServiceProvider">
         </providerContributor>
      </extension>
+        <extension
+              point="org.eclipse.ui.trace.traceComponents">
+           <component
+                 id="org.eclipse.ptp.rdt.server.dstore.component"
+                 label="RDT DStore Server">
+              <bundle
+                    consumed="true"
+                    name="org.eclipse.ptp.rdt.server.dstore">
+              </bundle>
+           </component>
+        </extension>
 </plugin>

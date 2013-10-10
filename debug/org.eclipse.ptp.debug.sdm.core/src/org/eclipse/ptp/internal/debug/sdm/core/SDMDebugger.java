@@ -56,7 +56,6 @@ import org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory;
 import org.eclipse.ptp.internal.debug.core.pdi.Session;
 import org.eclipse.ptp.internal.debug.sdm.core.messages.Messages;
 import org.eclipse.ptp.internal.debug.sdm.core.pdi.PDIDebugger;
-import org.eclipse.ptp.internal.debug.sdm.core.utils.DebugUtil;
 import org.eclipse.remote.core.IRemoteConnection;
 import org.eclipse.remote.core.IRemoteFileManager;
 import org.eclipse.remote.core.IRemoteServices;
@@ -194,7 +193,7 @@ public class SDMDebugger implements IPDebugger {
 											if (!destInfo.getAttribute(EFS.ATTRIBUTE_EXECUTABLE)) {
 												destInfo.setAttribute(EFS.ATTRIBUTE_EXECUTABLE, true);
 												/*
-												 * Make sure sdm is writeable to world
+												 * Make sure sdm is not writeable to world
 												 */
 												destInfo.setAttribute(EFS.ATTRIBUTE_OTHER_WRITE, false);
 												destPath.putInfo(destInfo, EFS.SET_ATTRIBUTES, progress.newChild(10));
@@ -269,18 +268,6 @@ public class SDMDebugger implements IPDebugger {
 	 */
 	public synchronized void initialize(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor, 30);
-		if (Preferences.getBoolean(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUG_CLIENT_ENABLED)) {
-			int level = Preferences.getInt(SDMDebugCorePlugin.getUniqueIdentifier(), SDMPreferenceConstants.SDM_DEBUG_CLIENT_LEVEL);
-			if ((level & SDMPreferenceConstants.DEBUG_CLIENT_TRACING) == SDMPreferenceConstants.DEBUG_CLIENT_TRACING) {
-				DebugUtil.SDM_MASTER_TRACING = true;
-			}
-			if ((level & SDMPreferenceConstants.DEBUG_CLIENT_TRACING_MORE) == SDMPreferenceConstants.DEBUG_CLIENT_TRACING_MORE) {
-				DebugUtil.SDM_MASTER_TRACING_MORE = true;
-			}
-			if ((level & SDMPreferenceConstants.DEBUG_CLIENT_OUTPUT) == SDMPreferenceConstants.DEBUG_CLIENT_OUTPUT) {
-				DebugUtil.SDM_MASTER_OUTPUT_TRACING = true;
-			}
-		}
 
 		ILaunchConfigurationWorkingCopy workingCopy = configuration.getWorkingCopy();
 

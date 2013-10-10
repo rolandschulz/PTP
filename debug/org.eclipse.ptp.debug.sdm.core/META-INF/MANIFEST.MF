@@ -32,8 +32,7 @@ Export-Package: org.eclipse.ptp.internal.debug.sdm.core;x-friends:="org.eclipse.
  org.eclipse.ptp.internal.debug.sdm.core.proxy;x-friends:="org.eclipse.ptp.debug.sdm.ui";
   uses:="org.eclipse.ptp.core.util,
    org.eclipse.core.runtime,
-   org.eclipse.ptp.proxy.debug.client",
- org.eclipse.ptp.internal.debug.sdm.core.utils;x-friends:="org.eclipse.ptp.debug.sdm.ui"
+   org.eclipse.ptp.proxy.debug.client"
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.debug.core,
  org.eclipse.core.filesystem,

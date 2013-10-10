@@ -1,0 +1,5 @@
+# Trace info for PTP debugger
+org.eclipse.ptp.debug.core/debug=false
+org.eclipse.ptp.debug.core/debug/master=false
+org.eclipse.ptp.debug.core/debug/master/more=false
+org.eclipse.ptp.debug.core/debug/master/output=false

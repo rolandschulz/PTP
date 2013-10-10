@@ -41,7 +41,7 @@ import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeUnion;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFTypeVoid;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIFValue;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IValueParent;
-import org.eclipse.ptp.internal.debug.core.PDebugUtils;
+import org.eclipse.ptp.internal.debug.core.PDebugOptions;
 import org.eclipse.ptp.internal.debug.core.pdi.aif.AIF;
 import org.eclipse.ptp.internal.debug.core.pdi.aif.AIFType;
 import org.eclipse.ptp.internal.debug.core.pdi.aif.AIFTypeAddress;
@@ -430,7 +430,7 @@ public class AIFFactory {
 		String debugStr = ""; //$NON-NLS-1$
 
 		if (fmt == null || fmt.length() == 0) {
-			PDebugUtils.println(Messages.AIFFactory_0 + fmt);
+			PDebugOptions.trace(Messages.AIFFactory_0 + fmt);
 			fLastType = UNKNOWNTYPE;
 			return fmt;
 		}
@@ -508,13 +508,13 @@ public class AIFFactory {
 			type = new AIFTypeNamed();
 			break;
 		default:
-			PDebugUtils.println(Messages.AIFFactory_20 + fmt);
+			PDebugOptions.trace(Messages.AIFFactory_20 + fmt);
 			fLastType = new AIFTypeIncomplete();
 			return ""; //$NON-NLS-1$
 		}
 
 		fmt = type.parse(fmt);
-		PDebugUtils.println(debugStr + type.toString());
+		PDebugOptions.trace(debugStr + type.toString());
 		fLastType = type;
 		return fmt;
 

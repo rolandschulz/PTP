@@ -22,7 +22,8 @@ Require-Bundle: org.eclipse.jface.text,
  org.eclipse.ptp.ui,
  org.eclipse.remote.core,
  org.eclipse.remote.ui,
- org.eclipse.ptp.debug.core
+ org.eclipse.ptp.debug.core,
+ org.eclipse.ui.trace
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: %pluginProvider
 Export-Package: org.eclipse.ptp.internal.debug.ui;x-friends:="org.eclipse.ptp.launch,org.eclipse.ptp.debug.sdm.ui",

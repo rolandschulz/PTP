@@ -13,9 +13,9 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.core.jobs.IJobControl;
 import org.eclipse.ptp.debug.core.launch.IPLaunch;
+import org.eclipse.ptp.internal.debug.core.PDebugOptions;
 import org.eclipse.ptp.internal.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.internal.debug.sdm.core.messages.Messages;
-import org.eclipse.ptp.internal.debug.sdm.core.utils.DebugUtil;
 import org.eclipse.remote.core.IRemoteConnection;
 import org.eclipse.remote.core.IRemoteFileManager;
 import org.eclipse.remote.core.IRemoteProcess;
@@ -42,16 +42,16 @@ public class SDMRunner extends Job {
 		this.setPriority(Job.LONG);
 		this.setSystem(true);
 		this.connection = conn;
-		DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING_MORE, Messages.SDMRunner_4);
+		PDebugOptions.trace(PDebugOptions.DEBUG_MASTER_MORE, Messages.SDMRunner_4);
 	}
 
 	public void setCommand(List<String> command) {
-		DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING_MORE, Messages.SDMRunner_5, command.toString());
+		PDebugOptions.trace(PDebugOptions.DEBUG_MASTER_MORE, Messages.SDMRunner_5, command.toString());
 		this.command = command;
 	}
 
 	public void setWorkDir(String workDir) {
-		DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING_MORE, Messages.SDMRunner_6, workDir);
+		PDebugOptions.trace(PDebugOptions.DEBUG_MASTER_MORE, Messages.SDMRunner_6, workDir);
 		this.workDir = workDir;
 	}
 
@@ -60,7 +60,7 @@ public class SDMRunner extends Job {
 	}
 
 	protected synchronized void setSdmState(SDMMasterState sdmState) {
-		DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING_MORE, Messages.SDMRunner_7, sdmState.toString());
+		PDebugOptions.trace(PDebugOptions.DEBUG_MASTER_MORE, Messages.SDMRunner_7, sdmState.toString());
 		this.sdmState = sdmState;
 		this.notifyAll();
 	}
@@ -69,7 +69,7 @@ public class SDMRunner extends Job {
 	 * @since 6.0
 	 */
 	public void setLaunch(IPLaunch launch) {
-		DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING_MORE, Messages.SDMRunner_8, launch.getJobId());
+		PDebugOptions.trace(PDebugOptions.DEBUG_MASTER_MORE, Messages.SDMRunner_8, launch.getJobId());
 		this.launch = launch;
 	}
 
@@ -78,7 +78,7 @@ public class SDMRunner extends Job {
 		assert command != null;
 		assert sdmProcess == null;
 
-		DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, Messages.SDMRunner_9);
+		PDebugOptions.trace(PDebugOptions.DEBUG_MASTER, Messages.SDMRunner_9);
 		/*
 		 * Catch all try...catch
 		 */
@@ -99,7 +99,7 @@ public class SDMRunner extends Job {
 			/*
 			 * Wait some time to assure that SDM servers and front end have started.
 			 */
-			DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, Messages.SDMRunner_10);
+			PDebugOptions.trace(PDebugOptions.DEBUG_MASTER, Messages.SDMRunner_10);
 			if (monitor.isCanceled()) {
 				throw new InterruptedException();
 			}
@@ -110,7 +110,7 @@ public class SDMRunner extends Job {
 			/*
 			 * Create process.
 			 */
-			DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, Messages.SDMRunner_11);
+			PDebugOptions.trace(PDebugOptions.DEBUG_MASTER, Messages.SDMRunner_11);
 			if (monitor.isCanceled()) {
 				throw new InterruptedException();
 			}
@@ -120,7 +120,7 @@ public class SDMRunner extends Job {
 			final BufferedReader err_reader = new BufferedReader(new InputStreamReader(sdmProcess.getErrorStream()));
 			final BufferedReader out_reader = new BufferedReader(new InputStreamReader(sdmProcess.getInputStream()));
 
-			if (DebugUtil.SDM_MASTER_OUTPUT_TRACING) {
+			if (PDebugOptions.isDebugging(PDebugOptions.DEBUG_MASTER_OUTPUT)) {
 				new Thread(new Runnable() {
 					public void run() {
 						try {
@@ -140,7 +140,7 @@ public class SDMRunner extends Job {
 				}, Messages.SDMRunner_13).start();
 			}
 
-			if (DebugUtil.SDM_MASTER_OUTPUT_TRACING) {
+			if (PDebugOptions.isDebugging(PDebugOptions.DEBUG_MASTER_OUTPUT)) {
 				new Thread(new Runnable() {
 					public void run() {
 						try {
@@ -164,7 +164,7 @@ public class SDMRunner extends Job {
 			 * Wait while running but not canceled.
 			 */
 			setSdmState(SDMMasterState.RUNNING);
-			DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING_MORE, Messages.SDMRunner_16);
+			PDebugOptions.trace(PDebugOptions.DEBUG_MASTER_MORE, Messages.SDMRunner_16);
 			while (!sdmProcess.isCompleted()) {
 				synchronized (this) {
 					wait(500);
@@ -179,13 +179,13 @@ public class SDMRunner extends Job {
 			/*
 			 * Check if process terminated successfully (if not canceled).
 			 */
-			DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, Messages.SDMRunner_17, sdmProcess.exitValue());
+			PDebugOptions.trace(PDebugOptions.DEBUG_MASTER, Messages.SDMRunner_17, Integer.toString(sdmProcess.exitValue()));
 			if (sdmProcess.exitValue() != 0) {
 				if (!monitor.isCanceled()) {
 					throw new CoreException(new Status(IStatus.ERROR, SDMDebugCorePlugin.getUniqueIdentifier(), NLS.bind(
 							Messages.SDMRunner_2, sdmProcess.exitValue())));
 				} else {
-					DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, Messages.SDMRunner_18);
+					PDebugOptions.trace(PDebugOptions.DEBUG_MASTER, Messages.SDMRunner_18);
 				}
 			}
 			setSdmState(SDMMasterState.FINISHED);
@@ -194,14 +194,14 @@ public class SDMRunner extends Job {
 			/*
 			 * Terminate the job, handling the error.
 			 */
-			DebugUtil.error(DebugUtil.SDM_MASTER_TRACING, Messages.SDMRunner_19, e);
+			PDebugOptions.trace(PDebugOptions.DEBUG_MASTER, Messages.SDMRunner_19, e.toString());
 			synchronized (this) {
-				DebugUtil.error(DebugUtil.SDM_MASTER_TRACING, Messages.SDMRunner_20, e);
+				PDebugOptions.trace(PDebugOptions.DEBUG_MASTER, Messages.SDMRunner_20, e.toString());
 				sdmProcess.destroy();
 			}
 			try {
 				if (launch != null) {
-					DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, Messages.SDMRunner_21, launch.getJobId());
+					PDebugOptions.trace(PDebugOptions.DEBUG_MASTER, Messages.SDMRunner_21, launch.getJobId());
 					launch.getJobControl().control(launch.getJobId(), IJobControl.TERMINATE_OPERATION, null);
 				}
 			} catch (CoreException e1) {
@@ -218,7 +218,7 @@ public class SDMRunner extends Job {
 				return new Status(IStatus.ERROR, SDMDebugCorePlugin.getUniqueIdentifier(), Messages.SDMRunner_3, e);
 			}
 		} finally {
-			DebugUtil.trace(DebugUtil.SDM_MASTER_TRACING, Messages.SDMRunner_22);
+			PDebugOptions.trace(PDebugOptions.DEBUG_MASTER, Messages.SDMRunner_22);
 			synchronized (this) {
 				sdmProcess = null;
 			}

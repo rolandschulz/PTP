@@ -55,7 +55,7 @@ import org.eclipse.ptp.debug.core.pdi.model.IPDIThread;
 import org.eclipse.ptp.debug.core.pdi.model.aif.IAIF;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIRequestFactory;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIStartDebuggerRequest;
-import org.eclipse.ptp.internal.debug.core.PDebugUtils;
+import org.eclipse.ptp.internal.debug.core.PDebugOptions;
 import org.eclipse.ptp.internal.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.internal.debug.core.pdi.messages.Messages;
 
@@ -90,7 +90,7 @@ public class Session implements IPDISession {
 			}
 			MultiStatus failed = null;
 			monitor.beginTask(getName(), runnables.length);
-			PDebugUtils.println(Messages.Session_16 + runnables.length);
+			PDebugOptions.trace(Messages.Session_16 + runnables.length);
 			for (Runnable runnable : runnables) {
 				try {
 					runnable.run();
@@ -177,6 +177,7 @@ public class Session implements IPDISession {
 	 * .core.runtime.IProgressMonitor, java.lang.String, java.lang.String,
 	 * java.lang.String, java.lang.String[])
 	 */
+	@Override
 	public void connectToDebugger(IProgressMonitor monitor, String app, String path, String dir, String[] args) throws PDIException {
 		SubMonitor progress = SubMonitor.convert(monitor, total_tasks + 10);
 		try {
@@ -204,6 +205,7 @@ public class Session implements IPDISession {
 	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#exit()
 	 */
+	@Override
 	public void exit() throws PDIException {
 		if (status != EXITING && status != EXITED) {
 			setStatus(EXITING);
@@ -233,6 +235,7 @@ public class Session implements IPDISession {
 	/**
 	 * @since 4.0
 	 */
+	@Override
 	public IPDITarget findTarget(TaskSet qTasks) throws PDIException {
 		IPDITarget target = targetManager.getTarget(qTasks);
 		if (target == null) {
@@ -246,6 +249,7 @@ public class Session implements IPDISession {
 	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getBreakpointManager()
 	 */
+	@Override
 	public IPDIBreakpointManager getBreakpointManager() {
 		return breakpointManager;
 	}
@@ -265,6 +269,7 @@ public class Session implements IPDISession {
 	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getDebugger()
 	 */
+	@Override
 	public IPDIDebugger getDebugger() {
 		return debugger;
 	}
@@ -274,6 +279,7 @@ public class Session implements IPDISession {
 	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getEventFactory()
 	 */
+	@Override
 	public IPDIEventFactory getEventFactory() {
 		return eventFactory;
 	}
@@ -283,6 +289,7 @@ public class Session implements IPDISession {
 	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getEventManager()
 	 */
+	@Override
 	public IPDIEventManager getEventManager() {
 		return eventManager;
 	}
@@ -292,6 +299,7 @@ public class Session implements IPDISession {
 	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getEventRequestManager()
 	 */
+	@Override
 	public IPDIEventRequestManager getEventRequestManager() {
 		return eventRequestManager;
 	}
@@ -301,6 +309,7 @@ public class Session implements IPDISession {
 	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getExpressionManager()
 	 */
+	@Override
 	public IPDIExpressionManager getExpressionManager() {
 		return expressionManager;
 	}
@@ -310,6 +319,7 @@ public class Session implements IPDISession {
 	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getJobID()
 	 */
+	@Override
 	public String getJobID() {
 		return job_id;
 	}
@@ -319,6 +329,7 @@ public class Session implements IPDISession {
 	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getMemoryManager()
 	 */
+	@Override
 	public IPDIMemoryManager getMemoryManager() {
 		return memoryManager;
 	}
@@ -328,6 +339,7 @@ public class Session implements IPDISession {
 	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getModelFactory()
 	 */
+	@Override
 	public IPDIModelFactory getModelFactory() {
 		return modelFactory;
 	}
@@ -337,6 +349,7 @@ public class Session implements IPDISession {
 	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getRegisterManager()
 	 */
+	@Override
 	public IPDIRegisterManager getRegisterManager() {
 		return registerManager;
 	}
@@ -346,6 +359,7 @@ public class Session implements IPDISession {
 	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getRequestFactory()
 	 */
+	@Override
 	public IPDIRequestFactory getRequestFactory() {
 		return requestFactory;
 	}
@@ -355,6 +369,7 @@ public class Session implements IPDISession {
 	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDISessionObject#getSession()
 	 */
+	@Override
 	public IPDISession getSession() {
 		return this;
 	}
@@ -364,6 +379,7 @@ public class Session implements IPDISession {
 	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getSignalManager()
 	 */
+	@Override
 	public IPDISignalManager getSignalManager() {
 		return signalManager;
 	}
@@ -376,6 +392,7 @@ public class Session implements IPDISession {
 	/**
 	 * @return
 	 */
+	@Override
 	public IPDISourceManager getSourceManager() {
 		return sourceManager;
 	}
@@ -385,6 +402,7 @@ public class Session implements IPDISession {
 	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getStatus()
 	 */
+	@Override
 	public int getStatus() {
 		return status;
 	}
@@ -394,6 +412,7 @@ public class Session implements IPDISession {
 	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getTargetManager()
 	 */
+	@Override
 	public IPDITargetManager getTargetManager() {
 		return targetManager;
 	}
@@ -403,6 +422,7 @@ public class Session implements IPDISession {
 	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getTaskManager()
 	 */
+	@Override
 	public IPDITaskManager getTaskManager() {
 		return taskManager;
 	}
@@ -415,6 +435,7 @@ public class Session implements IPDISession {
 	/**
 	 * @since 4.0
 	 */
+	@Override
 	public TaskSet getTasks() {
 		TaskSet tasks = new TaskSet(total_tasks);
 		tasks.set(0, total_tasks);
@@ -426,6 +447,7 @@ public class Session implements IPDISession {
 	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getThreadManager()
 	 */
+	@Override
 	public IPDIThreadManager getThreadManager() {
 		return threadManager;
 	}
@@ -435,6 +457,7 @@ public class Session implements IPDISession {
 	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getTimeout()
 	 */
+	@Override
 	public long getTimeout() {
 		return timeout;
 	}
@@ -444,6 +467,7 @@ public class Session implements IPDISession {
 	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getTotalTasks()
 	 */
+	@Override
 	public int getTotalTasks() {
 		return total_tasks;
 	}
@@ -453,6 +477,7 @@ public class Session implements IPDISession {
 	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#getVariableManager()
 	 */
+	@Override
 	public IPDIVariableManager getVariableManager() {
 		return variableManager;
 	}
@@ -467,6 +492,7 @@ public class Session implements IPDISession {
 	/**
 	 * @since 4.0
 	 */
+	@Override
 	public boolean isSuspended(TaskSet tasks) {
 		return taskManager.isAllSuspended(tasks);
 	}
@@ -481,6 +507,7 @@ public class Session implements IPDISession {
 	/**
 	 * @since 4.0
 	 */
+	@Override
 	public boolean isTerminated(TaskSet tasks) {
 		return taskManager.isAllTerminated(tasks);
 	}
@@ -498,11 +525,13 @@ public class Session implements IPDISession {
 	/**
 	 * @since 4.0
 	 */
+	@Override
 	public synchronized void processRunningEvent(TaskSet tasks) {
 		IPDITarget[] targets = targetManager.getTargets();
 		for (final IPDITarget target : targets) {
 			if (target.getTasks().intersects(tasks)) {
 				Runnable runnable = new Runnable() {
+					@Override
 					public void run() {
 						target.setSupended(false);
 					}
@@ -522,11 +551,13 @@ public class Session implements IPDISession {
 	/**
 	 * @since 4.0
 	 */
+	@Override
 	public synchronized void processSupsendedEvent(TaskSet tasks, final int thread_id, final String[] vars) {
 		IPDITarget[] targets = targetManager.getTargets();
 		for (final IPDITarget target : targets) {
 			if (target.getTasks().intersects(tasks)) {
 				Runnable runnable = new Runnable() {
+					@Override
 					public void run() {
 						target.setSupended(true);
 						target.updateState(thread_id);
@@ -583,6 +614,7 @@ public class Session implements IPDISession {
 	 * org.eclipse.ptp.debug.core.pdi.IPDISession#queueRunnable(java.lang.Runnable
 	 * )
 	 */
+	@Override
 	public void queueRunnable(Runnable runnable) {
 		notifyJob.addRunnable(runnable);
 	}
@@ -597,6 +629,7 @@ public class Session implements IPDISession {
 	/**
 	 * @since 4.0
 	 */
+	@Override
 	public void restart(TaskSet tasks) throws PDIException {
 		checkStatus();
 		throw new PDIException(tasks, Messages.Session_2);
@@ -612,6 +645,7 @@ public class Session implements IPDISession {
 	/**
 	 * @since 4.0
 	 */
+	@Override
 	public void resume(TaskSet tasks, boolean passSignal) throws PDIException {
 		checkStatus();
 		if (passSignal) {
@@ -634,6 +668,7 @@ public class Session implements IPDISession {
 	/**
 	 * @since 4.0
 	 */
+	@Override
 	public void resume(TaskSet tasks, IPDILocation location) throws PDIException {
 		checkStatus();
 		taskManager.getSuspendedTasks(tasks);
@@ -653,6 +688,7 @@ public class Session implements IPDISession {
 	/**
 	 * @since 4.0
 	 */
+	@Override
 	public void resume(TaskSet tasks, IPDISignal signal) throws PDIException {
 		checkStatus();
 		taskManager.getSuspendedTasks(tasks);
@@ -667,6 +703,7 @@ public class Session implements IPDISession {
 	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#setRequestTimeout(long)
 	 */
+	@Override
 	public void setRequestTimeout(long timeout) {
 		this.timeout = timeout;
 	}
@@ -676,6 +713,7 @@ public class Session implements IPDISession {
 	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#setStatus(int)
 	 */
+	@Override
 	public void setStatus(int status) {
 		waitLock.lock();
 		try {
@@ -690,6 +728,7 @@ public class Session implements IPDISession {
 	 * 
 	 * @see org.eclipse.ptp.debug.core.pdi.IPDISession#shutdown(boolean)
 	 */
+	@Override
 	public void shutdown(boolean force) {
 		try {
 			if (!force) {
@@ -727,6 +766,7 @@ public class Session implements IPDISession {
 	/**
 	 * @since 4.0
 	 */
+	@Override
 	public void start(TaskSet tasks) throws PDIException {
 		checkStatus();
 		eventRequestManager.addEventRequest(getRequestFactory().getResumeRequest(tasks, false));
@@ -742,6 +782,7 @@ public class Session implements IPDISession {
 	/**
 	 * @since 4.0
 	 */
+	@Override
 	public void stepInto(TaskSet tasks, int count) throws PDIException {
 		checkStatus();
 		taskManager.getSuspendedTasks(tasks);
@@ -761,6 +802,7 @@ public class Session implements IPDISession {
 	/**
 	 * @since 4.0
 	 */
+	@Override
 	public void stepIntoInstruction(TaskSet tasks, int count) throws PDIException {
 		checkStatus();
 		taskManager.getSuspendedTasks(tasks);
@@ -780,6 +822,7 @@ public class Session implements IPDISession {
 	/**
 	 * @since 4.0
 	 */
+	@Override
 	public void stepOver(TaskSet tasks, int count) throws PDIException {
 		checkStatus();
 		taskManager.getSuspendedTasks(tasks);
@@ -799,6 +842,7 @@ public class Session implements IPDISession {
 	/**
 	 * @since 4.0
 	 */
+	@Override
 	public void stepOverInstruction(TaskSet tasks, int count) throws PDIException {
 		checkStatus();
 		taskManager.getSuspendedTasks(tasks);
@@ -818,6 +862,7 @@ public class Session implements IPDISession {
 	/**
 	 * @since 4.0
 	 */
+	@Override
 	public void stepReturn(TaskSet tasks, IAIF aif) throws PDIException {
 		checkStatus();
 		taskManager.getSuspendedTasks(tasks);
@@ -837,6 +882,7 @@ public class Session implements IPDISession {
 	/**
 	 * @since 4.0
 	 */
+	@Override
 	public void stepReturn(TaskSet tasks, int count) throws PDIException {
 		checkStatus();
 		taskManager.getCanStepReturnTasks(tasks);
@@ -856,6 +902,7 @@ public class Session implements IPDISession {
 	/**
 	 * @since 4.0
 	 */
+	@Override
 	public void stepUntil(TaskSet tasks, IPDILocation location) throws PDIException {
 		checkStatus();
 		taskManager.getSuspendedTasks(tasks);
@@ -875,6 +922,7 @@ public class Session implements IPDISession {
 	/**
 	 * @since 4.0
 	 */
+	@Override
 	public void suspend(TaskSet tasks) throws PDIException {
 		checkStatus();
 		taskManager.getRunningTasks(tasks);
@@ -894,6 +942,7 @@ public class Session implements IPDISession {
 	/**
 	 * @since 4.0
 	 */
+	@Override
 	public void terminate(TaskSet tasks) throws PDIException {
 		checkStatus();
 		taskManager.getNonTerminatedTasks(tasks);
@@ -920,6 +969,7 @@ public class Session implements IPDISession {
 	/**
 	 * @since 4.0
 	 */
+	@Override
 	public void validateStepReturn(TaskSet tasks) throws PDIException {
 		/*
 		 * taskManager.getUnregisteredTasks(tasks); if (!tasks.isEmpty()) {

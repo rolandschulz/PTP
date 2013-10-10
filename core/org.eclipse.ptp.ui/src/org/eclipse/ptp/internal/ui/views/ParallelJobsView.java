@@ -44,10 +44,10 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.ptp.core.jobs.IJobStatus;
-import org.eclipse.ptp.internal.ui.DebugUtil;
 import org.eclipse.ptp.internal.ui.IElementManager;
 import org.eclipse.ptp.internal.ui.IJobManager;
 import org.eclipse.ptp.internal.ui.IPTPUIConstants;
+import org.eclipse.ptp.internal.ui.PTPUIDebugOptions;
 import org.eclipse.ptp.internal.ui.PTPUIPlugin;
 import org.eclipse.ptp.internal.ui.actions.ParallelAction;
 import org.eclipse.ptp.internal.ui.actions.RemoveAllTerminatedAction;
@@ -94,9 +94,8 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 			}
 
 			ISelection selection = getLastJobSelection();
-			if (debug) {
-				System.err.println("============= JobViewUpdateWorkbenchJob refresh: " + selection); //$NON-NLS-1$
-			}
+			PTPUIDebugOptions.trace(PTPUIDebugOptions.DEBUG_JOB_TRACING,
+					"============= JobViewUpdateWorkbenchJob refresh: " + selection); //$NON-NLS-1$
 			if (!jobTableViewer.getTable().isDisposed()) {
 				jobTableViewer.setSelection(selection, true);
 				jobTableViewer.refresh(true);
@@ -145,9 +144,8 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		@Override
 		public boolean shouldSchedule() {
 			int size = size();
-			if (debug) {
-				System.err.println("============= JobViewUpdateWorkbenchJob: " + refreshJobList.size()); //$NON-NLS-1$
-			}
+			PTPUIDebugOptions.trace(PTPUIDebugOptions.DEBUG_JOB_TRACING,
+					"============= JobViewUpdateWorkbenchJob: " + refreshJobList.size()); //$NON-NLS-1$
 			return (size == 1);
 		}
 
@@ -189,11 +187,6 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 			}
 		}
 	}
-
-	/*
-	 * Debug flag
-	 */
-	private final boolean debug = DebugUtil.JOBS_VIEW_TRACING;
 
 	/*
 	 * Element selection

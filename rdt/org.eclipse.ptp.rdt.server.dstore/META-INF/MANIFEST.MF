@@ -22,7 +22,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ptp.rdt.ui,
  org.eclipse.rse.connectorservice.dstore,
  org.eclipse.rse.core,
- org.eclipse.text
+ org.eclipse.text,
+ org.eclipse.ui.trace
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.ptp.internal.rdt.server.dstore.core;x-internal:=true,

@@ -38,5 +38,16 @@
           name="%ParallelViewCategory.name">
     </category>
  </extension>
+ <extension
+       point="org.eclipse.ui.trace.traceComponents">
+    <component
+          id="org.eclipse.ptp.ui.component"
+          label="PTP UI">
+       <bundle
+             consumed="true"
+             name="org.eclipse.ptp.ui">
+       </bundle>
+    </component>
+ </extension>
 
 </plugin>

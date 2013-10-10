@@ -14,7 +14,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ptp.rm.jaxb.ui,
  org.eclipse.ptp.rm.jaxb.control.ui,
  org.eclipse.ptp.rm.jaxb.core,
- org.eclipse.debug.core
+ org.eclipse.debug.core,
+ org.eclipse.ui.trace
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.ptp.ems.ui

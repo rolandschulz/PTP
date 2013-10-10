@@ -43,6 +43,7 @@ import org.eclipse.ptp.debug.core.pdi.request.IPDIStepOverInstructionRequest;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIStepOverRequest;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIStepRequest;
 import org.eclipse.ptp.debug.core.pdi.request.IPDITerminateRequest;
+import org.eclipse.ptp.internal.debug.core.PDebugOptions;
 import org.eclipse.ptp.internal.debug.core.pdi.manager.AbstractEventManager;
 import org.eclipse.ptp.internal.debug.sdm.core.messages.Messages;
 import org.eclipse.ptp.internal.debug.sdm.core.proxy.ProxyDebugClient;
@@ -255,17 +256,17 @@ public class SDMEventManager extends AbstractEventManager implements IProxyDebug
 				eventList.add(session.getEventFactory().newResumedEvent(session, eTasks, IPDIResumedEvent.CONTINUE));
 			} else if (request instanceof IPDIStepRequest) {
 				int details;
-				if (request instanceof IPDIStepIntoRequest)
+				if (request instanceof IPDIStepIntoRequest) {
 					details = IPDIResumedEvent.STEP_INTO;
-				else if (request instanceof IPDIStepOverRequest)
+				} else if (request instanceof IPDIStepOverRequest) {
 					details = IPDIResumedEvent.STEP_OVER;
-				else if (request instanceof IPDIStepFinishRequest)
+				} else if (request instanceof IPDIStepFinishRequest) {
 					details = IPDIResumedEvent.STEP_RETURN;
-				else if (request instanceof IPDIStepIntoInstructionRequest)
+				} else if (request instanceof IPDIStepIntoInstructionRequest) {
 					details = IPDIResumedEvent.STEP_INTO_INSTRUCTION;
-				else if (request instanceof IPDIStepOverInstructionRequest)
+				} else if (request instanceof IPDIStepOverInstructionRequest) {
 					details = IPDIResumedEvent.STEP_OVER_INSTRUCTION;
-				else {
+				} else {
 					details = IPDIResumedEvent.CONTINUE;
 				}
 				session.getTaskManager().setSuspendTasks(false, eTasks);
@@ -355,6 +356,8 @@ public class SDMEventManager extends AbstractEventManager implements IProxyDebug
 		ProxyDebugLocator loc = e.getFrame().getLocator();
 		IPDILocator locator = PDILocationFactory
 				.newLocator(loc.getFile(), loc.getFunction(), loc.getLineNumber(), loc.getAddress());
+		PDebugOptions.trace("Signal Event:" + eTasks.toString() + " sig:" + e.getSignalName() + " file:" + loc.getFile() + " func:" //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				+ loc.getFunction() + " line:" + loc.getLineNumber() + " addr:" + loc.getAddress()); //$NON-NLS-1$ //$NON-NLS-2$
 		fireEvent(createSuspendedEvent(
 				session.getEventFactory().newSignalInfo(session, eTasks, e.getSignalName(), e.getSignalMeaning(), null, locator),
 				e.getThreadId(), e.getFrame().getLevel(), e.getDepth(), e.getChangedVars()));

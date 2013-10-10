@@ -34,7 +34,7 @@ import org.eclipse.ptp.debug.core.pdi.manager.IPDIEventRequestManager;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequestListener;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIStopDebuggerRequest;
-import org.eclipse.ptp.internal.debug.core.PDebugUtils;
+import org.eclipse.ptp.internal.debug.core.PDebugOptions;
 import org.eclipse.ptp.internal.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.internal.debug.core.pdi.messages.Messages;
 
@@ -62,7 +62,7 @@ public class EventRequestManager extends AbstractPDIManager implements IPDIEvent
 					throw new PDIException(request.getTasks(), NLS.bind(Messages.EventRequestManager_1, request.getName()));
 				}
 
-				PDebugUtils.println(NLS.bind(Messages.EventRequestManager_2, request));
+				PDebugOptions.trace(NLS.bind(Messages.EventRequestManager_2, request));
 				fRequests.add(request);
 			}
 			schedule();
@@ -168,10 +168,12 @@ public class EventRequestManager extends AbstractPDIManager implements IPDIEvent
 		@Override
 		public IStatus run(IProgressMonitor monitor) {
 			SafeRunner.run(new ISafeRunnable() {
+				@Override
 				public void handleException(Throwable exception) {
 					PTPDebugCorePlugin.log(exception);
 				}
 
+				@Override
 				public void run() throws Exception {
 					IPDIEventRequest request = null;
 					synchronized (fRequests) {
@@ -209,6 +211,7 @@ public class EventRequestManager extends AbstractPDIManager implements IPDIEvent
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequestManager#
 	 * addEventRequest(org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest)
 	 */
+	@Override
 	public void addEventRequest(IPDIEventRequest request) throws PDIException {
 		if (!(request instanceof IPDIStopDebuggerRequest)) {
 			if (request.getTasks().isEmpty()) {
@@ -231,6 +234,7 @@ public class EventRequestManager extends AbstractPDIManager implements IPDIEvent
 	 * org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequestManager#canExecute
 	 * (org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest)
 	 */
+	@Override
 	public boolean canExecute(IPDIEventRequest request) {
 		return true;
 	}
@@ -241,6 +245,7 @@ public class EventRequestManager extends AbstractPDIManager implements IPDIEvent
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequestManager#
 	 * deleteAllEventRequests()
 	 */
+	@Override
 	public void deleteAllEventRequests() throws PDIException {
 		dispatchJob.removeEventRequests();
 	}
@@ -252,6 +257,7 @@ public class EventRequestManager extends AbstractPDIManager implements IPDIEvent
 	 * deleteEventRequest
 	 * (org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest)
 	 */
+	@Override
 	public void deleteEventRequest(IPDIEventRequest request) throws PDIException {
 		dispatchJob.removeEventRequest(request);
 	}
@@ -263,6 +269,7 @@ public class EventRequestManager extends AbstractPDIManager implements IPDIEvent
 	 * org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequestManager#execute
 	 * (org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequest)
 	 */
+	@Override
 	public void execute(IPDIEventRequest request) {
 		if (request != null) {
 			session.getEventManager().registerEventRequest(request);
@@ -279,6 +286,7 @@ public class EventRequestManager extends AbstractPDIManager implements IPDIEvent
 	 * @see org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequestManager#
 	 * flushEventRequests()
 	 */
+	@Override
 	public void flushEventRequests() {
 		session.getEventManager().removeAllRegisteredEventRequests();
 		dispatchJob.flushEventRequests();
@@ -291,6 +299,7 @@ public class EventRequestManager extends AbstractPDIManager implements IPDIEvent
 	 * org.eclipse.ptp.debug.core.pdi.request.IPDIEventRequestManager#getRequests
 	 * ()
 	 */
+	@Override
 	public IPDIEventRequest[] getRequests() {
 		return dispatchJob.getEventRequests();
 	}
@@ -311,6 +320,7 @@ public class EventRequestManager extends AbstractPDIManager implements IPDIEvent
 	 * 
 	 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
 	 */
+	@Override
 	public void handleEventRequestChanged(IPDIEventRequest event) {
 		dispatchJob.removeCurrentEventRequest();
 	}
