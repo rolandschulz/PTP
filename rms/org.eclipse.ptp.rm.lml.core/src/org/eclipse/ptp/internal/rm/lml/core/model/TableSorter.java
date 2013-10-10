@@ -43,6 +43,25 @@ public class TableSorter implements Comparator<RowType> {
 	private final String sortType;
 
 	/**
+	 * Regular expression for valid integer values
+	 */
+	private final static String intRegex = "^\\s*[\\+\\-]?[0-9]+$"; //$NON-NLS-1$
+
+	/**
+	 * Checks if the passed string contains an integer value.
+	 * Only returns true, if the entire string is a valid integer.
+	 * E.g. valid values are "1023","-70","+100"
+	 * Invalid values are "hello", "73.0", "100;"
+	 * 
+	 * @param value
+	 *            the value checked for valid integer
+	 * @return true, if the value is integer, false otherwise
+	 */
+	public static boolean isInteger(String value) {
+		return value.matches(intRegex);
+	}
+
+	/**
 	 * Constructor
 	 * 
 	 * @param sortType
@@ -72,6 +91,7 @@ public class TableSorter implements Comparator<RowType> {
 	 *            second element
 	 * @return integer which represents the result of the comparison
 	 */
+	@Override
 	public int compare(RowType a, RowType b) {
 		final CellType aCell = a.getCell().get(sortIndex);
 		String aValue = null;
@@ -100,11 +120,37 @@ public class TableSorter implements Comparator<RowType> {
 		// The two elements are not equal
 		if (sortType.equals("numeric")) { //$NON-NLS-1$
 			// The sort type is a numeric one
+
+			// Check if aValue and bValue contain valid Strings before parsing them
+			// This avoids number format exception
+			int aInt = 0;
+			int bInt = 0;
+
+			if (!isInteger(aValue)) {
+				if (sortDirection == up) {
+					return -1;
+				}
+				else {
+					return 1;
+				}
+			}
+			if (!isInteger(bValue)) {
+				if (sortDirection == up) {
+					return 1;
+				}
+				else {
+					return -1;
+				}
+			}
+
+			aInt = Integer.parseInt(aValue);
+			bInt = Integer.parseInt(bValue);
+
 			if (sortDirection == up) {
-				return Integer.parseInt(aValue) < Integer.parseInt(bValue) ? -1
+				return aInt < bInt ? -1
 						: 1;
 			} else {
-				return Integer.parseInt(aValue) < Integer.parseInt(bValue) ? 1
+				return aInt < bInt ? 1
 						: -1;
 			}
 		} else {
