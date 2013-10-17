@@ -521,7 +521,7 @@ public class RemoteMakeBuilder extends MakeBuilder {
 		// Then split the line by space would be safe.
 		// After resolve each variable, will finally have:  
 		// test d e build h="i j k" 'l  m'
-		String regex = "[$\\{,\\(,\\[,\",\'].*?[\\},\\),\\],\",\']"; //$NON-NLS-1$
+		String regex = "(\\{.*?\\})|(\\(.*?\\))|(\\[.*?\\])|(\".*?\")|(\\'.*?\')"; // //$NON-NLS-1$
 		Pattern pattern = Pattern.compile(regex);
 		Matcher matcher = pattern.matcher(args);
 		UUID uuid = UUID.randomUUID();
@@ -571,17 +571,33 @@ public class RemoteMakeBuilder extends MakeBuilder {
 		char[] array = string.toCharArray();
 		ArrayList<String> aList = new ArrayList<String>();
 		StringBuffer buffer = new StringBuffer();
-		boolean inComment = false;
+		boolean doubleQuote = false;
+		boolean singleQuote = false;
 		for (int i = 0; i < array.length; i++) {
 			char c = array[i];
-			if (array[i] == '"' || array[i] == '\'') {
+			if (c == '"') {
 				if (i > 0 && array[i - 1] == '\\') {
-					inComment = false;
-				} else {
-					inComment = !inComment;
+					doubleQuote = false;
+				} else if (doubleQuote){
+					// Met the second double quotes, and will split on next space. 
+					// So reset the doubleComment flag and singleComment flag to false;
+					doubleQuote = !doubleQuote;
+					singleQuote = false;
+				}else {
+					// Met the first double quotes, so change the flag to indicate inside the doubleComment
+					doubleQuote = !doubleQuote;
+				}
+			}else if (c == '\''){
+				if (i > 0 && array[i - 1] == '\\') {
+					singleQuote = false;
+				} else if (singleQuote){
+					singleQuote = !singleQuote;
+					doubleQuote = false;
+				}else {
+					singleQuote = !singleQuote;
 				}
 			}
-			if (c == ' ' && !inComment) {
+			if (c == ' ' && ( !doubleQuote && !singleQuote)) {
 				aList.add(buffer.toString());
 				buffer = new StringBuffer();
 			} else {
