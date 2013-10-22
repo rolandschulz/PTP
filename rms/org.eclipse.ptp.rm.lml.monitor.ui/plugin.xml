@@ -122,16 +122,10 @@
             class="org.eclipse.ptp.internal.rm.lml.monitor.ui.handlers.RemoveMonitorHandler"
             commandId="org.eclipse.ptp.rm.lml.monitor.ui.removeMonitor">
          <enabledWhen>
-            <with
-                  variable="selection">
-               <iterate
-                     ifEmpty="false">
-                  <test
-                        property="org.eclipse.ptp.rm.monitor.isActive"
-                        value="false">
-                  </test>
-               </iterate>
-            </with>
+            <test
+                  property="org.eclipse.ptp.rm.monitor.isActive"
+                  value="false">
+            </test>
          </enabledWhen>
       </handler>
       <handler
@@ -140,13 +134,10 @@
          <enabledWhen>
             <with
                   variable="selection">
-               <iterate
-                     ifEmpty="false">
-                  <test
-                        property="org.eclipse.ptp.rm.monitor.isActive"
-                        value="false">
-                  </test>
-               </iterate>
+               <test
+                     property="org.eclipse.ptp.rm.monitor.isActive"
+                     value="false">
+               </test>
             </with>
          </enabledWhen>
       </handler>
@@ -154,32 +145,20 @@
             class="org.eclipse.ptp.internal.rm.lml.monitor.ui.handlers.StopMonitorHandler"
             commandId="org.eclipse.ptp.rm.lml.monitor.ui.stopMonitor">
          <enabledWhen>
-            <with
-                  variable="selection">
-               <iterate
-                     ifEmpty="false">
-                  <test
-                        property="org.eclipse.ptp.rm.monitor.isActive"
-                        value="true">
-                  </test>
-               </iterate>
-            </with>
+            <test
+                  property="org.eclipse.ptp.rm.monitor.isActive"
+                  value="true">
+            </test>
          </enabledWhen>
       </handler>
       <handler
             class="org.eclipse.ptp.internal.rm.lml.monitor.ui.handlers.RefreshMonitorHandler"
             commandId="org.eclipse.ptp.rm.lml.monitor.ui.refreshMonitor">
          <enabledWhen>
-            <with
-                  variable="selection">
-               <iterate
-                     ifEmpty="false">
-                  <test
-                        property="org.eclipse.ptp.rm.monitor.isActive"
-                        value="true">
-                  </test>
-               </iterate>
-            </with>
+            <test
+                  property="org.eclipse.ptp.rm.monitor.isActive"
+                  value="true">
+            </test>
          </enabledWhen>
       </handler>
    </extension>
