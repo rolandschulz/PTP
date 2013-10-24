@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2011 IBM Corporation and others.
+ * Copyright (c) 2009, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,12 +20,15 @@ import java.util.Properties;
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.ICommandLauncher;
 import org.eclipse.cdt.managedbuilder.core.IBuilder;
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ptp.internal.rdt.core.index.IndexBuildSequenceController;
 import org.eclipse.ptp.internal.rdt.core.remotemake.RemoteProcessClosure;
@@ -164,7 +167,28 @@ public class RemoteCommandLauncher implements ICommandLauncher {
 			// set the directory in which to run the command
 			IRemoteFileManager fileManager = connection.getFileManager();
 			if(changeToDirectory != null && fileManager != null) {
-				processBuilder.directory(fileManager.getResource(changeToDirectory.toString()));
+				IFileStore directoryStore = null;
+				
+				try {
+					directoryStore = fileManager.getResource(changeToDirectory.toString());
+				}
+				catch (NullPointerException e) {
+					// RSE doesn't handle it well when you try to get a store that doesn't exist... so catch NPE in case of that
+				}
+				
+				// hack:  managed build might be sending us a bogus directory based on workspace_loc
+				// if the store doesn't exist, try using the path (without device) to find a corresponding directory
+				// under the project
+				if(directoryStore == null || !directoryStore.fetchInfo().exists()) {
+					IPath alternatePath = changeToDirectory.setDevice(null).makeRelative();
+					IResource resource = fProject.findMember(alternatePath);
+					if(resource.exists()) {
+						// use it!
+						directoryStore = EFS.getStore(resource.getLocationURI());
+					}
+				}
+				
+				processBuilder.directory(directoryStore);
 			}
 			
 			// combine stdout and stderr
