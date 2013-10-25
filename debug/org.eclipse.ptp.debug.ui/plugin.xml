@@ -84,7 +84,7 @@
 				id="org.eclipse.debug.ui.launchActionSet">
 			</actionSet>
 			<actionSet
-				id="org.eclipse.cdt.debug.ui.debugActionSet">
+				id="org.eclipse.ptp.debug.ui.debugActionSet">
 			</actionSet>
 		</perspectiveExtension>
 	</extension>   	
@@ -152,8 +152,7 @@
 		point="org.eclipse.ui.actionSets">
 		<actionSet
         id="org.eclipse.ptp.debug.ui.debugActionSet"
-        label="%DebugActionSet.label"
-        visible="true">
+        label="%DebugActionSet.label">
 			<menu
 				label="%RunMenu.label"
 				path="additions"
@@ -163,50 +162,29 @@
 				id="org.eclipse.ptp.debug.ui.actions.ResumeAtLine"
 				class="org.eclipse.ptp.internal.debug.ui.actions.RetargetResumeAtLineAction"
 				disabledIcon="icons/tool/jump_co_disable.gif"
-				enablesFor="1"
 				icon="icons/tool/jump_co_normal.gif"
 				helpContextId="jump_to_line_action_context"
 				label="%GlobalJumpToLineAction.label"
 				menubarPath="org.eclipse.ui.run/stepGroup">
-				<enablement>
-					<pluginState
-						value="activated"
-						id="org.eclipse.ptp.debug.ui">
-					</pluginState>
-				</enablement>
 			</action>
 			<action
 				id="org.eclipse.ptp.debug.internal.ui.actions.SignalZeroWorkbenchActionDelegate"
 				class="org.eclipse.ptp.internal.debug.ui.actions.SignalZeroWorkbenchActionDelegate"
 				disabledIcon="icons/tool/signal0_co_disable.gif"
-				enablesFor="1"
 				icon="icons/tool/signal0_co_normal.gif"
 				helpContextId="resume_without_signal_action_context"
 				label="%SignalZeroAction.label"
 				menubarPath="org.eclipse.ui.run/stepGroup"
 				tooltip="%SignalZeroAction.tooltip">
-				<enablement>
-					<pluginState
-						value="activated"
-						id="org.eclipse.ptp.debug.ui">
-					</pluginState>
-				</enablement>
 			</action>
 			<action
 				id="org.eclipse.ptp.debug.ui.internal.actions.RestartActionDelegate"
 				class="org.eclipse.ptp.internal.debug.ui.actions.RestartActionDelegate"
 				disabledIcon="icons/tool/restart_disable.gif"
-				enablesFor="1"
 				icon="icons/tool/restart_normal.gif"
 				helpContextId="restart_action_context"
 				label="%RestartAction.label"
 				menubarPath="org.eclipse.ui.run/stepGroup">
-				<enablement>
-					<pluginState
-						value="activated"
-						id="org.eclipse.ptp.debug.ui">
-					</pluginState>
-				</enablement>
 			</action>
 		</actionSet>
 	</extension>
@@ -285,6 +263,12 @@
 				menubarPath="stepGroup"
 				enablesFor="1"
 				id="org.eclipse.ptp.debug.internal.ui.actions.RestartActionDelegate">
+				<enablement>
+					<pluginState
+						value="activated"
+						id="org.eclipse.ptp.debug.ui">
+					</pluginState>
+				</enablement>
 				<selection class="org.eclipse.ptp.debug.core.model.IRestart"/>
 			</action>
 			<action
@@ -313,6 +297,12 @@
 				class="org.eclipse.ptp.internal.debug.ui.actions.SignalZeroWorkbenchActionDelegate"
 				menubarPath="threadGroup"
 				id="org.eclipse.ptp.debug.internal.ui.actions.SignalZeroWorkbenchActionDelegate">
+				<enablement>
+					<pluginState
+						value="activated"
+						id="org.eclipse.ptp.debug.ui">
+					</pluginState>
+				</enablement>
 				<selection class="org.eclipse.ptp.debug.core.model.IResumeWithoutSignal"/>
 			</action>
 		</viewerContribution>
