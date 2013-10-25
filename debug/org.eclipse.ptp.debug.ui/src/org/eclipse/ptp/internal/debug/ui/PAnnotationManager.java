@@ -57,7 +57,9 @@ import org.eclipse.ptp.debug.core.event.IPDebugSuspendInfo;
 import org.eclipse.ptp.debug.core.model.IPDebugTarget;
 import org.eclipse.ptp.debug.core.model.IPStackFrame;
 import org.eclipse.ptp.debug.core.model.IPThread;
+import org.eclipse.ptp.debug.core.pdi.IPDILocator;
 import org.eclipse.ptp.debug.core.pdi.PDIException;
+import org.eclipse.ptp.debug.core.pdi.model.IPDIStackFrameDescriptor;
 import org.eclipse.ptp.debug.core.pdi.request.IPDIListStackFramesRequest;
 import org.eclipse.ptp.internal.debug.core.PTPDebugCorePlugin;
 import org.eclipse.ptp.internal.debug.core.sourcelookup.PSourceLookupDirector;
@@ -65,8 +67,6 @@ import org.eclipse.ptp.internal.debug.ui.messages.Messages;
 import org.eclipse.ptp.internal.ui.listeners.IJobChangedListener;
 import org.eclipse.ptp.internal.ui.model.IElementHandler;
 import org.eclipse.ptp.internal.ui.model.IElementSet;
-import org.eclipse.ptp.proxy.debug.client.ProxyDebugLocator;
-import org.eclipse.ptp.proxy.debug.client.ProxyDebugStackFrame;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
@@ -1152,18 +1152,12 @@ public class PAnnotationManager implements IJobChangedListener, IPDebugEventList
 					.getListStackFramesRequest(session.getPDISession(), tasks, low, high);
 			try {
 				session.getPDISession().getEventRequestManager().addEventRequest(request);
-				Map<TaskSet, Object> map = request.getResultMap(tasks);
-				for (TaskSet sTasks : map.keySet()) {
-					Object value = map.get(sTasks);
-					if (value instanceof ProxyDebugStackFrame[]) {
-						ProxyDebugStackFrame[] frames = (ProxyDebugStackFrame[]) value;
-						for (ProxyDebugStackFrame frame : frames) {
-							ProxyDebugLocator locator = frame.getLocator();
-							if (locator.getLineNumber() > 0) {
-								addUnregisterAnnotation(jobId, frame.getLevel(), locator.getFile(), locator.getLineNumber(), sTasks);
-								break;
-							}
-						}
+				IPDIStackFrameDescriptor[] frames = request.getStackFrames(tasks);
+				for (IPDIStackFrameDescriptor frame : frames) {
+					IPDILocator locator = frame.getLocator();
+					if (locator.getLineNumber() > 0) {
+						addUnregisterAnnotation(jobId, frame.getLevel(), locator.getFile(), locator.getLineNumber(), tasks);
+						break;
 					}
 				}
 			} catch (PDIException e) {
