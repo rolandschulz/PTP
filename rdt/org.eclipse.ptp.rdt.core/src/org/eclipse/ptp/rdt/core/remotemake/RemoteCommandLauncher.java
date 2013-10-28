@@ -160,8 +160,20 @@ public class RemoteCommandLauncher implements ICommandLauncher {
 			remoteEnvMap.clear();
 			
 			for(String envVar : env) {
-				String[] splitStr = envVar.split("="); //$NON-NLS-1$
-				remoteEnvMap.put(splitStr[0], splitStr[1]);
+				int eqIdx = envVar.indexOf('=');
+				if (eqIdx == -1)
+					throw new CoreException(
+							new Status(
+									IStatus.ERROR,
+									"org.eclipse.ptp.rdt.core", Messages.RemoteCommandLauncher_env_parse_error + envVar, null)); //$NON-NLS-1$
+				String var = envVar.substring(0, eqIdx);
+				if (eqIdx == (envVar.length() - 1)) {
+					// The value of the variable is a null string
+					remoteEnvMap.put(var, null);
+				} else {
+					String val = envVar.substring(eqIdx + 1, envVar.length());
+					remoteEnvMap.put(var, val);
+				}
 			}
 			
 			// set the directory in which to run the command
