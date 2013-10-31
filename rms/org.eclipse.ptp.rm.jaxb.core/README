@@ -7,5 +7,4 @@
 #
 ###################################################################################
 
-xjc -target 2.1 -d src -p org.eclipse.ptp.rm.jaxb.core.data schema/resource_manager_type.xsd
-	
+xjc -d src -b schema/namespace_bindings.xml schema/resource_manager_type.xsd
