@@ -270,6 +270,7 @@ public class TargetImpl implements IMatchable {
 		previous.setDescription(mergeString(previous.getDescription(), current.getDescription()));
 		previous.setTooltip(mergeString(previous.getTooltip(), current.getTooltip()));
 		previous.setChoice(mergeString(previous.getChoice(), current.getChoice()));
+		previous.setTranslateChoiceAs(mergeString(previous.getTranslateChoiceAs(), current.getTranslateChoiceAs()));
 	}
 
 	/**

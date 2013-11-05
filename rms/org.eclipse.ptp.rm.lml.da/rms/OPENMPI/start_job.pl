@@ -111,11 +111,17 @@ my $launchCommand = shift(@ARGV);
 
 if ($launchMode eq 'debug') {
 	$debuggerId = $ENV{'PTP_DEBUGGER_ID'};
-	$debuggerPath = $ENV{'PTP_DEBUGGER_EXECUTABLE_PATH'};
-	@debuggerArgs = shellwords($ENV{'PTP_DEBUGGER_ARGS'});
+	$debuggerPath = $ENV{'PTP_DEBUG_EXEC_PATH'};
+	@debuggerArgs = shellwords($ENV{'PTP_DEBUG_EXEC_ARGS'});
 	$ROUTING_FILE = getcwd() . "/routes_" . $ENV{'PTP_JOBID'};
 	push(@ARGV, "-mca", "orte_show_resolved_nodenames", "1", "-display-map");
 	push(@debuggerArgs, "--routing_file=$ROUTING_FILE");
+        $pid = fork();
+        if ($pid == 0) {
+                exec($debuggerPath, "--master", @debuggerArgs);
+                exit(1);
+        }
+        push(@child_pids, $pid);
 }
 
 # Set autoflush to pass output as soon as possble
@@ -140,6 +146,7 @@ if ( $pid == 0 ) {
 		    }
 		    close(IN);
 		    unlink($ROUTING_FILE);
+                    exit(0);
 		} 
 	} else {
 		exec($launchCommand, @ARGV);
