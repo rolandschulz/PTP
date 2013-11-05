@@ -147,8 +147,8 @@
 			<arg>${ptp_rm:extraArgs#value}</arg>
 			<environment name="PTP_JOBID" value="@jobId"/>
 			<environment name="PTP_LAUNCH_MODE" value="${ptp_rm:launchMode#value}" />
-			<environment name="PTP_DEBUGGER_EXECUTABLE_PATH" value="${ptp_rm:debuggerExecutablePath#value}"/>
-			<environment name="PTP_DEBUGGER_ARGS" value="${ptp_rm:debuggerArgs#value}"/>
+			<environment name="PTP_DEBUG_EXEC_PATH" value="${ptp_rm:debuggerExecutablePath#value}"/>
+			<environment name="PTP_DEBUG_EXEC_ARGS" value="${ptp_rm:debuggerArgs#value}"/>
 			<stdout-parser delim="\n">
 				<target ref="@jobId">
 					<match>
@@ -162,7 +162,6 @@
 					</match>
 				</target>
 			</stdout-parser>
-			<pre-launch-cmd name="SDM Master" exec="${ptp_rm:debuggerExecutablePath#value} --master --routing_file=routes_@jobId ${ptp_rm:debuggerArgs#value}" wait="false"/>
 		</submit-interactive-debug>		
 		<launch-tab>
 			<dynamic includeWidgetValuesFrom="Advanced Options">

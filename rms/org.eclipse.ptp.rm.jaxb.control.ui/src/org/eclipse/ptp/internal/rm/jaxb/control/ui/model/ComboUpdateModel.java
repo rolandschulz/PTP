@@ -32,6 +32,8 @@ public class ComboUpdateModel extends AbstractUpdateModel implements ModifyListe
 
 	private final Combo combo;
 	private final String itemsFrom;
+	private final String choices[];
+	private final String translateChoiceAs[];
 
 	/**
 	 * @param name
@@ -43,12 +45,25 @@ public class ComboUpdateModel extends AbstractUpdateModel implements ModifyListe
 	 * @param combo
 	 *            the widget to which this model corresponds
 	 */
-	public ComboUpdateModel(String name, String itemsFrom, IUpdateHandler handler, Combo combo) {
+	public ComboUpdateModel(String name, String itemsFrom, IUpdateHandler handler, Combo combo, String choices,
+			String translateChoiceAs) {
 		super(name, handler);
 		this.combo = combo;
 		this.itemsFrom = itemsFrom;
 		this.combo.addModifyListener(this);
 		this.combo.addSelectionListener(this);
+		if (choices != null) {
+			this.choices = choices.split(",");
+		}
+		else {
+			this.choices = null;
+		}
+		if (translateChoiceAs != null) {
+			this.translateChoiceAs = translateChoiceAs.split(",");
+		}
+		else {
+			this.translateChoiceAs = null;
+		}
 	}
 
 	@Override
@@ -62,7 +77,21 @@ public class ComboUpdateModel extends AbstractUpdateModel implements ModifyListe
 	 * @see org.eclipse.ptp.internal.rm.jaxb.ui.IUpdateModel#getValueFromControl()
 	 */
 	public Object getValueFromControl() {
-		return WidgetActionUtils.getSelected(combo);
+		String selection;
+
+		/*
+		 * If the selection matches a value in the choices array, return the
+		 * corresponding translateChoiceAs value. Otherwise just return the selection
+		 */
+		selection = WidgetActionUtils.getSelected(combo);
+		if ((translateChoiceAs != null) && (choices != null)) {
+			for (int i = 0; i < choices.length; i++) {
+				if (selection.equals(choices[i])) {
+					return translateChoiceAs[i];
+				}
+			}
+		}
+		return selection;
 	}
 
 	/*
@@ -78,6 +107,20 @@ public class ComboUpdateModel extends AbstractUpdateModel implements ModifyListe
 			String[] items = WidgetActionUtils.getItemsFrom(rmMap, itemsFrom);
 			if (items.length == 0) {
 				items = WidgetActionUtils.getItemsFrom(lcMap, itemsFrom);
+			}
+			/*
+			 * If an items value matches an entry in the translateChoiceAs array
+			 * replace it with the corresponding choices array entry.
+			 */
+			if ((translateChoiceAs != null) && (choices != null)) {
+				for (int i = 0; i < items.length; i++) {
+					for (int j = 0; j < translateChoiceAs.length; j++) {
+						if (items[i].equals(translateChoiceAs[j])) {
+							items[i] = choices[j];
+							break;
+						}
+					}
+				}
 			}
 			items = WidgetBuilderUtils.normalizeComboItems(items);
 			combo.setItems(items);
@@ -111,6 +154,14 @@ public class ComboUpdateModel extends AbstractUpdateModel implements ModifyListe
 		String s = JAXBControlUIConstants.ZEROSTR;
 		if (mapValue != null) {
 			s = (String) mapValue;
+			if ((translateChoiceAs != null) && (choices != null)) {
+				for (int i = 0; i < translateChoiceAs.length; i++) {
+					if (s.equals(translateChoiceAs[i])) {
+						s = choices[i];
+						break;
+					}
+				}
+			}
 		}
 		s = WidgetActionUtils.select(combo, s);
 		refreshing = false;

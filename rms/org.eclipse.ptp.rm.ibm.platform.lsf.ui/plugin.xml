@@ -26,5 +26,9 @@
             configurationFile="data/com.ibm.platform.lsf.xml"
             name="IBM Platform LSF">
       </JAXBResourceManagerConfiguration>
+      <JAXBResourceManagerConfiguration
+            configurationFile="data/com.ibm.platform.lsf_interactive.xml"
+            name="IBM Platform LSF Interactive">
+      </JAXBResourceManagerConfiguration>
    </extension>
 </plugin>

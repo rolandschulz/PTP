@@ -107,6 +107,7 @@ public class UpdateModelFactory {
 		private String tooltip;
 		private String description;
 		private String choice;
+		private String translateChoiceAs;
 		private final String itemsFrom;
 		private final String translateBooleanAs;
 		private final Integer min;
@@ -128,6 +129,7 @@ public class UpdateModelFactory {
 			type = CellEditorType.getType(data);
 			name = data.getName();
 			choice = data.getChoice();
+			translateChoiceAs = data.getTranslateChoiceAs();
 			itemsFrom = data.getItemsFrom();
 			translateBooleanAs = data.getTranslateBooleanAs();
 			min = data.getMin();
@@ -254,6 +256,7 @@ public class UpdateModelFactory {
 		private ButtonActionType action;
 		private String itemsFrom;
 		private String translateBooleanAs;
+		private String translateChoiceAs;
 
 		private ControlDescriptor(BrowseType browse, IVariableMap rmMap, IJAXBLaunchConfigurationTab tab) {
 			this.tab = tab;
@@ -348,6 +351,10 @@ public class UpdateModelFactory {
 
 		public String getTranslateBooleanAs() {
 			return translateBooleanAs;
+		}
+
+		public String getTranslateChoiceAs() {
+			return translateChoiceAs;
 		}
 
 		public String getType() {
@@ -463,6 +470,7 @@ public class UpdateModelFactory {
 		private void setData(AttributeType data) {
 			AttributeType a = data;
 			choice = a.getChoice();
+			translateChoiceAs = a.getTranslateChoiceAs();
 			itemsFrom = a.getItemsFrom();
 			min = a.getMin();
 			if (min == null) {
@@ -1064,7 +1072,7 @@ public class UpdateModelFactory {
 				model = new TextUpdateModel(dynamic, handler, (Text) control);
 			}
 		} else if (JAXBControlUIConstants.COMBO.equals(cd.getType())) {
-			model = new ComboUpdateModel(attr, cd.itemsFrom, handler, (Combo) control);
+			model = new ComboUpdateModel(attr, cd.itemsFrom, handler, (Combo) control, cd.getChoice(), cd.getTranslateChoiceAs());
 		} else if (JAXBControlUIConstants.SPINNER.equals(cd.getType())) {
 			model = new SpinnerUpdateModel(attr, handler, (Spinner) control);
 		} else if (JAXBControlUIConstants.RADIOBUTTON.equals(cd.getType()) || JAXBControlUIConstants.CHECKBOX.equals(cd.getType())) {

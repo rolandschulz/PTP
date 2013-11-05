@@ -365,7 +365,7 @@
 
                 <attribute name="MP_IOAGENT_CNT_ATTR" type="string">
                         <description>I/O agent count:</description>
-                        <tooltip>Specify the number I/O agents. {MP_TASKS_PER_NODE}
+                        <tooltip>Specify the number I/O agents. {MP_IOAGENT_CNT}
                         </tooltip>
                         <choice>,all</choice>
                         <validator>
@@ -3270,6 +3270,7 @@
 							<include>MP_MSG_ENVELOPE_BUF_ATTR</include>
 							<include>MP_NEWJOB_ATTR</include>
 							<include>MP_NODES_ATTR</include>
+                            <include>MP_TASKS_PER_NODE_ATTR</include>
 							<include>MP_PE_AFFINITY_ATTR</include>
 							<include>MP_PGMMODEL_ATTR</include>
 							<include>MP_PMDLOG_ATTR</include>

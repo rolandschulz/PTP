@@ -9,6 +9,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.ptp.rm.ibm.lsf.ui.LSFCommand;
+import org.eclipse.ptp.rm.ibm.lsf.ui.LSFQueuesCommand;
 import org.eclipse.ptp.rm.jaxb.control.ui.IWidgetDescriptor2;
 import org.eclipse.remote.core.IRemoteConnection;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -18,7 +19,7 @@ import org.eclipse.swt.widgets.Composite;
 
 public class QueueQueryControl extends LSFQueryControl {
 
-	private static final String queryCommand[] = { "bqueues", "-w" }; //$NON-NLS-1$ //$NON-NLS-2$
+	private static final String queryCommand[] = { "bqueues", "-l" }; //$NON-NLS-1$ //$NON-NLS-2$
 
 	/**
 	 * Create the custom widget for the JAXB ui. In this case the widget is a
@@ -36,7 +37,8 @@ public class QueueQueryControl extends LSFQueryControl {
 	}
 
 	@Override
-	protected void configureQueryButton(Button button, final IRemoteConnection connection) {
+	protected void configureQueryButton(Button button,
+			final IRemoteConnection connection) {
 		button.addSelectionListener(new SelectionAdapter() {
 			@Override
 			/**
@@ -61,18 +63,31 @@ public class QueueQueryControl extends LSFQueryControl {
 	 */
 	@Override
 	protected void getQueryResponse(IRemoteConnection connection) {
-		try {
-			IStatus runStatus;
-			LSFCommand command;
+        try {
+            IStatus runStatus;
+            LSFCommand command;
+            boolean isInteractive;
+            String interactiveFlag;
 
-			command = new LSFCommand(Messages.QueueCommandDesc, connection, queryCommand);
-			widgetDescriptor.getLaunchConfigurationDialog().run(true, true, command);
-			runStatus = command.getRunStatus();
-			processCommandResponse(command, runStatus);
-		} catch (InvocationTargetException e) {
-			// Do nothing
-		} catch (InterruptedException e) {
-			// Do nothing
-		}
+            /*
+             * Check if the queue query is being requested by an interactive or batch session
+             * by querying the widget title
+             */
+            interactiveFlag = widgetDescriptor.getTitle();
+            if ((interactiveFlag != null) && (interactiveFlag.equals("Interactive"))) {
+                isInteractive = true;
+            }
+            else {
+                isInteractive = false;
+            }
+            command = new LSFQueuesCommand(Messages.QueueCommandDesc, connection, queryCommand, isInteractive);
+            widgetDescriptor.getLaunchConfigurationDialog().run(true, true, command);
+            runStatus = command.getRunStatus();
+            processCommandResponse(command, runStatus);
+        } catch (InvocationTargetException e) {
+            // Do nothing
+        } catch (InterruptedException e) {
+            // Do nothing
+        }
 	}
 }
