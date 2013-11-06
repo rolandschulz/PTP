@@ -53,8 +53,11 @@ else {
              $ENV{'PTP_APP_EXEC_PATH'}, @runArgs);
     }
     elsif ($MPI_Command eq 'MPICH2') {
-        printf("Running MPICH programs not supported\n");
-        exit(1);
+        @runArgs = split(/ +/, $ENV{'PTP_APP_EXEC_ARGS'});
+        @MPIArgs = split(/ +/, $ENV{'LSF_MPI_OPTIONS'});
+        exec("/usr/bin/perl", "$PTP_Directory/rms/MPICH2/start_job.pl",
+             "mpirun", "-np", $ENV{'LSF_MPI_TASK_COUNT'}, @MPIArgs,
+             $ENV{'PTP_APP_EXEC_PATH'}, @runArgs);
     }
     else {
         exec($ENV{'SHELL'}, '-l');
