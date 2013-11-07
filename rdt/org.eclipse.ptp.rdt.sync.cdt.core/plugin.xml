@@ -45,5 +45,12 @@
                id="org.eclipse.cdt.core.g++">
          </language-scope>
       </provider>
+      <provider
+            class="org.eclipse.ptp.internal.rdt.sync.cdt.core.SyncXMLFileSettingsProvider"
+            id="org.eclipse.ptp.rdt.sync.core.SyncXMLFileSettingsProvider"
+            name="Sync XML File Settings"
+            parameter="Enter XML file location"
+            prefer-non-shared="true">
+      </provider>
    </extension>
 </plugin>
