@@ -47,9 +47,9 @@
          </language-scope>
       </provider>
       <provider
-            class="org.eclipse.ptp.internal.rdt.sync.cdt.core.SyncXMLFileSettingsProvider"
+            class="org.eclipse.ptp.internal.rdt.sync.cdt.core.XMLFileSettingsProvider"
             id="org.eclipse.ptp.rdt.sync.core.SyncXMLFileSettingsProvider"
-            name="Sync XML File Settings"
+            name="XML File Settings"
             parameter="Enter XML file location"
             prefer-non-shared="true">
       </provider>
