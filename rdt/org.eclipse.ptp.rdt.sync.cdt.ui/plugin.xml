@@ -108,8 +108,8 @@
      <extension
            point="org.eclipse.cdt.ui.LanguageSettingsProviderAssociation">
         <class-association
-              class="org.eclipse.ptp.internal.rdt.sync.cdt.core.SyncXMLFileSettingsProvider"
-              page="org.eclipse.ptp.internal.rdt.sync.cdt.ui.SyncXMLFileSettingsProviderOptions">
+              class="org.eclipse.ptp.internal.rdt.sync.cdt.core.XMLFileSettingsProvider"
+              page="org.eclipse.ptp.internal.rdt.sync.cdt.ui.XMLFileSettingsProviderOptions">
         </class-association>
      </extension>
 </plugin>

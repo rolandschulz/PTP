@@ -24,3 +24,4 @@ Bundle-Localization: plugin
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.eclipse.ptp.internal.rdt.sync.cdt.core.Activator
 Bundle-Vendor: %providerName
+Import-Package: org.eclipse.ui
