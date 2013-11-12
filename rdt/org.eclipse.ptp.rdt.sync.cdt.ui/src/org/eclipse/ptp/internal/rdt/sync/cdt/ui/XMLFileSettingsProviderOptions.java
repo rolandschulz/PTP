@@ -12,9 +12,8 @@ package org.eclipse.ptp.internal.rdt.sync.cdt.ui;
 
 import java.io.IOException;
 
-import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
-import org.eclipse.cdt.core.language.settings.providers.ILanguageSettingsProvider;
 import org.eclipse.cdt.ui.language.settings.providers.AbstractLanguageSettingProviderOptionPage;
 import org.eclipse.cdt.utils.ui.controls.ControlFactory;
 import org.eclipse.core.runtime.CoreException;
@@ -23,6 +22,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.ptp.internal.rdt.sync.cdt.core.XMLFileSettingsProvider;
+import org.eclipse.ptp.internal.rdt.sync.cdt.ui.messages.Messages;
 import org.eclipse.ptp.internal.rdt.sync.ui.RDTSyncUIPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -56,7 +56,7 @@ public class XMLFileSettingsProviderOptions extends AbstractLanguageSettingProvi
 		gd.horizontalSpan = 2;
 		label.setLayoutData(gd);
 		label.setEnabled(parent.isEnabled());
-		label.setText("XML file location:"); //$NON-NLS-1$
+		label.setText(Messages.XMLFileSettingsProviderOptions_0);
 
 		XMLFileNameTextBox = new Text(composite, SWT.BORDER);
 		gd = new GridData(GridData.FILL, GridData.CENTER, true, false);
@@ -73,7 +73,7 @@ public class XMLFileSettingsProviderOptions extends AbstractLanguageSettingProvi
 		gd.horizontalSpan = 2;
 		enableXSLTButton.setLayoutData(gd);
 		enableXSLTButton.setEnabled(parent.isEnabled());
-		enableXSLTButton.setText("Convert with XSLT file"); //$NON-NLS-1$
+		enableXSLTButton.setText(Messages.XMLFileSettingsProviderOptions_1);
 		enableXSLTButton.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -126,13 +126,13 @@ public class XMLFileSettingsProviderOptions extends AbstractLanguageSettingProvi
 	 * Mostly copied from org.eclipse.cdt.managedbuilder.internal.ui.language.settings.providers.BuiltinSpecsDetectorOptionPage#createBrowsButton
 	 */
 	private void createBrowseButton(Composite composite, final Text textBox) {
-		Button button = ControlFactory.createPushButton(composite, "Browse"); //$NON-NLS-1$
+		Button button = ControlFactory.createPushButton(composite, Messages.XMLFileSettingsProviderOptions_2);
 		button.setEnabled(parent.isEnabled());
 		button.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent evt) {
 				FileDialog dialog = new FileDialog(getShell(), SWT.NONE);
-				dialog.setText("Choose file"); //$NON-NLS-1$
+				dialog.setText(Messages.XMLFileSettingsProviderOptions_3);
 				String fileName = textBox.getText();
 				// taking chance that the first word is a compiler path
 				int space = fileName.indexOf(' ');
@@ -171,12 +171,12 @@ public class XMLFileSettingsProviderOptions extends AbstractLanguageSettingProvi
 			provider.setXMLFile(XMLFilePath);
 			try {
 				provider.reset();
-			} catch (ParserConfigurationException e) {
-				RDTSyncUIPlugin.log("Unable to parse XML file", e); //$NON-NLS-1$
+			} catch (TransformerException e) {
+				RDTSyncUIPlugin.log(Messages.XMLFileSettingsProviderOptions_4, e);
 			} catch (SAXException e) {
-				RDTSyncUIPlugin.log("Unable to parse XML file", e); //$NON-NLS-1$
+				RDTSyncUIPlugin.log(Messages.XMLFileSettingsProviderOptions_4, e);
 			} catch (IOException e) {
-				RDTSyncUIPlugin.log("Unable to read XML file", e); //$NON-NLS-1$
+				RDTSyncUIPlugin.log(Messages.XMLFileSettingsProviderOptions_5, e);
 			}
 		}
 		super.performApply(monitor);

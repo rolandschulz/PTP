@@ -10,11 +10,19 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.sync.cdt.core;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.StringWriter;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.eclipse.cdt.core.language.settings.providers.LanguageSettingsSerializableProvider;
 import org.eclipse.core.runtime.IPath;
@@ -41,16 +49,48 @@ public abstract class AbstractXMLSettingsProvider extends LanguageSettingsSerial
 	 */
 	public abstract IPath getXSLTFile();
 
-	public void reset() throws ParserConfigurationException, SAXException, IOException {
+	/**
+	 * Clears and reloads settings from XML file. It does nothing if XML file is null. If XSLT is non-null, it is used to
+	 * transform XML before loading settings.
+	 *
+	 * @throws IOException
+	 * 					on problems reading XML file
+	 * @throws SAXException
+	 * 					on problems parsing XML
+	 * @throws TransformerException
+	 * 					on problems with XSLT transformation
+	 */
+	public void reset() throws IOException, SAXException, TransformerException {
 		super.clear();
 		IPath XMLFile = getXMLFile();
 		if (XMLFile == null) {
 			return;
 		}
+		IPath XSLTFile = getXSLTFile();
 
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder = factory.newDocumentBuilder();
-		Document doc = builder.parse(getXMLFile().toFile());
+		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder;
+		try {
+			builder = dbFactory.newDocumentBuilder();
+		} catch (ParserConfigurationException e) {
+			// Should never happen since no configuring was done
+			throw new RuntimeException(e);
+		}
+
+		Document doc;
+		if (XSLTFile == null) {
+			doc = builder.parse(XMLFile.toFile());
+		} else {
+			TransformerFactory tFactory = TransformerFactory.newInstance();
+			Source XSLTSource = new StreamSource(XSLTFile.toFile());
+			Transformer transformer = tFactory.newTransformer(XSLTSource);
+
+			Source XMLSource = new StreamSource(XMLFile.toFile());
+			StringWriter transformedXML = new StringWriter();
+			transformer.transform(XMLSource, new StreamResult(transformedXML));
+			doc = builder.parse(transformedXML.toString());
+		}
+
 		super.loadEntries(doc.getDocumentElement());
 	}
 }
