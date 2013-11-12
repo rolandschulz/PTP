@@ -92,6 +92,12 @@ public class Messages extends NLS {
 	public static String GitParticipant_1;
 	public static String GitParticipant_2;
 	public static String GitParticipant_3;
+	public static String XMLFileSettingsProviderOptions_0;
+	public static String XMLFileSettingsProviderOptions_1;
+	public static String XMLFileSettingsProviderOptions_2;
+	public static String XMLFileSettingsProviderOptions_3;
+	public static String XMLFileSettingsProviderOptions_4;
+	public static String XMLFileSettingsProviderOptions_5;
 
 	static {
 		// initialize resource bundle
