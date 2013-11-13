@@ -449,7 +449,7 @@
 		<attribute name="LSF_MPI_COMMAND" type="choice">
 			<description>MPI Runtime:</description>
 			<tooltip>Specifies the parallel runtime environment to run the job.</tooltip>
-			<choice>,Parallel Environment,Open MPI,MPICH2</choice>
+			<choice>,Parallel Environment,Platform MPI,Open MPI,MPICH2</choice>
 		</attribute>
 		
 		<!-- Number of MPI tasks in the application. Needed so the debugger UI knows the task count -->

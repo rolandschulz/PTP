@@ -26,6 +26,10 @@ if ($ENV{'PTP_LAUNCH_MODE'} eq 'debug') {
         exec("/usr/bin/perl", "$PTP_Directory/rms/PE/run_pe_app.pl",
              $ENV{'PTP_DEBUG_EXEC_PATH'}, @debugArgs);
     }
+    elsif ($MPI_Command eq 'Platform MPI') {
+        exec("/usr/bin/perl", "$PTP_Directory/rms/PLATFORM_MPI/start_job.pl",
+             "mpirun", "-lsf", "-np", $ENV{'LSF_MPI_TASK_COUNT'});
+    }
     elsif ($MPI_Command eq 'Open MPI') {
         exec("/usr/bin/perl", "$PTP_Directory/rms/OPENMPI/start_job.pl",
              "mpirun", "-np", $ENV{'LSF_MPI_TASK_COUNT'});
@@ -43,6 +47,13 @@ else {
         $ENV{'MP_PROCS'} = $ENV{'LSF_MPI_TASK_COUNT'};
         @runArgs = split(/ +/, $ENV{'PTP_APP_EXEC_ARGS'});
         exec("/usr/bin/perl", "$PTP_Directory/rms/PE/run_pe_app.pl",
+             $ENV{'PTP_APP_EXEC_PATH'}, @runArgs);
+    }
+    elsif ($MPI_Command eq 'Platform MPI') {
+        @runArgs = split(/ +/, $ENV{'PTP_APP_EXEC_ARGS'});
+        @MPIArgs = split(/ +/, $ENV{'LSF_MPI_OPTIONS'});
+        exec("/usr/bin/perl", "$PTP_Directory/rms/PLATFORM_MPI/start_job.pl",
+             "mpirun", "-lsf", "-np", $ENV{'LSF_MPI_TASK_COUNT'}, @MPIArgs,
              $ENV{'PTP_APP_EXEC_PATH'}, @runArgs);
     }
     elsif ($MPI_Command eq 'Open MPI') {
