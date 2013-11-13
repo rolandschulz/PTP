@@ -21,8 +21,10 @@
 		the appropriate script, you ensure that the account is set up for PTP to run LSF commands.</p>
 	<p>If you are using LSF to run interactive parallel jobs using OpenMPI or MPICH2, you must make sure that the <b>PATH</b> 
 	    and <b>LD_LIBRARY_PATH</b> environment variables are set in your login shell script to point to the executable 
-	    (bin) and library (lib) directories for your version of MPI unless it is installed in system directories.
-	    For IBM Parallel Environment, the <b>poe</b> executable used to launch
+	    (bin) and library (lib) directories for your version of MPI unless it is installed in system directories.</p>
+	<p> If you are using IBM Platform MPI you must make sure the <b>PATH</b> environment variable is set in your login 
+	    shell script to point to the executable (bin) directory where the executables for IBM Platform MPI reside.</p>
+	<p> For IBM Parallel Environment, the <b>poe</b> executable used to launch
 	    your application resides in /usr/bin, so no special setup is required.</p>
 	<p>In addition, when you define the connection to the remote host, make sure the <b>Use login shell</b> checkbox
 		 in the <b>Generic Remote Host</b> dialog is checked. Note that this dialog appears in simplified mode. 
