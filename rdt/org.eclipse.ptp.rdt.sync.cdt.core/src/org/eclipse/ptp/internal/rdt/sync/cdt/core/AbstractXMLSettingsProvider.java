@@ -10,8 +10,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.sync.cdt.core;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringBufferInputStream;
 import java.io.StringWriter;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -21,6 +24,7 @@ import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
@@ -33,21 +37,27 @@ import org.xml.sax.SAXException;
  * Abstract class for language settings providers that get settings through XML.
  * This class handles reading, parsing, and storing XML data to the appropriate CDT data structures. Concrete classes only need
  * to provide the source of the XML and optional XSLT data, and specify when the data should be refreshed.
- * 
- * Note: Currently this class only supports XML from files. A future improvement would be to support XML data from other sources.
  */
 public abstract class AbstractXMLSettingsProvider extends LanguageSettingsSerializableProvider {
 	/**
-	 * @return path to XML file that contains language settings or null for no settings. This XML file will be converted by the
-	 * XSLT file returned by {@link #getXSLTFile}
+	 * @return XML file that contains language settings or null for no settings. This XML will be converted by the XSLT returned
+	 * by {@link #getXSLTFile} See {@link org.eclipse.ptp.rdt.sync.cdt.core.XMLConversionUtil} for helper methods to read files
+	 * into Document objects.
+	 * 
+	 * This function is called by "reset" so is allowed to throw the same exceptions, since the UI layer will probably call "reset".
+	 * @throws IOException
+	 * 					on problems retrieving XML from file system
+	 * @throws SAXException
+	 * 					on problems parsing XML 
 	 */
-	public abstract IPath getXMLFile();
+	public abstract Document getXML() throws IOException, SAXException;
 
 	/**
-	 * @return path to XSLT file to convert XML file returned by {@link #getXMLFile}, or null if no conversion is needed (XML file
-	 * is already in the proper format).
+	 * @return XSLT to convert XML returned by {@link #getXMLFile}, or null if no conversion is needed (XML is already in the
+	 * proper format). See {@link org.eclipse.ptp.rdt.sync.cdt.core.XMLConversionUtil} for helper methods to read files into
+	 * Document objects.
 	 */
-	public abstract IPath getXSLTFile();
+	public abstract Source getXSLT();
 
 	/**
 	 * Clears and reloads settings from XML file. It does nothing if XML file is null. If XSLT is non-null, it is used to
@@ -62,35 +72,34 @@ public abstract class AbstractXMLSettingsProvider extends LanguageSettingsSerial
 	 */
 	public void reset() throws IOException, SAXException, TransformerException {
 		super.clear();
-		IPath XMLFile = getXMLFile();
-		if (XMLFile == null) {
+		Document XMLInput = getXML();
+		if (XMLInput == null) {
 			return;
 		}
-		IPath XSLTFile = getXSLTFile();
-
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder;
-		try {
-			builder = dbFactory.newDocumentBuilder();
-		} catch (ParserConfigurationException e) {
-			// Should never happen since no configuring was done
-			throw new RuntimeException(e);
-		}
-
-		Document doc;
-		if (XSLTFile == null) {
-			doc = builder.parse(XMLFile.toFile());
+		Source XSLTInput = getXSLT();
+		
+		if (XSLTInput == null) {
+			super.loadEntries(XMLInput.getDocumentElement());
 		} else {
-			TransformerFactory tFactory = TransformerFactory.newInstance();
-			Source XSLTSource = new StreamSource(XSLTFile.toFile());
-			Transformer transformer = tFactory.newTransformer(XSLTSource);
+			// Transform XML with XSLT into a stream
+			Transformer transformer = TransformerFactory.newInstance().newTransformer(XSLTInput);
+			DOMSource tmpDOMSource = new DOMSource(XMLInput);
+			StringWriter XMLTransformed = new StringWriter();
+			transformer.transform(tmpDOMSource, new StreamResult(XMLTransformed));
 
-			Source XMLSource = new StreamSource(XMLFile.toFile());
-			StringWriter transformedXML = new StringWriter();
-			transformer.transform(XMLSource, new StreamResult(transformedXML));
-			doc = builder.parse(transformedXML.toString());
+			// Convert stream back into a document
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder builder;
+			try {
+				builder = dbFactory.newDocumentBuilder();
+			} catch (ParserConfigurationException e) {
+				// Should never happen since no configuring was done
+				throw new RuntimeException(e);
+			}
+			// TODO: Is default character set okay?
+			Document finalDoc = builder.parse(new ByteArrayInputStream(XMLTransformed.toString().getBytes()));
+
+			super.loadEntries(finalDoc.getDocumentElement());
 		}
-
-		super.loadEntries(doc.getDocumentElement());
 	}
 }

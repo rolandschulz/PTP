@@ -10,8 +10,14 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.sync.cdt.core;
 
+import java.io.IOException;
+
+import javax.xml.transform.Source;
+
 import org.eclipse.cdt.core.language.settings.providers.ILanguageSettingsEditableProvider;
 import org.eclipse.core.runtime.IPath;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 /**
  * A generic XML Settings provider. The user can specify an XML and XSLT file, thus providing generic support for build tools not
@@ -40,6 +46,22 @@ public class XMLFileSettingsProvider extends AbstractXMLSettingsProvider impleme
 	}
 
 	/**
+	 * Get the XML file
+	 * @return XML file
+	 */
+	public IPath getXMLFile() {
+		return XMLFile;
+	}
+
+	/**
+	 * Get the XSLT file
+	 * @return XSLT file
+	 */
+	public IPath getXSLTFile() {
+		return XSLTFile;
+	}
+
+	/**
 	 * Set the XML file
 	 * @param path to XML file or null to indicate no XML file
 	 */
@@ -60,8 +82,8 @@ public class XMLFileSettingsProvider extends AbstractXMLSettingsProvider impleme
 	 * @see org.eclipse.ptp.internal.rdt.sync.cdt.core.AbstractXMLSettingsProvider#getXMLFile()
 	 */
 	@Override
-	public IPath getXMLFile() {
-		return XMLFile;
+	public Document getXML() throws SAXException, IOException {
+		return XMLConversionUtil.XMLFileToDOM(XMLFile);
 	}
 
 	/*
@@ -69,7 +91,7 @@ public class XMLFileSettingsProvider extends AbstractXMLSettingsProvider impleme
 	 * @see org.eclipse.ptp.internal.rdt.sync.cdt.core.AbstractXMLSettingsProvider#getXSLTFile()
 	 */
 	@Override
-	public IPath getXSLTFile() {
-		return XSLTFile;
+	public Source getXSLT() {
+		return XMLConversionUtil.XSLTFileToSource(XSLTFile);
 	}
 }
