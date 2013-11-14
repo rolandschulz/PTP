@@ -32,6 +32,11 @@ public class Messages extends NLS {
 	public static String WizardUtil_0;
 	public static String WizardUtil_1;
 	public static String WizardUtil_2;
+	public static String CMakeSettingsProviderOptions_0;
+	public static String CMakeSettingsProviderOptions_1;
+	public static String CMakeSettingsProviderOptions_2;
+	public static String CMakeSettingsProviderOptions_3;
+	public static String CMakeSettingsProviderOptions_4;
 	public static String ConvertFromRemoteCToSyncProjectWizardPage_3;
 	public static String ConvertCToSyncCProjectWizard_0;
 	public static String ConvertCToSyncCProjectWizard_1;

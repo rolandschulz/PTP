@@ -14,6 +14,7 @@ import java.io.IOException;
 
 import javax.xml.transform.Source;
 
+import org.eclipse.core.runtime.IPath;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -21,6 +22,8 @@ import org.xml.sax.SAXException;
  * Language settings provider for projects that build with CMake
  */
 public class CMakeSettingsProvider extends AbstractXMLSettingsProvider {
+	private IPath buildDir = null;
+
 	@Override
 	public Document getXML() throws IOException, SAXException {
 	}
@@ -33,5 +36,21 @@ public class CMakeSettingsProvider extends AbstractXMLSettingsProvider {
 	public Source getXSLT() {
 		// No XSLT, because transformations are done internally
 		return null;
+	}
+
+	/**
+	 * Get the build directory
+	 * @return build directory
+	 */
+	public IPath getBuildDir() {
+		return buildDir;
+	}
+
+	/**
+	 * Set the build directory
+	 * @param path to build directory or null for no build directory
+	 */
+	public void setBuildDir(IPath dir) {
+		buildDir = dir;
 	}
 }
