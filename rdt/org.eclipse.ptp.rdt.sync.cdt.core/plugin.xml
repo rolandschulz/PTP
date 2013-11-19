@@ -53,5 +53,11 @@
             parameter="Enter XML file location"
             prefer-non-shared="true">
       </provider>
+      <provider
+            class="org.eclipse.ptp.internal.rdt.sync.cdt.core.CMakeSettingsProvider"
+            id="org.eclipse.ptp.rdt.sync.core.CMakeSettingsProvider"
+            name="CMake Build Settings"
+            prefer-non-shared="true">
+      </provider>
    </extension>
 </plugin>
