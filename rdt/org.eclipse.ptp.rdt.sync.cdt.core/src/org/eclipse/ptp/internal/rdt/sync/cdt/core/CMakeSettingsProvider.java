@@ -14,6 +14,12 @@ import java.io.IOException;
 
 import javax.xml.transform.Source;
 
+import org.eclipse.cdt.core.language.settings.providers.ICBuildOutputParser;
+import org.eclipse.cdt.core.language.settings.providers.IWorkingDirectoryTracker;
+import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
+import org.eclipse.cdt.managedbuilder.core.IConfiguration;
+import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -21,7 +27,8 @@ import org.xml.sax.SAXException;
 /**
  * Language settings provider for projects that build with CMake
  */
-public class CMakeSettingsProvider extends AbstractXMLSettingsProvider {
+public class CMakeSettingsProvider extends AbstractXMLSettingsProvider implements ICBuildOutputParser {
+	private IConfiguration config = null;
 	private IPath buildDir = null;
 
 	@Override
@@ -52,5 +59,34 @@ public class CMakeSettingsProvider extends AbstractXMLSettingsProvider {
 	 */
 	public void setBuildDir(IPath dir) {
 		buildDir = dir;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.cdt.core.language.settings.providers.ICBuildOutputParser#startup(org.eclipse.cdt.core.settings.model.ICConfigurationDescription, org.eclipse.cdt.core.language.settings.providers.IWorkingDirectoryTracker)
+	 */
+	@Override
+	public void startup(ICConfigurationDescription cfgDescription,
+			IWorkingDirectoryTracker cwdTracker) throws CoreException {
+		config = ManagedBuildManager.getConfigurationForDescription(cfgDescription);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.cdt.core.language.settings.providers.ICBuildOutputParser#processLine(java.lang.String)
+	 */
+	@Override
+	public boolean processLine(String line) {
+		// This is not really a build output parser, so ignore all lines
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.cdt.core.language.settings.providers.ICBuildOutputParser#shutdown()
+	 */
+	@Override
+	public void shutdown() {
+		// nothing to do
 	}
 }
