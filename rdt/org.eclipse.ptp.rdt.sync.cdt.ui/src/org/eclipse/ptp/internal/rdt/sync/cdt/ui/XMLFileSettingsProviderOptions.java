@@ -151,6 +151,9 @@ public class XMLFileSettingsProviderOptions extends AbstractLanguageSettingProvi
 	
 	@Override
 	public void performApply(IProgressMonitor monitor) throws CoreException {
+		if (!(providerTab.getProvider(providerId) instanceof XMLFileSettingsProvider)) {
+			return;
+		}
 		XMLFileSettingsProvider provider = (XMLFileSettingsProvider) providerTab.getProvider(providerId);
 
 		String XSLTFileName = XSLTFileNameTextBox.getText();
