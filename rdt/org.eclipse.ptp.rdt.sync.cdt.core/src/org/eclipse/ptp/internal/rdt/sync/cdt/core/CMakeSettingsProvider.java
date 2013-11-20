@@ -12,6 +12,9 @@ package org.eclipse.ptp.internal.rdt.sync.cdt.core;
 
 import java.io.IOException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 
 import org.eclipse.cdt.core.language.settings.providers.ICBuildOutputParser;
@@ -24,6 +27,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
@@ -54,7 +61,27 @@ public class CMakeSettingsProvider extends AbstractXMLSettingsProvider implement
 	@Override
 	public Document getXML() throws IOException, SAXException {
 		IPath CProjectFile = new Path(config.getBuilder().getBuildPath()).append(".cproject"); //$NON-NLS-1$
-		return XMLConversionUtil.XMLFileToDOM(CProjectFile);
+		Document XMLDoc = XMLConversionUtil.XMLFileToDOM(CProjectFile);
+		DocumentBuilderFactory builderFactory =
+		        DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = null;
+		try {
+		    builder = builderFactory.newDocumentBuilder();
+		} catch (ParserConfigurationException e) {
+			// Should never happen since no configuring is done
+			throw new RuntimeException(e);
+		}
+		Document doc = builder.newDocument();
+		Element providerNode = doc.createElement("provider"); //$NON-NLS-1$
+		String compiler = config.getToolChain().getTargetToolList()[0];
+		Element compilerNode = doc.createElement("language"); //$NON-NLS-1$
+		compilerNode.setAttribute("id", compiler); //$NON-NLS-1$
+		providerNode.appendChild(compilerNode);
+		NodeList entries = XMLDoc.getElementsByTagName("pathEntry"); //$NON-NLS-1$
+		for (int i=0; i<entries.getLength(); i++) {
+			NamedNodeMap attr = entries.item(i).getAttributes();
+		}
+		return XMLDoc;
 	}
 
 	/*
