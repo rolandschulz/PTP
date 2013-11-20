@@ -111,5 +111,9 @@
               class="org.eclipse.ptp.internal.rdt.sync.cdt.core.XMLFileSettingsProvider"
               page="org.eclipse.ptp.internal.rdt.sync.cdt.ui.XMLFileSettingsProviderOptions">
         </class-association>
+        <class-association
+              class="org.eclipse.ptp.internal.rdt.sync.cdt.core.CMakeSettingsProvider"
+              page="org.eclipse.ptp.internal.rdt.sync.cdt.ui.CMakeSettingsProviderOptions">
+        </class-association>
      </extension>
 </plugin>

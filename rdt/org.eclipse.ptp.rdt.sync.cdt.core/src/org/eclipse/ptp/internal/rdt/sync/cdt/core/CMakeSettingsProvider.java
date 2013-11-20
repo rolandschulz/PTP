@@ -15,24 +15,46 @@ import java.io.IOException;
 import javax.xml.transform.Source;
 
 import org.eclipse.cdt.core.language.settings.providers.ICBuildOutputParser;
+import org.eclipse.cdt.core.language.settings.providers.ILanguageSettingsEditableProvider;
 import org.eclipse.cdt.core.language.settings.providers.IWorkingDirectoryTracker;
 import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 /**
  * Language settings provider for projects that build with CMake
  */
-public class CMakeSettingsProvider extends AbstractXMLSettingsProvider implements ICBuildOutputParser {
+public class CMakeSettingsProvider extends AbstractXMLSettingsProvider implements ICBuildOutputParser, ILanguageSettingsEditableProvider {
 	private IConfiguration config = null;
 	private IPath buildDir = null;
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.cdt.core.language.settings.providers.LanguageSettingsSerializableProvider#clone()
+	 */
+	@Override
+	public CMakeSettingsProvider clone() throws CloneNotSupportedException {
+		return (CMakeSettingsProvider) super.clone();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.cdt.core.language.settings.providers.LanguageSettingsSerializableProvider#cloneShallow()
+	 */
+	@Override
+	public CMakeSettingsProvider cloneShallow() throws CloneNotSupportedException {
+		return (CMakeSettingsProvider) super.cloneShallow();
+	}
+
 	@Override
 	public Document getXML() throws IOException, SAXException {
+		IPath CProjectFile = new Path(config.getBuilder().getBuildPath()).append(".cproject"); //$NON-NLS-1$
+		return XMLConversionUtil.XMLFileToDOM(CProjectFile);
 	}
 
 	/*
