@@ -92,6 +92,10 @@ public class XMLFileSettingsProvider extends AbstractXMLSettingsProvider impleme
 	 */
 	@Override
 	public Source getXSLT() {
-		return XMLConversionUtil.XSLTFileToSource(XSLTFile);
+		if (XSLTFile == null) {
+			return null;
+		} else {
+			return XMLConversionUtil.XSLTFileToSource(XSLTFile);
+		}
 	}
 }
