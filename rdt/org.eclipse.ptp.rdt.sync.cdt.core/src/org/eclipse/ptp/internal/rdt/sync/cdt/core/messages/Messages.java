@@ -45,6 +45,8 @@ public class Messages extends NLS {
 
 	public static String BuildConfigurationManager_8;
 
+	public static String CMakeSettingsProvider_0;
+
 	public static String SyncGCCBuiltinSpecsDetector_0;
 
 	public static String SyncGCCBuiltinSpecsDetector_1;
