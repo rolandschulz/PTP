@@ -1,0 +1,427 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!DOCTYPE multihwpcprofilereport SYSTEM "/home/ruiliu/tmp/nightly-test/perfsuite-install/share/perfsuite/dtds/pshwpc/multihwpcprofilereport-0.3.dtd">
+<multihwpcprofilereport xmlns:perfsuite="http://perfsuite.ncsa.uiuc.edu/" version="0.4" generator="psprocess">
+    <hwpcprofilereport xmlns:perfsuite="http://perfsuite.ncsa.uiuc.edu/" version="0.1" generator="psprocess">
+        <date>Fri Nov 22 15:08:42 2013</date>
+        <hostname>Amituofo</hostname>
+        <domainname>null</domainname>
+        <username>ruiliu</username>
+        <executioninfo>
+        <date>Fri Nov 22 15:08:41 2013</date>
+        <hostname>Amituofo</hostname>
+        <domainname>(none)</domainname>
+        <pid>9377</pid>
+        <thread>0</thread>
+        <username>ruiliu</username>
+        <command>testfeedback</command>
+        <wallclock units="ticks">3591963642</wallclock>
+        <cputime units="seconds">
+            <usertime>0.000260</usertime>
+            <systemtime>0.000070</systemtime>
+        </cputime>
+        <machineinfo>
+            <cpucount>2</cpucount>
+            <cpuinfo>
+                <vendor>Intel</vendor>
+                <brand>Intel(R) Core(TM)2 Duo CPU     T9400  @ 2.53GHz</brand>
+                <cpuidinfo>family: 6, model: 23, stepping: 6</cpuidinfo>
+                <revision>6</revision>
+                <clockspeed units="MHz">2534.000</clockspeed>
+                <cacheinfo>
+                    <levels>2</levels>
+                    <cache type="instruction" level="1">
+                        <size units="KB">32</size>
+                        <linesize units="B">64</linesize>
+                        <associativity type="set">8</associativity>
+                    </cache>
+                    <cache type="data" level="1">
+                        <size units="KB">32</size>
+                        <linesize units="B">64</linesize>
+                        <associativity type="set">8</associativity>
+                    </cache>
+                    <cache type="unified" level="2">
+                        <size units="KB">6144</size>
+                        <linesize units="B">64</linesize>
+                        <associativity type="set">24</associativity>
+                    </cache>
+                </cacheinfo>
+                <tlbinfo>
+                    <tlb type="data" level="1">
+                        <entries>16</entries>
+                        <associativity type="set">4</associativity>
+                    </tlb>
+                    <tlb type="data" level="1">
+                        <entries>16</entries>
+                        <associativity type="set">4</associativity>
+                    </tlb>
+                    <tlb type="instruction" level="1">
+                        <entries>128</entries>
+                        <associativity type="set">4</associativity>
+                    </tlb>
+                    <tlb type="instruction" level="1">
+                        <entries>4</entries>
+                        <associativity type="set">4</associativity>
+                    </tlb>
+                    <tlb type="data" level="2">
+                        <entries>256</entries>
+                        <associativity type="set">4</associativity>
+                    </tlb>
+                    <tlb type="data" level="2">
+                        <entries>32</entries>
+                        <associativity type="set">4</associativity>
+                    </tlb>
+                </tlbinfo>
+            </cpuinfo>
+            <memoryinfo units="MB">2904.20</memoryinfo>
+            <syspagesize units="KB">4</syspagesize>
+        </machineinfo>
+        </executioninfo>
+        <hwpcprofile mapper="binutils">
+            <hwpcevent class="PAPI" version="5.2.0.0" type="preset" name="PAPI_TOT_CYC" domain="user"/>
+            <period>10000000</period>
+            <totalsamples>61</totalsamples>
+            <module name="/home/ruiliu/IROOT/papi-5.2.0/lib/libpfm.so.4.4.0">
+                <file name="??">
+                    <function name="??">
+                        <line lineno="0">1</line>
+                    </function>
+                </file>
+            </module>
+            <module name="/lib/i386-linux-gnu/ld-2.15.so">
+                <file name="??">
+                    <function name="??">
+                        <line lineno="0">2</line>
+                    </function>
+                </file>
+            </module>
+            <module name="/lib/i386-linux-gnu/libc-2.15.so">
+                <file name="??">
+                    <function name="??">
+                        <line lineno="0">1</line>
+                    </function>
+                </file>
+            </module>
+            <module name="/tmp/testfeedback/testfeedback">
+                <file name="/tmp/testfeedback//testfeedback.c">
+                    <function name="calc_pi">
+                        <line lineno="33">4</line>
+                        <line lineno="34">5</line>
+                        <line lineno="35">47</line>
+                    </function>
+                </file>
+            </module>
+            <module name="/usr/lib/openmpi/lib/libopen-pal.so.0.0.0">
+                <file name="??">
+                    <function name="??">
+                        <line lineno="0">1</line>
+                    </function>
+                </file>
+            </module>
+        </hwpcprofile>
+    </hwpcprofilereport>
+    <hwpcprofilereport xmlns:perfsuite="http://perfsuite.ncsa.uiuc.edu/" version="0.1" generator="psprocess">
+        <date>Fri Nov 22 15:08:42 2013</date>
+        <hostname>Amituofo</hostname>
+        <domainname>null</domainname>
+        <username>ruiliu</username>
+        <executioninfo>
+        <date>Fri Nov 22 15:08:41 2013</date>
+        <hostname>Amituofo</hostname>
+        <domainname>(none)</domainname>
+        <pid>9380</pid>
+        <thread>0</thread>
+        <username>ruiliu</username>
+        <command>testfeedback</command>
+        <wallclock units="ticks">3595116188</wallclock>
+        <cputime units="seconds">
+            <usertime>0.000250</usertime>
+            <systemtime>0.000000</systemtime>
+        </cputime>
+        <machineinfo>
+            <cpucount>2</cpucount>
+            <cpuinfo>
+                <vendor>Intel</vendor>
+                <brand>Intel(R) Core(TM)2 Duo CPU     T9400  @ 2.53GHz</brand>
+                <cpuidinfo>family: 6, model: 23, stepping: 6</cpuidinfo>
+                <revision>6</revision>
+                <clockspeed units="MHz">2534.000</clockspeed>
+                <cacheinfo>
+                    <levels>2</levels>
+                    <cache type="instruction" level="1">
+                        <size units="KB">32</size>
+                        <linesize units="B">64</linesize>
+                        <associativity type="set">8</associativity>
+                    </cache>
+                    <cache type="data" level="1">
+                        <size units="KB">32</size>
+                        <linesize units="B">64</linesize>
+                        <associativity type="set">8</associativity>
+                    </cache>
+                    <cache type="unified" level="2">
+                        <size units="KB">6144</size>
+                        <linesize units="B">64</linesize>
+                        <associativity type="set">24</associativity>
+                    </cache>
+                </cacheinfo>
+                <tlbinfo>
+                    <tlb type="data" level="1">
+                        <entries>16</entries>
+                        <associativity type="set">4</associativity>
+                    </tlb>
+                    <tlb type="data" level="1">
+                        <entries>16</entries>
+                        <associativity type="set">4</associativity>
+                    </tlb>
+                    <tlb type="instruction" level="1">
+                        <entries>128</entries>
+                        <associativity type="set">4</associativity>
+                    </tlb>
+                    <tlb type="instruction" level="1">
+                        <entries>4</entries>
+                        <associativity type="set">4</associativity>
+                    </tlb>
+                    <tlb type="data" level="2">
+                        <entries>256</entries>
+                        <associativity type="set">4</associativity>
+                    </tlb>
+                    <tlb type="data" level="2">
+                        <entries>32</entries>
+                        <associativity type="set">4</associativity>
+                    </tlb>
+                </tlbinfo>
+            </cpuinfo>
+            <memoryinfo units="MB">2904.20</memoryinfo>
+            <syspagesize units="KB">4</syspagesize>
+        </machineinfo>
+        </executioninfo>
+        <hwpcprofile mapper="binutils">
+            <hwpcevent class="PAPI" version="5.2.0.0" type="preset" name="PAPI_TOT_CYC" domain="user"/>
+            <period>10000000</period>
+            <totalsamples>58</totalsamples>
+            <module name="/lib/i386-linux-gnu/ld-2.15.so">
+                <file name="??">
+                    <function name="??">
+                        <line lineno="0">1</line>
+                    </function>
+                </file>
+            </module>
+            <module name="/lib/i386-linux-gnu/libc-2.15.so">
+                <file name="??">
+                    <function name="??">
+                        <line lineno="0">1</line>
+                    </function>
+                </file>
+            </module>
+            <module name="/tmp/testfeedback/testfeedback">
+                <file name="/tmp/testfeedback//testfeedback.c">
+                    <function name="calc_pi">
+                        <line lineno="33">7</line>
+                        <line lineno="34">6</line>
+                        <line lineno="35">43</line>
+                    </function>
+                </file>
+            </module>
+        </hwpcprofile>
+    </hwpcprofilereport>
+    <hwpcprofilereport xmlns:perfsuite="http://perfsuite.ncsa.uiuc.edu/" version="0.1" generator="psprocess">
+        <date>Fri Nov 22 15:08:42 2013</date>
+        <hostname>Amituofo</hostname>
+        <domainname>null</domainname>
+        <username>ruiliu</username>
+        <executioninfo>
+        <date>Fri Nov 22 15:08:41 2013</date>
+        <hostname>Amituofo</hostname>
+        <domainname>(none)</domainname>
+        <pid>9381</pid>
+        <thread>0</thread>
+        <username>ruiliu</username>
+        <command>testfeedback</command>
+        <wallclock units="ticks">3528777109</wallclock>
+        <cputime units="seconds">
+            <usertime>0.000240</usertime>
+            <systemtime>0.000010</systemtime>
+        </cputime>
+        <machineinfo>
+            <cpucount>2</cpucount>
+            <cpuinfo>
+                <vendor>Intel</vendor>
+                <brand>Intel(R) Core(TM)2 Duo CPU     T9400  @ 2.53GHz</brand>
+                <cpuidinfo>family: 6, model: 23, stepping: 6</cpuidinfo>
+                <revision>6</revision>
+                <clockspeed units="MHz">2534.000</clockspeed>
+                <cacheinfo>
+                    <levels>2</levels>
+                    <cache type="instruction" level="1">
+                        <size units="KB">32</size>
+                        <linesize units="B">64</linesize>
+                        <associativity type="set">8</associativity>
+                    </cache>
+                    <cache type="data" level="1">
+                        <size units="KB">32</size>
+                        <linesize units="B">64</linesize>
+                        <associativity type="set">8</associativity>
+                    </cache>
+                    <cache type="unified" level="2">
+                        <size units="KB">6144</size>
+                        <linesize units="B">64</linesize>
+                        <associativity type="set">24</associativity>
+                    </cache>
+                </cacheinfo>
+                <tlbinfo>
+                    <tlb type="data" level="1">
+                        <entries>16</entries>
+                        <associativity type="set">4</associativity>
+                    </tlb>
+                    <tlb type="data" level="1">
+                        <entries>16</entries>
+                        <associativity type="set">4</associativity>
+                    </tlb>
+                    <tlb type="instruction" level="1">
+                        <entries>128</entries>
+                        <associativity type="set">4</associativity>
+                    </tlb>
+                    <tlb type="instruction" level="1">
+                        <entries>4</entries>
+                        <associativity type="set">4</associativity>
+                    </tlb>
+                    <tlb type="data" level="2">
+                        <entries>256</entries>
+                        <associativity type="set">4</associativity>
+                    </tlb>
+                    <tlb type="data" level="2">
+                        <entries>32</entries>
+                        <associativity type="set">4</associativity>
+                    </tlb>
+                </tlbinfo>
+            </cpuinfo>
+            <memoryinfo units="MB">2904.20</memoryinfo>
+            <syspagesize units="KB">4</syspagesize>
+        </machineinfo>
+        </executioninfo>
+        <hwpcprofile mapper="binutils">
+            <hwpcevent class="PAPI" version="5.2.0.0" type="preset" name="PAPI_TOT_CYC" domain="user"/>
+            <period>10000000</period>
+            <totalsamples>58</totalsamples>
+            <module name="/lib/i386-linux-gnu/ld-2.15.so">
+                <file name="??">
+                    <function name="??">
+                        <line lineno="0">2</line>
+                    </function>
+                </file>
+            </module>
+            <module name="/tmp/testfeedback/testfeedback">
+                <file name="/tmp/testfeedback//testfeedback.c">
+                    <function name="calc_pi">
+                        <line lineno="33">6</line>
+                        <line lineno="34">6</line>
+                        <line lineno="35">44</line>
+                    </function>
+                </file>
+            </module>
+        </hwpcprofile>
+    </hwpcprofilereport>
+    <hwpcprofilereport xmlns:perfsuite="http://perfsuite.ncsa.uiuc.edu/" version="0.1" generator="psprocess">
+        <date>Fri Nov 22 15:08:42 2013</date>
+        <hostname>Amituofo</hostname>
+        <domainname>null</domainname>
+        <username>ruiliu</username>
+        <executioninfo>
+        <date>Fri Nov 22 15:08:41 2013</date>
+        <hostname>Amituofo</hostname>
+        <domainname>(none)</domainname>
+        <pid>9382</pid>
+        <thread>0</thread>
+        <username>ruiliu</username>
+        <command>testfeedback</command>
+        <wallclock units="ticks">3524325039</wallclock>
+        <cputime units="seconds">
+            <usertime>0.000240</usertime>
+            <systemtime>0.000010</systemtime>
+        </cputime>
+        <machineinfo>
+            <cpucount>2</cpucount>
+            <cpuinfo>
+                <vendor>Intel</vendor>
+                <brand>Intel(R) Core(TM)2 Duo CPU     T9400  @ 2.53GHz</brand>
+                <cpuidinfo>family: 6, model: 23, stepping: 6</cpuidinfo>
+                <revision>6</revision>
+                <clockspeed units="MHz">2534.000</clockspeed>
+                <cacheinfo>
+                    <levels>2</levels>
+                    <cache type="instruction" level="1">
+                        <size units="KB">32</size>
+                        <linesize units="B">64</linesize>
+                        <associativity type="set">8</associativity>
+                    </cache>
+                    <cache type="data" level="1">
+                        <size units="KB">32</size>
+                        <linesize units="B">64</linesize>
+                        <associativity type="set">8</associativity>
+                    </cache>
+                    <cache type="unified" level="2">
+                        <size units="KB">6144</size>
+                        <linesize units="B">64</linesize>
+                        <associativity type="set">24</associativity>
+                    </cache>
+                </cacheinfo>
+                <tlbinfo>
+                    <tlb type="data" level="1">
+                        <entries>16</entries>
+                        <associativity type="set">4</associativity>
+                    </tlb>
+                    <tlb type="data" level="1">
+                        <entries>16</entries>
+                        <associativity type="set">4</associativity>
+                    </tlb>
+                    <tlb type="instruction" level="1">
+                        <entries>128</entries>
+                        <associativity type="set">4</associativity>
+                    </tlb>
+                    <tlb type="instruction" level="1">
+                        <entries>4</entries>
+                        <associativity type="set">4</associativity>
+                    </tlb>
+                    <tlb type="data" level="2">
+                        <entries>256</entries>
+                        <associativity type="set">4</associativity>
+                    </tlb>
+                    <tlb type="data" level="2">
+                        <entries>32</entries>
+                        <associativity type="set">4</associativity>
+                    </tlb>
+                </tlbinfo>
+            </cpuinfo>
+            <memoryinfo units="MB">2904.20</memoryinfo>
+            <syspagesize units="KB">4</syspagesize>
+        </machineinfo>
+        </executioninfo>
+        <hwpcprofile mapper="binutils">
+            <hwpcevent class="PAPI" version="5.2.0.0" type="preset" name="PAPI_TOT_CYC" domain="user"/>
+            <period>10000000</period>
+            <totalsamples>58</totalsamples>
+            <module name="/lib/i386-linux-gnu/libc-2.15.so">
+                <file name="??">
+                    <function name="??">
+                        <line lineno="0">1</line>
+                    </function>
+                </file>
+            </module>
+            <module name="/tmp/testfeedback/testfeedback">
+                <file name="/tmp/testfeedback//testfeedback.c">
+                    <function name="calc_pi">
+                        <line lineno="33">11</line>
+                        <line lineno="34">5</line>
+                        <line lineno="35">40</line>
+                    </function>
+                </file>
+            </module>
+            <module name="/usr/lib/openmpi/lib/libopen-pal.so.0.0.0">
+                <file name="??">
+                    <function name="??">
+                        <line lineno="0">1</line>
+                    </function>
+                </file>
+            </module>
+        </hwpcprofile>
+    </hwpcprofilereport>
+</multihwpcprofilereport>
