@@ -49,9 +49,7 @@ to profile the program, then run "psprocess -x -o mhpr.xml myprog.*.xml" to do t
 source code mapping and combine the results of multiple processes/threads into
 one file "mhpr.xml".
 <li>Select the file "mhpr.xml" in the Project Explorer view.
-<li>Hit the PerfSuite Feedback View button
-(<img src="images/feedback_view.gif"></img>)
-in the toolbar, or select the menu "Feedback -> PerfSuite Feedback",
+<li>Click the mouse's right button and select the menu item "Display PerfSuite Feedback",
 or type the keyboard shortcut CTRL-7.
 The PerfSuite Feedback View Plugin parses the xml file, creates markers that are associated
 with the source code files, and create a feedback view with line items which are associated
@@ -122,17 +120,17 @@ After that, the "testfeedback" program was built, run with "psrun", and the gene
 <li>We typed "CTRL-7", and the plug-in created a new view.  We then clicked the "Expand All"
 button to see the line items.  The line items are grouped by the files.
 The format is "&lt;hostname&gt;-PID_&lt;pid&gt;-thread_&lt;threadid&gt;".
-In the case of the first one "Amituofo-PID_4228-thread_0", the host name is "Amituofo".
+In the case of the first one "Amituofo-PID_8950-thread_0", the host name is "Amituofo".
 Since it's an MPI run, the thread IDs are all 0s,
-but the PIDs are different.
-<img src="images/result-view.png"></img>
-<li>We double-clicked on the line corresponding to line 40 in the "Amituofo-PID_4228-thread_0"
-section.  The editor window brought the file "testfeedback.c" to front, and focused in line 40.
-<img src="images/double-clicked.png"></img>
+but the PIDs are different.<br/>
+<a href="images/result-view.png"><img src="images/result-view.png" alt="View of results" width=75%></img></a>
+<li>We double-clicked on the line corresponding to line 40 in the "Amituofo-PID_8950-thread_0"
+section.  The editor window brought the file "testfeedback.c" to front, and focused on line 40.<br>
+<a href="images/double-clicked.png"><img src="images/double-clicked.png" alt="Screenshot when an item in the view is double clicked" width=75%></img></a>
 
 <li>We also tried to click the markers in the editor window's overview ruler to go to other
-hot spot locations.
-<img src="images/overview-ruler.png"></img>
+hot spot locations.<br/>
+<a href="images/overview-ruler.png"><img src="images/overview-ruler.png" alt="Using overview ruler to go to lines" width=75%></img></a>
 
 </ol>
 
@@ -143,25 +141,23 @@ hot spot locations.
 
 Several GUI items were added by this feature, as shown in the following screen shots.
 <nl>
-<li>A new menu entry "Feedback -> PerfSuite Feedback"
+<li>A new context menu entry "Display PerfSuite Feedback"
 and a keyboard combination shortcut "CTRL-7"<br/>
-<img src="images/menu.png" alt="New Menu Entry">
-
-<li>A new toolbar button<br/>
-<img src="images/toolbar-button.png" alt="New Toolbar Button">
+<a href="images/context-menu.png"><img src="images/context-menu.png" alt="New Context Menu Entry: Display PerfSuite Feedback" width=75%></a>
 
 <li>A new view category "PTP ETFw Feedback View" and a new view
-"PerfSuite Feedback Items"</br>
-<img src="images/show-view.png" alt="New View Category and View">
+"PerfSuite Feedback Items"<br/>
+<a href="images/show-view.png"><img src="images/show-view.png" alt="New View Category and View" width=75%></a>
 
 <li>A new annotation type "PerfSuite Feedback Marker" and its preferences
  in "General -> Editors -> Text Editors -> Annotations -> PerfSuite Feedback Marker"<br/>
+<p>
 The preference items allow a user to choose for the lines associated with
 the markers: whether the markers appear in the
 vertical ruler, the overview ruler or neither, whether the text is highlighted or
 underlined with squiggly lines or neither, and the background color
-of the lines.
-<img src="images/prefs.png" alt="New Annotation Preference">
+of the lines.<br/>
+<a href="images/prefs.png"><img src="images/prefs.png" alt="New Annotation Preference" width=75%></a>
 
 </nl>
 
