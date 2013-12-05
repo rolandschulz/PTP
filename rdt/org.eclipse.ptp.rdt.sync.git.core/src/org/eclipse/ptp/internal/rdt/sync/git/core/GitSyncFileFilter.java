@@ -27,6 +27,7 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.NoFilepatternException;
@@ -249,6 +250,11 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 
 		for (SyncConfig config : SyncConfigManager.getConfigs(project)) {
 			config.setProperty(REMOTE_FILTER_IS_DIRTY, "TRUE"); //$NON-NLS-1$
+		}
+		try {
+			SyncConfigManager.saveConfigs(project);
+		} catch (CoreException e) {
+			Activator.log(Messages.GitSyncFileFilter_UnableToSaveSyncConfigs + project.getName(), e);
 		}
 	}
 
