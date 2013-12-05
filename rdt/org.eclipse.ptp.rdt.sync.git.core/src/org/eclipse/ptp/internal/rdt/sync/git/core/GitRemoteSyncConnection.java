@@ -73,6 +73,7 @@ import org.eclipse.ptp.internal.rdt.sync.git.core.messages.Messages;
 import org.eclipse.ptp.rdt.sync.core.RecursiveSubMonitor;
 import org.eclipse.ptp.rdt.sync.core.SyncConfig;
 import org.eclipse.ptp.rdt.sync.core.AbstractSyncFileFilter;
+import org.eclipse.ptp.rdt.sync.core.SyncConfigManager;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
 import org.eclipse.ptp.rdt.sync.core.exceptions.RemoteExecutionException;
 import org.eclipse.ptp.rdt.sync.core.exceptions.RemoteSyncException;
@@ -381,6 +382,11 @@ public class GitRemoteSyncConnection {
 					}
 				}
 				syncConfig.setProperty(GitSyncFileFilter.REMOTE_FILTER_IS_DIRTY, "FALSE"); //$NON-NLS-1$
+				try {
+					SyncConfigManager.saveConfigs(project);
+				} catch (CoreException e) {
+					Activator.log(Messages.GitRemoteSyncConnection_19 + project.getName(), e);
+				}
 			}
 			
 		    final String command = gitCommand() + " ls-files -X " + gitDir + "/" + Constants.INFO_EXCLUDE + " -o -m | " + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
