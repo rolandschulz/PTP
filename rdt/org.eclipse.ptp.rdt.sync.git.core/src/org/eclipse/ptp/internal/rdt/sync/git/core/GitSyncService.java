@@ -272,6 +272,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 		// On first sync, place .gitignore in directories. This is useful for folders that are already present and thus are never
 		// captured by a resource add or change event. (This can happen for projects converted to sync projects.)
 		if (!hasBeenSynced) {
+			hasBeenSynced = true;
 			project.accept(new IResourceVisitor() {
 				@Override
 				public boolean visit(IResource resource) throws CoreException {
@@ -292,7 +293,6 @@ public class GitSyncService extends AbstractSynchronizeService {
 				}
 			});
 		}
-		hasBeenSynced = true;
 
 		// Make a visitor that explores the delta. At the moment, this visitor is responsible for two tasks (the list may grow in
 		// the future):
