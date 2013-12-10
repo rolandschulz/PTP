@@ -5,22 +5,23 @@
 // Generated on: 2013.11.05 at 08:09:06 AM EST 
 //
 
-
 package org.eclipse.ptp.rm.jaxb.core.data;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
- * <p>Java class for widget-type complex type.
+ * <p>
+ * Java class for widget-type complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="widget-type">
@@ -74,498 +75,457 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "widget-type", propOrder = {
-    "layoutData",
-    "font",
-    "tooltip",
-    "itemsFrom",
-    "fixedText",
-    "dynamicText",
-    "controlState"
-})
+@XmlType(name = "widget-type", propOrder = { "layoutData", "font", "tooltip", "itemsFrom", "fixedText", "dynamicText",
+		"controlState" })
 public class WidgetType {
 
-    @XmlElement(name = "layout-data")
-    protected LayoutDataType layoutData;
-    protected FontType font;
-    protected String tooltip;
-    @XmlElement(name = "items-from")
-    protected String itemsFrom;
-    @XmlElement(name = "fixed-text")
-    protected String fixedText;
-    @XmlElement(name = "dynamic-text")
-    protected WidgetType.DynamicText dynamicText;
-    @XmlElement(name = "control-state")
-    protected ControlStateType controlState;
-    @XmlAttribute(name = "type")
-    protected String type;
-    @XmlAttribute(name = "typeId")
-    protected String typeId;
-    @XmlAttribute(name = "buttonId")
-    protected String buttonId;
-    @XmlAttribute(name = "title")
-    protected String title;
-    @XmlAttribute(name = "style")
-    protected String style;
-    @XmlAttribute(name = "readOnly")
-    protected Boolean readOnly;
-    @XmlAttribute(name = "attribute")
-    protected String attribute;
-    @XmlAttribute(name = "foreground")
-    protected String foreground;
-    @XmlAttribute(name = "background")
-    protected String background;
+	@XmlElement(name = "layout-data")
+	protected LayoutDataType layoutData;
+	protected FontType font;
+	protected String tooltip;
+	@XmlElement(name = "items-from")
+	protected String itemsFrom;
+	@XmlElement(name = "fixed-text")
+	protected String fixedText;
+	@XmlElement(name = "dynamic-text")
+	protected WidgetType.DynamicText dynamicText;
+	@XmlElement(name = "control-state")
+	protected ControlStateType controlState;
+	@XmlAttribute(name = "type")
+	protected String type;
+	@XmlAttribute(name = "typeId")
+	protected String typeId;
+	@XmlAttribute(name = "buttonId")
+	protected String buttonId;
+	@XmlAttribute(name = "title")
+	protected String title;
+	@XmlAttribute(name = "style")
+	protected String style;
+	@XmlAttribute(name = "readOnly")
+	protected Boolean readOnly;
+	@XmlAttribute(name = "attribute")
+	protected String attribute;
+	@XmlAttribute(name = "foreground")
+	protected String foreground;
+	@XmlAttribute(name = "background")
+	protected String background;
 
-    /**
-     * Gets the value of the layoutData property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link LayoutDataType }
-     *     
-     */
-    public LayoutDataType getLayoutData() {
-        return layoutData;
-    }
+	/**
+	 * Gets the value of the layoutData property.
+	 * 
+	 * @return
+	 *         possible object is {@link LayoutDataType }
+	 * 
+	 */
+	public LayoutDataType getLayoutData() {
+		return layoutData;
+	}
 
-    /**
-     * Sets the value of the layoutData property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link LayoutDataType }
-     *     
-     */
-    public void setLayoutData(LayoutDataType value) {
-        this.layoutData = value;
-    }
+	/**
+	 * Sets the value of the layoutData property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link LayoutDataType }
+	 * 
+	 */
+	public void setLayoutData(LayoutDataType value) {
+		this.layoutData = value;
+	}
 
-    /**
-     * Gets the value of the font property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link FontType }
-     *     
-     */
-    public FontType getFont() {
-        return font;
-    }
+	/**
+	 * Gets the value of the font property.
+	 * 
+	 * @return
+	 *         possible object is {@link FontType }
+	 * 
+	 */
+	public FontType getFont() {
+		return font;
+	}
 
-    /**
-     * Sets the value of the font property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link FontType }
-     *     
-     */
-    public void setFont(FontType value) {
-        this.font = value;
-    }
+	/**
+	 * Sets the value of the font property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link FontType }
+	 * 
+	 */
+	public void setFont(FontType value) {
+		this.font = value;
+	}
 
-    /**
-     * Gets the value of the tooltip property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getTooltip() {
-        return tooltip;
-    }
+	/**
+	 * Gets the value of the tooltip property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getTooltip() {
+		return tooltip;
+	}
 
-    /**
-     * Sets the value of the tooltip property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setTooltip(String value) {
-        this.tooltip = value;
-    }
+	/**
+	 * Sets the value of the tooltip property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setTooltip(String value) {
+		this.tooltip = value;
+	}
 
-    /**
-     * Gets the value of the itemsFrom property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getItemsFrom() {
-        return itemsFrom;
-    }
+	/**
+	 * Gets the value of the itemsFrom property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getItemsFrom() {
+		return itemsFrom;
+	}
 
-    /**
-     * Sets the value of the itemsFrom property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setItemsFrom(String value) {
-        this.itemsFrom = value;
-    }
+	/**
+	 * Sets the value of the itemsFrom property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setItemsFrom(String value) {
+		this.itemsFrom = value;
+	}
 
-    /**
-     * Gets the value of the fixedText property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getFixedText() {
-        return fixedText;
-    }
+	/**
+	 * Gets the value of the fixedText property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getFixedText() {
+		return fixedText;
+	}
 
-    /**
-     * Sets the value of the fixedText property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setFixedText(String value) {
-        this.fixedText = value;
-    }
+	/**
+	 * Sets the value of the fixedText property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setFixedText(String value) {
+		this.fixedText = value;
+	}
 
-    /**
-     * Gets the value of the dynamicText property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link WidgetType.DynamicText }
-     *     
-     */
-    public WidgetType.DynamicText getDynamicText() {
-        return dynamicText;
-    }
+	/**
+	 * Gets the value of the dynamicText property.
+	 * 
+	 * @return
+	 *         possible object is {@link WidgetType.DynamicText }
+	 * 
+	 */
+	public WidgetType.DynamicText getDynamicText() {
+		return dynamicText;
+	}
 
-    /**
-     * Sets the value of the dynamicText property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link WidgetType.DynamicText }
-     *     
-     */
-    public void setDynamicText(WidgetType.DynamicText value) {
-        this.dynamicText = value;
-    }
+	/**
+	 * Sets the value of the dynamicText property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link WidgetType.DynamicText }
+	 * 
+	 */
+	public void setDynamicText(WidgetType.DynamicText value) {
+		this.dynamicText = value;
+	}
 
-    /**
-     * Gets the value of the controlState property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link ControlStateType }
-     *     
-     */
-    public ControlStateType getControlState() {
-        return controlState;
-    }
+	/**
+	 * Gets the value of the controlState property.
+	 * 
+	 * @return
+	 *         possible object is {@link ControlStateType }
+	 * 
+	 */
+	public ControlStateType getControlState() {
+		return controlState;
+	}
 
-    /**
-     * Sets the value of the controlState property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link ControlStateType }
-     *     
-     */
-    public void setControlState(ControlStateType value) {
-        this.controlState = value;
-    }
+	/**
+	 * Sets the value of the controlState property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link ControlStateType }
+	 * 
+	 */
+	public void setControlState(ControlStateType value) {
+		this.controlState = value;
+	}
 
-    /**
-     * Gets the value of the type property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getType() {
-        if (type == null) {
-            return "text";
-        } else {
-            return type;
-        }
-    }
+	/**
+	 * Gets the value of the type property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getType() {
+		if (type == null) {
+			return "text";
+		} else {
+			return type;
+		}
+	}
 
-    /**
-     * Sets the value of the type property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setType(String value) {
-        this.type = value;
-    }
+	/**
+	 * Sets the value of the type property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setType(String value) {
+		this.type = value;
+	}
 
-    /**
-     * Gets the value of the typeId property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getTypeId() {
-        return typeId;
-    }
+	/**
+	 * Gets the value of the typeId property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getTypeId() {
+		return typeId;
+	}
 
-    /**
-     * Sets the value of the typeId property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setTypeId(String value) {
-        this.typeId = value;
-    }
+	/**
+	 * Sets the value of the typeId property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setTypeId(String value) {
+		this.typeId = value;
+	}
 
-    /**
-     * Gets the value of the buttonId property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getButtonId() {
-        return buttonId;
-    }
+	/**
+	 * Gets the value of the buttonId property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getButtonId() {
+		return buttonId;
+	}
 
-    /**
-     * Sets the value of the buttonId property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setButtonId(String value) {
-        this.buttonId = value;
-    }
+	/**
+	 * Sets the value of the buttonId property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setButtonId(String value) {
+		this.buttonId = value;
+	}
 
-    /**
-     * Gets the value of the title property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getTitle() {
-        return title;
-    }
+	/**
+	 * Gets the value of the title property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getTitle() {
+		return title;
+	}
 
-    /**
-     * Sets the value of the title property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setTitle(String value) {
-        this.title = value;
-    }
+	/**
+	 * Sets the value of the title property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setTitle(String value) {
+		this.title = value;
+	}
 
-    /**
-     * Gets the value of the style property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getStyle() {
-        return style;
-    }
+	/**
+	 * Gets the value of the style property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getStyle() {
+		return style;
+	}
 
-    /**
-     * Sets the value of the style property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setStyle(String value) {
-        this.style = value;
-    }
+	/**
+	 * Sets the value of the style property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setStyle(String value) {
+		this.style = value;
+	}
 
-    /**
-     * Gets the value of the readOnly property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
-     */
-    public boolean isReadOnly() {
-        if (readOnly == null) {
-            return false;
-        } else {
-            return readOnly;
-        }
-    }
+	/**
+	 * Gets the value of the readOnly property.
+	 * 
+	 * @return
+	 *         possible object is {@link Boolean }
+	 * 
+	 */
+	public boolean isReadOnly() {
+		if (readOnly == null) {
+			return false;
+		} else {
+			return readOnly;
+		}
+	}
 
-    /**
-     * Sets the value of the readOnly property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
-     */
-    public void setReadOnly(Boolean value) {
-        this.readOnly = value;
-    }
+	/**
+	 * Sets the value of the readOnly property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Boolean }
+	 * 
+	 */
+	public void setReadOnly(Boolean value) {
+		this.readOnly = value;
+	}
 
-    /**
-     * Gets the value of the attribute property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getAttribute() {
-        return attribute;
-    }
+	/**
+	 * Gets the value of the attribute property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getAttribute() {
+		return attribute;
+	}
 
-    /**
-     * Sets the value of the attribute property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setAttribute(String value) {
-        this.attribute = value;
-    }
+	/**
+	 * Sets the value of the attribute property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setAttribute(String value) {
+		this.attribute = value;
+	}
 
-    /**
-     * Gets the value of the foreground property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getForeground() {
-        return foreground;
-    }
+	/**
+	 * Gets the value of the foreground property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getForeground() {
+		return foreground;
+	}
 
-    /**
-     * Sets the value of the foreground property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setForeground(String value) {
-        this.foreground = value;
-    }
+	/**
+	 * Sets the value of the foreground property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setForeground(String value) {
+		this.foreground = value;
+	}
 
-    /**
-     * Gets the value of the background property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getBackground() {
-        return background;
-    }
+	/**
+	 * Gets the value of the background property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getBackground() {
+		return background;
+	}
 
-    /**
-     * Sets the value of the background property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setBackground(String value) {
-        this.background = value;
-    }
+	/**
+	 * Sets the value of the background property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setBackground(String value) {
+		this.background = value;
+	}
 
+	/**
+	 * <p>
+	 * Java class for anonymous complex type.
+	 * 
+	 * <p>
+	 * The following schema fragment specifies the expected content contained within this class.
+	 * 
+	 * <pre>
+	 * &lt;complexType>
+	 *   &lt;complexContent>
+	 *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+	 *       &lt;sequence>
+	 *         &lt;element name="arg" type="{http://eclipse.org/ptp/rm}arg-type" maxOccurs="unbounded"/>
+	 *       &lt;/sequence>
+	 *     &lt;/restriction>
+	 *   &lt;/complexContent>
+	 * &lt;/complexType>
+	 * </pre>
+	 * 
+	 * 
+	 */
+	@XmlAccessorType(XmlAccessType.FIELD)
+	@XmlType(name = "", propOrder = { "arg" })
+	public static class DynamicText {
 
-    /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType>
-     *   &lt;complexContent>
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *       &lt;sequence>
-     *         &lt;element name="arg" type="{http://eclipse.org/ptp/rm}arg-type" maxOccurs="unbounded"/>
-     *       &lt;/sequence>
-     *     &lt;/restriction>
-     *   &lt;/complexContent>
-     * &lt;/complexType>
-     * </pre>
-     * 
-     * 
-     */
-    @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "", propOrder = {
-        "arg"
-    })
-    public static class DynamicText {
+		@XmlElement(required = true)
+		protected List<ArgType> arg;
 
-        @XmlElement(required = true)
-        protected List<ArgType> arg;
+		/**
+		 * Gets the value of the arg property.
+		 * 
+		 * <p>
+		 * This accessor method returns a reference to the live list, not a snapshot. Therefore any modification you make to the
+		 * returned list will be present inside the JAXB object. This is why there is not a <CODE>set</CODE> method for the arg
+		 * property.
+		 * 
+		 * <p>
+		 * For example, to add a new item, do as follows:
+		 * 
+		 * <pre>
+		 * getArg().add(newItem);
+		 * </pre>
+		 * 
+		 * 
+		 * <p>
+		 * Objects of the following type(s) are allowed in the list {@link ArgType }
+		 * 
+		 * 
+		 */
+		public List<ArgType> getArg() {
+			if (arg == null) {
+				arg = new ArrayList<ArgType>();
+			}
+			return this.arg;
+		}
 
-        /**
-         * Gets the value of the arg property.
-         * 
-         * <p>
-         * This accessor method returns a reference to the live list,
-         * not a snapshot. Therefore any modification you make to the
-         * returned list will be present inside the JAXB object.
-         * This is why there is not a <CODE>set</CODE> method for the arg property.
-         * 
-         * <p>
-         * For example, to add a new item, do as follows:
-         * <pre>
-         *    getArg().add(newItem);
-         * </pre>
-         * 
-         * 
-         * <p>
-         * Objects of the following type(s) are allowed in the list
-         * {@link ArgType }
-         * 
-         * 
-         */
-        public List<ArgType> getArg() {
-            if (arg == null) {
-                arg = new ArrayList<ArgType>();
-            }
-            return this.arg;
-        }
-
-    }
+	}
 
 }

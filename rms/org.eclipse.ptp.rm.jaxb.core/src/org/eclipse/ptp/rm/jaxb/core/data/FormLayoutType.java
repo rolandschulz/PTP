@@ -5,7 +5,6 @@
 // Generated on: 2013.11.05 at 08:09:06 AM EST 
 //
 
-
 package org.eclipse.ptp.rm.jaxb.core.data;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -13,11 +12,12 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
- * <p>Java class for form-layout-type complex type.
+ * <p>
+ * Java class for form-layout-type complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="form-layout-type">
@@ -41,187 +41,173 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "form-layout-type")
 public class FormLayoutType {
 
-    @XmlAttribute(name = "marginHeight")
-    protected Integer marginHeight;
-    @XmlAttribute(name = "marginWidth")
-    protected Integer marginWidth;
-    @XmlAttribute(name = "marginTop")
-    protected Integer marginTop;
-    @XmlAttribute(name = "marginBottom")
-    protected Integer marginBottom;
-    @XmlAttribute(name = "marginLeft")
-    protected Integer marginLeft;
-    @XmlAttribute(name = "marginRight")
-    protected Integer marginRight;
-    @XmlAttribute(name = "spacing")
-    protected Integer spacing;
+	@XmlAttribute(name = "marginHeight")
+	protected Integer marginHeight;
+	@XmlAttribute(name = "marginWidth")
+	protected Integer marginWidth;
+	@XmlAttribute(name = "marginTop")
+	protected Integer marginTop;
+	@XmlAttribute(name = "marginBottom")
+	protected Integer marginBottom;
+	@XmlAttribute(name = "marginLeft")
+	protected Integer marginLeft;
+	@XmlAttribute(name = "marginRight")
+	protected Integer marginRight;
+	@XmlAttribute(name = "spacing")
+	protected Integer spacing;
 
-    /**
-     * Gets the value of the marginHeight property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public Integer getMarginHeight() {
-        return marginHeight;
-    }
+	/**
+	 * Gets the value of the marginHeight property.
+	 * 
+	 * @return
+	 *         possible object is {@link Integer }
+	 * 
+	 */
+	public Integer getMarginHeight() {
+		return marginHeight;
+	}
 
-    /**
-     * Sets the value of the marginHeight property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setMarginHeight(Integer value) {
-        this.marginHeight = value;
-    }
+	/**
+	 * Sets the value of the marginHeight property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Integer }
+	 * 
+	 */
+	public void setMarginHeight(Integer value) {
+		this.marginHeight = value;
+	}
 
-    /**
-     * Gets the value of the marginWidth property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public Integer getMarginWidth() {
-        return marginWidth;
-    }
+	/**
+	 * Gets the value of the marginWidth property.
+	 * 
+	 * @return
+	 *         possible object is {@link Integer }
+	 * 
+	 */
+	public Integer getMarginWidth() {
+		return marginWidth;
+	}
 
-    /**
-     * Sets the value of the marginWidth property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setMarginWidth(Integer value) {
-        this.marginWidth = value;
-    }
+	/**
+	 * Sets the value of the marginWidth property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Integer }
+	 * 
+	 */
+	public void setMarginWidth(Integer value) {
+		this.marginWidth = value;
+	}
 
-    /**
-     * Gets the value of the marginTop property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public Integer getMarginTop() {
-        return marginTop;
-    }
+	/**
+	 * Gets the value of the marginTop property.
+	 * 
+	 * @return
+	 *         possible object is {@link Integer }
+	 * 
+	 */
+	public Integer getMarginTop() {
+		return marginTop;
+	}
 
-    /**
-     * Sets the value of the marginTop property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setMarginTop(Integer value) {
-        this.marginTop = value;
-    }
+	/**
+	 * Sets the value of the marginTop property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Integer }
+	 * 
+	 */
+	public void setMarginTop(Integer value) {
+		this.marginTop = value;
+	}
 
-    /**
-     * Gets the value of the marginBottom property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public Integer getMarginBottom() {
-        return marginBottom;
-    }
+	/**
+	 * Gets the value of the marginBottom property.
+	 * 
+	 * @return
+	 *         possible object is {@link Integer }
+	 * 
+	 */
+	public Integer getMarginBottom() {
+		return marginBottom;
+	}
 
-    /**
-     * Sets the value of the marginBottom property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setMarginBottom(Integer value) {
-        this.marginBottom = value;
-    }
+	/**
+	 * Sets the value of the marginBottom property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Integer }
+	 * 
+	 */
+	public void setMarginBottom(Integer value) {
+		this.marginBottom = value;
+	}
 
-    /**
-     * Gets the value of the marginLeft property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public Integer getMarginLeft() {
-        return marginLeft;
-    }
+	/**
+	 * Gets the value of the marginLeft property.
+	 * 
+	 * @return
+	 *         possible object is {@link Integer }
+	 * 
+	 */
+	public Integer getMarginLeft() {
+		return marginLeft;
+	}
 
-    /**
-     * Sets the value of the marginLeft property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setMarginLeft(Integer value) {
-        this.marginLeft = value;
-    }
+	/**
+	 * Sets the value of the marginLeft property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Integer }
+	 * 
+	 */
+	public void setMarginLeft(Integer value) {
+		this.marginLeft = value;
+	}
 
-    /**
-     * Gets the value of the marginRight property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public Integer getMarginRight() {
-        return marginRight;
-    }
+	/**
+	 * Gets the value of the marginRight property.
+	 * 
+	 * @return
+	 *         possible object is {@link Integer }
+	 * 
+	 */
+	public Integer getMarginRight() {
+		return marginRight;
+	}
 
-    /**
-     * Sets the value of the marginRight property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setMarginRight(Integer value) {
-        this.marginRight = value;
-    }
+	/**
+	 * Sets the value of the marginRight property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Integer }
+	 * 
+	 */
+	public void setMarginRight(Integer value) {
+		this.marginRight = value;
+	}
 
-    /**
-     * Gets the value of the spacing property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public Integer getSpacing() {
-        return spacing;
-    }
+	/**
+	 * Gets the value of the spacing property.
+	 * 
+	 * @return
+	 *         possible object is {@link Integer }
+	 * 
+	 */
+	public Integer getSpacing() {
+		return spacing;
+	}
 
-    /**
-     * Sets the value of the spacing property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setSpacing(Integer value) {
-        this.spacing = value;
-    }
+	/**
+	 * Sets the value of the spacing property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Integer }
+	 * 
+	 */
+	public void setSpacing(Integer value) {
+		this.spacing = value;
+	}
 
 }

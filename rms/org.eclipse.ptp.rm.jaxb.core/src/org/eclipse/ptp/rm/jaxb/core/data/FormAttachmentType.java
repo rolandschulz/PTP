@@ -5,7 +5,6 @@
 // Generated on: 2013.11.05 at 08:09:06 AM EST 
 //
 
-
 package org.eclipse.ptp.rm.jaxb.core.data;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -13,11 +12,12 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
- * <p>Java class for form-attachment-type complex type.
+ * <p>
+ * Java class for form-attachment-type complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="form-attachment-type">
@@ -38,109 +38,101 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "form-attachment-type")
 public class FormAttachmentType {
 
-    @XmlAttribute(name = "alignment")
-    protected String alignment;
-    @XmlAttribute(name = "numerator")
-    protected Integer numerator;
-    @XmlAttribute(name = "denominator")
-    protected Integer denominator;
-    @XmlAttribute(name = "offset")
-    protected Integer offset;
+	@XmlAttribute(name = "alignment")
+	protected String alignment;
+	@XmlAttribute(name = "numerator")
+	protected Integer numerator;
+	@XmlAttribute(name = "denominator")
+	protected Integer denominator;
+	@XmlAttribute(name = "offset")
+	protected Integer offset;
 
-    /**
-     * Gets the value of the alignment property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getAlignment() {
-        return alignment;
-    }
+	/**
+	 * Gets the value of the alignment property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getAlignment() {
+		return alignment;
+	}
 
-    /**
-     * Sets the value of the alignment property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setAlignment(String value) {
-        this.alignment = value;
-    }
+	/**
+	 * Sets the value of the alignment property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setAlignment(String value) {
+		this.alignment = value;
+	}
 
-    /**
-     * Gets the value of the numerator property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public Integer getNumerator() {
-        return numerator;
-    }
+	/**
+	 * Gets the value of the numerator property.
+	 * 
+	 * @return
+	 *         possible object is {@link Integer }
+	 * 
+	 */
+	public Integer getNumerator() {
+		return numerator;
+	}
 
-    /**
-     * Sets the value of the numerator property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setNumerator(Integer value) {
-        this.numerator = value;
-    }
+	/**
+	 * Sets the value of the numerator property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Integer }
+	 * 
+	 */
+	public void setNumerator(Integer value) {
+		this.numerator = value;
+	}
 
-    /**
-     * Gets the value of the denominator property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public Integer getDenominator() {
-        return denominator;
-    }
+	/**
+	 * Gets the value of the denominator property.
+	 * 
+	 * @return
+	 *         possible object is {@link Integer }
+	 * 
+	 */
+	public Integer getDenominator() {
+		return denominator;
+	}
 
-    /**
-     * Sets the value of the denominator property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setDenominator(Integer value) {
-        this.denominator = value;
-    }
+	/**
+	 * Sets the value of the denominator property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Integer }
+	 * 
+	 */
+	public void setDenominator(Integer value) {
+		this.denominator = value;
+	}
 
-    /**
-     * Gets the value of the offset property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public Integer getOffset() {
-        return offset;
-    }
+	/**
+	 * Gets the value of the offset property.
+	 * 
+	 * @return
+	 *         possible object is {@link Integer }
+	 * 
+	 */
+	public Integer getOffset() {
+		return offset;
+	}
 
-    /**
-     * Sets the value of the offset property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setOffset(Integer value) {
-        this.offset = value;
-    }
+	/**
+	 * Sets the value of the offset property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Integer }
+	 * 
+	 */
+	public void setOffset(Integer value) {
+		this.offset = value;
+	}
 
 }

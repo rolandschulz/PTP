@@ -5,7 +5,6 @@
 // Generated on: 2013.11.05 at 08:09:06 AM EST 
 //
 
-
 package org.eclipse.ptp.rm.jaxb.core.data;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -13,11 +12,12 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
- * <p>Java class for range-type complex type.
+ * <p>
+ * Java class for range-type complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="range-type">
@@ -38,109 +38,101 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "range-type")
 public class RangeType {
 
-    @XmlAttribute(name = "lessThan")
-    protected String lessThan;
-    @XmlAttribute(name = "lessThanOrEqualTo")
-    protected String lessThanOrEqualTo;
-    @XmlAttribute(name = "greaterThan")
-    protected String greaterThan;
-    @XmlAttribute(name = "greaterThanOrEqualTo")
-    protected String greaterThanOrEqualTo;
+	@XmlAttribute(name = "lessThan")
+	protected String lessThan;
+	@XmlAttribute(name = "lessThanOrEqualTo")
+	protected String lessThanOrEqualTo;
+	@XmlAttribute(name = "greaterThan")
+	protected String greaterThan;
+	@XmlAttribute(name = "greaterThanOrEqualTo")
+	protected String greaterThanOrEqualTo;
 
-    /**
-     * Gets the value of the lessThan property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getLessThan() {
-        return lessThan;
-    }
+	/**
+	 * Gets the value of the lessThan property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getLessThan() {
+		return lessThan;
+	}
 
-    /**
-     * Sets the value of the lessThan property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setLessThan(String value) {
-        this.lessThan = value;
-    }
+	/**
+	 * Sets the value of the lessThan property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setLessThan(String value) {
+		this.lessThan = value;
+	}
 
-    /**
-     * Gets the value of the lessThanOrEqualTo property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getLessThanOrEqualTo() {
-        return lessThanOrEqualTo;
-    }
+	/**
+	 * Gets the value of the lessThanOrEqualTo property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getLessThanOrEqualTo() {
+		return lessThanOrEqualTo;
+	}
 
-    /**
-     * Sets the value of the lessThanOrEqualTo property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setLessThanOrEqualTo(String value) {
-        this.lessThanOrEqualTo = value;
-    }
+	/**
+	 * Sets the value of the lessThanOrEqualTo property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setLessThanOrEqualTo(String value) {
+		this.lessThanOrEqualTo = value;
+	}
 
-    /**
-     * Gets the value of the greaterThan property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getGreaterThan() {
-        return greaterThan;
-    }
+	/**
+	 * Gets the value of the greaterThan property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getGreaterThan() {
+		return greaterThan;
+	}
 
-    /**
-     * Sets the value of the greaterThan property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setGreaterThan(String value) {
-        this.greaterThan = value;
-    }
+	/**
+	 * Sets the value of the greaterThan property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setGreaterThan(String value) {
+		this.greaterThan = value;
+	}
 
-    /**
-     * Gets the value of the greaterThanOrEqualTo property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getGreaterThanOrEqualTo() {
-        return greaterThanOrEqualTo;
-    }
+	/**
+	 * Gets the value of the greaterThanOrEqualTo property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getGreaterThanOrEqualTo() {
+		return greaterThanOrEqualTo;
+	}
 
-    /**
-     * Sets the value of the greaterThanOrEqualTo property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setGreaterThanOrEqualTo(String value) {
-        this.greaterThanOrEqualTo = value;
-    }
+	/**
+	 * Sets the value of the greaterThanOrEqualTo property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setGreaterThanOrEqualTo(String value) {
+		this.greaterThanOrEqualTo = value;
+	}
 
 }

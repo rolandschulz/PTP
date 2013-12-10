@@ -5,7 +5,6 @@
 // Generated on: 2013.11.05 at 08:09:06 AM EST 
 //
 
-
 package org.eclipse.ptp.rm.jaxb.core.data;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -13,11 +12,12 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
- * <p>Java class for row-layout-type complex type.
+ * <p>
+ * Java class for row-layout-type complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="row-layout-type">
@@ -47,363 +47,337 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "row-layout-type")
 public class RowLayoutType {
 
-    @XmlAttribute(name = "type")
-    protected String type;
-    @XmlAttribute(name = "center")
-    protected Boolean center;
-    @XmlAttribute(name = "justify")
-    protected Boolean justify;
-    @XmlAttribute(name = "fill")
-    protected Boolean fill;
-    @XmlAttribute(name = "pack")
-    protected Boolean pack;
-    @XmlAttribute(name = "wrap")
-    protected Boolean wrap;
-    @XmlAttribute(name = "marginHeight")
-    protected Integer marginHeight;
-    @XmlAttribute(name = "marginWidth")
-    protected Integer marginWidth;
-    @XmlAttribute(name = "marginTop")
-    protected Integer marginTop;
-    @XmlAttribute(name = "marginBottom")
-    protected Integer marginBottom;
-    @XmlAttribute(name = "marginLeft")
-    protected Integer marginLeft;
-    @XmlAttribute(name = "marginRight")
-    protected Integer marginRight;
-    @XmlAttribute(name = "spacing")
-    protected Integer spacing;
+	@XmlAttribute(name = "type")
+	protected String type;
+	@XmlAttribute(name = "center")
+	protected Boolean center;
+	@XmlAttribute(name = "justify")
+	protected Boolean justify;
+	@XmlAttribute(name = "fill")
+	protected Boolean fill;
+	@XmlAttribute(name = "pack")
+	protected Boolean pack;
+	@XmlAttribute(name = "wrap")
+	protected Boolean wrap;
+	@XmlAttribute(name = "marginHeight")
+	protected Integer marginHeight;
+	@XmlAttribute(name = "marginWidth")
+	protected Integer marginWidth;
+	@XmlAttribute(name = "marginTop")
+	protected Integer marginTop;
+	@XmlAttribute(name = "marginBottom")
+	protected Integer marginBottom;
+	@XmlAttribute(name = "marginLeft")
+	protected Integer marginLeft;
+	@XmlAttribute(name = "marginRight")
+	protected Integer marginRight;
+	@XmlAttribute(name = "spacing")
+	protected Integer spacing;
 
-    /**
-     * Gets the value of the type property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getType() {
-        return type;
-    }
+	/**
+	 * Gets the value of the type property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getType() {
+		return type;
+	}
 
-    /**
-     * Sets the value of the type property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setType(String value) {
-        this.type = value;
-    }
+	/**
+	 * Sets the value of the type property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setType(String value) {
+		this.type = value;
+	}
 
-    /**
-     * Gets the value of the center property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
-     */
-    public boolean isCenter() {
-        if (center == null) {
-            return false;
-        } else {
-            return center;
-        }
-    }
+	/**
+	 * Gets the value of the center property.
+	 * 
+	 * @return
+	 *         possible object is {@link Boolean }
+	 * 
+	 */
+	public boolean isCenter() {
+		if (center == null) {
+			return false;
+		} else {
+			return center;
+		}
+	}
 
-    /**
-     * Sets the value of the center property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
-     */
-    public void setCenter(Boolean value) {
-        this.center = value;
-    }
+	/**
+	 * Sets the value of the center property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Boolean }
+	 * 
+	 */
+	public void setCenter(Boolean value) {
+		this.center = value;
+	}
 
-    /**
-     * Gets the value of the justify property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
-     */
-    public boolean isJustify() {
-        if (justify == null) {
-            return false;
-        } else {
-            return justify;
-        }
-    }
+	/**
+	 * Gets the value of the justify property.
+	 * 
+	 * @return
+	 *         possible object is {@link Boolean }
+	 * 
+	 */
+	public boolean isJustify() {
+		if (justify == null) {
+			return false;
+		} else {
+			return justify;
+		}
+	}
 
-    /**
-     * Sets the value of the justify property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
-     */
-    public void setJustify(Boolean value) {
-        this.justify = value;
-    }
+	/**
+	 * Sets the value of the justify property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Boolean }
+	 * 
+	 */
+	public void setJustify(Boolean value) {
+		this.justify = value;
+	}
 
-    /**
-     * Gets the value of the fill property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
-     */
-    public boolean isFill() {
-        if (fill == null) {
-            return false;
-        } else {
-            return fill;
-        }
-    }
+	/**
+	 * Gets the value of the fill property.
+	 * 
+	 * @return
+	 *         possible object is {@link Boolean }
+	 * 
+	 */
+	public boolean isFill() {
+		if (fill == null) {
+			return false;
+		} else {
+			return fill;
+		}
+	}
 
-    /**
-     * Sets the value of the fill property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
-     */
-    public void setFill(Boolean value) {
-        this.fill = value;
-    }
+	/**
+	 * Sets the value of the fill property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Boolean }
+	 * 
+	 */
+	public void setFill(Boolean value) {
+		this.fill = value;
+	}
 
-    /**
-     * Gets the value of the pack property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
-     */
-    public boolean isPack() {
-        if (pack == null) {
-            return false;
-        } else {
-            return pack;
-        }
-    }
+	/**
+	 * Gets the value of the pack property.
+	 * 
+	 * @return
+	 *         possible object is {@link Boolean }
+	 * 
+	 */
+	public boolean isPack() {
+		if (pack == null) {
+			return false;
+		} else {
+			return pack;
+		}
+	}
 
-    /**
-     * Sets the value of the pack property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
-     */
-    public void setPack(Boolean value) {
-        this.pack = value;
-    }
+	/**
+	 * Sets the value of the pack property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Boolean }
+	 * 
+	 */
+	public void setPack(Boolean value) {
+		this.pack = value;
+	}
 
-    /**
-     * Gets the value of the wrap property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
-     */
-    public boolean isWrap() {
-        if (wrap == null) {
-            return false;
-        } else {
-            return wrap;
-        }
-    }
+	/**
+	 * Gets the value of the wrap property.
+	 * 
+	 * @return
+	 *         possible object is {@link Boolean }
+	 * 
+	 */
+	public boolean isWrap() {
+		if (wrap == null) {
+			return false;
+		} else {
+			return wrap;
+		}
+	}
 
-    /**
-     * Sets the value of the wrap property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
-     */
-    public void setWrap(Boolean value) {
-        this.wrap = value;
-    }
+	/**
+	 * Sets the value of the wrap property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Boolean }
+	 * 
+	 */
+	public void setWrap(Boolean value) {
+		this.wrap = value;
+	}
 
-    /**
-     * Gets the value of the marginHeight property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public Integer getMarginHeight() {
-        return marginHeight;
-    }
+	/**
+	 * Gets the value of the marginHeight property.
+	 * 
+	 * @return
+	 *         possible object is {@link Integer }
+	 * 
+	 */
+	public Integer getMarginHeight() {
+		return marginHeight;
+	}
 
-    /**
-     * Sets the value of the marginHeight property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setMarginHeight(Integer value) {
-        this.marginHeight = value;
-    }
+	/**
+	 * Sets the value of the marginHeight property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Integer }
+	 * 
+	 */
+	public void setMarginHeight(Integer value) {
+		this.marginHeight = value;
+	}
 
-    /**
-     * Gets the value of the marginWidth property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public Integer getMarginWidth() {
-        return marginWidth;
-    }
+	/**
+	 * Gets the value of the marginWidth property.
+	 * 
+	 * @return
+	 *         possible object is {@link Integer }
+	 * 
+	 */
+	public Integer getMarginWidth() {
+		return marginWidth;
+	}
 
-    /**
-     * Sets the value of the marginWidth property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setMarginWidth(Integer value) {
-        this.marginWidth = value;
-    }
+	/**
+	 * Sets the value of the marginWidth property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Integer }
+	 * 
+	 */
+	public void setMarginWidth(Integer value) {
+		this.marginWidth = value;
+	}
 
-    /**
-     * Gets the value of the marginTop property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public Integer getMarginTop() {
-        return marginTop;
-    }
+	/**
+	 * Gets the value of the marginTop property.
+	 * 
+	 * @return
+	 *         possible object is {@link Integer }
+	 * 
+	 */
+	public Integer getMarginTop() {
+		return marginTop;
+	}
 
-    /**
-     * Sets the value of the marginTop property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setMarginTop(Integer value) {
-        this.marginTop = value;
-    }
+	/**
+	 * Sets the value of the marginTop property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Integer }
+	 * 
+	 */
+	public void setMarginTop(Integer value) {
+		this.marginTop = value;
+	}
 
-    /**
-     * Gets the value of the marginBottom property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public Integer getMarginBottom() {
-        return marginBottom;
-    }
+	/**
+	 * Gets the value of the marginBottom property.
+	 * 
+	 * @return
+	 *         possible object is {@link Integer }
+	 * 
+	 */
+	public Integer getMarginBottom() {
+		return marginBottom;
+	}
 
-    /**
-     * Sets the value of the marginBottom property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setMarginBottom(Integer value) {
-        this.marginBottom = value;
-    }
+	/**
+	 * Sets the value of the marginBottom property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Integer }
+	 * 
+	 */
+	public void setMarginBottom(Integer value) {
+		this.marginBottom = value;
+	}
 
-    /**
-     * Gets the value of the marginLeft property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public Integer getMarginLeft() {
-        return marginLeft;
-    }
+	/**
+	 * Gets the value of the marginLeft property.
+	 * 
+	 * @return
+	 *         possible object is {@link Integer }
+	 * 
+	 */
+	public Integer getMarginLeft() {
+		return marginLeft;
+	}
 
-    /**
-     * Sets the value of the marginLeft property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setMarginLeft(Integer value) {
-        this.marginLeft = value;
-    }
+	/**
+	 * Sets the value of the marginLeft property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Integer }
+	 * 
+	 */
+	public void setMarginLeft(Integer value) {
+		this.marginLeft = value;
+	}
 
-    /**
-     * Gets the value of the marginRight property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public Integer getMarginRight() {
-        return marginRight;
-    }
+	/**
+	 * Gets the value of the marginRight property.
+	 * 
+	 * @return
+	 *         possible object is {@link Integer }
+	 * 
+	 */
+	public Integer getMarginRight() {
+		return marginRight;
+	}
 
-    /**
-     * Sets the value of the marginRight property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setMarginRight(Integer value) {
-        this.marginRight = value;
-    }
+	/**
+	 * Sets the value of the marginRight property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Integer }
+	 * 
+	 */
+	public void setMarginRight(Integer value) {
+		this.marginRight = value;
+	}
 
-    /**
-     * Gets the value of the spacing property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public Integer getSpacing() {
-        return spacing;
-    }
+	/**
+	 * Gets the value of the spacing property.
+	 * 
+	 * @return
+	 *         possible object is {@link Integer }
+	 * 
+	 */
+	public Integer getSpacing() {
+		return spacing;
+	}
 
-    /**
-     * Sets the value of the spacing property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setSpacing(Integer value) {
-        this.spacing = value;
-    }
+	/**
+	 * Sets the value of the spacing property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Integer }
+	 * 
+	 */
+	public void setSpacing(Integer value) {
+		this.spacing = value;
+	}
 
 }

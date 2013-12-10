@@ -7,3 +7,4 @@
 
 @javax.xml.bind.annotation.XmlSchema(namespace = "http://eclipse.org/ptp/rm", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package org.eclipse.ptp.rm.jaxb.core.data;
+

@@ -5,7 +5,6 @@
 // Generated on: 2013.11.05 at 08:09:06 AM EST 
 //
 
-
 package org.eclipse.ptp.rm.jaxb.core.data;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -14,11 +13,12 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
- * <p>Java class for attribute-type complex type.
+ * <p>
+ * Java class for attribute-type complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="attribute-type">
@@ -51,466 +51,428 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "attribute-type", propOrder = {
-    "description",
-    "tooltip",
-    "choice",
-    "translateChoiceAs",
-    "itemsFrom",
-    "_default",
-    "value",
-    "linkValueTo",
-    "validator"
-})
+@XmlType(name = "attribute-type", propOrder = { "description", "tooltip", "choice", "translateChoiceAs", "itemsFrom", "_default",
+		"value", "linkValueTo", "validator" })
 public class AttributeType {
 
-    protected String description;
-    protected String tooltip;
-    protected String choice;
-    protected String translateChoiceAs;
-    @XmlElement(name = "items-from")
-    protected String itemsFrom;
-    @XmlElement(name = "default")
-    protected String _default;
-    protected Object value;
-    @XmlElement(name = "link-value-to")
-    protected String linkValueTo;
-    protected ValidatorType validator;
-    @XmlAttribute(name = "name", required = true)
-    protected String name;
-    @XmlAttribute(name = "type")
-    protected String type;
-    @XmlAttribute(name = "visible")
-    protected Boolean visible;
-    @XmlAttribute(name = "status")
-    protected String status;
-    @XmlAttribute(name = "readOnly")
-    protected Boolean readOnly;
-    @XmlAttribute(name = "translateBooleanAs")
-    protected String translateBooleanAs;
-    @XmlAttribute(name = "min")
-    protected Integer min;
-    @XmlAttribute(name = "max")
-    protected Integer max;
+	protected String description;
+	protected String tooltip;
+	protected String choice;
+	/**
+	 * @since 1.2
+	 */
+	protected String translateChoiceAs;
+	@XmlElement(name = "items-from")
+	protected String itemsFrom;
+	@XmlElement(name = "default")
+	protected String _default;
+	protected Object value;
+	@XmlElement(name = "link-value-to")
+	protected String linkValueTo;
+	protected ValidatorType validator;
+	@XmlAttribute(name = "name", required = true)
+	protected String name;
+	@XmlAttribute(name = "type")
+	protected String type;
+	@XmlAttribute(name = "visible")
+	protected Boolean visible;
+	@XmlAttribute(name = "status")
+	protected String status;
+	@XmlAttribute(name = "readOnly")
+	protected Boolean readOnly;
+	@XmlAttribute(name = "translateBooleanAs")
+	protected String translateBooleanAs;
+	@XmlAttribute(name = "min")
+	protected Integer min;
+	@XmlAttribute(name = "max")
+	protected Integer max;
 
-    /**
-     * Gets the value of the description property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getDescription() {
-        return description;
-    }
+	/**
+	 * Gets the value of the description property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getDescription() {
+		return description;
+	}
 
-    /**
-     * Sets the value of the description property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setDescription(String value) {
-        this.description = value;
-    }
+	/**
+	 * Sets the value of the description property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setDescription(String value) {
+		this.description = value;
+	}
 
-    /**
-     * Gets the value of the tooltip property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getTooltip() {
-        return tooltip;
-    }
+	/**
+	 * Gets the value of the tooltip property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getTooltip() {
+		return tooltip;
+	}
 
-    /**
-     * Sets the value of the tooltip property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setTooltip(String value) {
-        this.tooltip = value;
-    }
+	/**
+	 * Sets the value of the tooltip property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setTooltip(String value) {
+		this.tooltip = value;
+	}
 
-    /**
-     * Gets the value of the choice property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getChoice() {
-        return choice;
-    }
+	/**
+	 * Gets the value of the choice property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getChoice() {
+		return choice;
+	}
 
-    /**
-     * Sets the value of the choice property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setChoice(String value) {
-        this.choice = value;
-    }
+	/**
+	 * Sets the value of the choice property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setChoice(String value) {
+		this.choice = value;
+	}
 
-    /**
-     * Gets the value of the translateChoiceAs property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getTranslateChoiceAs() {
-        return translateChoiceAs;
-    }
+	/**
+	 * Gets the value of the translateChoiceAs property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * @since 1.2
+	 * 
+	 */
+	public String getTranslateChoiceAs() {
+		return translateChoiceAs;
+	}
 
-    /**
-     * Sets the value of the translateChoiceAs property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setTranslateChoiceAs(String value) {
-        this.translateChoiceAs = value;
-    }
+	/**
+	 * Sets the value of the translateChoiceAs property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * @since 1.2
+	 * 
+	 */
+	public void setTranslateChoiceAs(String value) {
+		this.translateChoiceAs = value;
+	}
 
-    /**
-     * Gets the value of the itemsFrom property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getItemsFrom() {
-        return itemsFrom;
-    }
+	/**
+	 * Gets the value of the itemsFrom property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getItemsFrom() {
+		return itemsFrom;
+	}
 
-    /**
-     * Sets the value of the itemsFrom property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setItemsFrom(String value) {
-        this.itemsFrom = value;
-    }
+	/**
+	 * Sets the value of the itemsFrom property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setItemsFrom(String value) {
+		this.itemsFrom = value;
+	}
 
-    /**
-     * Gets the value of the default property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getDefault() {
-        return _default;
-    }
+	/**
+	 * Gets the value of the default property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getDefault() {
+		return _default;
+	}
 
-    /**
-     * Sets the value of the default property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setDefault(String value) {
-        this._default = value;
-    }
+	/**
+	 * Sets the value of the default property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setDefault(String value) {
+		this._default = value;
+	}
 
-    /**
-     * Gets the value of the value property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Object }
-     *     
-     */
-    public Object getValue() {
-        return value;
-    }
+	/**
+	 * Gets the value of the value property.
+	 * 
+	 * @return
+	 *         possible object is {@link Object }
+	 * 
+	 */
+	public Object getValue() {
+		return value;
+	}
 
-    /**
-     * Sets the value of the value property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Object }
-     *     
-     */
-    public void setValue(Object value) {
-        this.value = value;
-    }
+	/**
+	 * Sets the value of the value property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Object }
+	 * 
+	 */
+	public void setValue(Object value) {
+		this.value = value;
+	}
 
-    /**
-     * Gets the value of the linkValueTo property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getLinkValueTo() {
-        return linkValueTo;
-    }
+	/**
+	 * Gets the value of the linkValueTo property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getLinkValueTo() {
+		return linkValueTo;
+	}
 
-    /**
-     * Sets the value of the linkValueTo property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setLinkValueTo(String value) {
-        this.linkValueTo = value;
-    }
+	/**
+	 * Sets the value of the linkValueTo property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setLinkValueTo(String value) {
+		this.linkValueTo = value;
+	}
 
-    /**
-     * Gets the value of the validator property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link ValidatorType }
-     *     
-     */
-    public ValidatorType getValidator() {
-        return validator;
-    }
+	/**
+	 * Gets the value of the validator property.
+	 * 
+	 * @return
+	 *         possible object is {@link ValidatorType }
+	 * 
+	 */
+	public ValidatorType getValidator() {
+		return validator;
+	}
 
-    /**
-     * Sets the value of the validator property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link ValidatorType }
-     *     
-     */
-    public void setValidator(ValidatorType value) {
-        this.validator = value;
-    }
+	/**
+	 * Sets the value of the validator property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link ValidatorType }
+	 * 
+	 */
+	public void setValidator(ValidatorType value) {
+		this.validator = value;
+	}
 
-    /**
-     * Gets the value of the name property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getName() {
-        return name;
-    }
+	/**
+	 * Gets the value of the name property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getName() {
+		return name;
+	}
 
-    /**
-     * Sets the value of the name property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setName(String value) {
-        this.name = value;
-    }
+	/**
+	 * Sets the value of the name property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setName(String value) {
+		this.name = value;
+	}
 
-    /**
-     * Gets the value of the type property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getType() {
-        if (type == null) {
-            return "java.lang.String";
-        } else {
-            return type;
-        }
-    }
+	/**
+	 * Gets the value of the type property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getType() {
+		if (type == null) {
+			return "java.lang.String";
+		} else {
+			return type;
+		}
+	}
 
-    /**
-     * Sets the value of the type property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setType(String value) {
-        this.type = value;
-    }
+	/**
+	 * Sets the value of the type property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setType(String value) {
+		this.type = value;
+	}
 
-    /**
-     * Gets the value of the visible property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
-     */
-    public boolean isVisible() {
-        if (visible == null) {
-            return true;
-        } else {
-            return visible;
-        }
-    }
+	/**
+	 * Gets the value of the visible property.
+	 * 
+	 * @return
+	 *         possible object is {@link Boolean }
+	 * 
+	 */
+	public boolean isVisible() {
+		if (visible == null) {
+			return true;
+		} else {
+			return visible;
+		}
+	}
 
-    /**
-     * Sets the value of the visible property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
-     */
-    public void setVisible(Boolean value) {
-        this.visible = value;
-    }
+	/**
+	 * Sets the value of the visible property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Boolean }
+	 * 
+	 */
+	public void setVisible(Boolean value) {
+		this.visible = value;
+	}
 
-    /**
-     * Gets the value of the status property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getStatus() {
-        return status;
-    }
+	/**
+	 * Gets the value of the status property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getStatus() {
+		return status;
+	}
 
-    /**
-     * Sets the value of the status property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setStatus(String value) {
-        this.status = value;
-    }
+	/**
+	 * Sets the value of the status property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setStatus(String value) {
+		this.status = value;
+	}
 
-    /**
-     * Gets the value of the readOnly property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
-     */
-    public boolean isReadOnly() {
-        if (readOnly == null) {
-            return false;
-        } else {
-            return readOnly;
-        }
-    }
+	/**
+	 * Gets the value of the readOnly property.
+	 * 
+	 * @return
+	 *         possible object is {@link Boolean }
+	 * 
+	 */
+	public boolean isReadOnly() {
+		if (readOnly == null) {
+			return false;
+		} else {
+			return readOnly;
+		}
+	}
 
-    /**
-     * Sets the value of the readOnly property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
-     */
-    public void setReadOnly(Boolean value) {
-        this.readOnly = value;
-    }
+	/**
+	 * Sets the value of the readOnly property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Boolean }
+	 * 
+	 */
+	public void setReadOnly(Boolean value) {
+		this.readOnly = value;
+	}
 
-    /**
-     * Gets the value of the translateBooleanAs property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getTranslateBooleanAs() {
-        return translateBooleanAs;
-    }
+	/**
+	 * Gets the value of the translateBooleanAs property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getTranslateBooleanAs() {
+		return translateBooleanAs;
+	}
 
-    /**
-     * Sets the value of the translateBooleanAs property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setTranslateBooleanAs(String value) {
-        this.translateBooleanAs = value;
-    }
+	/**
+	 * Sets the value of the translateBooleanAs property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setTranslateBooleanAs(String value) {
+		this.translateBooleanAs = value;
+	}
 
-    /**
-     * Gets the value of the min property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public Integer getMin() {
-        return min;
-    }
+	/**
+	 * Gets the value of the min property.
+	 * 
+	 * @return
+	 *         possible object is {@link Integer }
+	 * 
+	 */
+	public Integer getMin() {
+		return min;
+	}
 
-    /**
-     * Sets the value of the min property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setMin(Integer value) {
-        this.min = value;
-    }
+	/**
+	 * Sets the value of the min property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Integer }
+	 * 
+	 */
+	public void setMin(Integer value) {
+		this.min = value;
+	}
 
-    /**
-     * Gets the value of the max property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public Integer getMax() {
-        return max;
-    }
+	/**
+	 * Gets the value of the max property.
+	 * 
+	 * @return
+	 *         possible object is {@link Integer }
+	 * 
+	 */
+	public Integer getMax() {
+		return max;
+	}
 
-    /**
-     * Sets the value of the max property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setMax(Integer value) {
-        this.max = value;
-    }
+	/**
+	 * Sets the value of the max property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Integer }
+	 * 
+	 */
+	public void setMax(Integer value) {
+		this.max = value;
+	}
 
 }

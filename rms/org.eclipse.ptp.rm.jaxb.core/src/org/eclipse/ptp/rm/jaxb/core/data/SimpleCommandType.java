@@ -5,7 +5,6 @@
 // Generated on: 2013.11.05 at 08:09:06 AM EST 
 //
 
-
 package org.eclipse.ptp.rm.jaxb.core.data;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -13,11 +12,12 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
- * <p>Java class for simple-command-type complex type.
+ * <p>
+ * Java class for simple-command-type complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="simple-command-type">
@@ -41,199 +41,185 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "simple-command-type")
 public class SimpleCommandType {
 
-    @XmlAttribute(name = "exec", required = true)
-    protected String exec;
-    @XmlAttribute(name = "directory")
-    protected String directory;
-    @XmlAttribute(name = "redirectStderr")
-    protected Boolean redirectStderr;
-    @XmlAttribute(name = "ignoreExitStatus")
-    protected Boolean ignoreExitStatus;
-    @XmlAttribute(name = "wait")
-    protected Boolean wait;
-    @XmlAttribute(name = "name")
-    protected String name;
-    @XmlAttribute(name = "flags")
-    protected String flags;
+	@XmlAttribute(name = "exec", required = true)
+	protected String exec;
+	@XmlAttribute(name = "directory")
+	protected String directory;
+	@XmlAttribute(name = "redirectStderr")
+	protected Boolean redirectStderr;
+	@XmlAttribute(name = "ignoreExitStatus")
+	protected Boolean ignoreExitStatus;
+	@XmlAttribute(name = "wait")
+	protected Boolean wait;
+	@XmlAttribute(name = "name")
+	protected String name;
+	@XmlAttribute(name = "flags")
+	protected String flags;
 
-    /**
-     * Gets the value of the exec property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getExec() {
-        return exec;
-    }
+	/**
+	 * Gets the value of the exec property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getExec() {
+		return exec;
+	}
 
-    /**
-     * Sets the value of the exec property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setExec(String value) {
-        this.exec = value;
-    }
+	/**
+	 * Sets the value of the exec property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setExec(String value) {
+		this.exec = value;
+	}
 
-    /**
-     * Gets the value of the directory property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getDirectory() {
-        return directory;
-    }
+	/**
+	 * Gets the value of the directory property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getDirectory() {
+		return directory;
+	}
 
-    /**
-     * Sets the value of the directory property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setDirectory(String value) {
-        this.directory = value;
-    }
+	/**
+	 * Sets the value of the directory property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setDirectory(String value) {
+		this.directory = value;
+	}
 
-    /**
-     * Gets the value of the redirectStderr property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
-     */
-    public boolean isRedirectStderr() {
-        if (redirectStderr == null) {
-            return false;
-        } else {
-            return redirectStderr;
-        }
-    }
+	/**
+	 * Gets the value of the redirectStderr property.
+	 * 
+	 * @return
+	 *         possible object is {@link Boolean }
+	 * 
+	 */
+	public boolean isRedirectStderr() {
+		if (redirectStderr == null) {
+			return false;
+		} else {
+			return redirectStderr;
+		}
+	}
 
-    /**
-     * Sets the value of the redirectStderr property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
-     */
-    public void setRedirectStderr(Boolean value) {
-        this.redirectStderr = value;
-    }
+	/**
+	 * Sets the value of the redirectStderr property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Boolean }
+	 * 
+	 */
+	public void setRedirectStderr(Boolean value) {
+		this.redirectStderr = value;
+	}
 
-    /**
-     * Gets the value of the ignoreExitStatus property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
-     */
-    public boolean isIgnoreExitStatus() {
-        if (ignoreExitStatus == null) {
-            return false;
-        } else {
-            return ignoreExitStatus;
-        }
-    }
+	/**
+	 * Gets the value of the ignoreExitStatus property.
+	 * 
+	 * @return
+	 *         possible object is {@link Boolean }
+	 * 
+	 */
+	public boolean isIgnoreExitStatus() {
+		if (ignoreExitStatus == null) {
+			return false;
+		} else {
+			return ignoreExitStatus;
+		}
+	}
 
-    /**
-     * Sets the value of the ignoreExitStatus property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
-     */
-    public void setIgnoreExitStatus(Boolean value) {
-        this.ignoreExitStatus = value;
-    }
+	/**
+	 * Sets the value of the ignoreExitStatus property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Boolean }
+	 * 
+	 */
+	public void setIgnoreExitStatus(Boolean value) {
+		this.ignoreExitStatus = value;
+	}
 
-    /**
-     * Gets the value of the wait property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
-     */
-    public boolean isWait() {
-        if (wait == null) {
-            return true;
-        } else {
-            return wait;
-        }
-    }
+	/**
+	 * Gets the value of the wait property.
+	 * 
+	 * @return
+	 *         possible object is {@link Boolean }
+	 * 
+	 */
+	public boolean isWait() {
+		if (wait == null) {
+			return true;
+		} else {
+			return wait;
+		}
+	}
 
-    /**
-     * Sets the value of the wait property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
-     */
-    public void setWait(Boolean value) {
-        this.wait = value;
-    }
+	/**
+	 * Sets the value of the wait property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Boolean }
+	 * 
+	 */
+	public void setWait(Boolean value) {
+		this.wait = value;
+	}
 
-    /**
-     * Gets the value of the name property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getName() {
-        return name;
-    }
+	/**
+	 * Gets the value of the name property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getName() {
+		return name;
+	}
 
-    /**
-     * Sets the value of the name property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setName(String value) {
-        this.name = value;
-    }
+	/**
+	 * Sets the value of the name property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setName(String value) {
+		this.name = value;
+	}
 
-    /**
-     * Gets the value of the flags property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getFlags() {
-        return flags;
-    }
+	/**
+	 * Gets the value of the flags property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getFlags() {
+		return flags;
+	}
 
-    /**
-     * Sets the value of the flags property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setFlags(String value) {
-        this.flags = value;
-    }
+	/**
+	 * Sets the value of the flags property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setFlags(String value) {
+		this.flags = value;
+	}
 
 }

@@ -5,7 +5,6 @@
 // Generated on: 2013.11.05 at 08:09:06 AM EST 
 //
 
-
 package org.eclipse.ptp.rm.jaxb.core.data;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -13,11 +12,12 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
- * <p>Java class for row-data-type complex type.
+ * <p>
+ * Java class for row-data-type complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="row-data-type">
@@ -37,87 +37,81 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "row-data-type")
 public class RowDataType {
 
-    @XmlAttribute(name = "height")
-    protected Integer height;
-    @XmlAttribute(name = "width")
-    protected Integer width;
-    @XmlAttribute(name = "exclude")
-    protected Boolean exclude;
+	@XmlAttribute(name = "height")
+	protected Integer height;
+	@XmlAttribute(name = "width")
+	protected Integer width;
+	@XmlAttribute(name = "exclude")
+	protected Boolean exclude;
 
-    /**
-     * Gets the value of the height property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public Integer getHeight() {
-        return height;
-    }
+	/**
+	 * Gets the value of the height property.
+	 * 
+	 * @return
+	 *         possible object is {@link Integer }
+	 * 
+	 */
+	public Integer getHeight() {
+		return height;
+	}
 
-    /**
-     * Sets the value of the height property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setHeight(Integer value) {
-        this.height = value;
-    }
+	/**
+	 * Sets the value of the height property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Integer }
+	 * 
+	 */
+	public void setHeight(Integer value) {
+		this.height = value;
+	}
 
-    /**
-     * Gets the value of the width property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public Integer getWidth() {
-        return width;
-    }
+	/**
+	 * Gets the value of the width property.
+	 * 
+	 * @return
+	 *         possible object is {@link Integer }
+	 * 
+	 */
+	public Integer getWidth() {
+		return width;
+	}
 
-    /**
-     * Sets the value of the width property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setWidth(Integer value) {
-        this.width = value;
-    }
+	/**
+	 * Sets the value of the width property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Integer }
+	 * 
+	 */
+	public void setWidth(Integer value) {
+		this.width = value;
+	}
 
-    /**
-     * Gets the value of the exclude property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
-     */
-    public boolean isExclude() {
-        if (exclude == null) {
-            return false;
-        } else {
-            return exclude;
-        }
-    }
+	/**
+	 * Gets the value of the exclude property.
+	 * 
+	 * @return
+	 *         possible object is {@link Boolean }
+	 * 
+	 */
+	public boolean isExclude() {
+		if (exclude == null) {
+			return false;
+		} else {
+			return exclude;
+		}
+	}
 
-    /**
-     * Sets the value of the exclude property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
-     */
-    public void setExclude(Boolean value) {
-        this.exclude = value;
-    }
+	/**
+	 * Sets the value of the exclude property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Boolean }
+	 * 
+	 */
+	public void setExclude(Boolean value) {
+		this.exclude = value;
+	}
 
 }

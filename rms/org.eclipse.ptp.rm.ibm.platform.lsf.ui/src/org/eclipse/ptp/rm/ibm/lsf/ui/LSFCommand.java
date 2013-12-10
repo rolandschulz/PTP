@@ -14,11 +14,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.ptp.rm.ibm.lsf.ui.widgets.Messages;
 import org.eclipse.remote.core.IRemoteConnection;
 import org.eclipse.remote.core.IRemoteProcess;
 import org.eclipse.remote.core.IRemoteProcessBuilder;
-import org.eclipse.remote.core.IRemoteServices;
-import org.eclipse.ptp.rm.ibm.lsf.ui.widgets.Messages;
 
 /**
  * This class implements invocation of LSF commands as a job running on a non-UI
@@ -26,9 +25,9 @@ import org.eclipse.ptp.rm.ibm.lsf.ui.widgets.Messages;
  */
 public class LSFCommand implements IRunnableWithProgress {
 
-	private String command[];
-	private String commandDescription;
-	private IRemoteConnection remoteConnection;
+	private final String command[];
+	private final String commandDescription;
+	private final IRemoteConnection remoteConnection;
 	protected Vector<String[]> commandResponse;
 	protected String columnLabels[];
 	public static final int OK = 0;
@@ -85,8 +84,7 @@ public class LSFCommand implements IRunnableWithProgress {
 					}
 					if (monitor.isCanceled()) {
 						process.destroy();
-						return new Status(IStatus.CANCEL, Activator.PLUGIN_ID,
-								CANCELED, Messages.CommandCancelMessage, null);
+						return new Status(IStatus.CANCEL, Activator.PLUGIN_ID, CANCELED, Messages.CommandCancelMessage, null);
 					}
 					Thread.sleep(1000);
 				}
@@ -110,8 +108,7 @@ public class LSFCommand implements IRunnableWithProgress {
 		 * first line of output. Subsequent lines are ignored.
 		 */
 		try {
-			reader = new BufferedReader(new InputStreamReader(
-					process.getErrorStream()));
+			reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 			data = reader.readLine();
 			headerLine = true;
 			while (data != null) {
@@ -134,8 +131,7 @@ public class LSFCommand implements IRunnableWithProgress {
 			 * blank-delimited strings. The first line of output is the column
 			 * headings. Subsequent lines are reservation data.
 			 */
-			reader = new BufferedReader(new InputStreamReader(
-					process.getInputStream()));
+			reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 			data = reader.readLine();
 			headerLine = true;
 			commandResponse.clear();

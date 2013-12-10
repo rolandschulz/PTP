@@ -5,7 +5,6 @@
 // Generated on: 2013.11.05 at 08:09:06 AM EST 
 //
 
-
 package org.eclipse.ptp.rm.jaxb.core.data;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -13,11 +12,12 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
- * <p>Java class for entry-type complex type.
+ * <p>
+ * Java class for entry-type complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="entry-type">
@@ -40,177 +40,165 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "entry-type")
 public class EntryType {
 
-    @XmlAttribute(name = "key")
-    protected String key;
-    @XmlAttribute(name = "keyGroup")
-    protected Integer keyGroup;
-    @XmlAttribute(name = "keyIndex")
-    protected Integer keyIndex;
-    @XmlAttribute(name = "value")
-    protected String value;
-    @XmlAttribute(name = "valueGroup")
-    protected Integer valueGroup;
-    @XmlAttribute(name = "valueIndex")
-    protected Integer valueIndex;
+	@XmlAttribute(name = "key")
+	protected String key;
+	@XmlAttribute(name = "keyGroup")
+	protected Integer keyGroup;
+	@XmlAttribute(name = "keyIndex")
+	protected Integer keyIndex;
+	@XmlAttribute(name = "value")
+	protected String value;
+	@XmlAttribute(name = "valueGroup")
+	protected Integer valueGroup;
+	@XmlAttribute(name = "valueIndex")
+	protected Integer valueIndex;
 
-    /**
-     * Gets the value of the key property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getKey() {
-        return key;
-    }
+	/**
+	 * Gets the value of the key property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getKey() {
+		return key;
+	}
 
-    /**
-     * Sets the value of the key property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setKey(String value) {
-        this.key = value;
-    }
+	/**
+	 * Sets the value of the key property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setKey(String value) {
+		this.key = value;
+	}
 
-    /**
-     * Gets the value of the keyGroup property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public int getKeyGroup() {
-        if (keyGroup == null) {
-            return  0;
-        } else {
-            return keyGroup;
-        }
-    }
+	/**
+	 * Gets the value of the keyGroup property.
+	 * 
+	 * @return
+	 *         possible object is {@link Integer }
+	 * 
+	 */
+	public int getKeyGroup() {
+		if (keyGroup == null) {
+			return 0;
+		} else {
+			return keyGroup;
+		}
+	}
 
-    /**
-     * Sets the value of the keyGroup property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setKeyGroup(Integer value) {
-        this.keyGroup = value;
-    }
+	/**
+	 * Sets the value of the keyGroup property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Integer }
+	 * 
+	 */
+	public void setKeyGroup(Integer value) {
+		this.keyGroup = value;
+	}
 
-    /**
-     * Gets the value of the keyIndex property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public int getKeyIndex() {
-        if (keyIndex == null) {
-            return  0;
-        } else {
-            return keyIndex;
-        }
-    }
+	/**
+	 * Gets the value of the keyIndex property.
+	 * 
+	 * @return
+	 *         possible object is {@link Integer }
+	 * 
+	 */
+	public int getKeyIndex() {
+		if (keyIndex == null) {
+			return 0;
+		} else {
+			return keyIndex;
+		}
+	}
 
-    /**
-     * Sets the value of the keyIndex property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setKeyIndex(Integer value) {
-        this.keyIndex = value;
-    }
+	/**
+	 * Sets the value of the keyIndex property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Integer }
+	 * 
+	 */
+	public void setKeyIndex(Integer value) {
+		this.keyIndex = value;
+	}
 
-    /**
-     * Gets the value of the value property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getValue() {
-        return value;
-    }
+	/**
+	 * Gets the value of the value property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getValue() {
+		return value;
+	}
 
-    /**
-     * Sets the value of the value property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setValue(String value) {
-        this.value = value;
-    }
+	/**
+	 * Sets the value of the value property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setValue(String value) {
+		this.value = value;
+	}
 
-    /**
-     * Gets the value of the valueGroup property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public int getValueGroup() {
-        if (valueGroup == null) {
-            return  0;
-        } else {
-            return valueGroup;
-        }
-    }
+	/**
+	 * Gets the value of the valueGroup property.
+	 * 
+	 * @return
+	 *         possible object is {@link Integer }
+	 * 
+	 */
+	public int getValueGroup() {
+		if (valueGroup == null) {
+			return 0;
+		} else {
+			return valueGroup;
+		}
+	}
 
-    /**
-     * Sets the value of the valueGroup property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setValueGroup(Integer value) {
-        this.valueGroup = value;
-    }
+	/**
+	 * Sets the value of the valueGroup property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Integer }
+	 * 
+	 */
+	public void setValueGroup(Integer value) {
+		this.valueGroup = value;
+	}
 
-    /**
-     * Gets the value of the valueIndex property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public int getValueIndex() {
-        if (valueIndex == null) {
-            return  0;
-        } else {
-            return valueIndex;
-        }
-    }
+	/**
+	 * Gets the value of the valueIndex property.
+	 * 
+	 * @return
+	 *         possible object is {@link Integer }
+	 * 
+	 */
+	public int getValueIndex() {
+		if (valueIndex == null) {
+			return 0;
+		} else {
+			return valueIndex;
+		}
+	}
 
-    /**
-     * Sets the value of the valueIndex property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setValueIndex(Integer value) {
-        this.valueIndex = value;
-    }
+	/**
+	 * Sets the value of the valueIndex property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Integer }
+	 * 
+	 */
+	public void setValueIndex(Integer value) {
+		this.valueIndex = value;
+	}
 
 }

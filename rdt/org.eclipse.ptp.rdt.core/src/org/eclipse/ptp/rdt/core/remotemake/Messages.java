@@ -13,6 +13,9 @@ package org.eclipse.ptp.rdt.core.remotemake;
 
 import org.eclipse.osgi.util.NLS;
 
+/**
+ * @since 5.0
+ */
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.rdt.core.remotemake.messages"; //$NON-NLS-1$
 	public static String RemoteCommandLauncher_env_parse_error;

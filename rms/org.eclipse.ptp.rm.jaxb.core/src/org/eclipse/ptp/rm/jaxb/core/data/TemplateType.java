@@ -5,7 +5,6 @@
 // Generated on: 2013.11.05 at 08:09:06 AM EST 
 //
 
-
 package org.eclipse.ptp.rm.jaxb.core.data;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -13,11 +12,12 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
- * <p>Java class for template-type complex type.
+ * <p>
+ * Java class for template-type complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="template-type">
@@ -36,61 +36,57 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "template-type")
 public class TemplateType {
 
-    @XmlAttribute(name = "pattern")
-    protected String pattern;
-    @XmlAttribute(name = "separator")
-    protected String separator;
+	@XmlAttribute(name = "pattern")
+	protected String pattern;
+	@XmlAttribute(name = "separator")
+	protected String separator;
 
-    /**
-     * Gets the value of the pattern property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getPattern() {
-        return pattern;
-    }
+	/**
+	 * Gets the value of the pattern property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getPattern() {
+		return pattern;
+	}
 
-    /**
-     * Sets the value of the pattern property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setPattern(String value) {
-        this.pattern = value;
-    }
+	/**
+	 * Sets the value of the pattern property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setPattern(String value) {
+		this.pattern = value;
+	}
 
-    /**
-     * Gets the value of the separator property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getSeparator() {
-        if (separator == null) {
-            return " ";
-        } else {
-            return separator;
-        }
-    }
+	/**
+	 * Gets the value of the separator property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getSeparator() {
+		if (separator == null) {
+			return " ";
+		} else {
+			return separator;
+		}
+	}
 
-    /**
-     * Sets the value of the separator property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setSeparator(String value) {
-        this.separator = value;
-    }
+	/**
+	 * Sets the value of the separator property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setSeparator(String value) {
+		this.separator = value;
+	}
 
 }

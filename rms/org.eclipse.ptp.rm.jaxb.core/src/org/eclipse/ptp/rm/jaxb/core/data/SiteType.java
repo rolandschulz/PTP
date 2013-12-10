@@ -5,7 +5,6 @@
 // Generated on: 2013.11.05 at 08:09:06 AM EST 
 //
 
-
 package org.eclipse.ptp.rm.jaxb.core.data;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -13,11 +12,12 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
- * <p>Java class for site-type complex type.
+ * <p>
+ * Java class for site-type complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="site-type">
@@ -37,117 +37,104 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "site-type", propOrder = {
-    "remoteServices",
-    "connectionName",
-    "controlConnection",
-    "monitorConnection"
-})
+@XmlType(name = "site-type", propOrder = { "remoteServices", "connectionName", "controlConnection", "monitorConnection" })
 public class SiteType {
 
-    @XmlElement(name = "remote-services")
-    protected String remoteServices;
-    @XmlElement(name = "connection-name")
-    protected String connectionName;
-    @XmlElement(name = "control-connection")
-    protected String controlConnection;
-    @XmlElement(name = "monitor-connection")
-    protected String monitorConnection;
+	@XmlElement(name = "remote-services")
+	protected String remoteServices;
+	@XmlElement(name = "connection-name")
+	protected String connectionName;
+	@XmlElement(name = "control-connection")
+	protected String controlConnection;
+	@XmlElement(name = "monitor-connection")
+	protected String monitorConnection;
 
-    /**
-     * Gets the value of the remoteServices property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getRemoteServices() {
-        return remoteServices;
-    }
+	/**
+	 * Gets the value of the remoteServices property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getRemoteServices() {
+		return remoteServices;
+	}
 
-    /**
-     * Sets the value of the remoteServices property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setRemoteServices(String value) {
-        this.remoteServices = value;
-    }
+	/**
+	 * Sets the value of the remoteServices property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setRemoteServices(String value) {
+		this.remoteServices = value;
+	}
 
-    /**
-     * Gets the value of the connectionName property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getConnectionName() {
-        return connectionName;
-    }
+	/**
+	 * Gets the value of the connectionName property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getConnectionName() {
+		return connectionName;
+	}
 
-    /**
-     * Sets the value of the connectionName property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setConnectionName(String value) {
-        this.connectionName = value;
-    }
+	/**
+	 * Sets the value of the connectionName property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setConnectionName(String value) {
+		this.connectionName = value;
+	}
 
-    /**
-     * Gets the value of the controlConnection property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getControlConnection() {
-        return controlConnection;
-    }
+	/**
+	 * Gets the value of the controlConnection property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getControlConnection() {
+		return controlConnection;
+	}
 
-    /**
-     * Sets the value of the controlConnection property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setControlConnection(String value) {
-        this.controlConnection = value;
-    }
+	/**
+	 * Sets the value of the controlConnection property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setControlConnection(String value) {
+		this.controlConnection = value;
+	}
 
-    /**
-     * Gets the value of the monitorConnection property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getMonitorConnection() {
-        return monitorConnection;
-    }
+	/**
+	 * Gets the value of the monitorConnection property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getMonitorConnection() {
+		return monitorConnection;
+	}
 
-    /**
-     * Sets the value of the monitorConnection property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setMonitorConnection(String value) {
-        this.monitorConnection = value;
-    }
+	/**
+	 * Sets the value of the monitorConnection property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setMonitorConnection(String value) {
+		this.monitorConnection = value;
+	}
 
 }

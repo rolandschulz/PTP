@@ -5,7 +5,6 @@
 // Generated on: 2013.11.05 at 08:09:06 AM EST 
 //
 
-
 package org.eclipse.ptp.rm.jaxb.core.data;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -14,11 +13,12 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
- * <p>Java class for resource-manager-data complex type.
+ * <p>
+ * Java class for resource-manager-data complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="resource-manager-data">
@@ -38,116 +38,104 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "resource-manager-data", propOrder = {
-    "siteData",
-    "controlData",
-    "monitorData"
-})
+@XmlType(name = "resource-manager-data", propOrder = { "siteData", "controlData", "monitorData" })
 public class ResourceManagerData {
 
-    @XmlElement(name = "site-data")
-    protected SiteType siteData;
-    @XmlElement(name = "control-data")
-    protected ControlType controlData;
-    @XmlElement(name = "monitor-data")
-    protected MonitorType monitorData;
-    @XmlAttribute(name = "name")
-    protected String name;
+	@XmlElement(name = "site-data")
+	protected SiteType siteData;
+	@XmlElement(name = "control-data")
+	protected ControlType controlData;
+	@XmlElement(name = "monitor-data")
+	protected MonitorType monitorData;
+	@XmlAttribute(name = "name")
+	protected String name;
 
-    /**
-     * Gets the value of the siteData property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link SiteType }
-     *     
-     */
-    public SiteType getSiteData() {
-        return siteData;
-    }
+	/**
+	 * Gets the value of the siteData property.
+	 * 
+	 * @return
+	 *         possible object is {@link SiteType }
+	 * 
+	 */
+	public SiteType getSiteData() {
+		return siteData;
+	}
 
-    /**
-     * Sets the value of the siteData property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link SiteType }
-     *     
-     */
-    public void setSiteData(SiteType value) {
-        this.siteData = value;
-    }
+	/**
+	 * Sets the value of the siteData property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link SiteType }
+	 * 
+	 */
+	public void setSiteData(SiteType value) {
+		this.siteData = value;
+	}
 
-    /**
-     * Gets the value of the controlData property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link ControlType }
-     *     
-     */
-    public ControlType getControlData() {
-        return controlData;
-    }
+	/**
+	 * Gets the value of the controlData property.
+	 * 
+	 * @return
+	 *         possible object is {@link ControlType }
+	 * 
+	 */
+	public ControlType getControlData() {
+		return controlData;
+	}
 
-    /**
-     * Sets the value of the controlData property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link ControlType }
-     *     
-     */
-    public void setControlData(ControlType value) {
-        this.controlData = value;
-    }
+	/**
+	 * Sets the value of the controlData property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link ControlType }
+	 * 
+	 */
+	public void setControlData(ControlType value) {
+		this.controlData = value;
+	}
 
-    /**
-     * Gets the value of the monitorData property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link MonitorType }
-     *     
-     */
-    public MonitorType getMonitorData() {
-        return monitorData;
-    }
+	/**
+	 * Gets the value of the monitorData property.
+	 * 
+	 * @return
+	 *         possible object is {@link MonitorType }
+	 * 
+	 */
+	public MonitorType getMonitorData() {
+		return monitorData;
+	}
 
-    /**
-     * Sets the value of the monitorData property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link MonitorType }
-     *     
-     */
-    public void setMonitorData(MonitorType value) {
-        this.monitorData = value;
-    }
+	/**
+	 * Sets the value of the monitorData property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link MonitorType }
+	 * 
+	 */
+	public void setMonitorData(MonitorType value) {
+		this.monitorData = value;
+	}
 
-    /**
-     * Gets the value of the name property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getName() {
-        return name;
-    }
+	/**
+	 * Gets the value of the name property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getName() {
+		return name;
+	}
 
-    /**
-     * Sets the value of the name property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setName(String value) {
-        this.name = value;
-    }
+	/**
+	 * Sets the value of the name property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setName(String value) {
+		this.name = value;
+	}
 
 }

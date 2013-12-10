@@ -5,21 +5,22 @@
 // Generated on: 2013.11.05 at 08:09:06 AM EST 
 //
 
-
 package org.eclipse.ptp.rm.jaxb.core.data;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
- * <p>Java class for workflow-type complex type.
+ * <p>
+ * Java class for workflow-type complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="workflow-type">
@@ -38,103 +39,96 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "workflow-type", propOrder = {
-    "vardefs",
-    "managedFiles",
-    "step"
-})
+@XmlType(name = "workflow-type", propOrder = { "vardefs", "managedFiles", "step" })
 public class WorkflowType {
 
-    protected List<VardefsType> vardefs;
-    @XmlElement(name = "managed-files")
-    protected List<ManagedFilesType> managedFiles;
-    protected List<StepType> step;
+	protected List<VardefsType> vardefs;
+	@XmlElement(name = "managed-files")
+	protected List<ManagedFilesType> managedFiles;
+	protected List<StepType> step;
 
-    /**
-     * Gets the value of the vardefs property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the vardefs property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getVardefs().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link VardefsType }
-     * 
-     * 
-     */
-    public List<VardefsType> getVardefs() {
-        if (vardefs == null) {
-            vardefs = new ArrayList<VardefsType>();
-        }
-        return this.vardefs;
-    }
+	/**
+	 * Gets the value of the vardefs property.
+	 * 
+	 * <p>
+	 * This accessor method returns a reference to the live list, not a snapshot. Therefore any modification you make to the
+	 * returned list will be present inside the JAXB object. This is why there is not a <CODE>set</CODE> method for the vardefs
+	 * property.
+	 * 
+	 * <p>
+	 * For example, to add a new item, do as follows:
+	 * 
+	 * <pre>
+	 * getVardefs().add(newItem);
+	 * </pre>
+	 * 
+	 * 
+	 * <p>
+	 * Objects of the following type(s) are allowed in the list {@link VardefsType }
+	 * 
+	 * 
+	 */
+	public List<VardefsType> getVardefs() {
+		if (vardefs == null) {
+			vardefs = new ArrayList<VardefsType>();
+		}
+		return this.vardefs;
+	}
 
-    /**
-     * Gets the value of the managedFiles property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the managedFiles property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getManagedFiles().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link ManagedFilesType }
-     * 
-     * 
-     */
-    public List<ManagedFilesType> getManagedFiles() {
-        if (managedFiles == null) {
-            managedFiles = new ArrayList<ManagedFilesType>();
-        }
-        return this.managedFiles;
-    }
+	/**
+	 * Gets the value of the managedFiles property.
+	 * 
+	 * <p>
+	 * This accessor method returns a reference to the live list, not a snapshot. Therefore any modification you make to the
+	 * returned list will be present inside the JAXB object. This is why there is not a <CODE>set</CODE> method for the managedFiles
+	 * property.
+	 * 
+	 * <p>
+	 * For example, to add a new item, do as follows:
+	 * 
+	 * <pre>
+	 * getManagedFiles().add(newItem);
+	 * </pre>
+	 * 
+	 * 
+	 * <p>
+	 * Objects of the following type(s) are allowed in the list {@link ManagedFilesType }
+	 * 
+	 * 
+	 */
+	public List<ManagedFilesType> getManagedFiles() {
+		if (managedFiles == null) {
+			managedFiles = new ArrayList<ManagedFilesType>();
+		}
+		return this.managedFiles;
+	}
 
-    /**
-     * Gets the value of the step property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the step property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getStep().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link StepType }
-     * 
-     * 
-     */
-    public List<StepType> getStep() {
-        if (step == null) {
-            step = new ArrayList<StepType>();
-        }
-        return this.step;
-    }
+	/**
+	 * Gets the value of the step property.
+	 * 
+	 * <p>
+	 * This accessor method returns a reference to the live list, not a snapshot. Therefore any modification you make to the
+	 * returned list will be present inside the JAXB object. This is why there is not a <CODE>set</CODE> method for the step
+	 * property.
+	 * 
+	 * <p>
+	 * For example, to add a new item, do as follows:
+	 * 
+	 * <pre>
+	 * getStep().add(newItem);
+	 * </pre>
+	 * 
+	 * 
+	 * <p>
+	 * Objects of the following type(s) are allowed in the list {@link StepType }
+	 * 
+	 * 
+	 */
+	public List<StepType> getStep() {
+		if (step == null) {
+			step = new ArrayList<StepType>();
+		}
+		return this.step;
+	}
 
 }

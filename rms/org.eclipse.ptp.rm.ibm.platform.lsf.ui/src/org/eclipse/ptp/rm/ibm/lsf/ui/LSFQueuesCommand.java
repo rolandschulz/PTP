@@ -8,17 +8,12 @@ package org.eclipse.ptp.rm.ibm.lsf.ui;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Vector;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.remote.core.IRemoteConnection;
-import org.eclipse.remote.core.IRemoteProcess;
-import org.eclipse.remote.core.IRemoteProcessBuilder;
-import org.eclipse.remote.core.IRemoteServices;
 import org.eclipse.ptp.rm.ibm.lsf.ui.widgets.Messages;
+import org.eclipse.remote.core.IRemoteConnection;
 
 /**
  * This class implements invocation of LSF commands as a job running on a non-UI
@@ -26,7 +21,7 @@ import org.eclipse.ptp.rm.ibm.lsf.ui.widgets.Messages;
  */
 public class LSFQueuesCommand extends LSFCommand {
 
-	private boolean isInteractiveSession;
+	private final boolean isInteractiveSession;
 
 	/**
 	 * Constructor for creating a job to run a LSF command
@@ -38,12 +33,12 @@ public class LSFQueuesCommand extends LSFCommand {
 	 * @param cmd
 	 *            Array containing command name and command parameters
 	 */
-	public LSFQueuesCommand(String name, IRemoteConnection connection,
-			String cmd[], boolean isInteractive) {
+	public LSFQueuesCommand(String name, IRemoteConnection connection, String cmd[], boolean isInteractive) {
 		super(name, connection, cmd);
 		isInteractiveSession = isInteractive;
 	}
 
+	@Override
 	protected IStatus getCommandOutput(IProgressMonitor monitor) {
 		BufferedReader reader;
 		String columnData[];
@@ -66,8 +61,7 @@ public class LSFQueuesCommand extends LSFCommand {
 			 * excluding batch only queues when the target system configuration
 			 * is an interactive one
 			 */
-			reader = new BufferedReader(new InputStreamReader(
-					process.getInputStream()));
+			reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 			commandResponse.clear();
 			headerProcessed = false;
 			headerNext = false;
@@ -114,8 +108,7 @@ public class LSFQueuesCommand extends LSFCommand {
 				data = reader.readLine();
 				if (monitor.isCanceled()) {
 					reader.close();
-					return new Status(IStatus.CANCEL, Activator.PLUGIN_ID,
-							CANCELED, Messages.CommandCancelMessage, null);
+					return new Status(IStatus.CANCEL, Activator.PLUGIN_ID, CANCELED, Messages.CommandCancelMessage, null);
 				}
 			}
 			if ((queueData != null)
@@ -126,10 +119,8 @@ public class LSFQueuesCommand extends LSFCommand {
 			}
 			reader.close();
 		} catch (IOException e) {
-			return new Status(IStatus.ERROR, Activator.PLUGIN_ID,
-					COMMAND_ERROR, "Error reading command output", e);
+			return new Status(IStatus.ERROR, Activator.PLUGIN_ID, COMMAND_ERROR, "Error reading command output", e);
 		}
-		return new Status(IStatus.OK, Activator.PLUGIN_ID, OK,
-				Messages.OkMessage, null);
+		return new Status(IStatus.OK, Activator.PLUGIN_ID, OK, Messages.OkMessage, null);
 	}
 }

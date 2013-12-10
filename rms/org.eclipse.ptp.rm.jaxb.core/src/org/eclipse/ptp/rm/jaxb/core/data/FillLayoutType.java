@@ -5,7 +5,6 @@
 // Generated on: 2013.11.05 at 08:09:06 AM EST 
 //
 
-
 package org.eclipse.ptp.rm.jaxb.core.data;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -13,11 +12,12 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
- * <p>Java class for fill-layout-type complex type.
+ * <p>
+ * Java class for fill-layout-type complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="fill-layout-type">
@@ -38,109 +38,101 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "fill-layout-type")
 public class FillLayoutType {
 
-    @XmlAttribute(name = "type")
-    protected String type;
-    @XmlAttribute(name = "marginHeight")
-    protected Integer marginHeight;
-    @XmlAttribute(name = "marginWidth")
-    protected Integer marginWidth;
-    @XmlAttribute(name = "spacing")
-    protected Integer spacing;
+	@XmlAttribute(name = "type")
+	protected String type;
+	@XmlAttribute(name = "marginHeight")
+	protected Integer marginHeight;
+	@XmlAttribute(name = "marginWidth")
+	protected Integer marginWidth;
+	@XmlAttribute(name = "spacing")
+	protected Integer spacing;
 
-    /**
-     * Gets the value of the type property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getType() {
-        return type;
-    }
+	/**
+	 * Gets the value of the type property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getType() {
+		return type;
+	}
 
-    /**
-     * Sets the value of the type property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setType(String value) {
-        this.type = value;
-    }
+	/**
+	 * Sets the value of the type property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setType(String value) {
+		this.type = value;
+	}
 
-    /**
-     * Gets the value of the marginHeight property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public Integer getMarginHeight() {
-        return marginHeight;
-    }
+	/**
+	 * Gets the value of the marginHeight property.
+	 * 
+	 * @return
+	 *         possible object is {@link Integer }
+	 * 
+	 */
+	public Integer getMarginHeight() {
+		return marginHeight;
+	}
 
-    /**
-     * Sets the value of the marginHeight property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setMarginHeight(Integer value) {
-        this.marginHeight = value;
-    }
+	/**
+	 * Sets the value of the marginHeight property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Integer }
+	 * 
+	 */
+	public void setMarginHeight(Integer value) {
+		this.marginHeight = value;
+	}
 
-    /**
-     * Gets the value of the marginWidth property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public Integer getMarginWidth() {
-        return marginWidth;
-    }
+	/**
+	 * Gets the value of the marginWidth property.
+	 * 
+	 * @return
+	 *         possible object is {@link Integer }
+	 * 
+	 */
+	public Integer getMarginWidth() {
+		return marginWidth;
+	}
 
-    /**
-     * Sets the value of the marginWidth property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setMarginWidth(Integer value) {
-        this.marginWidth = value;
-    }
+	/**
+	 * Sets the value of the marginWidth property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Integer }
+	 * 
+	 */
+	public void setMarginWidth(Integer value) {
+		this.marginWidth = value;
+	}
 
-    /**
-     * Gets the value of the spacing property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public Integer getSpacing() {
-        return spacing;
-    }
+	/**
+	 * Gets the value of the spacing property.
+	 * 
+	 * @return
+	 *         possible object is {@link Integer }
+	 * 
+	 */
+	public Integer getSpacing() {
+		return spacing;
+	}
 
-    /**
-     * Sets the value of the spacing property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setSpacing(Integer value) {
-        this.spacing = value;
-    }
+	/**
+	 * Sets the value of the spacing property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Integer }
+	 * 
+	 */
+	public void setSpacing(Integer value) {
+		this.spacing = value;
+	}
 
 }

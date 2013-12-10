@@ -5,7 +5,6 @@
 // Generated on: 2013.11.05 at 08:09:06 AM EST 
 //
 
-
 package org.eclipse.ptp.rm.jaxb.core.data;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -14,11 +13,12 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
- * <p>Java class for push-button-type complex type.
+ * <p>
+ * Java class for push-button-type complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="push-button-type">
@@ -42,220 +42,198 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "push-button-type", propOrder = {
-    "layoutData",
-    "font",
-    "tooltip",
-    "buttonAction",
-    "controlState"
-})
+@XmlType(name = "push-button-type", propOrder = { "layoutData", "font", "tooltip", "buttonAction", "controlState" })
 public class PushButtonType {
 
-    @XmlElement(name = "layout-data")
-    protected LayoutDataType layoutData;
-    protected FontType font;
-    protected String tooltip;
-    @XmlElement(name = "button-action")
-    protected ButtonActionType buttonAction;
-    @XmlElement(name = "control-state")
-    protected ControlStateType controlState;
-    @XmlAttribute(name = "title")
-    protected String title;
-    @XmlAttribute(name = "foreground")
-    protected String foreground;
-    @XmlAttribute(name = "background")
-    protected String background;
+	@XmlElement(name = "layout-data")
+	protected LayoutDataType layoutData;
+	protected FontType font;
+	protected String tooltip;
+	@XmlElement(name = "button-action")
+	protected ButtonActionType buttonAction;
+	@XmlElement(name = "control-state")
+	protected ControlStateType controlState;
+	@XmlAttribute(name = "title")
+	protected String title;
+	@XmlAttribute(name = "foreground")
+	protected String foreground;
+	@XmlAttribute(name = "background")
+	protected String background;
 
-    /**
-     * Gets the value of the layoutData property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link LayoutDataType }
-     *     
-     */
-    public LayoutDataType getLayoutData() {
-        return layoutData;
-    }
+	/**
+	 * Gets the value of the layoutData property.
+	 * 
+	 * @return
+	 *         possible object is {@link LayoutDataType }
+	 * 
+	 */
+	public LayoutDataType getLayoutData() {
+		return layoutData;
+	}
 
-    /**
-     * Sets the value of the layoutData property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link LayoutDataType }
-     *     
-     */
-    public void setLayoutData(LayoutDataType value) {
-        this.layoutData = value;
-    }
+	/**
+	 * Sets the value of the layoutData property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link LayoutDataType }
+	 * 
+	 */
+	public void setLayoutData(LayoutDataType value) {
+		this.layoutData = value;
+	}
 
-    /**
-     * Gets the value of the font property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link FontType }
-     *     
-     */
-    public FontType getFont() {
-        return font;
-    }
+	/**
+	 * Gets the value of the font property.
+	 * 
+	 * @return
+	 *         possible object is {@link FontType }
+	 * 
+	 */
+	public FontType getFont() {
+		return font;
+	}
 
-    /**
-     * Sets the value of the font property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link FontType }
-     *     
-     */
-    public void setFont(FontType value) {
-        this.font = value;
-    }
+	/**
+	 * Sets the value of the font property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link FontType }
+	 * 
+	 */
+	public void setFont(FontType value) {
+		this.font = value;
+	}
 
-    /**
-     * Gets the value of the tooltip property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getTooltip() {
-        return tooltip;
-    }
+	/**
+	 * Gets the value of the tooltip property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getTooltip() {
+		return tooltip;
+	}
 
-    /**
-     * Sets the value of the tooltip property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setTooltip(String value) {
-        this.tooltip = value;
-    }
+	/**
+	 * Sets the value of the tooltip property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setTooltip(String value) {
+		this.tooltip = value;
+	}
 
-    /**
-     * Gets the value of the buttonAction property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link ButtonActionType }
-     *     
-     */
-    public ButtonActionType getButtonAction() {
-        return buttonAction;
-    }
+	/**
+	 * Gets the value of the buttonAction property.
+	 * 
+	 * @return
+	 *         possible object is {@link ButtonActionType }
+	 * 
+	 */
+	public ButtonActionType getButtonAction() {
+		return buttonAction;
+	}
 
-    /**
-     * Sets the value of the buttonAction property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link ButtonActionType }
-     *     
-     */
-    public void setButtonAction(ButtonActionType value) {
-        this.buttonAction = value;
-    }
+	/**
+	 * Sets the value of the buttonAction property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link ButtonActionType }
+	 * 
+	 */
+	public void setButtonAction(ButtonActionType value) {
+		this.buttonAction = value;
+	}
 
-    /**
-     * Gets the value of the controlState property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link ControlStateType }
-     *     
-     */
-    public ControlStateType getControlState() {
-        return controlState;
-    }
+	/**
+	 * Gets the value of the controlState property.
+	 * 
+	 * @return
+	 *         possible object is {@link ControlStateType }
+	 * 
+	 */
+	public ControlStateType getControlState() {
+		return controlState;
+	}
 
-    /**
-     * Sets the value of the controlState property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link ControlStateType }
-     *     
-     */
-    public void setControlState(ControlStateType value) {
-        this.controlState = value;
-    }
+	/**
+	 * Sets the value of the controlState property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link ControlStateType }
+	 * 
+	 */
+	public void setControlState(ControlStateType value) {
+		this.controlState = value;
+	}
 
-    /**
-     * Gets the value of the title property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getTitle() {
-        return title;
-    }
+	/**
+	 * Gets the value of the title property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getTitle() {
+		return title;
+	}
 
-    /**
-     * Sets the value of the title property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setTitle(String value) {
-        this.title = value;
-    }
+	/**
+	 * Sets the value of the title property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setTitle(String value) {
+		this.title = value;
+	}
 
-    /**
-     * Gets the value of the foreground property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getForeground() {
-        return foreground;
-    }
+	/**
+	 * Gets the value of the foreground property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getForeground() {
+		return foreground;
+	}
 
-    /**
-     * Sets the value of the foreground property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setForeground(String value) {
-        this.foreground = value;
-    }
+	/**
+	 * Sets the value of the foreground property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setForeground(String value) {
+		this.foreground = value;
+	}
 
-    /**
-     * Gets the value of the background property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getBackground() {
-        return background;
-    }
+	/**
+	 * Gets the value of the background property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getBackground() {
+		return background;
+	}
 
-    /**
-     * Sets the value of the background property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setBackground(String value) {
-        this.background = value;
-    }
+	/**
+	 * Sets the value of the background property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setBackground(String value) {
+		this.background = value;
+	}
 
 }

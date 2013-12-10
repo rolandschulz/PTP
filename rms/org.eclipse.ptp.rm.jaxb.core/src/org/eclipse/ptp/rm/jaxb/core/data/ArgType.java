@@ -5,7 +5,6 @@
 // Generated on: 2013.11.05 at 08:09:06 AM EST 
 //
 
-
 package org.eclipse.ptp.rm.jaxb.core.data;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -14,11 +13,12 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
 
-
 /**
- * <p>Java class for arg-type complex type.
+ * <p>
+ * Java class for arg-type complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="arg-type">
@@ -35,118 +35,108 @@ import javax.xml.bind.annotation.XmlValue;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "arg-type", propOrder = {
-    "content"
-})
+@XmlType(name = "arg-type", propOrder = { "content" })
 public class ArgType {
 
-    @XmlValue
-    protected String content;
-    @XmlAttribute(name = "attribute")
-    protected String attribute;
-    @XmlAttribute(name = "isUndefinedIfMatches")
-    protected String isUndefinedIfMatches;
-    @XmlAttribute(name = "resolve")
-    protected Boolean resolve;
+	@XmlValue
+	protected String content;
+	@XmlAttribute(name = "attribute")
+	protected String attribute;
+	@XmlAttribute(name = "isUndefinedIfMatches")
+	protected String isUndefinedIfMatches;
+	@XmlAttribute(name = "resolve")
+	protected Boolean resolve;
 
-    /**
-     * Gets the value of the content property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getContent() {
-        return content;
-    }
+	/**
+	 * Gets the value of the content property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getContent() {
+		return content;
+	}
 
-    /**
-     * Sets the value of the content property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setContent(String value) {
-        this.content = value;
-    }
+	/**
+	 * Sets the value of the content property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setContent(String value) {
+		this.content = value;
+	}
 
-    /**
-     * Gets the value of the attribute property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getAttribute() {
-        return attribute;
-    }
+	/**
+	 * Gets the value of the attribute property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getAttribute() {
+		return attribute;
+	}
 
-    /**
-     * Sets the value of the attribute property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setAttribute(String value) {
-        this.attribute = value;
-    }
+	/**
+	 * Sets the value of the attribute property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setAttribute(String value) {
+		this.attribute = value;
+	}
 
-    /**
-     * Gets the value of the isUndefinedIfMatches property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getIsUndefinedIfMatches() {
-        return isUndefinedIfMatches;
-    }
+	/**
+	 * Gets the value of the isUndefinedIfMatches property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getIsUndefinedIfMatches() {
+		return isUndefinedIfMatches;
+	}
 
-    /**
-     * Sets the value of the isUndefinedIfMatches property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setIsUndefinedIfMatches(String value) {
-        this.isUndefinedIfMatches = value;
-    }
+	/**
+	 * Sets the value of the isUndefinedIfMatches property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setIsUndefinedIfMatches(String value) {
+		this.isUndefinedIfMatches = value;
+	}
 
-    /**
-     * Gets the value of the resolve property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
-     */
-    public boolean isResolve() {
-        if (resolve == null) {
-            return true;
-        } else {
-            return resolve;
-        }
-    }
+	/**
+	 * Gets the value of the resolve property.
+	 * 
+	 * @return
+	 *         possible object is {@link Boolean }
+	 * 
+	 */
+	public boolean isResolve() {
+		if (resolve == null) {
+			return true;
+		} else {
+			return resolve;
+		}
+	}
 
-    /**
-     * Sets the value of the resolve property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
-     */
-    public void setResolve(Boolean value) {
-        this.resolve = value;
-    }
+	/**
+	 * Sets the value of the resolve property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Boolean }
+	 * 
+	 */
+	public void setResolve(Boolean value) {
+		this.resolve = value;
+	}
 
 }

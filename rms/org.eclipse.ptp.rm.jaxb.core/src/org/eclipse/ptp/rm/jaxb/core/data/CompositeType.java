@@ -5,11 +5,11 @@
 // Generated on: 2013.11.05 at 08:09:06 AM EST 
 //
 
-
 package org.eclipse.ptp.rm.jaxb.core.data;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -17,11 +17,12 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
- * <p>Java class for composite-type complex type.
+ * <p>
+ * Java class for composite-type complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="composite-type">
@@ -54,269 +55,237 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "composite-type", propOrder = {
-    "layout",
-    "layoutData",
-    "font",
-    "title",
-    "tabFolderOrCompositeOrWidget",
-    "controlState"
-})
+@XmlType(name = "composite-type", propOrder = { "layout", "layoutData", "font", "title", "tabFolderOrCompositeOrWidget",
+		"controlState" })
 public class CompositeType {
 
-    protected LayoutType layout;
-    @XmlElement(name = "layout-data")
-    protected LayoutDataType layoutData;
-    protected FontType font;
-    protected String title;
-    @XmlElements({
-        @XmlElement(name = "tab-folder", type = TabFolderType.class),
-        @XmlElement(name = "composite", type = CompositeType.class),
-        @XmlElement(name = "widget", type = WidgetType.class),
-        @XmlElement(name = "browse", type = BrowseType.class),
-        @XmlElement(name = "action", type = PushButtonType.class),
-        @XmlElement(name = "button-group", type = ButtonGroupType.class),
-        @XmlElement(name = "viewer", type = AttributeViewerType.class)
-    })
-    protected List<Object> tabFolderOrCompositeOrWidget;
-    @XmlElement(name = "control-state")
-    protected ControlStateType controlState;
-    @XmlAttribute(name = "group")
-    protected Boolean group;
-    @XmlAttribute(name = "style")
-    protected String style;
-    @XmlAttribute(name = "background")
-    protected String background;
+	protected LayoutType layout;
+	@XmlElement(name = "layout-data")
+	protected LayoutDataType layoutData;
+	protected FontType font;
+	protected String title;
+	@XmlElements({ @XmlElement(name = "tab-folder", type = TabFolderType.class),
+			@XmlElement(name = "composite", type = CompositeType.class), @XmlElement(name = "widget", type = WidgetType.class),
+			@XmlElement(name = "browse", type = BrowseType.class), @XmlElement(name = "action", type = PushButtonType.class),
+			@XmlElement(name = "button-group", type = ButtonGroupType.class),
+			@XmlElement(name = "viewer", type = AttributeViewerType.class) })
+	protected List<Object> tabFolderOrCompositeOrWidget;
+	@XmlElement(name = "control-state")
+	protected ControlStateType controlState;
+	@XmlAttribute(name = "group")
+	protected Boolean group;
+	@XmlAttribute(name = "style")
+	protected String style;
+	@XmlAttribute(name = "background")
+	protected String background;
 
-    /**
-     * Gets the value of the layout property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link LayoutType }
-     *     
-     */
-    public LayoutType getLayout() {
-        return layout;
-    }
+	/**
+	 * Gets the value of the layout property.
+	 * 
+	 * @return
+	 *         possible object is {@link LayoutType }
+	 * 
+	 */
+	public LayoutType getLayout() {
+		return layout;
+	}
 
-    /**
-     * Sets the value of the layout property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link LayoutType }
-     *     
-     */
-    public void setLayout(LayoutType value) {
-        this.layout = value;
-    }
+	/**
+	 * Sets the value of the layout property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link LayoutType }
+	 * 
+	 */
+	public void setLayout(LayoutType value) {
+		this.layout = value;
+	}
 
-    /**
-     * Gets the value of the layoutData property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link LayoutDataType }
-     *     
-     */
-    public LayoutDataType getLayoutData() {
-        return layoutData;
-    }
+	/**
+	 * Gets the value of the layoutData property.
+	 * 
+	 * @return
+	 *         possible object is {@link LayoutDataType }
+	 * 
+	 */
+	public LayoutDataType getLayoutData() {
+		return layoutData;
+	}
 
-    /**
-     * Sets the value of the layoutData property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link LayoutDataType }
-     *     
-     */
-    public void setLayoutData(LayoutDataType value) {
-        this.layoutData = value;
-    }
+	/**
+	 * Sets the value of the layoutData property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link LayoutDataType }
+	 * 
+	 */
+	public void setLayoutData(LayoutDataType value) {
+		this.layoutData = value;
+	}
 
-    /**
-     * Gets the value of the font property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link FontType }
-     *     
-     */
-    public FontType getFont() {
-        return font;
-    }
+	/**
+	 * Gets the value of the font property.
+	 * 
+	 * @return
+	 *         possible object is {@link FontType }
+	 * 
+	 */
+	public FontType getFont() {
+		return font;
+	}
 
-    /**
-     * Sets the value of the font property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link FontType }
-     *     
-     */
-    public void setFont(FontType value) {
-        this.font = value;
-    }
+	/**
+	 * Sets the value of the font property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link FontType }
+	 * 
+	 */
+	public void setFont(FontType value) {
+		this.font = value;
+	}
 
-    /**
-     * Gets the value of the title property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getTitle() {
-        return title;
-    }
+	/**
+	 * Gets the value of the title property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getTitle() {
+		return title;
+	}
 
-    /**
-     * Sets the value of the title property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setTitle(String value) {
-        this.title = value;
-    }
+	/**
+	 * Sets the value of the title property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setTitle(String value) {
+		this.title = value;
+	}
 
-    /**
-     * Gets the value of the tabFolderOrCompositeOrWidget property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the tabFolderOrCompositeOrWidget property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getTabFolderOrCompositeOrWidget().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link TabFolderType }
-     * {@link CompositeType }
-     * {@link WidgetType }
-     * {@link BrowseType }
-     * {@link PushButtonType }
-     * {@link ButtonGroupType }
-     * {@link AttributeViewerType }
-     * 
-     * 
-     */
-    public List<Object> getTabFolderOrCompositeOrWidget() {
-        if (tabFolderOrCompositeOrWidget == null) {
-            tabFolderOrCompositeOrWidget = new ArrayList<Object>();
-        }
-        return this.tabFolderOrCompositeOrWidget;
-    }
+	/**
+	 * Gets the value of the tabFolderOrCompositeOrWidget property.
+	 * 
+	 * <p>
+	 * This accessor method returns a reference to the live list, not a snapshot. Therefore any modification you make to the
+	 * returned list will be present inside the JAXB object. This is why there is not a <CODE>set</CODE> method for the
+	 * tabFolderOrCompositeOrWidget property.
+	 * 
+	 * <p>
+	 * For example, to add a new item, do as follows:
+	 * 
+	 * <pre>
+	 * getTabFolderOrCompositeOrWidget().add(newItem);
+	 * </pre>
+	 * 
+	 * 
+	 * <p>
+	 * Objects of the following type(s) are allowed in the list {@link TabFolderType } {@link CompositeType } {@link WidgetType }
+	 * {@link BrowseType } {@link PushButtonType } {@link ButtonGroupType } {@link AttributeViewerType }
+	 * 
+	 * 
+	 */
+	public List<Object> getTabFolderOrCompositeOrWidget() {
+		if (tabFolderOrCompositeOrWidget == null) {
+			tabFolderOrCompositeOrWidget = new ArrayList<Object>();
+		}
+		return this.tabFolderOrCompositeOrWidget;
+	}
 
-    /**
-     * Gets the value of the controlState property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link ControlStateType }
-     *     
-     */
-    public ControlStateType getControlState() {
-        return controlState;
-    }
+	/**
+	 * Gets the value of the controlState property.
+	 * 
+	 * @return
+	 *         possible object is {@link ControlStateType }
+	 * 
+	 */
+	public ControlStateType getControlState() {
+		return controlState;
+	}
 
-    /**
-     * Sets the value of the controlState property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link ControlStateType }
-     *     
-     */
-    public void setControlState(ControlStateType value) {
-        this.controlState = value;
-    }
+	/**
+	 * Sets the value of the controlState property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link ControlStateType }
+	 * 
+	 */
+	public void setControlState(ControlStateType value) {
+		this.controlState = value;
+	}
 
-    /**
-     * Gets the value of the group property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
-     */
-    public boolean isGroup() {
-        if (group == null) {
-            return false;
-        } else {
-            return group;
-        }
-    }
+	/**
+	 * Gets the value of the group property.
+	 * 
+	 * @return
+	 *         possible object is {@link Boolean }
+	 * 
+	 */
+	public boolean isGroup() {
+		if (group == null) {
+			return false;
+		} else {
+			return group;
+		}
+	}
 
-    /**
-     * Sets the value of the group property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
-     */
-    public void setGroup(Boolean value) {
-        this.group = value;
-    }
+	/**
+	 * Sets the value of the group property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Boolean }
+	 * 
+	 */
+	public void setGroup(Boolean value) {
+		this.group = value;
+	}
 
-    /**
-     * Gets the value of the style property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getStyle() {
-        return style;
-    }
+	/**
+	 * Gets the value of the style property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getStyle() {
+		return style;
+	}
 
-    /**
-     * Sets the value of the style property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setStyle(String value) {
-        this.style = value;
-    }
+	/**
+	 * Sets the value of the style property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setStyle(String value) {
+		this.style = value;
+	}
 
-    /**
-     * Gets the value of the background property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getBackground() {
-        return background;
-    }
+	/**
+	 * Gets the value of the background property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getBackground() {
+		return background;
+	}
 
-    /**
-     * Sets the value of the background property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setBackground(String value) {
-        this.background = value;
-    }
+	/**
+	 * Sets the value of the background property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setBackground(String value) {
+		this.background = value;
+	}
 
 }

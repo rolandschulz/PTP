@@ -37,8 +37,7 @@ public class QueueQueryControl extends LSFQueryControl {
 	}
 
 	@Override
-	protected void configureQueryButton(Button button,
-			final IRemoteConnection connection) {
+	protected void configureQueryButton(Button button, final IRemoteConnection connection) {
 		button.addSelectionListener(new SelectionAdapter() {
 			@Override
 			/**
@@ -63,31 +62,30 @@ public class QueueQueryControl extends LSFQueryControl {
 	 */
 	@Override
 	protected void getQueryResponse(IRemoteConnection connection) {
-        try {
-            IStatus runStatus;
-            LSFCommand command;
-            boolean isInteractive;
-            String interactiveFlag;
+		try {
+			IStatus runStatus;
+			LSFCommand command;
+			boolean isInteractive;
+			String interactiveFlag;
 
-            /*
-             * Check if the queue query is being requested by an interactive or batch session
-             * by querying the widget title
-             */
-            interactiveFlag = widgetDescriptor.getTitle();
-            if ((interactiveFlag != null) && (interactiveFlag.equals("Interactive"))) {
-                isInteractive = true;
-            }
-            else {
-                isInteractive = false;
-            }
-            command = new LSFQueuesCommand(Messages.QueueCommandDesc, connection, queryCommand, isInteractive);
-            widgetDescriptor.getLaunchConfigurationDialog().run(true, true, command);
-            runStatus = command.getRunStatus();
-            processCommandResponse(command, runStatus);
-        } catch (InvocationTargetException e) {
-            // Do nothing
-        } catch (InterruptedException e) {
-            // Do nothing
-        }
+			/*
+			 * Check if the queue query is being requested by an interactive or batch session
+			 * by querying the widget title
+			 */
+			interactiveFlag = widgetDescriptor.getTitle();
+			if ((interactiveFlag != null) && (interactiveFlag.equals("Interactive"))) {
+				isInteractive = true;
+			} else {
+				isInteractive = false;
+			}
+			command = new LSFQueuesCommand(Messages.QueueCommandDesc, connection, queryCommand, isInteractive);
+			widgetDescriptor.getLaunchConfigurationDialog().run(true, true, command);
+			runStatus = command.getRunStatus();
+			processCommandResponse(command, runStatus);
+		} catch (InvocationTargetException e) {
+			// Do nothing
+		} catch (InterruptedException e) {
+			// Do nothing
+		}
 	}
 }

@@ -36,6 +36,7 @@ public class Messages extends NLS {
 	public static String GitRemoteSyncConnection_16;
 	public static String GitRemoteSyncConnection_17;
 	public static String GitRemoteSyncConnection_18;
+	public static String GitRemoteSyncConnection_19;
 	public static String GitRemoteSyncConnection_2;
 	public static String GitRemoteSyncConnection_20;
 	public static String GitRemoteSyncConnection_21;
@@ -67,6 +68,7 @@ public class Messages extends NLS {
 	public static String GitServiceProvider_9;
 	public static String GitSyncFileFilter_UnableToLoad;
 	public static String GitSyncFileFilter_UnableToSave;
+	public static String GitSyncFileFilter_UnableToSaveSyncConfigs;
 	public static String GitSyncService_0;
 	public static String CommandRunner_0;
 	public static String CommandRunner_1;

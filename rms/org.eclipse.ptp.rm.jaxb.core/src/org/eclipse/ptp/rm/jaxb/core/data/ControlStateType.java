@@ -5,7 +5,6 @@
 // Generated on: 2013.11.05 at 08:09:06 AM EST 
 //
 
-
 package org.eclipse.ptp.rm.jaxb.core.data;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -13,11 +12,12 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
- * <p>Java class for control-state-type complex type.
+ * <p>
+ * Java class for control-state-type complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="control-state-type">
@@ -41,117 +41,104 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "control-state-type", propOrder = {
-    "showIf",
-    "hideIf",
-    "enableIf",
-    "disableIf"
-})
+@XmlType(name = "control-state-type", propOrder = { "showIf", "hideIf", "enableIf", "disableIf" })
 public class ControlStateType {
 
-    @XmlElement(name = "show-if")
-    protected ControlStateRuleType showIf;
-    @XmlElement(name = "hide-if")
-    protected ControlStateRuleType hideIf;
-    @XmlElement(name = "enable-if")
-    protected ControlStateRuleType enableIf;
-    @XmlElement(name = "disable-if")
-    protected ControlStateRuleType disableIf;
+	@XmlElement(name = "show-if")
+	protected ControlStateRuleType showIf;
+	@XmlElement(name = "hide-if")
+	protected ControlStateRuleType hideIf;
+	@XmlElement(name = "enable-if")
+	protected ControlStateRuleType enableIf;
+	@XmlElement(name = "disable-if")
+	protected ControlStateRuleType disableIf;
 
-    /**
-     * Gets the value of the showIf property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link ControlStateRuleType }
-     *     
-     */
-    public ControlStateRuleType getShowIf() {
-        return showIf;
-    }
+	/**
+	 * Gets the value of the showIf property.
+	 * 
+	 * @return
+	 *         possible object is {@link ControlStateRuleType }
+	 * 
+	 */
+	public ControlStateRuleType getShowIf() {
+		return showIf;
+	}
 
-    /**
-     * Sets the value of the showIf property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link ControlStateRuleType }
-     *     
-     */
-    public void setShowIf(ControlStateRuleType value) {
-        this.showIf = value;
-    }
+	/**
+	 * Sets the value of the showIf property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link ControlStateRuleType }
+	 * 
+	 */
+	public void setShowIf(ControlStateRuleType value) {
+		this.showIf = value;
+	}
 
-    /**
-     * Gets the value of the hideIf property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link ControlStateRuleType }
-     *     
-     */
-    public ControlStateRuleType getHideIf() {
-        return hideIf;
-    }
+	/**
+	 * Gets the value of the hideIf property.
+	 * 
+	 * @return
+	 *         possible object is {@link ControlStateRuleType }
+	 * 
+	 */
+	public ControlStateRuleType getHideIf() {
+		return hideIf;
+	}
 
-    /**
-     * Sets the value of the hideIf property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link ControlStateRuleType }
-     *     
-     */
-    public void setHideIf(ControlStateRuleType value) {
-        this.hideIf = value;
-    }
+	/**
+	 * Sets the value of the hideIf property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link ControlStateRuleType }
+	 * 
+	 */
+	public void setHideIf(ControlStateRuleType value) {
+		this.hideIf = value;
+	}
 
-    /**
-     * Gets the value of the enableIf property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link ControlStateRuleType }
-     *     
-     */
-    public ControlStateRuleType getEnableIf() {
-        return enableIf;
-    }
+	/**
+	 * Gets the value of the enableIf property.
+	 * 
+	 * @return
+	 *         possible object is {@link ControlStateRuleType }
+	 * 
+	 */
+	public ControlStateRuleType getEnableIf() {
+		return enableIf;
+	}
 
-    /**
-     * Sets the value of the enableIf property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link ControlStateRuleType }
-     *     
-     */
-    public void setEnableIf(ControlStateRuleType value) {
-        this.enableIf = value;
-    }
+	/**
+	 * Sets the value of the enableIf property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link ControlStateRuleType }
+	 * 
+	 */
+	public void setEnableIf(ControlStateRuleType value) {
+		this.enableIf = value;
+	}
 
-    /**
-     * Gets the value of the disableIf property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link ControlStateRuleType }
-     *     
-     */
-    public ControlStateRuleType getDisableIf() {
-        return disableIf;
-    }
+	/**
+	 * Gets the value of the disableIf property.
+	 * 
+	 * @return
+	 *         possible object is {@link ControlStateRuleType }
+	 * 
+	 */
+	public ControlStateRuleType getDisableIf() {
+		return disableIf;
+	}
 
-    /**
-     * Sets the value of the disableIf property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link ControlStateRuleType }
-     *     
-     */
-    public void setDisableIf(ControlStateRuleType value) {
-        this.disableIf = value;
-    }
+	/**
+	 * Sets the value of the disableIf property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link ControlStateRuleType }
+	 * 
+	 */
+	public void setDisableIf(ControlStateRuleType value) {
+		this.disableIf = value;
+	}
 
 }

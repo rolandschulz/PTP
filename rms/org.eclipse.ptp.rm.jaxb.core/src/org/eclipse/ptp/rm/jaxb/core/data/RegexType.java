@@ -5,7 +5,6 @@
 // Generated on: 2013.11.05 at 08:09:06 AM EST 
 //
 
-
 package org.eclipse.ptp.rm.jaxb.core.data;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -14,11 +13,12 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
 
-
 /**
- * <p>Java class for regex-type complex type.
+ * <p>
+ * Java class for regex-type complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="regex-type">
@@ -35,118 +35,108 @@ import javax.xml.bind.annotation.XmlValue;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "regex-type", propOrder = {
-    "content"
-})
+@XmlType(name = "regex-type", propOrder = { "content" })
 public class RegexType {
 
-    @XmlValue
-    protected String content;
-    @XmlAttribute(name = "flags")
-    protected String flags;
-    @XmlAttribute(name = "split")
-    protected Boolean split;
-    @XmlAttribute(name = "expression")
-    protected String expression;
+	@XmlValue
+	protected String content;
+	@XmlAttribute(name = "flags")
+	protected String flags;
+	@XmlAttribute(name = "split")
+	protected Boolean split;
+	@XmlAttribute(name = "expression")
+	protected String expression;
 
-    /**
-     * Gets the value of the content property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getContent() {
-        return content;
-    }
+	/**
+	 * Gets the value of the content property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getContent() {
+		return content;
+	}
 
-    /**
-     * Sets the value of the content property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setContent(String value) {
-        this.content = value;
-    }
+	/**
+	 * Sets the value of the content property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setContent(String value) {
+		this.content = value;
+	}
 
-    /**
-     * Gets the value of the flags property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getFlags() {
-        return flags;
-    }
+	/**
+	 * Gets the value of the flags property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getFlags() {
+		return flags;
+	}
 
-    /**
-     * Sets the value of the flags property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setFlags(String value) {
-        this.flags = value;
-    }
+	/**
+	 * Sets the value of the flags property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setFlags(String value) {
+		this.flags = value;
+	}
 
-    /**
-     * Gets the value of the split property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
-     */
-    public boolean isSplit() {
-        if (split == null) {
-            return false;
-        } else {
-            return split;
-        }
-    }
+	/**
+	 * Gets the value of the split property.
+	 * 
+	 * @return
+	 *         possible object is {@link Boolean }
+	 * 
+	 */
+	public boolean isSplit() {
+		if (split == null) {
+			return false;
+		} else {
+			return split;
+		}
+	}
 
-    /**
-     * Sets the value of the split property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
-     */
-    public void setSplit(Boolean value) {
-        this.split = value;
-    }
+	/**
+	 * Sets the value of the split property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Boolean }
+	 * 
+	 */
+	public void setSplit(Boolean value) {
+		this.split = value;
+	}
 
-    /**
-     * Gets the value of the expression property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getExpression() {
-        return expression;
-    }
+	/**
+	 * Gets the value of the expression property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getExpression() {
+		return expression;
+	}
 
-    /**
-     * Sets the value of the expression property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setExpression(String value) {
-        this.expression = value;
-    }
+	/**
+	 * Sets the value of the expression property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setExpression(String value) {
+		this.expression = value;
+	}
 
 }

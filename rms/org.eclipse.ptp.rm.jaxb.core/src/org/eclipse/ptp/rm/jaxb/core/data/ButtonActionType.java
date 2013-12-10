@@ -5,7 +5,6 @@
 // Generated on: 2013.11.05 at 08:09:06 AM EST 
 //
 
-
 package org.eclipse.ptp.rm.jaxb.core.data;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -14,11 +13,12 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
- * <p>Java class for button-action-type complex type.
+ * <p>
+ * Java class for button-action-type complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="button-action-type">
@@ -37,92 +37,84 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "button-action-type", propOrder = {
-    "action"
-})
+@XmlType(name = "button-action-type", propOrder = { "action" })
 public class ButtonActionType {
 
-    @XmlElement(required = true)
-    protected String action;
-    @XmlAttribute(name = "clearValue")
-    protected String clearValue;
-    @XmlAttribute(name = "refresh")
-    protected Boolean refresh;
+	@XmlElement(required = true)
+	protected String action;
+	@XmlAttribute(name = "clearValue")
+	protected String clearValue;
+	@XmlAttribute(name = "refresh")
+	protected Boolean refresh;
 
-    /**
-     * Gets the value of the action property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getAction() {
-        return action;
-    }
+	/**
+	 * Gets the value of the action property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getAction() {
+		return action;
+	}
 
-    /**
-     * Sets the value of the action property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setAction(String value) {
-        this.action = value;
-    }
+	/**
+	 * Sets the value of the action property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setAction(String value) {
+		this.action = value;
+	}
 
-    /**
-     * Gets the value of the clearValue property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getClearValue() {
-        return clearValue;
-    }
+	/**
+	 * Gets the value of the clearValue property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getClearValue() {
+		return clearValue;
+	}
 
-    /**
-     * Sets the value of the clearValue property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setClearValue(String value) {
-        this.clearValue = value;
-    }
+	/**
+	 * Sets the value of the clearValue property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setClearValue(String value) {
+		this.clearValue = value;
+	}
 
-    /**
-     * Gets the value of the refresh property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
-     */
-    public boolean isRefresh() {
-        if (refresh == null) {
-            return true;
-        } else {
-            return refresh;
-        }
-    }
+	/**
+	 * Gets the value of the refresh property.
+	 * 
+	 * @return
+	 *         possible object is {@link Boolean }
+	 * 
+	 */
+	public boolean isRefresh() {
+		if (refresh == null) {
+			return true;
+		} else {
+			return refresh;
+		}
+	}
 
-    /**
-     * Sets the value of the refresh property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
-     */
-    public void setRefresh(Boolean value) {
-        this.refresh = value;
-    }
+	/**
+	 * Sets the value of the refresh property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Boolean }
+	 * 
+	 */
+	public void setRefresh(Boolean value) {
+		this.refresh = value;
+	}
 
 }

@@ -5,11 +5,11 @@
 // Generated on: 2013.11.05 at 08:09:06 AM EST 
 //
 
-
 package org.eclipse.ptp.rm.jaxb.core.data;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -17,11 +17,12 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
- * <p>Java class for match-type complex type.
+ * <p>
+ * Java class for match-type complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="match-type">
@@ -46,107 +47,92 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "match-type", propOrder = {
-    "expression",
-    "addOrAppendOrPut"
-})
+@XmlType(name = "match-type", propOrder = { "expression", "addOrAppendOrPut" })
 public class MatchType {
 
-    protected RegexType expression;
-    @XmlElements({
-        @XmlElement(name = "add", type = AddType.class),
-        @XmlElement(name = "append", type = AppendType.class),
-        @XmlElement(name = "put", type = PutType.class),
-        @XmlElement(name = "set", type = SetType.class),
-        @XmlElement(name = "throw", type = ThrowType.class)
-    })
-    protected List<Object> addOrAppendOrPut;
-    @XmlAttribute(name = "moveToTop")
-    protected Boolean moveToTop;
+	protected RegexType expression;
+	@XmlElements({ @XmlElement(name = "add", type = AddType.class), @XmlElement(name = "append", type = AppendType.class),
+			@XmlElement(name = "put", type = PutType.class), @XmlElement(name = "set", type = SetType.class),
+			@XmlElement(name = "throw", type = ThrowType.class) })
+	protected List<Object> addOrAppendOrPut;
+	@XmlAttribute(name = "moveToTop")
+	protected Boolean moveToTop;
 
-    /**
-     * Gets the value of the expression property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link RegexType }
-     *     
-     */
-    public RegexType getExpression() {
-        return expression;
-    }
+	/**
+	 * Gets the value of the expression property.
+	 * 
+	 * @return
+	 *         possible object is {@link RegexType }
+	 * 
+	 */
+	public RegexType getExpression() {
+		return expression;
+	}
 
-    /**
-     * Sets the value of the expression property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link RegexType }
-     *     
-     */
-    public void setExpression(RegexType value) {
-        this.expression = value;
-    }
+	/**
+	 * Sets the value of the expression property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link RegexType }
+	 * 
+	 */
+	public void setExpression(RegexType value) {
+		this.expression = value;
+	}
 
-    /**
-     * Gets the value of the addOrAppendOrPut property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the addOrAppendOrPut property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getAddOrAppendOrPut().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link AddType }
-     * {@link AppendType }
-     * {@link PutType }
-     * {@link SetType }
-     * {@link ThrowType }
-     * 
-     * 
-     */
-    public List<Object> getAddOrAppendOrPut() {
-        if (addOrAppendOrPut == null) {
-            addOrAppendOrPut = new ArrayList<Object>();
-        }
-        return this.addOrAppendOrPut;
-    }
+	/**
+	 * Gets the value of the addOrAppendOrPut property.
+	 * 
+	 * <p>
+	 * This accessor method returns a reference to the live list, not a snapshot. Therefore any modification you make to the
+	 * returned list will be present inside the JAXB object. This is why there is not a <CODE>set</CODE> method for the
+	 * addOrAppendOrPut property.
+	 * 
+	 * <p>
+	 * For example, to add a new item, do as follows:
+	 * 
+	 * <pre>
+	 * getAddOrAppendOrPut().add(newItem);
+	 * </pre>
+	 * 
+	 * 
+	 * <p>
+	 * Objects of the following type(s) are allowed in the list {@link AddType } {@link AppendType } {@link PutType } {@link SetType }
+	 * {@link ThrowType }
+	 * 
+	 * 
+	 */
+	public List<Object> getAddOrAppendOrPut() {
+		if (addOrAppendOrPut == null) {
+			addOrAppendOrPut = new ArrayList<Object>();
+		}
+		return this.addOrAppendOrPut;
+	}
 
-    /**
-     * Gets the value of the moveToTop property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
-     */
-    public boolean isMoveToTop() {
-        if (moveToTop == null) {
-            return false;
-        } else {
-            return moveToTop;
-        }
-    }
+	/**
+	 * Gets the value of the moveToTop property.
+	 * 
+	 * @return
+	 *         possible object is {@link Boolean }
+	 * 
+	 */
+	public boolean isMoveToTop() {
+		if (moveToTop == null) {
+			return false;
+		} else {
+			return moveToTop;
+		}
+	}
 
-    /**
-     * Sets the value of the moveToTop property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
-     */
-    public void setMoveToTop(Boolean value) {
-        this.moveToTop = value;
-    }
+	/**
+	 * Sets the value of the moveToTop property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Boolean }
+	 * 
+	 */
+	public void setMoveToTop(Boolean value) {
+		this.moveToTop = value;
+	}
 
 }

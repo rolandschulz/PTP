@@ -5,7 +5,6 @@
 // Generated on: 2013.11.05 at 08:09:06 AM EST 
 //
 
-
 package org.eclipse.ptp.rm.jaxb.core.data;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -13,11 +12,12 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
- * <p>Java class for font-type complex type.
+ * <p>
+ * Java class for font-type complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="font-type">
@@ -45,91 +45,85 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "font-type")
 public class FontType {
 
-    @XmlAttribute(name = "name")
-    protected String name;
-    @XmlAttribute(name = "size")
-    protected Integer size;
-    @XmlAttribute(name = "style")
-    protected String style;
+	@XmlAttribute(name = "name")
+	protected String name;
+	@XmlAttribute(name = "size")
+	protected Integer size;
+	@XmlAttribute(name = "style")
+	protected String style;
 
-    /**
-     * Gets the value of the name property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getName() {
-        return name;
-    }
+	/**
+	 * Gets the value of the name property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getName() {
+		return name;
+	}
 
-    /**
-     * Sets the value of the name property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setName(String value) {
-        this.name = value;
-    }
+	/**
+	 * Sets the value of the name property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setName(String value) {
+		this.name = value;
+	}
 
-    /**
-     * Gets the value of the size property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public int getSize() {
-        if (size == null) {
-            return  9;
-        } else {
-            return size;
-        }
-    }
+	/**
+	 * Gets the value of the size property.
+	 * 
+	 * @return
+	 *         possible object is {@link Integer }
+	 * 
+	 */
+	public int getSize() {
+		if (size == null) {
+			return 9;
+		} else {
+			return size;
+		}
+	}
 
-    /**
-     * Sets the value of the size property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setSize(Integer value) {
-        this.size = value;
-    }
+	/**
+	 * Sets the value of the size property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Integer }
+	 * 
+	 */
+	public void setSize(Integer value) {
+		this.size = value;
+	}
 
-    /**
-     * Gets the value of the style property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getStyle() {
-        if (style == null) {
-            return "normal";
-        } else {
-            return style;
-        }
-    }
+	/**
+	 * Gets the value of the style property.
+	 * 
+	 * @return
+	 *         possible object is {@link String }
+	 * 
+	 */
+	public String getStyle() {
+		if (style == null) {
+			return "normal";
+		} else {
+			return style;
+		}
+	}
 
-    /**
-     * Sets the value of the style property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setStyle(String value) {
-        this.style = value;
-    }
+	/**
+	 * Sets the value of the style property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setStyle(String value) {
+		this.style = value;
+	}
 
 }

@@ -5,7 +5,6 @@
 // Generated on: 2013.11.05 at 08:09:06 AM EST 
 //
 
-
 package org.eclipse.ptp.rm.jaxb.core.data;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -13,11 +12,12 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
- * <p>Java class for form-data-type complex type.
+ * <p>
+ * Java class for form-data-type complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="form-data-type">
@@ -39,165 +39,148 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "form-data-type", propOrder = {
-    "top",
-    "bottom",
-    "left",
-    "right"
-})
+@XmlType(name = "form-data-type", propOrder = { "top", "bottom", "left", "right" })
 public class FormDataType {
 
-    protected FormAttachmentType top;
-    protected FormAttachmentType bottom;
-    protected FormAttachmentType left;
-    protected FormAttachmentType right;
-    @XmlAttribute(name = "height")
-    protected Integer height;
-    @XmlAttribute(name = "width")
-    protected Integer width;
+	protected FormAttachmentType top;
+	protected FormAttachmentType bottom;
+	protected FormAttachmentType left;
+	protected FormAttachmentType right;
+	@XmlAttribute(name = "height")
+	protected Integer height;
+	@XmlAttribute(name = "width")
+	protected Integer width;
 
-    /**
-     * Gets the value of the top property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link FormAttachmentType }
-     *     
-     */
-    public FormAttachmentType getTop() {
-        return top;
-    }
+	/**
+	 * Gets the value of the top property.
+	 * 
+	 * @return
+	 *         possible object is {@link FormAttachmentType }
+	 * 
+	 */
+	public FormAttachmentType getTop() {
+		return top;
+	}
 
-    /**
-     * Sets the value of the top property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link FormAttachmentType }
-     *     
-     */
-    public void setTop(FormAttachmentType value) {
-        this.top = value;
-    }
+	/**
+	 * Sets the value of the top property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link FormAttachmentType }
+	 * 
+	 */
+	public void setTop(FormAttachmentType value) {
+		this.top = value;
+	}
 
-    /**
-     * Gets the value of the bottom property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link FormAttachmentType }
-     *     
-     */
-    public FormAttachmentType getBottom() {
-        return bottom;
-    }
+	/**
+	 * Gets the value of the bottom property.
+	 * 
+	 * @return
+	 *         possible object is {@link FormAttachmentType }
+	 * 
+	 */
+	public FormAttachmentType getBottom() {
+		return bottom;
+	}
 
-    /**
-     * Sets the value of the bottom property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link FormAttachmentType }
-     *     
-     */
-    public void setBottom(FormAttachmentType value) {
-        this.bottom = value;
-    }
+	/**
+	 * Sets the value of the bottom property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link FormAttachmentType }
+	 * 
+	 */
+	public void setBottom(FormAttachmentType value) {
+		this.bottom = value;
+	}
 
-    /**
-     * Gets the value of the left property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link FormAttachmentType }
-     *     
-     */
-    public FormAttachmentType getLeft() {
-        return left;
-    }
+	/**
+	 * Gets the value of the left property.
+	 * 
+	 * @return
+	 *         possible object is {@link FormAttachmentType }
+	 * 
+	 */
+	public FormAttachmentType getLeft() {
+		return left;
+	}
 
-    /**
-     * Sets the value of the left property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link FormAttachmentType }
-     *     
-     */
-    public void setLeft(FormAttachmentType value) {
-        this.left = value;
-    }
+	/**
+	 * Sets the value of the left property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link FormAttachmentType }
+	 * 
+	 */
+	public void setLeft(FormAttachmentType value) {
+		this.left = value;
+	}
 
-    /**
-     * Gets the value of the right property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link FormAttachmentType }
-     *     
-     */
-    public FormAttachmentType getRight() {
-        return right;
-    }
+	/**
+	 * Gets the value of the right property.
+	 * 
+	 * @return
+	 *         possible object is {@link FormAttachmentType }
+	 * 
+	 */
+	public FormAttachmentType getRight() {
+		return right;
+	}
 
-    /**
-     * Sets the value of the right property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link FormAttachmentType }
-     *     
-     */
-    public void setRight(FormAttachmentType value) {
-        this.right = value;
-    }
+	/**
+	 * Sets the value of the right property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link FormAttachmentType }
+	 * 
+	 */
+	public void setRight(FormAttachmentType value) {
+		this.right = value;
+	}
 
-    /**
-     * Gets the value of the height property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public Integer getHeight() {
-        return height;
-    }
+	/**
+	 * Gets the value of the height property.
+	 * 
+	 * @return
+	 *         possible object is {@link Integer }
+	 * 
+	 */
+	public Integer getHeight() {
+		return height;
+	}
 
-    /**
-     * Sets the value of the height property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setHeight(Integer value) {
-        this.height = value;
-    }
+	/**
+	 * Sets the value of the height property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Integer }
+	 * 
+	 */
+	public void setHeight(Integer value) {
+		this.height = value;
+	}
 
-    /**
-     * Gets the value of the width property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public Integer getWidth() {
-        return width;
-    }
+	/**
+	 * Gets the value of the width property.
+	 * 
+	 * @return
+	 *         possible object is {@link Integer }
+	 * 
+	 */
+	public Integer getWidth() {
+		return width;
+	}
 
-    /**
-     * Sets the value of the width property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setWidth(Integer value) {
-        this.width = value;
-    }
+	/**
+	 * Sets the value of the width property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Integer }
+	 * 
+	 */
+	public void setWidth(Integer value) {
+		this.width = value;
+	}
 
 }

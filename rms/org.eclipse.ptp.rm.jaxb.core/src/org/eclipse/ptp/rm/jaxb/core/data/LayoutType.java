@@ -5,7 +5,6 @@
 // Generated on: 2013.11.05 at 08:09:06 AM EST 
 //
 
-
 package org.eclipse.ptp.rm.jaxb.core.data;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -13,11 +12,12 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
- * <p>Java class for layout-type complex type.
+ * <p>
+ * Java class for layout-type complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="layout-type">
@@ -37,117 +37,104 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "layout-type", propOrder = {
-    "fillLayout",
-    "rowLayout",
-    "gridLayout",
-    "formLayout"
-})
+@XmlType(name = "layout-type", propOrder = { "fillLayout", "rowLayout", "gridLayout", "formLayout" })
 public class LayoutType {
 
-    @XmlElement(name = "fill-layout")
-    protected FillLayoutType fillLayout;
-    @XmlElement(name = "row-layout")
-    protected RowLayoutType rowLayout;
-    @XmlElement(name = "grid-layout")
-    protected GridLayoutType gridLayout;
-    @XmlElement(name = "form-layout")
-    protected FormLayoutType formLayout;
+	@XmlElement(name = "fill-layout")
+	protected FillLayoutType fillLayout;
+	@XmlElement(name = "row-layout")
+	protected RowLayoutType rowLayout;
+	@XmlElement(name = "grid-layout")
+	protected GridLayoutType gridLayout;
+	@XmlElement(name = "form-layout")
+	protected FormLayoutType formLayout;
 
-    /**
-     * Gets the value of the fillLayout property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link FillLayoutType }
-     *     
-     */
-    public FillLayoutType getFillLayout() {
-        return fillLayout;
-    }
+	/**
+	 * Gets the value of the fillLayout property.
+	 * 
+	 * @return
+	 *         possible object is {@link FillLayoutType }
+	 * 
+	 */
+	public FillLayoutType getFillLayout() {
+		return fillLayout;
+	}
 
-    /**
-     * Sets the value of the fillLayout property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link FillLayoutType }
-     *     
-     */
-    public void setFillLayout(FillLayoutType value) {
-        this.fillLayout = value;
-    }
+	/**
+	 * Sets the value of the fillLayout property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link FillLayoutType }
+	 * 
+	 */
+	public void setFillLayout(FillLayoutType value) {
+		this.fillLayout = value;
+	}
 
-    /**
-     * Gets the value of the rowLayout property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link RowLayoutType }
-     *     
-     */
-    public RowLayoutType getRowLayout() {
-        return rowLayout;
-    }
+	/**
+	 * Gets the value of the rowLayout property.
+	 * 
+	 * @return
+	 *         possible object is {@link RowLayoutType }
+	 * 
+	 */
+	public RowLayoutType getRowLayout() {
+		return rowLayout;
+	}
 
-    /**
-     * Sets the value of the rowLayout property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link RowLayoutType }
-     *     
-     */
-    public void setRowLayout(RowLayoutType value) {
-        this.rowLayout = value;
-    }
+	/**
+	 * Sets the value of the rowLayout property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link RowLayoutType }
+	 * 
+	 */
+	public void setRowLayout(RowLayoutType value) {
+		this.rowLayout = value;
+	}
 
-    /**
-     * Gets the value of the gridLayout property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link GridLayoutType }
-     *     
-     */
-    public GridLayoutType getGridLayout() {
-        return gridLayout;
-    }
+	/**
+	 * Gets the value of the gridLayout property.
+	 * 
+	 * @return
+	 *         possible object is {@link GridLayoutType }
+	 * 
+	 */
+	public GridLayoutType getGridLayout() {
+		return gridLayout;
+	}
 
-    /**
-     * Sets the value of the gridLayout property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link GridLayoutType }
-     *     
-     */
-    public void setGridLayout(GridLayoutType value) {
-        this.gridLayout = value;
-    }
+	/**
+	 * Sets the value of the gridLayout property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link GridLayoutType }
+	 * 
+	 */
+	public void setGridLayout(GridLayoutType value) {
+		this.gridLayout = value;
+	}
 
-    /**
-     * Gets the value of the formLayout property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link FormLayoutType }
-     *     
-     */
-    public FormLayoutType getFormLayout() {
-        return formLayout;
-    }
+	/**
+	 * Gets the value of the formLayout property.
+	 * 
+	 * @return
+	 *         possible object is {@link FormLayoutType }
+	 * 
+	 */
+	public FormLayoutType getFormLayout() {
+		return formLayout;
+	}
 
-    /**
-     * Sets the value of the formLayout property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link FormLayoutType }
-     *     
-     */
-    public void setFormLayout(FormLayoutType value) {
-        this.formLayout = value;
-    }
+	/**
+	 * Sets the value of the formLayout property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link FormLayoutType }
+	 * 
+	 */
+	public void setFormLayout(FormLayoutType value) {
+		this.formLayout = value;
+	}
 
 }
