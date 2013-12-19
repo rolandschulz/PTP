@@ -294,7 +294,7 @@ public class RemoteProjectContentsLocationArea {
 		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
 		container.setLayoutData(gd);
 		
-		fRemoteConnectionWidget = new RemoteConnectionWidget(container, SWT.NONE, null, RemoteConnectionWidget.FLAG_FORCE_PROVIDER_SELECTION, null);
+		fRemoteConnectionWidget = new RemoteConnectionWidget(container, SWT.NONE, null, RemoteConnectionWidget.FLAG_FORCE_PROVIDER_SELECTION);
 		gd = new GridData();
 		gd.horizontalSpan = 3;
 		fRemoteConnectionWidget.setLayoutData(gd);

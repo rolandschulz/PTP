@@ -100,7 +100,7 @@ public class AddSyncConfigWizardPage extends WizardPage {
 		});
 
 		fRemoteConnectioWidget = new RemoteConnectionWidget(composite, SWT.NONE, null,
-				RemoteConnectionWidget.FLAG_NO_LOCAL_SELECTION, null);
+				RemoteConnectionWidget.FLAG_NO_LOCAL_SELECTION);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 3;
 		fRemoteConnectioWidget.setLayoutData(gd);

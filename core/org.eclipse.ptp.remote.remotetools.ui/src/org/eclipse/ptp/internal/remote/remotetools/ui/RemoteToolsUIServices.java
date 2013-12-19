@@ -70,6 +70,6 @@ public class RemoteToolsUIServices implements IRemoteUIServices {
 	 * @see org.eclipse.remote.ui.IRemoteUIServicesDescriptor#getUIFileManager()
 	 */
 	public IRemoteUIFileManager getUIFileManager() {
-		return new RemoteToolsUIFileManager(fServices);
+		return new RemoteToolsUIFileManager();
 	}
 }

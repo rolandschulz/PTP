@@ -132,8 +132,7 @@ public class AddMonitorDialog extends TitleAreaDialog {
 			}
 		});
 
-		fRemoteConnectionWidget = new RemoteConnectionWidget(composite, SWT.NONE, Messages.AddMonitorDialog_Connection_Type, 0,
-				null);
+		fRemoteConnectionWidget = new RemoteConnectionWidget(composite, SWT.NONE, Messages.AddMonitorDialog_Connection_Type, 0);
 		fRemoteConnectionWidget.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
 		fRemoteConnectionWidget.addSelectionListener(new SelectionAdapter() {
 			@Override

@@ -49,6 +49,7 @@ public class RemoteToolsCIndexServiceProviderContributer implements IServiceProv
 	/**
 	 * @since 2.0
 	 */
+	@Override
 	public void configureServiceProvider(IServiceProviderWorkingCopy sp, final Composite container) {
 
 		fProviderWorkingCopy = null;
@@ -63,7 +64,7 @@ public class RemoteToolsCIndexServiceProviderContributer implements IServiceProv
 		container.setLayout(new GridLayout(1, false));
 
 		final RemoteConnectionWidget remoteWidget = new RemoteConnectionWidget(container, SWT.NONE,
-				Messages.RemoteToolsCIndexServiceProviderContributer_0, RemoteConnectionWidget.FLAG_FORCE_PROVIDER_SELECTION, null);
+				Messages.RemoteToolsCIndexServiceProviderContributer_0, RemoteConnectionWidget.FLAG_FORCE_PROVIDER_SELECTION);
 		remoteWidget.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		remoteWidget.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -97,6 +98,7 @@ public class RemoteToolsCIndexServiceProviderContributer implements IServiceProv
 		}
 
 		fServerWidget.addModifyListener(new ModifyListener() {
+			@Override
 			public void modifyText(ModifyEvent e) {
 				if (e.data == FieldModifier.VALUE_INDEX_LOCATION) {
 					fConfigPath = fServerWidget.getIndexLocation();
@@ -120,6 +122,7 @@ public class RemoteToolsCIndexServiceProviderContributer implements IServiceProv
 	 * .eclipse.ptp.services.core.IServiceProvider,
 	 * org.eclipse.jface.wizard.IWizardPage)
 	 */
+	@Override
 	public IWizard getWizard(IServiceProvider provider, IWizardPage page) {
 		// TODO Auto-generated method stub
 		return null;
@@ -133,6 +136,7 @@ public class RemoteToolsCIndexServiceProviderContributer implements IServiceProv
 	 * (org.eclipse.jface.wizard.IWizard,
 	 * org.eclipse.ptp.services.core.IServiceProvider)
 	 */
+	@Override
 	public WizardPage[] getWizardPages(IWizard wizard, IServiceProvider provider) {
 		// TODO Auto-generated method stub
 		return null;

@@ -54,7 +54,7 @@ public class RemoteServicesServiceProviderContributor implements IServiceProvide
         layout.numColumns = 1;
         container.setLayout(layout);
         
-        fRemoteConnectionWidget = new RemoteConnectionWidget(container, SWT.NONE, null, RemoteConnectionWidget.FLAG_FORCE_PROVIDER_SELECTION, null);
+        fRemoteConnectionWidget = new RemoteConnectionWidget(container, SWT.NONE, null, RemoteConnectionWidget.FLAG_FORCE_PROVIDER_SELECTION);
         fRemoteConnectionWidget.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
         fRemoteConnectionWidget.addSelectionListener(new SelectionAdapter() {
 			@Override

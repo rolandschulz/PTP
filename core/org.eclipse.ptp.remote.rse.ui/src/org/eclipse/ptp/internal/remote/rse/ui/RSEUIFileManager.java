@@ -11,7 +11,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.remote.rse.ui;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.jface.window.Window;
@@ -109,7 +110,7 @@ public class RSEUIFileManager implements IRemoteUIFileManager {
 	 * 
 	 * @see org.eclipse.remote.IRemoteFileManager#browseFile(org.eclipse.swt. widgets.Shell, java.lang.String, java.lang.String)
 	 */
-	public String[] browseFiles(Shell shell, String message, String filterPath, int flags) {
+	public List<String> browseFiles(Shell shell, String message, String filterPath, int flags) {
 		SystemRemoteFileDialog dlg = new SystemRemoteFileDialog(shell, message, connHost);
 		dlg.setDefaultSystemConnection(connHost, onlyConnection);
 		dlg.setBlockOnOpen(true);
@@ -118,18 +119,13 @@ public class RSEUIFileManager implements IRemoteUIFileManager {
 			connHost = dlg.getSelectedConnection();
 			connection = connMgr.getConnection(connHost.getName());
 			Object retObj[] = dlg.getSelectedObjects();
-			Vector<String> selections = new Vector<String>(retObj.length);
+			List<String> selections = new ArrayList<String>(retObj.length);
 			for (Object element : retObj) {
 				if (element instanceof IRemoteFile) {
 					selections.add(((IRemoteFile) element).getAbsolutePath());
 				}
 			}
-			String remotePaths[] = new String[selections.size()];
-			int i = 0;
-			for (String s : selections) {
-				remotePaths[i++] = s;
-			}
-			return remotePaths;
+			return selections;
 		}
 		return null;
 	}
