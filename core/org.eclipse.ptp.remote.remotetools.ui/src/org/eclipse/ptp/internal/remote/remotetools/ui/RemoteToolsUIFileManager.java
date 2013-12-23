@@ -32,11 +32,12 @@ public class RemoteToolsUIFileManager implements IRemoteUIFileManager {
 	 * .swt.widgets.Shell, java.lang.String, java.lang.String)
 	 */
 	public String browseDirectory(Shell shell, String message, String filterPath, int flags) {
-		RemoteResourceBrowser browser = new RemoteResourceBrowser(connection, shell, RemoteResourceBrowser.SINGLE);
+		RemoteResourceBrowser browser = new RemoteResourceBrowser(shell, RemoteResourceBrowser.SINGLE);
 		browser.setType(RemoteResourceBrowser.DIRECTORY_BROWSER);
 		browser.setInitialPath(filterPath);
 		browser.setTitle(message);
 		browser.showConnections(showConnections);
+		browser.setConnection(connection);
 		if (browser.open() == Window.CANCEL) {
 			return null;
 		}
@@ -56,11 +57,12 @@ public class RemoteToolsUIFileManager implements IRemoteUIFileManager {
 	 * .swt.widgets.Shell, java.lang.String, java.lang.String)
 	 */
 	public String browseFile(Shell shell, String message, String filterPath, int flags) {
-		RemoteResourceBrowser browser = new RemoteResourceBrowser(connection, shell, RemoteResourceBrowser.SINGLE);
+		RemoteResourceBrowser browser = new RemoteResourceBrowser(shell, RemoteResourceBrowser.SINGLE);
 		browser.setType(RemoteResourceBrowser.FILE_BROWSER);
 		browser.setInitialPath(filterPath);
 		browser.setTitle(message);
 		browser.showConnections(showConnections);
+		browser.setConnection(connection);
 		if (browser.open() == Window.CANCEL) {
 			return null;
 		}
@@ -80,11 +82,12 @@ public class RemoteToolsUIFileManager implements IRemoteUIFileManager {
 	 * .swt.widgets.Shell, java.lang.String, java.lang.String)
 	 */
 	public List<String> browseFiles(Shell shell, String message, String filterPath, int flags) {
-		RemoteResourceBrowser browser = new RemoteResourceBrowser(connection, shell, RemoteResourceBrowser.MULTI);
+		RemoteResourceBrowser browser = new RemoteResourceBrowser(shell, RemoteResourceBrowser.MULTI);
 		browser.setType(RemoteResourceBrowser.FILE_BROWSER);
 		browser.setInitialPath(filterPath);
 		browser.setTitle(message);
 		browser.showConnections(showConnections);
+		browser.setConnection(connection);
 		if (browser.open() == Window.CANCEL) {
 			return null;
 		}
