@@ -48,7 +48,6 @@ import org.eclipse.ptp.rdt.sync.core.SyncManager;
  */
 public class GitSyncFileFilter extends AbstractSyncFileFilter {
 	private final JGitRepo jgitRepo;
-	private static Map<String, GitSyncFileFilter> pathToFilterMap = new HashMap<String, GitSyncFileFilter>();
 
 	private static Set<Character> escapifyCharSet = new HashSet<Character>();
 	static {
@@ -221,7 +220,7 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		} finally {
 			out.close();
 		}
-		final RmCommand rmCommand = new RmCommand(repository);
+		final RmCommand rmCommand = new RmCommand(repo);
 		rmCommand.setCached(true);
 		for (String fileName : getIgnoredFiles(null)) {
 			rmCommand.addFilepattern(fileName);
@@ -233,11 +232,6 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		} catch (GitAPIException e) {
 			new IOException(e);
 		}
-		}
-		try {
-			SyncConfigManager.saveConfigs(project);
-		} catch (CoreException e) {
-			Activator.log(Messages.GitSyncFileFilter_UnableToSaveSyncConfigs + project.getName(), e);
 	}
 
 	/**

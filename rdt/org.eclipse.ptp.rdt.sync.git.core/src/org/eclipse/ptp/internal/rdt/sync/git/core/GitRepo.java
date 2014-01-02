@@ -38,9 +38,8 @@ import org.eclipse.ptp.rdt.sync.core.RemoteLocation;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
 import org.eclipse.ptp.rdt.sync.core.exceptions.RemoteExecutionException;
 import org.eclipse.ptp.rdt.sync.core.exceptions.RemoteSyncException;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.IRemoteServices;
-import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.exception.RemoteConnectionException;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
@@ -183,7 +182,6 @@ public class GitRepo {
 	public void uploadFilter(JGitRepo localJGitRepo, IProgressMonitor monitor) throws MissingConnectionException, RemoteSyncException {
 		final RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 10);
 		IRemoteConnection conn = remoteLoc.getConnection();
-		IRemoteServices remoteServices = conn.getRemoteServices();
 		Repository repository = localJGitRepo.getRepository();
 
 		try {
@@ -192,7 +190,7 @@ public class GitRepo {
 					Constants.INFO_EXCLUDE);
 			IFileStore local = EFS.getLocalFileSystem().getStore(new Path(exclude.getAbsolutePath()));
 			String remoteExclude = remoteLoc.getDirectory() + "/" + GitSyncService.gitDir + "/" + Constants.INFO_EXCLUDE;  //$NON-NLS-1$ //$NON-NLS-2$
-			IFileStore remote = remoteServices.getFileManager(conn).getResource(remoteExclude);
+			IFileStore remote = conn.getFileManager().getResource(remoteExclude);
 			subMon.subTask(Messages.GitRepo_6);
 			local.copy(remote, EFS.OVERWRITE, subMon.newChild(3));
 

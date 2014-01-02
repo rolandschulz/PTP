@@ -11,7 +11,7 @@
 package org.eclipse.ptp.rdt.sync.ui;
 
 import org.eclipse.jface.operation.IRunnableContext;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteConnection;
 import org.eclipse.swt.widgets.Composite;
 
 /**
