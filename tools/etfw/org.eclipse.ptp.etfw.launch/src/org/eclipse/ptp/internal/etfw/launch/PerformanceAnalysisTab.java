@@ -60,6 +60,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 
 /**
  * Notes: This class is a re-implementation of ParallelToolSelectionTab using JAXB to dynamically build the UI.
@@ -224,70 +225,82 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 	}
 
 	private void rebuildTab(String toolName) {
+		clearOldWidgets();
+
 		if (toolName.equals(Messages.PerformanceAnalysisTab_PleaseSelectWorkflow)) {
-			clearOldWidgets();
 			return;
 		}
 
 		etfwTool = JAXBExtensionUtils.getTool(toolName);
-		vmap = controller.getEnvironment();
 
-		JAXBInitializationUtil.initializeMap(etfwTool, vmap);
+		if (controller != null) {
+			vmap = controller.getEnvironment();
 
-		// Add in connection property attributes to ETFW variable map
-		final IRemoteServices services = RemoteServices.getRemoteServices(controller.getRemoteServicesId());
-		if (services != null) {
-			final IRemoteConnectionManager connMgr = services.getConnectionManager();
-			IRemoteConnection remoteConnection = connMgr.getConnection(controller.getConnectionName());
-			if (remoteConnection != null) {
-				setConnectionPropertyAttributes(remoteConnection);
+			JAXBInitializationUtil.initializeMap(etfwTool, vmap);
+
+			// Add in connection property attributes to ETFW variable map
+			final IRemoteServices services = RemoteServices.getRemoteServices(controller.getRemoteServicesId());
+			if (services != null) {
+				final IRemoteConnectionManager connMgr = services.getConnectionManager();
+				IRemoteConnection remoteConnection = connMgr.getConnection(controller.getConnectionName());
+				if (remoteConnection != null) {
+					setConnectionPropertyAttributes(remoteConnection);
+				}
 			}
-		}
 
-		try {
-			launchTabParent = new ETFWParentLaunchConfigurationTab(controller, getLaunchConfigurationDialog(),
-					new NullProgressMonitor(), vmap);
-		} catch (Throwable e1) {
-			e1.printStackTrace();
-		}
-		launchTabParent.addContentsChangedListener(launchContentsChangedListener);
+			try {
+				launchTabParent = new ETFWParentLaunchConfigurationTab(controller, getLaunchConfigurationDialog(),
+						new NullProgressMonitor(), vmap);
+			} catch (Throwable e1) {
+				e1.printStackTrace();
+			}
+			launchTabParent.addContentsChangedListener(launchContentsChangedListener);
 
-		for (IJAXBLaunchConfigurationTab tabControl : tabControllers) {
-			tabControl.getLocalWidgets().clear();
-		}
+			for (IJAXBLaunchConfigurationTab tabControl : tabControllers) {
+				tabControl.getLocalWidgets().clear();
+			}
 
-		tabControllers.clear();
-		for (Control control : toolComposite.getChildren()) {
-			control.dispose();
-		}
+			tabControllers.clear();
+			for (Control control : toolComposite.getChildren()) {
+				control.dispose();
+			}
 
-		if (etfwTool.getControlData() != null) {
-			for (CommandType command : etfwTool.getControlData().getInitializeCommand()) {
-				if (command != null) {
-					try {
-						controller.runCommand(command, vmap);
-					} catch (CoreException e) {
-						e.printStackTrace();
+			if (etfwTool.getControlData() != null) {
+				for (CommandType command : etfwTool.getControlData().getInitializeCommand()) {
+					if (command != null) {
+						try {
+							controller.runCommand(command, vmap);
+						} catch (CoreException e) {
+							e.printStackTrace();
+						}
 					}
 				}
 			}
+
+			toolTabs = findTabControllers();
+
+			for (ToolPaneType toolTab : toolTabs) {
+				tabControllers.add(new JAXBDynamicLaunchConfigurationTab(controller, toolTab.getOptionPane(), launchTabParent));
+			}
+
+			launchTabParent.addDynamicContent(tabControllers);
+
+			try {
+				launchTabParent.createControl(toolComposite, controller.getControlId());
+			} catch (CoreException e) {
+				e.printStackTrace();
+			}
+
+			handleUpdate();
+		} else {
+			Composite comp = new Composite(toolComposite, SWT.NONE);
+			GridLayout layout = new GridLayout();
+			comp.setLayout(layout);
+			Text message = new Text(comp, SWT.NONE);
+			message.setText(Messages.PerformanceAnalysisTab_Please_select_a_target_configuration_first);
+			message.setBackground(toolComposite.getBackground());
+			message.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
 		}
-
-		toolTabs = findTabControllers();
-
-		for (ToolPaneType toolTab : toolTabs) {
-			tabControllers.add(new JAXBDynamicLaunchConfigurationTab(controller, toolTab.getOptionPane(), launchTabParent));
-		}
-
-		launchTabParent.addDynamicContent(tabControllers);
-
-		try {
-			launchTabParent.createControl(toolComposite, controller.getControlId());
-		} catch (CoreException e) {
-			e.printStackTrace();
-		}
-
-		handleUpdate();
 	}
 
 	private void handleUpdate() {

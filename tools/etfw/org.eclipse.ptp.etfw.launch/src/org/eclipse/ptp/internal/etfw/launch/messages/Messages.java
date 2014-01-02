@@ -9,6 +9,7 @@ public class Messages extends NLS {
 	public static String PerformanceAnalysisTab_BuildInstrumentedExecutable;
 	public static String PerformanceAnalysisTab_NoWorkflowSelected;
 	public static String PerformanceAnalysisTab_NoWorkflowTypeSelected;
+	public static String PerformanceAnalysisTab_Please_select_a_target_configuration_first;
 	public static String PerformanceAnalysisTab_PleaseSelectWorkflow;
 	public static String PerformanceAnalysisTab_PleaseSelectWorkflowType;
 	public static String PerformanceAnalysisTab_SelectExistingPerfData;
