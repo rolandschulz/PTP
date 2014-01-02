@@ -19,8 +19,10 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IResource;
@@ -221,7 +223,7 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		} finally {
 			out.close();
 		}
-		final RmCommand rmCommand = new RmCommand(repository);
+		final RmCommand rmCommand = new RmCommand(repo);
 		rmCommand.setCached(true);
 		for (String fileName : getIgnoredFiles(null)) {
 			rmCommand.addFilepattern(fileName);
@@ -233,11 +235,6 @@ public class GitSyncFileFilter extends AbstractSyncFileFilter {
 		} catch (GitAPIException e) {
 			new IOException(e);
 		}
-		}
-		try {
-			SyncConfigManager.saveConfigs(project);
-		} catch (CoreException e) {
-			Activator.log(Messages.GitSyncFileFilter_UnableToSaveSyncConfigs + project.getName(), e);
 	}
 
 	/**
