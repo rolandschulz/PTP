@@ -28,6 +28,7 @@ import org.eclipse.jgit.api.CommitCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.MergeCommand;
 import org.eclipse.jgit.api.MergeResult;
+import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.StatusCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -264,7 +265,8 @@ public class JGitRepo {
 
 			subMon.subTask(Messages.JGitRepo_3);
 			if (!diffFiles.removed.isEmpty()) {
-				final RmCommandCached rmCommand = new RmCommandCached(git.getRepository());
+				final RmCommand rmCommand = new RmCommand(git.getRepository());
+				rmCommand.setCached(true);
 				for (String fileName : diffFiles.removed) {
 					rmCommand.addFilepattern(fileName);
 				}
