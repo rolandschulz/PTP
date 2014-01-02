@@ -61,9 +61,9 @@ import org.eclipse.ptp.rdt.sync.core.RecursiveSubMonitor;
 import org.eclipse.ptp.rdt.sync.core.RemoteLocation;
 import org.eclipse.ptp.rdt.sync.core.SyncManager;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
-import org.eclipse.ptp.remote.core.AbstractRemoteProcess;
-import org.eclipse.ptp.remote.core.IRemoteConnection;
-import org.eclipse.ptp.remote.core.exception.RemoteConnectionException;
+import org.eclipse.remote.core.AbstractRemoteProcess;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.exception.RemoteConnectionException;
 
 /**
  * Class for a local Git repository managed by JGit
@@ -637,7 +637,7 @@ public class JGitRepo {
 				if (!connection.isOpen()) {
 					connection.open(null);
 				}
-				return (AbstractRemoteProcess) connection.getRemoteServices().getProcessBuilder(connection, commandList).start();
+				return (AbstractRemoteProcess) connection.getProcessBuilder(commandList).start();
 			} catch (IOException e) {
 				throw new TransportException(uri, e.getMessage(), e);
 			} catch (RemoteConnectionException e) {

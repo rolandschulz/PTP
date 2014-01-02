@@ -120,7 +120,7 @@ public interface ISynchronizeService extends ISynchronizeServiceDescriptor {
 	 * @since 4.0
 	 */
 	public void synchronize(IProject project, RemoteLocation remoteLoc, IResourceDelta delta,
-			EnumSet<SyncFlag> syncFlags) throws CoreException;
+			IProgressMonitor monitor, EnumSet<SyncFlag> syncFlags) throws CoreException;
 
 	/**
 	 * Get SyncFileFilter for given project

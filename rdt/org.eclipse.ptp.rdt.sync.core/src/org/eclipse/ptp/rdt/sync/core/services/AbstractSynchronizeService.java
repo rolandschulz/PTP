@@ -33,16 +33,10 @@ public abstract class AbstractSynchronizeService implements ISynchronizeService 
 	/*
 	 * (non-Javadoc)
 	 * 
-	/**
-	 * @since 4.0
-	 */
 	 * @see org.eclipse.ptp.rdt.sync.core.services.ISynchronizeServiceDescriptor#getService()
 	 */
 	@Override
 	public ISynchronizeService getService() {
 		return this;
 	}
-	 */
-	/**
-	 * @since 4.0
 }
