@@ -200,7 +200,7 @@ public class ETFWBuildTool extends ETFWToolStep implements IToolLaunchConfigurat
 			return;
 		}
 
-		buildInfo = ManagedBuildManager.getBuildInfo(thisCProject.getResource());
+		buildInfo = ManagedBuildManager.getBuildInfo(thisProject);
 		olddefbuildconf = buildInfo.getDefaultConfiguration();// TODO: Make sure
 																// default
 																// configuration
@@ -396,7 +396,7 @@ public class ETFWBuildTool extends ETFWToolStep implements IToolLaunchConfigurat
 		}
 		// System.out.println(tbpath+File.separator+"tau_xxx.sh"+tauCompilerArgs);
 		if (numChanges > 0) {
-			ManagedBuildManager.saveBuildInfo(thisCProject.getProject(), true);
+			ManagedBuildManager.saveBuildInfo(thisProject, true);
 		}
 
 		return true;
@@ -460,7 +460,7 @@ public class ETFWBuildTool extends ETFWToolStep implements IToolLaunchConfigurat
 		// lastBuilt=pathStore.fetchInfo().getLastModified();
 		// }
 
-		ManagedBuildManager.setDefaultConfiguration(thisCProject.getProject(), newBuildConfig);
+		ManagedBuildManager.setDefaultConfiguration(thisProject, newBuildConfig);
 		try {
 			thisProject.build(IncrementalProjectBuilder.FULL_BUILD, monitor);// .FULL_BUILD
 																				// //.INCREMENTAL_BUILD
@@ -492,7 +492,7 @@ public class ETFWBuildTool extends ETFWToolStep implements IToolLaunchConfigurat
 
 	public void restoreBuild() {
 		if (isManaged) {
-			ManagedBuildManager.setDefaultConfiguration(thisCProject.getProject(), olddefbuildconf);
+			ManagedBuildManager.setDefaultConfiguration(thisProject, olddefbuildconf);
 			// if(!configuration.getAttribute(NOCLEAN,
 			// false)&&managedBuildProj!=null&&newBuildConfig!=null)
 			// managedBuildProj.removeConfiguration(newBuildConfig.getId());

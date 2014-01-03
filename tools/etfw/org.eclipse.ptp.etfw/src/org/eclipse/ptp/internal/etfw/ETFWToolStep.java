@@ -17,8 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.eclipse.cdt.core.CCorePlugin;
-import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -104,7 +102,6 @@ public abstract class ETFWToolStep extends Job implements IToolLaunchConfigurati
 	protected String projectBinary = null;
 
 	protected String projectName = null;
-	protected ICProject thisCProject = null;
 	protected IProject thisProject = null;
 	// protected String outputLocation=null;
 	protected ILaunchConfiguration configuration = null;
@@ -158,14 +155,13 @@ public abstract class ETFWToolStep extends Job implements IToolLaunchConfigurati
 		configuration = conf;
 
 		thisProject = getProject(configuration);
-		thisCProject = CCorePlugin.getDefault().getCoreModel().create(thisProject);
 
 		isSyncProject = RemoteSyncNature.hasNature(thisProject);// BuildConfigurationManager.getInstance().isInitialized(thisProject);
 
 		if (isSyncProject) {
 			projectLocation = SyncConfigManager.getActive(thisProject).getLocation();
 		} else {
-			projectLocation = thisCProject.getResource().getLocationURI().getPath();
+			projectLocation = thisProject.getLocationURI().getPath();
 		}
 
 		outputLocation = projectLocation;

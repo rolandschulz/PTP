@@ -147,8 +147,7 @@ public class ETFWAnalysisTool extends ETFWToolStep implements IToolLaunchConfigu
 		try {
 			if (root.fetchInfo().exists() && root.fetchInfo().isDirectory()) {
 				filea = root.childStores(EFS.NONE, null);
-			}
-			else {
+			} else {
 				return files;
 			}
 		} catch (final CoreException e) {
@@ -186,8 +185,7 @@ public class ETFWAnalysisTool extends ETFWToolStep implements IToolLaunchConfigu
 				/*
 				 * If the tool has no group or the group is, at least, not internal just run with what is defined in the xml
 				 */
-				if (anap.getToolGroup() == null || !anap.getToolGroup().equals(INTERNAL))
-				{
+				if (anap.getToolGroup() == null || !anap.getToolGroup().equals(INTERNAL)) {
 					runTool = getToolCommandList(anap, configuration);
 					if (tool.getForAllLike() != null) {
 						final IFileStore getname = utilBlob.getFile(currentFile);
@@ -207,11 +205,9 @@ public class ETFWAnalysisTool extends ETFWToolStep implements IToolLaunchConfigu
 							utilBLob.runVis(runTool, null, outputLocation);
 						} else {
 
-							if (anap.getOutToFile() != null)
-							{
+							if (anap.getOutToFile() != null) {
 								utilBLob.runTool(runTool, null, outputLocation, anap.getOutToFile());
-							}
-							else {
+							} else {
 								byte[] utout = null;
 								final MessageConsole mc = findConsole("ETFw");
 								mc.clearConsole();
@@ -244,7 +240,7 @@ public class ETFWAnalysisTool extends ETFWToolStep implements IToolLaunchConfigu
 
 							manager.setExternalTarget(true);
 						} else {
-							projName = thisCProject.getElementName();
+							projName = thisProject.getName();
 						}
 
 						// TODO: This is sort of ok, but we should probably change the API to accept both the output dir and the
@@ -308,8 +304,7 @@ public class ETFWAnalysisTool extends ETFWToolStep implements IToolLaunchConfigu
 				 */
 				externalTarget = true;
 			}
-		}
-		else {
+		} else {
 			String customOutLoc = null;
 
 			try {
@@ -318,11 +313,9 @@ public class ETFWAnalysisTool extends ETFWToolStep implements IToolLaunchConfigu
 				e1.printStackTrace();
 			}
 
-			if (customOutLoc != null)
-			{
+			if (customOutLoc != null) {
 				outputLocation = customOutLoc;
-			}
-			else if (utilBlob.isRemote()) {
+			} else if (utilBlob.isRemote()) {
 				outputLocation = utilBlob.getWorkingDirectory();
 			}
 		}
