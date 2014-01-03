@@ -335,8 +335,7 @@ public class SyncManager {
 	 *            cannot be null
 	 * @param filter
 	 *            cannot be null
-	 * @throws CoreException 
-	 * @throws IOException
+	 * @throws CoreException
 	 */
 	public static void saveFileFilter(IProject project, AbstractSyncFileFilter filter) throws CoreException {
 		String currentSyncServiceId = SyncConfigManager.getActive(project).getSyncProviderId();
