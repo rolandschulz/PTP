@@ -71,7 +71,8 @@ public class AnalysisDropdownHandler extends AbstractHandler implements ISelecti
 			// if ss not set how are we notified of later selection changes??? BRT
 			if (ww != null) {
 				ss = ww.getSelectionService(); // throws on this
-				System.out.println("ss=" + ss);
+				if(traceOn)
+					System.out.println("ADDH ... ss=" + ss);
 				ss.addSelectionListener(this);
 				// and cache the selection that was in effect now.
 				// gives selection in ACTIVE PART. If editor was just opened, active part is probably the editor.

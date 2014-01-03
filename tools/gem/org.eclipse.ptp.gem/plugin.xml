@@ -236,7 +236,8 @@
    		point="org.eclipse.ui.menus">
       <menuContribution
       		locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
-         <toolbar id="org.eclipse.ptp.gem.toolbar">
+         <toolbar id="org.eclipse.ptp.gem.toolbar"
+                  label="%menulabel">
              <command
                   commandId="org.eclipse.ptp.gem.commands.gemCommand"
                   icon="icons/trident.gif"

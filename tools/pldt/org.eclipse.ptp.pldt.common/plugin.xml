@@ -29,12 +29,17 @@
          <commandParameter
                id="org.eclipse.ptp.pldt.common.dropDownCommand.msg"
                name="%commandParameter.name"
-               optional="true"
-               typeId="String">
+               optional="true">
          </commandParameter>
+         <!--
          <defaultHandler
                class="org.eclipse.ptp.pldt.common.actions.AnalysisDropdownHandler">
+            <parameter
+                  name="org.eclipse.ptp.pldt.common.parameter1"
+                  value="test">
+            </parameter>
          </defaultHandler>
+         -->
       </command>
    </extension>
    <extension
@@ -49,6 +54,7 @@
       <menuContribution
             locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
          <toolbar
+               label="%menulabel"
                id="org.eclipse.ptp.pldt.common.toolbar1">
             <command
                   commandId="org.eclipse.ptp.pldt.common.dropDownCommand"
