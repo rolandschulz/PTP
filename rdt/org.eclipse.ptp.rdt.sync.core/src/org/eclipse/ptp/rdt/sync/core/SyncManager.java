@@ -271,7 +271,7 @@ public class SyncManager {
 	}
 
 	/**
-	 * Get sync mode for a project
+	 * Get auto-sync mode for a project
 	 * 
 	 * @param project
 	 *            cannot be null
@@ -343,12 +343,12 @@ public class SyncManager {
 	}
 
 	// Note that the monitor is ignored for non-blocking jobs since SynchronizeJob creates its own monitor
-	private static Job[] scheduleSyncJobs(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags, SyncMode mode,
+	private static Job[] scheduleSyncJobs(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags, boolean syncAll,
 			boolean isBlocking, boolean useExceptionHandler, ISyncExceptionHandler seHandler, IProgressMonitor monitor)
 			throws CoreException {
 		int jobNum = 0;
 		SyncConfig[] syncConfigs;
-		if (mode == SyncMode.ACTIVE) {
+		if (!syncAll) {
 			syncConfigs = new SyncConfig[1];
 			syncConfigs[0] = SyncConfigManager.getActive(project);
 		} else {
@@ -492,8 +492,7 @@ public class SyncManager {
 			return null;
 		}
 
-		Job[] syncJobs = scheduleSyncJobs(delta, project, syncFlags, SyncMode.ACTIVE, isBlocking, useExceptionHandler, seHandler,
-				monitor);
+		Job[] syncJobs = scheduleSyncJobs(delta, project, syncFlags, false, isBlocking, useExceptionHandler, seHandler, monitor);
 		return syncJobs[0];
 	}
 
@@ -533,12 +532,11 @@ public class SyncManager {
 	 */
 	public static Job[] syncAll(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags, ISyncExceptionHandler seHandler)
 			throws CoreException {
-		SyncMode mode = getSyncMode(project);
-		if (mode == SyncMode.UNAVAILABLE) {
+		if (getSyncMode(project) == SyncMode.UNAVAILABLE) {
 			return new Job[0];
 		}
 
-		return scheduleSyncJobs(delta, project, syncFlags, mode, false, true, seHandler, null);
+		return scheduleSyncJobs(delta, project, syncFlags, true, false, true, seHandler, null);
 	}
 
 	/**
@@ -559,12 +557,11 @@ public class SyncManager {
 	 */
 	public static Job[] syncAllBlocking(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags,
 			ISyncExceptionHandler seHandler) throws CoreException {
-		SyncMode mode = getSyncMode(project);
-		if (mode == SyncMode.UNAVAILABLE) {
+		if (getSyncMode(project) == SyncMode.UNAVAILABLE) {
 			return new Job[0];
 		}
 
-		return scheduleSyncJobs(delta, project, syncFlags, mode, true, true, seHandler, null);
+		return scheduleSyncJobs(delta, project, syncFlags, true, true, true, seHandler, null);
 	}
 
 	/**
