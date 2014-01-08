@@ -77,18 +77,15 @@ public class ResourceChangeListener {
 					if (syncConfig != null) {
 						try {
 							if (delta.getKind() == IResourceDelta.CHANGED && syncConfig.isSyncOnSave()) {
-								// Do a non-forced sync to update any changes reported in delta. Sync'ing is necessary even if user
-								// has turned it off. This allows for some bookkeeping but no files are transferred.
-								if (syncMode == SyncMode.UNAVAILABLE) {
+								// Do a non-forced sync to update any changes reported in delta.
+								if ((syncMode == SyncMode.UNAVAILABLE) || (!syncOn)) {
 									continue;
-								} else if (!syncOn) {
-									SyncManager.sync(delta, project, SyncFlag.NO_SYNC, null);
 								} else if (syncMode == SyncMode.ALL) {
-									SyncManager.syncAll(delta, project, SyncFlag.NO_FORCE, new CommonSyncExceptionHandler(true,
+									SyncManager.syncAll(delta, project, SyncFlag.LR_ONLY, new CommonSyncExceptionHandler(true,
 											false));
 								} else if (syncMode == SyncMode.ACTIVE) {
 									SyncManager
-											.sync(delta, project, SyncFlag.NO_FORCE, new CommonSyncExceptionHandler(true, false));
+											.sync(delta, project, SyncFlag.LR_ONLY, new CommonSyncExceptionHandler(true, false));
 								}
 							}
 						} catch (CoreException e) {

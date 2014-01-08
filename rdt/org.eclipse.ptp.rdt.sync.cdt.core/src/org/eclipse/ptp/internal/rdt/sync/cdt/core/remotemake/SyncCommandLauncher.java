@@ -388,11 +388,11 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		if (shouldSyncAfterRun && SyncManager.getSyncAuto() && config.isSyncOnPostBuild()) {
 			switch (SyncManager.getSyncMode(getProject())) {
 			case ACTIVE:
-				SyncManager.syncBlocking(null, getProject(), SyncFlag.FORCE, monitor, null);
+				SyncManager.syncBlocking(null, getProject(), SyncFlag.BOTH, monitor, null);
 				break;
 
 			case ALL:
-				SyncManager.syncAllBlocking(null, getProject(), SyncFlag.FORCE, null);
+				SyncManager.syncAllBlocking(null, getProject(), SyncFlag.BOTH, null);
 				break;
 			}
 		}
@@ -403,11 +403,11 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		if (shouldSyncBeforeRun && config.isSyncOnPreBuild()) {
 			switch (SyncManager.getSyncMode(getProject())) {
 			case ACTIVE:
-				SyncManager.syncBlocking(null, getProject(), SyncFlag.FORCE, monitor, null);
+				SyncManager.syncBlocking(null, getProject(), SyncFlag.BOTH, monitor, null);
 				break;
 
 			case ALL:
-				SyncManager.syncAllBlocking(null, getProject(), SyncFlag.FORCE, null);
+				SyncManager.syncAllBlocking(null, getProject(), SyncFlag.BOTH, null);
 				break;
 			}
 		}

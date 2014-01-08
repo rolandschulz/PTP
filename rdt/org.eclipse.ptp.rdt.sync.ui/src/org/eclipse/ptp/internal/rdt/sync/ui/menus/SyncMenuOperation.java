@@ -73,16 +73,16 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 		// On sync request, sync regardless of the flags
 		try {
 			if (command.equals(syncActiveCommand)) {
-				SyncManager.sync(null, project, SyncFlag.FORCE, syncExceptionHandler);
+				SyncManager.sync(null, project, SyncFlag.BOTH, syncExceptionHandler);
 			} else if (command.equals(syncAllCommand)) {
-				SyncManager.syncAll(null, project, SyncFlag.FORCE, syncExceptionHandler);
+				SyncManager.syncAll(null, project, SyncFlag.BOTH, syncExceptionHandler);
 				// If user switches to active or all, assume the user wants to sync right away
 			} else if (command.equals(setActiveCommand)) {
 				SyncManager.setSyncMode(project, SyncMode.ACTIVE);
-				SyncManager.sync(null, project, SyncFlag.FORCE, syncExceptionHandler);
+				SyncManager.sync(null, project, SyncFlag.BOTH, syncExceptionHandler);
 			} else if (command.equals(setAllCommand)) {
 				SyncManager.setSyncMode(project, SyncMode.ALL);
-				SyncManager.syncAll(null, project, SyncFlag.FORCE, syncExceptionHandler);
+				SyncManager.syncAll(null, project, SyncFlag.BOTH, syncExceptionHandler);
 			} else if (command.equals(setNoneCommand)) {
 				SyncManager.setSyncMode(project, SyncMode.NONE);
 			} else if (command.equals(syncAutoCommand)) {
@@ -91,9 +91,9 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 				if (SyncManager.getSyncAuto()) {
 					SyncMode syncMode = SyncManager.getSyncMode(project);
 					if (syncMode == SyncMode.ACTIVE) {
-						SyncManager.sync(null, project, SyncFlag.FORCE, syncExceptionHandler);
+						SyncManager.sync(null, project, SyncFlag.BOTH, syncExceptionHandler);
 					} else if (syncMode == SyncMode.ALL) {
-						SyncManager.syncAll(null, project, SyncFlag.FORCE, syncExceptionHandler);
+						SyncManager.syncAll(null, project, SyncFlag.BOTH, syncExceptionHandler);
 					}
 				}
 			} else if (command.equals(syncExcludeCommand) || command.equals(syncIncludeCommand)) {

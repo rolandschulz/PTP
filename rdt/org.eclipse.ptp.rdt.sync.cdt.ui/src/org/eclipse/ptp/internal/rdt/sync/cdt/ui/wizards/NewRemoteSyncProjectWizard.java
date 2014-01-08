@@ -121,7 +121,7 @@ public class NewRemoteSyncProjectWizard extends CDTCommonProjectWizard {
 		// Force an initial sync
 		if (success && project != null) {
 			try {
-				SyncManager.sync(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(false, true));
+				SyncManager.sync(null, project, SyncFlag.BOTH, new CommonSyncExceptionHandler(false, true));
 			} catch (CoreException e) {
 				// This should never happen because only a blocking sync can throw a core exception.
 				Activator.log(Messages.NewRemoteSyncProjectWizard_0, e);

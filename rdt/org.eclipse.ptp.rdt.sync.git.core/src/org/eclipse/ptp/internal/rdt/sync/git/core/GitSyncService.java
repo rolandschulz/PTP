@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -62,8 +63,10 @@ public class GitSyncService extends AbstractSynchronizeService {
 
 	// Variables for managing sync threads
 	private static final ReentrantLock syncLock = new ReentrantLock();
-	private static final ConcurrentMap<ProjectAndRemoteLocationPair, AtomicLong> syncThreadsWaiting =
-			new ConcurrentHashMap<ProjectAndRemoteLocationPair, AtomicLong>();
+	private static final ConcurrentMap<ProjectAndRemoteLocationPair, AtomicBoolean> syncLRPending =
+			new ConcurrentHashMap<ProjectAndRemoteLocationPair, AtomicBoolean>();
+	private static final ConcurrentMap<ProjectAndRemoteLocationPair, AtomicBoolean> syncRLPending =
+			new ConcurrentHashMap<ProjectAndRemoteLocationPair, AtomicBoolean>();
 
 	// Entry indicates that the remote location has a clean (up-to-date) file filter for the project
 	private static final Set<LocalAndRemoteLocationPair> cleanFileFilterMap = new HashSet<LocalAndRemoteLocationPair>();
@@ -417,7 +420,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 
 		try {
 			/*
-			 * A synchronize with SyncFlag.FORCE guarantees that both directories are in sync.
+			 * A synchronize with SyncFlag.BOTH guarantees that both directories are in sync.
 			 * 
 			 * More precise: it guarantees that all changes written to disk at the moment of the call are guaranteed to be
 			 * synchronized between both directories. No guarantees are given for changes occurring during the synchronize call.
@@ -428,14 +431,11 @@ public class GitSyncService extends AbstractSynchronizeService {
 			 * Example: Why sync if current delta is empty? The RemoteMakeBuilder forces a sync before and after building. In some
 			 * cases, we want to ensure repos are synchronized regardless of the passed delta, which can be set to null.
 			 */
-			// TODO: We are not using the individual "sync to local" and "sync to remote" flags yet.
-			if (syncFlags.contains(SyncFlag.DISABLE_SYNC)) {
-				return;
-			}
-
+			// START HERE: Finish replacing threadCount with pending logic. CHECK FLAG VALUES - NOT ENUMSET VALUES!
 			ProjectAndRemoteLocationPair syncTarget = new ProjectAndRemoteLocationPair(project, remoteLoc);
-		    AtomicLong threadCount = syncThreadsWaiting.get(syncTarget);
-		    if (threadCount != null && threadCount.get() > 0 && syncFlags == SyncFlag.NO_FORCE) {
+		    AtomicBoolean LRPending = syncLRPending.get(syncTarget);
+		    AtomicBoolean RLPending = syncRLPending.get(syncTarget);
+		    if (threadCount != null && threadCount.get() > 0 && syncFlags == SyncFlag.LR_ONLY) {
 		    	return; // the queued thread will do the work for us. And we don't have to wait because of NO_FORCE
 		    }
 
@@ -522,7 +522,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 			// Commit local changes
 			subMon.subTask(Messages.GitSyncService_12);
 			boolean hasChanges = localRepo.commit(subMon.newChild(5));
-			if ((!hasChanges) && (syncFlags == SyncFlag.NO_FORCE)) {
+			if ((!hasChanges) && (syncFlags == SyncFlag.LR_ONLY)) {
 				return;
 			}
 

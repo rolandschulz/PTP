@@ -409,7 +409,7 @@ public class NewSyncProjectWizard extends Wizard implements INewWizard, IExecuta
 
 		// Force an initial sync
 		try {
-			SyncManager.sync(null, project, SyncFlag.FORCE, new CommonSyncExceptionHandler(false, true));
+			SyncManager.sync(null, project, SyncFlag.BOTH, new CommonSyncExceptionHandler(false, true));
 		} catch (CoreException e) {
 			// This should never happen because only a blocking sync can throw a core exception.
 			RDTSyncUIPlugin.log(Messages.NewSyncProjectWizard_Unexpected_core_exception, e);
