@@ -320,9 +320,13 @@ public class GitRepo {
      */
     public void merge(IProgressMonitor monitor) throws RemoteSyncException, MissingConnectionException {
 		CommandResults mergeResults;
-		// ff-only prevents accidental corruption of the remote repository but is supported only in recent Git versions.
-		// final String command = gitCommand + " merge --ff-only " + remotePushBranch; //$NON-NLS-1$
-		final String command = gitCommand() + " merge " + GitSyncService.remotePushBranch; //$NON-NLS-1$
+		// ff-only was introduced in Git 1.6.6 and prevents accidental corruption of the remote repository.
+		String command;
+		if (remoteGitVersion >= 1060600) {
+			command = gitCommand() + " merge --ff-only " + GitSyncService.remotePushBranch; //$NON-NLS-1$
+		} else {
+			command = gitCommand() + " merge " + GitSyncService.remotePushBranch; //$NON-NLS-1$
+		}
 
 		try {
 			mergeResults = this.executeRemoteCommand(command, monitor);
@@ -367,6 +371,32 @@ public class GitRepo {
 	}
 
 	/**
+	 * Get the SHA-1 of the current head commit
+     *
+     * @param monitor
+	 * @return SHA-1 hash code
+     *
+     * @throws RemoteSyncException
+	 * 			on problems executing the necessary remote commands.
+	 * @throws MissingConnectionException
+	 * 			if the connection is unresolved
+	 */
+	public String getHead(IProgressMonitor monitor) throws RemoteSyncException, MissingConnectionException {
+		String command = gitCommand() + " rev-parse HEAD"; //$NON-NLS-1$
+		CommandResults headResults;
+		try {
+			headResults = this.executeRemoteCommand(command, monitor);
+		} catch (IOException e) {
+			throw new RemoteSyncException(e);
+		} catch (InterruptedException e) {
+			throw new RemoteSyncException(e);
+		} catch (RemoteConnectionException e) {
+			throw new RemoteSyncException(e);
+		}
+		return headResults.getStdout();
+	}
+
+	/**
 	 * Get the remote location of this repository
 	 * @return remote location
 	 */
@@ -378,7 +408,7 @@ public class GitRepo {
 	 * Return the Git version used for this repository
 	 *
 	 * @param monitor
-	 * @return Git version as a single int in the format: MMMmmmrrr (Major, minor, and revision)
+	 * @return Git version as a single int in the format: MMmmrrpp (Major, minor, revision, and patch)
 	 *
 	 * @throws RemoteSyncException
 	 * @throws MissingConnectionException

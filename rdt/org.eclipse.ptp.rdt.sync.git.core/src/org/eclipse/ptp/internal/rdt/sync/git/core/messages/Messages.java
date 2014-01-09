@@ -47,6 +47,9 @@ public class Messages extends NLS {
 	public static String GitSyncService_18;
 	public static String GitSyncService_19;
 	public static String GitSyncService_2;
+	public static String GitSyncService_20;
+	public static String GitSyncService_21;
+	public static String GitSyncService_22;
 	public static String GitSyncService_3;
 	public static String GitSyncService_4;
 	public static String GitSyncService_5;
