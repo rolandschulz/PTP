@@ -556,7 +556,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 			// Commit local changes
 			subMon.subTask(Messages.GitSyncService_12);
 			boolean hasChanges = localRepo.commit(subMon.newChild(5));
-			if ((!hasChanges) && (syncFlags == SyncFlag.LR_ONLY)) {
+			if ((!hasChanges) && (!syncFlags.contains(SyncFlag.SYNC_RL))) {
 				return;
 			}
 

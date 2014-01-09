@@ -386,15 +386,7 @@ public class SyncCommandLauncher implements ICommandLauncher {
 	private void syncOnPostBuild(IProgressMonitor monitor) throws CoreException {
 		SyncConfig config = SyncConfigManager.getActive(getProject());
 		if (shouldSyncAfterRun && SyncManager.getSyncAuto() && config.isSyncOnPostBuild()) {
-			switch (SyncManager.getSyncMode(getProject())) {
-			case ACTIVE:
-				SyncManager.syncBlocking(null, getProject(), SyncFlag.BOTH, monitor, null);
-				break;
-
-			case ALL:
-				SyncManager.syncAllBlocking(null, getProject(), SyncFlag.BOTH, null);
-				break;
-			}
+			SyncManager.syncBlocking(null, getProject(), SyncFlag.RL_ONLY, monitor, null);
 		}
 	}
 
@@ -403,11 +395,11 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		if (shouldSyncBeforeRun && config.isSyncOnPreBuild()) {
 			switch (SyncManager.getSyncMode(getProject())) {
 			case ACTIVE:
-				SyncManager.syncBlocking(null, getProject(), SyncFlag.BOTH, monitor, null);
+				SyncManager.syncBlocking(null, getProject(), SyncFlag.LR_ONLY, monitor, null);
 				break;
 
 			case ALL:
-				SyncManager.syncAllBlocking(null, getProject(), SyncFlag.BOTH, null);
+				SyncManager.syncAllBlocking(null, getProject(), SyncFlag.LR_ONLY, null);
 				break;
 			}
 		}
