@@ -167,19 +167,21 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 	}
 
 	private void buildJAXBParserUI() {
-		selectToolLbl = new Label(topComposite, SWT.NONE);
-		selectToolLbl.setText(Messages.PerformanceAnalysisTab_SelectTool);
+		if (PreferenceConstants.getWorkflow() == null) {
+			selectToolLbl = new Label(topComposite, SWT.NONE);
+			selectToolLbl.setText(Messages.PerformanceAnalysisTab_SelectTool);
 
-		toolCombo = new Combo(topComposite, SWT.READ_ONLY);
-		toolCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		String[] toolNames = JAXBExtensionUtils.getToolNames();
-		toolCombo.add(Messages.PerformanceAnalysisTab_PleaseSelectWorkflow);
+			toolCombo = new Combo(topComposite, SWT.READ_ONLY);
+			toolCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+			String[] toolNames = JAXBExtensionUtils.getToolNames();
+			toolCombo.add(Messages.PerformanceAnalysisTab_PleaseSelectWorkflow);
 
-		for (String name : toolNames) {
-			toolCombo.add(name);
+			for (String name : toolNames) {
+				toolCombo.add(name);
+			}
+
+			toolCombo.addSelectionListener(listener);
 		}
-
-		toolCombo.addSelectionListener(listener);
 
 		toolComposite.getParent().layout();
 		topComposite.layout();
@@ -379,7 +381,7 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 					String parser = PreferenceConstants.getVersion();
 					if (parser.equals(IToolLaunchConfigurationConstants.USE_SAX_PARSER)) {
 						saxETFWTab.initializeFrom(configuration);
-					} else {
+					} else if (toolCombo != null) {
 						String toolName = configuration.getAttribute(IToolLaunchConfigurationConstants.SELECTED_TOOL,
 								IToolLaunchConfigurationConstants.EMPTY_STRING);
 						for (int index = 0; index < toolCombo.getItemCount(); index++) {
@@ -395,6 +397,8 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 							toolCombo.select(0);
 							clearOldWidgets();
 						}
+					} else {
+						rebuildTab(PreferenceConstants.getWorkflow());
 					}
 				}
 
@@ -416,16 +420,17 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 			if (parser.equals(IToolLaunchConfigurationConstants.USE_SAX_PARSER)) {
 				saxETFWTab.performApply(configuration);
 			} else {
-				if (toolCombo.getSelectionIndex() > 0) {
-					String selectedtool = toolCombo.getItem(toolCombo.getSelectionIndex());
-					configuration.setAttribute(SELECTED_TOOL, selectedtool);
+				if (toolCombo == null) {
+					configuration.setAttribute(SELECTED_TOOL, PreferenceConstants.getWorkflow());
+				} else if (toolCombo.getSelectionIndex() > 0) {
+					configuration.setAttribute(SELECTED_TOOL, toolCombo.getItem(toolCombo.getSelectionIndex()));
+				}
 
-					configuration.setAttribute(BUILDONLY, buildOnlyCheck.getSelection());
-					configuration.setAttribute(ANALYZEONLY, analyzeonlyCheck.getSelection());
+				configuration.setAttribute(BUILDONLY, buildOnlyCheck.getSelection());
+				configuration.setAttribute(ANALYZEONLY, analyzeonlyCheck.getSelection());
 
-					if (launchTabParent != null) {
-						launchTabParent.performApply(configuration);
-					}
+				if (launchTabParent != null) {
+					launchTabParent.performApply(configuration);
 				}
 			}
 		}
@@ -437,15 +442,13 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 
 		@Override
 		public void widgetSelected(SelectionEvent e) {
-			if (getLaunchConfigurationDialog().getActiveTab().getName().equals(getName())) {
-				int selection = toolCombo.getSelectionIndex();
-				String toolName = toolCombo.getItem(selection);
+			int selection = toolCombo.getSelectionIndex();
+			String toolName = toolCombo.getItem(selection);
 
-				if (!toolName.equals(prevToolName) || !launchConfiguration.getName().equals(prevLaunchConfig)) {
-					prevToolName = toolName;
-					prevLaunchConfig = launchConfiguration.getName();
-					rebuildTab(toolName);
-				}
+			if (!toolName.equals(prevToolName) || !launchConfiguration.getName().equals(prevLaunchConfig)) {
+				prevToolName = toolName;
+				prevLaunchConfig = launchConfiguration.getName();
+				rebuildTab(toolName);
 			}
 
 			updateLaunchConfigurationDialog();

@@ -19,11 +19,34 @@ import org.eclipse.ptp.internal.etfw.Activator;
  */
 public class PreferenceConstants {
 	public static final String ETFW_VERSION = "ETFW_VERSION"; //$NON-NLS-1$
+	/**
+	 * @since 7.1
+	 */
+	public static final String ETFW_WORKFLOW = "ETFW_WORKFLOW"; //$NON-NLS-1$
 
 	/**
 	 * @return the etfw version stored in preferences
 	 */
 	public static String getVersion() {
 		return Preferences.getString(Activator.PLUGIN_ID, ETFW_VERSION);
+	}
+
+	/**
+	 * Get the default workflow, or null if no default workflow has been set
+	 * 
+	 * @return default workflow or null
+	 * @since 7.1
+	 */
+	public static String getWorkflow() {
+		return Preferences.getString(Activator.PLUGIN_ID, ETFW_WORKFLOW);
+	}
+
+	/**
+	 * Set the default workflow
+	 * 
+	 * @since 7.1
+	 */
+	public static void setWorkflow(String workflow) {
+		Preferences.setString(Activator.PLUGIN_ID, ETFW_WORKFLOW, workflow);
 	}
 }
