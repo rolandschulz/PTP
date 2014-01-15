@@ -119,6 +119,8 @@ public class ResourcesTab extends LaunchConfigurationTab {
 
 	private final ContentsChangedListener launchContentsChangedListener = new ContentsChangedListener();
 
+	private boolean fIsInitialized;
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -462,6 +464,10 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	}
 
 	/*
+	 * initialzeFrom gets called when a launch configuration is created or edited, as well as every time the Resources tab is
+	 * activated. We need to make sure that the tab dynamic controls are only created and initialized with default or saved values
+	 * once.
+	 * 
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.ptp.launch.ui.tabs.LaunchConfigurationTab#initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
@@ -469,45 +475,47 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	@Override
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		super.initializeFrom(configuration);
-
-		final String rmType = LaunchUtils.getTemplateName(configuration);
-		final String remId = LaunchUtils.getRemoteServicesId(configuration);
-		final String remName = LaunchUtils.getConnectionName(configuration);
-		if (rmType != null && remId != null && remName != null) {
-			fSystemTypeCombo.select(fProviders.lastIndexOf(rmType) + 1);
-			updateEnablement();
-			/*
-			 * Only stop the controller if something has changed.
-			 */
-			if (fLaunchControl != null
-					&& (!fLaunchControl.getConfiguration().getName().equals(rmType)
-							|| !fLaunchControl.getRemoteServicesId().equals(remId) || !fLaunchControl.getConnectionName().equals(
-							remName))) {
+		if (!fIsInitialized) {
+			final String rmType = LaunchUtils.getTemplateName(configuration);
+			final String remId = LaunchUtils.getRemoteServicesId(configuration);
+			final String remName = LaunchUtils.getConnectionName(configuration);
+			if (rmType != null && remId != null && remName != null) {
+				fSystemTypeCombo.select(fProviders.lastIndexOf(rmType) + 1);
+				updateEnablement();
+				/*
+				 * Only stop the controller if something has changed.
+				 */
+				if (fLaunchControl != null
+						&& (!fLaunchControl.getConfiguration().getName().equals(rmType)
+								|| !fLaunchControl.getRemoteServicesId().equals(remId) || !fLaunchControl.getConnectionName()
+								.equals(remName))) {
+					stopController(fLaunchControl);
+					fLaunchControl = null;
+				}
+				/*
+				 * Set the connection and see if the user wants to open it. If yes, create a new controller if one doesn't already
+				 * exist. If no, revert to no connection selected.
+				 */
+				fRemoteConnectionWidget.setConnection(remId, remName);
+				IRemoteConnection conn = fRemoteConnectionWidget.getConnection();
+				if (conn != null) {
+					ILaunchController control = getNewController(remId, remName, rmType);
+					if (changeConnection(conn, control)) {
+						fRemoteConnection = conn;
+						fLaunchControl = control;
+					} else {
+						fRemoteConnectionWidget.setConnection(null);
+					}
+				}
+				updateLaunchAttributeControls(fLaunchControl, getLaunchConfiguration(), true);
+				updateLaunchConfigurationDialog();
+			} else {
 				stopController(fLaunchControl);
 				fLaunchControl = null;
+				fRemoteConnection = null;
+				updateEnablement();
 			}
-			/*
-			 * Set the connection and see if the user wants to open it. If yes, create a new controller if one doesn't already
-			 * exist. If no, revert to no connection selected.
-			 */
-			fRemoteConnectionWidget.setConnection(remId, remName);
-			IRemoteConnection conn = fRemoteConnectionWidget.getConnection();
-			if (conn != null) {
-				ILaunchController control = getNewController(remId, remName, rmType);
-				if (changeConnection(conn, control)) {
-					fRemoteConnection = conn;
-					fLaunchControl = control;
-				} else {
-					fRemoteConnectionWidget.setConnection(null);
-				}
-			}
-			updateLaunchAttributeControls(fLaunchControl, getLaunchConfiguration(), true);
-			updateLaunchConfigurationDialog();
-		} else {
-			stopController(fLaunchControl);
-			fLaunchControl = null;
-			fRemoteConnection = null;
-			updateEnablement();
+			fIsInitialized = true;
 		}
 	}
 
