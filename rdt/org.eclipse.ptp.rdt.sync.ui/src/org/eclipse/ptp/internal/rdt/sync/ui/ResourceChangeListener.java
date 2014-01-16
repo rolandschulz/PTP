@@ -77,7 +77,7 @@ public class ResourceChangeListener {
 					if (syncConfig != null) {
 						try {
 							if (delta.getKind() == IResourceDelta.CHANGED && syncConfig.isSyncOnSave()) {
-								// Do a non-forced sync to update any changes reported in delta.
+								// Do a local-to-remote sync to update any changes reported in delta.
 								if ((syncMode == SyncMode.UNAVAILABLE) || (!syncOn)) {
 									continue;
 								} else if (syncMode == SyncMode.ALL) {

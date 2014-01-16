@@ -555,8 +555,8 @@ public class GitSyncService extends AbstractSynchronizeService {
 
 			// Commit local changes
 			subMon.subTask(Messages.GitSyncService_12);
-			boolean hasChanges = localRepo.commit(subMon.newChild(5));
-			if ((!hasChanges) && (!syncFlags.contains(SyncFlag.SYNC_RL))) {
+			boolean hasLocalChanges = localRepo.commit(subMon.newChild(5));
+			if ((!hasLocalChanges) && (!syncFlags.contains(SyncFlag.SYNC_RL))) {
 				return;
 			}
 
@@ -624,7 +624,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 			}
 
 			// Push local repository to remote
-			if (syncFlags.contains(SyncFlag.SYNC_LR)) {
+			if (hasLocalChanges && syncFlags.contains(SyncFlag.SYNC_LR)) {
 				if (localRepo.getGit().branchList().call().size() > 0) { // check whether master was already created
 					subMon.subTask(Messages.GitSyncService_18);
 					localRepo.push(remoteRepo.getRemoteLocation(), subMon.newChild(20));
