@@ -12,6 +12,8 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.sync.ui;
 
+import java.util.EnumSet;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -76,6 +78,7 @@ public class ResourceChangeListener {
 					 */
 					if (syncConfig != null) {
 						try {
+							EnumSet<SyncFlag> f = SyncFlag.RL_ONLY;
 							if (delta.getKind() == IResourceDelta.CHANGED && syncConfig.isSyncOnSave()) {
 								// Do a local-to-remote sync to update any changes reported in delta.
 								if ((syncMode == SyncMode.UNAVAILABLE) || (!syncOn)) {

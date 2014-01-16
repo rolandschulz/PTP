@@ -374,7 +374,7 @@ public class GitRepo {
 	 * Get the SHA-1 of the current head commit
      *
      * @param monitor
-	 * @return SHA-1 hash code
+	 * @return SHA-1 hash code or null if no HEAD commit (can happen between initialization and first commit)
      *
      * @throws RemoteSyncException
 	 * 			on problems executing the necessary remote commands.
@@ -393,7 +393,12 @@ public class GitRepo {
 		} catch (RemoteConnectionException e) {
 			throw new RemoteSyncException(e);
 		}
-		return headResults.getStdout();
+		// Assume failure occurs because there is no head.
+		if (headResults.getExitCode() > 0) {
+			return null;
+		} else {
+			return headResults.getStdout();
+		}
 	}
 
 	/**

@@ -211,6 +211,25 @@ public class GitSyncService extends AbstractSynchronizeService {
 	}
 
 	/**
+	 * Check if a JGitRepo instance has been created for the passed project.
+	 * Note that this only checks for an in-memory representation, not for an on-disk JGit repository. So, for example, false
+	 * will be returned when Eclipse is restarted even if a JGit repository was created previously.
+	 *
+	 * @param project - cannot be null
+	 *
+	 * @return whether an instance exists
+	 * @throws RemoteSyncException
+	 * 				on problems getting the project's directory
+	 */
+	static boolean isJGitRepoInitialized(IProject project) throws RemoteSyncException {
+		IPath localDir = project.getLocation();
+		if (localDir == null) {
+			throw new RemoteSyncException(Messages.GitSyncService_17 + project.getName());
+		}
+		return (localDirectoryToJGitRepoMap.get(localDir) != null);
+	}
+
+	/**
 	 * Get JGit repository instance for the given project, creating it if necessary.
 	 * @param project - cannot be null
 	 * @param monitor
@@ -547,6 +566,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
 		try {
 			subMon.subTask(Messages.GitSyncService_6);
+			boolean hasLocalChanges = isJGitRepoInitialized(project);
 			JGitRepo localRepo = getLocalJGitRepo(project, subMon.newChild(5));
 
 			if (localRepo.inUnresolvedMergeState()) {
@@ -555,7 +575,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 
 			// Commit local changes
 			subMon.subTask(Messages.GitSyncService_12);
-			boolean hasLocalChanges = localRepo.commit(subMon.newChild(5));
+			hasLocalChanges = localRepo.commit(subMon.newChild(5)) || hasLocalChanges;
 			if ((!hasLocalChanges) && (!syncFlags.contains(SyncFlag.SYNC_RL))) {
 				return;
 			}
@@ -589,7 +609,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 
 			// Sync remote-to-local if and only if there are unknown changes
 			try {
-				if (!localRepo.commitExists(remoteHead)) {
+				if ((remoteHead == null) || (!localRepo.commitExists(remoteHead))) {
 					// Fetch the remote repository
 					subMon.subTask(Messages.GitSyncService_14);
 					localRepo.fetch(remoteRepo.getRemoteLocation(), subMon.newChild(20));

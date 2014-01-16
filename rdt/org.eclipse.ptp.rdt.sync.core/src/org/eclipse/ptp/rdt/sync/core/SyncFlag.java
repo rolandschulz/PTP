@@ -40,11 +40,11 @@ public enum SyncFlag {
 	 * Convenience flag set for sync'ing only from local to remote.
 	 * @since 4.0
 	 */
-	public static final EnumSet<SyncFlag> LR_ONLY = EnumSet.of(SYNC_LR);
+	public static final EnumSet<SyncFlag> LR_ONLY = EnumSet.of(SyncFlag.SYNC_LR);
 
 	/**
 	 * Convenience flag set for sync'ing only from remote to local.
 	 * @since 4.0
 	 */
-	public static final EnumSet<SyncFlag> RL_ONLY = EnumSet.of(SYNC_LR);
+	public static final EnumSet<SyncFlag> RL_ONLY = EnumSet.of(SyncFlag.SYNC_RL);
 }
