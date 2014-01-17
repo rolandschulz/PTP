@@ -53,11 +53,11 @@ public class SyncManager {
 		private final SyncConfig fSyncConfig;
 		private final IResourceDelta fDelta;
 		private final ISynchronizeService fSyncService;
-		private final EnumSet<SyncFlag> fSyncFlags;
+		private final Set<SyncFlag> fSyncFlags;
 		private final ISyncExceptionHandler fSyncExceptionHandler;
 
 		public SynchronizeJob(IProject project, SyncConfig syncConfig, IResourceDelta delta, ISynchronizeService syncService,
-				EnumSet<SyncFlag> syncFlags, ISyncExceptionHandler seHandler) {
+				Set<SyncFlag> syncFlags, ISyncExceptionHandler seHandler) {
 			super(Messages.SyncManager_4);
 			fProject = project;
 			fSyncConfig = syncConfig;
@@ -343,7 +343,7 @@ public class SyncManager {
 	}
 
 	// Note that the monitor is ignored for non-blocking jobs since SynchronizeJob creates its own monitor
-	private static Job[] scheduleSyncJobs(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags, boolean syncAll,
+	private static Job[] scheduleSyncJobs(IResourceDelta delta, IProject project, Set<SyncFlag> syncFlags, boolean syncAll,
 			boolean isBlocking, boolean useExceptionHandler, ISyncExceptionHandler seHandler, IProgressMonitor monitor)
 			throws CoreException {
 		int jobNum = 0;
@@ -486,7 +486,7 @@ public class SyncManager {
 		SyncUtils.flushNode(node);
 	}
 
-	private static Job sync(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags, boolean isBlocking,
+	private static Job sync(IResourceDelta delta, IProject project, Set<SyncFlag> syncFlags, boolean isBlocking,
 			boolean useExceptionHandler, ISyncExceptionHandler seHandler, IProgressMonitor monitor) throws CoreException {
 		if (getSyncMode(project) == SyncMode.UNAVAILABLE) {
 			return null;
@@ -509,8 +509,9 @@ public class SyncManager {
 	 *            logic to handle exceptions
 	 * @return the scheduled sync job
 	 * @throws CoreException
+	 * @since 4.0
 	 */
-	public static Job sync(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags, ISyncExceptionHandler seHandler)
+	public static Job sync(IResourceDelta delta, IProject project, Set<SyncFlag> syncFlags, ISyncExceptionHandler seHandler)
 			throws CoreException {
 		return sync(delta, project, syncFlags, false, true, seHandler, null);
 	}
@@ -529,8 +530,9 @@ public class SyncManager {
 	 * @return array of sync jobs scheduled
 	 * @throws CoreException
 	 *             on problems sync'ing
+	 * @since 4.0
 	 */
-	public static Job[] syncAll(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags, ISyncExceptionHandler seHandler)
+	public static Job[] syncAll(IResourceDelta delta, IProject project, Set<SyncFlag> syncFlags, ISyncExceptionHandler seHandler)
 			throws CoreException {
 		if (getSyncMode(project) == SyncMode.UNAVAILABLE) {
 			return new Job[0];
@@ -554,8 +556,9 @@ public class SyncManager {
 	 * @return array of sync jobs scheduled
 	 * @throws CoreException
 	 *             on problems sync'ing
+	 * @since 4.0
 	 */
-	public static Job[] syncAllBlocking(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags,
+	public static Job[] syncAllBlocking(IResourceDelta delta, IProject project, Set<SyncFlag> syncFlags,
 			ISyncExceptionHandler seHandler) throws CoreException {
 		if (getSyncMode(project) == SyncMode.UNAVAILABLE) {
 			return new Job[0];
@@ -579,8 +582,9 @@ public class SyncManager {
 	 * @return the scheduled sync job
 	 * @throws CoreException
 	 *             on problems sync'ing
+	 * @since 4.0
 	 */
-	public static Job syncBlocking(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags, IProgressMonitor monitor)
+	public static Job syncBlocking(IResourceDelta delta, IProject project, Set<SyncFlag> syncFlags, IProgressMonitor monitor)
 			throws CoreException {
 		return sync(delta, project, syncFlags, true, false, null, monitor);
 	}
@@ -602,8 +606,9 @@ public class SyncManager {
 	 * @return the scheduled sync job
 	 * @throws CoreException
 	 *             on problems sync'ing
+	 * @since 4.0
 	 */
-	public static Job syncBlocking(IResourceDelta delta, IProject project, EnumSet<SyncFlag> syncFlags, IProgressMonitor monitor,
+	public static Job syncBlocking(IResourceDelta delta, IProject project, Set<SyncFlag> syncFlags, IProgressMonitor monitor,
 			ISyncExceptionHandler seHandler) throws CoreException {
 		return sync(delta, project, syncFlags, true, true, seHandler, monitor);
 	}

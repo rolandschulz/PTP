@@ -10,7 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core;
 
+import java.util.Collections;
 import java.util.EnumSet;
+import java.util.Set;
 
 /**
  * Flags to control the behavior of synchronization.
@@ -34,17 +36,17 @@ public enum SyncFlag {
 	 * Convenience flag set for sync'ing both directions (from local to remote and from remote to local).
 	 * @since 4.0
 	 */
-	public static final EnumSet<SyncFlag> BOTH = EnumSet.allOf(SyncFlag.class);
+	public static final Set<SyncFlag> BOTH = Collections.unmodifiableSet(EnumSet.allOf(SyncFlag.class));
 
 	/**
 	 * Convenience flag set for sync'ing only from local to remote.
 	 * @since 4.0
 	 */
-	public static final EnumSet<SyncFlag> LR_ONLY = EnumSet.of(SyncFlag.SYNC_LR);
+	public static final Set<SyncFlag> LR_ONLY = Collections.unmodifiableSet(EnumSet.of(SyncFlag.SYNC_LR));
 
 	/**
 	 * Convenience flag set for sync'ing only from remote to local.
 	 * @since 4.0
 	 */
-	public static final EnumSet<SyncFlag> RL_ONLY = EnumSet.of(SyncFlag.SYNC_RL);
+	public static final Set<SyncFlag> RL_ONLY = Collections.unmodifiableSet(EnumSet.of(SyncFlag.SYNC_RL));
 }

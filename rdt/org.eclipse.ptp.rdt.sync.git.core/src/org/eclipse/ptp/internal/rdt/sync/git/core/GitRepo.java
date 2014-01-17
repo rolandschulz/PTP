@@ -397,7 +397,7 @@ public class GitRepo {
 		if (headResults.getExitCode() > 0) {
 			return null;
 		} else {
-			return headResults.getStdout();
+			return headResults.getStdout().trim();
 		}
 	}
 

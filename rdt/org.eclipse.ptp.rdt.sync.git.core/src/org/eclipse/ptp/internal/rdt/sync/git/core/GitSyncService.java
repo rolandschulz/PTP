@@ -11,7 +11,6 @@
 package org.eclipse.ptp.internal.rdt.sync.git.core;
 
 import java.io.IOException;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -429,7 +428,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 	 */
 	@Override
 	public void synchronize(final IProject project, RemoteLocation rl, IResourceDelta delta, IProgressMonitor monitor,
-			EnumSet<SyncFlag> syncFlags) throws CoreException {
+			Set<SyncFlag> syncFlags) throws CoreException {
 		if (project == null || rl == null) {
 			throw new NullPointerException();
 		}
@@ -453,7 +452,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 			ProjectAndRemoteLocationPair syncTarget = new ProjectAndRemoteLocationPair(project, remoteLoc);
 		    Boolean syncLR = syncFlags.contains(SyncFlag.SYNC_LR);
 		    Boolean syncRL = syncFlags.contains(SyncFlag.SYNC_RL);
-			EnumSet<SyncFlag> modifiedSyncFlags = syncFlags;
+			Set<SyncFlag> modifiedSyncFlags = new HashSet<SyncFlag>(syncFlags);
 
 			// Do not sync LR (local-to-remote) if another thread is already waiting to do it.
 		    if (syncLR) {
@@ -561,7 +560,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 	 *             for various problems sync'ing. All exceptions are wrapped in a RemoteSyncException and thrown, so that clients
 	 *             can always detect when a sync fails and why.
 	 */
-	private void doSync(IProject project, RemoteLocation remoteLoc, EnumSet<SyncFlag> syncFlags, IProgressMonitor monitor)
+	private void doSync(IProject project, RemoteLocation remoteLoc, Set<SyncFlag> syncFlags, IProgressMonitor monitor)
 			throws RemoteSyncException {
 		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
 		try {
