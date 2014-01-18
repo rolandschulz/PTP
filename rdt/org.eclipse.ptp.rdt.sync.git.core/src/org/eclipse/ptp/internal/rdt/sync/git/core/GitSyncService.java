@@ -68,6 +68,8 @@ public class GitSyncService extends AbstractSynchronizeService {
 
 	// Entry indicates that the remote location has a clean (up-to-date) file filter for the project
 	private static final Set<LocalAndRemoteLocationPair> cleanFileFilterMap = new HashSet<LocalAndRemoteLocationPair>();
+	// Entry indicates that the remote location contains the most recently committed local changes
+	private static final Set<LocalAndRemoteLocationPair> localChangesPushed = new HashSet<LocalAndRemoteLocationPair>();
 
 	// Boilerplate class for IPath and RemoteLocation Pair
 	private class LocalAndRemoteLocationPair {
@@ -565,17 +567,20 @@ public class GitSyncService extends AbstractSynchronizeService {
 		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
 		try {
 			subMon.subTask(Messages.GitSyncService_6);
-			boolean hasLocalChanges = isJGitRepoInitialized(project);
 			JGitRepo localRepo = getLocalJGitRepo(project, subMon.newChild(5));
 
 			if (localRepo.inUnresolvedMergeState()) {
 				throw new RemoteSyncMergeConflictException(Messages.GitSyncService_8);
 			}
 
+			LocalAndRemoteLocationPair lrpair = new LocalAndRemoteLocationPair(localRepo.getDirectory(), remoteLoc);
+
 			// Commit local changes
 			subMon.subTask(Messages.GitSyncService_12);
-			hasLocalChanges = localRepo.commit(subMon.newChild(5)) || hasLocalChanges;
-			if ((!hasLocalChanges) && (!syncFlags.contains(SyncFlag.SYNC_RL))) {
+			if (localRepo.commit(subMon.newChild(5))) {
+				localChangesPushed.remove(lrpair);
+			}
+			if ((localChangesPushed.contains(lrpair)) && (!syncFlags.contains(SyncFlag.SYNC_RL))) {
 				return;
 			}
 
@@ -589,13 +594,12 @@ public class GitSyncService extends AbstractSynchronizeService {
 			}
 
 			// Update remote file filter
-			LocalAndRemoteLocationPair lp = new LocalAndRemoteLocationPair(localRepo.getDirectory(), remoteRepo.getRemoteLocation());
 			int commitWork = 15;
-			if (!cleanFileFilterMap.contains(lp)) {
+			if (!cleanFileFilterMap.contains(lrpair)) {
 				commitWork -= 10;
 				subMon.subTask(Messages.GitSyncService_11);
 				remoteRepo.uploadFilter(localRepo, subMon.newChild(10));
-				cleanFileFilterMap.add(lp);
+				cleanFileFilterMap.add(lrpair);
 			}
 
 			// Commit remote changes
@@ -607,6 +611,9 @@ public class GitSyncService extends AbstractSynchronizeService {
 			String remoteHead = remoteRepo.getHead(subMon.newChild(5));
 
 			// Sync remote-to-local if and only if there are unknown changes
+			// At this point, we need to sync LR or sync RL or both. So it seems we should be checking the sync flags.
+			// For sync LR, though, unknown remote changes must be downloaded first anyway. For sync RL, there is no need to do
+			// the sync if remote changes are known.
 			try {
 				if ((remoteHead == null) || (!localRepo.commitExists(remoteHead))) {
 					// Fetch the remote repository
@@ -643,11 +650,12 @@ public class GitSyncService extends AbstractSynchronizeService {
 			}
 
 			// Push local repository to remote
-			if (hasLocalChanges && syncFlags.contains(SyncFlag.SYNC_LR)) {
+			if ((!localChangesPushed.contains(lrpair)) && (syncFlags.contains(SyncFlag.SYNC_LR))) {
 				if (localRepo.getGit().branchList().call().size() > 0) { // check whether master was already created
 					subMon.subTask(Messages.GitSyncService_18);
 					localRepo.push(remoteRepo.getRemoteLocation(), subMon.newChild(20));
 					remoteRepo.merge(subMon.newChild(10));
+					localChangesPushed.add(lrpair);
 				}
 			}
 		} catch (final IOException e) {
