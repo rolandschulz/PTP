@@ -212,25 +212,6 @@ public class GitSyncService extends AbstractSynchronizeService {
 	}
 
 	/**
-	 * Check if a JGitRepo instance has been created for the passed project.
-	 * Note that this only checks for an in-memory representation, not for an on-disk JGit repository. So, for example, false
-	 * will be returned when Eclipse is restarted even if a JGit repository was created previously.
-	 *
-	 * @param project - cannot be null
-	 *
-	 * @return whether an instance exists
-	 * @throws RemoteSyncException
-	 * 				on problems getting the project's directory
-	 */
-	static boolean isJGitRepoInitialized(IProject project) throws RemoteSyncException {
-		IPath localDir = project.getLocation();
-		if (localDir == null) {
-			throw new RemoteSyncException(Messages.GitSyncService_17 + project.getName());
-		}
-		return (localDirectoryToJGitRepoMap.get(localDir) != null);
-	}
-
-	/**
 	 * Get JGit repository instance for the given project, creating it if necessary.
 	 * @param project - cannot be null
 	 * @param monitor
