@@ -33,6 +33,10 @@ import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
 import org.eclipse.cdt.core.settings.model.ICLanguageSettingEntry;
 import org.eclipse.cdt.core.settings.model.ICSettingEntry;
 import org.eclipse.cdt.internal.core.BuildRunnerHelper;
+import org.eclipse.cdt.managedbuilder.core.IConfiguration;
+import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
+import org.eclipse.cdt.managedbuilder.core.IToolChain;
+import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuilderCorePlugin;
 import org.eclipse.cdt.managedbuilder.internal.core.ManagedMakeMessages;
 import org.eclipse.cdt.managedbuilder.language.settings.providers.GCCBuiltinSpecsDetector;
@@ -40,7 +44,10 @@ import org.eclipse.cdt.utils.CommandLineUtil;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -70,6 +77,8 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 	private static final String SCANNER_DISCOVERY_GLOBAL_CONSOLE = "org.eclipse.cdt.managedbuilder.ScannerDiscoveryGlobalConsole"; //$NON-NLS-1$
 	private static final String DEFAULT_CONSOLE_ICON = "icons/obj16/inspect_sys.gif"; //$NON-NLS-1$
 	private static final String GMAKE_ERROR_PARSER_ID = "org.eclipse.cdt.core.GmakeErrorParser"; //$NON-NLS-1$
+	private static final String PLUGIN_ID = "org.eclipse.ptp.internal.rdt.sync.cdt.core"; //$NON-NLS-1$
+	private static final String TOOLCHAIN_EXTENSION_POINT_ID = "ToolchainPath"; //$NON-NLS-1$
 
 	private static final int MONITOR_SCALE = 100;
 	private static final int TICKS_OUTPUT_PARSING = 1 * MONITOR_SCALE;
@@ -154,6 +163,11 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 			IPath program = new Path(""); //$NON-NLS-1$
 			String[] args = new String[0];
 			String[] cmdArray = CommandLineUtil.argumentsToArray(command);
+
+			String toolchainPath = getToolchainPath(currentProject);
+			if (toolchainPath != null) {
+				cmdArray[0] = toolchainPath + cmdArray[0];
+			}
 			if (cmdArray != null && cmdArray.length > 0) {
 				program = new Path(cmdArray[0]);
 				if (cmdArray.length > 1) {
@@ -339,5 +353,22 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 		}
 
 		return console;
+	}
+
+	private String getToolchainPath(IProject project) {
+		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(PLUGIN_ID, TOOLCHAIN_EXTENSION_POINT_ID);
+		IConfigurationElement[] infos = extensionPoint.getConfigurationElements();
+		for (IConfigurationElement configurationElement : infos) {
+			if (configurationElement.getName().equals("mapping")) { //$NON-NLS-1$
+				IToolChain toolChain = ManagedBuildManager.getBuildInfo(project).getDefaultConfiguration().getToolChain();
+				if (toolChain != null) {
+					String toolchainName = toolChain.getUniqueRealName();
+					if (configurationElement.getAttribute("toolchain").equals(toolchainName)) { //$NON-NLS-1$
+						return configurationElement.getAttribute("path"); //$NON-NLS-1$
+					}
+				}
+			}
+		}
+		return null;
 	}
 }

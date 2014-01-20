@@ -1,0 +1,117 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.eclipse.ptp.rdt.sync.cdt.core" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appInfo>
+         <meta.schema plugin="org.eclipse.ptp.rdt.sync.cdt.core" id="ToolchainPath" name="Toolchain Path"/>
+      </appInfo>
+      <documentation>
+         Makes possible to associate a path with a toolchain. For synchronized projects, the toolchain may be in a different directory on the remote server.
+         It is possible to create multiple mappings. Only if a toolchain name matches the toolchain field of the extension point, a specific path is going to be added.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="mapping"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="mapping">
+      <complexType>
+         <attribute name="toolchain" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Toolchain name associated with the project.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="path" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Path to be included in the call for a given toolchain.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+
+   <annotation>
+      <appInfo>
+         <meta.section type="since"/>
+      </appInfo>
+      <documentation>
+         7.0.4
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="examples"/>
+      </appInfo>
+      <documentation>
+         If an user creates a "Hello World Toolchain", it can add an extension point using the "Hello World Toolchain" in the toolchain field and a given path in the "path" field (for instance, /opt/helloWorldToolchain).
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="apiinfo"/>
+      </appInfo>
+      <documentation>
+         [Enter API information here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="implementation"/>
+      </appInfo>
+      <documentation>
+/*******************************************************************************
+ * Copyright (c) 2014 IBM Corporation
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Rodrigo Fraxino Araujo &lt;rfaraujo@br.ibm.com&gt; - initial API and implementation
+ *******************************************************************************/
+      </documentation>
+   </annotation>
+
+
+</schema>
