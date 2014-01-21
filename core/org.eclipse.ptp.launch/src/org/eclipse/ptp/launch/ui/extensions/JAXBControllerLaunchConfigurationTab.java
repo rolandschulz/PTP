@@ -27,6 +27,7 @@ import org.eclipse.ptp.launch.internal.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateHandler;
 import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModelEnabled;
+import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.LaunchTabType;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.eclipse.ptp.rm.jaxb.core.data.ScriptType;
@@ -268,4 +269,9 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	public void widgetSelected(SelectionEvent e) {
 		setVisibleOnSelected();
 	}
+	
+	public IVariableMap getRMVariableMap() {
+		return null;
+	}
+	
 }

@@ -10,7 +10,6 @@
 package org.eclipse.ptp.internal.etfw.launch;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -35,13 +34,12 @@ import org.eclipse.ptp.internal.etfw.jaxb.data.ToolPaneType;
 import org.eclipse.ptp.internal.etfw.jaxb.util.JAXBExtensionUtils;
 import org.eclipse.ptp.internal.etfw.launch.messages.Messages;
 import org.eclipse.ptp.internal.etfw.ui.ExternalToolSelectionTab;
-import org.eclipse.ptp.internal.rm.jaxb.control.ui.launch.IJAXBLaunchConfigurationTab;
+import org.eclipse.ptp.internal.rm.jaxb.control.core.variables.RMVariableMap;
+import org.eclipse.ptp.internal.rm.jaxb.core.JAXBCoreConstants;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationContentsChangedListener;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
-import org.eclipse.ptp.launch.ui.extensions.JAXBDynamicLaunchConfigurationTab;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.core.LaunchControllerManager;
-import org.eclipse.ptp.rm.jaxb.control.ui.IUpdateModel;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
 import org.eclipse.ptp.rm.jaxb.core.data.CommandType;
@@ -50,9 +48,10 @@ import org.eclipse.remote.core.IRemoteConnectionManager;
 import org.eclipse.remote.core.IRemoteServices;
 import org.eclipse.remote.core.RemoteServices;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -88,6 +87,7 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 	private final WidgetListener listener = new WidgetListener();
 	private List<ToolPaneType> toolTabs;
 
+	private ScrolledComposite scroller;
 	private Composite topComposite;
 	private Composite toolComposite;
 	private Composite bottomComposite;
@@ -96,8 +96,6 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 	private Button buildOnlyCheck;
 	private Button analyzeonlyCheck;
 
-	// This should be part of the launchTabParent, but there is RM specifics that must be removed
-	private final LinkedList<IJAXBLaunchConfigurationTab> tabControllers = new LinkedList<IJAXBLaunchConfigurationTab>();
 	private final ContentsChangedListener launchContentsChangedListener = new ContentsChangedListener();
 
 	// Sax Parser ETFW
@@ -130,7 +128,7 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 		topComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
 		toolComposite = new Composite(content, SWT.NONE);
-		toolComposite.setLayout(new FillLayout());
+		toolComposite.setLayout(new GridLayout());
 		toolComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		bottomComposite = new Composite(content, SWT.NONE);
@@ -236,7 +234,7 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 		etfwTool = JAXBExtensionUtils.getTool(toolName);
 
 		if (controller != null) {
-			vmap = controller.getEnvironment();
+			vmap = new RMVariableMap();
 
 			JAXBInitializationUtil.initializeMap(etfwTool, vmap);
 
@@ -250,19 +248,6 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 				}
 			}
 
-			try {
-				launchTabParent = new ETFWParentLaunchConfigurationTab(controller, getLaunchConfigurationDialog(),
-						new NullProgressMonitor(), vmap);
-			} catch (Throwable e1) {
-				e1.printStackTrace();
-			}
-			launchTabParent.addContentsChangedListener(launchContentsChangedListener);
-
-			for (IJAXBLaunchConfigurationTab tabControl : tabControllers) {
-				tabControl.getLocalWidgets().clear();
-			}
-
-			tabControllers.clear();
 			for (Control control : toolComposite.getChildren()) {
 				control.dispose();
 			}
@@ -281,19 +266,40 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 
 			toolTabs = findTabControllers();
 
-			for (ToolPaneType toolTab : toolTabs) {
-				tabControllers.add(new JAXBDynamicLaunchConfigurationTab(controller, toolTab.getOptionPane(), launchTabParent));
-			}
-
-			launchTabParent.addDynamicContent(tabControllers);
-
 			try {
-				launchTabParent.createControl(toolComposite, controller.getControlId());
+				launchTabParent = new ETFWParentLaunchConfigurationTab(controller, getLaunchConfigurationDialog(),
+						new NullProgressMonitor(), toolTabs, vmap);
+			} catch (Throwable e1) {
+				e1.printStackTrace();
+			}
+			launchTabParent.addContentsChangedListener(launchContentsChangedListener);
+
+			Composite comp = new Composite(toolComposite, SWT.NONE);
+
+			GridLayout layout = new GridLayout(1, true);
+			comp.setLayout(layout);
+			GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+			comp.setLayoutData(gd);
+
+			scroller = new ScrolledComposite(toolComposite, SWT.V_SCROLL | SWT.H_SCROLL | SWT.BORDER);
+			GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
+			scroller.setLayoutData(gridData);
+			scroller.setExpandHorizontal(true);
+			scroller.setExpandVertical(true);
+			scroller.setContent(null);
+			for (Control child : scroller.getChildren()) {
+				child.dispose();
+			}
+			try {
+				launchTabParent.createControl(scroller, controller.getControlId());
+				final Control dynControl = launchTabParent.getControl();
+				scroller.setContent(dynControl);
+				Point size = dynControl.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+				scroller.setMinSize(size);
+				launchTabParent.initializeFrom(this.launchConfiguration);
 			} catch (CoreException e) {
 				e.printStackTrace();
 			}
-
-			handleUpdate();
 		} else {
 			Composite comp = new Composite(toolComposite, SWT.NONE);
 			GridLayout layout = new GridLayout();
@@ -302,18 +308,6 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 			message.setText(Messages.PerformanceAnalysisTab_Please_select_a_target_configuration_first);
 			message.setBackground(toolComposite.getBackground());
 			message.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
-		}
-	}
-
-	private void handleUpdate() {
-		launchTabParent.initializeFrom(this.launchConfiguration);
-
-		for (IJAXBLaunchConfigurationTab tabControl : tabControllers) {
-			for (IUpdateModel m : tabControl.getLocalWidgets().values()) {
-				m.initialize(this.launchConfiguration, vmap, launchTabParent.getVariableMap());
-			}
-
-			((JAXBDynamicLaunchConfigurationTab) tabControl).initializeFrom(this.launchConfiguration);
 		}
 	}
 
@@ -424,14 +418,24 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 					configuration.setAttribute(SELECTED_TOOL, PreferenceConstants.getWorkflow());
 				} else if (toolCombo.getSelectionIndex() > 0) {
 					configuration.setAttribute(SELECTED_TOOL, toolCombo.getItem(toolCombo.getSelectionIndex()));
+					if (launchTabParent != null) {
+						try {
+							String controlid = launchTabParent.getJobControl().getControlId();
+							String attributeName = controlid + IToolLaunchConfigurationConstants.DOT
+									+ JAXBCoreConstants.CURRENT_CONTROLLER;
+							String oldController = configuration.getAttribute(attributeName, JAXBCoreConstants.ZEROSTR);
+							launchTabParent.performApply(configuration);
+
+							// performApply sets controller to the tab of the ETFw workflow, reset back to resources tab
+							configuration.setAttribute(attributeName, oldController);
+						} catch (CoreException e) {
+							e.printStackTrace();
+						}
+					}
 				}
 
 				configuration.setAttribute(BUILDONLY, buildOnlyCheck.getSelection());
 				configuration.setAttribute(ANALYZEONLY, analyzeonlyCheck.getSelection());
-
-				if (launchTabParent != null) {
-					launchTabParent.performApply(configuration);
-				}
 			}
 		}
 	}

@@ -119,8 +119,10 @@ public class JAXBInitializationUtil {
 
 	public static void initializeMap(EtfwToolProcessType etfwTool, IVariableMap instance) {
 		ControlDataType control = etfwTool.getControlData();
+		instance.clear();
 		Map<String, AttributeType> env = instance.getAttributes();
 		addAttributes(env, control);
+		instance.setInitialized(true);
 	}
 
 	public static void addAttributes(Map<String, AttributeType> env, ControlDataType control) {

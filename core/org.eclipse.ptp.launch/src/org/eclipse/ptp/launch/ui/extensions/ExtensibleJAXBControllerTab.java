@@ -149,8 +149,6 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 		String lastTab = null;
 		String key = null;
 		try {
-			key = controlId + JAXBUIConstants.DOT + JAXBUIConstants.INITIALIZED;
-			initialized = configuration.getAttribute(key, false);
 			key = controlId + JAXBUIConstants.DOT + JAXBUIConstants.CURRENT_CONTROLLER;
 			lastTab = configuration.getAttribute(key, JAXBUIConstants.ZEROSTR);
 		} catch (CoreException t1) {
@@ -178,21 +176,19 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 			}
 		}
 
-		if (!initialized) {
-			for (AbstractJAXBLaunchConfigurationTab tabControl : tabControllers) {
-				try {
-					tabControl.refreshLocal(configuration.getWorkingCopy());
-				} catch (CoreException t) {
-					return new RMLaunchValidation(false, t.getLocalizedMessage());
-				}
-			}
+		for (AbstractJAXBLaunchConfigurationTab tabControl : tabControllers) {
 			try {
-				ILaunchConfigurationWorkingCopy wc = configuration.getWorkingCopy();
-				wc.setAttribute(controlId + JAXBUIConstants.DOT + JAXBUIConstants.INITIALIZED, true);
-				wc.doSave();
+				tabControl.refreshLocal(configuration.getWorkingCopy());
 			} catch (CoreException t) {
-				JAXBUIPlugin.log(t);
+				return new RMLaunchValidation(false, t.getLocalizedMessage());
 			}
+		}
+		try {
+			ILaunchConfigurationWorkingCopy wc = configuration.getWorkingCopy();
+			wc.setAttribute(controlId + JAXBUIConstants.DOT + JAXBUIConstants.INITIALIZED, true);
+			wc.doSave();
+		} catch (CoreException t) {
+			JAXBUIPlugin.log(t);
 		}
 		return resultValidation;
 	}

@@ -87,19 +87,13 @@ public class ToolPaneTypeUtil {
 					
 					String value = ""; //$NON-NLS-1$
 					if (key.endsWith("MAP")) {
-						value = configuration.getAttribute(key, JAXBCoreConstants.ZEROSTR);
-						if(value.length()>0&&value.startsWith("{")){
-							value=value.substring(1);
-						}
-						if(value.length()>0&&value.endsWith("}")){
-							value=value.substring(0,value.length()-1);
-						}
-						String[] valuePairs = value.split(JAXBCoreConstants.CM);
-						for(String valuePair : valuePairs) {
-							if(valuePair.contains(JAXBCoreConstants.EQ)){
-								String[] pair = valuePair.split(JAXBCoreConstants.EQ);
-								envMap.put(pair[0].trim(), pair[1].trim());
-							}
+						Map map = configuration.getAttribute(key, new HashMap<String, String>());
+						Iterator mapIterator = map.keySet().iterator();
+						while(mapIterator.hasNext()) {
+							Object envKey = mapIterator.next();
+							Object envValue = map.get(envKey);
+							envMap.put(envKey.toString().trim(), envValue.toString().trim());
+							
 						}
 					}
 					else{

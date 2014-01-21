@@ -24,6 +24,7 @@ import org.eclipse.swt.widgets.Listener;
 public class MakefileComboUpdateModel extends AbstractUpdateModel implements SelectionListener {
 
 	private final TAUMakefileCombo makefileCombo;
+	private boolean updating = false;
 
 	public MakefileComboUpdateModel(String name, IUpdateHandler handler, Control control) {
 		super(name, handler);
@@ -32,13 +33,18 @@ public class MakefileComboUpdateModel extends AbstractUpdateModel implements Sel
 
 			@Override
 			public void handleEvent(Event event) {
-				try {
-					Object value = storeValue();
-					handleUpdate(value);
-					if(value!=null&&value instanceof String){
-						makefileCombo.setSelectedMakefile((String)value);
+				if (!updating) {
+					updating = true;
+					try {
+						Object value = storeValue();
+						handleUpdate(value);
+						if (value != null && value instanceof String) {
+							makefileCombo.setSelectedMakefile((String) value);
+						}
+					} catch (Exception ignored) {
+						ignored.printStackTrace();
 					}
-				} catch (Exception ignored) {
+					updating = false;
 				}
 			}
 		});
@@ -64,15 +70,15 @@ public class MakefileComboUpdateModel extends AbstractUpdateModel implements Sel
 		try {
 			Object value = storeValue();
 			handleUpdate(value);
-			if(value!=null&&value instanceof String){
-				makefileCombo.setSelectedMakefile((String)value);
+			if (value != null && value instanceof String) {
+				makefileCombo.setSelectedMakefile((String) value);
 			}
 		} catch (Exception ignored) {
 			ignored.printStackTrace();
 		}
 
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -82,14 +88,14 @@ public class MakefileComboUpdateModel extends AbstractUpdateModel implements Sel
 	 */
 	@Override
 	public void initialize(ILaunchConfiguration configuration, IVariableMap rmMap, IVariableMap lcMap) {
-		
-		String val = (String)lcMap.getValue(name);
-		if(val!=null&&val.length()>0&&val.contains("Makefile.tau")){
+
+		String val = (String) lcMap.getValue(name);
+		if (val != null && val.length() > 0 && val.contains("Makefile.tau")) {
 			makefileCombo.setSelectedMakefile(val);
 		}
-		
+
 		makefileCombo.setConfiguration(configuration);
-		
+
 		super.initialize(configuration, rmMap, lcMap);
 	}
 

@@ -11,7 +11,6 @@
 package org.eclipse.ptp.internal.etfw.jaxb.util;
 
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;

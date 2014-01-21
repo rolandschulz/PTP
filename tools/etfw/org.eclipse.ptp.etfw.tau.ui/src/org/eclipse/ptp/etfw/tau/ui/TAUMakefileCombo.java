@@ -104,9 +104,6 @@ public class TAUMakefileCombo extends AbstractWidget {
 				@Override
 				public void run() {
 					updateMakefileCombo();
-					if (combo != null && !combo.isDisposed()) {
-						combo.getParent().layout();
-					}
 					refreshing = false;
 				}
 			});
@@ -145,7 +142,6 @@ public class TAUMakefileCombo extends AbstractWidget {
 		});
 
 		if (allmakefiles == null) {
-
 			job.setUser(true);
 			job.schedule();
 		}
@@ -153,23 +149,19 @@ public class TAUMakefileCombo extends AbstractWidget {
 
 	@Override
 	public void setEnabled(boolean enabled) {
-		if (allmakefiles == null && enabled && !refreshing) {
+		if (!refreshing) {
 			refreshing = true;
 			Display.getDefault().asyncExec(new Runnable() {
 				@Override
 				public void run() {
 					initMakefiles();
-					String[] items = allmakefiles.toArray(new String[0]);
-					combo.setItems(items);
-					getParent().layout(true);
+					//String[] items = allmakefiles.toArray(new String[0]);
+					//combo.setItems(items);
+					//getParent().layout(true);
+					updateMakefileCombo();
 					refreshing = false;
 				}
 			});
-
-		}
-
-		if (!refreshing) {
-			updateMakefileCombo();
 		}
 	}
 
@@ -316,16 +308,23 @@ public class TAUMakefileCombo extends AbstractWidget {
 	}
 
 	public String getSelection() {
-		String selection = this.combo.getItem(combo.getSelectionIndex());
-		String makefilePath = taulib.toURI().getPath() + JAXBCoreConstants.REMOTE_PATH_SEP + selection;
+		String selection = JAXBCoreConstants.ZEROSTR;
+
+		String makefilePath = JAXBCoreConstants.ZEROSTR;
+		if (taulib != null && combo.getSelectionIndex() != -1) {
+			selection = this.combo.getItem(combo.getSelectionIndex());
+			makefilePath = taulib.toURI().getPath() + JAXBCoreConstants.REMOTE_PATH_SEP + selection;
+		}
 		return makefilePath;
 	}
 
 	public void setConfiguration(ILaunchConfiguration configuration) {
 		if (blt != null && blt.getConfig() == null) {
 			blt.setConfig(configuration);
-			job.setUser(true);
-			job.schedule();
+			if (!refreshing) {
+				job.setUser(true);
+				job.schedule();
+			}
 		}
 	}
 

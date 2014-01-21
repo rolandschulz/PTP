@@ -9,7 +9,6 @@
  *******************************************************************************/
 package org.eclipse.ptp.etfw.tau.ui.model;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.etfw.tau.ui.PerformanceDatabaseCombo;
 import org.eclipse.ptp.internal.rm.jaxb.core.JAXBCoreConstants;

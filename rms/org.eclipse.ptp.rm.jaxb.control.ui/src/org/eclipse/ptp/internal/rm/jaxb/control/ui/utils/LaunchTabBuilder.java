@@ -158,7 +158,11 @@ public class LaunchTabBuilder {
 	 */
 	public LaunchTabBuilder(IJAXBLaunchConfigurationTab tab) {
 		this.tab = tab;
-		this.rmVarMap = tab.getParent().getJobControl().getEnvironment();
+		if(tab.getParent().getRMVariableMap() != null) {
+			this.rmVarMap = tab.getParent().getRMVariableMap();
+		} else {
+			this.rmVarMap = tab.getParent().getJobControl().getEnvironment();
+		}
 	}
 
 	/**
@@ -222,7 +226,7 @@ public class LaunchTabBuilder {
 	 * @return top-level composite control
 	 * @throws Throwable
 	 */
-	public Composite build(Composite parent) throws CoreException {
+	public Composite build(Composite parent, boolean checkCycles) throws CoreException {
 		tab.getLocalWidgets().clear();
 		TabControllerType top = tab.getController();
 		Layout layout = createLayout(top.getLayout());
@@ -242,7 +246,7 @@ public class LaunchTabBuilder {
 			composite.setFont(WidgetBuilderUtils.getFont(fd));
 		}
 
-		maybeWireWidgets();
+		maybeWireWidgets(checkCycles);
 		return composite;
 	}
 
@@ -662,7 +666,7 @@ public class LaunchTabBuilder {
 	/**
 	 * Constructs a listener for each defined category of action on the target and adds it to the sources referenced in the rule.
 	 */
-	private void maybeWireWidgets() throws CoreException {
+	private void maybeWireWidgets(boolean checkCycles) throws CoreException {
 		Collection<ControlStateListener> listeners = new HashSet<ControlStateListener>();
 		for (ControlStateType cst : targets.keySet()) {
 			Control target = targets.get(cst);
@@ -694,7 +698,9 @@ public class LaunchTabBuilder {
 		Set<Button> dependSet = new HashSet<Button>();
 		for (ControlStateListener listener : listeners) {
 			dependSet.clear();
-			listener.findCyclicalDependencies(dependSet);
+			if(checkCycles) {
+				listener.findCyclicalDependencies(dependSet);
+			}
 		}
 
 		tab.setListeners(listeners);

@@ -97,6 +97,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 	protected TabControllerType controller;
 	protected String[] shared;
 	protected final Collection<IUpdateModel> sharedModels;
+	protected boolean checkCycles = true;
 
 	/**
 	 * @param control
@@ -163,7 +164,7 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 			if (listeners != null) {
 				listeners.clear();
 			}
-			control = builder.build(parent);
+			control = builder.build(parent, checkCycles);
 		} catch (CoreException e) {
 			throw CoreExceptionUtils.newException(NLS.bind(Messages.CreateControlConfigurableError, title), e);
 		}
@@ -261,7 +262,13 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 			}
 
 			LCVariableMap lcMap = parentTab.getVariableMap();
-			IVariableMap rmMap = fControl.getEnvironment();
+			IVariableMap rmMap = null;
+			if (parentTab.getRMVariableMap() != null) {
+				rmMap = parentTab.getRMVariableMap();
+			} else {
+				rmMap = fControl.getEnvironment();
+			}
+			fControl.getEnvironment();
 
 			for (IUpdateModel m : localWidgets.values()) {
 				m.initialize(configuration, rmMap, lcMap);
@@ -761,5 +768,19 @@ public class JAXBDynamicLaunchConfigurationTab extends AbstractJAXBLaunchConfigu
 			list.append(var).append(JAXBUIConstants.SP);
 		}
 		lcMap.putValue(JAXBUIConstants.VALID + id, list.toString().trim());
+	}
+
+	public boolean isCheckCycles() {
+		return checkCycles;
+	}
+
+	/**
+	 * Check for cyclical dependencies among JAXB widgets
+	 * 
+	 * @param checkCycles
+	 *            specifies whether to check for cyclical dependencies
+	 */
+	public void setCheckCycles(boolean checkCycles) {
+		this.checkCycles = checkCycles;
 	}
 }
