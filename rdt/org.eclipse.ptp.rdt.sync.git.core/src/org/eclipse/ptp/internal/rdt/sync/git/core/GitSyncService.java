@@ -11,7 +11,6 @@
 package org.eclipse.ptp.internal.rdt.sync.git.core;
 
 import java.io.IOException;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -62,11 +61,15 @@ public class GitSyncService extends AbstractSynchronizeService {
 
 	// Variables for managing sync threads
 	private static final ReentrantLock syncLock = new ReentrantLock();
-	private static final ConcurrentMap<ProjectAndRemoteLocationPair, AtomicLong> syncThreadsWaiting =
+	private static final ConcurrentMap<ProjectAndRemoteLocationPair, AtomicLong> syncLRPending =
+			new ConcurrentHashMap<ProjectAndRemoteLocationPair, AtomicLong>();
+	private static final ConcurrentMap<ProjectAndRemoteLocationPair, AtomicLong> syncRLPending =
 			new ConcurrentHashMap<ProjectAndRemoteLocationPair, AtomicLong>();
 
 	// Entry indicates that the remote location has a clean (up-to-date) file filter for the project
 	private static final Set<LocalAndRemoteLocationPair> cleanFileFilterMap = new HashSet<LocalAndRemoteLocationPair>();
+	// Entry indicates that the remote location contains the most recently committed local changes
+	private static final Set<LocalAndRemoteLocationPair> localChangesPushed = new HashSet<LocalAndRemoteLocationPair>();
 
 	// Boilerplate class for IPath and RemoteLocation Pair
 	private class LocalAndRemoteLocationPair {
@@ -408,7 +411,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 	 */
 	@Override
 	public void synchronize(final IProject project, RemoteLocation rl, IResourceDelta delta, IProgressMonitor monitor,
-			EnumSet<SyncFlag> syncFlags) throws CoreException {
+			Set<SyncFlag> syncFlags) throws CoreException {
 		if (project == null || rl == null) {
 			throw new NullPointerException();
 		}
@@ -417,7 +420,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 
 		try {
 			/*
-			 * A synchronize with SyncFlag.FORCE guarantees that both directories are in sync.
+			 * A synchronize with SyncFlag.BOTH guarantees that both directories are in sync.
 			 * 
 			 * More precise: it guarantees that all changes written to disk at the moment of the call are guaranteed to be
 			 * synchronized between both directories. No guarantees are given for changes occurring during the synchronize call.
@@ -428,24 +431,41 @@ public class GitSyncService extends AbstractSynchronizeService {
 			 * Example: Why sync if current delta is empty? The RemoteMakeBuilder forces a sync before and after building. In some
 			 * cases, we want to ensure repos are synchronized regardless of the passed delta, which can be set to null.
 			 */
-			// TODO: We are not using the individual "sync to local" and "sync to remote" flags yet.
-			if (syncFlags.contains(SyncFlag.DISABLE_SYNC)) {
-				return;
+			
+			ProjectAndRemoteLocationPair syncTarget = new ProjectAndRemoteLocationPair(project, remoteLoc);
+		    Boolean syncLR = syncFlags.contains(SyncFlag.SYNC_LR);
+		    Boolean syncRL = syncFlags.contains(SyncFlag.SYNC_RL);
+			Set<SyncFlag> modifiedSyncFlags = new HashSet<SyncFlag>(syncFlags);
+
+			// Do not sync LR (local-to-remote) if another thread is already waiting to do it.
+			if (syncLR) {
+				AtomicLong threadCount = syncLRPending.putIfAbsent(syncTarget, new AtomicLong(1));
+				if (threadCount != null) {
+					if (threadCount.get() > 0) {
+						syncLR = false;
+						modifiedSyncFlags.remove(SyncFlag.SYNC_LR);
+					} else {
+						threadCount.incrementAndGet();
+					}
+				}
 			}
 
-			ProjectAndRemoteLocationPair syncTarget = new ProjectAndRemoteLocationPair(project, remoteLoc);
-		    AtomicLong threadCount = syncThreadsWaiting.get(syncTarget);
-		    if (threadCount != null && threadCount.get() > 0 && syncFlags == SyncFlag.NO_FORCE) {
-		    	return; // the queued thread will do the work for us. And we don't have to wait because of NO_FORCE
-		    }
+			// Do not sync RL (remote-to-local) if another thread is already waiting to do it.
+			if (syncRL) {
+				AtomicLong threadCount = syncRLPending.putIfAbsent(syncTarget, new AtomicLong(1));
+				if (threadCount != null) {
+					if (threadCount.get() > 0) {
+						syncRL = false;
+						modifiedSyncFlags.remove(SyncFlag.SYNC_RL);
+					} else {
+						threadCount.incrementAndGet();
+					}
+				}
+			}
 
-		    // Increment the value, initializing it if necessary. See:
-		    // http://stackoverflow.com/questions/2539654/java-concurrency-many-writers-one-reader/2539761#2539761
-		    if (threadCount == null){ 
-		    	threadCount = syncThreadsWaiting.putIfAbsent(syncTarget, new AtomicLong(1)); 
-		    } 
-		    if(threadCount != null){
-		    	threadCount.incrementAndGet();      
+		    // Return if we have nothing to do.
+		    if (!(syncLR || syncRL)) {
+		    	return;
 		    }
 
 			// lock syncLock. interruptible by progress monitor
@@ -458,14 +478,21 @@ public class GitSyncService extends AbstractSynchronizeService {
 			} catch (InterruptedException e1) {
 				throw new CoreException(new Status(IStatus.CANCEL, Activator.PLUGIN_ID, Messages.GitSyncService_5));
 			} finally {
-				threadCount = syncThreadsWaiting.get(syncTarget);
-				assert(threadCount != null) : Messages.GitSyncService_19;
-				threadCount.decrementAndGet();
+				if (syncLR) {
+					AtomicLong LRPending = syncLRPending.get(syncTarget);
+					assert(LRPending != null) : Messages.GitSyncService_20;
+					LRPending.decrementAndGet();
+				}
+				if (syncRL) {
+					AtomicLong RLPending = syncRLPending.get(syncTarget);
+					assert(RLPending != null) : Messages.GitSyncService_21;
+					RLPending.decrementAndGet();
+				}
 			}
 
 			try {
 				subMon.subTask(Messages.GitSyncService_9);
-				doSync(project, remoteLoc, syncFlags, subMon.newChild(95));
+				doSync(project, remoteLoc, modifiedSyncFlags, subMon.newChild(95));
 			} catch (RemoteSyncMergeConflictException e) {
 				subMon.subTask(Messages.GitSyncService_10);
 				// Refresh after merge conflict since conflicted files are altered with markup.
@@ -490,12 +517,12 @@ public class GitSyncService extends AbstractSynchronizeService {
 	}
 
 	/**
-	 * Synchronize the given project to the given remote. Currently both directions are always synchronized.
+	 * Synchronize the given project to the given remote.
 	 * The sync strategy follows these three high-level steps:
 	 * 1) Commit local and remote changes. These are independent operations.
-	 * 2) Fetch remote changes and merge them locally. Thus, all merge conflicts should occur locally and thus easily managed.
-	 * 3) Push local changes to remote and merge them remotely. This final merge should never fail assuming files are
-	 *    unchanged during the sync.
+	 * 2) Fetch remote changes and merge them locally. Thus, all merge conflicts should occur locally and can be easily managed.
+	 * 3) Push local changes to remote and merge them remotely. This final merge should never fail assuming files are unchanged
+	 *    during the sync.
 	 *
 	 * @param project
 	 * 				the local project
@@ -508,7 +535,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 	 *             for various problems sync'ing. All exceptions are wrapped in a RemoteSyncException and thrown, so that clients
 	 *             can always detect when a sync fails and why.
 	 */
-	private void doSync(IProject project, RemoteLocation remoteLoc, EnumSet<SyncFlag> syncFlags, IProgressMonitor monitor)
+	private void doSync(IProject project, RemoteLocation remoteLoc, Set<SyncFlag> syncFlags, IProgressMonitor monitor)
 			throws RemoteSyncException {
 		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
 		try {
@@ -519,60 +546,83 @@ public class GitSyncService extends AbstractSynchronizeService {
 				throw new RemoteSyncMergeConflictException(Messages.GitSyncService_8);
 			}
 
+			LocalAndRemoteLocationPair lrpair = new LocalAndRemoteLocationPair(localRepo.getDirectory(), remoteLoc);
+
 			// Commit local changes
 			subMon.subTask(Messages.GitSyncService_12);
-			boolean hasChanges = localRepo.commit(subMon.newChild(5));
-			if ((!hasChanges) && (syncFlags == SyncFlag.NO_FORCE)) {
+			if (localRepo.commit(subMon.newChild(5))) {
+				// New changes - mark all local/remote pairs with current local as needing to be updated.
+				Iterator<LocalAndRemoteLocationPair> it = localChangesPushed.iterator();
+				while (it.hasNext()) {
+					LocalAndRemoteLocationPair lrp = it.next();
+					if (lrp.getLocal().equals(localRepo.getDirectory())) {
+						it.remove();
+					}
+				}
+			}
+
+			// Return early if local changes have already been pushed and remote-to-local sync was not requested.
+			if ((localChangesPushed.contains(lrpair)) && (!syncFlags.contains(SyncFlag.SYNC_RL))) {
 				return;
 			}
 
 			// Get remote repository. creating it if necessary
 			subMon.subTask(Messages.GitSyncService_7);
 			GitRepo remoteRepo = getGitRepo(remoteLoc, subMon.newChild(15));
+			
 			// Unresolved connection - abort
 			if (remoteRepo == null) {
 				return;
 			}
 
 			// Update remote file filter
-			LocalAndRemoteLocationPair lp = new LocalAndRemoteLocationPair(localRepo.getDirectory(), remoteRepo.getRemoteLocation());
-			int commitWork = 20;
-			if (!cleanFileFilterMap.contains(lp)) {
+			int commitWork = 15;
+			if (!cleanFileFilterMap.contains(lrpair)) {
 				commitWork -= 10;
 				subMon.subTask(Messages.GitSyncService_11);
 				remoteRepo.uploadFilter(localRepo, subMon.newChild(10));
-				cleanFileFilterMap.add(lp);
+				cleanFileFilterMap.add(lrpair);
 			}
 
+			// Commit remote changes
 			subMon.subTask(Messages.GitSyncService_13);
 			remoteRepo.commitRemoteFiles(subMon.newChild(commitWork));
 
-			try {
-				// Fetch the remote repository
-				subMon.subTask(Messages.GitSyncService_14);
-				localRepo.fetch(remoteRepo.getRemoteLocation(), subMon.newChild(20));
+			// Get hash code of the head of the remote repository
+			subMon.subTask(Messages.GitSyncService_22);
+			String remoteHead = remoteRepo.getHead(subMon.newChild(5));
 
-				// Merge it with local
-				subMon.subTask(Messages.GitSyncService_15);
-				org.eclipse.jgit.api.MergeResult mergeResult = localRepo.merge(subMon.newChild(5));
-				if (mergeResult.getFailingPaths() != null) {
-					String message = Messages.GitSyncService_16;
-					for (String s : mergeResult.getFailingPaths().keySet()) {
-						message += System.getProperty("line.separator") + s; //$NON-NLS-1$
+			// Sync remote-to-local if and only if the remote head commit is null or not in the local repository.
+			// Note that the sync flag settings are irrelevant here. If only an LR sync is requested, we still need to update the
+			// local with remote changes, and if RL sync is requested, it is still unnecessary if there are no remote changes.
+			try {
+				if ((remoteHead == null) || (!localRepo.commitExists(remoteHead))) {
+					// Fetch the remote repository
+					subMon.subTask(Messages.GitSyncService_14);
+					localRepo.fetch(remoteRepo.getRemoteLocation(), subMon.newChild(20));
+
+					// Merge it with local
+					subMon.subTask(Messages.GitSyncService_15);
+					org.eclipse.jgit.api.MergeResult mergeResult = localRepo.merge(subMon.newChild(5));
+					if (mergeResult.getFailingPaths() != null) {
+						String message = Messages.GitSyncService_16;
+						for (String s : mergeResult.getFailingPaths().keySet()) {
+							message += System.getProperty("line.separator") + s; //$NON-NLS-1$
+						}
+						throw new RemoteSyncException(message);
 					}
-					throw new RemoteSyncException(message);
-				}
-				if (localRepo.inUnresolvedMergeState()) {
-					throw new RemoteSyncMergeConflictException(Messages.GitSyncService_8);
-					// Even if we later decide not to throw an exception, it is important not to proceed after a merge conflict.
-					// return;
+					if (localRepo.inUnresolvedMergeState()) {
+						throw new RemoteSyncMergeConflictException(Messages.GitSyncService_8);
+						// Even if we later decide not to throw an exception, it is important not to proceed after a merge conflict.
+						// return;
+					}
 				}
 			} catch (TransportException e) {
 				if (e.getMessage().startsWith("Remote does not have ")) { //$NON-NLS-1$
 					// Means that the remote branch isn't set up yet (and thus nothing to fetch). Can be ignored and local to
 					// remote sync can proceed.
-					// Note: It is important, though, that we do not merge if fetch fails. Merge will fail because remote ref is
-					// not created.
+					// Note: It is important, though, that we do not merge if fetch fails. Merge will fail because remote ref
+					// is not created.
 				} else {
 					throw new RemoteSyncException(e);
 				}
@@ -581,10 +631,13 @@ public class GitSyncService extends AbstractSynchronizeService {
 			}
 
 			// Push local repository to remote
-			if (localRepo.getGit().branchList().call().size() > 0) { // check whether master was already created
-				subMon.subTask(Messages.GitSyncService_18);
-				localRepo.push(remoteRepo.getRemoteLocation(), subMon.newChild(20));
-				remoteRepo.merge(subMon.newChild(10));
+			if ((!localChangesPushed.contains(lrpair)) && (syncFlags.contains(SyncFlag.SYNC_LR))) {
+				if (localRepo.getGit().branchList().call().size() > 0) { // check whether master was already created
+					subMon.subTask(Messages.GitSyncService_18);
+					localRepo.push(remoteRepo.getRemoteLocation(), subMon.newChild(20));
+					remoteRepo.merge(subMon.newChild(10));
+					localChangesPushed.add(lrpair);
+				}
 			}
 		} catch (final IOException e) {
 			throw new RemoteSyncException(e);

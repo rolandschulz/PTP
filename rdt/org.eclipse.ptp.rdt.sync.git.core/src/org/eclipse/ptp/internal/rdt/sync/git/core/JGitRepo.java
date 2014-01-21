@@ -33,7 +33,9 @@ import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.StatusCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.AmbiguousObjectException;
+import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.errors.NotSupportedException;
+import org.eclipse.jgit.errors.RevisionSyntaxException;
 import org.eclipse.jgit.errors.TransportException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
@@ -290,6 +292,23 @@ public class JGitRepo {
 				monitor.done();
 			}
 		}
+	}
+
+	/**
+	 * Check if the given commit exists.
+	 *
+	 * @return whether the commit exists
+	 * @throws IOException
+	 * 					on problems accessing the file system
+	 * @throws IncorrectObjectTypeException 
+	 * @throws AmbiguousObjectException 
+	 * @throws RevisionSyntaxException
+	 * 					exceptions that most likely indicate JGit had problems handling the passed id
+	 */
+	boolean commitExists(String commitId) throws RevisionSyntaxException, AmbiguousObjectException, IncorrectObjectTypeException,
+	IOException {
+		ObjectId commitObjectId = this.getRepository().resolve(commitId);
+		return this.getRepository().hasObject(commitObjectId);
 	}
 
 	/**

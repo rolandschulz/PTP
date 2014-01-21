@@ -1347,7 +1347,7 @@ public class GemUtilities {
 		final IProgressMonitor monitor = new NullProgressMonitor();
 		final IProject project = getCurrentProject(gemActiveResource);
 		try {
-			SyncManager.syncBlocking(null, project, SyncFlag.FORCE, monitor);
+			SyncManager.syncBlocking(null, project, SyncFlag.BOTH, monitor);
 		} catch (final CoreException e) {
 			logExceptionDetail(e);
 		}

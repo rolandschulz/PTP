@@ -17,6 +17,7 @@ import org.eclipse.cdt.core.language.settings.providers.ILanguageSettingsEditabl
 import org.eclipse.cdt.core.settings.model.CIncludePathEntry;
 import org.eclipse.cdt.core.settings.model.ICLanguageSettingEntry;
 import org.eclipse.cdt.core.settings.model.ICSettingEntry;
+import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.language.settings.providers.GCCBuildCommandParser;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
