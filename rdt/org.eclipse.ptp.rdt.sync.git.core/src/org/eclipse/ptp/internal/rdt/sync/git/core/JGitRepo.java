@@ -307,7 +307,8 @@ public class JGitRepo {
 	 */
 	boolean commitExists(String commitId) throws RevisionSyntaxException, AmbiguousObjectException, IncorrectObjectTypeException,
 	IOException {
-		return (this.getRepository().resolve(commitId) != null);
+		ObjectId commitObjectId = this.getRepository().resolve(commitId);
+		return this.getRepository().hasObject(commitObjectId);
 	}
 
 	/**
