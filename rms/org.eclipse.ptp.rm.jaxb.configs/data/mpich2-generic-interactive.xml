@@ -67,14 +67,17 @@
 				</target>
 			</stderr-parser>
 		</submit-interactive>
-		<!-- submit-interactive-debug name="submit-interactive-debug" directory="${ptp_rm:executableDirectory#value}" waitForId="true" keepOpen="true">
-			<arg>perl ${ptp_rm:ptpDirectory#value}/rms/MPICH2/start_job.pl</arg>
+		<submit-interactive-debug name="submit-interactive-debug" directory="${ptp_rm:executableDirectory#value}" waitForId="true" keepOpen="true">
+			<arg>perl ${ptp_rm:ptpDirectory#value}/rms/MPICH2/start_debug_job.pl</arg>
 			<arg attribute="useDefaultPath" isUndefinedIfMatches="true">${ptp_rm:bindir#value}/mpiexec</arg>
 			<arg attribute="useDefaultPath" isUndefinedIfMatches="false">mpiexec</arg>
 			<arg>-np ${ptp_rm:mpiNumberOfProcesses#value}</arg>
 			<arg>${ptp_rm:debuggerExecutablePath#value}</arg>
 			<arg>${ptp_rm:debuggerArgs#value}</arg>
+			<environment name="PTP_JOBID" value="@jobId"/>
 			<environment name="PTP_LAUNCH_MODE" value="${ptp_rm:launchMode#value}" />
+			<environment name="PTP_DEBUG_EXEC_PATH" value="${ptp_rm:debuggerExecutablePath#value}"/>
+			<environment name="PTP_DEBUG_EXEC_ARGS" value="${ptp_rm:debuggerArgs#value}"/>
 			<stdout-parser delim="\n">
 				<target ref="@jobId">
 					<match>
@@ -98,7 +101,7 @@
 			</stderr-parser>
 			<pre-launch-cmd name="Cleanup" exec="rm -f routing_file" wait="true"/>
 			<post-launch-cmd name="SDM Master" exec="${ptp_rm:debuggerExecutablePath#value} -master ${ptp_rm:debuggerArgs#value}" wait="false"/>
-		</submit-interactive-debug-->		
+		</submit-interactive-debug>		
 		<launch-tab>
 			<dynamic includeWidgetValuesFrom="Advanced Options">
 				<title>Basic Options</title>
