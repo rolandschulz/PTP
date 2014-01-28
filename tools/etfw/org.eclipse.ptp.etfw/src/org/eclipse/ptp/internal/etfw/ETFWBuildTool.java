@@ -280,7 +280,7 @@ public class ETFWBuildTool extends ETFWToolStep implements IToolLaunchConfigurat
 		// TODO: We have to do this because PTP puts its output in the build
 		// directory
 
-		if (!isSyncProject && configuration.getAttribute(EXTOOL_EXECUTABLE_PATH_TAG, (String) null) != null) {
+		if (configuration.getAttribute(EXTOOL_EXECUTABLE_PATH_TAG, (String) null) != null) {
 			outputLocation = thisProject.getFile(newname).getLocationURI().getPath();// .toOSString();
 		}
 

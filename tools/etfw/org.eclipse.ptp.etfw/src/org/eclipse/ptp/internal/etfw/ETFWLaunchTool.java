@@ -170,16 +170,16 @@ public class ETFWLaunchTool extends ETFWToolStep implements IToolLaunchConfigura
 				testStore = utilBlob.getFile(progPath);
 			}
 
-			IFileStore progStore = utilBlob.getFile(projectLocation);
 			boolean progStoreGood = false;
-			if (progStore.fetchInfo().exists() && progPath != null) {
-				progStore = progStore.getChild(progPath);
-				if (progStore.fetchInfo().exists()) {
-					progStoreGood = true;
+			IFileStore progStore = null;
+			if (projectLocation != null) {
+				progStore = utilBlob.getFile(projectLocation);
+				if (progStore.fetchInfo().exists() && progPath != null) {
+					progStore = progStore.getChild(progPath);
+					if (progStore.fetchInfo().exists()) {
+						progStoreGood = true;
+					}
 				}
-			}
-			else {
-				progStore = null;
 			}
 
 			if ((testStore != null && testStore.fetchInfo().exists() && !testStore.fetchInfo().isDirectory()) || progStoreGood) {
@@ -203,19 +203,10 @@ public class ETFWLaunchTool extends ETFWToolStep implements IToolLaunchConfigura
 				if (testStore.fetchInfo().exists() && !testStore.fetchInfo().isDirectory()) {
 					confWC.setAttribute(apppathattrib, testStore.toURI().getPath());
 					confWC.setAttribute(appnameattrib, testStore.getName());
-				}
-				else {
+				} else { // progStoreGood
 					confWC.setAttribute(appnameattrib, progPath);
 					if (apppathattrib != null) {
-						// String path=null;
-						if (isSyncProject)
-						{
-							path = progStore.toURI().getPath();// outputLocation;
-						}
-						else
-						{
-							path = thisProject.getFile(progPath).getLocationURI().getPath();
-						}
+						path = progStore.toURI().getPath();// outputLocation;
 						// savePath = confWC.getAttribute(apppathattrib, (String) null);
 						confWC.setAttribute(apppathattrib, path);
 					}

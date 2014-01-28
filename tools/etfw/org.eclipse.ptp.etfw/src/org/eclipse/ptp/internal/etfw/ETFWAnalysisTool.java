@@ -240,7 +240,11 @@ public class ETFWAnalysisTool extends ETFWToolStep implements IToolLaunchConfigu
 
 							manager.setExternalTarget(true);
 						} else {
-							projName = thisProject.getName();
+							if (thisProject != null) {
+								projName = thisProject.getName();
+							} else {
+								projName = EMPTY_STRING;
+							}
 						}
 
 						// TODO: This is sort of ok, but we should probably change the API to accept both the output dir and the
