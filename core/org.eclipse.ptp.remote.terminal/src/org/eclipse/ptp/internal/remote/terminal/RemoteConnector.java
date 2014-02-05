@@ -10,10 +10,12 @@ package org.eclipse.ptp.internal.remote.terminal;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.tm.internal.terminal.provisional.api.ISettingsPage;
 import org.eclipse.tm.internal.terminal.provisional.api.ISettingsStore;
 import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
-import org.eclipse.tm.internal.terminal.provisional.api.Logger;
 import org.eclipse.tm.internal.terminal.provisional.api.provider.TerminalConnectorImpl;
 
 public class RemoteConnector extends TerminalConnectorImpl {
@@ -38,13 +40,22 @@ public class RemoteConnector extends TerminalConnectorImpl {
 		fConnection = new RemoteConnection(this, control);
 		fConnection.start();
 	}
+	
+	public IProject getProject() {
+		String projectName = fSettings.getProjectName();
+		if (projectName != null && !"".equals(projectName.trim())) {
+			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+			return root.getProject(projectName);
+		}
+		return null;
+	}
 
-	synchronized public void doDisconnect() {
+	public synchronized void doDisconnect() {
 		if (getInputStream() != null) {
 			try {
 				getInputStream().close();
 			} catch (Exception exception) {
-				Logger.logException(exception);
+				Activator.log(exception);
 			}
 		}
 
@@ -52,7 +63,7 @@ public class RemoteConnector extends TerminalConnectorImpl {
 			try {
 				getTerminalToRemoteStream().close();
 			} catch (Exception exception) {
-				Logger.logException(exception);
+				Activator.log(exception);
 			}
 		}
 	}
@@ -74,11 +85,11 @@ public class RemoteConnector extends TerminalConnectorImpl {
 		return fOutputStream;
 	}
 
-	void setInputStream(InputStream inputStream) {
+	public void setInputStream(InputStream inputStream) {
 		fInputStream = inputStream;
 	}
 
-	void setOutputStream(OutputStream outputStream) {
+	public void setOutputStream(OutputStream outputStream) {
 		fOutputStream = outputStream;
 	}
 
@@ -100,10 +111,12 @@ public class RemoteConnector extends TerminalConnectorImpl {
 		return fSettings.getSummary();
 	}
 
+	@SuppressWarnings("restriction")
 	public void load(ISettingsStore store) {
 		fSettings.load(store);
 	}
 
+	@SuppressWarnings("restriction")
 	public void save(ISettingsStore store) {
 		fSettings.save(store);
 	}

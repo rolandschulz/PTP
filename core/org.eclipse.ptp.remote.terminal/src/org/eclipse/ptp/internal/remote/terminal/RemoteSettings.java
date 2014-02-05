@@ -10,8 +10,16 @@ package org.eclipse.ptp.internal.remote.terminal;
 import org.eclipse.tm.internal.terminal.provisional.api.ISettingsStore;
 
 public class RemoteSettings implements IRemoteSettings {
+	public static final String CONNECTION_NAME = "ConnectionName"; //$NON-NLS-1$
+	public static final String REMOTE_SERVICES = "RemoteServices"; //$NON-NLS-1$
+	public static final String PROJECT_NAME = "Project"; //$NON-NLS-1$
+
 	protected String fRemoteServices;
 	protected String fConnectionName;
+	protected String fProjectName;
+
+	public RemoteSettings() {
+	}
 
 	public String getConnectionName() {
 		return fConnectionName;
@@ -21,18 +29,37 @@ public class RemoteSettings implements IRemoteSettings {
 		return fRemoteServices;
 	}
 
+	public String getProjectName() {
+		return fProjectName;
+	}
+
 	public String getSummary() {
-		return getRemoteServices() + '_' + getConnectionName();
+		return "Remote:" + getRemoteServices() + '_' + getConnectionName(); //$NON-NLS-1$
 	}
 
+	@Override
+	public String toString() {
+		return getSummary();
+	}
+
+	/**
+	 * Load information into the RemoteSettings object.
+	 */
+	@SuppressWarnings("restriction")
 	public void load(ISettingsStore store) {
-		fRemoteServices = store.get("RemoteServices");//$NON-NLS-1$
-		fConnectionName = store.get("ConnectionName");//$NON-NLS-1$
+		fRemoteServices = store.get(REMOTE_SERVICES);
+		fConnectionName = store.get(CONNECTION_NAME);
+		fProjectName = store.get(PROJECT_NAME);
 	}
 
+	/**
+	 * Extract information from the RemoteSettings object.
+	 */
+	@SuppressWarnings("restriction")
 	public void save(ISettingsStore store) {
-		store.put("RemoteServices", fRemoteServices);//$NON-NLS-1$
-		store.put("ConnectionName", fConnectionName);//$NON-NLS-1$
+		store.put(REMOTE_SERVICES, fRemoteServices);
+		store.put(CONNECTION_NAME, fConnectionName);
+		store.put(PROJECT_NAME, fProjectName);
 	}
 
 	public void setConnectionName(String name) {
@@ -41,5 +68,9 @@ public class RemoteSettings implements IRemoteSettings {
 
 	public void setRemoteServices(String remoteServices) {
 		fRemoteServices = remoteServices;
+	}
+
+	public void setProjectName(String projectName) {
+		fProjectName = projectName;
 	}
 }

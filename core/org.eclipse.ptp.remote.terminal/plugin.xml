@@ -48,5 +48,63 @@
          </view>
       </perspectiveExtension>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.eclipse.remote.ui.RemoteDevelopmentPreferencePage"
+            class="org.eclipse.ptp.internal.remote.terminal.TerminalPrefs"
+            id="org.eclipse.ptp.remote.terminal.page1"
+            name="%RemoteShellPreferences.name">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?after=additions">
+         <command
+               commandId="org.eclipse.ptp.terminal.utils.action"
+               label="Show Terminal"
+               style="push">
+            <visibleWhen>
+                     <iterate>
+                        <adapt type="org.eclipse.core.resources.IResource">
+                           <or>
+                              <test property="org.eclipse.core.resources.projectNature"
+                                 value="org.eclipse.ptp.rdt.sync.core.remoteSyncNature"/>
+                              <test property="org.eclipse.core.resources.projectNature"
+                                 value="org.eclipse.ptp.rdt.core.remoteNature"/>
+                              <test property="org.eclipse.core.resources.path"
+                                 value="remotetools:*"/>
+                           </or>
+                        </adapt>
+                     </iterate>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="org.eclipse.ptp.internal.remote.terminal.TerminalCommandHandler"
+            id="org.eclipse.ptp.terminal.utils.action"
+            name="Terminal">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            id="org.eclipse.ptp.terminal.utils.action"
+            name="Terminal">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            class="org.eclipse.ptp.internal.remote.terminal.TerminalInfoView"
+            id="org.eclipse.ptp.remote.terminal.view"
+            name="%TerminalHistoryView.name"
+            restorable="false">
+      </view>
+   </extension>
 
 </plugin>
