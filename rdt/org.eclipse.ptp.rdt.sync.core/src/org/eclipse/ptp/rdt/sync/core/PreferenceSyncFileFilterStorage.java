@@ -92,7 +92,9 @@ public class PreferenceSyncFileFilterStorage extends AbstractSyncFileFilter {
 	 * Load the default filters
 	 */
 	public void loadBuiltInDefaultFilter() {
-		for (String pattern : java.util.Arrays.asList(new String[] { "/.project", "/.cproject", "/.settings/" })) { //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		for (String pattern : java.util.Arrays.asList(new String[] {
+                "/.project", "/.cproject", "/.settings/", "coredir.[0-9]*/", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+                "core", "!core/", "core.[0-9]*", "!core.[0-9]*/" })) {  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			addPattern(pattern, true);
 		}
 	}
