@@ -17,15 +17,18 @@
 	<img alt="MonitorType" src="images/24monitor.jpeg" />
 
 	<p>
-		This component can be furnished with its own set of attributes
-		(currently unused). What is necessary to set at present is only the <i>schedulerType</i>
-		attribute (e.g., "PBS"). <i>refreshFrequencyInSeconds</i> defaults to
-		60, but this can be changed according to the needs of the user. Be
-		aware that too low a setting will probably not work, as the command on
-		an average sized system will take upwards of five seconds to complete
-		(XML is being streamed to the driver and a
-		<code>diff</code>
-		is sent back to the client ).
+	   This component can be furnished with its own set of properties
+	   (currently unused). What is necessary to set at present is only the <i>schedulerType</i>
+	   attribute. It specifies the target system's job scheduler. Currently supported batch systems are 
+	   COBALT_BG, GRIDENGINE, LL, LL_BG, LSF, OPENMPI, PBS, PE, SLURM, SLURM_ALPS, TORQUE and TORQUE_ALPS.
+	   These names can be used as attribute values for <i>schedulerType</i>.
+	   <i>refreshFrequencyInSeconds</i> defaults to
+	   60, but this can be changed according to the needs of the user. Be
+	   aware that too low a setting will probably not work, as the command on
+	   an average sized system will take upwards of five seconds to complete
+	   (XML is being streamed to the driver and a
+	   <code>diff</code>
+	   is sent back to the client ).
 	</p>
 
 	<p>
