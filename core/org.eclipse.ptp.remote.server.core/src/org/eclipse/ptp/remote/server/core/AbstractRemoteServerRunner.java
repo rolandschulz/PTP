@@ -596,6 +596,8 @@ public abstract class AbstractRemoteServerRunner extends Job {
 
 	/**
 	 * Check if the payload exists on the remote machine, and if not, or if it has changed then upload a copy.
+	 * This function is synchronized in order to avoid interference of multiple threads trying to
+	 * update the payload simultaneously (see bug 411830).
 	 * 
 	 * @param conn
 	 *            remote connection
@@ -607,7 +609,7 @@ public abstract class AbstractRemoteServerRunner extends Job {
 	 * @throws IOException
 	 *             thrown if any errors occur
 	 */
-	private boolean checkAndUploadPayload(IFileStore directory, IProgressMonitor monitor) throws IOException {
+	private synchronized boolean checkAndUploadPayload(IFileStore directory, IProgressMonitor monitor) throws IOException {
 		SubMonitor subMon = SubMonitor.convert(monitor, 100);
 		try {
 			IFileStore server = directory.getChild(getPayload());
@@ -850,7 +852,6 @@ public abstract class AbstractRemoteServerRunner extends Job {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime. IProgressMonitor)
 	 */
 	@Override
