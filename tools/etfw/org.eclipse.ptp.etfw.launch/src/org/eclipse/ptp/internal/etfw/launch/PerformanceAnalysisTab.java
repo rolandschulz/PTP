@@ -19,7 +19,6 @@ import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
 import org.eclipse.ptp.core.util.LaunchUtils;
@@ -38,6 +37,7 @@ import org.eclipse.ptp.internal.rm.jaxb.control.core.variables.RMVariableMap;
 import org.eclipse.ptp.internal.rm.jaxb.core.JAXBCoreConstants;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationContentsChangedListener;
 import org.eclipse.ptp.launch.ui.extensions.IRMLaunchConfigurationDynamicTab;
+import org.eclipse.ptp.launch.ui.tabs.LaunchConfigurationTab;
 import org.eclipse.ptp.rm.jaxb.control.core.ILaunchController;
 import org.eclipse.ptp.rm.jaxb.control.core.LaunchControllerManager;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
@@ -62,15 +62,13 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * Notes: This class is a re-implementation of ParallelToolSelectionTab using JAXB to dynamically build the UI.
- * TODO Review this class to see if some of what is done could be replaced with the JAXB provided classes or done as an extension of
- * the JAXB parent classes instead of what has been done with Some of the functionality in this class belongs in
- * ETFWParentLaunchConfiguration
+ * This class is a re-implementation of ParallelToolSelectionTab using JAXB to dynamically build the UI for setting up performance
+ * analysis tools to run on the application
  * 
  * @author Chris Navarro
  * 
  */
-public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab implements IToolLaunchConfigurationConstants,
+public class PerformanceAnalysisTab extends LaunchConfigurationTab implements IToolLaunchConfigurationConstants,
 		IExecutableExtension {
 
 	private static final String TAB_ID = "org.eclipse.ptp.internal.etfw.launch.PerformanceAnalysisTab"; //$NON-NLS-1$
@@ -353,11 +351,21 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 		return subTabs;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
+	 */
 	@Override
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
 		// Do nothing
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
+	 */
 	@Override
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		launchConfiguration = configuration;
@@ -402,6 +410,11 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
+	 */
 	@Override
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 		if (noPTP) {
@@ -441,21 +454,14 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 	}
 
 	protected class WidgetListener extends SelectionAdapter {
-		private String prevToolName;
-		private String prevLaunchConfig;
-
 		@Override
 		public void widgetSelected(SelectionEvent e) {
 			int selection = toolCombo.getSelectionIndex();
-			String toolName = toolCombo.getItem(selection);
-
-			if (!toolName.equals(prevToolName) || !launchConfiguration.getName().equals(prevLaunchConfig)) {
-				prevToolName = toolName;
-				prevLaunchConfig = launchConfiguration.getName();
+			if(selection != -1) {
+				String toolName = toolCombo.getItem(selection);
 				rebuildTab(toolName);
+				updateLaunchConfigurationDialog();
 			}
-
-			updateLaunchConfigurationDialog();
 		}
 	}
 
@@ -465,27 +471,39 @@ public class PerformanceAnalysisTab extends AbstractLaunchConfigurationTab imple
 		}
 	}
 
-	/**
-	 * @see ILaunchConfigurationTab#getName()
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#getName()
 	 */
 	@Override
 	public String getName() {
 		return Messages.PerformanceAnalysisTab_Tab_Name;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#getId()
+	 */
 	@Override
 	public String getId() {
 		return TAB_ID;
 	}
 
-	/**
-	 * @see ILaunchConfigurationTab#setLaunchConfigurationDialog (ILaunchConfigurationDialog)
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#setLaunchConfigurationDialog(org.eclipse.debug.ui.ILaunchConfigurationDialog)
 	 */
 	@Override
 	public void setLaunchConfigurationDialog(ILaunchConfigurationDialog dialog) {
 		super.setLaunchConfigurationDialog(dialog);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#isValid(org.eclipse.debug.core.ILaunchConfiguration)
+	 */
 	@Override
 	public boolean isValid(ILaunchConfiguration configuration) {
 		setErrorMessage(null);

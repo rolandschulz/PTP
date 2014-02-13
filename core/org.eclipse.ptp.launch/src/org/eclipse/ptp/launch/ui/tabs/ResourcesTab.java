@@ -475,26 +475,28 @@ public class ResourcesTab extends LaunchConfigurationTab {
 	@Override
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		super.initializeFrom(configuration);
-		if (!fIsInitialized) {
-			final String rmType = LaunchUtils.getTemplateName(configuration);
-			final String remId = LaunchUtils.getRemoteServicesId(configuration);
-			final String remName = LaunchUtils.getConnectionName(configuration);
+		final String rmType = LaunchUtils.getTemplateName(configuration);
+		final String remId = LaunchUtils.getRemoteServicesId(configuration);
+		final String remName = LaunchUtils.getConnectionName(configuration);
+
+		boolean fControlChanged = fLaunchControl != null
+				&& (!fLaunchControl.getConfiguration().getName().equals(rmType)
+						|| !fLaunchControl.getRemoteServicesId().equals(remId) || !fLaunchControl.getConnectionName()
+						.equals(remName));
+		if (!fIsInitialized || fControlChanged) {
 			if (rmType != null && remId != null && remName != null) {
 				fSystemTypeCombo.select(fProviders.lastIndexOf(rmType) + 1);
 				updateEnablement();
 				/*
 				 * Only stop the controller if something has changed.
 				 */
-				if (fLaunchControl != null
-						&& (!fLaunchControl.getConfiguration().getName().equals(rmType)
-								|| !fLaunchControl.getRemoteServicesId().equals(remId) || !fLaunchControl.getConnectionName()
-								.equals(remName))) {
+				if (fControlChanged) {
 					stopController(fLaunchControl);
 					fLaunchControl = null;
 				}
 				/*
-				 * Set the connection and see if the user wants to open it. If yes, create a new controller if one doesn't already
-				 * exist. If no, revert to no connection selected.
+				 * Set the connection and see if the user wants to open it. If yes, create a new controller if one doesn't
+				 * already exist. If no, revert to no connection selected.
 				 */
 				fRemoteConnectionWidget.setConnection(remId, remName);
 				IRemoteConnection conn = fRemoteConnectionWidget.getConnection();
@@ -514,8 +516,21 @@ public class ResourcesTab extends LaunchConfigurationTab {
 				fLaunchControl = null;
 				fRemoteConnection = null;
 				updateEnablement();
+				
+				// Undo selection made if there is one
+				if (rmType == null) {
+					fSystemTypeCombo.select(0);
+
+					// select the default message; thus if user types a filter string immediately, it will replace it
+					fSystemTypeCombo.setSelection(new Point(0, Messages.ResourcesTab_pleaseSelectTargetSystem.length()));
+				}
+				updateLaunchAttributeControls(fLaunchControl, getLaunchConfiguration(), false);
+				updateLaunchConfigurationDialog();
 			}
 			fIsInitialized = true;
+		} else {
+			updateLaunchAttributeControls(fLaunchControl, getLaunchConfiguration(), true);
+			updateLaunchConfigurationDialog();
 		}
 	}
 

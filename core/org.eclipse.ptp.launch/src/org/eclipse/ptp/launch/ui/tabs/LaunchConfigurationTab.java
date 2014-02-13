@@ -57,7 +57,7 @@ public abstract class LaunchConfigurationTab extends AbstractLaunchConfiguration
 		// cache the launch configuration for updates
 		setLaunchConfiguration(configuration);
 	}
-
+	
 	/**
 	 * Cache the launch configuration
 	 * 
