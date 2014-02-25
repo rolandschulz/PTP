@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.ptp.gem"
       label="%featureName"
-      version="7.0.4.qualifier"
+      version="7.0.5.qualifier"
       provider-name="%featureProvider">
 
    <description url="http://eclipse.org/ptp">
