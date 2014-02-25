@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 IBM Corporation and others.
+ * Copyright (c) 2012-2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  * IBM Corporation - Initial API and implementation
+ * Carsten Karbach, FZ Juelich
  *******************************************************************************/
 package org.eclipse.ptp.internal.rm.lml.monitor.ui;
 
@@ -34,8 +35,10 @@ public class MonitorImages {
 	private static final String T_TABS = "eview16/"; //$NON-NLS-1$
 
 	public static String IMG_STARTED = NAME_PREFIX + "monitor_started.gif"; //$NON-NLS-1$
+	public static String IMG_FORCEUPDATE = NAME_PREFIX + "monitor_force_update.png"; //$NON-NLS-1$
 
 	public static final ImageDescriptor DESC_STARTED = createManaged(T_TABS, IMG_STARTED);
+	public static final ImageDescriptor FORCE_STARTED = createManaged(T_TABS, IMG_FORCEUPDATE);
 
 	private static ImageDescriptor createManaged(String prefix, String name) {
 		return createManaged(imageRegistry, prefix, name);

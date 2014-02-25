@@ -1,104 +1,133 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--
-LML - LLView markup language
-
-
-Copyright (c) 2011-2013 Forschungszentrum Juelich GmbH
-
-All rights reserved. This program and the accompanying materials
-
-are made available under the terms of the Eclipse Public License v1.0
-
-which accompanies this distribution and is available at
-
-http://www.eclipse.org/legal/epl-v10.html
--->
-<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:lml="http://eclipse.org/ptp/lml" targetNamespace="http://eclipse.org/ptp/lml">
+<!-- LML - LLView markup language Copyright (c) 2011-2014 Forschungszentrum 
+	Juelich GmbH All rights reserved. This program and the accompanying materials 
+	are made available under the terms of the Eclipse Public License v1.0 which 
+	accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html -->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:lml="http://eclipse.org/ptp/lml"
+	targetNamespace="http://eclipse.org/ptp/lml">
 
 	<simpleType name="content_type">
-        <annotation>
-        	<documentation>Type describing the type of content of a table.</documentation>
-        </annotation>
-        <restriction base="string">
-    		<enumeration value="jobs" />
-    		<enumeration value="nodes" />
-    		<enumeration value="users" />
-    		<enumeration value="groups" />
-    		<enumeration value="classes" />
-    		<enumeration value="queues" />
-    		<enumeration value="other" />
-    	</restriction>
-    </simpleType>
+		<annotation>
+			<documentation>Type describing the type of content of a table.
+			</documentation>
+		</annotation>
+		<restriction base="string">
+			<enumeration value="jobs" />
+			<enumeration value="nodes" />
+			<enumeration value="users" />
+			<enumeration value="groups" />
+			<enumeration value="classes" />
+			<enumeration value="queues" />
+			<enumeration value="other" />
+		</restriction>
+	</simpleType>
 
-    <complexType name="RequestType">
-    	<annotation>
-    		<documentation>
-    			A type for collecting request information. LML can be
-    			used as communication language. The client sends layout
-    			information and empty data-tags to the server. The
-    			server returns the corresponding data.
-    		</documentation>
-    	</annotation>
-    	<sequence>
-            <element name="driver" type="lml:DriverType" minOccurs="0" maxOccurs="unbounded"></element>
-            <element name="layoutManagement"
-    			type="lml:LayoutRequestType" minOccurs="0" maxOccurs="1">
-    		</element>
-    	</sequence>
-    </complexType>
-    
-    <complexType name="LayoutRequestType">
-        <annotation>
-        	<documentation>Contains information about handling layouts on the server side. For example an LML-client could wish to save the layout on the server-side. These parameters are listed within this tag.</documentation>
-        </annotation>
-        <attribute default="false" name="saveLayout" type="boolean">
-    		<annotation>
-    			<documentation>
-    				If true, the server should save the currently send
-    				layout for this user.
-    			</documentation>
-    		</annotation>
-    	</attribute>
-    	<attribute default="false" name="getDefaultData"
-    		type="boolean">
-    		<annotation>
-    			<documentation>
-    				If true the server should return default data with a
-    				default layout. This can be usefull when the client
-    				connects to the server for the first time.
-    			</documentation>
-    		</annotation>
-    	</attribute>
-    </complexType>
+	<complexType name="RequestType">
+		<annotation>
+			<documentation>
+				A type for collecting request information. LML can be
+				used as communication language. The client sends layout
+				information and empty data-tags to the server. The
+				server returns the corresponding data.
+			</documentation>
+		</annotation>
+		<sequence>
+			<element name="driver" type="lml:DriverType" minOccurs="0"
+				maxOccurs="unbounded"></element>
+			<element name="layoutManagement" type="lml:LayoutRequestType"
+				minOccurs="0" maxOccurs="1">
+			</element>
+		</sequence>
+	</complexType>
 
-    <complexType name="DriverType">
-    	<annotation>
-    		<documentation>
-    			Definition of driver-parameters for calling the lml-da
-    			with specific driver-information.
-    		</documentation>
-    	</annotation>
-    	<sequence>
-    		<element name="command" type="lml:CommandType" minOccurs="0" maxOccurs="unbounded"></element>
-    	</sequence>
-    	<attribute name="name" type="string" use="required">
-    		<annotation>
-    			<documentation>Name of batch-system</documentation>
-    		</annotation>
-    	</attribute>
-    </complexType>
-    
-    <complexType name="CommandType">
-        <annotation>
-        	<documentation>Every command consists of a name and a path to this command.</documentation>
-        </annotation>
-        <attribute name="name" type="string" use="required">
-        	<annotation>
-        		<documentation>ID of the command</documentation>
-        	</annotation></attribute>
-    	<attribute name="exec" type="string" use="required">
-    		<annotation>
-    			<documentation>Path to the command on the server-side.</documentation>
-    		</annotation></attribute>
-    </complexType>
+	<complexType name="LayoutRequestType">
+		<annotation>
+			<documentation>Contains information about handling layouts on the
+				server side. For example an LML-client could wish to save the layout
+				on the server-side. These parameters are listed within this tag.
+			</documentation>
+		</annotation>
+		<attribute default="false" name="saveLayout" type="boolean">
+			<annotation>
+				<documentation>
+					If true, the server should save the currently send
+					layout for this user.
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute default="false" name="getDefaultData" type="boolean">
+			<annotation>
+				<documentation>
+					If true the server should return default data with a
+					default layout. This can be usefull when the client
+					connects to the server for the first time.
+				</documentation>
+			</annotation>
+		</attribute>
+	</complexType>
+
+	<complexType name="DriverType">
+		<annotation>
+			<documentation>
+				Definition of driver-parameters for calling the lml-da
+				with specific driver-information.
+			</documentation>
+		</annotation>
+		<sequence>
+			<element name="command" type="lml:CommandType" minOccurs="0"
+				maxOccurs="unbounded">
+			</element>
+			<element name="arg" type="lml:ArgumentType" minOccurs="0"
+				maxOccurs="unbounded">
+				<annotation>
+					<documentation>List of arguments for the LML_da driver script.
+					</documentation>
+				</annotation>
+			</element>
+		</sequence>
+		<attribute name="name" type="string" use="required">
+			<annotation>
+				<documentation>Name of batch-system</documentation>
+			</annotation>
+		</attribute>
+	</complexType>
+
+	<complexType name="CommandType">
+		<annotation>
+			<documentation>Every command consists of a name and a path to this
+				command.</documentation>
+		</annotation>
+		<attribute name="name" type="string" use="required">
+			<annotation>
+				<documentation>ID of the command</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="exec" type="string" use="required">
+			<annotation>
+				<documentation>Path to the command on the server-side.
+				</documentation>
+			</annotation>
+		</attribute>
+	</complexType>
+
+	<complexType name="ArgumentType">
+		<annotation>
+			<documentation>One argument is a single option, which is handed to
+				LML_DA.
+				This option can have only an attribute such as "verbose" or
+				an attribute with an associated value such as tmpdir=".mytmp".
+			</documentation>
+		</annotation>
+		<attribute name="attribute" type="string" use="required">
+			<annotation>
+				<documentation>The name of the argument handed to LML_DA.
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="value" type="string" use="optional">
+			<annotation>
+				<documentation>The optional value for the attribute.</documentation>
+			</annotation>
+		</attribute>
+	</complexType>
 </schema>

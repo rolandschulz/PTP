@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 IBM Corporation and others.
+ * Copyright (c) 2012-2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  * IBM Corporation - Initial API and implementation
+ * Carsten Karbach, FZ Juelich
  *******************************************************************************/
 package org.eclipse.ptp.internal.rm.lml.monitor.ui.views;
 
@@ -15,6 +16,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.TableColumnLayout;
@@ -43,6 +45,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
@@ -155,7 +158,15 @@ public class MonitorView extends ViewPart {
 					@Override
 					public Image getImage(Object element) {
 						IMonitorControl monitor = (IMonitorControl) element;
-						return monitor.isActive() ? MonitorImages.get(MonitorImages.IMG_STARTED) : null;
+						if (monitor.isActive()) {
+							if (monitor.isCacheActive()) {
+								return MonitorImages.get(MonitorImages.IMG_STARTED);
+							}
+							else {
+								return MonitorImages.get(MonitorImages.IMG_FORCEUPDATE);
+							}
+						}
+						return null;
 					}
 				});
 				break;
@@ -262,6 +273,15 @@ public class MonitorView extends ViewPart {
 		fViewer.getTable().setLinesVisible(true);
 		fViewer.getTable().setHeaderVisible(true);
 
+		MonitorControlManager.getInstance().addMonitorChangedListener(fMonitorChangedListener);
+
+		// Add menu manager in order to show a popup for the table
+		final MenuManager menuManager = new MenuManager();
+		final Menu menu = menuManager.createContextMenu(fViewer.getTable());
+		// Set the MenuManager
+		fViewer.getTable().setMenu(menu);
+		getSite().registerContextMenu(menuManager, fViewer);
+
 		/*
 		 * Enable property sheet updates when tree items are selected. Note for
 		 * this to work each item in the tree must either implement
@@ -269,8 +289,6 @@ public class MonitorView extends ViewPart {
 		 * in its AdapterFactory.
 		 */
 		getSite().setSelectionProvider(fViewer);
-
-		MonitorControlManager.getInstance().addMonitorChangedListener(fMonitorChangedListener);
 	}
 
 	/*

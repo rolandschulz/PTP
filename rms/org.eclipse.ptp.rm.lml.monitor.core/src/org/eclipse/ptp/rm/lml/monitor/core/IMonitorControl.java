@@ -69,6 +69,15 @@ public interface IMonitorControl {
 	public boolean isActive();
 
 	/**
+	 * Check if remote caching is active.
+	 * If so, the remote component will try to use cached data,
+	 * otherwise a data update is enforced.
+	 * 
+	 * @return true, if caching is active, false otherwise
+	 */
+	public boolean isCacheActive();
+
+	/**
 	 * Load persisted control information.
 	 * 
 	 * @return true if the control was active when saved
@@ -76,7 +85,7 @@ public interface IMonitorControl {
 	public boolean load() throws CoreException;
 
 	/**
-	 * Force the control to refresh its data. This will typically cause a
+	 * Let the control refresh its data. This will typically cause a
 	 * command to be run on the target system.
 	 */
 	public void refresh();
@@ -85,6 +94,19 @@ public interface IMonitorControl {
 	 * Save control data to persisted store.
 	 */
 	public void save();
+
+	/**
+	 * Enable or disable remote caching.
+	 * If caching is activated, the remote component
+	 * tries to use cached status data possibly
+	 * collected by another user. With caching deactivated
+	 * every user runs the remote data retrieval
+	 * separately.
+	 * 
+	 * @param active
+	 *            true for enabling caching, false otherwise
+	 */
+	public void setCacheActive(boolean active);
 
 	/**
 	 * Set the configuration name for the control

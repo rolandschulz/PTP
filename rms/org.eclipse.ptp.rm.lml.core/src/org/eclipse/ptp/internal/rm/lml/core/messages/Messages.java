@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011 Forschungszentrum Juelich GmbH
+ * Copyright (c) 2011-2014 Forschungszentrum Juelich GmbH
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution and is available at
@@ -7,6 +7,7 @@
  * 
  * Contributors:
  * 		Claudia Knobloch, FZ Juelich
+ * 		Carsten Karbach, FZ Juelich
  */
 package org.eclipse.ptp.internal.rm.lml.core.messages;
 
@@ -14,6 +15,8 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.internal.rm.lml.core.messages.messages"; //$NON-NLS-1$
+
+	public static String LguiItem_0;
 
 	public static String LMLCorePlugin_0;
 	public static String ErrorList_1;

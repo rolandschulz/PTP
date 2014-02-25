@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011-2012 Forschungszentrum Juelich GmbH
+ * Copyright (c) 2011-2014 Forschungszentrum Juelich GmbH
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution and is available at
@@ -399,10 +399,6 @@ public class TableView extends ViewPart {
 								componentAdded = false;
 							}
 							fLguiItem = lmlManager.getSelectedLguiItem();
-
-							if (fLguiItem != null) {
-								System.out.println();
-							}
 
 							if (fLguiItem != null && fLguiItem.getTableHandler() != null && tree.getSortColumn() != null) {
 								fLguiItem.getTableHandler().getSortProperties(gid);

@@ -43,6 +43,15 @@
             id="org.eclipse.ptp.rm.lml.monitor.ui.refreshMonitor"
             name="%RefreshMonitorCommand.name">
       </command>
+      <command
+            categoryId="org.eclipse.ptp.rm.lml.monitor.ui.monitorCommands"
+            id="org.eclipse.ptp.rm.lml.monitor.ui.switchCacheMode"
+            name="%SwitchCacheModeCommand.name">
+         <state
+               class="org.eclipse.ui.handlers.RegistryToggleState:true"
+               id="org.eclipse.ui.commands.toggleState">
+         </state>
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -154,6 +163,16 @@
       <handler
             class="org.eclipse.ptp.internal.rm.lml.monitor.ui.handlers.RefreshMonitorHandler"
             commandId="org.eclipse.ptp.rm.lml.monitor.ui.refreshMonitor">
+         <enabledWhen>
+            <test
+                  property="org.eclipse.ptp.rm.monitor.isActive"
+                  value="true">
+            </test>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="org.eclipse.ptp.internal.rm.lml.monitor.ui.handlers.SwitchCacheModeHandler"
+            commandId="org.eclipse.ptp.rm.lml.monitor.ui.switchCacheMode">
          <enabledWhen>
             <test
                   property="org.eclipse.ptp.rm.monitor.isActive"
@@ -527,7 +546,8 @@
          <command
                commandId="org.eclipse.ptp.rm.lml.monitor.ui.refreshMonitor"
                icon="icons/eview16/refresh_monitor.gif"
-               style="push">
+               style="pulldown"
+               tooltip="refresh">
          </command>
          <separator
                name="monitor2"
@@ -800,6 +820,63 @@
             </visibleWhen>
          </command>
       </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.ptp.rm.ui.views.MonitorView">
+         <command
+               commandId="org.eclipse.ptp.rm.lml.monitor.ui.startMonitor"
+               icon="icons/eview16/start_monitor.gif"
+               label="start monitor"
+               style="push">
+         </command>
+         <command
+               commandId="org.eclipse.ptp.rm.lml.monitor.ui.stopMonitor"
+               icon="icons/eview16/stop_monitor.gif"
+               label="stop monitor"
+               style="push">
+         </command>
+         <separator
+               name="monitor1"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.ptp.rm.lml.monitor.ui.refreshMonitor"
+               icon="icons/eview16/refresh_monitor.gif"
+               label="refresh"
+               style="pulldown"
+               tooltip="refresh">
+         </command>
+         <separator
+               name="monitor2"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.ptp.rm.lml.monitor.ui.addMonitor"
+               icon="icons/eview16/add_monitor.gif"
+               label="add new monitor"
+               style="push">
+         </command>
+         <command
+               commandId="org.eclipse.ptp.rm.lml.monitor.ui.removeMonitor"
+               icon="icons/eview16/remove_monitor.gif"
+               label="remove monitor"
+               style="push">
+         </command>
+         <separator
+               name="monitor3"
+               visible="true">
+         </separator>
+      </menuContribution>
+      <menuContribution
+            allPopups="true"
+            locationURI="menu:org.eclipse.ptp.rm.lml.monitor.ui.refreshMonitor">
+         <command
+               commandId="org.eclipse.ptp.rm.lml.monitor.ui.switchCacheMode"
+               label="force data update"
+               style="toggle"
+               tooltip="Do not allow usage of cache data on the next refresh. This might take longer.">
+         </command>
+      </menuContribution>
    </extension>
       <extension
             point="org.eclipse.core.expressions.propertyTesters">
@@ -817,5 +894,14 @@
                properties="isActive"
                type="java.lang.Object">
          </propertyTester>
+      </extension>
+      <extension
+            point="org.eclipse.ui.preferencePages">
+         <page
+               category="org.eclipse.ptp.ui.preferences.ptpPreferencesPage"
+               class="org.eclipse.ptp.internal.rm.lml.monitor.ui.preferences.MonitorPreferences"
+               id="org.eclipse.ptp.rm.lml.monitor.ui.monitoringPreferencePage"
+               name="Monitoring">
+         </page>
       </extension>
 </plugin>

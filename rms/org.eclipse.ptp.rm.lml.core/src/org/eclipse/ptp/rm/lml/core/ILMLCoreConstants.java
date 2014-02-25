@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 University of Illinois All rights reserved. This program
+ * Copyright (c) 2011-2014 University of Illinois All rights reserved. This program
  * and the accompanying materials are made available under the terms of the
  * Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html 
@@ -20,6 +20,9 @@ public interface ILMLCoreConstants {
 
 	public static final String ID_ACTIVE_JOBS_VIEW = "org.eclipse.ptp.rm.lml.ui.ActiveJobsView"; //$NON-NLS-1$
 	public static final String ID_INACTIVE_JOBS_VIEW = "org.eclipse.ptp.rm.lml.ui.InactiveJobsView"; //$NON-NLS-1$
+	// Names of attributes for LML_DA for activating / deactivating the cache
+	public static final String LMLDACACHEINTERVAL_ATTRIBUTE = "cacheinterval"; //$NON-NLS-1$
+	public static final String LMLDACACHE_ATTRIBUTE = "cache"; //$NON-NLS-1$
 
 	public static final int UNDEFINED = -1;
 

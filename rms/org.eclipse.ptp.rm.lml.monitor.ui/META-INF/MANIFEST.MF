@@ -25,5 +25,6 @@ Export-Package: org.eclipse.ptp.internal.rm.lml.monitor.ui;x-internal:=true,
  org.eclipse.ptp.internal.rm.lml.monitor.ui.dialogs;x-internal:=true,
  org.eclipse.ptp.internal.rm.lml.monitor.ui.handlers;x-internal:=true,
  org.eclipse.ptp.internal.rm.lml.monitor.ui.messages;x-internal:=true,
+ org.eclipse.ptp.internal.rm.lml.monitor.ui.preferences;x-internal:=true,
  org.eclipse.ptp.internal.rm.lml.monitor.ui.propertyTesters;x-internal:=true,
  org.eclipse.ptp.internal.rm.lml.monitor.ui.views;x-internal:=true

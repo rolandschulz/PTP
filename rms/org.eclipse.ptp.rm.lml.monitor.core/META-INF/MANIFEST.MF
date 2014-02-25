@@ -21,6 +21,7 @@ Bundle-Vendor: %pluginProvider
 Bundle-Localization: plugin
 Export-Package: org.eclipse.ptp.internal.rm.lml.monitor.core;x-internal:=true,
  org.eclipse.ptp.internal.rm.lml.monitor.core.messages;x-internal:=true,
+ org.eclipse.ptp.internal.rm.lml.monitor.core.preferences;x-internal:=true,
  org.eclipse.ptp.rm.lml.monitor.core;
   x-friends:="org.eclipse.ptp.rm.jaxb.tests,
    org.eclipse.ptp.rm.lml.monitor.ui,

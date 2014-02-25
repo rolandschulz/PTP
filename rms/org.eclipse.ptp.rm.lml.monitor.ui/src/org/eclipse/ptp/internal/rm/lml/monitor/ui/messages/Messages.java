@@ -36,6 +36,16 @@ public class Messages extends NLS {
 	public static String StartMonitorHandler_Unable_to_start_monitor;
 	public static String StopMonitorHandler_Stop_Monitors;
 	public static String StopMonitorHandler_Unable_to_stop_monitor;
+	public static String MonitorPreferences_0;
+
+	public static String MonitorPreferences_1;
+
+	public static String MonitorPreferences_2;
+
+	public static String MonitorPreferences_3;
+
+	public static String MonitorPreferences_4;
+
 	public static String MonitorView_AreYouSure;
 	public static String MonitorView_Status;
 	public static String MonitorView_StopMonitor;

@@ -399,6 +399,30 @@ public class LMLManager {
 	}
 
 	/**
+	 * Activate/Deactivate caching. Per default the caching mode is
+	 * parsed from the target system configuration. With this function
+	 * the caching mode can be set easier. When caching is activated
+	 * raw LML data can be cached among multiple PTP clients.
+	 * If caching is off, every client runs its LML_DA instance
+	 * entirely separately. This function must be called before
+	 * running the corresponding update.
+	 * 
+	 * @param name
+	 *            hash identifiying the Lgui, whose cache mode needs to be updated
+	 * @param activeCaching
+	 *            if true, caching is activated, otherwise it is deactivated
+	 */
+	public void setCachingMode(String name, boolean activeCaching) {
+		ILguiItem lguiItem = null;
+		synchronized (LGUIS) {
+			lguiItem = LGUIS.get(name);
+		}
+		if (lguiItem != null) {
+			lguiItem.setForceUpdate(!activeCaching);
+		}
+	}
+
+	/**
 	 * Run a refresh for one connection identified by <code>name</code>.
 	 * Sends the current LML layout to the passed output stream.
 	 * Expects an LML file as response from the input stream.

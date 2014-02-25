@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--- Copyright (c) 2014 Forschungszentrum Juelich GmbH. All rights reserved. 
+	This program and the accompanying materials are made available under the 
+	terms of the Eclipse Public License v1.0 which accompanies this distribution, 
+	and is available at http://www.eclipse.org/legal/epl-v10.html Contributors: 
+	Carsten Karbach (Forschungszentrum Juelich GmbH) -->
+
+<lml:lgui xmlns:lml="http://eclipse.org/ptp/lml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	layout="true" version="1.1"
+	xsi:schemaLocation="http://eclipse.org/ptp/lml http://eclipse.org/ptp/schemas/v1.1/lgui.xsd">
+
+	<request>
+
+		<driver name="TORQUE"><!-- The name is used as rms name, which is the folder containing the adapter scripts -->
+			<!-- If a value is omitted, the option is set to 1, this enables the corresponding option
+			e.g. <  arg attribute="verbose" /> means that the verbose option is activated.
+			To deactivate an option use <  arg attribute="verbose" value="0" />
+			In the following an example of all available LML_da_driver options is given
+			 -->
+			<arg attribute="rawfile" value="0"/>
+			<arg attribute="tmpdir" value="./mytmp" />
+			<arg attribute="permdir" value="./perm" />
+			<arg attribute="keeptmp" value="0" />
+			<arg attribute="keepperm" value="1" />
+			<arg attribute="verbose" value="0" />
+			<arg attribute="quiet" value="0" />
+			<arg attribute="nocheckrequest" value="0" />
+			<arg attribute="rms" value="TORQUE" />
+			<arg attribute="dump" value="0" />
+			<arg attribute="demo" value="1" />
+			<arg attribute="test" value="0" />
+			<arg attribute="cache" value="1" />
+			<arg attribute="cachedir" value="./cache" />
+			<arg attribute="cacheinterval" value="10" />
+		</driver>
+
+	</request>
+
+
+</lml:lgui>

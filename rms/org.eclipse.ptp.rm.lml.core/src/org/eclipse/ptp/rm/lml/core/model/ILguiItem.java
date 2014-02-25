@@ -1,12 +1,12 @@
 /**
- * Copyright (c) 2011 Forschungszentrum Juelich GmbH
+ * Copyright (c) 2011-2014 Forschungszentrum Juelich GmbH
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- * 		Claudia Knobloch, FZ Juelich
+ * 		Claudia Knobloch, Carsten Karbach, FZ Juelich
  */
 package org.eclipse.ptp.rm.lml.core.model;
 
@@ -181,7 +181,26 @@ public interface ILguiItem {
 	 */
 	public String saveCurrentLayout();
 
+	/**
+	 * Store the request used as configuration for LML_DA.
+	 * This request should be used in every update of this
+	 * connection.
+	 * 
+	 * @param request
+	 *            the request to use as configuration for every update via LML_DA
+	 */
 	public void setRequest(RequestType request);
+
+	/**
+	 * Via the LML_DA request one can configure to use caching or to
+	 * always run the entire LML_DA workflow. This function is a
+	 * convenience method for activating or deactivating the caching
+	 * functionality on updating.
+	 * 
+	 * @param force
+	 *            if true, caching is deactivated, otherwise use caching
+	 */
+	public void setForceUpdate(boolean force);
 
 	public void unlockPattern();
 

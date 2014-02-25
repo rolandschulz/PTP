@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011 Forschungszentrum Juelich GmbH
+ * Copyright (c) 2011-2014 Forschungszentrum Juelich GmbH
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution and is available at
@@ -29,11 +29,15 @@ import java.util.TreeMap;
 import java.util.UUID;
 
 import org.eclipse.ptp.internal.rm.lml.core.JAXBUtil;
+import org.eclipse.ptp.internal.rm.lml.core.LMLCorePlugin;
 import org.eclipse.ptp.internal.rm.lml.core.events.LguiUpdatedEvent;
+import org.eclipse.ptp.internal.rm.lml.core.messages.Messages;
 import org.eclipse.ptp.rm.lml.core.ILMLCoreConstants;
 import org.eclipse.ptp.rm.lml.core.JobStatusData;
+import org.eclipse.ptp.rm.lml.core.elements.ArgumentType;
 import org.eclipse.ptp.rm.lml.core.elements.CellType;
 import org.eclipse.ptp.rm.lml.core.elements.ColumnType;
+import org.eclipse.ptp.rm.lml.core.elements.DriverType;
 import org.eclipse.ptp.rm.lml.core.elements.InfoType;
 import org.eclipse.ptp.rm.lml.core.elements.InfodataType;
 import org.eclipse.ptp.rm.lml.core.elements.InformationType;
@@ -101,6 +105,12 @@ public class LguiItem implements ILguiItem {
 	private boolean lockUpdate = false;
 
 	private boolean lockPattern = false;
+
+	/**
+	 * If true, caching mechanism of LML_DA is deactivated by request.
+	 * Otherwise, cachin is allowed.
+	 */
+	private boolean forceUpdate = false;
 
 	/**
 	 * Constructor with LML-model as argument
@@ -195,7 +205,7 @@ public class LguiItem implements ILguiItem {
 	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#getCurrentLayout(java.io. OutputStream)
 	 */
 	@Override
-	public void getCurrentLayout(OutputStream output) {
+	public synchronized void getCurrentLayout(OutputStream output) {
 		while (lockPattern) {
 			// wait until the pattern have been set
 			System.out.print(ILMLCoreConstants.EMPTY);
@@ -206,6 +216,7 @@ public class LguiItem implements ILguiItem {
 			layout = firstRequest();
 		} else {
 			layout = getLayoutAccess().generateRequestFromModel();
+			forwardForceUpdateToRequest();
 			layout.setRequest(request);
 		}
 		jaxbUtil.marshal(layout, output);
@@ -533,7 +544,7 @@ public class LguiItem implements ILguiItem {
 	}
 
 	@Override
-	public String saveCurrentLayout() {
+	public synchronized String saveCurrentLayout() {
 
 		final StringWriter writer = new StringWriter();
 		LayoutRoot layoutLgui = null;
@@ -569,7 +580,7 @@ public class LguiItem implements ILguiItem {
 	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#update(java.io.InputStream)
 	 */
 	@Override
-	public void update(InputStream stream) {
+	public synchronized void update(InputStream stream) {
 
 		final BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 		StringBuilder xmlStream = new StringBuilder();
@@ -591,7 +602,15 @@ public class LguiItem implements ILguiItem {
 		}
 
 		if (xmlStream.length() > 0) {
-			lgui = jaxbUtil.unmarshal(xmlStream.toString());
+			LguiType parsed = jaxbUtil.unmarshal(xmlStream.toString());
+			if (parsed != null) {
+				lgui = parsed;
+			}
+			else {
+				// Show error dialog
+				LMLCorePlugin.log(Messages.LguiItem_0 + xmlStream.toString());
+			}
+
 			if (listeners.isEmpty()) {
 				createLguiHandlers();
 			}
@@ -781,6 +800,7 @@ public class LguiItem implements ILguiItem {
 		layoutReq.setGetDefaultData(true);
 
 		request.setLayoutManagement(layoutReq);
+		forwardForceUpdateToRequest();
 
 		result.setRequest(request);
 
@@ -877,5 +897,82 @@ public class LguiItem implements ILguiItem {
 				}
 			}
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.rm.lml.core.model.ILguiItem#setForceUpdate(boolean)
+	 */
+	@Override
+	public void setForceUpdate(boolean force) {
+		forceUpdate = force;
+	}
+
+	/**
+	 * Read the current forceUpdate state.
+	 * Adjust the request configuration according to the current state.
+	 * If update is enforce, set the cache update interval to 0,
+	 * otherwise to 60 seconds.
+	 */
+	protected void forwardForceUpdateToRequest() {
+
+		if (request == null) {
+			return;
+		}
+
+		if (forceUpdate) {
+			// Deactivate caching
+			setRequestAttribute(ILMLCoreConstants.LMLDACACHE_ATTRIBUTE, "0"); //$NON-NLS-1$
+			setRequestAttribute(ILMLCoreConstants.LMLDACACHEINTERVAL_ATTRIBUTE, "60"); //$NON-NLS-1$
+		}
+		else {
+			// Activate caching
+			setRequestAttribute(ILMLCoreConstants.LMLDACACHE_ATTRIBUTE, "1"); //$NON-NLS-1$
+			// Make sure, that the cache is only read, never do an update from the client
+			setRequestAttribute(ILMLCoreConstants.LMLDACACHEINTERVAL_ATTRIBUTE, "-1"); //$NON-NLS-1$
+		}
+	}
+
+	/**
+	 * Set a parameter passed to LML_DA.
+	 * If the parameter exists, overwrite with the given value.
+	 * Otherwise, create a new parameter entry with this value.
+	 * 
+	 * @param attribute
+	 *            name of the attribute, e.g. cache, cacheinterval, tmpdir
+	 * @param value
+	 *            the argument's value
+	 */
+	protected void setRequestAttribute(String attribute, String value) {
+		if (request == null) {
+			return;
+		}
+
+		ObjectFactory factory = new ObjectFactory();
+
+		// Make sure, that there is at least one driver within the request
+		DriverType driver;
+		if (request.getDriver().size() > 0) {
+			driver = request.getDriver().get(0);
+		}
+		else {
+			driver = factory.createDriverType();
+			request.getDriver().add(driver);
+		}
+		// Find the option for with the given attribute name
+		ArgumentType searchArg = null;
+		for (ArgumentType arg : driver.getArg()) {
+			if (arg.getAttribute().equals(attribute)) {
+				searchArg = arg;
+			}
+		}
+		if (searchArg == null) {
+			searchArg = factory.createArgumentType();
+			searchArg.setAttribute(attribute);
+			driver.getArg().add(searchArg);
+		}
+
+		searchArg.setValue(value);
 	}
 }

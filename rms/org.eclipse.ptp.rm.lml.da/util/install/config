@@ -1,0 +1,37 @@
+# Configuration file for the installation of LML_DA into a crontab
+
+# The values will be evaluated by the install script via the PERl eval function.
+# The variable $hostname will be replaced with the actual hostname of the system.
+# No SHELL environment variables are used. Thus, no variable except the $hostname
+# variable should be used in this configuration.
+
+# A hint for the RMS type of the monitored system, if this hint is omitted, 
+# the driver tries to determine the target system on its own.
+# Use undef for automaic detection of the target system.
+
+rms = "undef"
+
+# Directory used for caching raw LML data. PTP clients can read cache LML data from this directory.
+# This directory must have global read permissions.
+
+cachedir = "/tmp/LMLCache_$hostname/"
+
+# The interval used within the crontab configuration. Per default, the monitoring data is
+# updated every minute. To update only every 2 minutes for instance, replace this parameter 
+# with "*/2 * * * *"
+
+croninterval = "* * * * *"
+
+# Permanent directory of LML_DA. In this directory, persistent data such as a map of used
+# colors is stored. This path is relative to the LML_DA install directory.
+
+permdir = "./perm_cache_$hostname/"
+
+# Directory path where to install LML_DA. Per default ("") no LML_DA files are moved at
+# all. All files needed are already available. Optionally, another directory can
+# be configured here, where the LML_DA installation is placed into. E.g. with
+# installdir = "/usr/bin/lmlda" all required installation files are copied to that
+# directory. The daemon scripts are adapted to that path, too.
+# The directory configured here must exist. It is not created by the installation script.
+
+installdir = ""

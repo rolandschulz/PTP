@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012 Forschungszentrum Juelich GmbH
+ * Copyright (c) 2012-2014 Forschungszentrum Juelich GmbH
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution and is available at
@@ -198,9 +198,11 @@ public class JAXBUtil {
 			qName = ILMLCoreConstants.CHARTGROUP_ELEMENT;
 		}
 
-		value.setDescription(gobject.getDescription());
-		value.setId(gobject.getId());
-		value.setTitle(gobject.getTitle());
+		if (value != null) {
+			value.setDescription(gobject.getDescription());
+			value.setId(gobject.getId());
+			value.setTitle(gobject.getTitle());
+		}
 
 		return new JAXBElement<GobjectType>(new QName(qName), (Class<GobjectType>) gobject.getClass(), value);
 	}
@@ -305,7 +307,7 @@ public class JAXBUtil {
 		return validator;
 	}
 
-	private static void validate(Source source) throws SAXException, IOException, URISyntaxException {
+	private synchronized static void validate(Source source) throws SAXException, IOException, URISyntaxException {
 		try {
 			getValidator().validate(source);
 		} catch (final SAXParseException sax) {
@@ -575,8 +577,11 @@ public class JAXBUtil {
 	 *            LML instance, whose children have to be extracted
 	 * @return list of value objects of the direct children of the passed lgui instance
 	 */
-	public ArrayList<Object> getObjects(LguiType lgui) {
-		final ArrayList<Object> list = new ArrayList<Object>();
+	public List<Object> getObjects(LguiType lgui) {
+		final List<Object> list = new ArrayList<Object>();
+		if (lgui == null) {
+			return list;
+		}
 		for (final JAXBElement<?> element : lgui.getObjectsAndRelationsAndInformation()) {
 			list.add(element.getValue());
 		}
@@ -759,7 +764,12 @@ public class JAXBUtil {
 		} catch (final JAXBException e) {
 			// TODO ErrorMessage
 		}
-		return jaxb.getValue();
+		if (jaxb != null) {
+			return jaxb.getValue();
+		}
+		else {
+			return null;
+		}
 	}
 
 	/**
@@ -789,6 +799,33 @@ public class JAXBUtil {
 		try {
 			synchronized (LguiItem.class) {
 				jaxb = unmarshaller.unmarshal(source, LayoutRoot.class);
+			}
+		} catch (final JAXBException e) {
+		}
+		if (jaxb == null) {
+			return null;
+		} else {
+			return jaxb.getValue();
+		}
+	}
+
+	/**
+	 * Unmarshal any complete subtree of an LML file.
+	 * E.g. <request><driver name="TORQUE">...</request>
+	 * 
+	 * @param string
+	 *            contains entire XML for the request tag
+	 * @param parsedClass
+	 *            the class instance of the type T, this cannot be called within the generic function
+	 * @return the unmarshalled object or null, if unmarshalling failed
+	 */
+	public <T> T unmarshalFragment(String string, Class<T> parsedClass) {
+		// No validation is done here, as this would not allow to unmarshal any non-root elements
+		Source source = new StreamSource(new StringReader(string));
+		JAXBElement<T> jaxb = null;
+		try {
+			synchronized (LguiItem.class) {
+				jaxb = unmarshaller.unmarshal(source, parsedClass);
 			}
 		} catch (final JAXBException e) {
 		}

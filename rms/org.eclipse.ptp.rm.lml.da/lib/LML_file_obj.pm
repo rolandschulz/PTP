@@ -1,5 +1,5 @@
 #*******************************************************************************
-#* Copyright (c) 2011 Forschungszentrum Juelich GmbH.
+#* Copyright (c) 2011-2014 Forschungszentrum Juelich GmbH.
 #* All rights reserved. This program and the accompanying materials
 #* are made available under the terms of the Eclipse Public License v1.0
 #* which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
 #*
 #* Contributors:
 #*    Wolfgang Frings (Forschungszentrum Juelich GmbH) 
+#*    Carsten Karbach (Forschungszentrum Juelich GmbH) 
 #*******************************************************************************/ 
 package LML_file_obj;
 
@@ -50,6 +51,7 @@ sub new {
 #                          ->{driver}->{attr}->{name}
 #                                    ->{command}->{$name}->{exec}
 #                                                        ->{input}
+#                                    ->{args}->{attribute}
 #                          ->{layoutManagement}->{attr}->{$key}              
 #
 #                 {TABLELAYOUT}->{$id}->{id}
@@ -357,6 +359,17 @@ sub lml_start {
 	    foreach $k (sort keys %attr) {
 		$o->{REQUEST}->{driver}->{command}->{$cmdname}->{$k}=$attr{$k};
 	    }
+	}
+	return(1);
+    }
+    if($name eq "arg") { #Parse one argument to the driver
+	if(exists($attr{attribute})) {
+	    my $attribute=$attr{attribute};
+	    my $value;
+	    if(exists($attr{value})){
+	    	$value = $attr{value};
+	    }
+		$o->{REQUEST}->{driver}->{args}->{$attribute}=$value;
 	}
 	return(1);
     }

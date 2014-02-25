@@ -1,0 +1,26 @@
+Installation of LML_DA as a daemon
+
+LML_DA can be installed as a daemon triggering a data collection in a given interval.
+Instead of letting every client call the entire data collection workflow separately
+the clients can use the data already prepared by the daemon. This also allows to
+gather history data of the system load as you can rely on the daemon being active
+continuously. The installation of the daemon is done by the following steps:
+
+1) Connect a monitoring connection to your target system so that the 
+.eclipsesettings directory is generated there, which contains all files needed for
+the installation.
+
+2) Switch to the folder .eclipsesettings/util/install and adapt the config file to
+your needs. With that file one can configure the resource management system, the 
+directory for the cached files and the installation path for the LML_DA daemon files.
+
+3) Call the script installCrontab.pl by running
+> perl installCrontab.pl
+
+At the end of this install process it is summarized how to complete the installation.
+The above script generates a script, which calls LML_DA with the required parameters.
+Another script is generated, which can be run as daemon on its own, which calls the
+LML_DA script in an endless loop in a given interval. Finally, a crontab entry, which
+can call the LML_DA script is created, which can be added to the crontab configuration
+instead of running the daemon script. Adding the crontab entry or running the daemon
+script need to be done manually.
