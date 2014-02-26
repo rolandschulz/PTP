@@ -115,8 +115,6 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 					addDynamicTab(new JAXBImportedScriptLaunchConfigurationTab(control, importTab, this));
 				}
 			}
-			varMap = new LCVariableMap();
-			varMap.setEnvManager(getEnvManager(progress.newChild(10)));
 		} else {
 			getControllers().clear();
 			launchTabData = null;
@@ -269,9 +267,9 @@ public class JAXBControllerLaunchConfigurationTab extends ExtensibleJAXBControll
 	public void widgetSelected(SelectionEvent e) {
 		setVisibleOnSelected();
 	}
-	
+
 	public IVariableMap getRMVariableMap() {
 		return null;
 	}
-	
+
 }
