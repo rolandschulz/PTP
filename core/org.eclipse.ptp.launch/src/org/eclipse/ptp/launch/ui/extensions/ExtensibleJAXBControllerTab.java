@@ -183,13 +183,6 @@ public abstract class ExtensibleJAXBControllerTab extends AbstractRMLaunchConfig
 				return new RMLaunchValidation(false, t.getLocalizedMessage());
 			}
 		}
-		try {
-			ILaunchConfigurationWorkingCopy wc = configuration.getWorkingCopy();
-			wc.setAttribute(controlId + JAXBUIConstants.DOT + JAXBUIConstants.INITIALIZED, true);
-			wc.doSave();
-		} catch (CoreException t) {
-			JAXBUIPlugin.log(t);
-		}
 		return resultValidation;
 	}
 
