@@ -7,12 +7,12 @@
 	<parent>
 		<groupId>org.eclipse.ptp</groupId>
 		<artifactId>ptp-parent</artifactId>
-		<version>7.0.4-SNAPSHOT</version>
+		<version>7.0.5-SNAPSHOT</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
 	<artifactId>org.eclipse.ptp.rdt.core.remotejars</artifactId>
-	<version>7.0.4-SNAPSHOT</version>
+	<version>7.0.5-SNAPSHOT</version>
 	<packaging>eclipse-plugin</packaging>
 
 	<profiles>
