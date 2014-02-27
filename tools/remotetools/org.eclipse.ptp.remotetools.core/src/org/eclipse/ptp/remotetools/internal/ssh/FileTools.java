@@ -268,7 +268,7 @@ public class FileTools implements IRemoteFileTools {
 			SftpCallable<Integer> c = new SftpCallable<Integer>() {
 				@Override
 				public Integer call() throws SftpException {
-					getChannel().chmod(permissions, path);
+					getChannel().chmod(permissions, manager.getRemotePathTools().quote(path, true));
 					return 0;
 				}
 			};
@@ -725,7 +725,7 @@ public class FileTools implements IRemoteFileTools {
 				SftpCallable<Vector<LsEntry>> c = new SftpCallable<Vector<LsEntry>>() {
 					@Override
 					public Vector<LsEntry> call() throws SftpException {
-						return getChannel().ls(root);
+						return getChannel().ls(manager.getRemotePathTools().quote(root, true));
 					}
 				};
 				files = c.syncCmdInThread(Messages.FileTools_10, subMon.newChild(10));
@@ -809,9 +809,8 @@ public class FileTools implements IRemoteFileTools {
 		try {
 			test();
 			validateRemotePath(dir);
-			IRemotePathTools pathTool = manager.getRemotePathTools();
 			try {
-				executeCommand("rm -rf " + pathTool.quote(dir, true)); //$NON-NLS-1$
+				executeCommand("rm -rf " + manager.getRemotePathTools().quote(dir, true)); //$NON-NLS-1$
 			} catch (RemoteExecutionException e) {
 				throw new RemoteOperationException(e);
 			}
@@ -841,7 +840,7 @@ public class FileTools implements IRemoteFileTools {
 				SftpCallable<Integer> c = new SftpCallable<Integer>() {
 					@Override
 					public Integer call() throws SftpException {
-						getChannel().rm(file);
+						getChannel().rm(manager.getRemotePathTools().quote(file, true));
 						return 0;
 					}
 				};
@@ -876,7 +875,7 @@ public class FileTools implements IRemoteFileTools {
 			SftpCallable<Integer> c = new SftpCallable<Integer>() {
 				@Override
 				public Integer call() throws SftpException {
-					getChannel().setMtime(path, mtime);
+					getChannel().setMtime(manager.getRemotePathTools().quote(path, true), mtime);
 					return 0;
 				}
 			};
