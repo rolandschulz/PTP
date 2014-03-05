@@ -163,7 +163,8 @@ public class RemoteToolsFileStore extends FileStore {
 				}
 			} catch (Exception e) {
 				throw new CoreException(new Status(IStatus.ERROR, RemoteToolsAdapterCorePlugin.getDefault().getBundle()
-						.getSymbolicName(), EFS.ERROR_INTERNAL, NLS.bind(Messages.RemoteToolsFileStore_0, fRemotePath.toString()), e));
+						.getSymbolicName(), EFS.ERROR_INTERNAL, NLS.bind(Messages.RemoteToolsFileStore_0, fRemotePath.toString()),
+						e));
 			}
 		}
 	}
@@ -240,27 +241,42 @@ public class RemoteToolsFileStore extends FileStore {
 		}
 		//		System.out.println("MKDIR: " + fRemotePath.toString()); //$NON-NLS-1$
 
-		IRemoteItem item = getRemoteItem(monitor);
+		if ((options & EFS.SHALLOW) == EFS.SHALLOW) {
+			IFileStore parent = getParent();
+			if (parent != null && !parent.fetchInfo(EFS.NONE, monitor).exists()) {
+				throw new CoreException(new Status(IStatus.ERROR, RemoteToolsAdapterCorePlugin.getDefault().getBundle()
+						.getSymbolicName(), EFS.ERROR_WRITE, NLS.bind(Messages.RemoteToolsFileStore_1, fRemotePath.toString()),
+						null));
+			}
+			if (monitor.isCanceled()) {
+				return this;
+			}
+		}
 
-		if (!item.exists()) {
-			if ((options & EFS.SHALLOW) == EFS.SHALLOW) {
-				IFileStore parent = getParent();
-				if (parent != null && !parent.fetchInfo(EFS.NONE, monitor).exists()) {
+		try {
+			getExecutionManager(monitor).getRemoteFileTools().createDirectory(fRemotePath.toString(), monitor);
+			cacheRemoteItem(null);
+		} catch (Exception e) {
+			// Ignore exception
+		}
+
+		if (!monitor.isCanceled()) {
+			/*
+			 * Check if the result exists and is a directory, throw an exception if neither.
+			 */
+			IRemoteItem item = getRemoteItem(monitor);
+			if (!monitor.isCanceled()) {
+				if (!item.exists()) {
 					throw new CoreException(new Status(IStatus.ERROR, RemoteToolsAdapterCorePlugin.getDefault().getBundle()
-							.getSymbolicName(), EFS.ERROR_WRITE, NLS.bind(Messages.RemoteToolsFileStore_1, fRemotePath.toString()), null));
+							.getSymbolicName(), EFS.ERROR_WRITE, NLS.bind(Messages.RemoteToolsFileStore_2, fRemotePath.toString()),
+							null));
+				}
+				if (!item.isDirectory()) {
+					throw new CoreException(new Status(IStatus.ERROR, RemoteToolsAdapterCorePlugin.getDefault().getBundle()
+							.getSymbolicName(), EFS.ERROR_WRONG_TYPE, NLS.bind(Messages.RemoteToolsFileStore_13,
+							fRemotePath.toString()), null));
 				}
 			}
-
-			try {
-				getExecutionManager(monitor).getRemoteFileTools().createDirectory(fRemotePath.toString(), monitor);
-				cacheRemoteItem(null);
-			} catch (Exception e) {
-				throw new CoreException(new Status(IStatus.ERROR, RemoteToolsAdapterCorePlugin.getDefault().getBundle()
-						.getSymbolicName(), EFS.ERROR_INTERNAL, NLS.bind(Messages.RemoteToolsFileStore_2, fRemotePath.toString()), e));
-			}
-		} else if (!item.isDirectory()) {
-			throw new CoreException(new Status(IStatus.ERROR, RemoteToolsAdapterCorePlugin.getDefault().getBundle()
-					.getSymbolicName(), EFS.ERROR_WRONG_TYPE, NLS.bind(Messages.RemoteToolsFileStore_13, fRemotePath.toString()), null));
 		}
 
 		return this;
@@ -290,7 +306,8 @@ public class RemoteToolsFileStore extends FileStore {
 		if (item.isDirectory()) {
 			//			System.out.println("OPENINPUTSTREAM: " + Messages.RemoteToolsFileStore_3); //$NON-NLS-1$
 			throw new CoreException(new Status(IStatus.ERROR, RemoteToolsAdapterCorePlugin.getDefault().getBundle()
-					.getSymbolicName(), EFS.ERROR_WRONG_TYPE, NLS.bind(Messages.RemoteToolsFileStore_3, fRemotePath.toString()), null));
+					.getSymbolicName(), EFS.ERROR_WRONG_TYPE, NLS.bind(Messages.RemoteToolsFileStore_3, fRemotePath.toString()),
+					null));
 		}
 
 		try {
