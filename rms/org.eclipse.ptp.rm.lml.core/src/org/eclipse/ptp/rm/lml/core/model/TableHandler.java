@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.ptp.internal.rm.lml.core.LMLCorePlugin;
 import org.eclipse.ptp.internal.rm.lml.core.model.Pattern;
 import org.eclipse.ptp.internal.rm.lml.core.model.TableColumnLayout;
 import org.eclipse.ptp.internal.rm.lml.core.model.TableSorter;
@@ -384,7 +383,6 @@ public class TableHandler extends LguiHandler {
 				return tag;
 			}
 		}
-		LMLCorePlugin.log(ILMLCoreConstants.LOG_NO_TABLE_1 + gid + ILMLCoreConstants.LOG_NO_TABLE_2);
 		return null;
 	}
 
