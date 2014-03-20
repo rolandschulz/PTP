@@ -14,7 +14,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.filesystem
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: org.eclipse.ptp.internal.etfw.jaxb;x-friends:="org.eclipse.ptp.etfw.launch",
+Export-Package: org.eclipse.ptp.internal.etfw.jaxb;x-friends:="org.eclipse.ptp.etfw.launch,org.eclipse.ptp.etfw",
  org.eclipse.ptp.internal.etfw.jaxb.data;x-friends:="org.eclipse.ptp.etfw,org.eclipse.ptp.etfw.launch",
  org.eclipse.ptp.internal.etfw.jaxb.osgi;x-internal:=true,
  org.eclipse.ptp.internal.etfw.jaxb.util;x-friends:="org.eclipse.ptp.etfw,org.eclipse.ptp.etfw.launch"

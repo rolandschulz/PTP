@@ -128,14 +128,13 @@ public class ETFWAnalysisTool extends ETFWToolStep implements IToolLaunchConfigu
 		IFileStore[] filea = null;
 		try {
 			filea = root.childStores(EFS.NONE, null);
+			for (final IFileStore f : filea) {
+				if (f.fetchInfo().isDirectory()) {
+					files.add(f);
+				}
+			}
 		} catch (final CoreException e) {
 			e.printStackTrace();
-		}
-
-		for (final IFileStore f : filea) {
-			if (f.fetchInfo().isDirectory()) {
-				files.add(f);
-			}
 		}
 
 		return files;
@@ -209,7 +208,7 @@ public class ETFWAnalysisTool extends ETFWToolStep implements IToolLaunchConfigu
 								utilBLob.runTool(runTool, null, outputLocation, anap.getOutToFile());
 							} else {
 								byte[] utout = null;
-								final MessageConsole mc = findConsole("ETFw");
+								final MessageConsole mc = findConsole("ETFw"); //$NON-NLS-1$
 								mc.clearConsole();
 								final OutputStream os = mc.newOutputStream();
 								utout = utilBlob.runToolGetOutput(runTool, null, outputLocation, true);
@@ -312,7 +311,10 @@ public class ETFWAnalysisTool extends ETFWToolStep implements IToolLaunchConfigu
 			String customOutLoc = null;
 
 			try {
-				customOutLoc = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, (String) null);
+				String rmName = configuration.getAttribute(IPTPLaunchConfigurationConstants.ATTR_RESOURCE_MANAGER_UNIQUENAME,
+						IToolLaunchConfigurationConstants.EMPTY);
+				customOutLoc = configuration.getAttribute(rmName + IToolLaunchConfigurationConstants.DOT
+						+ IPTPLaunchConfigurationConstants.ATTR_WORKING_DIR, (String) null);
 			} catch (final CoreException e1) {
 				e1.printStackTrace();
 			}

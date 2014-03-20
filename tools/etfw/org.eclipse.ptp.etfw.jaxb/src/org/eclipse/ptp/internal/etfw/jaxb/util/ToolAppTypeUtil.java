@@ -18,7 +18,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ptp.internal.etfw.jaxb.data.ToolArgumentType;
 import org.eclipse.ptp.internal.etfw.jaxb.data.ToolPaneType;
-import org.eclipse.ptp.internal.rm.jaxb.core.JAXBCoreConstants;
 
 /**
  * Utility methods for getting tool app arguments and environment variables.
@@ -59,32 +58,20 @@ public class ToolAppTypeUtil {
 
 		if (toolPanes != null) {
 			for (ToolPaneType toolPane : toolPanes) {
-				String arg = JAXBCoreConstants.ZEROSTR;
 				if (toolPane.getPrependWith() != null) {
-					arg += toolPane.getPrependWith();
+					input.add(toolPane.getPrependWith());
 				}
 
 				if (toolPane.getEncloseWith() != null) {
-					arg += toolPane.getEncloseWith();
+					input.add(toolPane.getEncloseWith().trim());
 				}
-				String nextArg = ToolPaneTypeUtil.getArgument(configuration, toolPane.getConfigId());
-				if (nextArg != null) {
-					nextArg = nextArg.trim();
-					arg += nextArg;
-					if (toolPane.getEncloseWith() != null) {
-						arg += toolPane.getEncloseWith();
-					}
-
-					if (arg.length() > 0)
-					{
-						int space = arg.indexOf(' ');
-						if (arg.indexOf('-') == 0 && space > 0) {
-							input.add(arg.substring(0, space).trim());
-							arg = arg.substring(space).trim();
-						}
-
-						input.add(arg);
-					}
+				List<String> nextArguments = ToolPaneTypeUtil.getArguments(configuration, toolPane.getConfigId());
+				if(!nextArguments.isEmpty()) {
+					input.addAll(nextArguments);
+				}
+				
+				if (toolPane.getEncloseWith() != null) {
+					input.add(toolPane.getEncloseWith());
 				}
 			}
 		}

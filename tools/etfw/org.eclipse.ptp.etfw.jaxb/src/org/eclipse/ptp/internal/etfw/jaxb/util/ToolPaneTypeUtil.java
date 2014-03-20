@@ -9,8 +9,10 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.etfw.jaxb.util;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
@@ -27,13 +29,14 @@ import org.eclipse.ptp.internal.rm.jaxb.core.JAXBCoreConstants;
  */
 public class ToolPaneTypeUtil {
 
-	public static String getArgument(ILaunchConfiguration configuration, String configID) {
+	public static List<String> getArguments(ILaunchConfiguration configuration, String configID) {
+		List<String> arguments = new ArrayList<String>();
 		try {
 			String controlId = configuration.getAttribute(ETFWCoreConstants.RM_NAME,
 					JAXBCoreConstants.ZEROSTR);
 			String attributeKey = controlId + JAXBCoreConstants.DOT + configID;
-			String args = new String(JAXBCoreConstants.ZEROSTR);
 			Iterator<?> iterator = configuration.getAttributes().keySet().iterator();
+			
 			while (iterator.hasNext()) {
 				String key = iterator.next().toString();
 				if (key.startsWith(attributeKey) && !key.endsWith(ETFWCoreConstants.PAIRED_ATTRIBUTE_SAVED)) {
@@ -45,29 +48,25 @@ public class ToolPaneTypeUtil {
 						try {
 							value = Integer.toString(configuration.getAttribute(key, 0));
 						} catch (DebugException e1) {
-							// e1.printStackTrace();
 							// just ignore the value
 						}
 					}
-
+					
 					if (!value.trim().isEmpty()) {
-						if (value.endsWith(JAXBCoreConstants.EQ)) {
-							// Locate paired attribute
-							String pairedKey = key + ETFWCoreConstants.PAIRED_ATTRIBUTE_SAVED;
-							if (configuration.hasAttribute(pairedKey)) {
-								value += configuration.getAttribute(pairedKey, JAXBCoreConstants.ZEROSTR);
-							}
-						}
-						args += value + JAXBCoreConstants.SP;
+						 arguments.add(value);
+						// Locate paired attribute
+						String pairedKey = key + ETFWCoreConstants.PAIRED_ATTRIBUTE_SAVED;
+						if (configuration.hasAttribute(pairedKey)) {
+							arguments.add(configuration.getAttribute(pairedKey, JAXBCoreConstants.ZEROSTR));
+						} 
 					}
 				}
 			}
-			args = args.trim();
-			return args;
+			return arguments;
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
-		return ""; //$NON-NLS-1$
+		return arguments;
 	}
 
 	public static Map<String, String> getEnvVars(ILaunchConfiguration configuration, String configVarID) {
@@ -84,36 +83,36 @@ public class ToolPaneTypeUtil {
 			while (iterator.hasNext()) {
 				String key = iterator.next().toString();
 				if (key.startsWith(keyStartsWith)) {
-					
-					String value = ""; //$NON-NLS-1$
-					if (key.endsWith("MAP")) {
+
+					String value = JAXBCoreConstants.ZEROSTR; 
+					if (key.endsWith("MAP")) { //$NON-NLS-1$
 						Map map = configuration.getAttribute(key, new HashMap<String, String>());
 						Iterator mapIterator = map.keySet().iterator();
-						while(mapIterator.hasNext()) {
+						while (mapIterator.hasNext()) {
 							Object envKey = mapIterator.next();
 							Object envValue = map.get(envKey);
 							envMap.put(envKey.toString().trim(), envValue.toString().trim());
-							
+
 						}
 					}
-					else{
+					else {
 						// split the key with the variable name (after the last underscore)
 						String mapKey = key.replace(keyStartsWith, JAXBCoreConstants.ZEROSTR);
-					try {
-						// Try string attribute
-						value = configuration.getAttribute(key, JAXBCoreConstants.ZEROSTR);
-					} catch (DebugException e) {
 						try {
-							// Try integer attribute
-							value = Integer.toString(configuration.getAttribute(key, 0));
-						} catch (DebugException e1) {
-							// Ignore other types
+							// Try string attribute
+							value = configuration.getAttribute(key, JAXBCoreConstants.ZEROSTR);
+						} catch (DebugException e) {
+							try {
+								// Try integer attribute
+								value = Integer.toString(configuration.getAttribute(key, 0));
+							} catch (DebugException e1) {
+								// Ignore other types
+							}
+						}
+						if (value != null && value.trim().length() > 0) {
+							envMap.put(mapKey, value);
 						}
 					}
-					if (value != null && value.trim().length() > 0) {
-						envMap.put(mapKey, value);
-					}
-				}
 				}
 			}
 			return envMap;

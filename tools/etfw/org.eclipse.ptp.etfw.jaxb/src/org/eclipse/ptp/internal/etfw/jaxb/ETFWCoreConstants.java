@@ -30,4 +30,6 @@ public class ETFWCoreConstants {
 	public static final String PAIRED_ATTRIBUTE_SAVED = "_SAVED"; //$NON-NLS-1$
 	public static final String RM_NAME = "org.eclipse.ptp.launch.RESOURCE_MANAGER_NAME"; //$NON-NLS-1$
 	public static final String URL_SP = "%20"; //$NON-NLS-1$
+	public static final String EQ = JAXBCoreConstants.EQ;
+	
 }

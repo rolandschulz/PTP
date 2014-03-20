@@ -25,6 +25,7 @@ import org.eclipse.ptp.core.util.LaunchUtils;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.PreferenceConstants;
 import org.eclipse.ptp.internal.etfw.jaxb.JAXBInitializationUtil;
+import org.eclipse.ptp.internal.etfw.jaxb.data.AnalysisToolType;
 import org.eclipse.ptp.internal.etfw.jaxb.data.BuildToolType;
 import org.eclipse.ptp.internal.etfw.jaxb.data.EtfwToolProcessType;
 import org.eclipse.ptp.internal.etfw.jaxb.data.ExecToolType;
@@ -347,6 +348,23 @@ public class PerformanceAnalysisTab extends LaunchConfigurationTab implements IT
 						}
 					}
 				}
+			} else if (tool instanceof AnalysisToolType) {
+				AnalysisToolType analysisTool = (AnalysisToolType) tool;
+				if (analysisTool.getGlobal() != null) {
+					for (ToolPaneType toolPane : analysisTool.getGlobal().getToolPanes()) {
+						if (!toolPane.isVirtual() && toolPane.getOptionPane() != null) {
+							subTabs.add(toolPane);
+						}
+					}
+				}
+
+				for (ToolAppType toolApp : analysisTool.getAnalysisCommands()) {
+					for (ToolPaneType toolPane : toolApp.getToolPanes()) {
+						if (!toolPane.isVirtual() && toolPane.getOptionPane() != null) {
+							subTabs.add(toolPane);
+						}
+					}
+				}
 			}
 		}
 		return subTabs;
@@ -458,7 +476,7 @@ public class PerformanceAnalysisTab extends LaunchConfigurationTab implements IT
 		@Override
 		public void widgetSelected(SelectionEvent e) {
 			int selection = toolCombo.getSelectionIndex();
-			if(selection != -1) {
+			if (selection != -1) {
 				String toolName = toolCombo.getItem(selection);
 				rebuildTab(toolName);
 				updateLaunchConfigurationDialog();
@@ -474,6 +492,7 @@ public class PerformanceAnalysisTab extends LaunchConfigurationTab implements IT
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#getName()
 	 */
 	@Override
@@ -493,7 +512,10 @@ public class PerformanceAnalysisTab extends LaunchConfigurationTab implements IT
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#setLaunchConfigurationDialog(org.eclipse.debug.ui.ILaunchConfigurationDialog)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.AbstractLaunchConfigurationTab#setLaunchConfigurationDialog(org.eclipse.debug.ui.ILaunchConfigurationDialog
+	 * )
 	 */
 	@Override
 	public void setLaunchConfigurationDialog(ILaunchConfigurationDialog dialog) {
@@ -532,7 +554,7 @@ public class PerformanceAnalysisTab extends LaunchConfigurationTab implements IT
 
 		return true;
 	}
-	
+
 	public Image getImage() {
 		return LaunchImages.getImage(LaunchImages.IMG_PERFORMANCE_TAB);
 	}

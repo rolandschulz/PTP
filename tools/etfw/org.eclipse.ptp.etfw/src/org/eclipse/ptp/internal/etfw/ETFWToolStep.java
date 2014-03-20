@@ -26,6 +26,7 @@ import org.eclipse.ptp.etfw.IBuildLaunchUtils;
 import org.eclipse.ptp.etfw.IToolLaunchConfigurationConstants;
 import org.eclipse.ptp.etfw.toolopts.ToolApp;
 import org.eclipse.ptp.etfw.toolopts.ToolsOptionsConstants;
+import org.eclipse.ptp.internal.etfw.jaxb.ETFWCoreConstants;
 import org.eclipse.ptp.internal.etfw.jaxb.data.ToolAppType;
 import org.eclipse.ptp.internal.etfw.jaxb.data.ToolIOType;
 import org.eclipse.ptp.internal.etfw.jaxb.util.ToolAppTypeUtil;
@@ -151,7 +152,11 @@ public abstract class ETFWToolStep extends Job implements IToolLaunchConfigurati
 		}
 
 		for (final String a : argList) {
-			args += a + " "; //$NON-NLS-1$
+			if(a.endsWith(ETFWCoreConstants.EQ)) {
+				args += a;
+			} else {
+				args += a + IToolLaunchConfigurationConstants.SPACE;
+			}
 		}
 
 		// Formerly replaced with projectLocation global variable. May be the

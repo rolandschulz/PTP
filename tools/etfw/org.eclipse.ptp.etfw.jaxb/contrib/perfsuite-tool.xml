@@ -3,8 +3,6 @@
 	<controlData>
 		<attribute name="PERFSUITE_psrun.configuration_id_-CONFIG" type="boolean" translateBooleanAs="-c, ">
 			<rm:description>Specify configuration file</rm:description>
-			<rm:default>
-			</rm:default>
 		</attribute>
 		<attribute name="PERFSUITE_psrun.configuration_id_-CONFIG_SAVED" type="string">
 			<rm:description>Specified configuration file</rm:description>
@@ -69,8 +67,40 @@
 			</rm:default>
 		</attribute>
 		<attribute name="PERFSUITE_psrun.configuration_id_-OVERFLOW_THRESHOLD_SAVED" type="string">
-			<rm:description>Overflow threshold</rm:description>
+			<rm:description>Specify overflow threshold</rm:description>
 		</attribute>
+		<attribute name="PERFSUITE_psrun.configuration_id_-OUTPUT" type="boolean" translateBooleanAs="-o, ">
+			<rm:description>Use output prefix</rm:description>
+			<rm:default>-o</rm:default>
+		</attribute>
+		<attribute name="PERFSUITE_psrun.configuration_id_-OUTPUT_SAVED" type="string">
+			<rm:description>Output prefix</rm:description>
+			<rm:default>psprocess</rm:default>
+		</attribute>
+		
+		<!-- PSProcess Attributes -->
+		<attribute name="PERFSUITE_psprocess.configuration_id_XMLOUTPUT" type="boolean" translateBooleanAs="-x, ">
+		</attribute>
+		<attribute name="PERFSUITE_psprocess.configuration_id_INPUTFILE" type="string">
+		</attribute>
+		<attribute name="PERFSUITE_psprocess.configuration_id_GLOB" type="boolean" translateBooleanAs="--glob , ">
+			<rm:default>--glob</rm:default>
+		</attribute>
+		<attribute name="PERFSUITE_psprocess.configuration_id_GLOB_SAVED" visible="false">
+		</attribute>
+		<attribute name="psProcessOutputDirectoryCB" type="boolean">
+			<rm:default>true</rm:default>
+		</attribute>
+		<attribute name="org.eclipse.ptp.launch.WORKING_DIR_ATTR">
+		</attribute>
+		<attribute name="PERFSUITE_psprocess.configuration_id_-OUTPUT" type="boolean" translateBooleanAs="-o, ">
+			<rm:description>Specify output file</rm:description>
+			<rm:default>-o</rm:default>
+		</attribute>
+		<attribute name="PERFSUITE_psprocess.configuration_id_-OUTPUT_SAVED" type="string">
+			<rm:description>Output file name</rm:description>
+			<rm:default>mhpr.xml</rm:default>
+		</attribute>	
 	</controlData>
 	<execTool tool-name="PerfSuite">
 		<execUtils tool-command="psrun">
@@ -207,9 +237,100 @@
 								<rm:enable-if button="overflow-threshold-button" selected="true" />
 							</rm:control-state>
 						</rm:widget>
+						<rm:widget type="checkbox" title="Output" buttonId="outputCB" style="SWT.LEFT"
+							attribute="PERFSUITE_psrun.configuration_id_-OUTPUT">
+							<rm:layout-data>
+								<rm:grid-data widthHint="150" horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+							<rm:tooltip>Specify output prefix</rm:tooltip>
+						</rm:widget>
+						<rm:widget type="text" style="SWT.BORDER" attribute="PERFSUITE_psrun.configuration_id_-OUTPUT_SAVED">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:tooltip>Output prefix to use</rm:tooltip>
+							<rm:control-state>
+								<rm:enable-if button="outputCB" selected="true" />
+							</rm:control-state>
+						</rm:widget>
 					</rm:composite>
 				</optionPane>
 			</toolPanes>
 		</execUtils>
 	</execTool>
+	<analysisTool>
+		<analysis-commands tool-command="psprocess">
+			<!--   <toolArguments value="-glob mytest*"/> -->
+			<toolPanes virtual="false" embedded="false">
+				<configId>PERFSUITE_psprocess.configuration_id_</configId>
+				<configVarId>PERFSUITE_psprocess.environmentvariables.configuration_id_</configVarId>
+				<optionPane>
+					<rm:title>PSProcess</rm:title>
+					<rm:layout>
+						<rm:grid-layout />
+					</rm:layout>
+					<rm:composite>
+						<rm:layout>
+							<rm:grid-layout numColumns="3" makeColumnsEqualWidth="false" />
+						</rm:layout>
+						<rm:layout-data>
+							<rm:grid-data horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="true" />
+						</rm:layout-data>
+						<rm:widget type="checkbox" title="XML Output" buttonId="xmlOutputCB" style="SWT.LEFT" attribute="PERFSUITE_psprocess.configuration_id_XMLOUTPUT">
+							<rm:layout-data>
+								<rm:grid-data widthHint="150" horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+							<rm:tooltip>Produce xml as output</rm:tooltip>
+						</rm:widget>
+						<rm:widget type="label" style="SWT.LEFT">
+							<rm:layout-data>
+	                     		<rm:grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+	                  		</rm:layout-data>
+	                  		<rm:tooltip>Specify the directory of the psrun output to post process</rm:tooltip>
+	                  		<rm:fixed-text>Output Directory:</rm:fixed-text>
+						</rm:widget>
+						<rm:browse title="Browse..." localOnly="false" directory="true" textStyle="SWT.BORDER"
+							attribute="org.eclipse.ptp.launch.WORKING_DIR_ATTR">
+							<rm:text-layout-data>
+								<rm:grid-data horizontalSpan="1" horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="true" />
+							</rm:text-layout-data>
+							<rm:button-layout-data>
+								<rm:grid-data horizontalSpan="1" horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="false" />
+							</rm:button-layout-data>
+							<rm:tooltip>Location of the psrun output files</rm:tooltip>
+						</rm:browse>
+						<rm:widget type="label" style="SWT.LEFT">
+							<rm:layout-data>
+	                     		<rm:grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
+	                  		</rm:layout-data>
+	                  		<rm:tooltip>Specify the file output pattern to search on for post processing (e.g. psprocess*)</rm:tooltip>
+	                  		<rm:fixed-text>Output file pattern:</rm:fixed-text>
+						</rm:widget>
+						<rm:widget type="text" style="SWT.BORDER" attribute="PERFSUITE_psprocess.configuration_id_GLOB_SAVED">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:tooltip>psrun output prefix to search on for post processing</rm:tooltip>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Output" buttonId="psProcessOutputCB" style="SWT.LEFT"
+							attribute="PERFSUITE_psprocess.configuration_id_-OUTPUT">
+							<rm:layout-data>
+								<rm:grid-data widthHint="150" horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+							<rm:tooltip>Specify output file name</rm:tooltip>
+						</rm:widget>
+						<rm:widget type="text" style="SWT.BORDER" attribute="PERFSUITE_psprocess.configuration_id_-OUTPUT_SAVED">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:tooltip>Output file name</rm:tooltip>
+							<rm:control-state>
+								<rm:enable-if button="psProcessOutputCB" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+					</rm:composite>
+				</optionPane>
+			</toolPanes>
+		</analysis-commands>
+	</analysisTool>
 </etfwTool>
