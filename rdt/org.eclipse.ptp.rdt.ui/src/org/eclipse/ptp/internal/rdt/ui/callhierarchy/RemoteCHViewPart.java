@@ -454,7 +454,7 @@ public class RemoteCHViewPart extends ViewPart {
                 CHNode n2= (CHNode) e2;
                 int offset1= n1.getFirstReferenceOffset();
                 int offset2= n2.getFirstReferenceOffset();
-                return CoreUtility.compare(offset1, offset2);
+                return Integer.compare(offset1, offset2);
             }
         };
         
