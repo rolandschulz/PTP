@@ -364,14 +364,32 @@ sub escape_special_characters {
 # @return passed string with escaped XML special characters
 #***************************************************************************
 sub escapeForXML{
+	no warnings "utf8";#Ignore the warnings as the entire UTF8 range is required for the range checks
 	my $result = shift;
 	$result =~ s/&/&amp;/g;
+	$result =~ s/\n/\&\#10;/gs;
 	$result =~ s/</&lt;/g;
 	$result =~ s/>/&gt;/g;
 	$result =~ s/"/&quot;/g;
 	$result =~ s/'/&apos;/g;
-	
-	return $result;
+	#Exclude invalid Unicode characters,
+	#examples are thos characters marking the coloring for the console outputs
+	#see http://www.w3.org/TR/2000/REC-xml-20001006#NT-Char for definition of allowed XML characters
+	my @chars = split('', $result);
+	my $finalResult = "";
+
+	for(my $i=0;$i<= $#chars; $i++){
+		my $current = $chars[$i];
+		if (($current eq "\N{U+0009}") ||
+	        ($current eq "\N{U+000A}") ||
+	        ($current eq "\N{U+000D}") ||
+	        (($current ge "\N{U+0020}") && ($current le "\N{U+D7FF}")) ||
+	        (($current ge "\N{U+E000}") && ($current le "\N{U+FFFD}")) ||
+	        (($current ge "\N{U+10000}") && ($current le "\N{U+10FFFF}"))){
+	        $finalResult.= $current;
+		}
+	}
+	return $finalResult;
 }
 
 1;

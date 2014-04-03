@@ -114,16 +114,6 @@ sub modify {
     my($key,$mkey,$value)=@_;
     my $ret=$value;
 
-    if($mkey eq "motd") {
-#	$ret=~s/\&/&amp;/gs;
-	$ret=~s/\n/\&\#10;/gs;
-        $ret=~s/</\&lt;/gs;
-        $ret=~s/>/\&gt;/gs;
-        $ret=~s/\&/\&amp;/gs;
-        $ret=~s/'/\&apos;/gs;
-        $ret=~s/"/\&quot;/gs;
-    }
-
     return($ret);
 }
 
