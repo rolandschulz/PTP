@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Tests
+Bundle-SymbolicName: org.eclipse.ptp.rdt.sync.git.core.tests
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Import-Package: org.eclipse.core.resources,
+ org.eclipse.core.runtime,
+ org.eclipse.ptp.internal.rdt.sync.core,
+ org.eclipse.ptp.rdt.sync.core,
+ org.eclipse.remote.core,
+ org.eclipse.remote.core.exception
+Require-Bundle: org.junit;bundle-version="4.11.0"
