@@ -14,5 +14,5 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: %pluginProvider
 Bundle-Localization: plugin
-Export-Package: org.eclipse.ptp.internal.rdt.sync.git.core;x-friends:="org.eclipse.ptp.rdt.sync.git.ui,org.eclipse.ptp.rdt.sync.core.tests",
+Export-Package: org.eclipse.ptp.internal.rdt.sync.git.core;x-friends:="org.eclipse.ptp.rdt.sync.git.ui,org.eclipse.ptp.rdt.sync.core.tests,org.eclipse.ptp.rdt.sync.git.core.tests",
  org.eclipse.ptp.internal.rdt.sync.git.core.messages;x-internal:=true
