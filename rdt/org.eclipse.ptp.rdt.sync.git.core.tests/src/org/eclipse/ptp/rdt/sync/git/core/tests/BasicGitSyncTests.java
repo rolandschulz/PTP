@@ -141,6 +141,7 @@ public class BasicGitSyncTests {
 	private static void deleteConnection(IRemoteConnection conn) {
 		IRemoteConnectionManager connMgr = getRemoteConnectionManager();
 		try {
+			conn.close();
 			connMgr.removeConnection(conn);
 		} catch (RemoteConnectionException e) {
 			RDTSyncCorePlugin.log("Unable to delete connection", e);
