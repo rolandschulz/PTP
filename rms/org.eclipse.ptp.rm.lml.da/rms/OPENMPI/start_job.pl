@@ -116,12 +116,18 @@ if ($launchMode eq 'debug') {
 	$ROUTING_FILE = getcwd() . "/routes_" . $ENV{'PTP_JOBID'};
 	push(@ARGV, "-mca", "orte_show_resolved_nodenames", "1", "-display-map");
 	push(@debuggerArgs, "--routing_file=$ROUTING_FILE");
-        $pid = fork();
-        if ($pid == 0) {
-                exec($debuggerPath, "--master", @debuggerArgs);
-                exit(1);
-        }
-        push(@child_pids, $pid);
+	#
+	# If PTP_DEBUG_START_MASTER is set then the debugger is asking us to start the master SDM. 
+	# Otherwise we assume the master SDM is started elsewhere...
+	#
+	if (exists $ENV{'PTP_DEBUG_START_MASTER'}) {
+		$pid = fork();
+		if ($pid == 0) {
+			exec($debuggerPath, "--master", @debuggerArgs);
+			exit(1);
+		}
+		push(@child_pids, $pid);
+	}
 }
 
 # Set autoflush to pass output as soon as possble

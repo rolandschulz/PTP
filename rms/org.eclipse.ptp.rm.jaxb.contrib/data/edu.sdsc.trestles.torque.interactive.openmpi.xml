@@ -213,6 +213,10 @@ three processors on one red node: -l nodes=2:blue:ppn=2+red:ppn=3.]]></tooltip>
 					</match>
 				</target>
 			</stderr-parser>
+			<!-- The SDM master must be started here rather than in the start_job.pl script. This is because the Torque interactive will run
+			     the script on one of the compute nodes, however the SDM master must be run on the login node so that it can connect to the
+			     remote end of the ssh tunnel. -->
+			<pre-launch-cmd name="SDM Master" exec="${ptp_rm:debuggerExecutablePath#value} --master --routing_file=routes_@jobId ${ptp_rm:debuggerArgs#value}" wait="false"/>
 		</submit-interactive-debug>
 		<get-job-status name="get-job-status" ignoreExitStatus="true">
 			<arg>${ptp_rm:bindir#value}qstat</arg>
