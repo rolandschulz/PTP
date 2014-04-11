@@ -125,11 +125,6 @@ sub modify {
     my($key,$mkey,$value)=@_;
     my $ret=$value;
 
-    if($mkey eq "motd") {
-	$ret = escapeForXML($ret);
-	$ret=~s/\n/\&\#10;/gs;
-    }
-
     return($ret);
 }
 

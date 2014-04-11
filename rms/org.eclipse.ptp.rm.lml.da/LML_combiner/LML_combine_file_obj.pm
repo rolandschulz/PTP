@@ -257,12 +257,14 @@ sub escapeForXML{
 	$result =~ s/&gt;/>/g;
 	$result =~ s/&quot;/"/g;
 	$result =~ s/&apos;/'/g;
+	$result =~ s/\&\#10;/\n/gs;
 	#Now escape all special characters in the result string
 	$result =~ s/&/&amp;/g;
 	$result =~ s/</&lt;/g;
 	$result =~ s/>/&gt;/g;
 	$result =~ s/"/&quot;/g;
 	$result =~ s/'/&apos;/g;
+	$result =~ s/\n/\&\#10;/gs;
 	
 	return $result;
 }

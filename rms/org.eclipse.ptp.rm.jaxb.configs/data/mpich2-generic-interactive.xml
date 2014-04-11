@@ -131,11 +131,6 @@
 						<grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true"/>
 					</layout-data>
 					<title>Options</title>
-					<widget type="checkbox" title="No local" attribute="noLocalOption">
-						<layout-data>
-							<grid-data horizontalSpan="2"/>
-						</layout-data>
-					</widget>
 					<widget type="checkbox" title="Prefix:" buttonId="prefixButton" attribute="prefixOption"/>
 					<widget type="text" style="SWT.BORDER" attribute="prefix">
 						<layout-data>
