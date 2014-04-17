@@ -7,7 +7,11 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Import-Package: org.eclipse.core.resources,
  org.eclipse.core.runtime,
  org.eclipse.ptp.internal.rdt.sync.core,
+ org.eclipse.ptp.internal.rdt.sync.git.core,
  org.eclipse.ptp.rdt.sync.core,
+ org.eclipse.ptp.rdt.sync.core.exceptions,
+ org.eclipse.ptp.rdt.sync.core.services,
  org.eclipse.remote.core,
  org.eclipse.remote.core.exception
-Require-Bundle: org.junit;bundle-version="4.11.0"
+Require-Bundle: org.junit;bundle-version="4.11.0",
+ org.eclipse.jgit
