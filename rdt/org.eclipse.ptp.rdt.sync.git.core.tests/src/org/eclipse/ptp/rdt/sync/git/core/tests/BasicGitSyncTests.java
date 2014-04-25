@@ -27,11 +27,11 @@ import org.eclipse.ptp.internal.rdt.sync.git.core.JGitRepo;
 import org.eclipse.ptp.rdt.sync.core.RemoteLocation;
 import org.eclipse.ptp.rdt.sync.core.exceptions.MissingConnectionException;
 import org.eclipse.remote.core.IRemoteConnection;
-import org.eclipse.remote.core.IRemoteConnectionManager;
-import org.eclipse.remote.core.IRemoteConnectionWorkingCopy;
 import org.eclipse.remote.core.IRemoteServices;
 import org.eclipse.remote.core.RemoteServices;
 import org.eclipse.remote.core.exception.RemoteConnectionException;
+import org.eclipse.remote.internal.jsch.core.JSchConnectionManager;
+import org.eclipse.remote.internal.jsch.core.JSchConnectionWorkingCopy;
 import org.junit.Test;
 
 /**
@@ -40,16 +40,16 @@ import org.junit.Test;
  * Tests are configured in "remotehost.properties." Basic sync operations are performed on and between the given local and remote
  * directories. Timing information is also logged, which is useful for identifying bottlenecks for a particular local/remote pair.
  */
+@SuppressWarnings("restriction")
 public class BasicGitSyncTests {
 	private static String remoteServicesProvider = "org.eclipse.remote.JSch";
 	private static String testConnectionName = "testSyncConnection";
 
-	private String host = null;
-	private String username = null;
-	private String password = null;
 	private String localBaseDir = null;
 	private String remoteBaseDir = null;
 	private int steps = 1;
+	private IRemoteConnection remoteConn;
+	private boolean init = false;
 
 	/**
 	 * Constructor - reads in test configuration
@@ -68,23 +68,30 @@ public class BasicGitSyncTests {
 			log("Unable to close test properties file", e);
 		}
 
-		host = prop.getProperty("host");
-		username = prop.getProperty("username");
-		password = prop.getProperty("password");
 		localBaseDir = prop.getProperty("localBaseDir");
+		if (localBaseDir == null) {
+			log("localBaseDir property required");
+			return;
+		}
+
 		remoteBaseDir = prop.getProperty("remoteBaseDir");
+		if (remoteBaseDir == null || remoteBaseDir.equals("")) {
+			remoteBaseDir = "/tmp";
+		}
+
 		String numSteps = prop.getProperty("steps");
 		if (numSteps != null) {
 			steps = Integer.parseInt(numSteps);
 		}
-		// TODO: Change so that password is not required in config file.
-		assertTrue(host != null && password != null);
-		if (username == null || username.equals("")) {
-			username = System.getProperty("user.name");
+
+		try {
+			// TODO: Pop up a dialog for password if it is not specified.
+			remoteConn = createTestConnection(prop);
+		} catch (RemoteConnectionException e) {
+			log("Unable to create test connection", e);
+			return;
 		}
-		if (remoteBaseDir == null || remoteBaseDir.equals("")) {
-			remoteBaseDir = "/tmp";
-		}
+		init = true;
 	}
 
 	/**
@@ -96,20 +103,12 @@ public class BasicGitSyncTests {
 	 */
 	@Test
 	public void basicGitSyncTest() throws CoreException, GitAPIException, IOException, MissingConnectionException {
-		IRemoteConnection conn;
-
-		try {
-			// TODO: Pop up a dialog for password if it is not specified.
-			conn = createTestConnection(host, username, password, remoteBaseDir);
-		} catch (RemoteConnectionException e) {
-			log("Unable to create test connection to host: " + host + " directory: " + remoteBaseDir, e);
-			return;
-		}
+		assertTrue("Test initialization failed", init);
 
 		RemoteLocation remoteLocation = new RemoteLocation();
-		remoteLocation.setConnection(conn);
+		remoteLocation.setConnection(remoteConn);
 		remoteLocation.setLocation(remoteBaseDir);
-		remoteLocation.setRemoteServicesId(conn.getRemoteServices().getId());
+		remoteLocation.setRemoteServicesId(remoteConn.getRemoteServices().getId());
 
 		Timer stepTimer = new Timer();
 		Timer totalTimer = new Timer();
@@ -149,18 +148,43 @@ public class BasicGitSyncTests {
 			log("\n");
 			stepTimer.reset();
 		}
-		deleteConnection(conn);
+		deleteConnection(remoteConn);
 	}
 
-	private static IRemoteConnection createTestConnection(String host, String username, String password, String remoteBaseDir)
+	private static IRemoteConnection createTestConnection(Properties prop)
 			throws RemoteConnectionException {
-		IRemoteConnectionManager connMgr = getRemoteConnectionManager();
+		JSchConnectionManager connMgr = getRemoteConnectionManager();
 		assertNotNull(connMgr);
 
-		IRemoteConnectionWorkingCopy wc = connMgr.newConnection(testConnectionName); //$NON-NLS-1$  
+		String host = prop.getProperty("host");
+		String username = prop.getProperty("username");
+		String password = prop.getProperty("password");
+		String keyFile = prop.getProperty("keyFile");
+		String portString = prop.getProperty("port");
+		if (host == null) {
+			throw new RemoteConnectionException("host property required");
+		}
+
+		if (password == null && keyFile == null) {
+			throw new RemoteConnectionException("Either password or keyFile property required");
+		}
+		if (username == null || username.equals("")) {
+			username = System.getProperty("user.name");
+		}
+
+		JSchConnectionWorkingCopy wc = (JSchConnectionWorkingCopy) connMgr.newConnection(testConnectionName); //$NON-NLS-1$  
 		wc.setAddress(host);
 		wc.setUsername(username);
-		wc.setPassword(password);
+		if (keyFile != null) {
+			wc.setKeyFile(keyFile);
+			wc.setIsPasswordAuth(false);
+		} else {
+			wc.setPassword(password);
+			wc.setIsPasswordAuth(true);
+		}
+		if (portString != null) {
+			wc.setPort(Integer.parseInt(portString));
+		}
 		IRemoteConnection conn = wc.save();
 		assertNotNull(conn);
 
@@ -172,7 +196,7 @@ public class BasicGitSyncTests {
 	}
 
 	private static void deleteConnection(IRemoteConnection conn) {
-		IRemoteConnectionManager connMgr = getRemoteConnectionManager();
+		JSchConnectionManager connMgr = getRemoteConnectionManager();
 		try {
 			conn.close();
 			connMgr.removeConnection(conn);
@@ -181,11 +205,11 @@ public class BasicGitSyncTests {
 		}
 	}
 
-	private static IRemoteConnectionManager getRemoteConnectionManager() {
+	private static JSchConnectionManager getRemoteConnectionManager() {
 		IRemoteServices remoteServices = RemoteServices.getRemoteServices(remoteServicesProvider);
 		assertNotNull(remoteServices);
 
-		return remoteServices.getConnectionManager();
+		return (JSchConnectionManager) remoteServices.getConnectionManager();
 	}
 
 	// Report event and elapsed time, according to passed timer, to the log.
