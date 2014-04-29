@@ -317,22 +317,17 @@ public class GitRepo {
 	 * 			on problems executing the necessary remote commands.
 	 * @throws MissingConnectionException
 	 * 			if the connection is unresolved
+	 * @return CommandResults
+	 * 			merge results
      */
-    public void merge(IProgressMonitor monitor) throws RemoteSyncException, MissingConnectionException {
+    public CommandResults merge(IProgressMonitor monitor) throws RemoteSyncException, MissingConnectionException {
 		CommandResults mergeResults;
 		// ff-only was introduced in Git 1.6.6 and prevents accidental corruption of the remote repository.
-		String command;
-		if (remoteGitVersion >= 1060600) {
-			command = gitCommand() + " merge --ff-only " + GitSyncService.remotePushBranch; //$NON-NLS-1$
-		} else {
-			command = gitCommand() + " merge " + GitSyncService.remotePushBranch; //$NON-NLS-1$
-		}
-
+		// For Eclipse Luna, we only support Git 1.7 or greater and so always use --ff-only. Always having this option makes the
+		// sync easier to optimize, because we can safely do only a local-to-remote sync. See bug 410695.
+		String command = gitCommand() + " merge --ff-only " + GitSyncService.remotePushBranch; //$NON-NLS-1$
 		try {
-			mergeResults = this.executeRemoteCommand(command, monitor);
-			if (mergeResults.getExitCode() != 0) {
-				throw new RemoteSyncException(new RemoteExecutionException(Messages.GitRepo_13 + mergeResults.getStderr()));
-			}
+			return this.executeRemoteCommand(command, monitor);
 		} catch (IOException e) {
 			throw new RemoteSyncException(e);
 		} catch (InterruptedException e) {

@@ -43,6 +43,15 @@ public class CommandRunner {
 		private int exitCode;
 
 		/**
+		 * Constructor creates a default result of success with no output.
+		 */
+		public CommandResults() {
+			stdout = ""; //$NON-NLS-1$
+			stderr = ""; //$NON-NLS-1$
+			exitCode = 0;
+		}
+
+		/**
 		 * @return the exitCode
 		 */
 		public int getExitCode() {
