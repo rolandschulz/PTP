@@ -1,0 +1,55 @@
+<html>
+<head>
+<title>Remote Generic Interactive</title>
+<link rel="stylesheet" type="text/css" href="../help.css">
+<script type="text/javascript" src="thumb.js"> </script>
+</head>
+<body>
+
+<h1 id="top">Remote Generic Interactive</h1>
+<p>This section describes how to set up a run configuration using the "Remote Generic Interactive" 
+as a target system configuration for the <a href="../toc.html">Parallel Tools Platform (PTP)</a>.
+
+<p>This target system configuration (TSC) is a simple way to launch a job on a remote system,
+not especially a parallel job.
+ 
+<p>As described in <a href="../03pRunConfig.html">Running Parallel Programs</a>, create a run configuration
+via Run > Run Configurations ... and create a new <b>Parallel Application</b>.
+<p>The specifics for running the remote program with PTP are specified on
+the <b>Resources</b> tab of the run configuration.
+For <b>Target System Configuration</b>, select <b>Remote-Generic-Interactive</b>
+<p><img src="../images/rms-remote-generic-interative.png">
+<p>Then specify a <b>Remote Service Provider</b> and a connection.  If you have already specified a connection, e.g.
+for a <a href="../sync.html">Synchronized Project</a> or a remote project,
+you can select it, or you can create a new connection at this point with the <b>New...</b> button.
+
+<p><img src="../images/rms-remote-generic-interative-conn.png">
+<blockquote>
+<p>For how to create a connection, see <a href="../remoteTools.html#create">Creating Remote Connections</a> and 
+<a href="../remoteTools.html#local">Local Connections</a>
+
+<p>Note: To edit connection information after a connection has been created, e.g. to change user name or password, see
+<a href="../remoteTools.html#edit">Editing Remote Connections</a> in Remote Tools.
+</blockquote>
+<p>After selecting a Connection, it will ask to run a command on the system.
+Select <b>Yes</b> to continue.  Check the <b>Don't ask to run command again for this configuration</b>
+to avoid being asked again for this launch configuration.  The information from the command results will be used
+to populate information on the dialog.
+
+<p>On the <b>Application</b> tab (as described in 
+<a href="../03pRunConfig.html#application">run configuration setup for running your parallel application</a>),
+for the <b>Remote-Generic-Interactive</b> target system configuration,
+the application name shouldn't be the executable name, but a run script that is provided by the user.
+by specifying the Application program
+on the <b>Application</b> tab, and any other information required.
+Use the <b>Browse...</b> button to select the script from a location on the remote target system.
+<p><img src="../images/rms-remote-generic-interative-app-script.png">
+
+<p>&nbsp
+<p><a href="#top">Back to Top</a> | <a href="../toc.html">Back to Table of Contents</a>
+</body>
+</html>
+
+
+
+
