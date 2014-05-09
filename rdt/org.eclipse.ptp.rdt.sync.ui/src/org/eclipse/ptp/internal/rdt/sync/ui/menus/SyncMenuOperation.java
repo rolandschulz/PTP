@@ -64,7 +64,12 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 	@Override
 	public Object execute(ExecutionEvent event) {
 		String command = event.getParameter(SYNC_COMMAND_PARAMETER_ID);
-		IProject project = getProject();
+		IStructuredSelection sel = this.getSelectedElements();
+		// Ignore empty selection
+		if (sel == null || sel.getFirstElement() == null) {
+			return null;
+		}
+		IProject project = getProject(sel);
 		if (project == null) {
 			RDTSyncUIPlugin.getDefault().logErrorMessage(Messages.SyncMenuOperation_0);
 			return null;
@@ -98,7 +103,6 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 				}
 			} else if (command.equals(syncExcludeCommand) || command.equals(syncIncludeCommand)) {
 				AbstractSyncFileFilter sff = SyncManager.getFileFilter(project);
-				IStructuredSelection sel = this.getSelectedElements();
 				boolean exclude = command.equals(syncExcludeCommand);
 
 				for (Object element : sel.toArray()) {
@@ -127,7 +131,6 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 					|| (command.equals(resolveAsRemoteCommand))) {
 				String currentSyncServiceId = SyncConfigManager.getActive(project).getSyncProviderId();
 				ISynchronizeService syncService = SyncManager.getSyncService(currentSyncServiceId);
-				IStructuredSelection sel = this.getSelectedElements();
 
 				ArrayList<IPath> paths = new ArrayList<IPath>();
 				for (Object element : sel.toArray()) {
@@ -184,7 +187,8 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 			return;
 		}
 
-		IProject project = this.getProject();
+		IStructuredSelection sel = this.getSelectedElements();
+		IProject project = this.getProject(sel);
 		if (project == null) {
 			// Disable error message - this happens routinely for non-IResource selections
 			// RDTSyncUIPlugin.getDefault().logErrorMessage(Messages.SyncMenuOperation_0);
@@ -205,8 +209,7 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 	/*
 	 * Portions copied from org.eclipse.ptp.services.ui.wizards.setDefaultFromSelection
 	 */
-	private IProject getProject() {
-		IStructuredSelection selection = this.getSelectedElements();
+	private IProject getProject(IStructuredSelection selection) {
 		if (selection == null) {
 			return null;
 		}

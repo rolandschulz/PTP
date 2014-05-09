@@ -349,6 +349,7 @@
             class="org.eclipse.ptp.internal.rdt.sync.ui.menus.SyncMenuOperation"
             commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand">
          <enabledWhen>
+            <or>
                <with
                      variable="selection">
                   <count
@@ -364,6 +365,13 @@
                      </adapt>
                   </iterate>
                </with>
+               <with
+                     variable="activePartId">
+                  <equals
+                        value="org.eclipse.ptp.rdt.sync.ui.SyncMergeFileTableViewer">
+                  </equals>
+               </with>
+            </or>
          </enabledWhen>
       </handler>
    </extension>
