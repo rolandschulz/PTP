@@ -3,7 +3,9 @@
       id="org.eclipse.ptp.gig"
       label="%featureName"
       version="8.0.0.qualifier"
-      provider-name="%providerName">
+      provider-name="%providerName"
+      license-feature="org.eclipse.license"
+      license-feature-version="0.0.0">
 
    <description url="http://eclipse.org/ptp">
       The Graphical Explorer of GPU Programs (GIG) is used to help
