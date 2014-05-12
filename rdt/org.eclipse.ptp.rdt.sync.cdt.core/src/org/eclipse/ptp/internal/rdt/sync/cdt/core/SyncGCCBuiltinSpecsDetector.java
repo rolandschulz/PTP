@@ -33,8 +33,6 @@ import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
 import org.eclipse.cdt.core.settings.model.ICLanguageSettingEntry;
 import org.eclipse.cdt.core.settings.model.ICSettingEntry;
 import org.eclipse.cdt.internal.core.BuildRunnerHelper;
-import org.eclipse.cdt.managedbuilder.core.IConfiguration;
-import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.cdt.managedbuilder.core.IToolChain;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuilderCorePlugin;
@@ -218,7 +216,7 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 	 * connection name prepended.
 	 */
 	@Override
-	protected void setSettingEntries(List<ICLanguageSettingEntry> entries) {
+	protected void setSettingEntries(List<? extends ICLanguageSettingEntry> entries) {
 		if (entries == null) {
 			super.setSettingEntries(entries);
 			return;

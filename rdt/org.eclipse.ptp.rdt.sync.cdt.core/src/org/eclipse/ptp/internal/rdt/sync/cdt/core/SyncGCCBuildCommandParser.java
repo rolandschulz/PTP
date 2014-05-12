@@ -17,7 +17,6 @@ import org.eclipse.cdt.core.language.settings.providers.ILanguageSettingsEditabl
 import org.eclipse.cdt.core.settings.model.CIncludePathEntry;
 import org.eclipse.cdt.core.settings.model.ICLanguageSettingEntry;
 import org.eclipse.cdt.core.settings.model.ICSettingEntry;
-import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.language.settings.providers.GCCBuildCommandParser;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -41,7 +40,7 @@ public class SyncGCCBuildCommandParser extends GCCBuildCommandParser implements 
 	 * {@link org.eclipse.ptp.internal.rdt.sync.cdt.core.SyncGCCBuiltinSpecsDetector#setSettingEntries(List)}
 	 */
 	@Override
-	protected void setSettingEntries(List<ICLanguageSettingEntry> entries) {
+	protected void setSettingEntries(List<? extends ICLanguageSettingEntry> entries) {
 		if (entries == null) {
 			super.setSettingEntries(entries);
 			return;
