@@ -147,4 +147,9 @@ public class DummyFile implements IIndexFile, Serializable {
 		return 0;
 	}
 
+	public String getReplacementHeader() throws CoreException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

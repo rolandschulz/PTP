@@ -263,13 +263,13 @@ public class THHierarchyModel {
 
 	private void removeFilteredLeafs(THNode[] rootNodes) {
 		for (THNode node : rootNodes) {
-			node.removeFilteredLeafs();
+			node.removeFilteredLeaves();
 		}
 	}
 	
 	private void removeNonImplementorLeaves(THNode[] rootNodes) {
 		for (THNode node : rootNodes) {
-			node.removeNonImplementorLeafs();
+			node.removeNonImplementorLeaves();
 		}
 	}
 
