@@ -149,6 +149,7 @@
 			<environment name="PTP_LAUNCH_MODE" value="${ptp_rm:launchMode#value}" />
 			<environment name="PTP_DEBUG_EXEC_PATH" value="${ptp_rm:debuggerExecutablePath#value}"/>
 			<environment name="PTP_DEBUG_EXEC_ARGS" value="${ptp_rm:debuggerArgs#value}"/>
+			<environment name="PTP_DEBUG_START_MASTER" value="1"/>
 			<stdout-parser delim="\n">
 				<target ref="@jobId">
 					<match>
