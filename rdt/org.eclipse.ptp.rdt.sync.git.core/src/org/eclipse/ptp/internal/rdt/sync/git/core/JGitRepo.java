@@ -77,7 +77,7 @@ public class JGitRepo {
 	private IPath localDirectory;
 	private Git git;
 	private GitSyncFileFilter fileFilter = null;
-	private boolean mergeMapInitialized = false; // Call "readMergeConflictFiles" at least once before using the map.
+	private boolean mergeMapInitialized = false; // If false, call "readMergeConflictFiles" to populate the map.
 	private final Map<IPath, String[]> fileToMergePartsMap = new HashMap<IPath, String[]>();
 	private final Map<RemoteLocation, TransportGitSsh> remoteToTransportMap = new HashMap<RemoteLocation, TransportGitSsh>();
 
@@ -578,6 +578,9 @@ public class JGitRepo {
 				getRef("refs/remotes/" + remoteBranchName + "/master"); //$NON-NLS-1$ //$NON-NLS-2$
 		final MergeCommand mergeCommand = git.merge().include(remoteMasterRef);
 		subMon.subTask(Messages.JGitRepo_12);
+		// Bug 434783: Merge resolution only works once for each Eclipse session.
+		// Need to reset flag after each merge.
+		mergeMapInitialized = false;
 		return mergeCommand.call();
 		} finally {
 			if (monitor != null) {
