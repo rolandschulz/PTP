@@ -355,6 +355,10 @@ public class SyncGCCBuiltinSpecsDetector extends GCCBuiltinSpecsDetector impleme
 
 	private String getToolchainPath(IProject project) {
 		IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(PLUGIN_ID, TOOLCHAIN_EXTENSION_POINT_ID);
+		// Bug 434896
+		if (extensionPoint == null) {
+			return null;
+		}
 		IConfigurationElement[] infos = extensionPoint.getConfigurationElements();
 		for (IConfigurationElement configurationElement : infos) {
 			if (configurationElement.getName().equals("mapping")) { //$NON-NLS-1$
