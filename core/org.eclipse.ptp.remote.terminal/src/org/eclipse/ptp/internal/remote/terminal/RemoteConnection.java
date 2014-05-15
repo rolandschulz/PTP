@@ -51,7 +51,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 
 @SuppressWarnings("restriction")
-class RemoteConnection extends Thread {
+public class RemoteConnection extends Thread {
 	private static int fgNo;
 
 	protected static Display getStandardDisplay() {
@@ -75,6 +75,7 @@ class RemoteConnection extends Thread {
 		fControl.setState(TerminalState.CONNECTING);
 	}
 
+	@Override
 	public void run() {
 		try {
 			fProject = fConn.getProject();
@@ -158,8 +159,9 @@ class RemoteConnection extends Thread {
 		byte[] buf = new byte[32 * 1024];
 		while (true) {
 			int n = in.read(buf, 0, buf.length);
-			if (n < 0)
+			if (n < 0) {
 				break;
+			}
 			String str = new String(buf, 0, n);
 			boolean print = parse(str);
 			if (print) {
@@ -209,6 +211,7 @@ class RemoteConnection extends Thread {
 
 		getStandardDisplay().asyncExec(new Runnable() {
 
+			@Override
 			public void run() {
 				try {
 					final Dialog dialog = new Dialog(getStandardDisplay().getActiveShell()) {
@@ -271,11 +274,12 @@ class RemoteConnection extends Thread {
 		final String[] choices = str.split("\\s*~~\\s*"); //$NON-NLS-1$
 
 		getStandardDisplay().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				try {
 					final Dialog dialog = new Dialog(getStandardDisplay().getActiveShell()) {
-						private Map<String, String> smap = new HashMap<String, String>();
-						private List<Button> buttons = new ArrayList<Button>();
+						private final Map<String, String> smap = new HashMap<String, String>();
+						private final List<Button> buttons = new ArrayList<Button>();
 
 						@Override
 						protected void configureShell(Shell shell) {
@@ -339,18 +343,16 @@ class RemoteConnection extends Thread {
 	 *            - the file to open
 	 */
 	public void openFile(final String file) {
-		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot()
-				.getProjects();
-		for (int i = 0; i < projects.length; i++) {
-			final IProject prj = projects[i];
+		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+		for (final IProject prj : projects) {
 			final URI remoteURI = Util.getLocationURI(prj);
 			if (remoteURI != null) {
 				if (file.startsWith(remoteURI.getPath())) {
 					// Found!
 					getStandardDisplay().asyncExec(new Runnable() {
+						@Override
 						public void run() {
-							IWorkbenchPage page = PlatformUI.getWorkbench()
-									.getActiveWorkbenchWindow().getActivePage();
+							IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 
 							try {
 								String loc = file.substring(remoteURI.getPath().length() + 1);
@@ -366,9 +368,9 @@ class RemoteConnection extends Thread {
 			}
 		}
 		getStandardDisplay().asyncExec(new Runnable() {
+			@Override
 			public void run() {
-				IWorkbenchPage page = PlatformUI.getWorkbench()
-						.getActiveWorkbenchWindow().getActivePage();
+				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 				try {
 					IEditorDescriptor editorDesc = IDE.getEditorDescriptor(file);
 					IRemoteFileManager irfm = fRemoteConnection.getFileManager();
@@ -383,8 +385,7 @@ class RemoteConnection extends Thread {
 		return;
 	}
 
-	void setupHistoryMonitoring(RemoteConnector remoteConnector, IPreferenceStore preferenceStore)
-			throws IOException {
+	void setupHistoryMonitoring(RemoteConnector remoteConnector, IPreferenceStore preferenceStore) throws IOException {
 		MachineManager.MachineInfo minfo = null;
 		if ((fRemoteConnection.getRemoteServices().getCapabilities() & IRemoteServices.CAPABILITY_SUPPORTS_COMMAND_SHELL) != 0) {
 			fProcess = fRemoteConnection.getCommandShell(IRemoteProcessBuilder.ALLOCATE_PTY);
@@ -407,9 +408,7 @@ class RemoteConnection extends Thread {
 		// Tell history files where to write commands
 		MachineManager.setOutputStream(fRemoteConnection.getAddress(), outputStream);
 
-		String startup = getDefault(
-				preferenceStore.getString(Messages.SHELL_STARTUP_COMMAND),
-				TerminalPrefs.SHELL_STARTUP_DEFAULT);
+		String startup = getDefault(preferenceStore.getString(Messages.SHELL_STARTUP_COMMAND), TerminalPrefs.SHELL_STARTUP_DEFAULT);
 
 		if (minfo != null) {
 			if (minfo.isCsh) {
