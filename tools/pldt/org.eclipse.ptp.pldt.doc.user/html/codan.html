@@ -15,6 +15,11 @@ are flagged as errors and can be confused with compile errors.
 <p>Codan Errors are identified with "bug icons" and they are listed in the
 Problems View as well.
 <p><img src="images/codan-errors.png">
+<p>If the include file path settings are not correct, Codan will report that the referenced APIs are in error
+on the local Eclipse workbench.
+For <a href="PLUGINS_ROOT/org.eclipse.ptp.doc.user/html/sync.html">synchronized projects</a>, if you do not care to see errors on the local copies or use Eclipse
+hyperlink navigation within the editor, you may not want to see Codan errors.
+(The build system on the remote target probably correctly locates include files during build).
 <p>You may want to turn off Codan or change its default reporting to Warning instead of Error.
 <p>To modify the Codan settings, open Preferences 
 (Window > Preferences, or on Mac OS X, Eclipse > Preferences)

@@ -8,7 +8,7 @@
 </head>
 
 <body>
-<h1 id="top"><img src="images/feedback_view.gif">PTP ETFw PerfSuite Feedback View</h1>
+<h1 id="top"><img src="images/feedback_view_icon.gif">PTP ETFw PerfSuite Feedback View</h1>
 <h2>Overview</h2>
 
 <p>
@@ -20,12 +20,12 @@ hardware performance counters, and interval timer profiling.
 <p>
 The Parallel Tools Platform External Tools Framework Feedback View
 (PTP ETFw Feedback View)
-provides a convenient
+is part of the PTP <a href="PLUGINS_ROOT/org.eclipse.ptp.etfw.doc.user/html/toc.html">External Tools Framework</a>,
+and provides a convenient
 way to use the file name and line number information contained in an XML file
 to allow a user to easily navigate to the lines in the files.
 
-<p>The PTP ETFw PerfSuite Feedback View plug-in is based on the above 
-feature.
+<p>The PTP ETFw PerfSuite Feedback View plug-in is based on the above feature.
 Specifically, it provides an Eclipse view, exposing information found
 in an XML file
 of the type "multihwpcprofilereport" -- a specific type of XML file that
@@ -39,11 +39,17 @@ run.
 
 <h2>Instructions</h2>
 <p>
-
 <ol>
-<li>Either use tools inside Eclipse such as PTP ETFw, or use tools outside Eclipse such as
+<li>First you need to run PerfSuite to measure and provide analysis files for your application.
+You can 
+<ul>
+<li>use tools inside Eclipse such as PTP ETFw - see <a href="perfsuite-example.html">an example running Perfsuite from PTP</a> </li>
+<li>
+or use tools outside Eclipse such as
 on the command line, to perform PerfSuite runs to measure and analyze the results, and
-create a file of the type "multihwpcprofilereport".  One way to create such files
+create a file of the type "multihwpcprofilereport".  </li>
+</ul>
+One way to create such files
 is to run "psrun &lt;options&gt; myprog myargs" with a profiling configuration file
 to profile the program, then run "psprocess -x -o mhpr.xml myprog.*.xml" to do the
 source code mapping and combine the results of multiple processes/threads into
@@ -111,12 +117,13 @@ process:
 clean:
 	rm -rf testfeedback mhpr.xml testfeedback.*.xml
 </pre>
-
+<p>
 We selected the menu item "Project -> Clean", followed by "Project -> Build All".
 After that, the "testfeedback" program was built, run with "psrun", and the generated
 "testfeedback.*.xml" files were processed by "psprocess" and combined into "mhpr.xml".
-
+<br>&nbsp;
 <li>We selected the file "mhpr.xml" in the Project Explorer view.
+<br>&nbsp;
 <li>We typed "CTRL-7", and the plug-in created a new view.  We then clicked the "Expand All"
 button to see the line items.  The line items are grouped by the files.
 The format is "&lt;hostname&gt;-PID_&lt;pid&gt;-thread_&lt;threadid&gt;".
@@ -124,11 +131,12 @@ In the case of the first one "Amituofo-PID_8950-thread_0", the host name is "Ami
 Since it's an MPI run, the thread IDs are all 0s,
 but the PIDs are different.<br/>
 <a href="images/result-view.png"><img src="images/result-view.png" alt="View of results" width=75%></img></a>
+<br>&nbsp;
 <li>We double-clicked on the line corresponding to line 40 in the "Amituofo-PID_8950-thread_0"
 section.  The editor window brought the file "testfeedback.c" to front, and focused on line 40.<br>
 <a href="images/double-clicked.png"><img src="images/double-clicked.png" alt="Screenshot when an item in the view is double clicked" width=75%></img></a>
-
-<li>We also tried to click the markers in the editor window's overview ruler to go to other
+<br>&nbsp;
+<li>We also tried to click the markers in the editor window's overview ruler (on the right edge of the editor) to go to other
 hot spot locations.<br/>
 <a href="images/overview-ruler.png"><img src="images/overview-ruler.png" alt="Using overview ruler to go to lines" width=75%></img></a>
 
@@ -142,13 +150,12 @@ hot spot locations.<br/>
 Several GUI items were added by this feature, as shown in the following screen shots.
 <nl>
 <li>A new context menu entry "Display PerfSuite Feedback"
-and a keyboard combination shortcut "CTRL-7"<br/>
+and a keyboard combination shortcut "CTRL-7" can be selected on an XML file in the Project Explorer<br/>
 <a href="images/context-menu.png"><img src="images/context-menu.png" alt="New Context Menu Entry: Display PerfSuite Feedback" width=75%></a>
-
-<li>A new view category "PTP ETFw Feedback View" and a new view
-"PerfSuite Feedback Items"<br/>
+<br>&nbsp;
+<li>The view can be explicitly displayed by selecting Window > Show View to find  "PTP ETFw Feedback View" in its own category.<br/>
 <a href="images/show-view.png"><img src="images/show-view.png" alt="New View Category and View" width=75%></a>
-
+<br>&nbsp;
 <li>A new annotation type "PerfSuite Feedback Marker" and its preferences
  in "General -> Editors -> Text Editors -> Annotations -> PerfSuite Feedback Marker"<br/>
 <p>
@@ -165,6 +172,7 @@ of the lines.<br/>
 <p>
 
 <ul>
+<li><p>See the <a href="perfsuite-example.html">PerfSuite Example with PTP</a> for more information on launching PerfSuite from within Eclipse and PTP.
 <li>Eclipse PTP ETFw Feedback View page on Eclipse Wiki:<br/>
     <a href="http://wiki.eclipse.org/PTP/ETFw/PTP_External_Tools_Framework_Feedback_View">http://wiki.eclipse.org/PTP/ETFw/PTP_External_Tools_Framework_Feedback_View</a>
 <li>PerfSuite web site:<br/>

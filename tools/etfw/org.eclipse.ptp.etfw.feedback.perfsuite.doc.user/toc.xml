@@ -2,6 +2,9 @@
 <?NLS TYPE="org.eclipse.help.toc"?>
 
 <toc label="ETFw PerfSuite" link_to="../org.eclipse.ptp.etfw.doc.user/toc.xml#etfw-other" >
+ <topic href="html/perfsuite-example.html" label="PerfSuite  Example with PTP">
+ </topic>
  <topic href="html/perfsuite-feedback-view.html" label="PerfSuite Feedback View">
  </topic>
+
 </toc>

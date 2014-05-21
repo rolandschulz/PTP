@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="generator" content="ReText 3.1.4">
+  	<link rel="stylesheet" type="text/css" href="help.css">
+  <title>Perfsuite Example with PTP</title>
+</head>
+<body>
+<h1 id="top">Perfsuite Example with PTP</h1>
+<h3>Overview</h3>
+<p>PerfSuite is a collection of tools, utilities and libraries for software performance analysis that can assist in optimizing your code. 
+It has been integrated into the PTP Development environment through the External Tools Framework (ETFw) so that it can be run in your Eclipse IDE instead of at the command line. 
+There are also PerfSuite plug-ins that can parse the PerfSuite output into the PerfSuite Feedback view for easier navigation to areas of concern. 
+The intention of this guide to assist in running PerfSuite through the use of an example.</p>
+<h3>Prerequisites</h3>
+<p>To analyze your application using the Perfsuite ETFw workflow, <strong>psrun</strong> and *<em>psprocess</em> must be available in your system path. 
+If they aren't, then you will need to compile and install them from the source code found at 
+<a href="http://perfsuite.ncsa.illinois.edu/">http://perfsuite.ncsa.illinois.edu/</a>.
+You may also need to install additional software that is required by PerfSuite if it is not already installed. The instructions can be found at the previous link.</p>
+<h3>Execute PerfSuite</h3>
+<p>To setup a new <strong>profile</strong> launch configuration, go to <strong>Run</strong> &gt; <strong>Profile Configurations...</strong>. 
+Where it says <strong>Parallel Application</strong>, right click and select <strong>New</strong>. 
+You should see a wizard page similar to the one below. 
+If you already have a <strong>Run Configuration</strong>, 
+then most of this should already be filled in for you and you can skip to the section on the <strong>Performance Analysis</strong> tab.</p>
+<p><img alt="Setup resources tab for execution." src="images/ex-resources-tab.png"></p>
+<p>In the <strong>Resources</strong> tab, specify a <strong>target configuration</strong>, <strong>connection</strong> and the <strong>number of processors</strong> to use for this analysis. 
+In the example here, the <strong>Open MPI-Generic Interactive</strong> target system is being used for a local machine that is being connected to via SSH and 2 processors are being used. 
+Change these settings so they are appropriate for your machine.</p>
+<p>Next, select the <strong>Application</strong> tab. Here you will specify the <strong>Project</strong> and the <strong>Application Program</strong> to execute. 
+In this example, the project name is <strong>shallow-local</strong> and the application is the <strong>shallow</strong> water model. 
+Your application tab should look similar to the one below:</p>
+<p><img alt="Specify project and application in Application tab." src="images/ex-application-tab.png"></p>
+<p>Make the appropriate changes for your application and project before moving on to the next section.</p>
+<p>The last tab is the <strong>Performance Analysis</strong> tab. Select it and then fill out the PerfSuite tab with the options you want to use when running <strong>psrun</strong>. 
+For information on what the options are, you can either access the help associated with the executable 
+or visit <a href="http://perfsuite.ncsa.illinois.edu">http://perfsuite.ncsa.illinois.edu</a></p>
+<p><img alt="Specify the options to use with psrun." src="images/ex-perfsuite-psrun.png"></p>
+<p>In this example, the output format is <strong>xml</strong>, the configuration to use is <strong>papi_profile_cycles.xml</strong> and the output prefix is <strong>psprocess</strong>. 
+Whatever the output prefix is should match what you specify in the <strong>PSProcess</strong> tab so the <strong>psprocess</strong> executable understands which files to post process. 
+After making selections, select the <strong>PSProcess</strong> tab.</p>
+<p><img alt="Specify the options to use with psprocess." src="images/ex-perfsuite-psprocess.png"></p>
+<p>For <strong>PSProcess</strong>, we specify the output as <strong>XML Output</strong>, the output directory should be your project directory, the output file pattern should match the prefix you specified in the previous tab and the output file for this example is <strong>mhpr.xml</strong>. 
+The output file name can be anything.</p>
+<p>Once everything is specified, click the <strong>Profile</strong> button.</p>
+<p>When the execution has finished, you should see a new file called <strong>mhpr.xml</strong> in your project folder (or whatever you specified). If you right click on it, you should see an option <strong>Display PerfSuite Feedback</strong> (see below).</p>
+<p><img alt="Open output file with PerfSuite feedback view." src="images/ex-perfsuite-feedback.png"></p>
+<p>This will open the <strong>Perfsuite Feedback</strong> view and allow you to navigate your performance results.</p>
+<p><img alt="Feedback view of results." src="images/ex-feedback-view.png"></p>
+<p>See the <a href="perfsuite-feedback-view.html">PerfSuite Feedback view</a> for more information on using this view.
+<p>&nbsp;<p>&nbsp;<p>&nbsp;
+<p><a href="#top">Back to Top</a>
+</body>
+</html>
