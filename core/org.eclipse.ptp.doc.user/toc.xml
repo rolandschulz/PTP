@@ -6,15 +6,28 @@
       <topic label="Overview"  href="html/00overview.html"/> 
       <topic label="Prerequisites" href="html/00prereqs.html"/>
       <topic label="New and Noteworthy"  href="html/00newNoteworthy.html"/> 
-      <topic label="Introduction to PTP Project Types"  href="html/localVsRemote.html"/>
+      <topic href="html/localVsRemote.html" label="Introduction to PTP Project Types">
+         <topic href="html/localVsRemote.html#local" label="Local">
+         </topic>
+         <topic href="html/localVsRemote.html#remote" label="Remote">
+         </topic>
+         <topic href="html/localVsRemote.html#sync" label="Synchronized">
+         </topic>
+      </topic>
 
-      <topic label="Introduction to Creating MPI Projects" href="html/01buildMPIprog.html"/> 
+      <topic href="html/01buildMPIprog.html" label="Introduction to Creating MPI Projects">
+         <topic href="html/01buildMPIprog.html#sync" label="Synchronized project with a Makefile">
+         </topic>
+         <topic href="html/01buildMPIprog.html#local-helloMPI" label="Local project without a supplied Makefile - Managed Build project">
+         </topic>
+      </topic> 
       <topic label="Synchronized Projects" href="html/sync.html"/>
       <topic label="Building Synchronized Projects" href="html/build.html"/>
       <topic label="Configuring Environment Modules" href="html/modules.html"/>
       <topic label="Recognizing Compiler Errors: Cray, PGI, and Open64" href="html/errorParsers.html"/>
-      <topic label="Running Parallel Programs"  href="html/03pRunConfig.html"> 
-          <!-- FIXME make order consistent with toc.xml -->
+      <topic label="Running Parallel Programs"  href="html/03pRunConfig.html">
+         <topic label="Supported Target System Configurations" href="html/03pRunConfig.html#ptp-tscs" >
+         </topic> 
           <topic label="Running Open MPI Jobs" href="html/rms/openMPI.html"/>
           <topic label="Running SLURM Jobs" href="html/rms/slurm.html"/>
           <topic label="Running SLURM ALPS Jobs" href="html/rms/slurmalps.html"/>
