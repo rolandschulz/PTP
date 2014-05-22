@@ -38,7 +38,7 @@ The files are copied to the local machine.
 <li><a href="#sync-launch">Step 5: Launch the program</a>
 </ul>
 
-<h2 id="sync-create">Step 1: Create the project</h2>
+<h3 id="sync-create">Step 1: Create the project</h3>
 <p>We assume for this example that the source code exists on the remote target machine.
 <pre>
 <code>
@@ -133,7 +133,8 @@ By default all files are synchronized between the local and remote systems
 <p>For more details on synchronization, configurations, filters, Synchronization properties,
 etc. see <a href="sync.html">Synchronized Projects</a>.
 
-<h2 id="sync-term">Step 2: (Optional) Open a remote terminal on the remote machine</h2>
+<h3 id="sync-term">Step 2: (Optional) Open a remote terminal on the remote machine</h3
+>
 <p>Since this example describes how to create a synchronized project mirrored on a remote machine,
 it assumes a directory on the remote machine exists with source code and a Makefile already existing in it.
 
@@ -143,10 +144,14 @@ good point to demonstrate doing so and show what files exist on the remote machi
 for how to connect with shell access to the remote system, within an Eclipse view,
 using the same information already available in the connection you created for the synchronized
 project.
+<ul>
+<li>Summary: in the <b>Terminal</b> view, select the <img src="images/rterm_icon_connect.png"> <b>Connect</b> button 
+to use the existing connection in the Terminal window.
+</ul>
 <p>This example shows the files in the remote directory that are mirrored in the synchronized
 project within Eclipse PTP.
 <br><img src="images/01sync-term.png">
-<h2 id="sync-edit">Step 3: Edit source files</h2>
+<h3 id="sync-edit">Step 3: Edit source files</h3>
 <p>To edit a source file, double-click on a file in the Project explorer view.
 The editor opens on that file.
 
@@ -155,27 +160,32 @@ from include files that aren't on your system, and in the Eclipse
 <b>Problems</b> view.
 <p><img src="images/01edit-codanErrors.png"></p>
 <p>&nbsp;
-<p>
+<p>To remove the Codan errors, you can either
+<ul>
+<li>Turn off Codan errors (easiest) or
+<li>Specify remote include files on the remote target machine for the synchronized project.
+</ul>
 To tell Eclipse about remote include files see
 <a href="includes.html">Include files for Synchronized Projects</a>.
 <p>&nbsp;
-<p>With include files successfully specified, the editor errors
+<p>With include files successfully specified (or Codan errors turned off), the editor errors
 should go away:
 <p><img src="images/01edit-no-codanErrors.png"></p>
 <p>&nbsp;
-<h2 id="sync-build">Step 4: Build the executable on the remote machine</h2>
+<h3 id="sync-build">Step 4: Build the executable on the remote machine</h3>
 <p></p>
 <ol>
 <li><p>Assuming that you have MPI installed on the remote 
 system and accessible via PATH, etc, it can now be built.
 </p>
-<p>A build can be initiated by using <b>Project &gt; Build Project</b>  menu 
+<p>A build can be initiated by using the <b>Project &gt; Build Project</b>  menu 
 or selecting the project in
 the <b>Project Explorer</b> view and selecting the 
 <img src="images/01sync-hammer-icon.png">
 hammer icon in the toolbar.
 If the hammer icon or other build options are not available, it probably means
 there is no project selected in the <b>Project Explorer</b> view.
+<br>
 <p><img src="images/01sync-buildIconsToolbar.png"></p>
 </li>
 <p>&nbsp;
@@ -188,18 +198,22 @@ You can see the results of the build in the console view.
 (Click on the <b>Console</b> tab near the bottom  of the Eclipse workbench.)
 
 <p><img src="images/01sync-build-console.png"></p>
+<p>&nbsp;
 <p>
 Once the build is complete, any errors  (e.g. compile errors) will be displayed in the 
 <b>Problems view</b>, the 
-corresponding source files will be flagged, and markers will be inserted into the editor window.</p><p><br></p></li>
-
+corresponding source files will be flagged, and markers will be inserted into the editor window.</p><p><br></p>
+<p>To force a sync of the files between the local and remote copies at any time, select the project in the <b>Project Explorer</b> view 
+and use the <img src="images/01sync-icon.png"> Sync button in the toolbar.
+</li>
 </li>
 </ol>
 
-<h2 id="sync-launch">Step 5: Launch the program</h2>
+<h3 id="sync-launch">Step 5: Launch the program</h3>
 <p></p>
 <p>Once you have verified that the application has built correctly, you can then 
-<a href="03pRunConfig.html">create a run configuration and launch the parallel program.</a></p></li>
+<a href="03pRunConfig.html">create a run configuration and launch the parallel program.</a></p>
+</li>
 
 
 
@@ -218,9 +232,10 @@ with "Hello MPI World"  sample source code.
 <li><a href="#build">Build the executable</a></li>
 <li><a href="#launch">Launch the program</a></li>
 </ul>
-<h3 id="create">Step 1: Create the project</h2>
+<h3 id="create">Step 1: Create the project</h3>
 <p>Note: this tutorial uses the
-<a href="PLUGINS_ROOT/org.eclipse.ptp.pldt.doc.user/html/toc.html">Parallel Language Development Tools (PLDT)</a> wizards for creating MPI projects. 
+<a href="PLUGINS_ROOT/org.eclipse.ptp.pldt.doc.user/html/toc.html">Parallel Language Development Tools (PLDT)</a> wizards for quickly 
+creating MPI projects with sample code.
 
 <ol>
 <li><p>If not already there, switch to the C/C++ Perspective using <b>Window &gt; Open Perspective &gt; Other...</b>  and then choose <b>C/C++</b></p><p><br></p></li>
@@ -240,7 +255,7 @@ The 'Source' value indicates the name of the folder in which the source file wil
 <p>Click <b>Next ></b>.</p><p><br></p></li>
 </ol>
 
-<h2 id="configure">Step 2: Configure the project to use MPI</h2>
+<h3 id="configure">Step 2: Configure the project to use MPI</h3>
 <p></p>
 <ol>
 <li><p>In the <b>MPI Project Settings</b> dialog, make sure <b>Add MPI Project settings to this project</b> is checked.
@@ -257,7 +272,7 @@ or MPI build commands.
 </li>
 </ol>
 
-<h2 id="build">Step 3: Build the executable</h2>
+<h3 id="build">Step 3: Build the executable</h3>
 <p></p>
 <ol>
 <li><p>Assuming that you have MPI installed and that the project was configured correctly, the application should now automatically build. 
@@ -289,7 +304,7 @@ tree item, change the <b>Command:</b> string from mpicc to whatever your MPI bui
 </li>
 </ol>
 
-<h2 id="launch">Step 4: Launch the program</h2>
+<h3 id="launch">Step 4: Launch the program</h3>
 <p></p>
 <ol>
 <li><p>Once you have verified that the application has built correctly, you can then 
