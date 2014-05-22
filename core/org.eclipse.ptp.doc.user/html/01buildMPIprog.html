@@ -66,8 +66,11 @@ on Eclipse features for Fortran.
 under your Eclipse workspace directory, so leave this as is.
 <p>The <b>Remote Directory</b> specifies where the remote files are located, so we must tell Eclipse where it is.
 <p>Here we create a new connection to the remote machine.
-Click on <b>New...</b> next to <b>Connection:</b>
+First select a <b>Remote Service Provider</b> as <b>Remote Tools</b>.
+Then select the <b>New...</b> button next to <b>Connection:</b>
 to create a new connection.
+<p>
+<img src="images/01sync-newProj2a.png">
 <ul><li>If a connection already exists, simply select it.</li></ul>
 <h4 id="newconn">Creating a new connection</h4>
 <p>The dialog to create a new remote connection appears, <b>Target Environment Configuration</b>.
@@ -85,7 +88,7 @@ see
 of the source files of your project - for <b>Remote Directory</b>, select the <b>Browse</b> button.
 Note that this is the first time the connection information is used, so if you have specified
 hostname, userid, or password incorrectly it will fail.
-If this is the case, either
+If you do get an error connecting, and you need to change the host name, userid or password in the connection, you can:
 <ul>
 <li>create another connection right here
 in the new sync project wizard.  You can always delete the first one later ... or
@@ -94,7 +97,7 @@ in the new sync project wizard.  You can always delete the first one later ... o
 to change the connection information.
 </ul>
 
-<p>If the connection information is successful, you will see a  dialog on the remote system
+<p>If the connection information is successful, the <b>Browse</b> button will pop up a  dialog on the remote system
 allowing you to select the <b>Project Location</b> on that system.
 Select the location of your source files - or create a new directory to which you can
 add files later - and select <b>OK</b>.
