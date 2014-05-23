@@ -73,10 +73,18 @@ public class NewRemoteSyncProjectWizardOperation implements Runnable {
 			String toolChainName = config.getToolChain().getSuperClass().getName();
 			if (remoteToolChains.contains(toolChainName)) {
 				WizardUtil.modifyRemoteBuildConfigForSync(config);
-				defaultRemoteBuildConfig = config;
+				// Bug 434893: Favor debugging configs for default build configs
+				if ((defaultRemoteBuildConfig == null) ||
+						(!(defaultRemoteBuildConfig.getName().toLowerCase().contains("debug")))) { //$NON-NLS-1$
+					defaultRemoteBuildConfig = config;
+				}
 			} else if (localToolChains.contains(toolChainName)){
 				WizardUtil.modifyLocalBuildConfigForSync(config);
-				defaultLocalBuildConfig = config;
+				// Bug 434893: Favor debugging configs for default build configs
+				if ((defaultLocalBuildConfig == null) ||
+						(!(defaultLocalBuildConfig.getName().toLowerCase().contains("debug")))) { //$NON-NLS-1$
+					defaultLocalBuildConfig = config;
+				}
 			} else {
 				assert false : Messages.NewRemoteSyncProjectWizardOperation_3;
 				WizardUtil.modifyRemoteBuildConfigForSync(config);
