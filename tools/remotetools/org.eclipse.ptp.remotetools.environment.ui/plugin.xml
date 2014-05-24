@@ -18,37 +18,5 @@
             id="org.eclipse.ptp.remotetools.environment.ui.views.RemoteEnvironmentsView">
       </view>
    </extension>
-   <extension
-         point="org.eclipse.ui.perspectiveExtensions">
-      <perspectiveExtension
-            targetID="org.eclipse.cdt.ui.CPerspective">
-         <view
-               id="org.eclipse.ptp.remotetools.environment.ui.views.RemoteEnvironmentsView"
-               ratio="0.5"
-               relationship="stack"
-               relative="org.eclipse.ui.console.ConsoleView"
-               showTitle="true"
-               visible="true">
-         </view>
-      </perspectiveExtension>
-      <perspectiveExtension
-            targetID="org.eclipse.ptp.rm.lml.ui.SystemMonitoringPerspective">
-         <view
-               id="org.eclipse.ptp.remotetools.environment.ui.views.RemoteEnvironmentsView"
-               minimized="false"
-               relationship="stack"
-               relative="org.eclipse.ui.console.ConsoleView">
-         </view>
-      </perspectiveExtension>
-      <perspectiveExtension
-            targetID="org.eclipse.ptp.rdt.ui.remoteCPerspective">
-         <view
-               id="org.eclipse.ptp.remotetools.environment.ui.views.RemoteEnvironmentsView"
-               minimized="false"
-               relationship="stack"
-               relative="org.eclipse.ptp.rdt.ui.callHierarchy">
-         </view>
-      </perspectiveExtension>
-   </extension>
 
 </plugin>
