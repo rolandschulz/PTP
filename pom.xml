@@ -18,14 +18,10 @@
 		<eclipse-release>luna</eclipse-release>
 		<tycho-version>0.19.0</tycho-version>
 		<tycho-extras-version>${tycho-version}</tycho-extras-version>
-		<platform-version>4.4milestones</platform-version>
-		<platform-site>http://download.eclipse.org/eclipse/updates/${platform-version}</platform-site>
-		<tm-version>3.6milestones</tm-version>
-		<tm-site>http://download.eclipse.org/tm/updates/${tm-version}</tm-site>
-		<cdt-version>8.4</cdt-version>
-		<cdt-site>http://download.eclipse.org/tools/cdt/builds/${cdt-version}/nightly</cdt-site>	
-		<egit-version>nightly</egit-version>
-		<egit-site>http://download.eclipse.org/egit/updates-${egit-version}</egit-site>
+		<platform-site>http://download.eclipse.org/eclipse/updates/4.4milestones/S-4.4RC2-201405221330</platform-site>
+		<tm-site>http://download.eclipse.org/tm/updates/3.6milestones/RC1</tm-site>
+		<cdt-site>http://download.eclipse.org/tools/cdt/builds/${eclipse-release}/milestones</cdt-site>	
+		<egit-site>http://download.eclipse.org/egit/staging/v3.4.0.201405211411-rc1</egit-site>
 		<photran-site>http://download.eclipse.org/tools/ptp/builds/hudson/ptp-nightly-photran</photran-site>
 		<remote-site>http://download.eclipse.org/tools/ptp/builds/remote/${eclipse-release}/nightly</remote-site>
 		<license-site>http://download.eclipse.org/cbi/updates/license</license-site>
@@ -195,32 +191,32 @@
 
 	<repositories>
 		<repository>
-			<id>platform-${platform-version}</id>
+			<id>platform-$eclipse-release}</id>
 			<url>${platform-site}</url>
 			<layout>p2</layout>
 		</repository>
 		<repository>
-			<id>tm-${tm-version}</id>
+			<id>tm-${eclipse-release}</id>
 			<url>${tm-site}</url>
 			<layout>p2</layout>
 		</repository>
 		<repository>
-			<id>cdt-${cdt-version}</id>
+			<id>cdt-${eclipse-release}</id>
 			<url>${cdt-site}</url>
 			<layout>p2</layout>
 		</repository>
 		<repository>
-			<id>egit-${egit-version}</id>
+			<id>egit-${eclipse-release}</id>
 			<url>${egit-site}</url>
 			<layout>p2</layout>
 		</repository>
 		<repository>
-			<id>photran</id>
+			<id>photran-${eclipse-release}</id>
 			<url>${photran-site}</url>
 			<layout>p2</layout>
 		</repository>
 		<repository>
-			<id>remote</id>
+			<id>remote-${eclipse-release}</id>
 			<url>${remote-site}</url>
 			<layout>p2</layout>
 		</repository>
