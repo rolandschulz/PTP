@@ -57,7 +57,7 @@
 	<property name="dStoreBaseName" value="rseserver-3.4"/>
 
 	<!-- CDT PROPERTIES -->
-	<property name="cdtBaseUrl" value="http://download.eclipse.org/tools/cdt/builds/kepler/nightly"/>
+	<property name="cdtBaseUrl" value="http://download.eclipse.org/tools/cdt/builds/luna/milestones/rc2"/>
 	
 	<!-- CDT branch need to be added for PTP maintenance builds -->
 	<property name="cdtBranch" value="master"/>
@@ -168,6 +168,7 @@
 		<property file="${downloads}/cdt.properties"/>
 		
 		<property name="cdtCoreJar" value="org.eclipse.cdt.core_${cdtCoreVersion}.jar"/>
+		<property name="cdtCoreNativeJar" value="org.eclipse.cdt.core.native_${cdtCoreNativeVersion}.jar"/>
 		<property name="cdtCoreAIXJar" value="org.eclipse.cdt.core.aix_${cdtCoreAIXVersion}.jar"/>
 		<property name="cdtCoreLinuxPPC64Jar" value="org.eclipse.cdt.core.linux.ppc64_${cdtCoreLinuxPPC64Version}.jar"/>
 		<property name="cdtCoreLinuxx86Jar" value="org.eclipse.cdt.core.linux.x86_${cdtCoreLinuxx86Version}.jar"/>
@@ -239,7 +240,20 @@
 		</unzip>
 	</target>
 	
-	<target name="generate.file.lists" depends="compile.all, get.cdt, get.cdt.core.lrparser, get.cdt.core.parser.upc, get.cdt.core.lrparser.xlc">
+	<target name="get.cdt.core.native">
+		<!--Get cdt.core.native source from Git-->
+		<copy todir="${basedir}/../org.eclipse.cdt.core.native">
+			<fileset dir="${basedir}/gitrepo/org.eclipse.cdt/core/org.eclipse.cdt.core.native"/>
+  		</copy>
+		
+		<!--Get cdt.core.native bin from CDT build-->
+		<get src="${cdtBaseUrl}/plugins/${cdtCoreNativeJar}" dest="${downloads}/${cdtCoreNativeJar}"/>
+		<unzip dest="${basedir}/../org.eclipse.cdt.core.native/target/classes">
+			<fileset dir="${downloads}" includes="${cdtCoreNativeJar}"/>
+		</unzip>
+	</target>
+	
+	<target name="generate.file.lists" depends="compile.all, get.cdt, get.cdt.core.lrparser, get.cdt.core.parser.upc, get.cdt.core.lrparser.xlc, get.cdt.core.native">
 		<java
 			fork="true"
 			classname="org.eclipse.ptp.internal.rdt.core.jardesc.JarDescElementExtractor"

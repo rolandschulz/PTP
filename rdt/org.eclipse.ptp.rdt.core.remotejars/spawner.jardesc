@@ -10,8 +10,8 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
-        <javaElement handleIdentifier="=org.eclipse.cdt.core/utils&lt;org.eclipse.cdt.utils.spawner"/>
+        <javaElement handleIdentifier="=org.eclipse.cdt.core.native/src&lt;org.eclipse.cdt.utils.spawner"/>
         <javaElement handleIdentifier="=org.eclipse.ptp.remote.rse.core/miners"/>
-        <javaElement handleIdentifier="=org.eclipse.cdt.core/utils&lt;org.eclipse.cdt.utils.pty"/>
+        <javaElement handleIdentifier="=org.eclipse.cdt.core.native/src&lt;org.eclipse.cdt.utils.pty"/>
     </selectedElements>
 </jardesc>

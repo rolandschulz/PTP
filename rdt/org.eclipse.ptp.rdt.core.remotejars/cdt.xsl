@@ -16,6 +16,9 @@
 	<xsl:template match="artifact[@classifier='osgi.bundle' and @id='org.eclipse.cdt.core']">
 cdtCoreVersion=<xsl:value-of select="@version"/>
 	</xsl:template>
+	<xsl:template match="artifact[@classifier='osgi.bundle' and @id='org.eclipse.cdt.core.native']">
+cdtCoreNativeVersion=<xsl:value-of select="@version"/>
+	</xsl:template>
 	<xsl:template match="artifact[@classifier='osgi.bundle' and @id='org.eclipse.cdt.core.lrparser']">
 cdtCoreLRParserVersion=<xsl:value-of select="@version"/>
 	</xsl:template>
