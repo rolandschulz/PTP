@@ -23,11 +23,18 @@ Editing occurs locally and each file is synchronized with the currently active r
 This enables faster interaction with the files
 and editor, more CDT editor features since the files are local, and continued interaction for editing etc. if the network
 connection is lost.
+<p>For an overview of the different types of projects (Local, Synchronized, and Remote) see 
+<a href="localVsRemote.html">Introduction to PTP Project Types</a>.
 <p>
 <h2 id=prereq>Requirements for Synchronized Projects</h2>
 <p>To host a synchronized project, the remote system must support the <a href="http://git-scm.com/">Git</a> distributed version control system.
 Note that this is completely independent of using <a href="http://git-scm.com/">Git</a> for source code control.
+
 <h2 id=create>Creating a new Synchronized Project</h2>
+<p>To start, we assume you are in the <b>C/C++ Perspective</b>.
+<p>If not already there, switch to the C/C++ Perspective using <b>Window &gt; Open Perspective &gt; Other...</b>  and then choose 
+<b>C/C++</b></p> 
+
 <p>To create a new Synchronized Project, first select an appropriate wizard:</p>
 Select <b>File > New > Other...</b>
 then in the wizard selection dialog, select <b>Remote > Synchronized C/C++ Project</b>, <b>Synchronized Fortran Project</b>, or <b>Synchronized Project</b> for synchronization only without support for a specific language.
@@ -39,7 +46,8 @@ select <b>New > Synchronized C/C++ Project</b>, <b>Synchronized Fortran Project<
 <p><br></p>
 <p><img src="images/sync-newprojContext.png">
 <p><br></p>
-<p id="new-sync-proj">Now fill out the <b>New Synchronized Project</b> dialog shown. The dialog for synchronization only will not contain the lower portion for selecting project types and toolchains.
+<p id="new-sync-proj">Now fill out the <b>New Synchronized Project</b> dialog shown. 
+The dialog for a generic <b>Synchronized Project</b> (synchronization only) will not contain the lower portion for selecting project types and toolchains.
 
 <p>
 <img src="images/sync-newprojCreate.png">

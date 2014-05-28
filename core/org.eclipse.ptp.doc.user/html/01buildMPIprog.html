@@ -66,22 +66,25 @@ on Eclipse features for Fortran.
 under your Eclipse workspace directory, so leave this as is.
 <p>The <b>Remote Directory</b> specifies where the remote files are located, so we must tell Eclipse where it is.
 <p>Here we create a new connection to the remote machine.
-First select a <b>Remote Service Provider</b> as <b>Remote Tools</b>.
+
 Then select the <b>New...</b> button next to <b>Connection:</b>
 to create a new connection.
+<blockquote><b>Note:</b> if your dialog also asks for <b>Remote Services Provider</b>, 
+then the default remote services provider is not set in <b>Preferences</b> under <b>Remote Development</b>.
+</blockquote>
 <p>
 <img src="images/01sync-newProj2a.png">
 <ul><li>If a connection already exists, simply select it.</li></ul>
 <h4 id="newconn">Creating a new connection</h4>
-<p>The dialog to create a new remote connection appears, <b>Target Environment Configuration</b>.
-Enter a name for the connection in <b>Target name:</b>
+<p>The <b>New Connection</b> dialog appears.
+Enter a name for the connection in <b>Connection name:</b>
 and enter the host name, user name, and password.
 <p>
 <img src="images/01sync-newConn.png">
 <p>&nbsp;
 <p>If your machine access requires ssh access through a frontend/intermediate node, use localhost and port -
 see 
-<a href="remoteTools.html#tunnel">SSH tunneling via Remote Tools</a>
+<a href="remoteTools.html#tunnel">SSH tunneling</a>
 
 <p>Select <b>Finish</b> when the connection information is filled in.
 <p>Back on the wizard dialog, once the connection has been created, choose the remote location
@@ -93,7 +96,7 @@ If you do get an error connecting, and you need to change the host name, userid 
 <li>create another connection right here
 in the new sync project wizard.  You can always delete the first one later ... or
 <li>cancel out of the new project wizard and see
-<a href="remoteTools.html#edit">editing connection information in Remote Tools</a>
+<a href="remoteTools.html#edit">editing connection information</a>
 to change the connection information.
 </ul>
 
