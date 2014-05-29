@@ -100,6 +100,7 @@
    <extension
          point="org.eclipse.ui.views">
       <view
+            category="Terminal"
             class="org.eclipse.ptp.internal.remote.terminal.TerminalInfoView"
             id="org.eclipse.ptp.remote.terminal.view"
             name="%TerminalHistoryView.name"
