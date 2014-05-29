@@ -6,53 +6,151 @@
 </head> 
 <body>
 <h1 id="top">PTP Remote Terminal</h1>
-<p><b>Remote Terminal</b> is a lightweight remote terminal that can be used to provide a shell from within Eclipse.
+<p><b>Remote Terminal</b> is a lightweight remote terminal that can be used to provide shell access to remote systems from within Eclipse.
 It is included with the Parallel Tools Platform (PTP) and uses the same connection information
-that is used by remote and synchronized projects, including <a href="remoteTools.html">Remote Tools</a>.
-<p>The <b>Terminal</b> view should be available near the bottom of the workbench
+that is used by remote and synchronized projects, including the default <a href="remoteTools.html">Built-in SSH</a>.
+
+<p>The <b>Terminal</b> view should be available near the bottom of the workbench.
+
 <p>
 <img src="images/rterm_wbench.png">
-<p>If it is not visible, you can open it via <b>Window > Show View > Other...</b>
+
+<p>If you already have a connection and/or a synchronized project, you can open a <b>Terminal</b> 
+<ul><li>
+to the machine with which
+the project is synchronized - by right-clicking on the project, then selecting "Show Terminal" from
+the dropdown menu.
+<li>to the machine with which any connection is established - in the <b>Terminal</b> view, select the <img src="images/rterm_icon_connect.png"> <b>Connect</b> 
+button.
+</li>
+</ul>
+</p>
+<p>If the <b>Terminal</b> view  is not visible, you can open it via <b>Window > Show View > Other...</b>
 and under <b>Terminal</b>, select <b>Terminal</b>.
 <p>
 <img src="images/rterm_showview.png">
 
-<p>The <b>Terminal</b> view is a convenient way to provide shell
-access to remote systems, and uses the same connection information that may be in use
-already for e.g. a synchronized project.
-
-<p>In the <b>Terminal</b> view, select the <img src="images/rterm_icon_connect.png"> <b>Connect</b> 
-<!-- or the <b>New Terminal Connection</b>  -->
+<p>To open a shell directly from the <b>Terminal</b> view, select the <img src="images/rterm_icon_connect.png"> <b>Connect</b> 
 button.
-
-<p>
-
 <p><img src="images/rterm_connect2.png"></p>
+
 <p>&nbsp;</p>
 <p>In the next dialog, choose <b>Connection Type:</b> to use e.g. <b>Remote Services</b>,
-and under <b>Settings</b>, select 
-<b>Remote service provider:</b> to use e.g. <b>Remote Tools</b>.
-Select your existing connection.  Or, if you have not already established a connection, select <b>New...</b>
+and under <b>Settings</b>, select the connection to use. 
+If you have not already established a connection, select <b>New...</b>
 and enter hostname, user, password, etc.
-For more information about creating connections, see <a href="remoteTools.html">Remote Tools</a>.
+For more information about creating connections, see <a href="remoteTools.html">Remote Services</a>.
 <p><img src="images/rterm_connect1.png"></p>
 
 <p>Select <b>OK</b> to open the shell on the selected system.
 <p><img src="images/rterm_connected.png"></p>
 <p>Shell commands can be entered on the selected system.
 <p>&nbsp;
+
+<h2 id="interact">Terminal/Eclipse Interaction</h2>
+
+<p>It is possible for the shell and the terminal to interact, allowing the eclipse
+user to have the best of both the command line and the GUI.</p>
+
+<p>For example, a short command can call up the Eclipse editor from the command line:
+<p><img src="images/rterm_ptpEdit.png">
+
+<p>Commands are initiated by special strings, sometimes called "escape sequences."
+These sequences are enumerated below:</p>
+<ol>
+<li><b>Open File:</b> The string "~~EPTP:OpenFile~~FileName\n" will cause the file
+named to be opened inside the Eclipse browser. Note that only full path names will
+work. If the file is part of a synchronized project, Eclipse will open the file as
+a local file on the client machine. If it is not, it will open the file with an URL
+using a "remotetools" protocol.</li>
+
+<li><b>Choose a File:</b> The string "~~EPTP:Choice~~File1~~File2~~..~~FileN\n" will
+open a dialog box in Eclipse and allow the user to choose one of the selected files
+for opening.</li>
+
+<li><b>Menu:</b> The string "~~EPTP:Radio~~MenuText1::~Command1~~MenuText2::~Command2.."
+will create a dialog box with a sequence of radio buttons, labeled "MenuText1", "MenuText2",
+etc. Choosing a given item and clicking OK will cause the corresponding command to be
+sent to the shell and executed.</li>
+</ol>
+
+<p>It is convenient to invoke the above escape sequences through the use of scripts.
+The following script is suggested for opening files on the remote machine. An example
+follows:</p>
+
+<pre>
+#!/usr/bin/perl
+use strict;
+use File::Spec;
+my @files = ();
+my $aflag = 0;
+for my $a (@ARGV) {
+    if($a eq "-a") {
+        $aflag = 1;
+    } elsif(-r $a) {
+        push @files, File::Spec-&gt;rel2abs($a);
+    }
+}
+if($#files == 0) {
+    print "~~EPTP:OpenFile~~",$files[0],"\n";
+} elsif($aflag) {
+    for my $file (@files) {
+        print "~~EPTP:OpenFile~~",$file,"\n";
+        sleep(1);
+    }
+} else {
+    print "~~EPTP:Choice~~",join("~~",@files),"\n";
+}
+</pre>
+
+<p>Using this script, it is possible to open any file within
+the Eclipse editor by typing:</p>
+
+<pre>  ptp filename</pre>
+
+<p>Note that the file name can be relative or absolute.</p>
+
+<h2 id="hist">Terminal History</h2>
+
+<p>A new view is available called "Terminal History." To open
+it type <b>Window > Show View > Other...</b>, and under the <b>Other</b> category, select "Terminal History."</p>
+
+<p>If you opened any terminals using "Show Terminal" on any synchronized projects,
+this view will show you your shell histories on the remote
+machines. In order for this to work, however, you must add a
+few special commands to your startup files on the remote machines.</p>
+
+<ol>
+<li><b>For Bash:</b> Add "history -a" to your ~/.bashrc</li>
+<li><b>For Tcsh/Csh:</b> Add "set history=100;set savehist=100;alias precmd 'history -S'" to
+your ~/.cshrc. Feel free to change the number "100" to whatever number of items you wish
+to retain in your shell history.</li>
+</ol>
+
+<p><img src="images/rterm_term_hist.png" width="600"></p>
+
+<p>As you type each new command, it will appear in the top of the history view,
+pushing the older commands down.</p>
+
+<ol>
+<li>If you wish to keep one of the commands near
+the top of the view, click the checkbox.</li>
+<.i>If you wish to re-execute the command
+from the history, click the numbered button at the left.</li>
+<li>If you wish to delete
+the command from the history, click the "X" button on the right.</li>
+<li>If you wish to edit the command, click inside the text box containing it.</li>
+</ol>
+
 <h2 id="other">Other Features</h2>
-<!-- FIXME caveat these don't seem to work quite right. -->
 
 <p>To create an additional view for another terminal connection use <b>New Terminal View</b>
 from the dropdown menu next to the 
 <img src="images/rterm_icon_newConn.png"> button in the view toolbar.
 <p><img src="images/rterm_newTermView.png"></p>
-<p>Fill in the information as indicated above, for the additional Terminal view.
-Note that you can change the view title in the dialog to create the new Terminal connection.
-This will give the multiple terminal views different names.
-<p>Then multiple <b>Terminal</b> views will exist, each with a different connection.  View titles were not changed in this example.
+<p>Then multiple <b>Terminal</b> views will exist, each with a different connection.
 <p><img src="images/rterm_2views.png"></p>
+<p>
 
 
 <p><a href="#top">Back to Top</a> | <a href="toc.html">Back to Table of Contents</a></p>
