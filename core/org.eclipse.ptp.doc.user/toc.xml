@@ -48,7 +48,7 @@
       <topic label="Monitoring Jobs and Systems" href="html/05monitoring.html"/>
       <topic label="Parallel Debugging"  href="html/06parDebugging.html"/>
       <topic label="Preferences" href="html/07ptpPrefs.html"/>
-      <topic href="html/remoteTools.html" label="Managing Remote Connections with Remote Tools">
+      <topic href="html/remoteTools.html" label="Managing Remote Connections">
          <topic href="html/remoteTools.html" label="Creating and Editing Connections"/>
          <topic href="html/remoteTerminal.html" label="Remote Terminal- Shell Access within Eclipse"/>
       </topic>
