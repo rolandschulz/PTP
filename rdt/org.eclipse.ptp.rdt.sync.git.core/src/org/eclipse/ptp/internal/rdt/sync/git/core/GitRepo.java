@@ -146,8 +146,12 @@ public class GitRepo {
 	private void doInit(IProgressMonitor monitor) throws IOException, RemoteExecutionException, RemoteSyncException,
 			MissingConnectionException {
 		try {
-			String commands = "git --git-dir=" + GitSyncService.gitDir + " init && " + //$NON-NLS-1$ //$NON-NLS-2$
-					"git --git-dir=" + GitSyncService.gitDir + " config core.preloadindex true"; //$NON-NLS-1$ //$NON-NLS-2$
+			// Bug 416078. Do not use "git" directly because it ignores preference setting.
+			// We used "git" instead of gitCommand() before to avoid having "--work-tree" for init, which fails for Git 1.5.2.4
+			// or earlier. Now it would probably be fine, since we only support 1.7 or greater, but we still avoid --work-tree
+			// just in case.
+			String commands = gitBinary() + " --git-dir=" + GitSyncService.gitDir + " init && " + //$NON-NLS-1$ //$NON-NLS-2$
+					gitBinary() + " --git-dir=" + GitSyncService.gitDir + " config core.preloadindex true"; //$NON-NLS-1$ //$NON-NLS-2$
 			CommandResults commandResults = null;
 
 			try {
@@ -341,8 +345,8 @@ public class GitRepo {
     	return new ArrayList<String>(Arrays.asList(command.split(" "))); //$NON-NLS-1$
     }
 
-	// Get the base git command for this system, includes the git binary plus sync-specific arguments.
-	private String gitCommand() {
+    // Get the base git binary for this system.
+    private String gitBinary() {
 		String gitBinary = "git"; //$NON-NLS-1$
 		IScopeContext context = InstanceScope.INSTANCE;
 		Preferences prefSyncNode = context.getNode(instanceScopeSyncNode);
@@ -362,7 +366,12 @@ public class GitRepo {
 			}
 		}
 
-		return gitBinary + " " + gitArgs; //$NON-NLS-1$
+		return gitBinary;
+    }
+
+	// Get the base git command for this system, includes the git binary plus sync-specific arguments.
+	private String gitCommand() {
+		return gitBinary() + " " + gitArgs; //$NON-NLS-1$
 	}
 
 	/**

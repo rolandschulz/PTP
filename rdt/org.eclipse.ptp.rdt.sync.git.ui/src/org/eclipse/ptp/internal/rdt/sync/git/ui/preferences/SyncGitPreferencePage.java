@@ -419,10 +419,8 @@ public class SyncGitPreferencePage extends PreferencePage implements IWorkbenchP
 			return true;
 		}
 
-		if (version < 10600) {
+		if (version < 10700) {
 			gitWarningMessage = Messages.SyncGitPreferencePage_12 + versionString + Messages.SyncGitPreferencePage_13;
-		} else if (version < 10700) {
-			gitWarningMessage = Messages.SyncGitPreferencePage_12 + versionString + Messages.SyncGitPreferencePage_14;
 		}
 
 		// Prefer false positives to false negatives. Return true by default.
