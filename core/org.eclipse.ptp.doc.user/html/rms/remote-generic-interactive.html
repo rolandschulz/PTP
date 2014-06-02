@@ -19,7 +19,7 @@ via Run > Run Configurations ... and create a new <b>Parallel Application</b>.
 the <b>Resources</b> tab of the run configuration.
 For <b>Target System Configuration</b>, select <b>Remote-Generic-Interactive</b>
 <p><img src="../images/rms-remote-generic-interative.png">
-<p>Then specify a <b>Remote Service Provider</b> and a connection.  If you have already specified a connection, e.g.
+<p>Then specify a connection.  If you have already specified a connection, e.g.
 for a <a href="../sync.html">Synchronized Project</a> or a remote project,
 you can select it, or you can create a new connection at this point with the <b>New...</b> button.
 
@@ -33,18 +33,28 @@ you can select it, or you can create a new connection at this point with the <b>
 </blockquote>
 <p>After selecting a Connection, it will ask to run a command on the system.
 Select <b>Yes</b> to continue.  Check the <b>Don't ask to run command again for this configuration</b>
-to avoid being asked again for this launch configuration.  The information from the command results will be used
+to avoid being asked again for this launch configuration.  The information from the command results are generally used
 to populate information on the dialog.
 
 <p>On the <b>Application</b> tab (as described in 
 <a href="../03pRunConfig.html#application">run configuration setup for running your parallel application</a>),
 for the <b>Remote-Generic-Interactive</b> target system configuration,
 the application name shouldn't be the executable name, but a run script that is provided by the user.
-by specifying the Application program
-on the <b>Application</b> tab, and any other information required.
+
+<ul>
+<li>For this example, we created a simple synchronized project that contains a "hello world" script
+<pre>
+#!/bin/bash
+# hello.sh
+echo "Hello PTP Remote Generic Interactive World"
+</pre>
+</ul>
 Use the <b>Browse...</b> button to select the script from a location on the remote target system.
 <p><img src="../images/rms-remote-generic-interative-app-script.png">
-
+<p>Select the <b>Run</b> button to execute the script.
+The results from this simple "hello world" script are shown in the <b>Console</b> view at the bottom
+of the workbench window.
+<p><img src="../images/rms-remote-generic-interative-app-script-console.png">
 <p>&nbsp
 <p><a href="#top">Back to Top</a> | <a href="../toc.html">Back to Table of Contents</a>
 </body>
