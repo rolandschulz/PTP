@@ -77,6 +77,10 @@
 			<rm:description>Output prefix</rm:description>
 			<rm:default>psprocess</rm:default>
 		</attribute>
+		<attribute name="PERFSUITE_psrun.configuration_id_-FORK" type="boolean" translateBooleanAs="-f, ">
+			<rm:description>Monitor child processes (default no)</rm:description>
+			<rm:default></rm:default>
+		</attribute>
 		
 		<!-- PSProcess Attributes -->
 		<attribute name="PERFSUITE_psprocess.configuration_id_XMLOUTPUT" type="boolean" translateBooleanAs="-x, ">
@@ -100,6 +104,22 @@
 		<attribute name="PERFSUITE_psprocess.configuration_id_-OUTPUT_SAVED" type="string">
 			<rm:description>Output file name</rm:description>
 			<rm:default>mhpr.xml</rm:default>
+		</attribute>
+		<attribute name="PERFSUITE_psprocess.configuration_id_-BRIEF" type="boolean" translateBooleanAs="-b, ">
+			<rm:description>Brief output (no machine information)</rm:description>
+			<rm:default></rm:default>
+		</attribute>
+		<attribute name="PERFSUITE_psprocess.configuration_id_THRESHOLD" type="boolean" translateBooleanAs="-t, ">
+			<rm:default></rm:default>
+		</attribute>
+		<attribute name="PERFSUITE_psprocess.configuration_id_THRESHOLD_SAVED" visible="false">
+			<rm:default></rm:default>
+		</attribute>
+		<attribute name="PERFSUITE_psprocess.configuration_id_-CUSTOMMETRICSFILE" type="boolean" translateBooleanAs="-m, ">
+			<rm:description>Specify custom metric definition file</rm:description>
+		</attribute>
+		<attribute name="PERFSUITE_psprocess.configuration_id_-CUSTOMMETRICSFILE_SAVED" type="string">
+			<rm:description>Save custom metric definition file</rm:description>
 		</attribute>	
 	</controlData>
 	<execTool tool-name="PerfSuite">
@@ -108,7 +128,7 @@
 				<configId>PERFSUITE_psrun.configuration_id_</configId>
 				<configVarId>PERFSUITE_psrun.environmentvariables.configuration_id_</configVarId>
 				<optionPane>
-					<rm:title>PerfSuite</rm:title>
+					<rm:title>PSRun</rm:title>
 					<rm:layout>
 						<rm:grid-layout />
 					</rm:layout>
@@ -154,6 +174,12 @@
 								<rm:grid-data widthHint="150" horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="3" />
 							</rm:layout-data>
 							<rm:tooltip>Include MD5 checksums in output</rm:tooltip>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Fork Support" style="SWT.LEFT" attribute="PERFSUITE_psrun.configuration_id_-FORK">
+							<rm:layout-data>
+								<rm:grid-data widthHint="150" horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="3" />
+							</rm:layout-data>
+							<rm:tooltip>Monitor child processes (default no)</rm:tooltip>
 						</rm:widget>
 						<rm:widget type="checkbox" title="Domain" buttonId="domain-button" style="SWT.LEFT" attribute="PERFSUITE_psrun.configuration_id_-DOMAIN">
 							<rm:layout-data>
@@ -237,7 +263,7 @@
 								<rm:enable-if button="overflow-threshold-button" selected="true" />
 							</rm:control-state>
 						</rm:widget>
-						<rm:widget type="checkbox" title="Output" buttonId="outputCB" style="SWT.LEFT"
+						<rm:widget type="checkbox" title="Output Prefix" buttonId="outputCB" style="SWT.LEFT"
 							attribute="PERFSUITE_psrun.configuration_id_-OUTPUT">
 							<rm:layout-data>
 								<rm:grid-data widthHint="150" horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
@@ -282,6 +308,51 @@
 							</rm:layout-data>
 							<rm:tooltip>Produce xml as output</rm:tooltip>
 						</rm:widget>
+						<rm:widget type="checkbox" title="Limit Output" buttonId="briefOutputCB" style="SWT.LEFT" attribute="PERFSUITE_psprocess.configuration_id_-BRIEF">
+							<rm:layout-data>
+								<rm:grid-data widthHint="150" horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="3" />
+							</rm:layout-data>
+							<rm:tooltip>Brief output (no machine information)</rm:tooltip>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Reporting Threshold" buttonId="thresholdCB" style="SWT.LEFT"
+							attribute="PERFSUITE_psprocess.configuration_id_THRESHOLD">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+							<rm:tooltip>Set minimum % to report</rm:tooltip>
+						</rm:widget>
+						<rm:widget type="text" style="SWT.BORDER" attribute="PERFSUITE_psprocess.configuration_id_THRESHOLD_SAVED">
+							<rm:layout-data>
+								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
+							</rm:layout-data>
+							<rm:tooltip>Set minimum % to report</rm:tooltip>
+							<rm:control-state>
+								<rm:enable-if button="thresholdCB" selected="true" />
+							</rm:control-state>
+						</rm:widget>
+						<rm:widget type="checkbox" title="Custom Metrics" buttonId="customMetricsCB" style="SWT.LEFT"
+							attribute="PERFSUITE_psprocess.configuration_id_-CUSTOMMETRICSFILE">
+							<rm:layout-data>
+								<rm:grid-data widthHint="150" horizontalAlign="SWT.FILL" grabExcessHorizontal="false" horizontalSpan="1" />
+							</rm:layout-data>
+							<rm:tooltip>Specify custom metric definition file</rm:tooltip>
+						</rm:widget>
+						<rm:browse title="Browse..." localOnly="false" directory="false" textStyle="SWT.BORDER"
+							attribute="PERFSUITE_psprocess.configuration_id_-CUSTOMMETRICSFILE_SAVED">
+							<rm:text-layout-data>
+								<rm:grid-data horizontalSpan="1" horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="true" />
+							</rm:text-layout-data>
+							<rm:button-layout-data>
+								<rm:grid-data horizontalSpan="1" horizontalAlign="SWT.FILL" verticalAlign="SWT.FILL" grabExcessHorizontal="false" />
+							</rm:button-layout-data>
+							<rm:tooltip>Specify custom metric definition file</rm:tooltip>
+							<rm:text-control-state>
+								<rm:enable-if button="customMetricsCB" selected="true" />
+							</rm:text-control-state>
+							<rm:button-control-state>
+								<rm:enable-if button="customMetricsCB" selected="true" />
+							</rm:button-control-state>
+						</rm:browse>
 						<rm:widget type="label" style="SWT.LEFT">
 							<rm:layout-data>
 	                     		<rm:grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
@@ -303,14 +374,14 @@
 							<rm:layout-data>
 	                     		<rm:grid-data horizontalAlign="SWT.BEGINNING" grabExcessHorizontal="false"/>
 	                  		</rm:layout-data>
-	                  		<rm:tooltip>Specify the file output pattern to search on for post processing (e.g. psprocess*)</rm:tooltip>
-	                  		<rm:fixed-text>Output file pattern:</rm:fixed-text>
+	                  		<rm:tooltip>Perform filename expansion using the pattern specified (e.g. psprocess*)</rm:tooltip>
+	                  		<rm:fixed-text>Input file pattern:</rm:fixed-text>
 						</rm:widget>
 						<rm:widget type="text" style="SWT.BORDER" attribute="PERFSUITE_psprocess.configuration_id_GLOB_SAVED">
 							<rm:layout-data>
 								<rm:grid-data horizontalAlign="SWT.FILL" grabExcessHorizontal="true" horizontalSpan="2" />
 							</rm:layout-data>
-							<rm:tooltip>psrun output prefix to search on for post processing</rm:tooltip>
+							<rm:tooltip>Perform filename expansion using the pattern specified (e.g. psprocess*)</rm:tooltip>
 						</rm:widget>
 						<rm:widget type="checkbox" title="Output" buttonId="psProcessOutputCB" style="SWT.LEFT"
 							attribute="PERFSUITE_psprocess.configuration_id_-OUTPUT">
