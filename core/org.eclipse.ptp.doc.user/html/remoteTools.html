@@ -38,13 +38,17 @@ projects.
 <h2 id="create">Creating Remote Connections</h2>
 <p>New connections are typically created when a need for them arises, such as creating a remote or synchronized
 project, or a run configuration on a remote target machine. 
+<ul>
+<li>You can also create a new connection independently via the <b>Preferences</b> page.  See 
+<a href="#edit">Edit</a> below and use the <b>Add </b> button on the <b>Preferences</b> page.
+</ul>
 To create a new connection to a remote machine, e.g. when creating a <a href="sync.html">synchronized project</a>, 
 the new connection information is specified as part of the <b>New Synchronized Project</b> dialog.
 <p>
 <img src="images/rt_newConnect.png">
 <p>
-Select <b>New...</b> and on the <b>Target Environment Configuration</b> dialog, specify a target name
-of your choice. Select <b>Remote Host</b> and fill in user name and password. Select
+Select <b>New...</b> and on the <b>New Connection</b> dialog, specify a Connection name
+of your choice. Fill in user name and password. Select
 <b>Finish</b> to create the connection.
 <p><img src="images/rt_connection_new.png">
 <p>
@@ -57,7 +61,7 @@ For example, pick an unused port > 1024 such as 7373 in this example:
 ssh -L 7373:&lt;target-host&gt;:22 &lt;intermediate-userid&gt;@&lt;intermediate-host&gt;
 </pre>
 
-<p>Then in the connection dialog, Select <b>Advanced...</b> and use the same port number that you specified
+<p>Then in the connection dialog, expand the <b>Advanced </b> section and use the same port number that you specified
 from the command line ssh command.
 <p>
 <img src="images/rt_tunnel.png">
