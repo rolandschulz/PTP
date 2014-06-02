@@ -27,15 +27,15 @@
       <topic label="Recognizing Compiler Errors: Cray, PGI, and Open64" href="html/errorParsers.html"/>
       <topic label="Running Parallel Programs"  href="html/03pRunConfig.html">
          <topic label="Supported Target System Configurations" href="html/03pRunConfig.html#ptp-tscs" >
-         </topic> 
-          <topic label="Running Open MPI Jobs" href="html/rms/openMPI.html"/>
-          <topic label="Running SLURM Jobs" href="html/rms/slurm.html"/>
-          <topic label="Running SLURM ALPS Jobs" href="html/rms/slurmalps.html"/>
-          <topic label="Running Grid Engine Jobs" href="html/rms/gridengine.html"/>
-          <topic label="Running IBM PE Jobs" href="html/rms/ibm-pe.html"/>
+         </topic>
           <topic label="Running IBM LoadLeveler Jobs" href="html/rms/ibm-ll.html"/>
-          <topic label="Running IBM Platform MPI Jobs" href="html/rms/ibm-pmpi.html"/>
+          <topic label="Running IBM PE Jobs" href="html/rms/ibm-pe.html"/>
+          <topic label="Running IBM Platform MPI Jobs" href="html/rms/ibm-pmpi.html"/> 
+          <topic label="Running Open MPI Jobs" href="html/rms/openMPI.html"/>
           <topic label="Running PBS Jobs" href="html/rms/pbs.html"/>
+          <topic label="Running Remote Generic Interactive Jobs" href="html/rms/remote-generic-interactive.html" />
+          <topic label="Running SLURM Jobs" href="html/rms/slurm.html"/>
+          <topic label="Running Grid Engine Jobs" href="html/rms/gridengine.html"/>        
           <topic label="Running TORQUE Jobs" href="html/rms/torque.html"/>
           <!-- anchor point for general TSC help docs -->
           <anchor id="ptpRun"/>
