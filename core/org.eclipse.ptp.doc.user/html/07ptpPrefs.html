@@ -40,7 +40,7 @@ preferences information for other features.</p>
 
 <p>Next, expand <b>Parallel Tools</b> and  <b>Remote Development</b> in the list of preferences
 pages on the left side and choose the component's preferences you wish
-to change. The following image shows all available components.
+to change.  
 (You may see different items depending on which optional features you have installed.)
 </p>
 
@@ -145,8 +145,8 @@ For more information see <a href="http://wiki.eclipse.org/PTP/ETFw/PTP_External_
 
 <dl>
 <dt><b>External Tool Parser</b> (default jaxb-parser)</dt>
-<!-- FIXME what is default parser?-->
-	<dd> The default parser for ETFw.</dd>
+
+	<dd>This option selects between the SAX workflow parser and the JAXB workflow parser which supports newer xml tool definitions.</dd>
 	<dt><b>Tool Definition File</b> (default empty)</dt>
 	<dd>The name of a file containing the ETFw XML configuration.</dd>
 </dl>
@@ -161,11 +161,13 @@ Feedback view.</p>
 Feedback view</a> for more information.</p>
 
 <h2 id="launch">Launch</h2>
-<!-- FIXME  -->
+<!-- FIXME regrab/check image when greg removes checkbox -->
+<p>Allows configuration of perspective that automatically opens on a run and debug launch of a parallel application.
+
 <p><img src="images/07prefsLaunch.png"></p>
 
 <h2 id="monitoring">Monitoring</h2>
-<!-- FIXME  -->
+<p>Provides some options for the System Monitoring Perspective
 <p><img src="images/07prefsMonitoring.png"></p>
 
 <h2 id="targetConfigs">Target Configurations</h2>
@@ -180,6 +182,7 @@ Feedback view</a> for more information.</p>
 <h2 id="remoteDev">Remote Development Preferences</h2>
 <p>The main page for <b>Remote Development</b> preferences 
 allows specification of a default Remote Services provider.
+The default provider is used whenever new services are created - for example, new connections to remote machines.
 <p>The choices are:
 <ul>
 <li>None - in this case, a choice of Remote Services provider is requested in each case where it is needed (e.g. specifying a new connection)</li>
@@ -192,6 +195,8 @@ allows specification of a default Remote Services provider.
 <h3 id="connections">Connections</h3>
 <p>On the <b>Connections</b> page, connections can be added (created), edited (changed), removed, 
 opened (started) and closed (stopped).
+Current connections for the selected <b>Remote Service Provider</b> (Built-in SSH, Remote Tools, or RSE) are shown.
+
 Note that a connection cannot be edited or removed when it is open.
 To edit or remove a connection, stop it first.
 <p><img src="images/07prefsRD_connections.png"></p>
@@ -205,7 +210,10 @@ To edit or remove a connection, stop it first.
 <p><img src="images/rt-prefs.png"></p>
 
 <h3 id="serviceConfig">Service Configurations Preferences</h3>
-<!-- FIXME need description, maybe refer to sync page  -->
+
+<p>Service configurations are used to persist information about RDT remote projects. 
+The service configuration preference page is only intended for developers and should 
+only be used if you understand what you are doing.
 <p><img src="images/07prefsServiceConfig.png"></p>
 <h3 id="sync">Synchronized Projects Preferences</h3>
 <h3 id="filter">File Filtering</h3>
