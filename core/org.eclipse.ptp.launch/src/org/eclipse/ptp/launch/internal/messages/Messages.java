@@ -20,7 +20,6 @@ public class Messages extends NLS {
 	public static String Launch_common_Error;
 
 	public static String LaunchPreferencesPage_Always;
-	public static String LaunchPreferencesPage_Auto_start_RM;
 	public static String LaunchPreferencesPage_Never;
 	public static String LaunchPreferencesPage_OpenParallelDebugPerspective;
 	public static String LaunchPreferencesPage_OpenSystemMonitoringPerspective;
