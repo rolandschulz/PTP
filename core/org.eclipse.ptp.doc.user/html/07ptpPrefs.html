@@ -7,19 +7,27 @@
 <body>
 
 <h1>Preferences</h1>
+<p> <!--  FIXME - regrab or edit all screenshots due to "Remote Shell Preferences" change -->
+<!-- See FIXME  --> 
+<!-- See FIXME  --> 
+<!-- See FIXME  -->  
 <p>Topics include:</p>
 <ul>
-	<li><a href="#open">Opening PTP Preferences</li>
+	<li><a href="#open">Opening Preferences</li>
 	<li><a href="#main">Parallel Tools Preferences </li>
 	<li><a href="#debug">Debug Preferences  </li>
 
 	<li><a href="#external">External Tools Framework (ETFw) Preferences</a></li>
+	<li><a href="#launch">Launch Preferences</a></li>
+	<li><a href="#monitoring">Monitoring Preferences</a></li>
 	<li><a href="#pldt">PLDT Preferences</a></li>
-		<li><a href="#sync">Synchronize Preferences  </li>
+	<li><a href="#targetConfigs">Target Configurations Preferences</a></li>
+	<li><a href="#remoteDev">Remote Development Preferences </li>
+
 </ul>
-<p>Please see the <a href="http://help.eclipse.org/juno/index.jsp">online documentation</a> for the additional
-preference information.</p>
-<h2 id="open">Opening the PTP Preferences</h2>
+<p>Please see the <a href="http://help.eclipse.org">online documentation</a> for  additional
+preferences information for other features.</p>
+<h2 id="open">Opening Preferences</h2>
 <p>To open the <b>Preferences dialog</b>, select:</p>
 <ul>
 	<li>
@@ -30,29 +38,25 @@ preference information.</p>
 	</li>
 </ul>
 
-<p>Next, expand <b>Parallel Tools</b> in the list of preferences
+<p>Next, expand <b>Parallel Tools</b> and  <b>Remote Development</b> in the list of preferences
 pages on the left side and choose the component's preferences you wish
-to change. The following image shows all available components:</p>
+to change. The following image shows all available components.
+(You may see different items depending on which optional features you have installed.)
+</p>
 
 <p><img src="images/07prefsAll.png"></p>
 
 <h2 id="main"><a name="run"></a>Parallel Tools Preference Page</h2>
-<p>This is the main preferences page for PTP. Available preferences
-are:</p>
-<dl>
-	<dt><b>Temporary output directory</b></dt>
-	<dd>Temporary directory to use to save process output</dd>
-	<dt><b>Console buffer size (lines)</b></dt>
-	<dd>Number of lines of output from each process to save (0 means
-	infinite)</dd>
-</dl>
+<p>This is the main preferences parent page for PTP. Available preferences
+are in the items beneath it. Expand the tree to view these.
+
 
 <h2 id="debug">Debug Preferences Page (Parallel Tools &gt; Debug)</h2>
 <p>This is the main parallel debugger preferences page. These are
 preferences that apply to any parallel debugger.</p>
 <p><img src="images/07prefsDebug.png"></p>
 
-<h3>Default settings</h3>
+<h4>Default settings</h4>
 <p>These preferences control some debugger default behavior</p>
 <dl>
 	<dt><b>Show full paths on breakpoint</b> (default disabled)</dt>
@@ -65,18 +69,18 @@ preferences that apply to any parallel debugger.</p>
 	breakpoint is hit.</dd>
 </dl>
 
-<h3>Communication</h3>
+<h4>Communication</h4>
 <p>These are preferences relating to the communication between
 Eclipse and the external parallel debugger. They do not normally need to
 be changed.</p>
 <dl>
 	<dt><b>Command timeout (ms)</b> (default 60000)</dt>
-	<dd>This specifices the period Eclipse waits after sending a
+	<dd>This specifies the period Eclipse waits after sending a
 	command to the external debugger. If no response is received the debug
 	session will be terminated.</dd>
 </dl>
 
-<h3>Variable</h3>
+<h4>Variable</h4>
 <p>These variables control the action of the debugger to update
 variable information.</p>
 <dl>
@@ -91,8 +95,7 @@ variable information.</p>
 	changed.</dd>
 </dl>
 
-<h2 id="sdm">SDM (Scalable Debug Manager) Preferences (Parallel Tools &gt;
-Debug &gt; SDM)</h2>
+<h3 id="sdm">SDM (Scalable Debug Manager) Preferences (Parallel Tools &gt; Debug &gt; SDM)</h3>
 <p>These are preferences for controlling the behavior of the
 scalable debug manager, which is the server component of the parallel
 debugger. They do not normally need to be changed.</p>
@@ -116,19 +119,16 @@ launched. They do not normally need to be altered.</p>
 	to populate the Debug tab on the launch configuration.</dd>
 </dl>
 
-<h3>SDM debugging options</h3>
-<p>These preference allow the SDM operation to be debugged. They are
+<h3>SDM tracing options</h3>
+<p>These preference allow the SDM operation to be traced. They are
 normally only used by PTP developers.</p>
 
 <dl>
-	<dt><b>Enable SDM debugging</b></dt>
-	<dd>This turns on debugging of the SDM. Additional options can be
-	set to control the type and amount of debugging information that is
+	<dt><b>Enable SDM tracing</b></dt>
+	<dd>This turns on tracing of the SDM. Additional options can be
+	set to control the type and amount of tracing information that is
 	generated.</dd>
-	<dt><b>Enable SDM client debugging</b></dt>
-	<dd>Enables debugging of the SDM Eclipse client. Additional
-	options can be set to control the type and amount of debugging
-	information that is generated.</dd>
+
 </dl>
 
 <h2 id="external">External Tools Preferences Page (Parallel Tools &gt; External Tools)</h2>
@@ -144,6 +144,9 @@ For more information see <a href="http://wiki.eclipse.org/PTP/ETFw/PTP_External_
 <p>These preferences are used to configure ETFw</p>
 
 <dl>
+<dt><b>External Tool Parser</b> (default jaxb-parser)</dt>
+<!-- FIXME what is default parser?-->
+	<dd> The default parser for ETFw.</dd>
 	<dt><b>Tool Definition File</b> (default empty)</dt>
 	<dd>The name of a file containing the ETFw XML configuration.</dd>
 </dl>
@@ -157,17 +160,66 @@ Feedback view.</p>
 <p>These preferences are used to configure the feedback view. See <a href="PLUGINS_ROOT/org.eclipse.ptp.etfw.feedback/html/toc.html">
 Feedback view</a> for more information.</p>
 
+<h2 id="launch">Launch</h2>
+<!-- FIXME  -->
+<p><img src="images/07prefsLaunch.png"></p>
+
+<h2 id="monitoring">Monitoring</h2>
+<!-- FIXME  -->
+<p><img src="images/07prefsMonitoring.png"></p>
+
+<h2 id="targetConfigs">Target Configurations</h2>
+<!-- FIXME  -->
+<p><img src="images/07prefsTargetConfigs.png"></p>
+
 <h2 id="pldt">Parallel Language Development Tools (PLDT) Preferences</h2>
 <p>See the help for <a
 	href="PLUGINS_ROOT/org.eclipse.ptp.pldt.doc.user/html/toc.html">PLDT</a></p>
 
-<h2 id="sync">Sync Preferences</h2>
-<p>The preferences page for Synchronized projects includes 
-setting defaults for sync filtering.
+
+<h2 id="remoteDev">Remote Development Preferences</h2>
+<p>The main page for <b>Remote Development</b> preferences 
+allows specification of a default Remote Services provider.
+<p>The choices are:
+<ul>
+<li>None - in this case, a choice of Remote Services provider is requested in each case where it is needed (e.g. specifying a new connection)</li>
+<li>Built-in SSH (default, recommended)</li> 
+<li>Remote System Environment (RSE)</li> 
+<li>Remote Tools</li> 
+</ul>
+<p><img src="images/07prefsRD_main.png"></p>
+
+<h3 id="connections">Connections</h3>
+<p>On the <b>Connections</b> page, connections can be added (created), edited (changed), removed, 
+opened (started) and closed (stopped).
+Note that a connection cannot be edited or removed when it is open.
+To edit or remove a connection, stop it first.
+<p><img src="images/07prefsRD_connections.png"></p>
+
+<h3 id="remoteShell">Remote Shell Preferences</h3>
+
+<p><img src="images/07prefsRD_remoteShell.png"></p>
+
+<h3 id="remoteTools">Remote Tools Preferences</h3>
+<p>Default values for remote hosts created using Remote Tools.
+<p><img src="images/rt-prefs.png"></p>
+
+<h3 id="serviceConfig">Service Configurations Preferences</h3>
+<!-- FIXME need description, maybe refer to sync page  -->
+<p><img src="images/07prefsServiceConfig.png"></p>
+<h3 id="sync">Synchronized Projects Preferences</h3>
+<h3 id="filter">File Filtering</h3>
+<p>The preferences page for <b>Synchronized projects > File Filtering</b> includes 
+setting defaults for file filtering. This allows files matching certain patterns to be
+excluded (or included) from the file synchronization.  For example, you may want to add 
+"*.o" as an exclude filter to not have object files sync'd back to the local file system
+after a compile creates them on the remote target. 
+You may also want to add the executable that your project creates to be excluded.
+Besides changing the default filtering here, you can modify <b>File Filtering</b> on each project as well.
 <p><img src="images/sync-prefs.png">
 <p>Git is used in synchronized projects implementation.
 If Git is not available in your path on the remote machine, it can be specified here.
-Git location can be changed for each connection.
+Specify the connection for each Git Binary Location you want to change.
 <p><img src="images/sync-prefs-git.png">
 
 <p>&nbsp;
