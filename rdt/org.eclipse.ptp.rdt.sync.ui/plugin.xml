@@ -30,14 +30,6 @@
     </wizard>
    </extension>
    <extension
-       point="org.eclipse.ui.navigator.viewer">
-       <viewerContentBinding viewerId="org.eclipse.ui.navigator.ProjectExplorer">
-          <includes>
-              <contentExtension pattern="org.eclipse.ptp.rdt.sync.ui.navigator.content"/>
-          </includes>
-       </viewerContentBinding>
-   </extension> 
-   <extension
          point="org.eclipse.ui.commands">
       <command
             id="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
@@ -64,13 +56,22 @@
                         value="1">
                   </count>
                   <iterate>
-                     <adapt
-                           type="org.eclipse.core.resources.IProject">
-                        <test
-                              property="org.eclipse.core.resources.projectNature"
-                              value="org.eclipse.ptp.rdt.sync.core.remoteSyncNature">
-                        </test>
-                     </adapt>
+                     <or>
+                        <adapt
+                              type="org.eclipse.core.resources.IProject">
+                           <test
+                                 property="org.eclipse.core.resources.projectNature"
+                                 value="org.eclipse.ptp.rdt.sync.core.remoteSyncNature">
+                           </test>
+                        </adapt>
+                        <adapt
+                              type="org.eclipse.cdt.core.model.ICProject">
+                           <test
+                                 property="org.eclipse.core.resources.projectNature"
+                                 value="org.eclipse.ptp.rdt.sync.core.remoteSyncNature">
+                           </test>
+                        </adapt>
+                     </or>
                   </iterate>
                </with>
             </visibleWhen>
