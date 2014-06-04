@@ -322,7 +322,7 @@ public class RMLaunchTest extends TestCase {
 	@SuppressWarnings("unchecked")
 	private void emulateLaunchTab() throws Throwable {
 		launchConfig = new TestLaunchConfiguration();
-		Map<Object, Object> env = launchConfig.getAttributes();
+		Map<String, Object> env = launchConfig.getAttributes();
 		Map<String, String> live = new HashMap<String, String>();
 		live.put("FOO_VAR_1", "FOO_VALUE_1"); //$NON-NLS-1$ //$NON-NLS-2$
 		live.put("FOO_VAR_2", "FOO_VALUE_2"); //$NON-NLS-1$ //$NON-NLS-2$
