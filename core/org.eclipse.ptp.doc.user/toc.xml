@@ -21,7 +21,10 @@
          <topic href="html/01buildMPIprog.html#local-helloMPI" label="Local project without a supplied Makefile - Managed Build project">
          </topic>
       </topic> 
-      <topic label="Synchronized Projects" href="html/sync.html"/>
+      <topic href="html/sync.html" label="Synchronized Projects">
+         <topic href="html/includes.html" label="Include Files">
+         </topic>
+      </topic>
       <topic label="Building Synchronized Projects" href="html/build.html"/>
       <topic label="Configuring Environment Modules" href="html/modules.html"/>
       <topic label="Recognizing Compiler Errors: Cray, PGI, and Open64" href="html/errorParsers.html"/>
