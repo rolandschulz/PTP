@@ -32,6 +32,7 @@ import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.StatusCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.dircache.DirCacheIterator;
 import org.eclipse.jgit.errors.AmbiguousObjectException;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.errors.NotSupportedException;
@@ -55,6 +56,7 @@ import org.eclipse.jgit.transport.Transport;
 import org.eclipse.jgit.transport.TransportGitSsh;
 import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.treewalk.TreeWalk;
+import org.eclipse.jgit.treewalk.filter.TreeFilter;
 import org.eclipse.jgit.util.FS;
 import org.eclipse.ptp.internal.rdt.sync.git.core.GitSyncFileFilter.DiffFiles;
 import org.eclipse.ptp.internal.rdt.sync.git.core.messages.Messages;
@@ -101,6 +103,19 @@ public class JGitRepo {
 				monitor.done();
 			}
 		}
+	}
+	
+	private boolean anyDiffInIndex() throws IOException {
+		final Repository repo = getRepository();
+		final TreeWalk treeWalk = new TreeWalk(repo);
+		treeWalk.setRecursive(true); //recursive is required because a hash for a (sub)tree might not be available
+		final ObjectId rev = repo.resolve("HEAD"); //$NON-NLS-1$
+		if (rev != null) { //HEAD doesn't exist for a new repo, then we want to compare against empty tree
+			treeWalk.addTree(new RevWalk(repo).parseTree(rev));
+		}
+		treeWalk.addTree(new DirCacheIterator(repo.readDirCache()));
+		treeWalk.setFilter(TreeFilter.ANY_DIFF);
+		return treeWalk.next();
 	}
 
 	/**
@@ -233,8 +248,6 @@ public class JGitRepo {
 	public boolean commit(IProgressMonitor monitor) throws GitAPIException, IOException {
 		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 10);
 		
-		boolean addedOrRemovedFiles = false;
-
 		assert(!inUnresolvedMergeState());
 		try {
 			DiffFiles diffFiles = fileFilter.getDiffFiles();
@@ -261,7 +274,6 @@ public class JGitRepo {
 					addCommand.addFilepattern(fileName);
 				}
 				addCommand.call();
-				addedOrRemovedFiles = true;
 			}
 			subMon.worked(3);
 
@@ -273,13 +285,12 @@ public class JGitRepo {
 					rmCommand.addFilepattern(fileName);
 				}
 				rmCommand.call();
-				addedOrRemovedFiles = true;
 			}
 			subMon.worked(3);
 
 			// Check if a commit is required.
 			subMon.subTask(Messages.JGitRepo_4);
-			if (addedOrRemovedFiles || inMergeState()) {
+			if (anyDiffInIndex() || inMergeState()) {
 				final CommitCommand commitCommand = git.commit();
 				commitCommand.setMessage(GitSyncService.commitMessage);
 				commitCommand.call();
