@@ -23,7 +23,7 @@
 <!-- ============================================================================= -->
 
    <extension point="org.eclipse.help.toc"> 
-       <toc file="guide.xml"/>   
+       <toc file="toc.xml"/>   
        <toc file="reference.xml"/>   
    </extension>
    
