@@ -143,10 +143,14 @@
          <enabledWhen>
             <with
                   variable="selection">
-               <test
-                     property="org.eclipse.ptp.rm.monitor.isActive"
-                     value="false">
-               </test>
+               <iterate
+                     ifEmpty="false"
+                     operator="or">
+                  <test
+                        property="org.eclipse.ptp.rm.monitor.isActive"
+                        value="false">
+                  </test>
+               </iterate>
             </with>
          </enabledWhen>
       </handler>
@@ -154,30 +158,39 @@
             class="org.eclipse.ptp.internal.rm.lml.monitor.ui.handlers.StopMonitorHandler"
             commandId="org.eclipse.ptp.rm.lml.monitor.ui.stopMonitor">
          <enabledWhen>
-            <test
-                  property="org.eclipse.ptp.rm.monitor.isActive"
-                  value="true">
-            </test>
+            <with
+                  variable="selection">
+               <test
+                     property="org.eclipse.ptp.rm.monitor.isActive"
+                     value="true">
+               </test>
+            </with>
          </enabledWhen>
       </handler>
       <handler
             class="org.eclipse.ptp.internal.rm.lml.monitor.ui.handlers.RefreshMonitorHandler"
             commandId="org.eclipse.ptp.rm.lml.monitor.ui.refreshMonitor">
          <enabledWhen>
-            <test
-                  property="org.eclipse.ptp.rm.monitor.isActive"
-                  value="true">
-            </test>
+            <with
+                  variable="selection">
+               <test
+                     property="org.eclipse.ptp.rm.monitor.isActive"
+                     value="true">
+               </test>
+            </with>
          </enabledWhen>
       </handler>
       <handler
             class="org.eclipse.ptp.internal.rm.lml.monitor.ui.handlers.SwitchCacheModeHandler"
             commandId="org.eclipse.ptp.rm.lml.monitor.ui.switchCacheMode">
          <enabledWhen>
-            <test
-                  property="org.eclipse.ptp.rm.monitor.isActive"
-                  value="true">
-            </test>
+            <with
+                  variable="selection">
+               <test
+                     property="org.eclipse.ptp.rm.monitor.isActive"
+                     value="true">
+               </test>
+            </with>
          </enabledWhen>
       </handler>
    </extension>
@@ -546,8 +559,7 @@
          <command
                commandId="org.eclipse.ptp.rm.lml.monitor.ui.refreshMonitor"
                icon="icons/eview16/refresh_monitor.gif"
-               style="pulldown"
-               tooltip="refresh">
+               style="pulldown">
          </command>
          <separator
                name="monitor2"
@@ -872,7 +884,7 @@
             locationURI="menu:org.eclipse.ptp.rm.lml.monitor.ui.refreshMonitor">
          <command
                commandId="org.eclipse.ptp.rm.lml.monitor.ui.switchCacheMode"
-               label="force data update"
+               label="%SwitchCacheModeCommand.name"
                style="toggle"
                tooltip="Do not allow usage of cache data on the next refresh. This might take longer.">
          </command>

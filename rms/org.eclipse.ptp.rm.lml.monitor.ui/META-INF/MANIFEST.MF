@@ -28,3 +28,5 @@ Export-Package: org.eclipse.ptp.internal.rm.lml.monitor.ui;x-internal:=true,
  org.eclipse.ptp.internal.rm.lml.monitor.ui.preferences;x-internal:=true,
  org.eclipse.ptp.internal.rm.lml.monitor.ui.propertyTesters;x-internal:=true,
  org.eclipse.ptp.internal.rm.lml.monitor.ui.views;x-internal:=true
+Import-Package: org.eclipse.e4.core.services.events,
+ org.eclipse.e4.ui.workbench

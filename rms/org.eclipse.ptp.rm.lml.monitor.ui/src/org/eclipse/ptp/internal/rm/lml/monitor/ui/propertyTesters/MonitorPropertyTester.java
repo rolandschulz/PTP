@@ -12,6 +12,8 @@
 package org.eclipse.ptp.internal.rm.lml.monitor.ui.propertyTesters;
 
 import org.eclipse.core.expressions.PropertyTester;
+import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -44,6 +46,11 @@ public class MonitorPropertyTester extends PropertyTester {
 			IEvaluationService service = (IEvaluationService) window.getService(IEvaluationService.class);
 			if (service != null) {
 				service.requestEvaluation(NAMESPACE + "." + IS_ACTIVE); //$NON-NLS-1$
+			}
+			// FIXME Workaround for Toolbar update problem - See bug 436696
+			IEventBroker b = (IEventBroker) window.getService(IEventBroker.class);
+			if (b != null) {
+				b.send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, UIEvents.ALL_ELEMENT_ID);
 			}
 		}
 	}
@@ -78,8 +85,6 @@ public class MonitorPropertyTester extends PropertyTester {
 						selectedMonitorId = ((IMonitorControl) sel.getFirstElement()).getControlId();
 					}
 				}
-
-				requestEvaluationOfProperty();
 			}
 		});
 	}
@@ -95,8 +100,8 @@ public class MonitorPropertyTester extends PropertyTester {
 
 		IMonitorControl monitor = null;
 		// Check if there is an active page at all before using it
-		if (PlatformUI.getWorkbench() != null && PlatformUI.getWorkbench().getActiveWorkbenchWindow() != null &&
-				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage() != null) {
+		if (PlatformUI.getWorkbench() != null && PlatformUI.getWorkbench().getActiveWorkbenchWindow() != null
+				&& PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage() != null) {
 			// Try to get a selection directly from the view as this is faster than depending on the listener
 			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 			ISelection selection = page.getSelection(IMonitorUIConstants.ID_SYSTEM_MONITOR_VIEW);

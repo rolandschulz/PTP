@@ -564,8 +564,7 @@ public class MonitorControl implements IMonitorControl {
 						fActive = false;
 						save();
 						fLMLManager.closeLgui(getControlId());
-					}
-					else {
+					} else {
 						fMonitorJob.askForStop();
 						fMonitorJob.schedule();
 					}
