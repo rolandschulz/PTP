@@ -826,13 +826,13 @@
          <command
                commandId="org.eclipse.ptp.rm.lml.monitor.ui.startMonitor"
                icon="icons/eview16/start_monitor.gif"
-               label="start monitor"
+               label="%StartMonitorCommand.name"
                style="push">
          </command>
          <command
                commandId="org.eclipse.ptp.rm.lml.monitor.ui.stopMonitor"
                icon="icons/eview16/stop_monitor.gif"
-               label="stop monitor"
+               label="%StopMonitorCommand.name"
                style="push">
          </command>
          <separator
@@ -842,7 +842,7 @@
          <command
                commandId="org.eclipse.ptp.rm.lml.monitor.ui.refreshMonitor"
                icon="icons/eview16/refresh_monitor.gif"
-               label="refresh"
+               label="%RefreshMonitorCommand.name"
                style="pulldown"
                tooltip="refresh">
          </command>
@@ -853,13 +853,13 @@
          <command
                commandId="org.eclipse.ptp.rm.lml.monitor.ui.addMonitor"
                icon="icons/eview16/add_monitor.gif"
-               label="add new monitor"
+               label="%AddMonitorCommand.name"
                style="push">
          </command>
          <command
                commandId="org.eclipse.ptp.rm.lml.monitor.ui.removeMonitor"
                icon="icons/eview16/remove_monitor.gif"
-               label="remove monitor"
+               label="%RemoveMonitorCommand.name"
                style="push">
          </command>
          <separator
