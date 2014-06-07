@@ -47,23 +47,14 @@ public class StartMonitorHandler extends AbstractHandler implements IHandler {
 			}
 			try {
 				HandlerUtil.getActiveWorkbenchWindow(event).run(true, true, new IRunnableWithProgress() {
-
 					@Override
 					public void run(IProgressMonitor progress) throws InvocationTargetException, InterruptedException {
 						SubMonitor subMon = SubMonitor.convert(progress, monitors.size());
-						try {
-							for (IMonitorControl monitor : monitors) {
-								try {
-									if (!monitor.isActive()) {
-										monitor.start(subMon.newChild(1));
-									}
-								} catch (CoreException e) {
-									throw new InvocationTargetException(e);
-								}
-							}
-						} finally {
-							if (progress != null) {
-								progress.done();
+						for (IMonitorControl monitor : monitors) {
+							try {
+								monitor.start(subMon.newChild(1));
+							} catch (CoreException e) {
+								throw new InvocationTargetException(e);
 							}
 						}
 					}

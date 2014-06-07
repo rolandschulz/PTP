@@ -56,6 +56,8 @@ import org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl;
 import org.eclipse.ptp.rm.lml.monitor.core.IMonitorCoreConstants;
 import org.eclipse.ptp.rm.lml.monitor.core.MonitorControlManager;
 import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteConnectionChangeEvent;
+import org.eclipse.remote.core.IRemoteConnectionChangeListener;
 import org.eclipse.remote.core.IRemoteConnectionManager;
 import org.eclipse.remote.core.IRemoteServices;
 import org.eclipse.remote.core.RemoteServices;
@@ -87,68 +89,103 @@ public class MonitorControl implements IMonitorControl {
 	 */
 	private class MonitorJob extends Job {
 		private final LMLDAServer fServer;
-		// If true, this monitoring connection will be closed on the next run of this job
-		private boolean stopRequest = false;
+		private final IRemoteConnection fConnection;
+		private int waitCount;
+		private boolean stopReqested;
 
 		public MonitorJob(IRemoteConnection conn) {
 			super(Messages.LMLResourceManagerMonitor_LMLMonitorJob);
 			setSystem(true);
+			fConnection = conn;
 			fServer = (LMLDAServer) RemoteServerManager.getServer(LMLDAServer.SERVER_ID, conn);
 			fServer.setWorkDir(new Path(conn.getWorkingDirectory()).append(".eclipsesettings").toString()); //$NON-NLS-1$
 		}
 
 		/**
-		 * Configure this job to stop the monitoring on
-		 * the next run.
+		 * Tell server to stop
 		 */
 		public void askForStop() {
-			stopRequest = true;
+			if (fServer.serverIsRunning()) {
+				fServer.cancel();
+			}
+			stopReqested = true;
+			wakeUp();
 		}
 
 		/**
 		 * Schedule an immediate refresh
 		 */
 		public void refresh() {
+			waitCount = 0;
 			wakeUp();
 		}
 
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
 			final SubMonitor subMon = SubMonitor.convert(monitor, 100);
-			if (stopRequest) {
-				fActive = false;
-				save();
-				fLMLManager.closeLgui(getControlId());
-				MonitorControlManager.getInstance().fireMonitorUpdated(new IMonitorControl[] { MonitorControl.this });
-				return Status.OK_STATUS;
-			}
+
+			fConnection.addConnectionChangeListener(fConnectionListener);
+			JobManager.getInstance().addListener(fJobListener);
 
 			try {
-				fServer.startServer(subMon.newChild(20));
-				if (!subMon.isCanceled()) {
-					fServer.waitForServerStart(subMon.newChild(20));
-					if (!subMon.isCanceled() && fServer.serverIsRunning()) {
-						LMLManager.getInstance().update(getControlId(), fServer.getInputStream(), fServer.getOutputStream());
+				while (!stopReqested && !subMon.isCanceled()) {
+					fServer.startServer(subMon.newChild(20));
+					if (!subMon.isCanceled()) {
+						fServer.waitForServerStart(subMon.newChild(20));
+						if (!subMon.isCanceled() && fServer.serverIsRunning()) {
+							LMLManager.getInstance().update(getControlId(), fServer.getInputStream(), fServer.getOutputStream());
+						}
+					}
+
+					if (!stopReqested) {
+						IStatus status = fServer.waitForServerFinish(subMon.newChild(40));
+
+						if (status == Status.OK_STATUS) {
+							waitCount = getUpdateInterval() * 1000;
+
+							while (!stopReqested && !subMon.isCanceled() && waitCount > 0) {
+								synchronized (this) {
+									try {
+										wait(100);
+									} catch (InterruptedException e) {
+										// Ignore
+									}
+								}
+								waitCount -= 100;
+							}
+						}
 					}
 				}
 			} catch (final Exception e) {
-				fActive = false;
-				MonitorControlManager.getInstance().fireMonitorUpdated(new IMonitorControl[] { MonitorControl.this });
 				return new Status(IStatus.ERROR, LMLMonitorCorePlugin.PLUGIN_ID, e.getLocalizedMessage(), e);
-			}
-			IStatus status = fServer.waitForServerFinish(subMon.newChild(40));
+			} finally {
+				save();
+				fLMLManager.closeLgui(getControlId());
 
-			int prefUpdateInterval = getUpdateInterval();
+				fConnection.removeConnectionChangeListener(fConnectionListener);
+				JobManager.getInstance().removeListener(fJobListener);
 
-			if (isActive() && status == Status.OK_STATUS) {
-				if (!stopRequest) {
-					schedule(prefUpdateInterval * 1000);
-				}
-			} else {
-				fActive = false;
-				MonitorControlManager.getInstance().fireMonitorUpdated(new IMonitorControl[] { MonitorControl.this });
+				setActive(false);
 			}
-			return status;
+
+			return Status.OK_STATUS;
+		}
+	}
+
+	private void setActive(boolean active) {
+		fActive = active;
+		MonitorControlManager.getInstance().fireMonitorUpdated(new IMonitorControl[] { MonitorControl.this });
+	}
+
+	private class ConnectionChangeListener implements IRemoteConnectionChangeListener {
+		@Override
+		public void connectionChanged(IRemoteConnectionChangeEvent event) {
+			int type = event.getType();
+			MonitorJob job = fMonitorJob;
+			if (job != null
+					&& (type == IRemoteConnectionChangeEvent.CONNECTION_CLOSED || type == IRemoteConnectionChangeEvent.CONNECTION_ABORTED)) {
+				job.askForStop();
+			}
 		}
 	}
 
@@ -205,19 +242,20 @@ public class MonitorControl implements IMonitorControl {
 		job.schedule();
 	}
 
-	private MonitorJob fMonitorJob;
 	private final String fControlId;
 	private final LMLManager fLMLManager = LMLManager.getInstance();
 	private final JobListener fJobListener = new JobListener();
-	private String fSavedLayout;
+	private final ConnectionChangeListener fConnectionListener = new ConnectionChangeListener();
 	private final List<JobStatusData> fSavedJobs = new ArrayList<JobStatusData>();
+
+	private String fSavedLayout;
+	private MonitorJob fMonitorJob;
 	private String fConfigurationName;
 	private boolean fActive;
-
 	private boolean cacheActive;// If true, remote caching is activated, otherwise an update is enforced
-
 	private String fRemoteServicesId;
 	private String fConnectionName;
+
 	private static final String XML = "xml";//$NON-NLS-1$ 
 	private static final String JOBS_ATTR = "jobs";//$NON-NLS-1$ 
 	private static final String JOB_ATTR = "job";//$NON-NLS-1$ 
@@ -226,9 +264,7 @@ public class MonitorControl implements IMonitorControl {
 	private static final String MONITOR_STATE = "monitorState";//$NON-NLS-1$;
 	private static final String MONITOR_ATTR = "monitor";//$NON-NLS-1$
 	private static final String REMOTE_SERVICES_ID_ATTR = "remoteServicesId";//$NON-NLS-1$;
-
 	private static final String CONNECTION_NAME_ATTR = "connectionName";//$NON-NLS-1$;
-
 	private static final String CONFIGURATION_NAME_ATTR = "configurationName";//$NON-NLS-1$
 
 	public MonitorControl(String controlId) {
@@ -387,7 +423,9 @@ public class MonitorControl implements IMonitorControl {
 	 */
 	@Override
 	public void refresh() {
-		fMonitorJob.refresh();
+		if (fMonitorJob != null) {
+			fMonitorJob.refresh();
+		}
 	}
 
 	/*
@@ -530,10 +568,6 @@ public class MonitorControl implements IMonitorControl {
 					fSavedJobs.toArray(new JobStatusData[0]));
 			setCacheActive(!getDefaultForceUpdate());
 
-			fActive = true;
-
-			MonitorControlManager.getInstance().fireMonitorUpdated(new IMonitorControl[] { this });
-
 			/*
 			 * Start monitoring job. Note that the monitoring job can fail,
 			 * in which case the monitor is considered to be stopped and the
@@ -543,8 +577,7 @@ public class MonitorControl implements IMonitorControl {
 				fMonitorJob = new MonitorJob(conn);
 				fMonitorJob.schedule();
 			}
-
-			JobManager.getInstance().addListener(fJobListener);
+			setActive(true);
 		}
 	}
 
@@ -555,23 +588,16 @@ public class MonitorControl implements IMonitorControl {
 	 */
 	@Override
 	public void stop() throws CoreException {
-		if (isActive()) {
-			JobManager.getInstance().removeListener(fJobListener);
-
+		if (fMonitorJob != null) {
 			synchronized (this) {
-				if (fMonitorJob != null) {
-					if (fMonitorJob.cancel()) {
-						fActive = false;
-						save();
-						fLMLManager.closeLgui(getControlId());
-					} else {
-						fMonitorJob.askForStop();
-						fMonitorJob.schedule();
-					}
+				fMonitorJob.askForStop();
+				try {
+					fMonitorJob.join();
+				} catch (InterruptedException e) {
+					// Ignore
 				}
+				fMonitorJob = null;
 			}
-
-			MonitorControlManager.getInstance().fireMonitorUpdated(new IMonitorControl[] { this });
 		}
 	}
 

@@ -43,9 +43,7 @@ public class StopMonitorHandler extends AbstractHandler implements IHandler {
 			}
 			for (IMonitorControl monitor : monitors) {
 				try {
-					if (monitor.isActive()) {
-						monitor.stop();
-					}
+					monitor.stop();
 				} catch (CoreException e) {
 					ErrorDialog.openError(HandlerUtil.getActiveShell(event), Messages.StopMonitorHandler_Stop_Monitors,
 							Messages.StopMonitorHandler_Unable_to_stop_monitor,
