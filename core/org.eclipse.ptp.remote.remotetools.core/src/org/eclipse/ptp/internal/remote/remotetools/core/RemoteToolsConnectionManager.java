@@ -25,15 +25,14 @@ import org.eclipse.ptp.remotetools.environment.core.ITargetEventListener;
 import org.eclipse.ptp.remotetools.environment.core.TargetElement;
 import org.eclipse.ptp.remotetools.environment.core.TargetEnvironmentManager;
 import org.eclipse.ptp.remotetools.environment.core.TargetTypeElement;
+import org.eclipse.remote.core.AbstractRemoteConnectionManager;
 import org.eclipse.remote.core.IRemoteConnection;
 import org.eclipse.remote.core.IRemoteConnectionChangeEvent;
-import org.eclipse.remote.core.IRemoteConnectionManager;
 import org.eclipse.remote.core.IRemoteConnectionWorkingCopy;
 import org.eclipse.remote.core.IRemoteServices;
 import org.eclipse.remote.core.exception.RemoteConnectionException;
 
-public class RemoteToolsConnectionManager implements IRemoteConnectionManager, ITargetEventListener {
-	private final IRemoteServices fRemoteServices;
+public class RemoteToolsConnectionManager extends AbstractRemoteConnectionManager implements ITargetEventListener {
 	private final TargetTypeElement fRemoteHost;
 	private final Map<String, IRemoteConnection> fConnections = new HashMap<String, IRemoteConnection>();
 
@@ -41,7 +40,7 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager, I
 	 * @since 4.0
 	 */
 	public RemoteToolsConnectionManager(IRemoteServices services) {
-		fRemoteServices = services;
+		super(services);
 		fRemoteHost = RemoteToolsServices.getTargetTypeElement();
 		TargetEnvironmentManager targetMgr = EnvironmentPlugin.getDefault().getTargetsManager();
 		targetMgr.addModelEventListener(this);
@@ -130,7 +129,8 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager, I
 	 */
 	public IRemoteConnectionWorkingCopy newConnection(String name) throws RemoteConnectionException {
 		if (getConnection(name) != null) {
-			throw new RemoteConnectionException(NLS.bind(Messages.RemoteToolsConnectionManager_Connection_with_name_already_exists, name));
+			throw new RemoteConnectionException(NLS.bind(Messages.RemoteToolsConnectionManager_Connection_with_name_already_exists,
+					name));
 		}
 		TargetElement element = newTargetElement(name);
 		return createConnection(element).getWorkingCopy();
@@ -173,7 +173,7 @@ public class RemoteToolsConnectionManager implements IRemoteConnectionManager, I
 	 * @throws RemoteConnectionException
 	 */
 	private IRemoteConnection createConnection(TargetElement element) {
-		return new RemoteToolsConnection(element.getName(), element, fRemoteServices);
+		return new RemoteToolsConnection(element.getName(), element, getRemoteServices());
 	}
 
 	/**

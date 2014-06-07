@@ -16,25 +16,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.remote.core.AbstractRemoteConnectionManager;
 import org.eclipse.remote.core.IRemoteConnection;
-import org.eclipse.remote.core.IRemoteConnectionManager;
 import org.eclipse.remote.core.IRemoteConnectionWorkingCopy;
 import org.eclipse.remote.core.IRemoteServices;
 import org.eclipse.remote.core.exception.RemoteConnectionException;
 import org.eclipse.rse.core.model.IHost;
 import org.eclipse.rse.core.model.ISystemRegistry;
 
-public class RSEConnectionManager implements IRemoteConnectionManager {
+public class RSEConnectionManager extends AbstractRemoteConnectionManager {
 	private final ISystemRegistry fRegistry;
-	private final IRemoteServices fRemoteServices;
 	private final Map<String, RSEConnection> fConnections = new HashMap<String, RSEConnection>();
 
 	/**
 	 * @since 4.0
 	 */
 	public RSEConnectionManager(ISystemRegistry registry, IRemoteServices services) {
+		super(services);
 		fRegistry = registry;
-		fRemoteServices = services;
 	}
 
 	/*
@@ -108,7 +107,7 @@ public class RSEConnectionManager implements IRemoteConnectionManager {
 	}
 
 	public IRemoteConnection createConnection(IHost host) {
-		return new RSEConnection(host, fRemoteServices);
+		return new RSEConnection(host, getRemoteServices());
 	}
 
 	/**
@@ -120,7 +119,7 @@ public class RSEConnectionManager implements IRemoteConnectionManager {
 		for (IHost host : hosts) {
 			RSEConnection conn = fConnections.get(host);
 			if (conn == null) {
-				conn = new RSEConnection(host, fRemoteServices);
+				conn = new RSEConnection(host, getRemoteServices());
 				if (!conn.initialize()) {
 					continue;
 				}
