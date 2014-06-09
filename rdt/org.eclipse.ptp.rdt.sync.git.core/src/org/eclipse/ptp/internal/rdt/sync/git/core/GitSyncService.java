@@ -640,7 +640,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 		try {
 			if (localRepo.getGit().branchList().call().size() > 0) { // check whether master was already created
 				subMon.subTask(Messages.GitSyncService_18);
-				localRepo.push(remoteRepo.getRemoteLocation(), subMon.newChild(20));
+				localRepo.push(remoteRepo, subMon.newChild(20));
 				subMon.subTask(Messages.GitSyncService_28);
 				return remoteRepo.merge(subMon.newChild(10));
 			}
@@ -668,7 +668,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 			// Download remote changes
 			subMon.subTask(Messages.GitSyncService_14);
 			try {
-				localRepo.fetch(remoteRepo.getRemoteLocation(), subMon.newChild(40));
+				localRepo.fetch(remoteRepo, subMon.newChild(40));
 			} catch (TransportException e) {
 				// Fetch can fail simply because the remote branch isn't set up yet. So just return in that case and throw an
 				// exception otherwise.

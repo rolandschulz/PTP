@@ -345,8 +345,12 @@ public class GitRepo {
     	return new ArrayList<String>(Arrays.asList(command.split(" "))); //$NON-NLS-1$
     }
 
-    // Get the base git binary for this system.
-    private String gitBinary() {
+    /**
+     * Get the base git binary for this system.
+     * 
+     * @return full path to binary
+     */
+    public String gitBinary() {
 		String gitBinary = "git"; //$NON-NLS-1$
 		IScopeContext context = InstanceScope.INSTANCE;
 		Preferences prefSyncNode = context.getNode(instanceScopeSyncNode);
@@ -369,8 +373,12 @@ public class GitRepo {
 		return gitBinary;
     }
 
-	// Get the base git command for this system, includes the git binary plus sync-specific arguments.
-	private String gitCommand() {
+    /**
+     * Get the base git command for this system, includes the git binary plus sync-specific arguments.
+     *
+     * @return full path to binary + arguments
+     */
+	public String gitCommand() {
 		return gitBinary() + " " + gitArgs; //$NON-NLS-1$
 	}
 

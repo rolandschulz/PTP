@@ -325,14 +325,15 @@ public class JGitRepo {
 	/**
 	 * Fetch files from the given remote. This only transmits the files. It does not update the local repository.
 	 *
-	 * @param remoteLoc
-	 * 			remote location
+	 * @param remoteRepo
+	 * 			remote Git repository
 	 * @param monitor
 	 *
 	 * @throws TransportException
 	 * 			on problem transferring files
 	 */
-	public void fetch(RemoteLocation remoteLoc, IProgressMonitor monitor) throws TransportException {
+	public void fetch(GitRepo remoteRepo, IProgressMonitor monitor) throws TransportException {
+		RemoteLocation remoteLoc = remoteRepo.getRemoteLocation();
 		int work = 10;
 		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, work);
 		TransportGitSsh transport = remoteToTransportMap.get(remoteLoc);
@@ -345,6 +346,8 @@ public class JGitRepo {
 
 		try {
 			subMon.subTask(Messages.JGitRepo_6);
+			String uploadCommand = remoteRepo.gitBinary() + " upload-pack"; //$NON-NLS-1$
+			transport.setOptionUploadPack(uploadCommand);
 			transport.fetch(new EclipseGitProgressTransformer(subMon.newChild(work)), null);
 		} catch (NotSupportedException e) {
 			throw new RuntimeException(e);
@@ -354,14 +357,15 @@ public class JGitRepo {
 	/**
 	 * Push local repository changes to remote. (Only committed changes are pushed). Does not update the remote repository.
 	 *
-	 * @param remoteLoc
-	 * 			remote location
+	 * @param remoteRepo
+	 * 			remote Git repository
 	 * @param monitor
 	 *
 	 * @throws TransportException
 	 *			on problem transferring files
 	 */
-	public void push(RemoteLocation remoteLoc, IProgressMonitor monitor) throws TransportException {
+	public void push(GitRepo remoteRepo, IProgressMonitor monitor) throws TransportException {
+		RemoteLocation remoteLoc = remoteRepo.getRemoteLocation();
 		int work = 10;
 		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, work);
 		TransportGitSsh transport = remoteToTransportMap.get(remoteLoc);
@@ -373,6 +377,8 @@ public class JGitRepo {
 		}
 		try {
 			subMon.subTask(Messages.JGitRepo_8);
+			String receiveCommand = remoteRepo.gitBinary() + " receive-pack"; //$NON-NLS-1$
+			transport.setOptionReceivePack(receiveCommand);
 			transport.push(new EclipseGitProgressTransformer(subMon.newChild(work)), null);
 		} catch (NotSupportedException e) {
 			throw new RuntimeException(e);
