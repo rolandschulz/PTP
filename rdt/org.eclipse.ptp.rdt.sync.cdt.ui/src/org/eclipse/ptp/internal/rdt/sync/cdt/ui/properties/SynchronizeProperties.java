@@ -90,7 +90,9 @@ public class SynchronizeProperties extends AbstractSynchronizeProperties {
 			fDirtyBuildConfigs.remove(fSyncConfig);
 		}
 
-		fEnvWidget.saveConfiguration(fEnvConfig);
+		if (fEnvConfig != null) {
+			fEnvWidget.saveConfiguration(fEnvConfig);
+		}
 		fDirtyEnvConfigs.put(fSyncConfig, fEnvConfig);
 	}
 
