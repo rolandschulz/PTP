@@ -50,6 +50,8 @@ public class GitRepo {
 	public static final String gitArgs = "--git-dir=" + GitSyncService.gitDir + " --work-tree=."; //$NON-NLS-1$ //$NON-NLS-2$
 	private static final String instanceScopeSyncNode = "org.eclipse.ptp.rdt.sync.core"; //$NON-NLS-1$
 	private static final String GIT_LOCATION_NODE_NAME = "git-location"; //$NON-NLS-1$
+	private static final String commitEmail = "ptp-dev@eclipse.org"; //$NON-NLS-1$
+	private static final String commitUserName = "PTP"; //$NON-NLS-1$
 	private final int MAX_FILES = 100;
 
 	private final RemoteLocation remoteLoc;
@@ -151,7 +153,10 @@ public class GitRepo {
 			// or earlier. Now it would probably be fine, since we only support 1.7 or greater, but we still avoid --work-tree
 			// just in case.
 			String commands = gitBinary() + " --git-dir=" + GitSyncService.gitDir + " init && " + //$NON-NLS-1$ //$NON-NLS-2$
-					gitBinary() + " --git-dir=" + GitSyncService.gitDir + " config core.preloadindex true"; //$NON-NLS-1$ //$NON-NLS-2$
+					gitBinary() + " --git-dir=" + GitSyncService.gitDir + " config core.preloadindex true && " + //$NON-NLS-1$ //$NON-NLS-2$
+					gitBinary() + " --git-dir=" + GitSyncService.gitDir + " config user.email \"" + commitEmail + "\" && " +  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					gitBinary() + " --git-dir=" + GitSyncService.gitDir + " config user.name \"" + commitUserName + "\""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
 			CommandResults commandResults = null;
 
 			try {
