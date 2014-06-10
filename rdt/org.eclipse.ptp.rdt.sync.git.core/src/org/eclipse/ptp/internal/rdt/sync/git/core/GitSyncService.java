@@ -340,10 +340,18 @@ public class GitSyncService extends AbstractSynchronizeService {
 	 * org.eclipse.core.resources.IProject)
 	 */
 	@Override
-	public void close(IProject project) throws RemoteSyncException {
+	public synchronized void close(IProject project) throws RemoteSyncException {
 		JGitRepo repo = getLocalJGitRepo(project, null);
 		if (repo != null) {
 			repo.close();
+		}
+
+		Iterator<Map.Entry<IPath, JGitRepo>> it = localDirectoryToJGitRepoMap.entrySet().iterator();
+		while (it.hasNext()) {
+			Map.Entry<IPath, JGitRepo> entry = it.next();
+			if (entry.getValue() == repo) {
+				it.remove();
+			}
 		}
 	}
 
