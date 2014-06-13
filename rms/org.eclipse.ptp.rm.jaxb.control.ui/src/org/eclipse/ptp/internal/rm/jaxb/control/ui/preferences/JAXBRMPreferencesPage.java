@@ -217,11 +217,6 @@ public class JAXBRMPreferencesPage extends PreferencePage implements IWorkbenchP
 	}
 
 	@Override
-	public void performApply() {
-		JAXBRMPreferenceManager.savePreferences();
-	}
-
-	@Override
 	public void performDefaults() {
 		reloadOption.setSelection(Preferences.getDefaultBoolean(JAXBControlCorePlugin.getUniqueIdentifier(),
 				JAXBRMPreferenceConstants.FORCE_XML_RELOAD, false));
@@ -246,6 +241,7 @@ public class JAXBRMPreferencesPage extends PreferencePage implements IWorkbenchP
 
 	@Override
 	public boolean performOk() {
+		JAXBRMPreferenceManager.savePreferences();
 		return true;
 	}
 
