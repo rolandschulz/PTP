@@ -481,8 +481,8 @@ public class ResourcesTab extends LaunchConfigurationTab {
 
 		boolean fControlChanged = fLaunchControl != null
 				&& (!fLaunchControl.getConfiguration().getName().equals(rmType)
-						|| !fLaunchControl.getRemoteServicesId().equals(remId) || !fLaunchControl.getConnectionName()
-						.equals(remName));
+						|| !fLaunchControl.getRemoteServicesId().equals(remId) || !fLaunchControl.getConnectionName().equals(
+						remName));
 		if (!fIsInitialized || fControlChanged) {
 			if (rmType != null && remId != null && remName != null) {
 				fSystemTypeCombo.select(fProviders.lastIndexOf(rmType) + 1);
@@ -502,7 +502,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 				IRemoteConnection conn = fRemoteConnectionWidget.getConnection();
 				if (conn != null) {
 					ILaunchController control = getNewController(remId, remName, rmType);
-					if (changeConnection(conn, control)) {
+					if (control != null && changeConnection(conn, control)) {
 						fRemoteConnection = conn;
 						fLaunchControl = control;
 					} else {
@@ -516,7 +516,7 @@ public class ResourcesTab extends LaunchConfigurationTab {
 				fLaunchControl = null;
 				fRemoteConnection = null;
 				updateEnablement();
-				
+
 				// Undo selection made if there is one
 				if (rmType == null) {
 					fSystemTypeCombo.select(0);
