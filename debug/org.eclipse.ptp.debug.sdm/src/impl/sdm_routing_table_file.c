@@ -16,6 +16,7 @@
  * Environment variables used to supply rank information
  */
 static char * RankVars[] = {
+	"OMPI_COMM_WORLD_RANK",			/* Open MPI 1.7+ */
 	"OMPI_MCA_orte_ess_vpid", 		/* Open MPI 1.3+ */
 	"OMPI_MCA_ns_nds_vpid", 		/* Open MPI 1.2 */
 	"PMI_RANK", 					/* MPICH2 */
