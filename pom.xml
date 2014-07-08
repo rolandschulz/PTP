@@ -15,6 +15,7 @@
 	<name>PTP Parent</name>
 
 	<properties>
+		<ptp-version>8.0.1</ptp-version>
 		<eclipse-release>luna</eclipse-release>
 		<tycho-version>0.19.0</tycho-version>
 		<tycho-extras-version>${tycho-version}</tycho-extras-version>
@@ -22,12 +23,12 @@
 		<tm-site>http://download.eclipse.org/tm/updates/3.6milestones/RC1</tm-site>
 		<cdt-site>http://download.eclipse.org/tools/cdt/builds/${eclipse-release}/milestones/rc2</cdt-site>	
 		<egit-site>http://download.eclipse.org/egit/staging/v3.4.0.201405211411-rc1</egit-site>
-		<photran-site>http://download.eclipse.org/tools/ptp/builds/hudson/ptp-nightly-photran</photran-site>
-		<remote-site>http://download.eclipse.org/tools/ptp/builds/remote/${eclipse-release}/nightly</remote-site>
+		<photran-site>http://download.eclipse.org/tools/ptp/builds/hudson/ptp-release-photran</photran-site>
+		<remote-site>http://download.eclipse.org/tools/ptp/builds/remote/${eclipse-release}/milestones/RC4</remote-site>
 		<license-site>http://download.eclipse.org/cbi/updates/license</license-site>
 		<!-- The following property is used by the production profile to install the final repo and  -->
 		<!-- associated components. It should be overridden if installing into a different location. -->
-		<ptp-install-dir>/home/data/httpd/download.eclipse.org/tools/ptp/builds/${eclipse-release}/nightly</ptp-install-dir>
+		<ptp-install-dir>/home/data/httpd/download.eclipse.org/tools/ptp/builds/${ptp-version}</ptp-install-dir>
 	</properties>
 
 	<licenses>
