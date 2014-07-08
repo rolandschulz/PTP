@@ -19,9 +19,9 @@
 		<eclipse-release>luna</eclipse-release>
 		<tycho-version>0.19.0</tycho-version>
 		<tycho-extras-version>${tycho-version}</tycho-extras-version>
-		<platform-site>http://download.eclipse.org/eclipse/updates/4.4milestones/S-4.4RC2-201405221330</platform-site>
-		<tm-site>http://download.eclipse.org/tm/updates/3.6milestones/RC1</tm-site>
-		<cdt-site>http://download.eclipse.org/tools/cdt/builds/${eclipse-release}/milestones/rc2</cdt-site>	
+		<platform-site>http://download.eclipse.org/eclipse/updates/4.4/R-4.4-201406061215</platform-site>
+		<tm-site>http://download.eclipse.org/tm/updates/3.6milestones/RC4</tm-site>
+		<cdt-site>http://download.eclipse.org/tools/cdt/builds/${eclipse-release}/milestones/rc4b</cdt-site>	
 		<egit-site>http://download.eclipse.org/egit/staging/v3.4.0.201405211411-rc1</egit-site>
 		<photran-site>http://download.eclipse.org/tools/ptp/builds/hudson/ptp-release-photran</photran-site>
 		<remote-site>http://download.eclipse.org/tools/ptp/builds/remote/${eclipse-release}/milestones/RC4</remote-site>
@@ -192,7 +192,7 @@
 
 	<repositories>
 		<repository>
-			<id>platform-$eclipse-release}</id>
+			<id>platform-${eclipse-release}</id>
 			<url>${platform-site}</url>
 			<layout>p2</layout>
 		</repository>
