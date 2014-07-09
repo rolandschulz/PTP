@@ -145,40 +145,40 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 		protected IStatus run(IProgressMonitor monitor) {
 			SubMonitor subMon = SubMonitor.convert(monitor, 100);
 			String jobId = fLaunch.getJobId();
-			fSubLock.lock();
 			try {
 				while (fLaunchControl.getJobStatus(jobId, subMon.newChild(50)).getState().equals(IJobStatus.SUBMITTED)
 						&& !subMon.isCanceled()) {
+					fSubLock.lock();
 					try {
 						fSubCondition.await(500, TimeUnit.MILLISECONDS);
 					} catch (InterruptedException e) {
 						// Expect to be interrupted if monitor is canceled
+					} finally {
+						fSubLock.unlock();
 					}
 				}
 			} catch (CoreException e) {
 				// Ignore
-			} finally {
-				fSubLock.unlock();
 			}
 
 			if (!subMon.isCanceled()) {
 				doCompleteJobLaunch(fLaunch, fDebugger);
 
-				fSubLock.lock();
 				try {
 					while (!fLaunchControl.getJobStatus(jobId, subMon.newChild(50)).getState().equals(IJobStatus.COMPLETED)
 							&& !subMon.isCanceled()) {
+						fSubLock.lock();
 						try {
 							fSubCondition.await(1000, TimeUnit.MILLISECONDS);
 						} catch (InterruptedException e) {
 							// Expect to be interrupted if monitor is
 							// canceled
+						} finally {
+							fSubLock.unlock();
 						}
 					}
 				} catch (CoreException e) {
 					// Ignore
-				} finally {
-					fSubLock.unlock();
 				}
 
 				if (!subMon.isCanceled()) {
