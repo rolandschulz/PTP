@@ -196,13 +196,13 @@ public class LaunchController implements ILaunchController {
 			throw CoreExceptionUtils.newException(Messages.LaunchController_notStarted, null);
 		}
 
-		if (RERUN_OPERATION.equals(operation)) {
-			ICommandJobStatus status = jobStatusMap.getStatus(jobId);
-			if (status != null) {
-				status.rerun();
-			}
-		} else {
+		ICommandJobStatus status = jobStatusMap.getStatus(jobId);
+
+		if (RERUN_OPERATION.equals(operation) && status != null) {
+			status.rerun();
+		} else if (status == null || !status.getState().equals(IJobStatus.COMPLETED)) {
 			SubMonitor progress = SubMonitor.convert(monitor, 100);
+			worked(progress, 30);
 			try {
 				pinTable.pin(jobId);
 				AttributeType a = getRMVariableMap().get(jobId);
@@ -213,19 +213,18 @@ public class LaunchController implements ILaunchController {
 					tmp.setName(jobId);
 					getRMVariableMap().put(jobId, tmp);
 				}
-				worked(progress, 30);
 				doControlCommand(jobId, operation);
 				if (tmp != null) {
 					getRMVariableMap().remove(jobId);
 				}
-				worked(progress, 40);
-				if (TERMINATE_OPERATION.equals(operation)) {
-					jobStatusMap.cancel(jobId);
-				}
-				worked(progress, 30);
 			} finally {
 				pinTable.release(jobId);
 			}
+			worked(progress, 40);
+			if (TERMINATE_OPERATION.equals(operation)) {
+				jobStatusMap.cancel(jobId);
+			}
+			worked(progress, 30);
 		}
 	}
 
