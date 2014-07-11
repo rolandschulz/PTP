@@ -96,6 +96,7 @@ public class LaunchController implements ILaunchController {
 		 * @see org.eclipse.remote.core.IRemoteConnectionChangeListener# connectionChanged
 		 * (org.eclipse.remote.core.IRemoteConnectionChangeEvent)
 		 */
+		@Override
 		public void connectionChanged(IRemoteConnectionChangeEvent event) {
 			if (event.getType() == IRemoteConnectionChangeEvent.CONNECTION_ABORTED
 					|| event.getType() == IRemoteConnectionChangeEvent.CONNECTION_CLOSED) {
@@ -189,6 +190,7 @@ public class LaunchController implements ILaunchController {
 	 * @see org.eclipse.ptp.rm.jaxb.control.core.IJAXBLaunchControl#control(java.lang.String, java.lang.String,
 	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
+	@Override
 	public void control(String jobId, String operation, IProgressMonitor monitor) throws CoreException {
 		if (!isActive()) {
 			throw CoreExceptionUtils.newException(Messages.LaunchController_notStarted, null);
@@ -232,6 +234,7 @@ public class LaunchController implements ILaunchController {
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.control.core.IJAXBLaunchControl#dispose()
 	 */
+	@Override
 	public void dispose() {
 		// NOP for the moment
 	}
@@ -247,36 +250,28 @@ public class LaunchController implements ILaunchController {
 	private void doControlCommand(String jobId, String operation) throws CoreException {
 		CoreException ce = CoreExceptionUtils.newException(Messages.RMNoSuchCommandError + operation, null);
 
-		CommandType job = null;
+		CommandType cmd = null;
 		if (TERMINATE_OPERATION.equals(operation)) {
 			maybeKillInteractive(jobId);
-			job = getConfiguration().getControlData().getTerminateJob();
-			if (job == null) { // there may not be an external cancel
+			cmd = getConfiguration().getControlData().getTerminateJob();
+			if (cmd == null) { // there may not be an external cancel
 				return;
 			}
 		} else if (SUSPEND_OPERATION.equals(operation)) {
-			job = getConfiguration().getControlData().getSuspendJob();
-			if (job == null) {
-				throw ce;
-			}
+			cmd = getConfiguration().getControlData().getSuspendJob();
 		} else if (RESUME_OPERATION.equals(operation)) {
-			job = getConfiguration().getControlData().getResumeJob();
-			if (job == null) {
-				throw ce;
-			}
+			cmd = getConfiguration().getControlData().getResumeJob();
 		} else if (RELEASE_OPERATION.equals(operation)) {
-			job = getConfiguration().getControlData().getReleaseJob();
-			if (job == null) {
-				throw ce;
-			}
+			cmd = getConfiguration().getControlData().getReleaseJob();
 		} else if (HOLD_OPERATION.equals(operation)) {
-			job = getConfiguration().getControlData().getHoldJob();
-			if (job == null) {
-				throw ce;
-			}
+			cmd = getConfiguration().getControlData().getHoldJob();
 		}
 
-		runCommand(jobId, job, CommandJob.JobMode.INTERACTIVE, getEnvironment(), null, ILaunchManager.RUN_MODE);
+		if (cmd == null) {
+			throw ce;
+		}
+
+		runCommand(jobId, cmd, CommandJob.JobMode.INTERACTIVE, getEnvironment(), null, ILaunchManager.RUN_MODE);
 	}
 
 	/**
@@ -346,6 +341,7 @@ public class LaunchController implements ILaunchController {
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.control.core.IJAXBJobControl#getConfiguration()
 	 */
+	@Override
 	public ResourceManagerData getConfiguration() {
 		return configData;
 	}
@@ -355,6 +351,7 @@ public class LaunchController implements ILaunchController {
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.control.core.IJAXBLaunchControl#getConnectionName()
 	 */
+	@Override
 	public String getConnectionName() {
 		return connectionName;
 	}
@@ -364,6 +361,7 @@ public class LaunchController implements ILaunchController {
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.control.core.IJAXBJobControl#getControlId()
 	 */
+	@Override
 	public String getControlId() {
 		return fControlId;
 	}
@@ -373,6 +371,7 @@ public class LaunchController implements ILaunchController {
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.control.core.IJAXBJobControl#getEnvironment()
 	 */
+	@Override
 	public IVariableMap getEnvironment() {
 		return getRMVariableMap();
 	}
@@ -405,6 +404,7 @@ public class LaunchController implements ILaunchController {
 	 * @see org.eclipse.ptp.rm.jaxb.control.core.IJAXBLaunchControl#getJobStatus(java.lang.String, boolean,
 	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
+	@Override
 	public IJobStatus getJobStatus(String jobId, boolean force, IProgressMonitor monitor) throws CoreException {
 		if (!isActive()) {
 			throw CoreExceptionUtils.newException(Messages.LaunchController_notStarted, null);
@@ -439,33 +439,50 @@ public class LaunchController implements ILaunchController {
 			}
 		}
 
-		String state = status == null ? IJobStatus.UNDETERMINED : status.getStateDetail();
+		AttributeType jobIdAttr = getRMVariableMap().get(jobId);
 
 		ICommandJob job = null;
-		try {
-			pinTable.pin(jobId);
-			AttributeType a = getRMVariableMap().get(jobId);
+		CommandType cmd = getConfiguration().getControlData().getGetJobStatus();
+		if (cmd != null && isActive() && !progress.isCanceled()) {
+			/*
+			 * Create a temporary jobId attribute with the same name as this job. This attribute is used to obtain the status from
+			 * the get-job-status command rather than the actual jobId attribute to avoid incorrectly setting the status when
+			 * running the command as an interactive job.
+			 */
+			String tmpJobId = UUID.randomUUID().toString();
+			AttributeType a = new AttributeType();
+			a.setVisible(false);
+			a.setName(jobId);
+			getRMVariableMap().put(tmpJobId, a);
 
-			CommandType cmd = getConfiguration().getControlData().getGetJobStatus();
-			if (cmd != null && isActive() && !progress.isCanceled()) {
-				AttributeType tmp = null;
-				if (a == null) {
-					tmp = new AttributeType();
-					tmp.setVisible(false);
-					tmp.setName(jobId);
-					getRMVariableMap().put(jobId, tmp);
-				}
-				job = runCommand(jobId, cmd, CommandJob.JobMode.STATUS, getEnvironment(), null, ILaunchManager.RUN_MODE);
-				if (tmp != null) {
-					a = getRMVariableMap().remove(jobId);
-				}
-			}
+			/*
+			 * Run the get-job-status command using the temporary jobId attribute.
+			 */
+			job = runCommand(tmpJobId, cmd, CommandJob.JobMode.STATUS, getEnvironment(), null, ILaunchManager.RUN_MODE);
 
-			if (a != null) {
-				state = String.valueOf(a.getValue());
+			/*
+			 * If there is already a jobId attribute, replace its value with the result of the get-job-status command so the new
+			 * status is correctly updated.
+			 */
+			a = getRMVariableMap().remove(tmpJobId);
+			if (jobIdAttr != null) {
+				try {
+					pinTable.pin(jobId);
+					jobIdAttr.setValue(a.getValue());
+				} finally {
+					pinTable.release(jobId);
+				}
+			} else {
+				jobIdAttr = a;
 			}
-		} finally {
-			pinTable.release(jobId);
+		}
+
+		String state = IJobStatus.UNDETERMINED;
+
+		if (jobIdAttr != null) {
+			state = String.valueOf(jobIdAttr.getValue());
+		} else if (status != null) {
+			state = status.getStateDetail();
 		}
 
 		if (status == null) {
@@ -501,6 +518,7 @@ public class LaunchController implements ILaunchController {
 	 * @see org.eclipse.ptp.rm.jaxb.control.core.IJAXBLaunchControl#getJobStatus(java.lang.String,
 	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
+	@Override
 	public IJobStatus getJobStatus(String jobId, IProgressMonitor monitor) throws CoreException {
 		return getJobStatus(jobId, false, monitor);
 	}
@@ -517,6 +535,7 @@ public class LaunchController implements ILaunchController {
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.control.core.IJAXBLaunchControl#getRemoteServicesId()
 	 */
+	@Override
 	public String getRemoteServicesId() {
 		return servicesId;
 	}
@@ -550,6 +569,7 @@ public class LaunchController implements ILaunchController {
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.control.core.ILaunchController#hasRunningJobs()
 	 */
+	@Override
 	public boolean hasRunningJobs() {
 		return jobStatusMap != null && !jobStatusMap.isEmpty();
 	}
@@ -559,6 +579,7 @@ public class LaunchController implements ILaunchController {
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.control.core.IJAXBLaunchControl#initialize()
 	 */
+	@Override
 	public void initialize() throws CoreException {
 		realizeRMDataFromXML();
 		if (servicesId == null && connectionName == null) {
@@ -599,6 +620,7 @@ public class LaunchController implements ILaunchController {
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.control.core.ILaunchController#isInitialized()
 	 */
+	@Override
 	public boolean isInitialized() {
 		return isInitialized;
 	}
@@ -816,6 +838,7 @@ public class LaunchController implements ILaunchController {
 	 * @see org.eclipse.ptp.rm.jaxb.control.core.ILaunchController#runCommand(org.eclipse.ptp.rm.jaxb.core.data.CommandType,
 	 * org.eclipse.ptp.rm.jaxb.core.IVariableMap)
 	 */
+	@Override
 	public void runCommand(CommandType command, IVariableMap attributes) throws CoreException {
 		runCommand(null, command, CommandJob.JobMode.INTERACTIVE, attributes, null, ILaunchManager.RUN_MODE);
 	}
@@ -865,6 +888,7 @@ public class LaunchController implements ILaunchController {
 	 * @see org.eclipse.ptp.rm.jaxb.control.core.ILaunchController#runCommand(java.lang.String, java.lang.String,
 	 * org.eclipse.debug.core.ILaunchConfiguration)
 	 */
+	@Override
 	public void runCommand(String name, String resetValue, ILaunchConfiguration configuration) throws CoreException {
 		if (!isActive()) {
 			throw CoreExceptionUtils.newException(Messages.LaunchController_notStarted, null);
@@ -933,6 +957,7 @@ public class LaunchController implements ILaunchController {
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.control.core.ILaunchController#setConnectionName(java.lang.String)
 	 */
+	@Override
 	public void setConnectionName(String connName) {
 		connectionName = connName;
 	}
@@ -978,6 +1003,7 @@ public class LaunchController implements ILaunchController {
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.control.core.ILaunchController#setRemoteServicesId(java.lang.String)
 	 */
+	@Override
 	public void setRemoteServicesId(String id) {
 		servicesId = id;
 	}
@@ -987,6 +1013,7 @@ public class LaunchController implements ILaunchController {
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.control.core.IJAXBLaunchControl#setRMConfigurationURL(java.net.URL)
 	 */
+	@Override
 	public void setRMConfigurationURL(URL url) {
 		if (url != null) {
 			configURL = url.toExternalForm();
@@ -998,6 +1025,7 @@ public class LaunchController implements ILaunchController {
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.control.core.IJAXBLaunchControl#start(org.eclipse.core.runtime.IProgressMonitor)
 	 */
+	@Override
 	public void start(IProgressMonitor monitor) throws CoreException {
 		if (!isActive) {
 			SubMonitor progress = SubMonitor.convert(monitor, 60);
@@ -1042,6 +1070,7 @@ public class LaunchController implements ILaunchController {
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.control.core.IJAXBLaunchControl#stop()
 	 */
+	@Override
 	public void stop() throws CoreException {
 		if (isActive) {
 			List<CommandType> onShutDown = getConfiguration().getControlData().getShutDownCommand();
@@ -1068,6 +1097,7 @@ public class LaunchController implements ILaunchController {
 	 * @see org.eclipse.ptp.core.jobs.IJobControl#submitJob(org.eclipse.debug.core.ILaunchConfiguration, java.lang.String,
 	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
+	@Override
 	public String submitJob(ILaunchConfiguration launchConfig, String launchMode, IProgressMonitor monitor) throws CoreException {
 		/*
 		 * give submission a unique id which will in most cases be replaced by the resource-generated id for the job/process

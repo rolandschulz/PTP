@@ -16,7 +16,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ptp.ems.core,
  org.eclipse.ptp.rm.lml.da.server
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: org.eclipse.ptp.internal.rm.jaxb.control.core;
   x-friends:="org.eclipse.ptp.rm.jaxb.tests,
    org.eclipse.ptp.rm.jaxb.control.ui,

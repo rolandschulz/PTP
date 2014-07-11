@@ -83,7 +83,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 			RemoteServicesDelegate d = null;
 			SubMonitor progress = SubMonitor.convert(monitor, 120);
 			try {
-				d = RemoteServicesDelegate.getDelegate(control.getRemoteServicesId(), control.getConnectionName(),
+				d = RemoteServicesDelegate.getDelegate(fControl.getRemoteServicesId(), fControl.getConnectionName(),
 						progress.newChild(20));
 				if (d.getRemoteFileManager() == null) {
 					/*
@@ -173,26 +173,26 @@ public class CommandJobStatus implements ICommandJobStatus {
 		}
 	}
 
-	private final ILaunchController control;
-	private final ICommandJob open;
-	private final String launchMode;
+	private final ILaunchController fControl;
+	private final ICommandJob fOpen;
+	private final String fLaunchMode;
 	private final IVariableMap fVarMap;
 
-	private String jobId;
-	private String owner;
-	private String queue;
-	private String state;
-	private String stateDetail;
-	private String remoteOutputPath;
-	private String remoteErrorPath;
-	private ICommandJobStreamsProxy proxy;
-	private IRemoteProcess process;
-	private PProcesses fProcesses;
-	private boolean initialized;
-	private boolean waitEnabled;
-	private boolean dirty;
+	private String fJobId;
+	private String fOwner;
+	private String fQueue;
+	private String fState;
+	private String fStateDetail;
+	private String fRemoteOutputPath;
+	private String fRemoteErrorPath;
+	private ICommandJobStreamsProxy fProxy;
+	private IRemoteProcess fProcess;
+	private PProcesses fPProcesses;
+	private boolean fInitialized;
+	private boolean fWaitEnabled;
+	private boolean fDirty;
 	private boolean fFilesChecked;
-	private long lastRequestedUpdate;
+	private long fLastRequestedUpdate;
 
 	/**
 	 * @param rmUniqueName
@@ -213,16 +213,16 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 *            resource manager control
 	 */
 	public CommandJobStatus(String jobId, String state, ICommandJob open, ILaunchController control, IVariableMap map, String mode) {
-		this.jobId = jobId;
+		this.fJobId = jobId;
 		normalizeState(state);
-		this.open = open;
-		this.control = control;
+		this.fOpen = open;
+		this.fControl = control;
 		this.fVarMap = map;
-		this.launchMode = mode;
-		waitEnabled = true;
-		lastRequestedUpdate = 0;
-		initialized = false;
-		dirty = false;
+		this.fLaunchMode = mode;
+		fWaitEnabled = true;
+		fLastRequestedUpdate = 0;
+		fInitialized = false;
+		fDirty = false;
 		fFilesChecked = false;
 	}
 
@@ -231,30 +231,31 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * 
 	 * @see org.eclipse.ptp.internal.rm.jaxb.control.core.ICommandJobStatus#cancel()
 	 */
+	@Override
 	public boolean cancel() {
 		synchronized (this) {
-			if (getStateRank(stateDetail) > 4) {
+			if (getStateRank(fStateDetail) > 4) {
 				return false;
 			}
 
-			waitEnabled = false;
+			fWaitEnabled = false;
 
 			/*
 			 * If this process is persistent (open), call terminate on the job, as it may still be running; the process will be
 			 * killed and the proxy closed inside the job
 			 */
-			if (open != null) {
-				open.terminate();
-				open.getJobStatus().setState(IJobStatus.CANCELED);
+			if (fOpen != null) {
+				fOpen.terminate();
+				fOpen.getJobStatus().setState(IJobStatus.CANCELED);
 				return true;
 			}
 
 			notifyAll();
 
-			if (process != null && !process.isCompleted()) {
-				process.destroy();
-				if (proxy != null) {
-					proxy.close();
+			if (fProcess != null && !fProcess.isCompleted()) {
+				fProcess.destroy();
+				if (fProxy != null) {
+					fProxy.close();
 				}
 				return true;
 			}
@@ -267,9 +268,10 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * 
 	 * @see org.eclipse.ptp.internal.rm.jaxb.control.core.ICommandJobStatus#cancelWait()
 	 */
+	@Override
 	public void cancelWait() {
 		synchronized (this) {
-			waitEnabled = false;
+			fWaitEnabled = false;
 			notifyAll();
 		}
 	}
@@ -281,7 +283,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * @return transition is legal
 	 */
 	private boolean canUpdateState(String newState) {
-		int prevRank = getStateRank(stateDetail);
+		int prevRank = getStateRank(fStateDetail);
 		int currRank = getStateRank(newState);
 		if (prevRank >= currRank) {
 			if (prevRank == 0) {
@@ -318,9 +320,9 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * If interactive, check to see if the process has completed.
 	 */
 	private void checkProcessStateForTermination() {
-		if (process != null) {
-			if (process.isCompleted()) {
-				setState(process.exitValue() == 0 ? COMPLETED : FAILED);
+		if (fProcess != null) {
+			if (fProcess.isCompleted()) {
+				setState(fProcess.exitValue() == 0 ? COMPLETED : FAILED);
 			}
 		}
 	}
@@ -330,13 +332,14 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * 
 	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
 	 */
+	@Override
 	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
 		if (adapter == IPJobStatus.class) {
-			if (fProcesses != null) {
+			if (fPProcesses != null) {
 				return this;
 			}
-			if (jobId != null && control != null) {
+			if (fJobId != null && fControl != null) {
 				AttributeType nProcsAttr = fVarMap.get(JAXBControlConstants.MPI_PROCESSES);
 				/*
 				 * Bug 412887 - make sure to check for linked attribute
@@ -355,7 +358,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 						// Ignore
 					}
 					if (nProcs > 0) {
-						fProcesses = new PProcesses(nProcs);
+						fPProcesses = new PProcesses(nProcs);
 						return this;
 					}
 				}
@@ -369,8 +372,9 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * 
 	 * @see org.eclipse.ptp.core.jobs.IJobStatus#getControlId()
 	 */
+	@Override
 	public String getControlId() {
-		return control.getControlId();
+		return fControl.getControlId();
 	}
 
 	/*
@@ -378,8 +382,9 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * 
 	 * @see org.eclipse.ptp.rmsystem.IJobStatus#getErrorPath()
 	 */
+	@Override
 	public String getErrorPath() {
-		return remoteErrorPath;
+		return fRemoteErrorPath;
 	}
 
 	/*
@@ -387,8 +392,9 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * 
 	 * @see org.eclipse.ptp.core.jobs.IJobStatus#getJobId()
 	 */
+	@Override
 	public synchronized String getJobId() {
-		return jobId;
+		return fJobId;
 	}
 
 	/*
@@ -396,8 +402,9 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * 
 	 * @see org.eclipse.ptp.internal.rm.jaxb.control.core.ICommandJobStatus#getLastUpdateRequest()
 	 */
+	@Override
 	public synchronized long getLastUpdateRequest() {
-		return lastRequestedUpdate;
+		return fLastRequestedUpdate;
 	}
 
 	/*
@@ -405,8 +412,9 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * 
 	 * @see org.eclipse.ptp.core.jobs.IJobStatus#getLaunchMode()
 	 */
+	@Override
 	public String getLaunchMode() {
-		return launchMode;
+		return fLaunchMode;
 	}
 
 	/*
@@ -414,8 +422,9 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * 
 	 * @see org.eclipse.ptp.core.jobs.IPJobStatus#getNumberOfProcesses()
 	 */
+	@Override
 	public int getNumberOfProcesses() {
-		return fProcesses != null ? fProcesses.getNumberOfProcesses() : 0;
+		return fPProcesses != null ? fPProcesses.getNumberOfProcesses() : 0;
 	}
 
 	/*
@@ -423,8 +432,9 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * 
 	 * @see org.eclipse.ptp.rmsystem.IJobStatus#getOutputPath()
 	 */
+	@Override
 	public String getOutputPath() {
-		return remoteOutputPath;
+		return fRemoteOutputPath;
 	}
 
 	/*
@@ -432,8 +442,9 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * 
 	 * @see org.eclipse.ptp.rmsystem.IJobStatus#getOwner()
 	 */
+	@Override
 	public String getOwner() {
-		return owner;
+		return fOwner;
 	}
 
 	/*
@@ -441,8 +452,9 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * 
 	 * @see org.eclipse.ptp.core.jobs.IPJobStatus#getProcessState(int)
 	 */
+	@Override
 	public String getProcessState(int proc) {
-		return fProcesses != null ? fProcesses.getProcessState(proc) : ""; //$NON-NLS-1$
+		return fPProcesses != null ? fPProcesses.getProcessState(proc) : ""; //$NON-NLS-1$
 	}
 
 	/*
@@ -450,8 +462,9 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * 
 	 * @see org.eclipse.ptp.rmsystem.IJobStatus#getQueueName()
 	 */
+	@Override
 	public String getQueueName() {
-		return queue;
+		return fQueue;
 	}
 
 	/*
@@ -459,11 +472,12 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * 
 	 * @see org.eclipse.ptp.core.jobs.IJobStatus#getState()
 	 */
+	@Override
 	public synchronized String getState() {
-		if (stateDetail != IJobStatus.CANCELED) {
+		if (fStateDetail != IJobStatus.CANCELED) {
 			checkProcessStateForTermination();
 		}
-		return state;
+		return fState;
 	}
 
 	/*
@@ -471,11 +485,12 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * 
 	 * @see org.eclipse.ptp.core.jobs.IJobStatus#getStateDetail()
 	 */
+	@Override
 	public synchronized String getStateDetail() {
-		if (stateDetail != IJobStatus.CANCELED) {
+		if (fStateDetail != IJobStatus.CANCELED) {
 			checkProcessStateForTermination();
 		}
-		return stateDetail;
+		return fStateDetail;
 	}
 
 	/**
@@ -522,8 +537,9 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * 
 	 * @see org.eclipse.ptp.core.jobs.IJobStatus#getStreamsProxy()
 	 */
+	@Override
 	public IStreamsProxy getStreamsProxy() {
-		return proxy;
+		return fProxy;
 	}
 
 	/*
@@ -531,29 +547,30 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * 
 	 * @see org.eclipse.ptp.internal.rm.jaxb.control.core.ICommandJobStatus#initialize(java.lang.String)
 	 */
+	@Override
 	public void initialize(String jobId) {
-		if (initialized) {
+		if (fInitialized) {
 			return;
 		}
-		this.jobId = jobId;
+		this.fJobId = jobId;
 		String path = null;
-		remoteOutputPath = null;
-		remoteErrorPath = null;
+		fRemoteOutputPath = null;
+		fRemoteErrorPath = null;
 		AttributeType a = fVarMap.get(JAXBControlConstants.STDOUT_REMOTE_FILE);
 		if (a != null) {
 			path = (String) a.getValue();
 			if (path != null && !JAXBControlConstants.ZEROSTR.equals(path)) {
-				remoteOutputPath = fVarMap.getString(jobId, path);
+				fRemoteOutputPath = fVarMap.getString(jobId, path);
 			}
 		}
 		a = fVarMap.get(JAXBControlConstants.STDERR_REMOTE_FILE);
 		if (a != null) {
 			path = (String) a.getValue();
 			if (path != null && !JAXBControlConstants.ZEROSTR.equals(path)) {
-				remoteErrorPath = fVarMap.getString(jobId, path);
+				fRemoteErrorPath = fVarMap.getString(jobId, path);
 			}
 		}
-		initialized = true;
+		fInitialized = true;
 	}
 
 	/*
@@ -561,8 +578,9 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * 
 	 * @see org.eclipse.ptp.core.jobs.IJobStatus#isInteractive()
 	 */
+	@Override
 	public boolean isInteractive() {
-		return process != null;
+		return fProcess != null;
 	}
 
 	/**
@@ -584,14 +602,15 @@ public class CommandJobStatus implements ICommandJobStatus {
 	private boolean isWaitEnabled() {
 		boolean w = true;
 		synchronized (this) {
-			w = waitEnabled;
+			w = fWaitEnabled;
 		}
 		return w;
 	}
 
+	@Override
 	public void rerun() {
 		if (getState().equals(IJobStatus.RUNNING) && isInteractive()) {
-			open.rerun();
+			fOpen.rerun();
 		}
 	}
 
@@ -600,6 +619,7 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus#maybeWaitForHandlerFiles (int)
 	 */
+	@Override
 	public void maybeWaitForHandlerFiles(int blockForSecs, IProgressMonitor monitor) {
 		if (fFilesChecked) {
 			return;
@@ -610,12 +630,12 @@ public class CommandJobStatus implements ICommandJobStatus {
 
 		SubMonitor progress = SubMonitor.convert(monitor, 10);
 
-		if (remoteOutputPath != null) {
-			tout = checkForReady(remoteOutputPath, blockForSecs, progress.newChild(5));
+		if (fRemoteOutputPath != null) {
+			tout = checkForReady(fRemoteOutputPath, blockForSecs, progress.newChild(5));
 		}
 
-		if (remoteErrorPath != null) {
-			terr = checkForReady(remoteErrorPath, blockForSecs, progress.newChild(5));
+		if (fRemoteErrorPath != null) {
+			terr = checkForReady(fRemoteErrorPath, blockForSecs, progress.newChild(5));
 		}
 
 		if (tout == null && terr == null) {
@@ -656,8 +676,9 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * 
 	 * @see org.eclipse.ptp.internal.rm.jaxb.control.core.ICommandJobStatus#setOwner(java .lang.String)
 	 */
+	@Override
 	public void setOwner(String owner) {
-		this.owner = owner;
+		this.fOwner = owner;
 	}
 
 	/*
@@ -665,8 +686,9 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * 
 	 * @see org.eclipse.ptp.internal.rm.jaxb.control.core.ICommandJobStatus#setProcess(org.eclipse.remote.core.IRemoteProcess)
 	 */
+	@Override
 	public void setProcess(IRemoteProcess process) {
-		this.process = process;
+		this.fProcess = process;
 	}
 
 	/*
@@ -674,9 +696,10 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * 
 	 * @see org.eclipse.ptp.core.jobs.IPJobStatus#setProcessOutput(java.util.BitSet, java.lang.String)
 	 */
+	@Override
 	public void setProcessOutput(BitSet procs, String output) {
-		if (fProcesses != null) {
-			fProcesses.setProcessOutput(procs, output);
+		if (fPProcesses != null) {
+			fPProcesses.setProcessOutput(procs, output);
 		}
 	}
 
@@ -685,9 +708,10 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * 
 	 * @see org.eclipse.ptp.core.jobs.IPJobStatus#setProcessState(java.util.BitSet, java.lang.String)
 	 */
+	@Override
 	public void setProcessState(BitSet procs, String state) {
-		if (fProcesses != null) {
-			fProcesses.setProcessState(procs, state);
+		if (fPProcesses != null) {
+			fPProcesses.setProcessState(procs, state);
 		}
 	}
 
@@ -697,8 +721,9 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * @see org.eclipse.ptp.internal.rm.jaxb.control.core.ICommandJobStatus#setProxy(org.eclipse.ptp.internal.rm.jaxb.control.core.
 	 * ICommandJobStreamsProxy)
 	 */
+	@Override
 	public void setProxy(ICommandJobStreamsProxy proxy) {
-		this.proxy = proxy;
+		this.fProxy = proxy;
 	}
 
 	/*
@@ -706,8 +731,9 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * 
 	 * @see org.eclipse.ptp.internal.rm.jaxb.control.core.ICommandJobStatus#setQueueName (java.lang.String)
 	 */
+	@Override
 	public void setQueueName(String name) {
-		this.queue = name;
+		this.fQueue = name;
 	}
 
 	/*
@@ -715,68 +741,69 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * 
 	 * @see org.eclipse.ptp.internal.rm.jaxb.control.core.ICommandJobStatus#setState(java.lang.String)
 	 */
+	@Override
 	public synchronized void setState(String state) {
 		if (!canUpdateState(state)) {
 			return;
 		}
 
-		dirty = false;
-		String previousDetail = stateDetail;
+		fDirty = false;
+		String previousDetail = fStateDetail;
 
 		normalizeState(state);
 
-		if (previousDetail == null || !previousDetail.equals(stateDetail)) {
-			dirty = true;
+		if (previousDetail == null || !previousDetail.equals(fStateDetail)) {
+			fDirty = true;
 			JobManager.getInstance().fireJobChanged(this);
 		}
 	}
 
 	private void normalizeState(String newState) {
 		if (UNDETERMINED.equals(newState)) {
-			state = UNDETERMINED;
-			stateDetail = UNDETERMINED;
+			fState = UNDETERMINED;
+			fStateDetail = UNDETERMINED;
 		} else if (SUBMITTED.equals(newState)) {
-			state = SUBMITTED;
-			stateDetail = SUBMITTED;
+			fState = SUBMITTED;
+			fStateDetail = SUBMITTED;
 		} else if (RUNNING.equals(newState)) {
-			state = RUNNING;
-			stateDetail = RUNNING;
+			fState = RUNNING;
+			fStateDetail = RUNNING;
 		} else if (SUSPENDED.equals(newState)) {
-			state = SUSPENDED;
-			stateDetail = SUSPENDED;
+			fState = SUSPENDED;
+			fStateDetail = SUSPENDED;
 		} else if (COMPLETED.equals(newState)) {
-			state = COMPLETED;
-			stateDetail = COMPLETED;
+			fState = COMPLETED;
+			fStateDetail = COMPLETED;
 		} else if (QUEUED_ACTIVE.equals(newState)) {
-			state = SUBMITTED;
-			stateDetail = QUEUED_ACTIVE;
+			fState = SUBMITTED;
+			fStateDetail = QUEUED_ACTIVE;
 		} else if (SYSTEM_ON_HOLD.equals(newState)) {
-			state = SUBMITTED;
-			stateDetail = SYSTEM_ON_HOLD;
+			fState = SUBMITTED;
+			fStateDetail = SYSTEM_ON_HOLD;
 		} else if (USER_ON_HOLD.equals(newState)) {
-			state = SUBMITTED;
-			stateDetail = USER_ON_HOLD;
+			fState = SUBMITTED;
+			fStateDetail = USER_ON_HOLD;
 		} else if (USER_SYSTEM_ON_HOLD.equals(newState)) {
-			state = SUBMITTED;
-			stateDetail = USER_SYSTEM_ON_HOLD;
+			fState = SUBMITTED;
+			fStateDetail = USER_SYSTEM_ON_HOLD;
 		} else if (SYSTEM_SUSPENDED.equals(newState)) {
-			state = SUSPENDED;
-			stateDetail = SYSTEM_SUSPENDED;
+			fState = SUSPENDED;
+			fStateDetail = SYSTEM_SUSPENDED;
 		} else if (USER_SUSPENDED.equals(newState)) {
-			state = SUSPENDED;
-			stateDetail = USER_SUSPENDED;
+			fState = SUSPENDED;
+			fStateDetail = USER_SUSPENDED;
 		} else if (USER_SYSTEM_SUSPENDED.equals(newState)) {
-			state = SUSPENDED;
-			stateDetail = USER_SYSTEM_SUSPENDED;
+			fState = SUSPENDED;
+			fStateDetail = USER_SYSTEM_SUSPENDED;
 		} else if (FAILED.equals(newState)) {
-			state = COMPLETED;
-			stateDetail = FAILED;
+			fState = COMPLETED;
+			fStateDetail = FAILED;
 		} else if (CANCELED.equals(newState)) {
-			state = COMPLETED;
-			stateDetail = CANCELED;
+			fState = COMPLETED;
+			fStateDetail = CANCELED;
 		} else if (JOB_OUTERR_READY.equals(newState)) {
-			state = COMPLETED;
-			stateDetail = JOB_OUTERR_READY;
+			fState = COMPLETED;
+			fStateDetail = JOB_OUTERR_READY;
 		}
 	}
 
@@ -785,8 +812,9 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * 
 	 * @see org.eclipse.ptp.internal.rm.jaxb.control.core.ICommandJobStatus#setUpdateRequestTime(long)
 	 */
+	@Override
 	public synchronized void setUpdateRequestTime(long update) {
-		lastRequestedUpdate = update;
+		fLastRequestedUpdate = update;
 	}
 
 	/*
@@ -794,9 +822,10 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJobStatus#stateChanged()
 	 */
+	@Override
 	public synchronized boolean stateChanged() {
-		boolean changed = dirty && !UNDETERMINED.equals(state);
-		dirty = false;
+		boolean changed = fDirty && !UNDETERMINED.equals(fState);
+		fDirty = false;
 		return changed;
 	}
 
@@ -806,13 +835,13 @@ public class CommandJobStatus implements ICommandJobStatus {
 	@Override
 	public String toString() {
 		List<String> s = new ArrayList<String>();
-		s.add(jobId);
-		s.add(owner);
-		s.add(queue);
-		s.add(state);
-		s.add(stateDetail);
-		s.add(remoteOutputPath);
-		s.add(remoteErrorPath);
+		s.add(fJobId);
+		s.add(fOwner);
+		s.add(fQueue);
+		s.add(fState);
+		s.add(fStateDetail);
+		s.add(fRemoteOutputPath);
+		s.add(fRemoteErrorPath);
 		return s.toString();
 	}
 
@@ -822,9 +851,10 @@ public class CommandJobStatus implements ICommandJobStatus {
 	 * @see org.eclipse.ptp.internal.rm.jaxb.control.core.ICommandJobStatus#waitForJobId(java.lang.String, java.lang.String,
 	 * org.eclipse.core.runtime.IProgressMonitor)
 	 */
+	@Override
 	public void waitForJobId(String uuid, String waitUntil, IProgressMonitor monitor) throws CoreException {
 		SubMonitor progress = SubMonitor.convert(monitor);
-		while (!progress.isCanceled() && isWaitEnabled() && (jobId == null || !isReached(state, waitUntil))) {
+		while (!progress.isCanceled() && isWaitEnabled() && (fJobId == null || !isReached(fState, waitUntil))) {
 			synchronized (this) {
 				try {
 					wait(1000);
@@ -835,36 +865,36 @@ public class CommandJobStatus implements ICommandJobStatus {
 
 			progress.setWorkRemaining(10);
 
-			if (isInteractive() && isWaitEnabled() && process.isCompleted() && process.exitValue() != 0) {
+			if (isInteractive() && isWaitEnabled() && fProcess.isCompleted() && fProcess.exitValue() != 0) {
 				throw CoreExceptionUtils.newException(uuid + JAXBCoreConstants.CO + JAXBCoreConstants.SP + FAILED, null);
 			}
 
 			AttributeType a = fVarMap.get(uuid);
 			if (a != null) {
-				jobId = a.getName();
+				fJobId = a.getName();
 				String v = (String) a.getValue();
 				if (v != null) {
 					setState(v);
 				}
 
-				if (jobId != null) {
+				if (fJobId != null) {
 					if (stateChanged()) {
 						/*
 						 * guarantee the presence of intermediate state in the environment
 						 */
-						fVarMap.put(jobId, a);
+						fVarMap.put(fJobId, a);
 
 						/*
 						 * Update status
 						 */
-						ICommandJobStatusMap map = JobStatusMap.getInstance(control);
+						ICommandJobStatusMap map = JobStatusMap.getInstance(fControl);
 						if (map != null) {
-							map.addJobStatus(jobId, this);
+							map.addJobStatus(fJobId, this);
 						}
 					}
 				}
 
-				if (stateDetail == FAILED) {
+				if (fStateDetail == FAILED) {
 					throw CoreExceptionUtils.newException(uuid + JAXBCoreConstants.CO + JAXBCoreConstants.SP + FAILED, null);
 				}
 			}
