@@ -133,7 +133,7 @@ public class MonitorControl implements IMonitorControl {
 					if (!subMon.isCanceled()) {
 						fServer.waitForServerStart(subMon.newChild(20));
 						if (!subMon.isCanceled() && fServer.serverIsRunning()) {
-							LMLManager.getInstance().update(getControlId(), fServer.getInputStream(), fServer.getOutputStream());
+							LMLManager.getInstance().update(getId(), fServer.getInputStream(), fServer.getOutputStream());
 						}
 					}
 
@@ -160,7 +160,7 @@ public class MonitorControl implements IMonitorControl {
 				return new Status(IStatus.ERROR, LMLMonitorCorePlugin.PLUGIN_ID, e.getLocalizedMessage(), e);
 			} finally {
 				save();
-				fLMLManager.closeLgui(getControlId());
+				fLMLManager.closeLgui(getId());
 
 				fConnection.removeConnectionChangeListener(fConnectionListener);
 				JobManager.getInstance().removeListener(fJobListener);
@@ -242,7 +242,7 @@ public class MonitorControl implements IMonitorControl {
 		job.schedule();
 	}
 
-	private final String fControlId;
+	private final String fMonitorId;
 	private final LMLManager fLMLManager = LMLManager.getInstance();
 	private final JobListener fJobListener = new JobListener();
 	private final ConnectionChangeListener fConnectionListener = new ConnectionChangeListener();
@@ -267,8 +267,8 @@ public class MonitorControl implements IMonitorControl {
 	private static final String CONNECTION_NAME_ATTR = "connectionName";//$NON-NLS-1$;
 	private static final String CONFIGURATION_NAME_ATTR = "configurationName";//$NON-NLS-1$
 
-	public MonitorControl(String controlId) {
-		fControlId = controlId;
+	public MonitorControl(String monitorId) {
+		fMonitorId = monitorId;
 	}
 
 	/*
@@ -309,11 +309,11 @@ public class MonitorControl implements IMonitorControl {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#getControlId()
+	 * @see org.eclipse.ptp.rm.lml.monitor.core.IMonitorControl#getId()
 	 */
 	@Override
-	public String getControlId() {
-		return fControlId;
+	public String getId() {
+		return fMonitorId;
 	}
 
 	/*
@@ -437,8 +437,8 @@ public class MonitorControl implements IMonitorControl {
 	public void save() {
 		final XMLMemento memento = XMLMemento.createWriteRoot(MONITOR_ATTR);
 
-		final String layout = fLMLManager.getCurrentLayout(getControlId());
-		final JobStatusData[] jobs = fLMLManager.getUserJobs(getControlId());
+		final String layout = fLMLManager.getCurrentLayout(getId());
+		final JobStatusData[] jobs = fLMLManager.getUserJobs(getId());
 
 		saveState(memento);
 
@@ -564,7 +564,7 @@ public class MonitorControl implements IMonitorControl {
 			/*
 			 * Initialize LML classes
 			 */
-			fLMLManager.openLgui(getControlId(), conn.getUsername(), getMonitorConfigurationRequestType(controller), fSavedLayout,
+			fLMLManager.openLgui(getId(), conn.getUsername(), getMonitorConfigurationRequestType(controller), fSavedLayout,
 					fSavedJobs.toArray(new JobStatusData[0]));
 			setCacheActive(!getDefaultForceUpdate());
 
@@ -605,7 +605,8 @@ public class MonitorControl implements IMonitorControl {
 		ILaunchController controller = LaunchControllerManager.getInstance().getLaunchController(status.getControlId());
 		if (controller != null) {
 			String[][] attrs = { { JobStatusData.CONTROL_ID_ATTR, status.getControlId() },
-					{ JobStatusData.QUEUE_NAME_ATTR, status.getQueueName() }, { JobStatusData.OWNER_ATTR, status.getOwner() },
+					{ JobStatusData.MONITOR_ID_ATTR, getId() }, { JobStatusData.QUEUE_NAME_ATTR, status.getQueueName() },
+					{ JobStatusData.OWNER_ATTR, status.getOwner() },
 					{ JobStatusData.STDOUT_REMOTE_FILE_ATTR, status.getOutputPath() },
 					{ JobStatusData.STDERR_REMOTE_FILE_ATTR, status.getErrorPath() },
 					{ JobStatusData.INTERACTIVE_ATTR, Boolean.toString(status.isInteractive()) } };
@@ -615,7 +616,7 @@ public class MonitorControl implements IMonitorControl {
 			if (IJobStatus.JOB_OUTERR_READY.equals(status.getStateDetail())) {
 				checkOutputFile(data, controller);
 			}
-			fLMLManager.addUserJob(getControlId(), status.getJobId(), data);
+			fLMLManager.addUserJob(getId(), status.getJobId(), data);
 		}
 	}
 
@@ -687,7 +688,7 @@ public class MonitorControl implements IMonitorControl {
 	}
 
 	private File getSaveLocation() {
-		return LMLMonitorCorePlugin.getDefault().getStateLocation().append(getControlId()).addFileExtension(XML).toFile();
+		return LMLMonitorCorePlugin.getDefault().getStateLocation().append(getId()).addFileExtension(XML).toFile();
 	}
 
 	private void loadJobs(IMemento memento, List<JobStatusData> jobs) {
@@ -730,22 +731,20 @@ public class MonitorControl implements IMonitorControl {
 	}
 
 	private void updateJob(IJobStatus status) {
-		if (status.getControlId().equals(getControlId())) {
+		JobStatusData data = fLMLManager.getUserJob(getId(), status.getJobId());
+		if (data != null && !data.isRemoved() && status.getControlId().equals(data.getString(JobStatusData.CONTROL_ID_ATTR))) {
 			ILaunchController controller = LaunchControllerManager.getInstance().getLaunchController(status.getControlId());
-			if (controller != null) {
-				JobStatusData data = fLMLManager.getUserJob(status.getControlId(), status.getJobId());
-				if (data != null && !data.isRemoved() && IJobStatus.JOB_OUTERR_READY.equals(status.getStateDetail())) {
-					checkOutputFile(data, controller);
-				}
-				fLMLManager.updateUserJob(getControlId(), status.getJobId(), status.getState(), status.getStateDetail());
+			if (controller != null && IJobStatus.JOB_OUTERR_READY.equals(status.getStateDetail())) {
+				checkOutputFile(data, controller);
 			}
+			fLMLManager.updateUserJob(getId(), status.getJobId(), status.getState(), status.getStateDetail());
 		}
 	}
 
 	@Override
 	public void setCacheActive(boolean active) {
 		cacheActive = active;
-		fLMLManager.setCachingMode(getControlId(), cacheActive);
+		fLMLManager.setCachingMode(getId(), cacheActive);
 		// Notify listeners about a possible change here
 		MonitorControlManager.getInstance().fireMonitorUpdated(new IMonitorControl[] { this });
 	}

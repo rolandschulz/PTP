@@ -82,7 +82,7 @@ public class MonitorPropertyTester extends PropertyTester {
 				if (event.getSelection() instanceof IStructuredSelection) {
 					IStructuredSelection sel = (IStructuredSelection) event.getSelection();
 					if (!sel.isEmpty()) {
-						selectedMonitorId = ((IMonitorControl) sel.getFirstElement()).getControlId();
+						selectedMonitorId = ((IMonitorControl) sel.getFirstElement()).getId();
 					}
 				}
 			}

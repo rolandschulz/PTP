@@ -43,7 +43,7 @@ public interface IMonitorControl {
 	 * 
 	 * @return unique ID
 	 */
-	public String getControlId();
+	public String getId();
 
 	/**
 	 * Get the ID of the remote services used by the control for remote
