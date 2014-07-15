@@ -61,7 +61,6 @@ import org.eclipse.ptp.internal.debug.ui.actions.SuspendAction;
 import org.eclipse.ptp.internal.debug.ui.actions.TerminateAction;
 import org.eclipse.ptp.internal.debug.ui.actions.UnregisterAction;
 import org.eclipse.ptp.internal.debug.ui.messages.Messages;
-import org.eclipse.ptp.internal.ui.IJobManager;
 import org.eclipse.ptp.internal.ui.actions.ParallelAction;
 import org.eclipse.ptp.internal.ui.model.IElementHandler;
 import org.eclipse.ptp.internal.ui.model.IElementSet;
@@ -70,7 +69,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.progress.WorkbenchJob;
 
 /**
@@ -114,12 +112,8 @@ public class ParallelDebugView extends ParallelJobsView {
 		}
 	};
 
-	public ParallelDebugView(IJobManager manager) {
-		super(manager);
-	}
-
 	public ParallelDebugView() {
-		this(PTPDebugUIPlugin.getUIDebugManager());
+		super(PTPDebugUIPlugin.getUIDebugManager());
 	}
 
 	/*
@@ -144,21 +138,13 @@ public class ParallelDebugView extends ParallelJobsView {
 	protected Viewer getDebugViewer() {
 		if (launchViewer == null) {
 			IWorkbenchPage page = getViewSite().getPage();
-			if (page == null) {
-				return null;
-			}
-			IViewPart part = page.findView(IDebugUIConstants.ID_DEBUG_VIEW);
-			if (part == null) {
-				try {
-					part = page.showView(IDebugUIConstants.ID_DEBUG_VIEW);
-				} catch (PartInitException e) {
-					return null;
-				}
-			}
-			if (part != null && part instanceof AbstractDebugView) {
-				launchViewer = ((AbstractDebugView) part).getViewer();
-				if (launchViewer != null) {
-					launchViewer.addSelectionChangedListener(debugViewSelectChangedListener);
+			if (page != null) {
+				IViewPart part = page.findView(IDebugUIConstants.ID_DEBUG_VIEW);
+				if (part != null && part instanceof AbstractDebugView) {
+					launchViewer = ((AbstractDebugView) part).getViewer();
+					if (launchViewer != null) {
+						launchViewer.addSelectionChangedListener(debugViewSelectChangedListener);
+					}
 				}
 			}
 		}
@@ -502,8 +488,6 @@ public class ParallelDebugView extends ParallelJobsView {
 				Viewer viewer = getDebugViewer();
 				if (viewer != null) {
 					ISelection selection = viewer.getSelection();
-					// ISelection selection =
-					// getViewSite().getPage().getSelection(IDebugUIConstants.ID_DEBUG_VIEW);
 					if (selection instanceof IStructuredSelection) {
 						Object element = ((IStructuredSelection) selection).getFirstElement();
 						if (element instanceof IPDebugElement) {

@@ -63,6 +63,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
@@ -262,9 +263,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 		} else { // cur_job == null && job == null
 			selection = new StructuredSelection();
 		}
-		if (isVisible()) {
-			jobViewUpdateJob.schedule(selection, force);
-		}
+		jobViewUpdateJob.schedule(selection, force);
 	}
 
 	/*
@@ -286,7 +285,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	 * @since 7.0
 	 */
 	public void doChangeJob(final IJobStatus job) {
-		syncExec(new Runnable() {
+		Display.getDefault().syncExec(new Runnable() {
 			@Override
 			public void run() {
 				selectJob(job);
@@ -630,7 +629,7 @@ public class ParallelJobsView extends AbstractParallelSetView implements ISelect
 	 * Refresh the job view. Called to notify the job view that the model has changed and it needs to update the view.
 	 */
 	protected void refreshJobView() {
-		syncExec(new Runnable() {
+		Display.getDefault().syncExec(new Runnable() {
 			@Override
 			public void run() {
 				if (!jobTableViewer.getTable().isDisposed()) {

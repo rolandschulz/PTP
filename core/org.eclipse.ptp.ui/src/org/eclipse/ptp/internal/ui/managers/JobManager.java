@@ -24,7 +24,9 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.SafeRunner;
+import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jface.util.SafeRunnable;
+import org.eclipse.ptp.core.jobs.IJobListener;
 import org.eclipse.ptp.core.jobs.IJobStatus;
 import org.eclipse.ptp.core.jobs.IPJobStatus;
 import org.eclipse.ptp.internal.ui.IJobManager;
@@ -42,7 +44,7 @@ import org.eclipse.swt.graphics.Image;
  * 
  */
 
-public class JobManager extends AbstractElementManager implements IJobManager {
+public class JobManager extends AbstractElementManager implements IJobManager, IJobListener {
 	protected Map<String, IJobStatus> jobList = new HashMap<String, IJobStatus>();
 	protected IJobStatus cur_job = null;
 	protected final String DEFAULT_TITLE = Messages.JobManager_0;
@@ -56,7 +58,7 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 	 * @since 7.0
 	 */
 	private void addJob(IJobStatus job) {
-		if (job != null) {
+		if (job != null && job.getLaunchMode().equals(ILaunchManager.DEBUG_MODE)) {
 			IPJobStatus pJob = (IPJobStatus) job.getAdapter(IPJobStatus.class);
 			if (pJob != null) {
 				IElementSet set = createElementHandler(job).getSet(IElementHandler.SET_ROOT_ID);
@@ -152,7 +154,7 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 		}
 		IJobStatus job = getJob();
 		if (job != null) {
-			return job.getJobId(); //$NON-NLS-1$
+			return job.getJobId();
 		}
 		return ""; //$NON-NLS-1$
 	}
@@ -259,6 +261,16 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 		return (jid == null || jid.length() == 0);
 	}
 
+	@Override
+	public void jobAdded(IJobStatus status) {
+		addJob(status);
+	}
+
+	@Override
+	public void jobChanged(IJobStatus status) {
+		// Nothing
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -314,7 +326,6 @@ public class JobManager extends AbstractElementManager implements IJobManager {
 		String new_id = null;
 		if (job != null) {
 			new_id = job.getJobId();
-			addJob(job);
 		}
 		cur_job = job;
 		fireJobChangedEvent(IJobChangedListener.CHANGED, new_id, old_id);

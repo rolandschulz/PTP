@@ -37,12 +37,14 @@ import org.eclipse.ptp.internal.ui.messages.Messages;
 import org.eclipse.ptp.internal.ui.model.IElementHandler;
 import org.eclipse.ptp.internal.ui.model.IElementSet;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.progress.WorkbenchJob;
 
 /**
@@ -77,7 +79,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 			final String preferenceType = event.getProperty();
 			final Object value = event.getNewValue();
 			if (value != null) {
-				showWhile(new Runnable() {
+				BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
 					@Override
 					public void run() {
 						if (!canvas.isDisposed()) {
@@ -118,7 +120,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		PTPUIPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(propertyChangeListener);
 		createView(parent);
 		setContentDescription(EMPTY_TITLE);
-		registerColor = getDisplay().getSystemColor(SWT.COLOR_WIDGET_BORDER);
+		registerColor = Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_BORDER);
 	}
 
 	/**
@@ -182,7 +184,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	 *            Message of title
 	 */
 	protected void changeTitle(final String message) {
-		asyncExec(new Runnable() {
+		Display.getDefault().asyncExec(new Runnable() {
 			@Override
 			public void run() {
 				setContentDescription(message);
@@ -201,7 +203,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 		Composite composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(new FillLayout());
 		composite.setLayoutData(new GridData(GridData.FILL_BOTH));
-		composite.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
+		composite.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
 		canvas = new ElementIconCanvas(this, composite, SWT.NONE);
 		canvas.setContentProvider(this);
 		canvas.setImageProvider(this);
@@ -475,7 +477,7 @@ public abstract class AbstractParallelElementView extends AbstractParallelView i
 	 *            true if show ruler
 	 */
 	public void setDisplayRuler(final boolean showRuler) {
-		asyncExec(new Runnable() {
+		Display.getDefault().asyncExec(new Runnable() {
 			@Override
 			public void run() {
 				if (!canvas.isDisposed()) {

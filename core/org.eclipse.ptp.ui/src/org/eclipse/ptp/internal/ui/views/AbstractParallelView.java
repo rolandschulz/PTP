@@ -18,12 +18,11 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.ui.views;
 
-import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
+
 /**
  * @author clement chu
  *
@@ -31,7 +30,7 @@ import org.eclipse.ui.part.ViewPart;
 public abstract class AbstractParallelView extends ViewPart {
 	private boolean fIsVisible = false;
 	private ParallelViewPartListener partListener = null;
-	private boolean debug = false;
+	private final boolean debug = false;
 
 	protected void registerPartListener() {
 		if (partListener == null) {
@@ -39,6 +38,7 @@ public abstract class AbstractParallelView extends ViewPart {
 			getSite().getPage().addPartListener(partListener);
 		}
 	}
+
 	protected void deregisterPartListener() {
 		if (partListener != null) {
 			getSite().getPage().removePartListener(partListener);
@@ -46,51 +46,54 @@ public abstract class AbstractParallelView extends ViewPart {
 		}
 	}
 
-	/** Get Display
-	 * @return display
-	 */
-	protected Display getDisplay() {
-		return getViewSite().getShell().getDisplay();
-	}
-	public void asyncExec(Runnable r) {
-		if (isVisible())
-			getDisplay().asyncExec(r);
-	}
-	public void syncExec(Runnable r) {
-		if (isVisible())
-			getDisplay().syncExec(r);
-	}
-	public void showWhile(Runnable r) {
-		if (isVisible())
-			BusyIndicator.showWhile(getDisplay(), r);
-	}
-	
 	public abstract void repaint(boolean all);
-	
+
 	/**
 	 * Notification this view is now visible.
 	 */
-	protected void becomesVisible() {}
+	protected void becomesVisible() {
+	}
+
 	/**
 	 * Notification this view is now hidden.
 	 */
-	protected void becomesHidden() {}
-	
+	protected void becomesHidden() {
+	}
+
 	public boolean isVisible() {
 		return fIsVisible;
 	}
+
 	private class ParallelViewPartListener implements IPartListener2 {
+		@Override
 		public void partActivated(IWorkbenchPartReference partRef) {
 			if (debug) {
 				System.err.println("-------------------- partActivated"); //$NON-NLS-1$
 			}
 			repaint(true);
 		}
-		public void partBroughtToTop(IWorkbenchPartReference partRef) {}
-		public void partClosed(IWorkbenchPartReference partRef) {}
-		public void partDeactivated(IWorkbenchPartReference partRef) {}
-		public void partInputChanged(IWorkbenchPartReference partRef) {}
-		public void partOpened(IWorkbenchPartReference partRef) {}
+
+		@Override
+		public void partBroughtToTop(IWorkbenchPartReference partRef) {
+		}
+
+		@Override
+		public void partClosed(IWorkbenchPartReference partRef) {
+		}
+
+		@Override
+		public void partDeactivated(IWorkbenchPartReference partRef) {
+		}
+
+		@Override
+		public void partInputChanged(IWorkbenchPartReference partRef) {
+		}
+
+		@Override
+		public void partOpened(IWorkbenchPartReference partRef) {
+		}
+
+		@Override
 		public void partHidden(IWorkbenchPartReference partRef) {
 			IWorkbenchPart part = partRef.getPart(false);
 			if (part == AbstractParallelView.this) {
@@ -98,6 +101,8 @@ public abstract class AbstractParallelView extends ViewPart {
 				becomesHidden();
 			}
 		}
+
+		@Override
 		public void partVisible(IWorkbenchPartReference partRef) {
 			IWorkbenchPart part = partRef.getPart(false);
 			if (part == AbstractParallelView.this) {
