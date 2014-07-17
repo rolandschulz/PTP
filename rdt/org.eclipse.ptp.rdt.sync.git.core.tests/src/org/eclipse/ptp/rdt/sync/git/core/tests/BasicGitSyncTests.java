@@ -131,13 +131,13 @@ public class BasicGitSyncTests {
 			remoteRepo.commitRemoteFiles(null);
 			log("Committed remote files", stepTimer);
 
-			localRepo.fetch(remoteLocation, null);
+			localRepo.fetch(remoteRepo, null);
 			log("Fetched remote files", stepTimer);
 
 			localRepo.merge(null);
 			log("Local merged in remote changes", stepTimer);
 
-			localRepo.push(remoteLocation, null);
+			localRepo.push(remoteRepo, null);
 			log("Pushed local files to remote", stepTimer);
 
 			remoteRepo.merge(null);
