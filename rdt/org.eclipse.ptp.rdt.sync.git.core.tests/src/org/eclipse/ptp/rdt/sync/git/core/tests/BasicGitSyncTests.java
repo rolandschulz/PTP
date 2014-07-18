@@ -165,9 +165,6 @@ public class BasicGitSyncTests {
 			throw new RemoteConnectionException("host property required");
 		}
 
-		if (password == null && keyFile == null) {
-			throw new RemoteConnectionException("Either password or keyFile property required");
-		}
 		if (username == null || username.equals("")) {
 			username = System.getProperty("user.name");
 		}
