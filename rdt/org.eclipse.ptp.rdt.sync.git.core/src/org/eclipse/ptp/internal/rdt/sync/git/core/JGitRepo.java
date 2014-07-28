@@ -256,6 +256,11 @@ public class JGitRepo {
 			for (String dirName : diffFiles.dirSet) {
 				IPath emptyFilePath = new Path(this.getRepository().getWorkTree().getAbsolutePath());
 				emptyFilePath = emptyFilePath.append(dirName);
+				// Bug 439609 - directory may have been deleted
+				File emptyFileDir = new File(emptyFilePath.toOSString());
+				if (!emptyFileDir.exists()) {
+					continue;
+				}
 				emptyFilePath = emptyFilePath.append(EMPTY_FILE_NAME);
 				File emptyFile = new File(emptyFilePath.toOSString());
 				boolean fileWasCreated = emptyFile.createNewFile();
