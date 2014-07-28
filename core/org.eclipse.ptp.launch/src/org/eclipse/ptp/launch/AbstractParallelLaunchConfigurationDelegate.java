@@ -126,6 +126,61 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			setSystem(true);
 		}
 
+		@Override
+		protected IStatus run(IProgressMonitor monitor) {
+			SubMonitor subMon = SubMonitor.convert(monitor, 100);
+			String jobId = fLaunch.getJobId();
+			try {
+				IJobStatus status = waitForStatusChange(jobId, IJobStatus.SUBMITTED, subMon.newChild(50));
+
+				/*
+				 * Status could be RUNNING or COMPLETED at this point. If COMPLETED then we need to check it was not CANCELED before
+				 * calling doCompleteLaunch().
+				 */
+				if (!subMon.isCanceled()) {
+					if (!status.getStateDetail().equals(IJobStatus.CANCELED)) {
+						doCompleteJobLaunch(fLaunch, fDebugger);
+					}
+
+					if (!status.getState().equals(IJobStatus.COMPLETED)) {
+						status = waitForStatusChange(jobId, IJobStatus.RUNNING, subMon.newChild(50));
+					}
+
+					if (!subMon.isCanceled() && !status.getStateDetail().equals(IJobStatus.CANCELED)) {
+						/*
+						 * When the job terminates, do any post launch data synchronization.
+						 */
+						doPostLaunchSynchronization(fLaunch.getLaunchConfiguration());
+					}
+				}
+			} catch (CoreException e) {
+				PTPLaunchPlugin.log(e);
+			}
+
+			/*
+			 * Clean up any launch activities.
+			 */
+			doCleanupLaunch(fLaunch);
+
+			/*
+			 * Remove job submission
+			 */
+			synchronized (jobSubmissions) {
+				jobSubmissions.remove(jobId);
+				if (jobSubmissions.size() == 0) {
+					JobManager.getInstance().removeListener(fJobListener);
+				}
+			}
+
+			return Status.OK_STATUS;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime. IProgressMonitor)
+		 */
+
 		public void statusChanged() {
 			fSubLock.lock();
 			try {
@@ -135,81 +190,27 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 			}
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime. IProgressMonitor)
-		 */
-
-		@Override
-		protected IStatus run(IProgressMonitor monitor) {
+		private IJobStatus waitForStatusChange(String jobId, String jobStatus, IProgressMonitor monitor) throws CoreException {
 			SubMonitor subMon = SubMonitor.convert(monitor, 100);
-			String jobId = fLaunch.getJobId();
-			try {
-				while (fLaunchControl.getJobStatus(jobId, subMon.newChild(50)).getState().equals(IJobStatus.SUBMITTED)
-						&& !subMon.isCanceled()) {
-					fSubLock.lock();
-					try {
-						fSubCondition.await(500, TimeUnit.MILLISECONDS);
-					} catch (InterruptedException e) {
-						// Expect to be interrupted if monitor is canceled
-					} finally {
-						fSubLock.unlock();
-					}
-				}
-			} catch (CoreException e) {
-				// Ignore
-			}
 
-			if (!subMon.isCanceled()) {
-				doCompleteJobLaunch(fLaunch, fDebugger);
+			IJobStatus status = fLaunchControl.getJobStatus(jobId, subMon.newChild(10));
 
+			while (status.getState().equals(jobStatus) && !subMon.isCanceled()) {
+				fSubLock.lock();
 				try {
-					while (!fLaunchControl.getJobStatus(jobId, subMon.newChild(50)).getState().equals(IJobStatus.COMPLETED)
-							&& !subMon.isCanceled()) {
-						fSubLock.lock();
-						try {
-							fSubCondition.await(1000, TimeUnit.MILLISECONDS);
-						} catch (InterruptedException e) {
-							// Expect to be interrupted if monitor is
-							// canceled
-						} finally {
-							fSubLock.unlock();
-						}
-					}
-				} catch (CoreException e) {
-					// Ignore
+					fSubCondition.await(1000, TimeUnit.MILLISECONDS);
+				} catch (InterruptedException e) {
+					// Expect to be interrupted if monitor is canceled
+				} finally {
+					fSubLock.unlock();
 				}
-
-				if (!subMon.isCanceled()) {
-					/*
-					 * When the job terminates, do any post launch data synchronization.
-					 */
-					// If needed, copy data back.
-					try {
-						// Get the list of paths to be copied back.
-						doPostLaunchSynchronization(fLaunch.getLaunchConfiguration());
-					} catch (CoreException e) {
-						PTPLaunchPlugin.log(e);
-					}
-
-					/*
-					 * Clean up any launch activities.
-					 */
-					doCleanupLaunch(fLaunch);
-
-					/*
-					 * Remove job submission
-					 */
-					synchronized (jobSubmissions) {
-						jobSubmissions.remove(jobId);
-						if (jobSubmissions.size() == 0) {
-							JobManager.getInstance().removeListener(fJobListener);
-						}
-					}
-				}
+				status = fLaunchControl.getJobStatus(jobId, subMon.newChild(10));
+				subMon.setWorkRemaining(100);
 			}
-			return Status.OK_STATUS;
+
+			subMon.worked(100);
+
+			return status;
 		}
 	}
 
@@ -268,11 +269,6 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 * @see org.eclipse.debug.core.model.LaunchConfigurationDelegate#getLaunch(org .eclipse.debug.core.ILaunchConfiguration,
 	 * java.lang.String)
 	 */
-
-	@Override
-	public ILaunch getLaunch(ILaunchConfiguration configuration, String mode) throws CoreException {
-		return new PLaunch(configuration, mode, null);
-	}
 
 	/**
 	 * Check if the copy local file is enabled. If it is, copy the executable file from the local host to the remote host.
@@ -453,6 +449,11 @@ public abstract class AbstractParallelLaunchConfigurationDelegate extends Launch
 	 */
 	protected IPDebugConfiguration getDebugConfig(ILaunchConfiguration config) throws CoreException {
 		return PTPDebugCorePlugin.getDefault().getDebugConfiguration(LaunchUtils.getDebuggerID(config));
+	}
+
+	@Override
+	public ILaunch getLaunch(ILaunchConfiguration configuration, String mode) throws CoreException {
+		return new PLaunch(configuration, mode, null);
 	}
 
 	/**

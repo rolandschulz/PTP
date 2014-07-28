@@ -10,7 +10,9 @@
 package org.eclipse.ptp.rm.lml.core;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 /**
@@ -39,6 +41,7 @@ public class JobStatusData {
 	public static final String QUEUE_NAME_ATTR = "queueName";//$NON-NLS-1$;
 	public static final String OWNER_ATTR = "owner";//$NON-NLS-1$;
 	public static final String CONTROL_ID_ATTR = "controlId";//$NON-NLS-1$
+	public static final String MONITOR_ID_ATTR = "monitorId";//$NON-NLS-1$
 	public static final String REMOVED_ATTR = "removed";//$NON-NLS-1$
 
 	private static boolean detailIsFinal(String detail) {
@@ -204,5 +207,21 @@ public class JobStatusData {
 			setState(state);
 			setStateDetail(stateDetail);
 		}
+	}
+
+	@Override
+	public String toString() {
+		StringBuffer str = new StringBuffer();
+		str.append("JobStatusData={"); //$NON-NLS-1$
+		Iterator<Entry<String, String>> iterator = fAttrs.entrySet().iterator();
+		while (iterator.hasNext()) {
+			Entry<String, String> entry = iterator.next();
+			str.append(entry.getKey() + "=" + entry.getValue()); //$NON-NLS-1$
+			if (iterator.hasNext()) {
+				str.append(","); //$NON-NLS-1$
+			}
+		}
+		str.append("}"); //$NON-NLS-1$
+		return str.toString();
 	}
 }

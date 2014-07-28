@@ -190,7 +190,7 @@ public class MonitorControlManager {
 	}
 
 	private void addMonitorControl(IMonitorControl monitor) {
-		fMonitorControls.put(monitor.getControlId(), monitor);
+		fMonitorControls.put(monitor.getId(), monitor);
 		fireMonitorAdded(new IMonitorControl[] { monitor });
 	}
 
@@ -208,8 +208,8 @@ public class MonitorControlManager {
 	}
 
 	public IMonitorControl createMonitorControl(String remoteServicesId, String connectionName, String configName) {
-		String controlId = LaunchControllerManager.generateControlId(remoteServicesId, connectionName, configName);
-		IMonitorControl monitor = new MonitorControl(controlId);
+		String monitorId = LaunchControllerManager.generateControlId(remoteServicesId, connectionName, configName);
+		IMonitorControl monitor = new MonitorControl(monitorId);
 		monitor.setRemoteServicesId(remoteServicesId);
 		monitor.setConnectionName(connectionName);
 		monitor.setConfigurationName(configName);
@@ -291,7 +291,7 @@ public class MonitorControlManager {
 				if (event.getSelection() instanceof IStructuredSelection) {
 					IStructuredSelection sel = (IStructuredSelection) event.getSelection();
 					if (!sel.isEmpty()) {
-						monitorId = ((IMonitorControl) sel.getFirstElement()).getControlId();
+						monitorId = ((IMonitorControl) sel.getFirstElement()).getId();
 					}
 				}
 				LMLManager.getInstance().selectLgui(monitorId);
@@ -302,8 +302,8 @@ public class MonitorControlManager {
 		job.schedule();
 	}
 
-	public IMonitorControl getMonitorControl(String controlId) {
-		return fMonitorControls.get(controlId);
+	public IMonitorControl getMonitorControl(String monitorId) {
+		return fMonitorControls.get(monitorId);
 	}
 
 	public Collection<IMonitorControl> getMonitorControls() {
@@ -356,7 +356,7 @@ public class MonitorControlManager {
 
 	public void removeMonitorControls(IMonitorControl[] monitors) {
 		for (IMonitorControl monitor : monitors) {
-			fMonitorControls.remove(monitor.getControlId());
+			fMonitorControls.remove(monitor.getId());
 			monitor.dispose();
 		}
 		saveMonitors();
@@ -378,7 +378,7 @@ public class MonitorControlManager {
 	private void saveMonitors() {
 		final XMLMemento memento = XMLMemento.createWriteRoot(MONITORS_ATTR);
 		for (IMonitorControl monitor : fMonitorControls.values()) {
-			memento.createChild(MONITOR_ID_ATTR, monitor.getControlId());
+			memento.createChild(MONITOR_ID_ATTR, monitor.getId());
 		}
 
 		try {

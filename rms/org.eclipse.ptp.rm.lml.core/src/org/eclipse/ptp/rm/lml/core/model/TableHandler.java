@@ -521,7 +521,7 @@ public class TableHandler extends LguiHandler {
 					final String queueName = getCellValue(table, rowType, ILguiItem.JOB_QUEUE_NAME);
 					final String owner = getCellValue(table, rowType, ILguiItem.JOB_OWNER);
 					final String state = getCellValue(table, rowType, ILguiItem.JOB_STATUS);
-					final String[][] attrs = { { JobStatusData.CONTROL_ID_ATTR, lguiItem.getName() },
+					final String[][] attrs = { { JobStatusData.MONITOR_ID_ATTR, lguiItem.getName() },
 							{ JobStatusData.QUEUE_NAME_ATTR, queueName }, { JobStatusData.OWNER_ATTR, owner },
 							{ JobStatusData.STATE_ATTR, state } };
 					status = new JobStatusData(jobId, attrs);

@@ -137,7 +137,6 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 
 				final DebuggerSession session = new DebuggerSession(jobId, launch, project, debugger);
 				Display.getDefault().asyncExec(new Runnable() {
-
 					public void run() {
 						try {
 							new ProgressMonitorDialog(PTPLaunchPlugin.getActiveWorkbenchShell()).run(true, true, session);
@@ -155,7 +154,6 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 				 * Completion of launch fails, then terminate the job and display error message.
 				 */
 				Display.getDefault().asyncExec(new Runnable() {
-
 					public void run() {
 						PTPLaunchPlugin.errorDialog(Messages.ParallelLaunchConfigurationDelegate_1, e.getStatus());
 						PTPLaunchPlugin.log(e);
@@ -208,10 +206,6 @@ public class ParallelLaunchConfigurationDelegate extends AbstractParallelLaunchC
 
 		try {
 			if (mode.equals(ILaunchManager.DEBUG_MODE)) {
-				/*
-				 * Show ptp debug view
-				 */
-				showPTPDebugView(IPTPDebugUIConstants.ID_VIEW_PARALLELDEBUG);
 				progress.subTask(Messages.ParallelLaunchConfigurationDelegate_6);
 
 				/*

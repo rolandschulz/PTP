@@ -135,7 +135,7 @@ public class RuntimeProcess implements IProcess, IJobListener {
 	 * @see org.eclipse.ptp.core.jobs.IJobListener#jobChanged(org.eclipse.ptp.core.jobs.IJobStatus)
 	 */
 	public void jobChanged(IJobStatus status) {
-		if (!isTerminated()) {
+		if (!isTerminated() && fLaunch.getJobId().equals(status.getJobId())) {
 			if (status.getState().equals(IJobStatus.COMPLETED)) {
 				terminated();
 			}

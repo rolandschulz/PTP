@@ -38,23 +38,19 @@ public class RemoveJobHandler extends AbstractHandler {
 			if (MessageDialog.openQuestion(HandlerUtil.getActiveShell(event), Messages.RemoveJob_Cannot_undo,
 					Messages.RemoveJob_Permanently_remove_job_entry)) {
 				List<JobStatusData> data = new ArrayList<JobStatusData>();
-				String controlId = null;
+				String monitorId = null;
 				for (Object selected : selection.toArray()) {
 					if (selected instanceof Row) {
 						Row row = (Row) selected;
-						JobStatusData status = row.status;
-						if (controlId == null) {
-							controlId = status.getString(JobStatusData.CONTROL_ID_ATTR);
-							if (controlId == null) {
-								break;
-							}
+						monitorId = row.status.getString(JobStatusData.MONITOR_ID_ATTR);
+						if (monitorId != null) {
+							data.add(row.status);
+							LMLManager.getInstance().removeUserJob(monitorId, row.status.getJobId());
 						}
-						data.add(status);
-						LMLManager.getInstance().removeUserJob(controlId, status.getJobId());
 					}
 				}
-				if (controlId != null) {
-					ActionUtils.removeFiles(controlId, data);
+				if (!data.isEmpty()) {
+					ActionUtils.removeFiles(data);
 				}
 				return Status.OK_STATUS;
 			}

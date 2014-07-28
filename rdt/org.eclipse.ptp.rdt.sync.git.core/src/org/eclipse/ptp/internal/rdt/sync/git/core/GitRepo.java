@@ -155,7 +155,9 @@ public class GitRepo {
 			String commands = gitBinary() + " --git-dir=" + GitSyncService.gitDir + " init && " + //$NON-NLS-1$ //$NON-NLS-2$
 					gitBinary() + " --git-dir=" + GitSyncService.gitDir + " config core.preloadindex true && " + //$NON-NLS-1$ //$NON-NLS-2$
 					gitBinary() + " --git-dir=" + GitSyncService.gitDir + " config user.email \"" + commitEmail + "\" && " +  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-					gitBinary() + " --git-dir=" + GitSyncService.gitDir + " config user.name \"" + commitUserName + "\""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					gitBinary() + " --git-dir=" + GitSyncService.gitDir + " config user.name \"" + commitUserName + "\" && " + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					// Bug 439919. Create a master branch when initializing a remote repository.
+					gitCommand() + " commit --allow-empty -m \"" + GitSyncService.commitMessage + "\""; //$NON-NLS-1$ //$NON-NLS-2$
 
 			CommandResults commandResults = null;
 

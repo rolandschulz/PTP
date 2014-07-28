@@ -188,40 +188,43 @@ public class ActionUtils {
 	 * @param selected
 	 *            list of job data objects
 	 */
-	public static void removeFiles(final String controlId, final List<JobStatusData> selected) {
+	public static void removeFiles(final List<JobStatusData> selected) {
 		Job j = new Job(Messages.ActionUtils_Remove_Files) {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				SubMonitor progress = SubMonitor.convert(monitor, 50 * selected.size());
 				for (JobStatusData status : selected) {
-					ILaunchController control = LaunchControllerManager.getInstance().getLaunchController(controlId);
-					if (control != null) {
-						String remotePath = status.getString(JobStatusData.STDOUT_REMOTE_FILE_ATTR);
-						if (remotePath != null) {
-							try {
-								IFileStore lres = RemoteServicesUtils.getRemoteFileWithProgress(control.getRemoteServicesId(),
-										control.getConnectionName(), remotePath, progress);
-								if (lres != null) {
-									if (lres.fetchInfo(EFS.NONE, progress.newChild(25)).exists()) {
-										lres.delete(EFS.NONE, progress.newChild(25));
+					String controlId = status.getString(JobStatusData.CONTROL_ID_ATTR);
+					if (controlId != null) {
+						ILaunchController control = LaunchControllerManager.getInstance().getLaunchController(controlId);
+						if (control != null) {
+							String remotePath = status.getString(JobStatusData.STDOUT_REMOTE_FILE_ATTR);
+							if (remotePath != null) {
+								try {
+									IFileStore lres = RemoteServicesUtils.getRemoteFileWithProgress(control.getRemoteServicesId(),
+											control.getConnectionName(), remotePath, progress);
+									if (lres != null) {
+										if (lres.fetchInfo(EFS.NONE, progress.newChild(25)).exists()) {
+											lres.delete(EFS.NONE, progress.newChild(25));
+										}
 									}
+								} catch (Throwable t) {
+									// continue to remove if possible
 								}
-							} catch (Throwable t) {
-								// continue to remove if possible
 							}
-						}
-						remotePath = status.getString(JobStatusData.STDERR_REMOTE_FILE_ATTR);
-						if (remotePath != null) {
-							try {
-								IFileStore lres = RemoteServicesUtils.getRemoteFileWithProgress(control.getRemoteServicesId(),
-										control.getConnectionName(), remotePath, progress);
-								if (lres != null) {
-									if (lres.fetchInfo(EFS.NONE, progress.newChild(25)).exists()) {
-										lres.delete(EFS.NONE, progress.newChild(25));
+							remotePath = status.getString(JobStatusData.STDERR_REMOTE_FILE_ATTR);
+							if (remotePath != null) {
+								try {
+									IFileStore lres = RemoteServicesUtils.getRemoteFileWithProgress(control.getRemoteServicesId(),
+											control.getConnectionName(), remotePath, progress);
+									if (lres != null) {
+										if (lres.fetchInfo(EFS.NONE, progress.newChild(25)).exists()) {
+											lres.delete(EFS.NONE, progress.newChild(25));
+										}
 									}
+								} catch (Throwable t) {
+									// continue to remove if possible
 								}
-							} catch (Throwable t) {
-								// continue to remove if possible
 							}
 						}
 					}

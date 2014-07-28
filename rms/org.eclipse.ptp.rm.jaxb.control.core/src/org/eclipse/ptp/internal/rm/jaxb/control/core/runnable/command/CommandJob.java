@@ -192,7 +192,7 @@ public class CommandJob extends Job implements ICommandJob {
 	private final JobMode jobMode;
 	private final ILaunchConfiguration launchConfig;
 	private final String launchMode;
-	private final List<Job> cmdJobs = new ArrayList<Job>();
+	private final List<SimpleCommandJob> cmdJobs = new ArrayList<>();
 	private final StringBuffer error;
 
 	private IStatus runStatus;
@@ -370,6 +370,7 @@ public class CommandJob extends Job implements ICommandJob {
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJob#getExecuteStatus()
 	 */
+	@Override
 	public ICommandJobStatus getJobStatus() {
 		return jobStatus;
 	}
@@ -377,6 +378,7 @@ public class CommandJob extends Job implements ICommandJob {
 	/**
 	 * @return the process wrapper
 	 */
+	@Override
 	public IRemoteProcess getProcess() {
 		return process;
 	}
@@ -384,6 +386,7 @@ public class CommandJob extends Job implements ICommandJob {
 	/**
 	 * @return object wrapping stream monitors.
 	 */
+	@Override
 	public ICommandJobStreamsProxy getProxy() {
 		return proxy;
 	}
@@ -393,6 +396,7 @@ public class CommandJob extends Job implements ICommandJob {
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJob#getRunStatus()
 	 */
+	@Override
 	public IStatus getRunStatus() {
 		return runStatus;
 	}
@@ -409,6 +413,7 @@ public class CommandJob extends Job implements ICommandJob {
 	/**
 	 * @return if job is active
 	 */
+	@Override
 	public boolean isActive() {
 		boolean b = false;
 		synchronized (this) {
@@ -420,6 +425,7 @@ public class CommandJob extends Job implements ICommandJob {
 	/**
 	 * @return if job is batch
 	 */
+	@Override
 	public boolean isBatch() {
 		return jobMode == JobMode.BATCH;
 	}
@@ -429,6 +435,7 @@ public class CommandJob extends Job implements ICommandJob {
 	 * 
 	 * @see org.eclipse.ptp.internal.rm.jaxb.control.core.ICommandJob#joinConsumers()
 	 */
+	@Override
 	public IStatus joinConsumers() {
 		IStatus status = Status.OK_STATUS;
 
@@ -573,7 +580,6 @@ public class CommandJob extends Job implements ICommandJob {
 	 * @param builder
 	 * @throws CoreException
 	 */
-	@SuppressWarnings({ "unchecked" })
 	public void prepareEnv(IRemoteProcessBuilder builder) throws CoreException {
 		boolean appendEnv = true;
 		Map<String, String> launchEnv = new HashMap<String, String>();
@@ -672,6 +678,7 @@ public class CommandJob extends Job implements ICommandJob {
 	 * 
 	 * @see org.eclipse.ptp.internal.rm.jaxb.control.core.ICommandJob#rerun()
 	 */
+	@Override
 	public void rerun() {
 		if (hasInput() && isActive() && jobStatus.getState().equals(IJobStatus.RUNNING)) {
 			/*
@@ -696,7 +703,7 @@ public class CommandJob extends Job implements ICommandJob {
 		jobThread = Thread.currentThread();
 
 		for (SimpleCommandType cmd : command.getPreLaunchCmd()) {
-			Job job = new SimpleCommandJob(uuid, cmd, command.getDirectory(), control, rmVarMap, this);
+			SimpleCommandJob job = new SimpleCommandJob(uuid, cmd, command.getDirectory(), control, rmVarMap, this);
 			job.setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY, Boolean.TRUE);
 			job.schedule();
 			if (cmd.isWait()) {
@@ -745,6 +752,7 @@ public class CommandJob extends Job implements ICommandJob {
 			try {
 				jobStatus.waitForJobId(uuid, waitUntil, progress.newChild(20));
 			} catch (CoreException failed) {
+				terminate();
 				error.append(jobStatus.getStreamsProxy().getOutputStreamMonitor().getContents()).append(JAXBCoreConstants.LINE_SEP);
 
 				runStatus = CoreExceptionUtils.getErrorStatus(failed.getMessage() + JAXBCoreConstants.LINE_SEP + error.toString(),
@@ -791,7 +799,7 @@ public class CommandJob extends Job implements ICommandJob {
 				 * Once job has started running, execute any post launch commands
 				 */
 				for (SimpleCommandType cmd : command.getPostLaunchCmd()) {
-					Job job = new SimpleCommandJob(uuid, cmd, command.getDirectory(), control, rmVarMap, this);
+					SimpleCommandJob job = new SimpleCommandJob(uuid, cmd, command.getDirectory(), control, rmVarMap, this);
 					job.setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY, Boolean.TRUE);
 					job.schedule();
 					if (cmd.isWait()) {
@@ -841,6 +849,7 @@ public class CommandJob extends Job implements ICommandJob {
 			proxy.setErrMonitor(new CommandJobStreamMonitor(monitorErr, null));
 		}
 		proxy.getErrorStreamMonitor().addListener(new IStreamListener() {
+			@Override
 			public void streamAppended(String text, IStreamMonitor monitor) {
 				error.append(text);
 			}
@@ -924,6 +933,7 @@ public class CommandJob extends Job implements ICommandJob {
 	 * 
 	 * @see org.eclipse.ptp.rm.jaxb.core.ICommandJob#terminate()
 	 */
+	@Override
 	public synchronized void terminate() {
 		if (active) {
 			active = false;
@@ -945,9 +955,9 @@ public class CommandJob extends Job implements ICommandJob {
 					jobThread.interrupt();
 				}
 			}
-			for (Job job : cmdJobs) {
+			for (SimpleCommandJob job : cmdJobs) {
 				if (job.getState() == Job.RUNNING) {
-					job.cancel();
+					job.terminate();
 				}
 			}
 			cmdJobs.clear();
@@ -961,6 +971,7 @@ public class CommandJob extends Job implements ICommandJob {
 	 * 
 	 * @return whether to wait
 	 */
+	@Override
 	public boolean waitForId() {
 		return command.isWaitForId();
 	}
@@ -979,8 +990,8 @@ public class CommandJob extends Job implements ICommandJob {
 			stream.write(JAXBControlConstants.LINE_SEP.getBytes());
 			stream.flush();
 			proxy.setInputStream(stream);
-		} catch (Throwable t) {
-			return CoreExceptionUtils.getErrorStatus(Messages.ProcessRunError, t);
+		} catch (IOException | CoreException e) {
+			return CoreExceptionUtils.getErrorStatus(Messages.ProcessRunError, e);
 		}
 		return Status.OK_STATUS;
 	}

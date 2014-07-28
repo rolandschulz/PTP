@@ -41,6 +41,7 @@ import org.eclipse.debug.ui.ILaunchConfigurationTab;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.ptp.core.jobs.JobManager;
 import org.eclipse.ptp.internal.debug.ui.messages.Messages;
 import org.eclipse.ptp.internal.debug.ui.sourcelookup.DefaultSourceLocator;
 import org.eclipse.ptp.internal.ui.IPTPUIConstants;
@@ -382,6 +383,8 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		uiDebugManager = new UIDebugManager();
+		uiDebugManager.initialize();
+		JobManager.getInstance().addListener(uiDebugManager);
 		enableDebugViewToolbar();
 	}
 
@@ -391,6 +394,7 @@ public class PTPDebugUIPlugin extends AbstractUIPlugin {
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		uiDebugManager.shutdown();
+		JobManager.getInstance().removeListener(uiDebugManager);
 		uiDebugManager = null;
 		super.stop(context);
 		plugin = null;
