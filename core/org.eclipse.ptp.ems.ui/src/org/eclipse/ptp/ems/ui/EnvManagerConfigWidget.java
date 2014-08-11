@@ -192,13 +192,13 @@ public final class EnvManagerConfigWidget extends Composite {
 	}
 
 	private void createEnvConfigTextbox() {
-		envConfigTextbox = new Text(stack, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.SHADOW_IN);
+		envConfigTextbox = new Text(stack, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
 		envConfigTextbox.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		envConfigTextbox.setText(""); //$NON-NLS-1$
 		allowEnterAndTabInTextbox(envConfigTextbox);
 		envConfigTextbox.setFont(JFaceResources.getTextFont());
 	}
-
+ 
 	/**
 	 * Allows the Enter and Tab keys to insert text into the text box, even if it's in a dialog box where these keys would usually
 	 * press the default button and traverse to the next control, respectively.
