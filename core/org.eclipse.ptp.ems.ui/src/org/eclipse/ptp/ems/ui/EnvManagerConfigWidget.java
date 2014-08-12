@@ -127,8 +127,6 @@ public final class EnvManagerConfigWidget extends Composite {
 		final boolean isChecked = useEMSCheckbox.getSelection();
 
 		manualConfigCheckbox.setVisible(isChecked);
-		envConfigTextbox.setEnabled(isChecked);
-		envConfigChecklist.setEnabled(isChecked);
 
 		setTopControl();
 	}
