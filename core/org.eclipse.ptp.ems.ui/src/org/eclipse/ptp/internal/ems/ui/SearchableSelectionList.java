@@ -356,6 +356,7 @@ public final class SearchableSelectionList extends Composite {
 						Collections.swap(fSelectedItems, index, index - 1);
 					}
 				}
+				updateEnablement();
 			}
 		});
 
@@ -381,6 +382,7 @@ public final class SearchableSelectionList extends Composite {
 						Collections.swap(fSelectedItems, index, index + 1);
 					}
 				}
+				updateEnablement();
 			}
 		});
 
@@ -501,10 +503,8 @@ public final class SearchableSelectionList extends Composite {
 		}
 		fSelectedTable.removeAll();
 		for (final String moduleName : fSelectedItems) {
-			if (matches(pattern, moduleName)) {
-				final TableItem item = new TableItem(fSelectedTable, SWT.NONE);
-				item.setText(0, moduleName);
-			}
+			final TableItem item = new TableItem(fSelectedTable, SWT.NONE);
+			item.setText(0, moduleName);
 		}
 		layout();
 	}
