@@ -10,7 +10,7 @@
 	xmlns="http://eclipse.org/ptp/rm" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://eclipse.org/ptp/rm http://eclipse.org/ptp/schemas/v1.1/rm.xsd" 
-	name="Open MPI-Generic-Interactive">
+	name="Generic Open MPI Interactive">
 	<control-data>
 		<attribute name="ompi_minor_version" visible="false" type="integer"/>
 		<attribute name="local_prefix" visible="false" type="string">

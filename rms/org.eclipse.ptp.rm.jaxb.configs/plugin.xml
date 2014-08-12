@@ -5,63 +5,63 @@
          point="org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagerConfigurations">
       <JAXBResourceManagerConfiguration
             configurationFile="data/pbs-generic-batch.xml"
-            name="PBS-Generic-Batch">
+            name="Generic PBS Batch">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/pbs-generic-interactive.xml"
-            name="PBS-Generic-Interactive">
+            name="Generic PBS Interactive">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/gridengine-generic-batch.xml"
-            name="Grid Engine-Generic-Batch">
+            name="Generic Grid Engine Batch">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/openmpi-generic-interactive.xml"
-            name="Open MPI-Generic-Interactive">
+            name="Generic OpenMPI Interactive">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/slurm-bgp-batch.xml"
-            name="SLURM-BGP-Batch">
+            name="Generic SLURM BGP Batch">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/slurm-bgq-batch.xml"
-            name="SLURM-BGQ-Batch">
+            name="Generic SLURM BGQ Batch">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/pbs-bgp-batch.xml"
-            name="PBS-BGP-Batch">
+            name="Generic PBS BGP Batch">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/pbs-bgq-batch.xml"
-            name="PBS-BGQ-Batch">
+            name="Generic PBS BGQ Batch">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/slurm-alps-generic-batch.xml"
-            name="SLURM-ALPS-Generic-Batch">
+            name="Generic SLURM ALPS Batch">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/slurm-generic-batch.xml"
-            name="SLURM-Generic-Batch">
+            name="Generic SLURM Batch">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/torque-generic-batch.xml"
-            name="Torque-Generic-Batch">
+            name="Generic Torque Batch">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/torque-generic-interactive.xml"
-            name="Torque-Generic-Interactive">
+            name="Generic Torque Interactive">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/remote-generic-interactive.xml"
-            name="Remote-Generic-Interactive">
+            name="Generic Remote Interactive">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/mpich2-generic-interactive.xml"
-            name="MPICH2-Generic-Interactive">
+            name="Generic MPICH2 Interactive">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/ibm-platform-mpi-interactive.xml"
-            name="IBM Platform MPI">
+            name="Generic IBM Platform MPI">
       </JAXBResourceManagerConfiguration>
    </extension>
 </plugin>
