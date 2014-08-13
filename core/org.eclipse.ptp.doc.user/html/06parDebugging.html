@@ -9,6 +9,7 @@
 <h1>Parallel Debugging</h1>
 <p>This section describes the features of PTP that enable a developer to debug a parallel application. The topics that will be covered include:</p>
 <ul>
+<li><a href="#supported">Supported Target System Configurations</a></li>
 <li><a href="#launch">Creating a Debug Launch Configuration</a></li>
 <li><a href="#feat">The Parallel Debug Perspective </a></li>
 <li><a href="#pSets">Process Sets</a></li>
@@ -20,7 +21,31 @@
 <li><a href="#finish">Terminating Execution</a></li>
 </ul>
 
+<h2 id="supported">Supported Target System Configurations</h2>
+<p>The PTP Parallel debugger has been implemented for a number of Target System Configurations (TSCs).
+For details and the most recent information, see the <a href="https://wiki.eclipse.org/PTP/release_notes/8.0">Release Notes</a> and the
+<a href="https://wiki.eclipse.org/Parallel_Tools_Platform_FAQ#Q:_Where_does_the_PTP_Parallel_Debugger_work.3F">PTP FAQ</a> 
+<p>For PTP 8.0, Parallel debugging is supported for
+<ul>
+<li>Generic TSCs: 
+<ul>
+<li>Generic OpenMPI Interactive</li>
+<li>Generic MPICH2 Interactive</li>
+<li>Generic Remote Interactive</li>
+<li>IBM Parallel Environment</li>
+<li>IBM Platform LSF Interactive</li>
+<li>IBM Platform MPI</li>
+</ul>
+</li>
+<li>Specific system TSCs: 
+<ul>
+<li>Trestles Torque OpenMPI Interactive 
+</ul>
+</li>
+</ul>
+
 <h2 id="launch">Creating a Debug Launch Configuration</h2>
+
 In order to launch a debug job, the user must first create a Debug Configuration. The process for doing this is identical to that used to 
 <a href="03pRunConfig.html">run a parallel program</a>,
 with the exception of a single extra tab that needs to be completed. Only this extra tab will be described here.
