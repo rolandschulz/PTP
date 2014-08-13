@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ptp.ems.core.EnvManagerRegistry;
 import org.eclipse.ptp.ems.core.IEnvManager;
+import org.eclipse.ptp.ems.core.IEnvManager2;
 import org.eclipse.ptp.ems.core.IEnvManagerConfig;
 import org.eclipse.ptp.internal.ems.ui.EMSUIPlugin;
 import org.eclipse.remote.core.IRemoteConnection;
@@ -44,7 +45,7 @@ import org.eclipse.ui.PlatformUI;
  * 
  * @since 6.0
  */
-public class LazyEnvManagerDetector implements IEnvManager {
+public class LazyEnvManagerDetector implements IEnvManager2 {
 
 	private class GetEnvManagerRunnable implements IRunnableWithProgress {
 		private IEnvManager envManager = EnvManagerRegistry.getNullEnvManager();
@@ -122,6 +123,24 @@ public class LazyEnvManagerDetector implements IEnvManager {
 	@Override
 	public List<String> determineAvailableElements(IProgressMonitor pm) throws RemoteConnectionException, IOException {
 		return ensureEnvManagerDetected().determineAvailableElements(pm);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ptp.ems.core.IEnvManager#determineAvailableElements(org.eclipse.core.runtime.IProgressMonitor, java.util.List)
+	 */
+	/**
+	 * @since 3.0
+	 */
+	@Override
+	public List<String> determineAvailableElements(IProgressMonitor pm, List<String> selectedElements) throws RemoteConnectionException, IOException {
+		IEnvManager mgr = ensureEnvManagerDetected();
+		if (mgr instanceof IEnvManager2) {
+			return ((IEnvManager2)mgr).determineAvailableElements(pm, selectedElements);
+		} else {
+			return mgr.determineAvailableElements(pm);
+		}
 	}
 
 	/*
