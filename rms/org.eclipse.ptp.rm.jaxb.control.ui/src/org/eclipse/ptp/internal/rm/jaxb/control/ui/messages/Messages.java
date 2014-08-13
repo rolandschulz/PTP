@@ -38,6 +38,8 @@ public class Messages extends NLS {
 	public static String ControlStateRuleUtil_1;
 	public static String ControlStateRuleUtil_2;
 	public static String WidgetInstantiationError;
+	public static String JAXBRMPreferencesPage_0;
+
 	public static String JAXBRMPreferencesPage_Preferences_options;
 	public static String JAXBRMPreferencesPage_ParserDebug_options;
 	public static String JAXBRMPreferencesPage_CommandDebug_options;
