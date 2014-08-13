@@ -61,7 +61,7 @@
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/ibm-platform-mpi-interactive.xml"
-            name="Generic IBM Platform MPI">
+            name="IBM Platform MPI">
       </JAXBResourceManagerConfiguration>
    </extension>
 </plugin>
