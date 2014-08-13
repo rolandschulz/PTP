@@ -190,14 +190,13 @@ public class SDMDebugger implements IPDebugger {
 											 * Check if the sdm is executable. Make it executable if not.
 											 */
 											destInfo = destPath.fetchInfo(EFS.NONE, progress.newChild(10));
-											if (!destInfo.getAttribute(EFS.ATTRIBUTE_EXECUTABLE)) {
-												destInfo.setAttribute(EFS.ATTRIBUTE_EXECUTABLE, true);
-												/*
-												 * Make sure sdm is not writeable to world
-												 */
-												destInfo.setAttribute(EFS.ATTRIBUTE_OTHER_WRITE, false);
-												destPath.putInfo(destInfo, EFS.SET_ATTRIBUTES, progress.newChild(10));
-											}
+											destInfo.setAttribute(EFS.ATTRIBUTE_EXECUTABLE, true);
+											
+											/*
+											 * Make sure sdm is not writeable to world
+											 */
+											destInfo.setAttribute(EFS.ATTRIBUTE_OTHER_WRITE, false);
+											destPath.putInfo(destInfo, EFS.SET_ATTRIBUTES, progress.newChild(10));
 
 											return destPath.toURI().getPath();
 										}
