@@ -394,12 +394,26 @@ public class SyncCommandLauncher implements ICommandLauncher {
 		SyncConfig config = SyncConfigManager.getActive(getProject());
 		if (shouldSyncBeforeRun && config.isSyncOnPreBuild()) {
 			switch (SyncManager.getSyncMode(getProject())) {
-			case ACTIVE:
+			case ACTIVE_BEFORE_BUILD:
 				SyncManager.syncBlocking(null, getProject(), SyncFlag.LR_ONLY, monitor, null);
+				break;
+			
+			case ACTIVE:
+				SyncManager.syncBlocking(null, getProject(), SyncFlag.WAIT_FOR_LR_ONLY, monitor, null);
 				break;
 
 			case ALL:
-				SyncManager.syncAllBlocking(null, getProject(), SyncFlag.LR_ONLY, null);
+				SyncManager.syncBlocking(null, getProject(), SyncFlag.WAIT_FOR_LR_ONLY, monitor, null);
+				break;
+				
+			case NONE:
+				break;
+				
+			case UNAVAILABLE:
+				break;
+				
+			default:
+				// Shouldn't ever happen
 				break;
 			}
 		}

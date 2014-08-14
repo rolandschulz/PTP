@@ -19,7 +19,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.core.resources.IFile;
@@ -59,13 +58,36 @@ public class GitSyncService extends AbstractSynchronizeService {
 	// Implement storage of local JGit repositories and Git repositories.
 	private static final Map<IPath, JGitRepo> localDirectoryToJGitRepoMap = new HashMap<IPath, JGitRepo>();
 	private static final Map<RemoteLocation, GitRepo> remoteLocationToGitRepoMap = new HashMap<RemoteLocation, GitRepo>();
+	
+	private static class SyncInt {
+		private int value;
+		public SyncInt(int initialValue) {
+			value = initialValue;
+		}
+		public synchronized int get() {
+			return value;
+		}
+		public synchronized int incrementAndGet() {
+			return ++value;
+		}
+		public synchronized int decrementAndGet() {
+			--value;
+			notifyAll();
+			return value;
+		}
+		public synchronized void waitForZero() throws InterruptedException {
+			while(value != 0) {
+				wait();
+			}
+		}
+	}
 
 	// Variables for managing sync threads
 	private static final ReentrantLock syncLock = new ReentrantLock();
-	private static final ConcurrentMap<ProjectAndRemoteLocationPair, AtomicLong> syncLRPending =
-			new ConcurrentHashMap<ProjectAndRemoteLocationPair, AtomicLong>();
-	private static final ConcurrentMap<ProjectAndRemoteLocationPair, AtomicLong> syncRLPending =
-			new ConcurrentHashMap<ProjectAndRemoteLocationPair, AtomicLong>();
+	private static final ConcurrentMap<ProjectAndRemoteLocationPair, SyncInt> syncLRPending =
+			new ConcurrentHashMap<ProjectAndRemoteLocationPair, SyncInt>();
+	private static final ConcurrentMap<ProjectAndRemoteLocationPair, SyncInt> syncRLPending =
+			new ConcurrentHashMap<ProjectAndRemoteLocationPair, SyncInt>();
 
 	// Entry indicates that the remote location has a clean (up-to-date) file filter for the project
 	private static final Set<LocalAndRemoteLocationPair> cleanFileFilterMap = new HashSet<LocalAndRemoteLocationPair>();
@@ -73,7 +95,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 	private static final Set<LocalAndRemoteLocationPair> localChangesPushed = new HashSet<LocalAndRemoteLocationPair>();
 
 	// Boilerplate class for IPath and RemoteLocation Pair
-	private class LocalAndRemoteLocationPair {
+	private static class LocalAndRemoteLocationPair {
 		IPath localDir;
 		RemoteLocation remoteLoc;
 
@@ -101,7 +123,6 @@ public class GitSyncService extends AbstractSynchronizeService {
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;
-			result = prime * result + getOuterType().hashCode();
 			result = prime * result
 					+ ((localDir == null) ? 0 : localDir.hashCode());
 			result = prime * result
@@ -121,9 +142,6 @@ public class GitSyncService extends AbstractSynchronizeService {
 				return false;
 			}
 			LocalAndRemoteLocationPair other = (LocalAndRemoteLocationPair) obj;
-			if (!getOuterType().equals(other.getOuterType())) {
-				return false;
-			}
 			if (localDir == null) {
 				if (other.localDir != null) {
 					return false;
@@ -140,14 +158,10 @@ public class GitSyncService extends AbstractSynchronizeService {
 			}
 			return true;
 		}
-
-		private GitSyncService getOuterType() {
-			return GitSyncService.this;
-		}
 	}
 
 	// Boilerplate class for IProject and RemoteLocation Pair
-	private class ProjectAndRemoteLocationPair {
+	private static class ProjectAndRemoteLocationPair {
 		IProject project;
 		RemoteLocation remoteLoc;
 
@@ -167,7 +181,6 @@ public class GitSyncService extends AbstractSynchronizeService {
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;
-			result = prime * result + getOuterType().hashCode();
 			result = prime * result
 					+ ((project == null) ? 0 : project.hashCode());
 			result = prime * result
@@ -187,9 +200,6 @@ public class GitSyncService extends AbstractSynchronizeService {
 				return false;
 			}
 			ProjectAndRemoteLocationPair other = (ProjectAndRemoteLocationPair) obj;
-			if (!getOuterType().equals(other.getOuterType())) {
-				return false;
-			}
 			if (project == null) {
 				if (other.project != null) {
 					return false;
@@ -205,10 +215,6 @@ public class GitSyncService extends AbstractSynchronizeService {
 				return false;
 			}
 			return true;
-		}
-
-		private GitSyncService getOuterType() {
-			return GitSyncService.this;
 		}
 	}
 
@@ -426,7 +432,24 @@ public class GitSyncService extends AbstractSynchronizeService {
 		if (project == null || rl == null) {
 			throw new NullPointerException();
 		}
+		// Make a copy to protect against the remote location
+		// being changed by another thread.
 		RemoteLocation remoteLoc = new RemoteLocation(rl);
+
+		ProjectAndRemoteLocationPair syncTarget = new ProjectAndRemoteLocationPair(project, remoteLoc);
+		if(syncFlags.contains(SyncFlag.WAIT_FOR_LR)) {
+			try {
+				SyncInt si = syncLRPending.get(syncTarget);
+				if (si != null) {
+					si.waitForZero();
+				}
+			} catch (InterruptedException e) {
+				// This shouldn't happen.
+				Activator.log(e);
+			}
+			return;
+		}
+		
 		RecursiveSubMonitor subMon = RecursiveSubMonitor.convert(monitor, 100);
 
 		try {
@@ -443,14 +466,13 @@ public class GitSyncService extends AbstractSynchronizeService {
 			 * cases, we want to ensure repos are synchronized regardless of the passed delta, which can be set to null.
 			 */
 			
-			ProjectAndRemoteLocationPair syncTarget = new ProjectAndRemoteLocationPair(project, remoteLoc);
 		    Boolean syncLR = syncFlags.contains(SyncFlag.SYNC_LR);
 		    Boolean syncRL = syncFlags.contains(SyncFlag.SYNC_RL);
 			Set<SyncFlag> modifiedSyncFlags = new HashSet<SyncFlag>(syncFlags);
 
 			// Do not sync LR (local-to-remote) if another thread is already waiting to do it.
 			if (syncLR) {
-				AtomicLong threadCount = syncLRPending.putIfAbsent(syncTarget, new AtomicLong(1));
+				SyncInt threadCount = syncLRPending.putIfAbsent(syncTarget, new SyncInt(1));
 				if (threadCount != null) {
 					if (threadCount.get() > 0) {
 						syncLR = false;
@@ -463,7 +485,7 @@ public class GitSyncService extends AbstractSynchronizeService {
 
 			// Do not sync RL (remote-to-local) if another thread is already waiting to do it.
 			if (syncRL) {
-				AtomicLong threadCount = syncRLPending.putIfAbsent(syncTarget, new AtomicLong(1));
+				SyncInt threadCount = syncRLPending.putIfAbsent(syncTarget, new SyncInt(1));
 				if (threadCount != null) {
 					if (threadCount.get() > 0) {
 						syncRL = false;
@@ -490,12 +512,12 @@ public class GitSyncService extends AbstractSynchronizeService {
 				throw new CoreException(new Status(IStatus.CANCEL, Activator.PLUGIN_ID, Messages.GitSyncService_5));
 			} finally {
 				if (syncLR) {
-					AtomicLong LRPending = syncLRPending.get(syncTarget);
+					SyncInt LRPending = syncLRPending.get(syncTarget);
 					assert(LRPending != null) : Messages.GitSyncService_20;
 					LRPending.decrementAndGet();
 				}
 				if (syncRL) {
-					AtomicLong RLPending = syncRLPending.get(syncTarget);
+					SyncInt RLPending = syncRLPending.get(syncTarget);
 					assert(RLPending != null) : Messages.GitSyncService_21;
 					RLPending.decrementAndGet();
 				}

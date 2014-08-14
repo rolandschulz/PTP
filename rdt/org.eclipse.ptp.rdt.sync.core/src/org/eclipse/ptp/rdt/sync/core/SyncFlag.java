@@ -17,7 +17,7 @@ import java.util.Set;
 /**
  * Flags to control the behavior of synchronization.
  * 
- * @since 4.0
+ * @since 4.1
  */
 public enum SyncFlag {
 	/**
@@ -30,13 +30,20 @@ public enum SyncFlag {
 	 * Sync remote to local
 	 * @since 4.0
 	 */
-	SYNC_RL;
+	SYNC_RL,
+	
+	/**
+	 * Wait only
+	 * @since 4.1
+	 */
+	WAIT_FOR_LR;
 
 	/**
 	 * Convenience flag set for sync'ing both directions (from local to remote and from remote to local).
-	 * @since 4.0
+	 * @since 4.1
 	 */
-	public static final Set<SyncFlag> BOTH = Collections.unmodifiableSet(EnumSet.allOf(SyncFlag.class));
+	public static final Set<SyncFlag> BOTH = Collections.unmodifiableSet(
+			EnumSet.of(SyncFlag.SYNC_LR,SyncFlag.SYNC_RL));
 
 	/**
 	 * Convenience flag set for sync'ing only from local to remote.
@@ -49,4 +56,10 @@ public enum SyncFlag {
 	 * @since 4.0
 	 */
 	public static final Set<SyncFlag> RL_ONLY = Collections.unmodifiableSet(EnumSet.of(SyncFlag.SYNC_RL));
+
+	/**
+	 * Convenience flag set for sync'ing on the wait for pending requests.
+	 * @since 4.1
+	 */
+	public static final Set<SyncFlag> WAIT_FOR_LR_ONLY = Collections.unmodifiableSet(EnumSet.of(SyncFlag.WAIT_FOR_LR));
 }

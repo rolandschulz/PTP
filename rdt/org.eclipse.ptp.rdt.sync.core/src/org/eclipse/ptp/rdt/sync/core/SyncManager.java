@@ -10,9 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core;
 
-import java.io.IOException;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -92,12 +90,20 @@ public class SyncManager {
 		}
 	}
 
-	// ACTIVE: Sync with current active configuration
-	// ALL: Sync with all configurations
+	// ACTIVE: Sync with current active configuration after saving
+	// ACTIVE_BEFORE_BUILD: Don't sync after saving, instead sync just before building
+	// ALL: Sync with all configurations after saving
 	// NONE: Do not transfer files but still call sync and do bookkeeping
 	// UNAVAILABLE: Do not call sync. (Used internally during project creation and deletion.)
 	public static enum SyncMode {
-		ACTIVE, ALL, NONE, UNAVAILABLE
+		/**
+		 * @since 4.1
+		 */
+		ACTIVE_BEFORE_BUILD,
+		ACTIVE,
+		ALL,
+		NONE,
+		UNAVAILABLE
 	};
 
 	private static final String SYNC_MODE_KEY = "sync-mode"; //$NON-NLS-1$
