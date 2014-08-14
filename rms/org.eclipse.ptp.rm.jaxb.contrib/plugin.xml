@@ -4,52 +4,48 @@
    <extension
          point="org.eclipse.ptp.rm.jaxb.core.JAXBResourceManagerConfigurations">
       <JAXBResourceManagerConfiguration
-            configurationFile="data/edu.utk.nics.kraken.pbs.batch.xml"
-            name="edu.utk.nics.kraken.pbs.batch">
-      </JAXBResourceManagerConfiguration>
-      <JAXBResourceManagerConfiguration
             configurationFile="data/edu.utk.nics.keeneland.pbs.batch.xml"
-            name="edu.utk.nics.keeneland.pbs.batch">
+            name="Keeneland PBS Batch">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/edu.illinois.ncsa.bluewaters.pbs.batch.xml"
-            name="edu.illinois.ncsa.bluewaters.pbs.batch">
+            name="BlueWaters PBS Batch">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/edu.sdsc.trestles.torque.batch.xml"
-            name="edu.sdsc.trestles.torque.batch">
+            name="Trestles Torque Batch">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/edu.sdsc.trestles.torque.interactive.openmpi.xml"
-            name="edu.sdsc.trestles.torque.interactive.openmpi">
+            name="Trestles Torque OpenMPI Interactive">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/edu.utexas.tacc.lonestar.sge.batch.xml"
-            name="edu.utexas.tacc.lonestar.sge.batch">
+            name="Lonestar SGE Batch">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/edu.utexas.tacc.stampede.slurm.batch.xml"
-            name="edu.utexas.tacc.stampede.slurm.batch">
+            name="Stampede SLURM Batch">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/gov.anl.alcf.bgp.pbs.batch.xml"
-        name="gov.anl.alcf.bgp.pbs.batch">
+        name="ALCF PBS BGP Batch">
       </JAXBResourceManagerConfiguration>      
       <JAXBResourceManagerConfiguration
             configurationFile="data/gov.anl.alcf.bgq.pbs.batch.xml"
-        name="gov.anl.alcf.bgq.pbs.batch">
+        name="ALCF PBS BGQ Batch">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/de.fz-juelich.juropa.torque.batch.xml"
-            name="de.fz-juelich.juropa.torque.batch">
+            name="Juropa Torque Batch">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/de.fz-juelich.judge.torque.batch.xml"
-            name="de.fz-juelich.judge.torque.batch">
+            name="Judge Torque Batch">
       </JAXBResourceManagerConfiguration>
       <JAXBResourceManagerConfiguration
             configurationFile="data/de.fz-juelich.juqueen.ll_bg.xml"
-            name="de.fz-juelich.juqueen.ll_bg">
+            name="Juqueen LoadLeveler BGQ">
       </JAXBResourceManagerConfiguration>
    </extension>
 </plugin>

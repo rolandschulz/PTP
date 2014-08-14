@@ -31,6 +31,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.internal.rm.jaxb.core.messages.Messages;
 import org.eclipse.ptp.rm.jaxb.core.IVariableMap;
 import org.eclipse.ptp.rm.jaxb.core.data.AttributeType;
@@ -39,6 +40,7 @@ import org.eclipse.ptp.rm.jaxb.core.data.MonitorType;
 import org.eclipse.ptp.rm.jaxb.core.data.ResourceManagerData;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
+
 
 /**
  * Convenience methods for validating and unmarshaling XML using JAXB.
@@ -280,7 +282,10 @@ public class JAXBInitializationUtils {
 	 */
 	private static void validate(Source source) throws SAXException, IOException, URISyntaxException {
 		try {
-			getValidator().validate(source);
+			boolean validate = Preferences.getBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBCorePreferenceConstants.VALIDATE_XML);
+			if(validate) {
+				getValidator().validate(source);
+			}
 		} catch (SAXParseException sax) {
 			JAXBCorePlugin.log(printInfo(sax));
 			throw sax;

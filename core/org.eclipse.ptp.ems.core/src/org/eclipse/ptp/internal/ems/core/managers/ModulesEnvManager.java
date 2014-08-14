@@ -71,7 +71,7 @@ public final class ModulesEnvManager extends AbstractEnvManager {
 	 * It is assumed that module names (matching this pattern) do not need to be escaped when used as arguments on a Bash command
 	 * line (see {@link #getBashCommandForModuleLoad(String)}).
 	 */
-	private static final Pattern MODULE_NAME_PATTERN = Pattern.compile("[A-Za-z0-9-_/.]+"); //$NON-NLS-1$
+	private static final Pattern MODULE_NAME_PATTERN = Pattern.compile("[\\w/+.-]+"); //$NON-NLS-1$
 
 	@Override
 	public String getName() {

@@ -15,6 +15,8 @@ import org.eclipse.ptp.core.Preferences;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.JAXBControlCorePlugin;
 import org.eclipse.ptp.internal.rm.jaxb.control.core.JAXBRMPreferenceConstants;
 import org.eclipse.ptp.internal.rm.jaxb.control.ui.messages.Messages;
+import org.eclipse.ptp.internal.rm.jaxb.core.JAXBCorePlugin;
+import org.eclipse.ptp.internal.rm.jaxb.core.JAXBCorePreferenceConstants;
 import org.eclipse.ptp.internal.rm.jaxb.ui.JAXBUIConstants;
 import org.eclipse.ptp.internal.rm.jaxb.ui.util.WidgetBuilderUtils;
 import org.eclipse.swt.SWT;
@@ -39,6 +41,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
  */
 public class JAXBRMPreferencesPage extends PreferencePage implements IWorkbenchPreferencePage, SelectionListener, ModifyListener {
 
+	private Button validateXML;
 	private Button reloadOption;
 	private Button segmentPattern;
 	private Button matchStatus;
@@ -70,6 +73,9 @@ public class JAXBRMPreferencesPage extends PreferencePage implements IWorkbenchP
 		keepManagedFiles = new Button(optionsGroup, SWT.CHECK | SWT.LEFT);
 		keepManagedFiles.addSelectionListener(this);
 		keepManagedFiles.setText(JAXBRMPreferenceConstants.KEEP_MANAGED_FILES);
+		validateXML = new Button(optionsGroup, SWT.CHECK | SWT.LEFT);
+		validateXML.addSelectionListener(this);
+		validateXML.setText(Messages.JAXBRMPreferencesPage_0);
 
 		Group parserOptionsGroup = new Group(preferences, SWT.SHADOW_ETCHED_IN);
 		parserOptionsGroup.setText(Messages.JAXBRMPreferencesPage_ParserDebug_options);
@@ -113,7 +119,7 @@ public class JAXBRMPreferencesPage extends PreferencePage implements IWorkbenchP
 		showCommandOutput = new Button(commandOptionsGroup, SWT.CHECK | SWT.LEFT);
 		showCommandOutput.addSelectionListener(this);
 		showCommandOutput.setText(JAXBRMPreferenceConstants.SHOW_COMMAND_OUTPUT);
-
+		
 		Composite c = new Composite(preferences, SWT.NONE);
 		c.setLayout(new GridLayout(7, false));
 		gd = new GridData();
@@ -191,6 +197,10 @@ public class JAXBRMPreferencesPage extends PreferencePage implements IWorkbenchP
 		b = Platform.getPreferencesService().getBoolean(JAXBControlCorePlugin.getUniqueIdentifier(),
 				JAXBRMPreferenceConstants.SHOW_COMMAND_OUTPUT, def, null);
 		showCommandOutput.setSelection(b);
+		def = Preferences.getDefaultBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBCorePreferenceConstants.VALIDATE_XML, false);
+		b = Platform.getPreferencesService().getBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBCorePreferenceConstants.VALIDATE_XML, def, null);
+		validateXML.setSelection(b);		
+				
 		def = Preferences.getDefaultBoolean(JAXBControlCorePlugin.getUniqueIdentifier(),
 				JAXBRMPreferenceConstants.KEEP_MANAGED_FILES, false);
 		b = Platform.getPreferencesService().getBoolean(JAXBControlCorePlugin.getUniqueIdentifier(),
@@ -232,6 +242,7 @@ public class JAXBRMPreferencesPage extends PreferencePage implements IWorkbenchP
 				JAXBRMPreferenceConstants.SHOW_COMMAND, false));
 		showCommandOutput.setSelection(Preferences.getDefaultBoolean(JAXBControlCorePlugin.getUniqueIdentifier(),
 				JAXBRMPreferenceConstants.SHOW_COMMAND_OUTPUT, false));
+		validateXML.setSelection(Preferences.getDefaultBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBCorePreferenceConstants.VALIDATE_XML, false));
 		keepManagedFiles.setSelection(Preferences.getDefaultBoolean(JAXBControlCorePlugin.getUniqueIdentifier(),
 				JAXBRMPreferenceConstants.KEEP_MANAGED_FILES, false));
 		logFile.setText(Preferences.getDefaultString(JAXBControlCorePlugin.getUniqueIdentifier(),
@@ -298,6 +309,9 @@ public class JAXBRMPreferencesPage extends PreferencePage implements IWorkbenchP
 		} else if (source == keepManagedFiles) {
 			boolean b = keepManagedFiles.getSelection();
 			Preferences.setBoolean(JAXBControlCorePlugin.getUniqueIdentifier(), JAXBRMPreferenceConstants.KEEP_MANAGED_FILES, b);
+		} else if (source == validateXML) {
+			boolean b = validateXML.getSelection();
+			Preferences.setBoolean(JAXBCorePlugin.getUniqueIdentifier(), JAXBCorePreferenceConstants.VALIDATE_XML, b);
 		}
 	}
 }

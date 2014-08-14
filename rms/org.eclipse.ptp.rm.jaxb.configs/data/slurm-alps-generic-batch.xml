@@ -13,7 +13,7 @@
 	xmlns="http://eclipse.org/ptp/rm" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://eclipse.org/ptp/rm http://eclipse.org/ptp/schemas/v1.1/rm.xsd" 
-	name="SLURM-ALPS-Generic-Batch">
+	name="Generic SLURM ALPS Batch">
     <control-data>
         <!-- this is a necessary attribute for the functioning of LML; link it to the batch-specific variable name -->
         <attribute name="control.queue.name" visible="false">

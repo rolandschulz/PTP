@@ -12,7 +12,7 @@
 	xmlns="http://eclipse.org/ptp/rm" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://eclipse.org/ptp/rm http://eclipse.org/ptp/schemas/v1.1/rm.xsd" 
-	name="Torque-Generic-Interactive">
+	name="Generic Torque Interactive">
 	<control-data>
 		<!-- Set the default value of this attribute if PBS is installed in a non-standard location -->
 		<attribute name="bindir" visible="false"/>

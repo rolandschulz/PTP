@@ -18,6 +18,7 @@ public class Messages extends NLS {
 	public static String SystemId;
 	public static String LineNumber;
 	public static String ColumnNumber;
+
 	public static String Message;
 
 	static {

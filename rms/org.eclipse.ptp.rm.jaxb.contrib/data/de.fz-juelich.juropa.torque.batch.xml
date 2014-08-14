@@ -15,7 +15,7 @@
 <resource-manager-builder xmlns="http://eclipse.org/ptp/rm"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://eclipse.org/ptp/rm http://eclipse.org/ptp/schemas/v1.2/rm.xsd"
-	name="de.fz-juelich.juropa.torque.batch">
+	name="Juropa Torque Batch">
 	<control-data>
 		<!-- Set the default value of this attribute if MSUB is installed in a 
 			non-standard location -->
