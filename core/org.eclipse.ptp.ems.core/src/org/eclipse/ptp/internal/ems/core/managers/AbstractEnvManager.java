@@ -354,8 +354,8 @@ public abstract class AbstractEnvManager implements IEnvManager {
 
 	private String createTempFile(IProgressMonitor pm) throws RemoteConnectionException, IOException {
 		final List<String> output = runCommand(pm, true, "mktemp", "-qt", "ptpscript_XXXXXX"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		if (output.size() != 1) {
-			throw new IOException("Unexpected output from mktemp -t ptpscript"); //$NON-NLS-1$
+		if (output.isEmpty()) {
+			throw new IOException("No output from mktemp -t ptpscript"); //$NON-NLS-1$
 		}
 		return output.get(0);
 	}
