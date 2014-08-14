@@ -38,7 +38,7 @@ import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 /**
  * Static class that houses the function ("run") for initializing a new synchronized project.
  */
-public class NewRemoteSyncProjectWizardOperation implements Runnable {
+public class NewRemoteSyncProjectWizardOperation {
 	private static final String DEFAULT_BUILD_CONFIG_ID = "default-build-config-id"; //$NON-NLS-1$
 	private static final String ConfigMapKey = "config-map"; //$NON-NLS-1$
 
@@ -167,12 +167,6 @@ public class NewRemoteSyncProjectWizardOperation implements Runnable {
 		return RemoteSyncNature.hasNature(project);
 	}
 
-	@Override
-	public void run() {
-		// TODO Auto-generated method stub
-		
-	}
-	
 	private static IConfiguration findBuildConfigByName(String name, IConfiguration[] configArray) {
 		for (IConfiguration config : configArray) {
 			if (config.getName().equals(name)) {

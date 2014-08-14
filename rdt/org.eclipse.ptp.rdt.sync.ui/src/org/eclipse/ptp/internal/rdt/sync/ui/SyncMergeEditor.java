@@ -146,6 +146,8 @@ public class SyncMergeEditor {
 		}
 	}
 
+	// IStreamContentAccessor interface needed for passing file contents.
+	// Not sure, though, why IModificationDate was implemented, but we keep it just in case.
 	private static class SyncMergeItem implements IStreamContentAccessor, ITypedElement, IModificationDate {
 		private final String content;
 
@@ -155,13 +157,12 @@ public class SyncMergeEditor {
 
 		@Override
 		public long getModificationDate() {
-			// TODO Auto-generated method stub
 			return 0;
 		}
 
 		@Override
 		public String getName() {
-			return "Compare Editor Test"; //$NON-NLS-1$
+			return "Compare Editor"; //$NON-NLS-1$
 		}
 
 		@Override
