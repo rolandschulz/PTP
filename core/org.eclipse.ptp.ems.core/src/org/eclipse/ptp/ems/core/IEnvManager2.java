@@ -22,14 +22,11 @@ import org.eclipse.remote.core.exception.RemoteConnectionException;
  * that allows the list of selected modules to be passed to the method to determine available modules.
  * <p>
  * This allows EMS to support nested modules (Bug 405413) by allowing the selected modules to be loaded before running
- * 
- * <pre>
- * module avail
- * </pre>.
+ * <pre>module avail</pre>.
  * 
  * @author Jeff Overbey
  * 
- * @since 3.1
+ * @since 3.0
  */
 public interface IEnvManager2 extends IEnvManager {
 	/**
