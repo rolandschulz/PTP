@@ -128,18 +128,16 @@ public class LazyEnvManagerDetector implements IEnvManager2 {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.ptp.ems.core.IEnvManager#determineAvailableElements(org.eclipse.core.runtime.IProgressMonitor,
-	 * java.util.List)
+	 * @see org.eclipse.ptp.ems.core.IEnvManager#determineAvailableElements(org.eclipse.core.runtime.IProgressMonitor, java.util.List)
 	 */
 	/**
-	 * @since 3.1
+	 * @since 3.0
 	 */
 	@Override
-	public List<String> determineAvailableElements(IProgressMonitor pm, List<String> selectedElements)
-			throws RemoteConnectionException, IOException {
+	public List<String> determineAvailableElements(IProgressMonitor pm, List<String> selectedElements) throws RemoteConnectionException, IOException {
 		IEnvManager mgr = ensureEnvManagerDetected();
 		if (mgr instanceof IEnvManager2) {
-			return ((IEnvManager2) mgr).determineAvailableElements(pm, selectedElements);
+			return ((IEnvManager2)mgr).determineAvailableElements(pm, selectedElements);
 		} else {
 			return mgr.determineAvailableElements(pm);
 		}
