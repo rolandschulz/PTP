@@ -135,6 +135,15 @@
                </command>
                <command
                      commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
+                     label="%SyncActiveBeforeBuild.name"
+                     style="radio">
+                  <parameter
+                        name="org.eclipse.ptp.rdt.sync.ui.syncCommand.syncModeParameter"
+                        value="set_active_before_build">
+                  </parameter>
+               </command>
+               <command
+                     commandId="org.eclipse.ptp.rdt.sync.ui.SyncCommand"
                      label="%SyncAll.name"
                      style="radio">
                   <parameter

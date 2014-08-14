@@ -49,6 +49,7 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 	private static final String syncAllCommand = "sync_all"; //$NON-NLS-1$
 	private static final String setNoneCommand = "set_none"; //$NON-NLS-1$
 	private static final String setActiveCommand = "set_active"; //$NON-NLS-1$
+	private static final String setActiveBeforeBuildCommand = "set_active_before_build"; //$NON-NLS-1$
 	private static final String setAllCommand = "set_all"; //$NON-NLS-1$
 	private static final String syncAutoCommand = "sync_auto"; //$NON-NLS-1$
 	private static final String syncFileList = "sync_file_list"; //$NON-NLS-1$
@@ -90,6 +91,8 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 				SyncManager.syncAll(null, project, SyncFlag.BOTH, syncExceptionHandler);
 			} else if (command.equals(setNoneCommand)) {
 				SyncManager.setSyncMode(project, SyncMode.NONE);
+			} else if (command.equals(setActiveBeforeBuildCommand)) {
+				SyncManager.setSyncMode(project, SyncMode.ACTIVE_BEFORE_BUILD);
 			} else if (command.equals(syncAutoCommand)) {
 				SyncManager.setSyncAuto(!(SyncManager.getSyncAuto()));
 				// If user switches to automatic sync'ing, go ahead and sync based on current setting for project
@@ -197,8 +200,9 @@ public class SyncMenuOperation extends AbstractHandler implements IElementUpdate
 
 		SyncMode syncMode = SyncManager.getSyncMode(project);
 		if ((command.equals(setActiveCommand) && syncMode == SyncMode.ACTIVE)
+				|| (command.equals(setActiveBeforeBuildCommand) && syncMode == SyncMode.ACTIVE_BEFORE_BUILD)
 				|| (command.equals(setAllCommand) && syncMode == SyncMode.ALL)
-				|| (command.equals(setNoneCommand) && (syncMode == SyncMode.NONE || syncMode == SyncMode.UNAVAILABLE))
+				|| (command.equals(setNoneCommand) && (syncMode == SyncMode.NONE|| syncMode == SyncMode.UNAVAILABLE))
 				|| (command.equals(syncAutoCommand) && SyncManager.getSyncAuto())) {
 			element.setChecked(true);
 		} else {
