@@ -15,7 +15,7 @@
 	<name>PTP Parent</name>
 
 	<properties>
-		<ptp-version>8.0.1</ptp-version>
+		<ptp-version>8.1.0</ptp-version>
 		<eclipse-release>luna</eclipse-release>
 		<tycho-version>0.19.0</tycho-version>
 		<tycho-extras-version>${tycho-version}</tycho-extras-version>
