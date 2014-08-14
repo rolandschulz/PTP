@@ -23,7 +23,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ptp.ems.core.EnvManagerRegistry;
 import org.eclipse.ptp.ems.core.IEnvManager;
-import org.eclipse.ptp.ems.core.IEnvManager2;
 import org.eclipse.ptp.ems.ui.EnvManagerConfigWidget;
 import org.eclipse.ptp.ems.ui.IErrorListener;
 import org.eclipse.ptp.internal.ems.ui.messages.Messages;
@@ -386,11 +385,7 @@ public final class EnvManagerChecklist extends Composite {
 
 			@Override
 			public List<String> computeItems(IProgressMonitor monitor) throws Exception {
-				if (envManager instanceof IEnvManager2) {
-					return ((IEnvManager2)envManager).determineAvailableElements(monitor, selectedItems);
-				} else {
-					return envManager.determineAvailableElements(monitor);
-				}
+				return envManager.determineAvailableElements(monitor);
 			}
 
 			@Override

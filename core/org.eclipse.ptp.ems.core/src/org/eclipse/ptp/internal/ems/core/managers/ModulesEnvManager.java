@@ -21,9 +21,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ptp.ems.core.EnvManagerConfigString;
 import org.eclipse.ptp.ems.core.IEnvManager;
-import org.eclipse.ptp.ems.core.IEnvManager2;
 import org.eclipse.ptp.internal.ems.core.messages.Messages;
 import org.eclipse.remote.core.exception.RemoteConnectionException;
 
@@ -32,7 +30,7 @@ import org.eclipse.remote.core.exception.RemoteConnectionException;
  * 
  * @author Jeff Overbey
  */
-public final class ModulesEnvManager extends AbstractEnvManager implements IEnvManager2 {
+public final class ModulesEnvManager extends AbstractEnvManager {
 
 	/** Command used by {@link #getDescription(IProgressMonitor)}. Output must match {@value #MODULES_SIGNATURE}. */
 	private static final String CMD_MODULE_HELP = "module help"; //$NON-NLS-1$
@@ -108,18 +106,7 @@ public final class ModulesEnvManager extends AbstractEnvManager implements IEnvM
 
 	@Override
 	public List<String> determineAvailableElements(IProgressMonitor pm) throws RemoteConnectionException, IOException {
-		return determineAvailableElements(pm, Collections.<String>emptyList());
-	}
-
-	@Override
-	public List<String> determineAvailableElements(IProgressMonitor pm, List<String> selectedModules) throws RemoteConnectionException, IOException {
-		EnvManagerConfigString config = new EnvManagerConfigString();
-		config.setEnvMgmtEnabled(true);
-		config.setManualConfig(false);
-		config.setConfigElements(selectedModules);
-		String script = createBashScript(pm, false, config, CMD_MODULE_AVAIL);
-		final List<String> output = runCommand(pm, false, "bash", "--login", script); //$NON-NLS-1$ //$NON-NLS-2$
-
+		final List<String> output = runCommandInBashLoginShell(pm, CMD_MODULE_AVAIL);
 		if (output == null) {
 			return Collections.<String> emptyList();
 		} else {
