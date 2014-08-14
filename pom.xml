@@ -16,6 +16,7 @@
 
 	<properties>
 		<ptp-version>8.1.0</ptp-version>
+		<remote-version>1.1.0</remote-version>
 		<eclipse-release>luna</eclipse-release>
 		<tycho-version>0.19.0</tycho-version>
 		<tycho-extras-version>${tycho-version}</tycho-extras-version>
@@ -24,7 +25,7 @@
 		<cdt-site>http://download.eclipse.org/tools/cdt/builds/${eclipse-release}/milestones/rc4b</cdt-site>	
 		<egit-site>http://download.eclipse.org/egit/updates-3.4.1</egit-site>
 		<photran-site>http://download.eclipse.org/tools/ptp/builds/hudson/ptp-release-photran</photran-site>
-		<remote-site>http://download.eclipse.org/tools/ptp/builds/remote/${eclipse-release}/milestones/RC4</remote-site>
+		<remote-site>http://download.eclipse.org/tools/ptp/builds/remote/${remote-version}</remote-site>
 		<license-site>http://download.eclipse.org/cbi/updates/license</license-site>
 		<!-- The following property is used by the production profile to install the final repo and  -->
 		<!-- associated components. It should be overridden if installing into a different location. -->
