@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ptp.ems.core.EnvManagerConfigString;
 import org.eclipse.ptp.ems.core.IEnvManager;
 import org.eclipse.ptp.ems.core.IEnvManager2;
+import org.eclipse.ptp.ems.core.IEnvManagerConfig;
 import org.eclipse.ptp.internal.ems.core.messages.Messages;
 import org.eclipse.remote.core.exception.RemoteConnectionException;
 
@@ -54,6 +55,9 @@ public final class ModulesEnvManager extends AbstractEnvManager implements IEnvM
 
 	/** Format string for a command to echo a line of output. */
 	private static final String CMDFMT_ECHO = "echo '%s'"; //$NON-NLS-1$
+	
+	/** Format string for a command to dump information about all current modules. */
+	private static final String CMDFMT_MODULE_INFO = "module show `module list -t 2>&1 | grep -v Currently`"; //$NON-NLS-1$
 
 	/**
 	 * Pattern that must be matched by (at least) one line of the output of {@link #CMD_MODULE_HELP} in order for the environment
@@ -226,5 +230,18 @@ public final class ModulesEnvManager extends AbstractEnvManager implements IEnvM
 		} else {
 			return Arrays.asList(loadCommand);
 		}
+	}
+
+	@Override
+	public List<String> getModuleIncludes(IProgressMonitor pm, IEnvManagerConfig config) throws IOException, RemoteConnectionException {
+		final List<String> output = runCommandInBashLoginShell(pm, CMD_MODULE_LIST);
+		if (output == null) {
+			return Collections.<String> emptyList();
+		} else {
+			return Collections.unmodifiableList(collectModuleNamesFrom(output));
+		}
+
+		// Parse out includes
+		// Add to include paths
 	}
 }

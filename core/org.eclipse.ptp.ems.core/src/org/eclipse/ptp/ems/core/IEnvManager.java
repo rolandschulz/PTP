@@ -170,6 +170,17 @@ public interface IEnvManager {
 	public String getBashConcatenation(String separator, boolean echo, IEnvManagerConfig config, String commandToExecuteAfterward);
 
 	/**
+	 * Get includes for the current set of modules
+	 * @param pm 
+	 * @param config 
+	 * @return 
+	 * @throws IOException
+	 * @throws RemoteConnectionException 
+	 * @since 3.1
+	 */
+	public List<String> getModuleIncludes(IProgressMonitor pm, IEnvManagerConfig config) throws IOException, RemoteConnectionException;
+
+	/**
 	 * Creates a temporary file on the remote machine and writes a Bash shell script into that file which will configure the remote
 	 * environment with the given elements, execute the given command, and then delete the temporary file (shell script).
 	 * 
