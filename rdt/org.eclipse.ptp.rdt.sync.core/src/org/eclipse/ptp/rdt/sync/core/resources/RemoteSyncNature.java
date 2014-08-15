@@ -123,8 +123,7 @@ public class RemoteSyncNature implements IProjectNature {
 	 */
 	@Override
 	public void configure() throws CoreException {
-		// TODO Auto-generated method stub
-
+		// nothing to do
 	}
 
 	/*
@@ -134,8 +133,7 @@ public class RemoteSyncNature implements IProjectNature {
 	 */
 	@Override
 	public void deconfigure() throws CoreException {
-		// TODO Auto-generated method stub
-
+		// nothing to do
 	}
 
 	/*
