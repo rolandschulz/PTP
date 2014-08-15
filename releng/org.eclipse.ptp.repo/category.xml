@@ -60,9 +60,6 @@
    <feature url="features/org.eclipse.photran.xlf_0.0.0.jar" id="org.eclipse.photran.xlf" version="0.0.0">
       <category name="Fortran Development Tools (Photran)"/>
    </feature>
-   <feature url="features/org.eclipse.rephraserengine_0.0.0.jar" id="org.eclipse.rephraserengine" version="0.0.0">
-      <category name="Fortran Development Tools (Photran)"/>
-   </feature>
    <feature url="features/org.eclipse.ptp.rdt.editor_0.0.0.jar" id="org.eclipse.ptp.rdt.editor" version="0.0.0">
       <category name="Remote Development Tools"/>
    </feature>
