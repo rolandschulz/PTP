@@ -24,7 +24,7 @@
 		<tm-site>http://download.eclipse.org/tm/updates/3.6milestones/RC4</tm-site>
 		<cdt-site>http://download.eclipse.org/tools/cdt/builds/${eclipse-release}/milestones/rc4b</cdt-site>	
 		<egit-site>http://download.eclipse.org/egit/updates-3.4.1</egit-site>
-		<photran-site>http://download.eclipse.org/tools/ptp/builds/hudson/ptp-release-photran</photran-site>
+		<photran-site>http://download.eclipse.org/tools/ptp/builds/hudson/ptp-nightly-photran</photran-site>
 		<remote-site>http://download.eclipse.org/tools/ptp/builds/remote/${remote-version}</remote-site>
 		<license-site>http://download.eclipse.org/cbi/updates/license</license-site>
 		<!-- The following property is used by the production profile to install the final repo and  -->
