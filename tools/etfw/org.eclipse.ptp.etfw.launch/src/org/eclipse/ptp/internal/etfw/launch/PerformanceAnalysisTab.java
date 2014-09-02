@@ -446,28 +446,31 @@ public class PerformanceAnalysisTab extends LaunchConfigurationTab implements IT
 			if (parser.equals(IToolLaunchConfigurationConstants.USE_SAX_PARSER)) {
 				saxETFWTab.performApply(configuration);
 			} else {
+				configuration.setAttribute(BUILDONLY, buildOnlyCheck.getSelection());
+				configuration.setAttribute(ANALYZEONLY, analyzeonlyCheck.getSelection());
+
 				if (toolCombo == null) {
 					configuration.setAttribute(SELECTED_TOOL, PreferenceConstants.getWorkflow());
 				} else if (toolCombo.getSelectionIndex() > 0) {
 					configuration.setAttribute(SELECTED_TOOL, toolCombo.getItem(toolCombo.getSelectionIndex()));
-					if (launchTabParent != null) {
-						try {
-							String controlid = launchTabParent.getJobControl().getControlId();
-							String attributeName = controlid + IToolLaunchConfigurationConstants.DOT
-									+ JAXBCoreConstants.CURRENT_CONTROLLER;
-							String oldController = configuration.getAttribute(attributeName, JAXBCoreConstants.ZEROSTR);
-							launchTabParent.performApply(configuration);
-
-							// performApply sets controller to the tab of the ETFw workflow, reset back to resources tab
-							configuration.setAttribute(attributeName, oldController);
-						} catch (CoreException e) {
-							e.printStackTrace();
-						}
-					}
+				} else {
+					return;
 				}
 
-				configuration.setAttribute(BUILDONLY, buildOnlyCheck.getSelection());
-				configuration.setAttribute(ANALYZEONLY, analyzeonlyCheck.getSelection());
+				if (launchTabParent != null) {
+					try {
+						String controlid = launchTabParent.getJobControl().getControlId();
+						String attributeName = controlid + IToolLaunchConfigurationConstants.DOT
+								+ JAXBCoreConstants.CURRENT_CONTROLLER;
+						String oldController = configuration.getAttribute(attributeName, JAXBCoreConstants.ZEROSTR);
+						launchTabParent.performApply(configuration);
+
+						// performApply sets controller to the tab of the ETFw workflow, reset back to resources tab
+						configuration.setAttribute(attributeName, oldController);
+					} catch (CoreException e) {
+						e.printStackTrace();
+					}
+				}
 			}
 		}
 	}
@@ -555,6 +558,7 @@ public class PerformanceAnalysisTab extends LaunchConfigurationTab implements IT
 		return true;
 	}
 
+	@Override
 	public Image getImage() {
 		return LaunchImages.getImage(LaunchImages.IMG_PERFORMANCE_TAB);
 	}
