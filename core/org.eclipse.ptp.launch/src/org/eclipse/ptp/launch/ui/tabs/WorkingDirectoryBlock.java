@@ -262,7 +262,7 @@ public class WorkingDirectoryBlock extends LaunchConfigurationTab {
 				if (fileManager != null) {
 					fileManager.setConnection(conn[0]);
 					fileManager.showConnections(false);
-					String path = fileManager.browseFile(getShell(), Messages.WorkingDirectoryBlock_Select_Working_Directory,
+					String path = fileManager.browseDirectory(getShell(), Messages.WorkingDirectoryBlock_Select_Working_Directory,
 							getFieldContent(workingDirText.getText()), 0);
 					if (path != null) {
 						workingDirText.setText(path.toString());
