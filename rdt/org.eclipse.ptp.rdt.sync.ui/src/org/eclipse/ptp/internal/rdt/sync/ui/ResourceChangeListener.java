@@ -12,6 +12,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.internal.rdt.sync.ui;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -59,8 +62,6 @@ public class ResourceChangeListener {
 				}
 				return;
 			}
-			if(!SyncManager.getSyncAuto())
-				return;
 			for (IResourceDelta delta : event.getDelta().getAffectedChildren()) {
 				IProject project = delta.getResource().getProject();
 				if (project == null) {
@@ -68,18 +69,27 @@ public class ResourceChangeListener {
 				}
 				if (RemoteSyncNature.hasNature(project)) {
 					SyncMode syncMode = SyncManager.getSyncMode(project);
+					boolean syncOn = true;
+					if (!(SyncManager.getSyncAuto()) || syncMode == SyncMode.NONE) {
+						syncOn = false;
+					}
 					SyncConfig syncConfig = SyncConfigManager.getActive(project);
 					/*
 					 * syncConfig can be null when sync nature is added to the project as this generates a resource change event
 					 */
 					if (syncConfig != null) {
 						try {
+							Set<SyncFlag> f = SyncFlag.RL_ONLY;
 							if (delta.getKind() == IResourceDelta.CHANGED && syncConfig.isSyncOnSave()) {
 								// Do a local-to-remote sync to update any changes reported in delta.
-								if (syncMode == SyncMode.ALL) {
-									SyncManager.syncAll(delta, project, SyncFlag.LR_ONLY, new CommonSyncExceptionHandler(true,false));
+								if ((syncMode == SyncMode.UNAVAILABLE) || (!syncOn)) {
+									continue;
+								} else if (syncMode == SyncMode.ALL) {
+									SyncManager.syncAll(delta, project, SyncFlag.LR_ONLY, new CommonSyncExceptionHandler(true,
+											false));
 								} else if (syncMode == SyncMode.ACTIVE) {
-									SyncManager.sync(delta, project, SyncFlag.LR_ONLY, new CommonSyncExceptionHandler(true, false));
+									SyncManager
+											.sync(delta, project, SyncFlag.LR_ONLY, new CommonSyncExceptionHandler(true, false));
 								}
 							}
 						} catch (CoreException e) {

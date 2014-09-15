@@ -10,7 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ptp.rdt.sync.core;
 
+import java.io.IOException;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -90,20 +92,12 @@ public class SyncManager {
 		}
 	}
 
-	// ACTIVE: Sync with current active configuration after saving
-	// ACTIVE_BEFORE_BUILD: Don't sync after saving, instead sync just before building
-	// ALL: Sync with all configurations after saving
+	// ACTIVE: Sync with current active configuration
+	// ALL: Sync with all configurations
 	// NONE: Do not transfer files but still call sync and do bookkeeping
 	// UNAVAILABLE: Do not call sync. (Used internally during project creation and deletion.)
 	public static enum SyncMode {
-		/**
-		 * @since 4.1
-		 */
-		ACTIVE_BEFORE_BUILD,
-		ACTIVE,
-		ALL,
-		NONE,
-		UNAVAILABLE
+		ACTIVE, ALL, NONE, UNAVAILABLE
 	};
 
 	private static final String SYNC_MODE_KEY = "sync-mode"; //$NON-NLS-1$
@@ -617,21 +611,6 @@ public class SyncManager {
 	public static Job syncBlocking(IResourceDelta delta, IProject project, Set<SyncFlag> syncFlags, IProgressMonitor monitor,
 			ISyncExceptionHandler seHandler) throws CoreException {
 		return sync(delta, project, syncFlags, true, true, seHandler, monitor);
-	}
-	
-	/**
-	 * Wait until there are no synchronizations pending for this project/location pair.
-	 * @param project
-	 * @param config
-	 * @throws CoreException 
-	 * @since 4.1
-	 */
-	public static void syncJoin(IProject project,SyncConfig config) throws CoreException {
-		String currentSyncServiceId = config.getSyncProviderId();
-		ISynchronizeService syncService = SyncManager.getSyncService(currentSyncServiceId);
-		Set<SyncFlag> syncFlags = new HashSet<SyncFlag>();
-		syncFlags.add(SyncFlag.WAIT_FOR_LR);
-		syncService.synchronize(project, config.getRemoteLocation(), null, null, syncFlags);
 	}
 
 	// Static class - do not allow creating of instances

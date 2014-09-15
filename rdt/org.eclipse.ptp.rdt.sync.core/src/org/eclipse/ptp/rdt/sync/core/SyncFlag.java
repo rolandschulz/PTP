@@ -30,13 +30,7 @@ public enum SyncFlag {
 	 * Sync remote to local
 	 * @since 4.0
 	 */
-	SYNC_RL,
-	
-	/**
-	 * Wait only
-	 * @since 4.1
-	 */
-	WAIT_FOR_LR;
+	SYNC_RL;
 
 	/**
 	 * Convenience flag set for sync'ing both directions (from local to remote and from remote to local).
