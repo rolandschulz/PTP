@@ -274,12 +274,13 @@ public class CommandJob extends Job implements ICommandJob {
 			int exit = 0;
 			if (uuid != null) {
 				if (!command.isWaitForId()) {
-					try {
-						// Must call waitFor() here to correctly obtain exit status. Calling exitValue() can result in a -1 value
-						// being returned if the job has not completed.
-						exit = process.waitFor();
-					} catch (InterruptedException ignored) {
-						// Ignore
+					/*
+					 * Cannot call waitFor here as it will block if the process has not terminated. The best we can do is a check of
+					 * the exit value if the process has completed. Some processes may not have completed by this point, so they
+					 * will need to be checked later.
+					 */
+					if (process.isCompleted()) {
+						exit = process.exitValue();
 					}
 					if (exit != 0) {
 						return processError(builder.command().get(0), exit, null);
