@@ -6,12 +6,12 @@
   <parent>
     <groupId>org.eclipse.ptp</groupId>
     <artifactId>ptp-parent</artifactId>
-    <version>8.1.0-SNAPSHOT</version>
+    <version>8.1.1-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
   <artifactId>org.eclipse.ptp.remote</artifactId>
-  <version>8.1.0-SNAPSHOT</version>
+  <version>8.1.1-SNAPSHOT</version>
   <packaging>eclipse-feature</packaging>
   <groupId>org.eclipse.ptp.features</groupId>
 </project>
