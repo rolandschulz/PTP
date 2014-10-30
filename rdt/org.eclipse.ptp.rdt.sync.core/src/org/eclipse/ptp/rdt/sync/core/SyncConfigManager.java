@@ -182,7 +182,7 @@ public class SyncConfigManager {
 	public static URI getActiveSyncLocationURI(IResource resource) throws CoreException {
 		SyncConfig config = getActive(resource.getProject());
 		if (config != null) {
-			return getSyncLocationURI(config, resource.getProject());
+			return getSyncLocationURI(config, resource);
 		}
 		return null;
 	}
