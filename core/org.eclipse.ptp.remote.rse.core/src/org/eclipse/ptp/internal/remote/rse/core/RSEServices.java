@@ -1,17 +1,21 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- * IBM Corporation - Initial API and implementation
+ *    IBM Corporation - Initial API and implementation
+ *    Markus Schorn - Fix for Bug 449362
  *******************************************************************************/
 package org.eclipse.ptp.internal.remote.rse.core;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ptp.internal.remote.rse.core.messages.Messages;
 import org.eclipse.remote.core.AbstractRemoteServices;
 import org.eclipse.remote.core.IRemoteConnectionManager;
@@ -24,6 +28,7 @@ public class RSEServices extends AbstractRemoteServices {
 	private ISystemRegistry fRegistry = null;
 	private IRemoteConnectionManager fConnMgr = null;
 	private boolean fInitialized;
+	private boolean fTriggeredInitJob;
 
 	public RSEServices(IRemoteServicesDescriptor descriptor) {
 		super(descriptor);
@@ -47,6 +52,21 @@ public class RSEServices extends AbstractRemoteServices {
 		// will be attempted again.
 
 		if (!RSECorePlugin.isInitComplete(RSECorePlugin.INIT_ALL)) {
+			// The call to 'isInitComplete(...)' does not trigger the 
+			// initialization of RSE. Let's call 'waitForInitCompletion', which
+			// will do that.
+			if (!fTriggeredInitJob) {
+				fTriggeredInitJob = true;
+				new Job(Messages.RSEServices_Initializing_RSE_services) {
+					protected IStatus run(IProgressMonitor monitor) {
+						try {
+							return RSECorePlugin.waitForInitCompletion();
+						} catch (InterruptedException e) {
+							return Status.CANCEL_STATUS;
+						}
+					}
+				}.schedule();
+			}
 			return;
 		}
 
