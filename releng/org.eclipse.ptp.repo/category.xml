@@ -66,9 +66,13 @@
    <feature url="features/org.eclipse.remote_0.0.0.jar" id="org.eclipse.remote" version="0.0.0">
       <category name="Remote Services"/>
    </feature>
+   <feature url="features/org.eclipse.remote.source_0.0.0.jar" id="org.eclipse.remote.source" version="0.0.0">
+      <category name="Remote Services SDK"/>
+   </feature>
 
    <category-def name="Parallel Tools Platform" label="Parallel Tools Platform"/>
    <category-def name="Remote Development Tools" label="Remote Development Tools"/>
    <category-def name="Remote Services" label="Remote Services"/>
+   <category-def name="Remote Services SDK" label="Remote Services SDK"/>
    <category-def name="Fortran Development Tools (Photran)" label="Fortran Development Tools (Photran)"/>
 </site>
