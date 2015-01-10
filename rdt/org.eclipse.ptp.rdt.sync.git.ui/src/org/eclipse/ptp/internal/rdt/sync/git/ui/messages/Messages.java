@@ -18,7 +18,6 @@ public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ptp.internal.rdt.sync.git.ui.messages.messages"; //$NON-NLS-1$
 	public static String GitParticipant_1;
 	public static String GitParticipant_2;
-	public static String GitParticipant_3;
 	public static String GitParticipant_browse;
 	public static String GitParticipant_location;
 	public static String SyncGitPreferencePage_0;

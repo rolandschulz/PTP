@@ -11,18 +11,34 @@
 
 package org.eclipse.ptp.internal.rdt.sync.git.ui;
 
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.List;
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableContext;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.IWizardContainer;
+import org.eclipse.jface.wizard.ProgressMonitorPart;
+import org.eclipse.ptp.internal.rdt.sync.git.core.CommandRunner;
+import org.eclipse.ptp.internal.rdt.sync.git.core.CommandRunner.CommandResults;
 import org.eclipse.ptp.internal.rdt.sync.git.ui.messages.Messages;
+import org.eclipse.ptp.internal.rdt.sync.ui.RDTSyncUIPlugin;
+import org.eclipse.ptp.rdt.sync.core.RecursiveSubMonitor;
+import org.eclipse.ptp.rdt.sync.core.exceptions.RemoteExecutionException;
+import org.eclipse.ptp.rdt.sync.core.exceptions.RemoteSyncException;
 import org.eclipse.ptp.rdt.sync.ui.AbstractSynchronizeParticipant;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipant;
 import org.eclipse.ptp.rdt.sync.ui.ISynchronizeParticipantDescriptor;
 import org.eclipse.remote.core.IRemoteConnection;
 import org.eclipse.remote.core.IRemoteFileManager;
+import org.eclipse.remote.core.exception.RemoteConnectionException;
 import org.eclipse.remote.ui.IRemoteUIConnectionManager;
 import org.eclipse.remote.ui.IRemoteUIConstants;
 import org.eclipse.remote.ui.IRemoteUIFileManager;
@@ -38,6 +54,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
@@ -48,14 +66,20 @@ import org.eclipse.swt.widgets.Text;
  */
 public class GitParticipant extends AbstractSynchronizeParticipant {
 	private static final String FILE_SCHEME = "file"; //$NON-NLS-1$
+    private static final String TOUCH_TEST_FILE = ".touch_test_file_ptp_sync";
+	private static final Display display = Display.getCurrent();
+	private IRunnableContext fContext;
 
 	private IRemoteConnection fSelectedConnection;
 
 	private String fProjectName = ""; //$NON-NLS-1$
+	private String remoteError = null;
 	private Button fBrowseButton;
 
 	private Text fLocationText;
 	private RemoteConnectionWidget fRemoteConnectionWidget;
+	private ProgressMonitorPart fValidateRemoteProgressBar;
+	private Button fValidateRemoteButton;
 	private IWizardContainer container;
 
 	// If false, automatically select "Remote Tools" provider instead of letting the user select the provider.
@@ -85,6 +109,7 @@ public class GitParticipant extends AbstractSynchronizeParticipant {
 	 */
 	@Override
 	public void createConfigurationArea(Composite parent, IRunnableContext context) {
+		fContext = context;
 		this.container = (IWizardContainer) context;
 		final Composite configArea = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
@@ -154,6 +179,39 @@ public class GitParticipant extends AbstractSynchronizeParticipant {
 				}
 			}
 		});
+
+		// Button to start validation of remote
+		fValidateRemoteButton = new Button(configArea, SWT.PUSH);
+		fValidateRemoteButton.setText("Validate Remote");
+		fValidateRemoteButton.setEnabled(false);
+		fValidateRemoteButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				checkRemote();
+				if (remoteError == null) {
+					fLocationText.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
+				} else {
+					fLocationText.setForeground(display.getSystemColor(SWT.COLOR_DARK_RED));
+				}
+				update();
+			}
+		});
+
+		// Progress bar for validation of remote directory
+		// Place inside group to create a border
+		Group progressGroup = new Group(configArea, SWT.NONE);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 1;
+		gd.grabExcessHorizontalSpace = true;
+		progressGroup.setLayoutData(gd);
+		progressGroup.setLayout(new GridLayout());
+		fValidateRemoteProgressBar = new ProgressMonitorPart(progressGroup, new GridLayout(), true);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 1;
+		gd.grabExcessHorizontalSpace = true;
+		fValidateRemoteProgressBar.setLayoutData(gd);
+		fValidateRemoteProgressBar.setEnabled(false);
+		// fValidateRemoteProgressBar.setBackground(display.getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW));
 	}
 
 	/**
@@ -199,9 +257,8 @@ public class GitParticipant extends AbstractSynchronizeParticipant {
 		if (fLocationText.getText().length() == 0) {
 			return Messages.GitParticipant_2;
 		}
-		IRemoteFileManager fileManager = fSelectedConnection.getFileManager();
-		if (fileManager.toURI(fLocationText.getText()) == null) {
-			return Messages.GitParticipant_3;
+		if (remoteError != null) {
+			return remoteError;
 		}
 		// should we check permissions of: fileManager.getResource(fLocationText.getText()).getParent() ?
 		return null;
@@ -248,6 +305,13 @@ public class GitParticipant extends AbstractSynchronizeParticipant {
 	private void handleConnectionSelected() {
 		fSelectedConnection = fRemoteConnectionWidget.getConnection();
 		fLocationText.setText(getDefaultPathDisplayString());
+		if ((fValidateRemoteButton != null) && (!fValidateRemoteButton.isDisposed())) {
+			if (fSelectedConnection == null) {
+				fValidateRemoteButton.setEnabled(false);
+			} else {
+				fValidateRemoteButton.setEnabled(true);
+			}
+		}
 		update();
 	}
 
@@ -261,6 +325,118 @@ public class GitParticipant extends AbstractSynchronizeParticipant {
 	public boolean isConfigComplete() {
 		return getErrorMessage() == null;
 	}
+
+	// Check if the remote location is valid. If valid, set "remoteError" to null. Otherwise, remoteError contains the error message.
+	private void checkRemote() {
+		remoteError = null;
+		RecursiveSubMonitor progress = RecursiveSubMonitor.convert(fValidateRemoteProgressBar, 30);
+		progress.beginTask("Validate Remote", 30);
+		IPath parentPath = new Path(fLocationText.getText());
+		if (!parentPath.isAbsolute()) {
+			remoteError = "Remote path must be absolute";
+		}
+		try {
+			// Find the lowest-level file in the path that exist.
+			int numloops = 0;
+			while(!parentPath.isRoot()) {
+				List<String> args = Arrays.asList("test", "-e", parentPath.toString());
+				String errorMessage = null;
+				CommandResults cr = null;
+				try {
+					progress.subTask("Checking if " + parentPath.toString() + " exists");
+					cr = this.runRemoteCommand(args, progress.newChild(1));
+				} catch (RemoteExecutionException e) {
+					errorMessage = this.buildErrorMessage(null, "Unable to verify remote", e);
+				}
+
+				if (errorMessage != null) {
+					MessageDialog.openError(null, "Remote Execution", errorMessage);
+					remoteError = "Unable to verify remote path";
+				} else if (cr.getExitCode() == 0) {
+					break;
+				}
+
+				parentPath = parentPath.removeLastSegments(1);
+				numloops++;
+				if (numloops > 9) {
+					progress.setWorkRemaining(21);
+				}
+			}
+			progress.setWorkRemaining(20);
+
+			// Assume parent path is a directory and see if we can write a test file to it.
+			// Note that this test fails if parent path is not a directory, so no need to test that case.
+			String touchFile = parentPath.append(new Path(TOUCH_TEST_FILE)).toString();
+			List<String> args = Arrays.asList("touch", touchFile);
+			String errorMessage = null;
+			CommandResults cr = null;
+			try {
+				progress.subTask("Testing if " + parentPath.toString() + " is accessible");
+				cr = this.runRemoteCommand(args, progress.newChild(10));
+			} catch (RemoteExecutionException e) {
+				errorMessage = this.buildErrorMessage(null, "Unable to verify remote", e);
+			}
+
+			if (errorMessage != null) {
+				MessageDialog.openError(null, "Remote Execution", errorMessage);
+				remoteError = "Unable to verify remote path";
+			} else if (cr.getExitCode() != 0) {
+				remoteError = "Remote path invalid";
+			}
+
+			// Remove the test file
+			args = Arrays.asList("rm", "-f", touchFile);
+			errorMessage = null;
+			cr = null;
+			try {
+				progress.subTask("Cleaning up from testing");
+				cr = this.runRemoteCommand(args, progress.newChild(10));
+				errorMessage = this.buildErrorMessage(cr, "Unable to remove test file: " + touchFile, null);
+			} catch (RemoteExecutionException e) {
+				errorMessage = this.buildErrorMessage(null, "Unable to remove test file: " + touchFile, e);
+			}
+
+			if (errorMessage != null) {
+				MessageDialog.openError(null, "Remote Execution", errorMessage);
+			}
+		} finally {
+			if (fValidateRemoteProgressBar != null) {
+				fValidateRemoteProgressBar.done();
+			}
+		}
+	}
+
+    // Wrapper for running commands - wraps exceptions and invoking of command runner inside container run command.
+    private CommandResults remoteCommandResults;
+    private CommandResults runRemoteCommand(final List<String> command, final IProgressMonitor progress)
+    		throws RemoteExecutionException {
+            try {
+                    fContext.run(false, true, new IRunnableWithProgress() {
+                    		// TODO: Is it okay that we ignore the input monitor? Seems wrong...
+                            @Override
+                            public void run(IProgressMonitor monitor) throws InvocationTargetException {
+                                    try {
+                                            remoteCommandResults = CommandRunner.executeRemoteCommand(fSelectedConnection, command, null, progress);
+                                    } catch (RemoteSyncException e) {
+                                            throw new InvocationTargetException(e);
+                                    } catch (IOException e) {
+                                            throw new InvocationTargetException(e);
+                                    } catch (InterruptedException e) {
+                                            throw new InvocationTargetException(e);
+                                    } catch (RemoteConnectionException e) {
+                                            throw new InvocationTargetException(e);
+                                    } finally {
+                                            monitor.done();
+                                    }
+                            }
+                    });
+            } catch (InvocationTargetException e) {
+                    throw new RemoteExecutionException(e.getCause());
+            } catch (InterruptedException e) {
+                    throw new RemoteExecutionException(e);
+            }
+            return remoteCommandResults;
+    }
 
 	/*
 	 * (non-Javadoc)
@@ -282,4 +458,28 @@ public class GitParticipant extends AbstractSynchronizeParticipant {
 		}
 		container.updateButtons();
 	}
+
+    // Builds error message for command.
+    // Either the command result or the exception should be null, but not both.
+    // baseMessage cannot be null.
+    // Returns error message or null if no error occurred (can only occur if cr is not null).
+    private String buildErrorMessage(CommandResults cr, String baseMessage, RemoteExecutionException e) {
+            // Command successful
+            if (cr != null && cr.getExitCode() == 0) {
+                    return null;
+            }
+
+            // Command runs but unsuccessfully
+            if (cr != null) {
+                    return baseMessage + ": " + cr.getStderr();
+            }
+
+            // Command did not run - exception thrown
+            String errorMessage = baseMessage;
+            if (e.getMessage() != null) {
+                    errorMessage += ": " + e.getMessage();
+            }
+
+            return errorMessage;
+    }
 }
